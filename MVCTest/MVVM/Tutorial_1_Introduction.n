@@ -1,0 +1,49 @@
+﻿using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Nemerle.Xml;
+using Nemerle.NemerleWeb;
+using System.Xml.Linq;
+
+namespace MVCTest
+{
+  [Record, ViewModel]
+  public class IntroductionViewModel
+  {
+    public FirstName     : string { get; set; }
+    public LastName      : string { get; set; }
+    public FullName      : string { get { FirstName + " " + LastName } }
+        
+    CapitalizeLastName() : void
+    {
+        LastName = LastName.ToUpper();
+    }
+  }
+
+  public partial module Views
+  {
+    [View()]
+    public IntroductionView(viewModel : IntroductionViewModel) : string
+    {
+      _ = viewModel;
+      <# 
+        <div xmlns="">
+            <p>First name: <strong data-bind="text: FirstName"> </strong></p>
+            <p>Last name: <strong data-bind="text: LastName"> </strong></p>
+
+            <p>First name: <input data-bind="value: FirstName" /></p>
+            <p>Last name: <input data-bind="value: LastName" /></p>
+
+            <p>Full name: <strong data-bind="text: FullName"> </strong></p>
+
+            <button data-bind="click: CapitalizeLastName">Go caps</button>
+        </div>
+      #>
+    }
+  }
+}

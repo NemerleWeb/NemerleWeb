@@ -1,0 +1,114 @@
+﻿using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Extensions;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Nemerle.Xml;
+using Nemerle.NemerleWeb;
+using System.Xml.Linq;
+
+namespace MVCTest
+{
+    [ViewModel]
+    public class LoadingAndSavingViewModel
+    {        
+        public class Task
+        {
+            public Title : string { get; set; }
+            public IsDone : bool { get; set; }
+            public _destroy : bool { get; set; }
+        }
+        
+        public Tasks : List[Task] { get; set; }
+        public NewTaskText : string { get; set; }
+        public IncompleteTasks : IEnumerable[Task]
+        {
+            get {
+                def result = List();
+                foreach(t in Tasks)
+                    when(!t.IsDone)
+                        result.Add(t);
+                result
+            }
+        }
+        
+        public this() {
+            server.Load(tasks => {
+                Tasks = tasks.ToList();
+            });
+        }
+        
+        AddTask() : void {
+            Tasks.Add(Task() <- (Title = NewTaskText, IsDone = false, _destroy = false));
+            NewTaskText = "";
+        }
+        
+        RemoveTask(task : Task) : void {
+            task._destroy = true;
+            _ = Tasks.Remove(task);
+        }
+        
+        Save() : void {
+            server.Save(Tasks, result => {                
+                js alert(result);
+            });
+        }
+        
+        public class Server
+        {
+            public Save(tasks : IEnumerable[Task]) : string
+            {
+                $<#
+                Server received $(tasks.Count()) task(s). 
+                $(tasks.Count(t => t.IsDone)) of which are marked as done. 
+                $(tasks.Count(t => t._destroy)) of which are marked for deletion.#>;
+            }
+            
+            public Load() : IEnumerable[Task]
+            {
+                [
+                    Task() <- (Title = "Wire the money to Panama", IsDone = true, _destroy = false),
+                    Task() <- (Title = "Get hair dye, beard trimmer, dark glasses and \"passport\"", IsDone = false, _destroy = false),
+                    Task() <- (Title = "Book taxi to airport", IsDone = false, _destroy = false),
+                    Task() <- (Title = "Arrange for someone to look after the cat", IsDone = false, _destroy = false),
+                ]
+            }
+        }
+    }
+
+    public partial module Views
+    {
+        [View()]
+        public LoadingAndSavingView(viewModel : LoadingAndSavingViewModel) : string
+        {
+            _ = viewModel;
+            <# 
+            <div xmlns="">
+                <h3>Tasks</h3>
+
+                <form data-bind="submit: AddTask">
+                    Add task: <input data-bind="value: NewTaskText" placeholder="What needs to be done?" />
+                    <button type="submit">Add</button>
+                </form>
+
+                <ul data-bind="foreach: Tasks, visible: Tasks().length > 0">
+                    <li>
+                        <input type="checkbox" data-bind="checked: IsDone" />
+                        <input data-bind="value: Title, disable: IsDone" />
+                        <a href="#" data-bind="click: $root.RemoveTask">Delete</a>
+                    </li> 
+                </ul>
+
+                You have <b data-bind="text: IncompleteTasks().length">&nbsp;</b> incomplete task(s)
+                <span data-bind="visible: IncompleteTasks().length == 0"> - it's beer time!</span>
+
+                <button data-bind="click: Save">Save</button>
+            </div>
+          #>
+        }
+    }
+}

@@ -1,0 +1,78 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Nemerle.NemerleWeb
+{  
+  module JsKnownMembers
+  {
+      public Convert(call : TExpr.Call, builder : TExpr -> JsAST) : JsAST
+      {      
+        def result = match(call) {
+        | Call(MethodRef(obj = Call(MethodRef(meth = serverMeth, obj = obj), _, _), meth = meth), parms, _) when serverMeth.Name == "get_server" && obj is TExpr.This =>       
+            def parameters = if(parms.Length > 0) parms.Zip(meth.GetParameters()).Take(parms.Length - 1).Map((cp, mp) => (mp.name, builder(cp.expr))) else [];
+            def callback = if(parms.Length > 0) builder(parms.Last().expr) else JsAST.Void();
+            match(callback) { 
+            | Seq(DefValue as dv :: cb :: []) => JsAST.Seq([dv, JsAST.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, cb)])
+            | _ => JsAST.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, callback)
+            }            
+        | Call(MethodRef(obj = o, meth = meth), parms, _) => ConvertMethod(o.Type.TypeInfo, builder(o), meth, parms.Map(p => builder(p.expr)))
+        | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) => ConvertMethod(fromType.TypeInfo, builder(left), meth, parms.Map(p => builder(p.expr)))
+        | Call(OpCode as op, parms, _) => JsAST.Call(builder(op), parms.Map(p => builder(p.expr)))
+        | Call(Base, _, _) => JsAST.Void()        
+        | Call(s, _, _) => Message.Warning($"Unsupported call to $s"); JsAST.Void()
+        }        
+        result
+      }
+      
+      public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
+      {
+        def typeName = if(type.SystemType != null) type.SystemType.FullName else type.FrameworkTypeName;
+        match(member.Name, parms) {
+        | ("op_Inequality", _) => JsAST.Call(JsAST.OpCode("!="), parms)
+        | ("ToString", h :: _) => JsAST.Call(JsAST.MethodRef(h, "toString"), [])
+        | ("ToString", [])  => JsAST.Call(JsAST.MethodRef(left, "toString"), [])
+        | ("Concat", h :: t) when typeName == typeof(string).FullName                    => JsAST.Call(JsAST.MethodRef(h, "concat"), t)
+        | ("ToUpper", []) when typeName == typeof(string).FullName                       => JsAST.Call(JsAST.MethodRef(left, "toUpperCase"), [])
+        | ("op_Implicit", h :: [])                                                            => h
+        | ("op_Implicit", h :: t)                                                             => JsAST.Seq(h :: t)
+        | ("op_Addition", parms)                                                              => JsAST.Call(JsAST.OpCode("+"), parms)
+        //List
+        | ("get_Item", h :: []) when typeName == typeof(List[_]).FullName     => JsAST.Call(JsAST.Indexer(left), [h])
+        | ("Add",      h :: []) when typeName == typeof(List[_]).FullName     => JsAST.Call(JsAST.MethodRef(PropertyToField(left), "push"), [h])
+        | ("Remove",   h :: []) when typeName == typeof(List[_]).FullName     => JsAST.Call(JsAST.MethodRef(PropertyToField(left), "remove"), [h])
+        | ("ToList", h :: []) when typeName == typeof(Enumerable).FullName    => h
+        //
+        | ("WriteLine", h :: []) when typeName == typeof(Console).FullName    => JsAST.Call(JsAST.MethodRef(JsAST.LocalRef("console"), "log"), [h])
+        //
+        | (".ctor", parms) when typeName == typeof(list[_].Cons).FullName => JsAST.Array(parms.Filter(p => !(p is JsAST.NotImpl()))) //filter out [] in the end
+        | (".ctor", parms) when typeName == typeof(List[_]).FullName => JsAST.Array(parms.Filter(p => !(p is JsAST.NotImpl())))
+        | (".ctor", parms) => JsAST.Call(JsAST.Constructor(type), parms)
+        | _ when member.Name.StartsWith("get_")                                               => JsAST.PropertyGet(left, RemoveGetSet(member.Name))
+        | (_, h :: []) when member.Name.StartsWith("set_")                                    => JsAST.PropertySet(left, RemoveGetSet(member.Name), h)            
+        | _                                                                                   => Message.Warning(member.Location, $"$(member.Name) not implemented in JS"); JsAST.Call(JsAST.MethodRef(left, RemoveGetSet(member.Name)), parms)
+        }
+      }
+      
+      private RemoveGetSet(methodName : string) : string {
+        if(IsGetSet(methodName)) methodName.Substring(4) else methodName
+      }
+      
+      private IsGetSet(methodName : string) : bool {
+          methodName.StartsWith("get_") || methodName.StartsWith("set_")
+      }
+      
+      private PropertyToField(prop : JsAST) : JsAST
+      {          
+      | PropertyGet(obj, name) => JsAST.FieldRef(obj, name)
+      | _ => prop
+      }
+  }
+}

@@ -1,0 +1,191 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Globalization;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using BF = System.Reflection.BindingFlags;
+using TExpr = Nemerle.Compiler.Typedtree.TExpr;
+
+namespace Nemerle.NemerleWeb
+{
+  [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
+  macro ViewModel(tb : TypeBuilder)
+  {
+    ViewModelImpl.DoTransformBeforeInheritance(tb, Macros.ImplicitCTX())
+  }
+  
+  [MacroUsage(MacroPhase.BeforeTypedMembers, MacroTargets.Class)]
+  macro ViewModel(tb : TypeBuilder) 
+  {
+    ViewModelImpl.DoTransformBeforeTypedMembers(tb, Macros.ImplicitCTX())
+  }
+  
+  [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Class)]
+  macro ViewModel(tb : TypeBuilder) 
+  {
+    ViewModelImpl.DoTransform(tb, Macros.ImplicitCTX())
+  }
+  
+  module ViewModelImpl
+  {    
+    public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
+    {
+      Macros.DefineCTX(typer);
+      def vmInterface = <[ ttype: Nemerle.NemerleWeb.IViewModel ]>;
+      def superTypes = tb.GetDirectSuperTypes();
+      
+      unless (superTypes != null && superTypes.Exists(t => t.Equals(vmInterface)))
+        tb.AddImplementedInterface(<[ Nemerle.NemerleWeb.IViewModel ]>);
+    }
+    
+    public DoTransformBeforeTypedMembers(_tb : TypeBuilder, _typer : Typer) : void
+    {
+    }
+    
+    public DoTransform(tb : TypeBuilder, typer : Typer) : void
+    {            
+      Macros.DefineCTX(typer);
+      
+      def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");
+      def serverMethods = Dictionary();
+      when(serverClass != null)
+      {          
+          def env = typer.Manager.CoreEnv;
+          def env = env.EnterIntoNamespace(tb.NamespaceNode);
+          def controllerName = tb.Name + "Controller";
+          def field = <[ decl: _server : $(serverClass.Name : usesite) = $(serverClass.Name : usesite)() ]>;          
+          def ctb = env.Define(<[ decl: 
+            public class $(controllerName : usesite) : System.Web.Mvc.Controller
+            {}
+          ]>);
+          ctb.Define(field);
+                 
+          def ptb = tb.DefineNestedType(<[ decl:
+              class ServerProxy
+              {}
+          ]>);
+          tb.Define(<[ decl: server : ServerProxy { get { ServerProxy() } } ]>);
+          
+          foreach(member in serverClass.GetMembers()) {
+              | method is IMethod when !method.IsConstructor && method.DeclaringType.FullName == serverClass.FullName => 
+                  def parameters = method.GetParameters().Map(p => <[ $(p.Name : usesite) : $(p.ty : typed) ]>);              
+                  def fparms = parameters.Map(PParameter);
+                  def methodName = ctb.ParsedName.NewName(method.Name);
+                            
+                  ctb.Define(<[ decl: 
+                    public $(methodName : name) (..$fparms) : System.Web.Mvc.ActionResult
+                    {
+                        def result = _server.$(method.Name : dyn)(..$parameters);
+                        def settings = Newtonsoft.Json.JsonSerializerSettings();
+                        settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
+                        Content(Newtonsoft.Json.JsonConvert.SerializeObject(result, settings));
+                    }
+                  ]>);
+                  
+                  serverMethods.Add(method.Name, fparms);
+                  
+                  def fparms = fparms.Append([<[ parameter: callback : $(method.ReturnType : typed) -> void ]>]);
+                  
+                  ptb.Define(<[ decl:                   
+                    public $(methodName : name) (..$(fparms)) : void
+                    {}
+                  ]>);
+              | _ => ()              
+          }
+        
+          ptb.Compile();
+          ctb.Compile();
+      }
+    
+      //assert2(false);
+      def addParams(parms, expr) : PExpr {
+          match(parms) {
+          | head :: tail => 
+          def newExpr = <[ $expr; __constructorParams.Add($(head : dyn)); ]>;
+          addParams(tail, newExpr);                
+          | [] => expr
+          }              
+      }          
+      def ienType = <[ ttype : System.Collections.IEnumerable ]>;
+      def cl = JsClass(tb, "  ", ienType, typer);
+      def constructor = cl.Constructor;
+      def constructorParams = if(constructor != null) constructor.GetParameters().Map(p => p.Name) else [];
+      def ctor = constructor :> MethodBuilder;
+      ctor.Body = addParams(constructorParams, <[ $(ctor.Body); "js constructor end"; __constructorParams = List(); ]>);
+      tb.Define(<[ decl: __constructorParams : List[object] ]>);
+      def result = cl.Write();
+      
+      def toTypedObjectFunction = 
+<#
+function ToTypedObject(obj) {
+    if(typeof obj === "string") {
+        try {
+            obj = JSON.parse(obj);
+        } catch(e) {
+        }
+    }
+    
+    if(!!obj.$type) {
+        //var typename = obj.$type.replace(/.*\+(.+),.+/, "$1");
+        var typename = obj.$type.replace(".", "_").replace("+", "_").replace(/(.+),.+/, "$1");
+        var newObj = eval('new ' + typename + '()');        
+        for(var p in obj) {
+            if(obj.hasOwnProperty(p) && newObj.hasOwnProperty(p)) {
+                if(typeof newObj[p] === "function")
+                    newObj[p](ToTypedObject(obj[p]));
+                else 
+                    newObj[p] = ToTypedObject(obj[p]);
+            }
+        }
+        return newObj;
+    }               
+    if(obj instanceof Array) {
+        var newArr = [];
+        for (var i=0, l = obj.length; i < l; newArr.push(ToTypedObject(obj[i++])));
+        return newArr;
+    }
+    return obj;
+};
+#>;        
+      def applyBindings = 
+$<#  ko.applyBindings(new $(JsClass.GetProperName(tb))({0}));#>;
+      _ = tb.DefineWithSource(<[ decl:
+        public GetViewModelScript() : string
+        {
+          def sb = System.Text.StringBuilder();          
+          _ = sb.AppendLine($toTypedObjectFunction);
+          _ = sb.AppendLine($result);
+          def paramList = __constructorParams.Map(obj => "ToTypedObject(" + Utils.ToJson(obj) + ")");
+          _ = sb.AppendLine(string.Format($applyBindings, $"..$(paramList)"));
+          sb.ToString()
+        }
+        ]>);
+        
+      def lambdaMeth = tb.DefineAndReturn(<[ decl: 
+        public GetLambdaScript() : string
+        { "" } ]>) :> MethodBuilder;
+        
+      tb.Manager.TypeTreeBuildFinish += m => {
+          def lambdas = tb.DeclaredNestedTypes
+                          .Filter(t => t.Name.StartsWith("_N__N_"))
+                          .Map(t => JsClass(t, "  ", ienType, typer).Write());
+          def lambdas = $"..$(lambdas; Environment.NewLine)";
+          
+          lambdaMeth.Body = <[ 
+            def sb = System.Text.StringBuilder();
+            sb.AppendLine($lambdas);
+            sb.ToString()
+          ]>;
+          
+          tb.Compile();
+      };
+    }
+  }
+}

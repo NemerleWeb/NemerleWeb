@@ -1,0 +1,40 @@
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Web;
+using System.Web.Mvc;
+
+using Nemerle;
+using Nemerle.NemerleWeb;
+
+namespace MVCTest.Controllers
+{
+	public class HomeController : Controller
+	{
+	    public Index() : ActionResult 
+	    {
+            View();
+        }
+    
+        public Introduction() : ActionResult
+        {
+            View(Utils.MakePageHtml(IntroductionViewModel("John", "Silver"), Views.IntroductionView) : object)
+        }
+        
+        public ListsAndCollections() : ActionResult
+        {
+            View(Utils.MakePageHtml(ListsAndCollectionsViewModel(), Views.ListsAndCollectionsView) : object)
+        }
+        
+        public SinglePageApps() : ActionResult
+        {
+            View(Utils.MakePageHtml(SPAViewModel(), Views.SPAView) : object)
+        }
+        
+        public LoadingAndSaving() : ActionResult
+        {            
+            View(Utils.MakePageHtml(LoadingAndSavingViewModel(), Views.LoadingAndSavingView) : object);
+        }
+        
+    }
+}

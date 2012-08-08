@@ -1,0 +1,210 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+using Nemerle.Compiler.Parsetree;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Nemerle.NemerleWeb
+{
+  public module JsASTBuilder
+  {
+      public Build(expr : TExpr) : JsAST
+      {          
+        match(TryToConvertKnownTemplates(expr)) {
+        | Some(jsast) => jsast
+        | _ =>
+          match(expr) {
+            | Array                             => Message.Warning(expr.Location, "Array not implemented"); JsAST.NotImpl()
+            | ArrayIndexer                      => Message.Warning(expr.Location, "ArrayIndexer not implemented"); JsAST.NotImpl()
+            | Assign(s, t)                      => JsAST.Assign(Build(s), Build(t))
+            | Base                              => Message.Warning(expr.Location, "Base not implemented"); JsAST.NotImpl()
+            | Block(body = body)                => Build(body) 
+            | Cache                             => Message.Warning(expr.Location, "Cache not implemented"); JsAST.NotImpl()
+            | CacheRef                          => Message.Warning(expr.Location, "CacheRef not implemented"); JsAST.NotImpl()
+            | Call as call                      => JsKnownMembers.Convert(call, Build)
+            | ClosureFieldOf                    => Message.Warning(expr.Location, "ClosureFieldOf not implemented"); JsAST.NotImpl()
+            | ClosureObjectOf                   => Message.Warning(expr.Location, "ClosureObjectOf not implemented"); JsAST.NotImpl()
+            | ConstantObjectRef                 => Message.Warning(expr.Location, "ConstantObjectRef not implemented"); JsAST.NotImpl() 
+            | CtorOf                            => Message.Warning(expr.Location, "CtorOf not implemented"); JsAST.NotImpl()
+            | DebugInfo(expr = expr)            => Build(expr)
+            | Def                               => Message.Warning(expr.Location, "Def not implemented"); JsAST.NotImpl()
+            | DefaultValue                      => JsAST.Void()
+            | DefFunctionsIn                    => Message.Warning(expr.Location, "DefFunctionsIn not implemented"); JsAST.NotImpl()
+            | DefValIn(name, val, body)         => JsAST.Seq([JsAST.DefValue(name.Name, Build(val)), Build(body)])
+            | Delayed                           => Message.Warning(expr.Location, "Delayed not implemented"); JsAST.NotImpl()
+            | Error                             => Message.Warning(expr.Location, "Error not implemented"); JsAST.NotImpl()
+            | EventMember                       => Message.Warning(expr.Location, "EventMember not implemented"); JsAST.NotImpl()
+            | FieldMember(obj, fld)             => JsAST.FieldRef(Build(obj), fld.Name) 
+            | FieldOf                           => Message.Warning(expr.Location, "FieldOf not implemented"); JsAST.NotImpl()
+            | Goto(target, _)                   => JsAST.Goto(target)
+            | HasType                           => Message.Warning(expr.Location, "HasType not implemented"); JsAST.NotImpl()
+            | If(cond, then, els, _, _)         => JsAST.If(Build(cond), Build(then), Build(els))
+            | ImplicitValueTypeCtor             => Message.Warning(expr.Location, "ImplicitValueTypeCtor not implemented"); JsAST.NotImpl()
+            | Label(id, body)                   => JsAST.Label(id, Build(body))
+            | Literal(val)                      => 
+                match(val) {                
+                | Null          => JsAST.Literal(JsLiteral.Null())
+                | String (val)  => JsAST.Literal(JsLiteral.String(val))
+                | Float (val)   => JsAST.Literal(JsLiteral.Float(val))
+                | Double (val)  => JsAST.Literal(JsLiteral.Float(val))
+                | Decimal (val) => JsAST.Literal(JsLiteral.Float(Convert.ToDouble(val)))
+                | Char (val)    => JsAST.Literal(JsLiteral.String(val.ToString()))
+                | Bool (val)    => JsAST.Literal(JsLiteral.Bool(val))
+                | Integer (val, isneg, _) => JsAST.Literal(JsLiteral.Integer((val :> int) * (if(isneg) -1 else 1)))
+                | Enum => 
+                    Message.Error("Enums currently not supported");
+                    JsAST.NotImpl();
+                | Void          => JsAST.Void()
+                | _ => Message.Error("Unmatched literal"); JsAST.NotImpl();
+                }
+            | LocalFunRef                       => Message.Warning(expr.Location, "LocalFunRef not implemented"); JsAST.NotImpl()
+            | LocalRef(decl)                    => JsAST.LocalRef(decl.Name)
+            | MacroEnvelope(expanded = ex, original = org, the_macro = _) => 
+                match(org) { 
+                | <[ foreach($it in $coll) $body  ]> => 
+                    def it = it.ToString();
+                    def coll = if(coll.TypedObject is TExpr) Build(coll.TypedObject :> TExpr) else JsAST.LocalRef(coll.ToString());
+                    def body = match(body) {
+                    | Sequence(h :: _) => if(h.TypedObject is TExpr) Build(h.TypedObject :> TExpr) else JsAST.Code(h.ToString());
+                    | pexpr => if(pexpr.TypedObject is TExpr) Build(pexpr.TypedObject :> TExpr) else JsAST.Code(pexpr.ToString());
+                    }
+                    
+                    JsAST.For(it, coll, body);                    
+                | MacroCall(Name(Id = "js"), _, p :: []) => 
+                    match(p) {
+                    | SyntaxElement.Expression(Literal(Literal.String(val))) => JsAST.Code(val)
+                    | _ => JsAST.Code(p.ToString().Trim('\"'));
+                    }                    
+                | _ => Build(ex)
+                }                
+            | Match(expr, _)                => Message.Warning(expr.Location, "Match not implemented"); JsAST.NotImpl()
+            | MethodAddress                     => Message.Warning(expr.Location, "MethodAddress not implemented"); JsAST.NotImpl()
+            | MethodOf                          => Message.Warning(expr.Location, "MethodOf not implemented"); JsAST.NotImpl()
+            | MethodRef(obj, meth, _, _)        => 
+                if(meth.Name.StartsWith("get_") || meth.Name.StartsWith("set_"))
+                    JsAST.MethodRef(Build(obj), meth.Name.Substring(4))
+                else
+                    JsAST.MethodRef(Build(obj), meth.Name)
+            | MultipleAssign                    => Message.Warning(expr.Location, "MultipleAssign not implemented"); JsAST.NotImpl()
+            | OpCode(name)                      => ConvertToJsOpCode(name)
+            | PropertyMember                    => JsAST.NotImpl()
+            | SelfTailCall                      => Message.Warning(expr.Location, "SelfTailCall not implemented"); JsAST.NotImpl()
+            | Sequence(e1, e2)                  => JsAST.Seq([Build(e1), Build(e2)])
+            | StaticEventRef                    => Message.Warning(expr.Location, "StaticEventRef not implemented"); JsAST.NotImpl()
+            | StaticPropertyRef                 => Message.Warning(expr.Location, "StaticPropertyRef not implemented"); JsAST.NotImpl()
+            | StaticRef(from, mem, _)           => JsAST.StaticRef(JsClass.GetProperName(from.TypeInfo), mem.Name)
+            | Switch                            => Message.Warning(expr.Location, "Switch not implemented"); JsAST.NotImpl()
+            | This                              => JsAST.This()
+            | Throw                             => Message.Warning(expr.Location, "Throw not implemented"); JsAST.NotImpl()
+            | Try(_, _)                         => Message.Warning(expr.Location, "Try not implemented"); JsAST.NotImpl()
+            | TryFinally(b, h)                  => JsAST.TryFinally(Build(b), Build(h))
+            | Tuple                             => Message.Warning(expr.Location, "Tuple not implemented"); JsAST.NotImpl()
+            | TupleIndexer                      => Message.Warning(expr.Location, "TupleIndexer not implemented"); JsAST.NotImpl()
+            | TypeConversion(e, _, _, _)        => Build(e)
+            | TypeOf                            => JsAST.NotImpl()
+            | Use                               => JsAST.NotImpl()
+            | _ => Message.Error("Unmatched TExpr $expr"); JsAST.NotImpl();
+          }
+        }
+      } 
+      
+      ConvertToJsOpCode(name : string) : JsAST
+      {
+        | "+.s"                       
+        | "+.u"                       
+        | "+.f"                       => JsAST.OpCode("+")
+        | "<<.s" | "<<.f"                
+        | "<<.u"                      => JsAST.OpCode("<<")
+        | ">>.s" | ">>.f"             
+        | ">>.u"                      => JsAST.OpCode(">>")
+        | "unary.+.s"                    
+        | "unary.+.u"                    
+        | "unary.+.f"                 => JsAST.OpCode("+")
+        | "-.s"                       
+        | "-.u"                       
+        | "-.f"                       
+        | "unary.-.s"                 
+        | "unary.-.f"                 => JsAST.OpCode("-")
+        | "unary.~.u"                    
+        | "unary.~.s"                 => JsAST.OpCode("~")
+        | "++.i4.f"                   
+        | "++.i4.s"                   
+        | "++.i4.u"                   
+        | "++.i4.s.i1"                
+        | "++.i4.u.i1"                
+        | "++.i4.s.i2"                
+        | "++.i4.u.i2"                
+        | "++.i8.f"                   
+        | "++.i8.s"                   
+        | "++.i8.u"                   
+        | "++.r4.f"                   
+        | "++.r8.f"                   => JsAST.OpCode("++")
+        | "--.i4.f"                   
+        | "--.i4.s"                   
+        | "--.i4.u"                   
+        | "--.i4.s.i1"                
+        | "--.i4.u.i1"                
+        | "--.i4.s.i2"                
+        | "--.i4.u.i2"                
+        | "--.i8.f"                   
+        | "--.i8.s"                   
+        | "--.i8.u"                   
+        | "--.r4.f"                   
+        | "--.r8.f"                   => JsAST.OpCode("--")
+        | "unary.~.f"                 => JsAST.OpCode("~")
+        | "*.s"                       
+        | "*.u"                       
+        | "*.f"                       => JsAST.OpCode("*")
+        | "/.s" | "/.f"               
+        | "/.u"                       => JsAST.OpCode("/")
+        | "%.s" | "%.f"               
+        | "%.u"                       => JsAST.OpCode("%")
+        | "|.s" | "|.u" | "|.f" | "|" => JsAST.OpCode("|")
+        | "&.s" | "&.u" | "&.f" | "&" => JsAST.OpCode("&")
+        | "^.s" | "^.u" | "^.f" | "^" => JsAST.OpCode("^")
+        | "bool.!"                    => JsAST.OpCode("!")
+        | "==.ref" | "=="             => JsAST.OpCode("===")
+        | "!=.ref" | "!="             => JsAST.OpCode("!==")
+        | "<.s" | "<.f"               
+        | "<.u"                       => JsAST.OpCode("<")
+        | ">.s" | ">.f"               
+        | ">.u"                       => JsAST.OpCode(">")
+        | "<=.s"                      
+        | "<=.f"                      
+        | "<=.u"                      => JsAST.OpCode("<=")
+        | ">=.s"                      
+        | ">=.f"                      
+        | ">=.u"                      => JsAST.OpCode(">=")
+        | _                           => 
+            Message.Error("unmatched TExpr.Opcode (" + name + ")"); 
+            JsAST.NotImpl();
+      }
+      
+      TryToConvertKnownTemplates(expr : TExpr) : option[JsAST]
+      { 
+          match(expr) {
+          | DefValIn(LocalValue as lv, Call(func = MethodRef(meth = getenum, obj = collection)), body) when lv.Name == "enumerator" && getenum.Name == "GetEnumerator" => 
+            match(body) {
+            | TryFinally(Sequence(Literal, Label(body = MacroEnvelope(expanded = ifexpr))), Call(func = MethodRef(meth = disp))) when disp.Name == "Dispose" => 
+                match(ifexpr) { 
+                | If(cond = Call(OpCode("=="), Parm(expr = TypeConversion(expr = Call(func = MethodRef(meth = movnxt)))) :: Parm(expr = TypeConversion(expr = Literal(Literal.Bool(true)))) :: [], _), e_then = ifbody) when movnxt.Name == "MoveNext" => 
+                    match(ifbody) {
+                    | Label(_, TypeConversion(expr = Sequence(DefValIn(body = DefValIn(body = Sequence(_, foreachbody)), name = iterName), _))) => 
+                        Some(JsAST.For(iterName.Name, Build(collection), Build(foreachbody))) 
+                    | _ => None()
+                    }            
+                | _ => None()
+                }
+            | _ => None() 
+            }
+          | _ => None()
+          }
+      }
+  }
+}

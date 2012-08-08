@@ -1,0 +1,100 @@
+﻿using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Nemerle.Xml;
+using Nemerle.NemerleWeb;
+using System.Xml.Linq;
+
+namespace MVCTest
+{
+  [ViewModel]
+  public class ListsAndCollectionsViewModel
+  {
+    [Record]
+    public class SeatReservation 
+    {
+        public Name : string { get; set; }
+        public Meal : Meal { get; set; }        
+        public FormattedPrice : string 
+        { 
+            get { if(Meal != null) Meal.Price.ToString() else "None" } 
+        }
+    }
+    
+    [Record]
+    public class Meal 
+    {
+        public MealName : string { get; set; }
+        public Price : decimal { get; set; }
+    }
+    
+    public AvailableMeals : List[Meal] { get; set; }
+    public Seats          : List[SeatReservation] { get; set; }
+    public TotalSurcharge : decimal 
+    { 
+        get { 
+            mutable total = 0m;
+            foreach(seat in Seats) {
+                total = total + seat.Meal.Price;
+            }
+            total
+        } 
+    }
+    
+    public this() 
+    {
+        AvailableMeals = [Meal("Potatoes", 1), Meal("Tomatoes", 2)].ToList();
+        Seats = [SeatReservation("Steve", AvailableMeals[0]), 
+                 SeatReservation("Roger", AvailableMeals[1])].ToList();
+    }
+    
+    public AddSeat() : void 
+    {
+        Seats.Add(SeatReservation("", AvailableMeals[0]))
+    }
+    
+    public RemoveSeat(seat : SeatReservation) : bool 
+    {        
+        Seats.Remove(seat)
+    }
+  }
+
+  public partial module Views
+  {
+    [View()]
+    public ListsAndCollectionsView(viewModel : ListsAndCollectionsViewModel) : string
+    {
+      _ = viewModel;
+      <# 
+        <div xmlns="">
+            <h2>Your seat reservations (<span data-bind="text: Seats().length"> </span>)</h2>
+
+            <table>
+                <thead><tr>
+                    <th>Passenger name</th><th>Meal</th><th>Surcharge</th><th></th>
+                </tr></thead>
+                <tbody data-bind="foreach: Seats">
+                    <tr>
+                        <td><input data-bind="value: Name" /></td>
+                        <td><select data-bind="options: $root.AvailableMeals, value: Meal, optionsText: 'MealName'"></select></td>
+                        <td data-bind="text: FormattedPrice"></td>
+                        <td><a href="#" data-bind="click: function() { $root.RemoveSeat(this) }">Remove</a></td>
+                    </tr>    
+                </tbody>
+            </table>
+
+            <button data-bind="click: AddSeat, enable: Seats().length < 5">Reserve another seat</button>
+
+            <h3 data-bind="visible: TotalSurcharge() > 0">
+                Total surcharge: <span data-bind="text: TotalSurcharge().toFixed(2)"></span>
+            </h3>
+        </div>
+      #>
+    }
+  }
+}

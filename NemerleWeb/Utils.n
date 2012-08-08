@@ -1,0 +1,53 @@
+﻿using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+using System.IO;
+
+using Nemerle.Extensions;
+using Nemerle.Xml;
+using Nemerle.NemerleWeb;
+using System.Xml.Linq;
+
+using Newtonsoft.Json;
+
+namespace Nemerle.NemerleWeb
+{
+  public module Utils
+  {
+    public ToJson(value : string) : string
+    {
+      def sb = Text.StringBuilder(value.Length + 2);
+      _ = sb.Append(' ') // this char will replased later by '"'.
+      .Append(value).Replace(<#"#>, <#""#>).Replace("\n", <#\n#>)
+      .Append('"');
+      
+      sb[0] = '"';
+      
+      sb.ToString()
+    }
+    
+    public ToJson[T](value : T) : string
+    {
+        JsonConvert.SerializeObject(value, JsonSerializerSettings() <- TypeNameHandling = TypeNameHandling.Objects);
+    }
+        
+    public MakePageHtml[ViewModel](viewModel : ViewModel, makeView : ViewModel -> string) : string
+      where ViewModel: IViewModel
+    {
+      def testView = makeView(viewModel);            
+      def script = $<#
+  <script type='text/javascript'>
+    $(viewModel.GetLambdaScript())
+    $(viewModel.GetViewModelScript())
+  </script>
+      #>;
+      
+      testView + script;
+    }
+  }
+}

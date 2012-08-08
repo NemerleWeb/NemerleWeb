@@ -1,0 +1,222 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Nemerle.NemerleWeb
+{
+    [Record]
+    public class JsClass
+    {
+        public ClassType : TypeBuilder { get; set; }
+        public Indent : string    { get; set; }
+        public IEnumerableType : TypeVar { get; set; }
+        public Typer : Typer { get; set; }
+        
+        IsViewmodel : bool { get { !ClassType.Name.StartsWith("_N_") } }
+        public Constructor : IMethod { 
+            get {
+                def constructors = ClassType.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
+                when(constructors.Length > 1)
+                      Message.Error(ClassType.Location, "Multiple constructors are not supported");  
+                constructors.FirstOrDefault()
+            }
+        }
+        
+        public Write() : string 
+        {
+            def bodyIndent = Indent + "  ";
+            def constructorParams = GetConstructorParams();
+            def properties = GetProperties(bodyIndent);
+            def computedProperties = GetComputedProperties(bodyIndent);
+            def fields = GetFields(bodyIndent);         
+            def constructorBody = GetConstructorBody(bodyIndent);
+            def staticConstructorBody = GetStaticConstructorBody(Indent);
+            def methods = GetMethods(bodyIndent);                        
+            def innerClasses = GetNestedClasses();
+            def returning = match(ClassType.BaseType.Name) {
+                | "Function" => bodyIndent + "return this.apply;"
+                | "FunctionVoid" => bodyIndent + "return this.apply_void;"
+                | _ => ""
+            }
+            
+$<#
+$innerClasses
+$(Indent)function $(GetProperName(ClassType))(..$constructorParams) {
+$(bodyIndent)var self = this;
+$properties
+$fields
+$methods
+$constructorBody
+$computedProperties
+$returning
+$(Indent)}
+$staticConstructorBody#>
+        }
+        
+        GetConstructorParams() : list[string] 
+        { 
+            def ctor = Constructor;
+            if(ctor != null) ctor.GetParameters().Map(p => p.Name) else [];            
+        }
+        
+        GetProperties(indent : string) : string 
+        {            
+            def props = ClassType.GetProperties().Filter(p => p.Name != "server").Cast.[PropertyBuilder]();
+            def normalProps = props.Filter(p => !(p.CanRead && !p.CanWrite));
+                                       
+            def propVal(prop : PropertyBuilder) {
+                def isArray = TypeIsArray(prop.GetGetter().ReturnType.TypeInfo);
+                match((IsViewmodel, isArray)) {
+                | (true, true) => "ko.observableArray([])"
+                | (true, false) => "ko.observable()"
+                | (false, true) => "[]";   
+                | (false, false) => "{}";
+                }
+            }
+            def propStrings = normalProps.Map(p => indent + $<#this.$(p.Name) = $(propVal(p))#>);
+            $<#..$(propStrings; ";\n")#>;
+        }
+        
+        GetComputedProperties(indent : string) : string 
+        {            
+            def props = ClassType.GetProperties().Filter(p => p.Name != "server").Cast.[PropertyBuilder]();
+            def computedProps = props.Filter(p => p.CanRead && !p.CanWrite);
+                                       
+            def propVal(prop : PropertyBuilder) {
+                def computedBody = TranslateMethodBody(prop.GetGetter() :> MethodBuilder, indent);                    
+$<#ko.computed(function() {
+$computedBody
+})#>
+            }
+            def propStrings = computedProps.Map(p => indent + $<#this.$(p.Name) = $(propVal(p))#>);
+            $<#..$(propStrings; ";\n")#>;
+        }
+        
+        GetFields(indent : string) : string 
+        {
+            def fields = ClassType.GetFields().Where(f => !f.IsStatic && f.Name != "server" && !f.Name.StartsWith("_N_") && f.Name != "__constructorParams");
+            def fldVal(fld : IField) {
+                if(TypeIsArray(fld.GetMemType().TypeInfo)) "[]" else "{}";
+            }
+            def fieldStrings = fields.Map(f => indent + $<#this.$(f.Name) = $(fldVal(f))#>);
+            $<#..$(fieldStrings; ";\n")#>;
+        }
+        
+        GetStaticFields(indent : string) : string 
+        {
+            def fields = ClassType.GetFields().Where(f => f.IsStatic);
+            def fldVal(_fld : IField) {
+                "{}";                    
+            }
+            def fieldStrings = fields.Map(f => indent + $<#$(ClassType.Name).$(f.Name) = $(fldVal(f))#>);
+            $<#..$(fieldStrings; ";\n")#>;
+        }
+        
+        GetConstructorBody(indent : string) : string
+        {
+            //assert2(false);
+            def ctor = Constructor;
+            if(ctor != null) {
+                def ctorBody = TranslateMethodBody(ctor :> MethodBuilder, indent);
+                def endIndex = ctorBody.IndexOf("js constructor end");
+                if(endIndex != -1) ctorBody.Substring(0, endIndex - 1) else ctorBody
+            }
+            else
+                ""
+        }
+        
+        GetStaticConstructorBody(indent : string) : string 
+        {
+            def ctors = ClassType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic);            
+            def ctor = ctors.FirstOrDefault() :> MethodBuilder;
+            if(ctor != null)
+                TranslateMethodBody(ctor,indent);
+            else
+                ""
+        }
+        
+        GetMethods(indent : string) : string 
+        {
+            def methodParms(method) {
+                method.GetParameters().Map(p => p.Name);
+            }
+            def methods = ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                   .Filter(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
+                                   .Filter(m => !m.IsConstructor)
+                                   .Map(m => 
+$<#$(indent)this.$(m.Name) = function(..$(methodParms(m))) { 
+$(TranslateMethodBody(m :> MethodBuilder, indent + "  "))
+$(indent)}#>);
+
+            $<#..$(methods; "\n")#>
+        }
+        
+        GetNestedClasses() : string 
+        {            
+            def nested = ClassType.DeclaredNestedTypes
+                                  .Filter(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server
+                                  .Filter(c => !c.Name.StartsWith("_N__N_")) //Not generated class
+                                  .Map(c => JsClass(c, Indent, IEnumerableType, Typer).Write());
+            $"..$(nested; Environment.NewLine)"
+        }
+        
+        ApplyAttributesToGeneratedClasses() : void
+        {
+            ClassType.DeclaredNestedTypes
+                     .Filter(t => t.Name.StartsWith("_N__N_"))
+                     .Iter(t => t.Ast.AddCustomAttribute(<[ Nemerle.NemerleWeb.GeneratedClass ]>));
+        }
+        
+        TypeIsArray(type : TypeInfo) : bool 
+        {
+            type.IsDerivedFrom(IEnumerableType.TypeInfo) && type.FullName != "System.String";
+        }
+        
+        public GetMethodJsAST(method : MethodBuilder) : JsAST 
+        {        
+            match(method.Header.Body) {
+            | FunBody.Typed(typedBody) =>
+                mutable jsAst = JsASTBuilder.Build(typedBody);
+                jsAst = JsASTHelper.LabelsToNamedWhile(jsAst);
+                jsAst = JsASTHelper.TransformBottomUp(jsAst);            
+                jsAst = JsASTHelper.FlattenAndRemoveVoids(jsAst);
+                jsAst = JsASTHelper.RemoveEmptyBranches(jsAst);
+            
+                when(!(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor)
+                    jsAst = JsASTHelper.MakeReturn(jsAst);
+                
+                match(jsAst) {
+                | Seq => jsAst
+                | _ => JsAST.Seq([jsAst])
+                }
+            | FunBody.Parsed => 
+                def oldEmitDebug = Typer.Manager.Options.EmitDebug;
+                Typer.Manager.Options.EmitDebug = false;
+                def methodTyper = Typer(ClassType, null, method, method.Env);
+                methodTyper.RunFullTyping();
+                Typer.Manager.Options.EmitDebug = oldEmitDebug;
+                GetMethodJsAST(method);
+            | _ => 
+                Message.Error("Couldn't type body"); 
+                JsAST.Void();
+            }
+        }
+    
+        public TranslateMethodBody(meth : MethodBuilder, indent = "" : string) : string
+        {           
+            def ast = GetMethodJsAST(meth);
+            ast.Write(indent);
+        }
+        
+        public static GetProperName(type : TypeInfo) : string {
+            type.FullName.Replace(".", "_")
+        }
+    }
+}

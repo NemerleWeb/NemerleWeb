@@ -1,0 +1,31 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
+using Nemerle.Compiler.Typedtree;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+
+namespace Nemerle.NemerleWeb
+{
+  macro Js(parameters : PExpr)
+  // See: http://nemerle.org/wiki/Macros_tutorial#Adding_new_syntax_to_the_compiler and http://nemerle.org/wiki/Syntax_extensions
+  syntax ("js", parameters) 
+  {
+    JsImpl.DoTransform(Macros.ImplicitCTX(), parameters)
+  }
+  
+  module JsImpl
+  {
+    public DoTransform(typer : Typer, _parameters : PExpr) : PExpr
+    {
+      Macros.DefineCTX(typer);
+      <[ ]>
+    }
+  }
+}
