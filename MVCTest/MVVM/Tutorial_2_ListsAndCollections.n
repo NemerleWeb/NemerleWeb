@@ -62,14 +62,9 @@ namespace MVCTest
     {        
         Seats.Remove(seat)
     }
-  }
-
-  public partial module Views
-  {
-    [View()]
-    public ListsAndCollectionsView(viewModel : ListsAndCollectionsViewModel) : string
+    
+    public View() : string
     {
-      _ = viewModel;
       <# 
         <div xmlns="">
             <h2>Your seat reservations (<span data-bind="text: Seats().length"> </span>)</h2>

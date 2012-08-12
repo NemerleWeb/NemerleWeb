@@ -36,10 +36,9 @@ namespace Nemerle.NemerleWeb
         JsonConvert.SerializeObject(value, JsonSerializerSettings() <- TypeNameHandling = TypeNameHandling.Objects);
     }
         
-    public MakePageHtml[ViewModel](viewModel : ViewModel, makeView : ViewModel -> string) : string
-      where ViewModel: IViewModel
+    public MakePageHtml[ViewModel](viewModel : IViewModel) : string
     {
-      def testView = makeView(viewModel);            
+      def testView = viewModel.View();
       def script = $<#
   <script type='text/javascript'>
     $(viewModel.GetLambdaScript())

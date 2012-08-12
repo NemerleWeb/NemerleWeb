@@ -95,14 +95,9 @@ namespace MVCTest
                 allMail.FirstOrDefault(m => m.Id == mailId);
             }
         }
-    }
-
-    public partial module Views
-    {
-        [View()]
-        public SPAView(viewModel : SPAViewModel) : string
+        
+        public View() : string
         {
-            _ = viewModel;
             <# 
             <div xmlns="">
                 <ul class="folders" data-bind="foreach: Folders">

@@ -18,22 +18,22 @@ namespace MVCTest.Controllers
     
         public Introduction() : ActionResult
         {
-            View(Utils.MakePageHtml(IntroductionViewModel("John", "Silver"), Views.IntroductionView) : object)
+            View(Utils.MakePageHtml(IntroductionViewModel("John", "Silver")) : object)
         }
         
         public ListsAndCollections() : ActionResult
         {
-            View(Utils.MakePageHtml(ListsAndCollectionsViewModel(), Views.ListsAndCollectionsView) : object)
+            View(Utils.MakePageHtml(ListsAndCollectionsViewModel()) : object)
         }
         
         public SinglePageApps() : ActionResult
         {
-            View(Utils.MakePageHtml(SPAViewModel(), Views.SPAView) : object)
+            View(Utils.MakePageHtml(SPAViewModel()) : object)
         }
         
         public LoadingAndSaving() : ActionResult
         {            
-            View(Utils.MakePageHtml(LoadingAndSavingViewModel(), Views.LoadingAndSavingView) : object);
+            View(Utils.MakePageHtml(LoadingAndSavingViewModel()) : object);
         }
         
     }

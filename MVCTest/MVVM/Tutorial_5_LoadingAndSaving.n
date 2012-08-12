@@ -78,14 +78,9 @@ namespace MVCTest
                 ]
             }
         }
-    }
-
-    public partial module Views
-    {
-        [View()]
-        public LoadingAndSavingView(viewModel : LoadingAndSavingViewModel) : string
+        
+        public View() : string
         {
-            _ = viewModel;
             <# 
             <div xmlns="">
                 <h3>Tasks</h3>

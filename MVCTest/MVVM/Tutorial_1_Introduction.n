@@ -23,14 +23,10 @@ namespace MVCTest
     {
         LastName = LastName.ToUpper();
     }
-  }
-
-  public partial module Views
-  {
-    [View()]
-    public IntroductionView(viewModel : IntroductionViewModel) : string
+    
+    public View() : string
     {        
-      $<# 
+      $<#
         <div xmlns="">
             <p>First name: <strong> </strong></p>
             <p>Last name: <strong data-bind="text: LastName"> </strong></p>

@@ -12,5 +12,6 @@ namespace Nemerle.NemerleWeb
   {
     GetLambdaScript() : string;
     GetViewModelScript() : string;
+    View() : string;
   }
 }

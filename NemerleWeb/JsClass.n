@@ -40,6 +40,7 @@ namespace Nemerle.NemerleWeb
                 ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                          .Filter(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
                          .Filter(m => !m.IsConstructor)
+                         .Filter(m => m.Name != "View")
             }
         }
         
