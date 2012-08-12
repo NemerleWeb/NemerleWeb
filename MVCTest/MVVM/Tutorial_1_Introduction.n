@@ -29,11 +29,10 @@ namespace MVCTest
   {
     [View()]
     public IntroductionView(viewModel : IntroductionViewModel) : string
-    {
-      _ = viewModel;
-      <# 
+    {        
+      $<# 
         <div xmlns="">
-            <p>First name: <strong data-bind="text: FirstName"> </strong></p>
+            <p>First name: <strong> </strong></p>
             <p>Last name: <strong data-bind="text: LastName"> </strong></p>
 
             <p>First name: <input data-bind="value: FirstName" /></p>

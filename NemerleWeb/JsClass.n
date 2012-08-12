@@ -18,8 +18,34 @@ namespace Nemerle.NemerleWeb
         public Indent : string    { get; set; }
         public IEnumerableType : TypeVar { get; set; }
         public Typer : Typer { get; set; }
+        public Properties : list[PropertyBuilder] 
+        {
+            get {
+                def props = ClassType.GetProperties().Filter(p => p.Name != "server").Cast.[PropertyBuilder]();
+                props.Filter(p => !(p.CanRead && !p.CanWrite));
+            }
+        }
+        
+        public ComputedProperties : list[PropertyBuilder] 
+        {
+            get {
+                def props = ClassType.GetProperties().Filter(p => p.Name != "server").Cast.[PropertyBuilder]();
+                props.Filter(p => p.CanRead && !p.CanWrite);
+            }
+        }
+        
+        public Methods : list[IMethod] 
+        {
+            get {
+                ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                         .Filter(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
+                         .Filter(m => !m.IsConstructor)
+            }
+        }
+        
         
         IsViewmodel : bool { get { !ClassType.Name.StartsWith("_N_") } }
+        
         public Constructor : IMethod { 
             get {
                 def constructors = ClassType.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
@@ -67,10 +93,7 @@ $staticConstructorBody#>
         }
         
         GetProperties(indent : string) : string 
-        {            
-            def props = ClassType.GetProperties().Filter(p => p.Name != "server").Cast.[PropertyBuilder]();
-            def normalProps = props.Filter(p => !(p.CanRead && !p.CanWrite));
-                                       
+        {                                                   
             def propVal(prop : PropertyBuilder) {
                 def isArray = TypeIsArray(prop.GetGetter().ReturnType.TypeInfo);
                 match((IsViewmodel, isArray)) {
@@ -80,22 +103,19 @@ $staticConstructorBody#>
                 | (false, false) => "{}";
                 }
             }
-            def propStrings = normalProps.Map(p => indent + $<#this.$(p.Name) = $(propVal(p))#>);
+            def propStrings = Properties.Map(p => indent + $<#this.$(p.Name) = $(propVal(p))#>);
             $<#..$(propStrings; ";\n")#>;
         }
         
         GetComputedProperties(indent : string) : string 
-        {            
-            def props = ClassType.GetProperties().Filter(p => p.Name != "server").Cast.[PropertyBuilder]();
-            def computedProps = props.Filter(p => p.CanRead && !p.CanWrite);
-                                       
+        {                              
             def propVal(prop : PropertyBuilder) {
                 def computedBody = TranslateMethodBody(prop.GetGetter() :> MethodBuilder, indent);                    
 $<#ko.computed(function() {
 $computedBody
 })#>
             }
-            def propStrings = computedProps.Map(p => indent + $<#this.$(p.Name) = $(propVal(p))#>);
+            def propStrings = ComputedProperties.Map(p => indent + $<#this.$(p.Name) = $(propVal(p))#>);
             $<#..$(propStrings; ";\n")#>;
         }
         
@@ -147,10 +167,7 @@ $computedBody
             def methodParms(method) {
                 method.GetParameters().Map(p => p.Name);
             }
-            def methods = ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                                   .Filter(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
-                                   .Filter(m => !m.IsConstructor)
-                                   .Map(m => 
+            def methods = Methods.Map(m => 
 $<#$(indent)this.$(m.Name) = function(..$(methodParms(m))) { 
 $(TranslateMethodBody(m :> MethodBuilder, indent + "  "))
 $(indent)}#>);
