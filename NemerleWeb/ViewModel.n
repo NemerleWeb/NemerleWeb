@@ -218,6 +218,8 @@ $<#  ko.applyBindings(new $(JsClass.GetProperName(tb))({0}));#>;
         defineBinding("click", methodNames);
         defineBinding("submit", methodNames);
         
+        defineBinding("value", allPropNames);
+        
         def tp = PExpr.FromQualifiedIdentifier(tb.Manager, "bind_type");
         tb.Define(<[ decl: public static bind : $tp = $tp() ]>);
         bind.Compile();
