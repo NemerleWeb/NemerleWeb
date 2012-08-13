@@ -1,0 +1,104 @@
+﻿using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using PExpr = Nemerle.Compiler.Parsetree.PExpr;
+
+namespace Nemerle.NemerleWeb
+{
+  using XmlAst;
+  
+  enum SpliceType
+  {
+    | Expr | List | Foreach | When | Unless
+  }
+  
+  [Record]
+  class PegLocated { public StartPos : int; public EndPos : int; }
+ 
+  [Record] class TagOpen  : PegLocated { public ident : Splicable; public attrs : list[XmlAst] }
+  [Record] class TagClose : PegLocated { public ident : Splicable; }
+  
+  [Record]
+  variant Splicable : PegLocated
+  {
+    | Value       { value : string; }
+    | Expr        { expr : string; }
+    | ControlExpr { name : string; namePos : int; expr : string; }
+    | ListExpr    { expr : string; }
+
+    #region ToString, Equals & GetHashCode
+    
+    public override ToString() : string
+    {
+      match (this)
+      {
+        | Value(value)                => value
+        | Expr(expr)                  => $"$$$(expr)"
+        | ListExpr(expr)              => $"..$$$(expr)"
+        | ControlExpr(name, _, body)  => $"$$$name $body"
+      }
+    }
+    
+    [Nemerle.OverrideObjectEquals]
+    public Equals(other : Splicable) : bool
+    {
+      match (this, other)
+      {
+        | (Value(value1),           Value(value2)          ) => string.Equals(value1, value2)
+        | (Expr(expr1),             Expr(expr2)            ) => string.Equals(expr1, expr2)
+        | (ListExpr(expr1),         ListExpr(expr2)        ) => string.Equals(expr1, expr2)
+        | _                                                  => false
+      }
+    }
+    
+    public override GetHashCode() : int
+    {
+      match (this)
+      {
+        | Value(value)                => 2 + value.GetHashCode()
+        | Expr(expr)                  => 3 + expr.GetHashCode()
+        | ListExpr(expr)              => 4 + expr.GetHashCode()
+        | ControlExpr(name, _, body)  => 5 + name.GetHashCode() ^ body.GetHashCode()
+      }
+    }
+    
+    #endregion
+  }
+  
+  [Record]
+  variant XmlAst : PegLocated
+  {
+    | Attr        { name : Splicable; value  : Splicable; }
+    | Text        { value : Splicable; }
+    | Tag         { name : Splicable; content : list[XmlAst]; }
+    | TagSplice   { expr : string; isList : bool; }
+    | AttrSplice  { expr : string; spliceType : SpliceType; }
+    
+    public override ToString() : string
+    {
+      match (this)
+      {
+        | Attr(name, value)   => $"$name=$value"
+        | Text(value)         => value.ToString()
+        | Tag(name, []) => $<#<$name/>#>
+        | Tag(name, content) when content.ForAll(_ is Attr)  => $<#<$name ..$(content; " ") />#>
+        | Tag(name, content) when content.ForAll(x => !(x is Attr))  => 
+          $<#<$name>..$(content; "")</$name>#>
+          
+        | Tag(name, content) => 
+          def attrs = content.Filter(_ is Attr);
+          def oterContent = content.Filter(x => x is Text || x is Tag);
+          $<#<$name ..$(attrs; " ")>..$(oterContent; "")</$name>#>
+        | AttrSplice(expr, SpliceType.List) | TagSplice(expr, true)  => $"..$$$expr"
+        | AttrSplice(expr, SpliceType.Expr) | TagSplice(expr, false) => $"$$$expr"
+        | AttrSplice(expr, SpliceType.Foreach) => $"$$foreach $expr"
+        | AttrSplice(expr, SpliceType.When) => $"$$foreach $expr"
+        | AttrSplice(expr, SpliceType.Unless) => $"$$foreach $expr"
+      }
+    }
+  }
+}

@@ -1,0 +1,283 @@
+﻿using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Nemerle.Peg;
+
+using NLocation = Nemerle.Compiler.Location;
+
+namespace Nemerle.NemerleWeb
+{
+  using XmlAst;
+  
+  [PegGrammar(Options = EmitDebugSources, start,
+  grammar
+  {
+    digit                      = ['0'..'9'];
+    letter                     = (['A'..'Z', 'a' .. 'z', '\u037F' .. '\u1FFF'] / '_');
+    s                          = (' ' / '\t' / '\n' / '\r')*;
+    identifier                 = '@'? letter (letter / digit)*;
+    nameStartChar              = '_' / ['A'..'Z', 'a' .. 'z', '\u00C0'..'\u00D6', '\u00D8'..'\u00F6', '\u00F8'..'\u02FF', '\u0370'..'\u037D', '\u037F'..'\u1FFF', '\u200C'..'\u200D', '\u2070'..'\u218F', '\u2C00'..'\u2FEF', '\u3001'..'\uD7FF', '\uF900'..'\uFDCF', '\uFDF0'..'\uFFFD'];
+    nameChar                   = nameStartChar /  digit / '.'  / '-' / '\u00B7' / ['\u0300' .. '\u036F', '\u203F' .. '\u2040'];
+    xmlName                    = nameStartChar nameChar*;
+    
+    ERROR                      = [Any] / ![Any];
+
+    unprefixedName : Splicable = xmlName;
+    qualifiedName  : Splicable = unprefixedName s;
+    tagName        : Splicable = (qualifiedName / splice / spliceList) s;
+    
+    spliceBody1                = identifier;
+    noBracket                  = !('(' / ')') [Any];
+    spliceBody2                = '(' s (noBracket / spliceBody2)* ')';
+    spliceBody                 = spliceBody1 / spliceBody2;
+    splice         : Splicable =        '$' spliceBody;
+    spliceList     : Splicable = ".." s '$' spliceBody;
+    controlAttrs   : Splicable = '$' ("when" / "unless" / "foreach") s spliceBody2 s;
+    splicedTag     : XmlAst    = splice / spliceList;
+    
+    
+    tagOpen        : TagOpen   = '<' s tagName attr* '>';
+    tagClose       : TagClose  = '<' s '/' s tagName? '>';
+    tagEmpty       : XmlAst    = '<' s tagName attr* '/' s '>';
+    
+    xtextValue                 = (!('<' / '>' / '$' / ".." '$') [Any])+;
+    xtext          : XmlAst    = xtextValue;
+    tagFull        : XmlAst    = tagOpen content* tagClose;
+    tag            : XmlAst    = tagFull / tagEmpty;
+    content        : XmlAst    = tagFull / tagEmpty / splicedTag / xtext;
+    attrValue1                 = '"'  (!'"'  [Any])* '"';
+    attrValue2                 = '\'' (!'\'' [Any])* '\'';
+    attrValue3     : Splicable = attrValue2 / attrValue1;
+    attrValueSpl1  : Splicable = '"' splice '"';
+    attrValueSpl2  : Splicable = '\'' splice '\'';
+    attrValue      : Splicable = (splice / attrValueSpl1 / attrValueSpl2 / attrValue3) s;
+    attr1          : XmlAst    = qualifiedName '=' s attrValue;
+    attrSplice     : XmlAst    = controlAttrs / splice / spliceList;
+    attr           : XmlAst    = attr1 / attrSplice;
+    start          : XmlAst    = s tag s ![Any];
+  })]
+  internal class XmlQuotParser
+  {
+    _location : NLocation;
+    _lineOffsetMap : array[int];
+    
+    public this(location : NLocation, text : string)
+    {
+      _location       = location;
+      
+      def fillLineOffsetMap()
+      {
+        def map = List(text.Length / 10);
+
+        map.Add(0);
+        
+        for (mutable i = 0; i < text.Length; i++)
+          if (text[i] == '\n')
+            map.Add(i + 1);
+          else when (text[i] == '\r')
+          {
+            def next = i + 1;
+            
+            when (next < text.Length && text[next] != '\n')
+              map.Add(i + 1);
+          }
+          
+        map.ToArray()
+      }
+      
+      _lineOffsetMap  = fillLineOffsetMap();
+    }
+
+    public ToLocation(startPos : int, endPos : int) : NLocation
+    {
+      def getTextPoint(pos : int) : TextPoint
+      {
+        def result = _lineOffsetMap.BinarySearch(e => e - pos);
+        def index  = if (result < 0) (~result) - 1 else result;
+        def offset = _lineOffsetMap[index];
+        def ch     = pos - offset;
+        
+        TextPoint(index + 1, ch + 1)
+      }
+      
+      def result = NLocation(_location.FileIndex,
+        _location.Begin.Offcet(getTextPoint(startPos)),
+        _location.Begin.Offcet(getTextPoint(endPos)));
+      result
+    }
+    
+    public ToLocation(node : PegLocated) : NLocation
+    {
+      ToLocation(node.StartPos, node.EndPos)
+    }
+
+    public ToLocation(tok : NToken) : NLocation
+    {
+      ToLocation(tok.StartPos, tok.EndPos)
+    }
+    
+    //unprefixedName : Splicable = xmlName;
+    unprefixedName(name : NToken) : Splicable
+    {
+      Splicable.Value(name.StartPos, name.EndPos, GetText(name))
+    }
+    
+    tagName(name : Splicable, _ : NToken) : Splicable { name }
+    
+    //qualifiedName  : Splicable = prefixedName / unprefixedName;
+    qualifiedName(name : Splicable, _ : NToken) : Splicable
+    {
+      name
+    }
+
+    //splice         : Splicable =        '$' spliceBody;
+    splice(_ : NToken, expr : NToken) : Splicable
+    {
+      Splicable.Expr(expr.StartPos, expr.EndPos, GetText(expr))
+    }
+    
+    //spliceList     : Splicable = ".." s '$' spliceBody;
+    spliceList(_ : NToken, _ : NToken, _ : NToken, expr : NToken) : Splicable
+    {
+      Splicable.ListExpr(expr.StartPos, expr.EndPos, GetText(expr))
+    }
+    
+    //splicedTag     : XmlAst    = splice / spliceList;
+    splicedTag(splice : Splicable) : XmlAst
+    {
+      match (splice)
+      {
+        | Expr(expr)     => TagSplice(splice.StartPos, splice.EndPos, expr, false)
+        | ListExpr(expr) => TagSplice(splice.StartPos, splice.EndPos, expr, true)
+        | ControlExpr | Value => assert(false);
+      }
+    }
+    
+    //tagOpen        : TagOpen   = '<' s qualifiedName attr* '>';
+    tagOpen(lt : NToken, _ : NToken, id : Splicable, attrs : List[XmlAst], gt : NToken) : TagOpen
+      requires attrs.All(a => a is Attr || a is AttrSplice)
+    {
+      TagOpen(lt.StartPos, gt.EndPos, id, attrs.Map(x => x))
+    }
+
+    //tagClose       : TagClose  = '<' s '/' s qualifiedName '>' s;
+    tagClose(lt : NToken, _ : NToken, _ : NToken, _ : NToken, id : option[Splicable], gt : NToken) : TagClose
+    {
+      def value =
+        match (id)
+        {
+          | Some(x) => x
+          | _       => Splicable.Value(-1, -1, "")
+        };
+      TagClose(lt.StartPos, gt.EndPos, value)
+    }
+    
+    //tagEmpty       : Tag       = '<' s qualifiedName attr* '/' s '>' s;
+    tagEmpty(lt : NToken, _ : NToken, id : Splicable, attrs : List[XmlAst], _ : NToken, _ : NToken, gt : NToken) : XmlAst
+    {
+      Tag(lt.StartPos, gt.EndPos, id, attrs.Map(x => x));
+    }
+    
+    //xtext           : Text      = (!('<' | '>') [Any])+;
+    xtext(txt : NToken) : XmlAst
+    {
+      Text(txt.StartPos, txt.EndPos, Splicable.Value(txt.StartPos, txt.EndPos, GetText(txt)))
+    }
+    
+    //tagFull        : Tag       = tagOpen content* tagClose;
+    tagFull(tagOpen : TagOpen, content : List[XmlAst], tagClose: TagClose) : XmlAst
+    {
+      def open = tagOpen;
+      def closeIdent = tagClose.ident;
+      
+      unless (closeIdent is Splicable.Value("") || open.ident.Equals(tagClose.ident))
+      {
+        Message.Error(ToLocation(open.ident), "Tag was not closed.");
+        Message.FatalError(ToLocation(tagClose.ident), $"Expecting end tag </$(open.ident)> or </>.");
+      }
+        
+      def cont = open.attrs.Map(x => x) + content.Map(x => x);
+      Tag(tagOpen.StartPos, tagClose.EndPos, open.ident, cont)
+    }
+    
+    //tag            : Tag       = tagFull / tagEmpty;
+    tag(t : XmlAst) : XmlAst { t }
+    
+    //content        : XmlAst    = xtext / tagFull / tagEmpty;
+    content(cont : XmlAst) : XmlAst
+    {
+      cont
+    }
+    
+    //attrValue3      : Splicable = attrValue2 / attrValue1;
+    attrValue3(value : NToken) : Splicable
+    {
+      def text = _parsingSource.Text.Substring(value.StartPos + 1, value.EndPos - value.StartPos - 2);
+      Splicable.Value(value.StartPos + 1, value.EndPos - 1, text)
+    }
+    
+    attrValueSpl1(_ : NToken, spl : Splicable, _ : NToken) : Splicable
+    {      
+      spl
+    }
+    
+    attrValueSpl2(_ : NToken, spl : Splicable, _ : NToken) : Splicable
+    {      
+      spl
+    }
+    
+    //attrValue      : Splicable = (attrValue3 / splice) s;
+    attrValue(value : Splicable, _ : NToken) : Splicable
+    {
+      value
+    }    
+    
+    //attr           : Attr      = qualifiedName '=' s attrValue s;
+    attr1(id : Splicable, _ : NToken, _ : NToken, value : Splicable) : XmlAst
+    {
+      Attr(id.StartPos, value.EndPos, id, value)
+    }
+    
+    //controlAttrs   : Splicable = '$' ("foreach" / "unless" / "foreach") s spliceBody2 s;
+    controlAttrs(_ : NToken, exprName : NToken, _ : NToken, body : NToken, _ : NToken) : Splicable
+    {
+      Splicable.ControlExpr(body.StartPos, body.EndPos, GetText(exprName), 
+        exprName.StartPos, GetText(body))
+    }
+    
+    //attrSplice     : XmlAst    = splice;
+    attrSplice(splice : Splicable) : XmlAst
+    {
+      def splice = splice;
+
+      match (splice)
+      {
+        | Expr(expr)     => AttrSplice(splice.StartPos, splice.EndPos, expr, SpliceType.Expr)
+        | ListExpr(expr) => AttrSplice(splice.StartPos, splice.EndPos, expr, SpliceType.List)
+        | ControlExpr("foreach", _, expr) => AttrSplice(splice.StartPos, splice.EndPos, expr, SpliceType.Foreach)
+        | ControlExpr("when",    _, expr) => AttrSplice(splice.StartPos, splice.EndPos, expr, SpliceType.When)
+        | ControlExpr("unless",  _, expr) => AttrSplice(splice.StartPos, splice.EndPos, expr, SpliceType.Unless)
+        | ControlExpr                     => assert(false)
+        | Value => assert(false);
+      }
+    }
+    
+    //attr           : XmlAst    = attr1 / attrSplice;
+    attr(value : XmlAst) : XmlAst
+    {
+      value
+    }
+    
+    //start          : Tag       = s tag ![Any];
+    start(_ : NToken, tag : XmlAst, _ : NToken) : XmlAst
+    {
+      tag
+    }
+  }
+}

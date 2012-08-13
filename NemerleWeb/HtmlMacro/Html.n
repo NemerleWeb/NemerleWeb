@@ -1,0 +1,67 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
+
+using System.Collections.Generic;
+
+namespace Nemerle.NemerleWeb
+{
+  public macro HtmlQuoting(expr)
+  syntax ("html", expr)
+  {
+    HtmlImpl.ToXLinq(Nemerle.Macros.ImplicitCTX(), expr)
+  }
+
+  internal module HtmlImpl
+  {
+    mutable _debug = true;
+    
+    internal ToXLinq(typer : Typer, expr : PExpr) : PExpr
+    {
+      assert2(!_debug);
+      
+      match (expr)
+      {
+        | PExpr.Literal(Literal where(RawString = rs)) =>
+          if (rs.Length == 0 || rs[0] != '<')
+            Message.FatalError(expr.Location, "The literal in 'xml' macro must be recursive string.")
+          else
+          {
+            def str = rs.Substring(2, rs.Length - 4);
+            def loc = expr.Location;
+            def loc = Location(loc.FileIndex, loc.Line, loc.Column + 2, loc.EndLine, loc.EndColumn - 2);
+            //def timer = System.Diagnostics.Stopwatch.StartNew();
+            def parser = XmlQuotParser(loc, str);
+            match (parser.Parse(str))
+            {
+              | Some(result) => 
+                //timer.Stop();
+                //Message.Hint($"Parse tooke: $(timer.Elapsed)");
+                //timer.Reset();
+                //timer.Start();
+                def transformer = XmlAstToXLinq(typer, parser);
+                def res = transformer.Transform(result, Set(), "");
+                //timer.Stop();
+                //Message.Hint($"Transform tooke: $(timer.Elapsed)");
+                res
+                
+              | _ =>
+                def (pos, expected) = parser.GetMaxRollbackPosAndNames();
+                def expected = expected.NToList();
+                
+                def msg = if (expected.IsEmpty) "Unexpected character."
+                          else match (expected.DivideLast())
+                          {
+                            | ([], last)        => $"Expected $last."
+                            | (expected,  last) => $"Expected ..$expected or $last."
+                          };
+                Message.FatalError(parser.ToLocation(pos, pos + 1), msg)
+            }
+          }
+          
+        | _ => Message.FatalError(expr.Location, "You must pass recursive string with XML literal into 'html' macro.")
+      }
+    }
+  }
+}

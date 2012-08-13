@@ -25,20 +25,23 @@ namespace MVCTest
     }
     
     public View() : string
-    {        
-      $<#
+    {       
+      def h = html <#
         <div xmlns="">
-            <p>First name: <strong $(bind.text.FirstName)> </strong></p>
-            <p>Last name: <strong $(bind.text.LastName)> </strong></p>
+            <p>First name: <strong>$FirstName</strong></p>
+            <p>Last name: <strong>$LastName</strong></p>
 
-            <p>First name: <input $(bind.value.FirstName) /></p>
-            <p>Last name: <input $(bind.value.LastName) /></p>
+            <p>First name: <input value="$FirstName" /></p>
+            <p>Last name: <input value="$LastName" /></p>
 
-            <p>Full name: <strong $(bind.text.FullName)> </strong></p>
+            <p>Full name: <strong>$FullName</strong></p>
 
-            <button $(bind.click.CapitalizeLastName)>Go caps</button>
+            <button click="$CapitalizeLastName">Go caps</button>
         </div>
-      #>
+      #>;
+      
+      h.DescendantNodes().OfType.[XElement]().Where(n => n.IsEmpty).Iter(n => n.Value = string.Empty);
+      h.ToString(SaveOptions.DisableFormatting);
     }
   }
 }

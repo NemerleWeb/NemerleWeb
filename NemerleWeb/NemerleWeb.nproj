@@ -70,8 +70,28 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(Nemerle)\Nemerle.Macros.dll</HintPath>
     </Reference>
+    <Reference Include="Nemerle.Peg">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(Nemerle)\Nemerle.Peg.dll</HintPath>
+    </Reference>
+    <Reference Include="Nemerle.Peg.Macros">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(Nemerle)\Nemerle.Peg.Macros.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HtmlMacro\Html.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HtmlMacro\XmlAst.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HtmlMacro\XmlAstToXLinq.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HtmlMacro\XmlQuotParser.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="IViewModel.n">
       <SubType>Code</SubType>
     </Compile>
@@ -114,6 +134,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="HtmlMacro\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
