@@ -24,11 +24,11 @@ namespace MVCTest
         LastName = LastName.ToUpper();
     }
     
-    public View() : string
+    public View() : XElement
     {       
-      def h = html <#
+      html <#
         <div xmlns="">
-            <p>First name: <strong>$FirstName</strong></p>
+            <p>First name: <strong>$(FirstName.Length)</strong></p>
             <p>Last name: <strong>$LastName</strong></p>
 
             <p>First name: <input value="$FirstName" /></p>
@@ -38,10 +38,7 @@ namespace MVCTest
 
             <button click="$CapitalizeLastName">Go caps</button>
         </div>
-      #>;
-      
-      h.DescendantNodes().OfType.[XElement]().Where(n => n.IsEmpty).Iter(n => n.Value = string.Empty);
-      h.ToString(SaveOptions.DisableFormatting);
+      #>;      
     }
   }
 }

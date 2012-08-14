@@ -19,13 +19,13 @@ namespace Nemerle.NemerleWeb
     
     internal ToXLinq(typer : Typer, expr : PExpr) : PExpr
     {
-      assert2(!_debug);
+      //assert2(!_debug);
       
       match (expr)
       {
         | PExpr.Literal(Literal where(RawString = rs)) =>
           if (rs.Length == 0 || rs[0] != '<')
-            Message.FatalError(expr.Location, "The literal in 'xml' macro must be recursive string.")
+            Message.FatalError(expr.Location, "The literal in 'html' macro must be recursive string.")
           else
           {
             def str = rs.Substring(2, rs.Length - 4);

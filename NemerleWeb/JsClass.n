@@ -199,22 +199,9 @@ $(indent)}#>);
         }
         
         public GetMethodJsAST(method : MethodBuilder) : JsAST 
-        {        
+        {   
             match(method.Header.Body) {
-            | FunBody.Typed(typedBody) =>
-                mutable jsAst = JsASTBuilder.Build(typedBody);
-                jsAst = JsASTHelper.LabelsToNamedWhile(jsAst);
-                jsAst = JsASTHelper.TransformBottomUp(jsAst);            
-                jsAst = JsASTHelper.FlattenAndRemoveVoids(jsAst);
-                jsAst = JsASTHelper.RemoveEmptyBranches(jsAst);
-            
-                when(!(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor)
-                    jsAst = JsASTHelper.MakeReturn(jsAst);
-                
-                match(jsAst) {
-                | Seq => jsAst
-                | _ => JsAST.Seq([jsAst])
-                }
+            | FunBody.Typed(typedBody) => JsASTBuilder.BuildJsAST(typedBody, !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor);
             | FunBody.Parsed => 
                 def oldEmitDebug = Typer.Manager.Options.EmitDebug;
                 Typer.Manager.Options.EmitDebug = false;

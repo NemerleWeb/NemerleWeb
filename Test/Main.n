@@ -1,0 +1,32 @@
+﻿using Nemerle.Collections;
+using Nemerle.Xml;
+
+using System;
+using System.Linq;
+using System.Console;
+using System.Collections.Generic;
+using System.Xml.Linq;
+
+using Nemerle.NemerleWeb;
+
+module Program
+{
+  Main() : void
+  {
+      def result = Utils.MakePageHtml(ViewModel());
+      Console.WriteLine(result);
+      _ = Console.ReadKey();
+  }
+}
+
+[ViewModel]
+public class ViewModel 
+{
+    lst : List[string] { get; set; }
+    
+    GetCount() : int {
+        lst.Count();
+    }
+    
+    public View() : XElement { html <#<div />#> }
+}

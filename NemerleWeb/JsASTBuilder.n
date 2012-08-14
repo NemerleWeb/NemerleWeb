@@ -14,7 +14,7 @@ namespace Nemerle.NemerleWeb
 {
   public module JsASTBuilder
   {
-      public Build(expr : TExpr) : JsAST
+      Build(expr : TExpr) : JsAST
       {          
         match(TryToConvertKnownTemplates(expr)) {
         | Some(jsast) => jsast
@@ -93,7 +93,7 @@ namespace Nemerle.NemerleWeb
                     JsAST.MethodRef(Build(obj), meth.Name)
             | MultipleAssign                    => Message.Warning(expr.Location, "MultipleAssign not implemented"); JsAST.NotImpl()
             | OpCode(name)                      => ConvertToJsOpCode(name)
-            | PropertyMember                    => JsAST.NotImpl()
+            | PropertyMember(obj, prop)         => JsAST.FieldRef(Build(obj), prop.Name)
             | SelfTailCall                      => Message.Warning(expr.Location, "SelfTailCall not implemented"); JsAST.NotImpl()
             | Sequence(e1, e2)                  => JsAST.Seq([Build(e1), Build(e2)])
             | StaticEventRef                    => Message.Warning(expr.Location, "StaticEventRef not implemented"); JsAST.NotImpl()
@@ -205,6 +205,23 @@ namespace Nemerle.NemerleWeb
             }
           | _ => None()
           }
+      }
+      
+      public BuildJsAST(expr : TExpr, shouldReturn : bool) : JsAST
+      {
+        mutable jsAst = JsASTBuilder.Build(expr);
+        jsAst = JsASTHelper.LabelsToNamedWhile(jsAst);
+        jsAst = JsASTHelper.TransformBottomUp(jsAst);            
+        jsAst = JsASTHelper.FlattenAndRemoveVoids(jsAst);
+        jsAst = JsASTHelper.RemoveEmptyBranches(jsAst);
+            
+        when(shouldReturn)
+            jsAst = JsASTHelper.MakeReturn(jsAst);
+                
+        match(jsAst) {
+        | Seq => jsAst
+        | _ => JsAST.Seq([jsAst])
+        }
       }
   }
 }

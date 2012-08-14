@@ -146,10 +146,14 @@ namespace Nemerle.NemerleWeb
           <[ { ..$expr } ]>
           
         | TagSplice(expr, false)        => 
-          def exprString = expr;
-          def expr = Parse(ToLocation(xmlAst), expr);  
-          def a = expr;
-          <[ L.XAttribute("data-bind", "text: " + $exprString + if($expr != null) "" else "") ]>
+          def js = expr;
+          def pexpr = Parse(ToLocation(xmlAst), expr);
+          def texpr = TyperHelper.TypeExpr(pexpr, _typer);
+          def js = match(JsASTBuilder.BuildJsAST(texpr, false).Write().Replace("self.", "")) {
+          | x when x.EndsWith(";") => x.Substring(0, x.Length - 1)
+          | x => x
+          };
+          <[ L.XAttribute("data-bind", "text: " + $js + if($expr != null) "" else "") ]>
           
           // TODO: Отладить проверку типа у сплайса утрибута "Тип не должен быть XAttribute".
           // На сегодня _typer.TypeExpr(expr) не видит переменных объявленных внутри $foreach,

@@ -35,6 +35,7 @@ namespace MVCTest
     
     public AvailableMeals : List[Meal] { get; set; }
     public Seats          : List[SeatReservation] { get; set; }
+    public SeatCount      : int;
     public TotalSurcharge : decimal 
     { 
         get { 
@@ -51,6 +52,7 @@ namespace MVCTest
         AvailableMeals = [Meal("Potatoes", 1), Meal("Tomatoes", 2)].ToList();
         Seats = [SeatReservation("Steve", AvailableMeals[0]), 
                  SeatReservation("Roger", AvailableMeals[1])].ToList();
+        SeatCount = Seats.Count();
     }
     
     public AddSeat() : void 
@@ -63,11 +65,11 @@ namespace MVCTest
         Seats.Remove(seat)
     }
     
-    public View() : string
+    public View() : XElement
     {
-      <# 
+      html <#
         <div xmlns="">
-            <h2>Your seat reservations (<span data-bind="text: Seats().length"> </span>)</h2>
+            <h2>Your seat reservations (<span>$(Seats.Count())</span>)</h2>
 
             <table>
                 <thead><tr>

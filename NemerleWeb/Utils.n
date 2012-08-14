@@ -38,7 +38,10 @@ namespace Nemerle.NemerleWeb
         
     public MakePageHtml[ViewModel](viewModel : IViewModel) : string
     {
-      def testView = viewModel.View();
+      def doc = viewModel.View();      
+      doc.DescendantNodes().OfType.[XElement]().Where(n => n.IsEmpty).Iter(n => n.Value = string.Empty);
+      def view = doc.ToString(SaveOptions.DisableFormatting);
+      
       def script = $<#
   <script type='text/javascript'>
     $(viewModel.GetLambdaScript())
@@ -46,7 +49,7 @@ namespace Nemerle.NemerleWeb
   </script>
       #>;
       
-      testView + script;
+      view + script;
     }
   }
 }
