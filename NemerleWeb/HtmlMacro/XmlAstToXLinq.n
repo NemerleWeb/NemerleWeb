@@ -95,8 +95,10 @@ namespace Nemerle.NemerleWeb
         def loopSubstitutions = loopStack.Rev().Select((l, i) => (l, string.Join("", NList.Repeat("$parent.", i))));
                 
         def transformJsExpr(expr) {
+            def a = loopSubstitutions;
+            def b = a;
             match(expr.Trim('\"')) {
-            | x when x.StartsWith("self.") => if(loopStack.Length > 0) x.Replace("self.", "$root") else x.Replace("self.", "") |> transformJsExpr
+            | x when x.StartsWith("self.") => if(loopStack.Length > 0) x.Replace("self.", "$root.") else x.Replace("self.", "") |> transformJsExpr
             | x when x.EndsWith(";") => x.Substring(0, x.Length - 1) |> transformJsExpr
             | x => match(loopSubstitutions.Find((l, _) => Regex.IsMatch(x, $"^$l"))) {
                 | Some((l, s)) => Regex.Replace(x, $"^$l", s) |> transformJsExpr
@@ -161,7 +163,7 @@ namespace Nemerle.NemerleWeb
             def nameExpr1 = SplicablePExprName(name);
             def nameExpr2 = Util.locate(ToLocation(name), <[ $nameExpr1 : L.XName ]>);
             mutable cnt = counter;
-            def cont = content.Map(x => <[ $(TransformImpl(x, splices, { cnt++; cnt; })) ]>);            
+            def cont = content.Map(x => <[ $(TransformImpl(x, splices, { cnt++; cnt; }, loopStack)) ]>);            
             def expr = <[ [L.XElement($nameExpr2, [..$cont].Flatten(c => c).Cast.[object]().CombineAttributes().ToArray())]; ]>;
             <[ $expr ]>
         | TagSplice(_, false)        => <[ [L.XAttribute("data-bind", "text: " + $(getSplice()))] ]>
@@ -173,7 +175,7 @@ namespace Nemerle.NemerleWeb
         | AttrSplice(_, SpliceType.Unless)  => Message.FatalError("Control instraction must place before attributes.");
         | Seq(items) => 
             mutable cnt = counter;
-            def exprs = items.Map(x => <[ $(TransformImpl(x, splices, { cnt++; cnt; })) ]>);
+            def exprs = items.Map(x => <[ $(TransformImpl(x, splices, { cnt++; cnt; }, loopStack)) ]>);
             <[ { ..$exprs } ]>
         }
     }
@@ -234,7 +236,7 @@ namespace Nemerle.NemerleWeb
                                                             | SyntaxElement.Expression(body) => SyntaxElement.Expression(CleanupCallRefs(body))                                                            
                                                             | _ => p
                                                             }))
-    | Define(p, Ref(name)) when _methodNames.Any(m => m == name.Id) => PExpr.Define(p, PExpr.Literal(Literal.String(name.Id)))
+    | Define(p, Ref(name)) when _methodNames.Any(m => m == name.Id) => PExpr.Define(p, PExpr.Literal(Literal.String("self." + name.Id)))
     | _ => expr
     }
   }
