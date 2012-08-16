@@ -84,14 +84,14 @@ public class ListsAndCollectionsViewModel
                     <tbody>
                         <tr $foreach(s in Seats)>
                             <td><input value="$(s.Name)" /></td>
-                            <td><select options="$AvailableMeals"></select></td>
+                            <td><select options="$AvailableMeals" data-bind="value: Meal" data-bind="optionsText: mealName"></select></td>
                             <td>$(s.FormattedPrice)</td>
                             <td><a href="#" click="$RemoveSeat">Remove</a></td>
                         </tr>    
                     </tbody>
                 </table>
 
-                <button click="$AddSeat" enable="$(Seats.Count() < 5)">Reserve another seat</button>
+                <button $when(Seats.Count() < 3) click="$AddSeat" enable="$(Seats.Count() < 5)">Reserve another seat</button>
 
                 <h3 visible="$(TotalSurcharge > 0)">
                     Total surcharge: <span>$TotalSurcharge</span>
