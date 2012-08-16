@@ -75,7 +75,7 @@ namespace Nemerle.NemerleWeb
     }
     public Transform(xmlAsts : XmlAst.Seq) : PExpr
     {
-        assert2(false);
+        //assert2(false);
         def splicedMethod = CleanupCallRefs(GetMethodWithSplicesOnly(xmlAsts));        
         def splices = TyperHelper.GetSplicesAst(splicedMethod, _typer)
                                  .Flatten(j => 

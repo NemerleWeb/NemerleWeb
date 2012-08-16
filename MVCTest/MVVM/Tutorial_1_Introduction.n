@@ -24,9 +24,10 @@ namespace MVCTest
         LastName = LastName.ToUpper();
     }
     
-    public View() : XElement
+    [Html]
+    public View() : string
     {       
-      html <#
+      <#
         <div xmlns="">
             <p>First name: <strong>$(FirstName.Length)</strong></p>
             <p>Last name: <strong>$LastName</strong></p>

@@ -96,9 +96,10 @@ namespace MVCTest
             }
         }
         
-        public View() : XElement
+        [Html]
+        public View() : string
         {
-            html <# 
+            <# 
             <div xmlns="">
                 <ul class="folders" data-bind="foreach: Folders">
                     <li data-bind="text: $data, 

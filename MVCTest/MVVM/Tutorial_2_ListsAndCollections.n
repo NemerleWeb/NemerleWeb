@@ -65,32 +65,32 @@ namespace MVCTest
         Seats.Remove(seat)
     }
     
-    public View() : XElement
+    [Html]
+    public View() : string
     {
-      html <#
-        <div xmlns="">
-            <h2>Your seat reservations (<span>$(Seats.Count())</span>)</h2>
+      <#
+            <div>
+                <h2>Your seat reservations (<span>$(Seats.Count())</span>)</h2>
+                <table>
+                    <thead><tr>
+                        <th>Passenger name</th><th>Meal</th><th>Surcharge</th><th></th>
+                    </tr></thead>
+                    <tbody>
+                        <tr $foreach(s in Seats)>
+                            <td><input value="$(s.Name)" /></td>
+                            <td><select options="$AvailableMeals" data-bind="value: Meal" data-bind="optionsText: 'MealName'"></select></td>
+                            <td>$(s.FormattedPrice)</td>
+                            <td><a href="#" click="$RemoveSeat">Remove</a></td>
+                        </tr>    
+                    </tbody>
+                </table>
 
-            <table>
-                <thead><tr>
-                    <th>Passenger name</th><th>Meal</th><th>Surcharge</th><th></th>
-                </tr></thead>
-                <tbody data-bind="foreach: Seats">
-                    <tr>
-                        <td><input data-bind="value: Name" /></td>
-                        <td><select data-bind="options: $root.AvailableMeals, value: Meal, optionsText: 'MealName'"></select></td>
-                        <td data-bind="text: FormattedPrice"></td>
-                        <td><a href="#" data-bind="click: function() { $root.RemoveSeat(this) }">Remove</a></td>
-                    </tr>    
-                </tbody>
-            </table>
+                <button $when(Seats.Count() < 3) click="$AddSeat" enable="$(Seats.Count() < 5)">Reserve another seat</button>
 
-            <button data-bind="click: AddSeat, enable: Seats().length < 5">Reserve another seat</button>
-
-            <h3 data-bind="visible: TotalSurcharge() > 0">
-                Total surcharge: <span data-bind="text: TotalSurcharge().toFixed(2)"></span>
-            </h3>
-        </div>
+                <h3 visible="$(TotalSurcharge > 0)">
+                    Total surcharge: <span>$TotalSurcharge</span>
+                </h3>
+            </div>
       #>
     }
   }
