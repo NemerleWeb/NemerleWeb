@@ -109,7 +109,7 @@ namespace Nemerle.NemerleWeb
         $"_N_T_temp_var_$temporaryVariableCounter";
     }
     
-    IterateAST(ast : JsAST) : IEnumerable[JsAST] 
+    public IterateAST(ast : JsAST) : IEnumerable[JsAST] 
     {
         def lst = List();
         _ = JsAST.Recurse(ast, a => {

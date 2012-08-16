@@ -142,7 +142,7 @@ $(Body.Write("  "))
             }
         }
         | If             { Cond : JsAST; Body : JsAST; ElseBody : JsAST;
-            public override Write(indent = "" : string) : string {
+            public override Write(_indent = "" : string) : string {
 $<# 
 if($(Cond.Write())) { 
 $(Body.Write("  "))
@@ -259,14 +259,14 @@ $(Body.Write())
             }
         }
         | Switch         { Expr : JsAST; Cases : list[JsAST.SwitchCase];
-            public override Write(indent = "" : string) : string {
+            public override Write(_indent = "" : string) : string {
 $<#switch($(Expr.Write())) {
 ..$(Cases; "\n"; e => e.Write("  "))
 }#>
             }
         }
         | SwitchCase     { Id : int; Body : JsAST;
-            public override Write(indent = "" : string) : string {
+            public override Write(_indent = "" : string) : string {
 $<#$Id:
 $(Body.Write("  "))
 break;#>
@@ -275,7 +275,7 @@ break;#>
         | ServerCall     { MethodName : string; TypeName : string; Parameters : list[string * JsAST]; Callback : JsAST;
             public override Write(indent = "" : string) : string {
                 def jsparms = Parameters.Map((name, val) => $"$name :' + ko.toJSON($(val.Write())) + '");
-$<#$.ajax({
+$<#$$.ajax({
 $(indent)url: '/$TypeName/$MethodName',
 $(indent)type: 'POST',
 $(indent)dataType: 'json',
@@ -296,7 +296,7 @@ $(indent)})#>
             }
         }
         | Try            { Body : JsAST; Handler : JsAST;
-            public override Write(indent = "" : string) : string {
+            public override Write(_indent = "" : string) : string {
 $<#
 try {
 $(Body.Write("  "))
@@ -306,7 +306,7 @@ $(Handler.Write("  "))
             }
         }
         | TryFinally     { Body : JsAST; Handler : JsAST;
-            public override Write(indent = "" : string) : string {
+            public override Write(_indent = "" : string) : string {
 $<#try {
 $(Body.Write("  "))
 } finally {
@@ -336,14 +336,14 @@ $(Handler.Write("  "))
         }
             
         | While          { Cond : JsAST; Body : JsAST;
-            public override Write(indent = "" : string) : string {
+            public override Write(_indent = "" : string) : string {
 $<#while($(Cond.Write())) {
 $(Body.Write("  "))
 }#>
             }
         }
         | WhileNamed     { Cond : JsAST; Body : JsAST; Name : string;
-            public override Write(indent = "" : string) : string {
+            public override Write(_indent = "" : string) : string {
 $<#$Name: while($(Cond.Write())) {
 $(Body.Write("  "))
 }#>  
@@ -379,7 +379,7 @@ $(Body.Write("  "))
             | Call(func, parms)           => JsAST.Call(recurse(func), parms.Map(recurse))
             | DefFunction(obj, ps, bdy)   => JsAST.DefFunction(recurse(obj), ps.Map(recurse), recurse(bdy))
             | DefValue(name, val)         => JsAST.DefValue(name, recurse(val))
-            | For(it, coll, body)         => JsAST.For(it, coll, recurse(body))
+            | For(it, coll, body)         => JsAST.For(it, recurse(coll), recurse(body))
             | Goto                        => ast'        
             | If(cond, then, els)         => JsAST.If(recurse(cond), recurse(then), recurse(els))
             | JustIf(cond, then)          => JsAST.JustIf(recurse(cond), recurse(then))

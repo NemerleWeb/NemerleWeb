@@ -2,27 +2,33 @@
 using Nemerle.Collections;
 using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
+using Nemerle.Text;
 using TT = Nemerle.Compiler.Typedtree;
 using TExpr = Nemerle.Compiler.Typedtree.TExpr;
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using System.Linq;
+using System.Text.RegularExpressions;
 using L = System.Xml.Linq;
 using X = Nemerle.NemerleWeb;
 using SCG = System.Collections.Generic;
 using NColl = Nemerle.Collections.NCollectionsExtensions;
 
 namespace Nemerle.NemerleWeb
-{
+{  
   class XmlAstToXLinq
   {
     _typer  : Typer;
     _parser : XmlQuotParser;
+    _methodNames : list[string];
     
     public this(typer : Typer, parser : XmlQuotParser)
     {
       _typer  = typer;
       _parser = parser;
+      _methodNames = typer.CurrentType.GetMethods().Map(m => m.Name);
     }
           
     public ToLocation(node : PegLocated) : Location
@@ -38,7 +44,7 @@ namespace Nemerle.NemerleWeb
       pExpr
     }
 
-    SplicablePExprName(value : X.Splicable, nsVars : Set[string], defaultns : string = "") : PExpr
+    SplicablePExprName(value : X.Splicable, defaultns : string = "") : PExpr
     {
       Util.locate(ToLocation(value),
       match (value)
@@ -65,127 +71,182 @@ namespace Nemerle.NemerleWeb
         | Splicable.ControlExpr     => assert(false)
       })
     }
-    public Transform(xmlAst : XmlAst, nsVars : Set[string], defaultns : string) : PExpr
+    public Transform(xmlAsts : XmlAst.Seq) : PExpr
     {
-      Util.locate(ToLocation(xmlAst), TransformImpl(xmlAst, nsVars, defaultns))
+        assert2(false);
+        def splicedMethod = CleanupCallRefs(GetMethodWithSplicesOnly(xmlAsts));        
+        def splices = TyperHelper.GetSplicesAst(splicedMethod, _typer)
+                                 .Flatten(j => 
+                                   match(j) {
+                                   | JsAST.DefValue(name, val) => 
+                                       regexp match(name) {
+                                       | <#^var(?<index : int>\d+)$#> => [(index, val.Write())]
+                                       | _ => []
+                                       }
+                                   }).ToDictionary((i, _) => i, (_, v) => v);
+        _typer.CurrentTypeBuilder.Define(<[ decl: __SplicesTypeCheck() : void { $splicedMethod } ]>);
+        _typer.CurrentTypeBuilder.Compile();
+        Util.locate(ToLocation(xmlAsts), TransformImpl(xmlAsts, splices))        
     }
     
-    public TransformImpl(xmlAst : XmlAst, nsVars : Set[string], defaultns : string) : PExpr
-    {
-      match (xmlAst)
-      {
+    public TransformImpl(xmlAst : XmlAst, splices : Dictionary[int, string], counter = 0 : int, loopStack = null : list[string]) : PExpr
+    {        
+        def loopStack = if(loopStack == null) [] else loopStack;
+        def loopSubstitutions = loopStack.Rev().Select((l, i) => (l, string.Join("", NList.Repeat("$parent.", i))));
+                
+        def transformJsExpr(expr) {
+            match(expr.Trim('\"')) {
+            | x when x.StartsWith("self.") => if(loopStack.Length > 0) x.Replace("self.", "$root") else x.Replace("self.", "") |> transformJsExpr
+            | x when x.EndsWith(";") => x.Substring(0, x.Length - 1) |> transformJsExpr
+            | x => match(loopSubstitutions.Find((l, _) => Regex.IsMatch(x, $"^$l"))) {
+                | Some((l, s)) => Regex.Replace(x, $"^$l", s) |> transformJsExpr
+                | None => x
+                }
+            };
+        }
+                
+        def getSplice() {
+            mutable splice;
+            if(splices.TryGetValue(counter, out splice))
+                transformJsExpr(splice);
+            else 
+                ""
+        }
+        
+        match (xmlAst)
+        {
         | Attr(name, Splicable.Expr as value)             => 
-          def name1   = SplicablePExprName(name, nsVars, defaultns);
-          def value1  = SplicablePExprStr(value);
-          
-          def attr = match(name, value) {
-          | (Splicable.Value(v), Splicable.Expr(e)) when v == "value" => <[ L.XAttribute("data-bind", "value: " + $e + if($value1 != null) "" else "") ]>
-          | (Splicable.Value(v), Splicable.Expr(e)) when v == "click" => <[ L.XAttribute("data-bind", "click: " + $e + if($value1 != null) "" else "") ]>
-          | _ => <[ L.XAttribute($name1, $value1) ]>
-          }          
-          
-          <[  { // If value of expression is null we return null which cause ignorin the attribute
-                def value = $value1 : object;
-                if (value == null) null else $attr
-              } ]>
-
+            def name1   = SplicablePExprName(name);
+            def value1  = SplicablePExprStr(value);            
+            match(name, value) {
+            | (Splicable.Value(v), _) when v == "value" => <[ [L.XAttribute("data-bind", "value: " + $(getSplice()))] ]>
+            | (Splicable.Value(v), _) when v == "click" => <[ [L.XAttribute("data-bind", "click: " + $(getSplice()))] ]>
+            | (Splicable.Value(v), _) when v == "enable" => <[ [L.XAttribute("data-bind", "enable: " + $(getSplice()))] ]>
+            | (Splicable.Value(v), _) when v == "visible" => <[ [L.XAttribute("data-bind", "visible: " + $(getSplice()))] ]>
+            | (Splicable.Value(v), _) when v == "options" => <[ [L.XAttribute("data-bind", "options: " + $(getSplice()))] ]>
+            | _ => <[ [L.XAttribute($name1, $value1)] ]>
+            }          
         | Attr(name, value)             => 
-          def nameExpr   = SplicablePExprName(name, nsVars, defaultns);          
-          def valueExpr  = SplicablePExprStr(value);
-          <[ L.XAttribute($nameExpr, $valueExpr) ]>
-        | Text(Splicable.Value(value))  => <[ L.XText($(value : string)) ]>
+            def nameExpr   = SplicablePExprName(name);          
+            def valueExpr  = SplicablePExprStr(value);
+            <[ [L.XAttribute($nameExpr, $valueExpr)] ]>
+        | Text(Splicable.Value(value))  => <[ [L.XText($(value : string))] ]>
         | Text(_)  => assert(false);
         | Tag(name, XmlAst.AttrSplice(expr, SpliceType.Foreach) as c :: content) =>
-          def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);
-          def tagExpr = TransformImpl(tag, nsVars, defaultns);
-          def header = Parse(ToLocation(c), expr);
-          <[  { 
-                def lst = SCG.List();
-                
-                foreach ($header)
-                {
-                  def tag = $tagExpr;
-                  
-                  when (tag != null)
-                    lst.Add(tag);
-                }
-                  
-                lst.ToArray()
-              } ]>
-          
+            def header = Parse(ToLocation(c), expr);
+            match(header) {
+            | <[ $x in $xs ]> => 
+                def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);                
+                def tagExpr = TransformImpl(tag, splices, counter + 1, loopStack.Append([x.ToString() + "."]));
+                def ret = <[ 
+                    mutable ret;
+                    foreach($x in $xs.Take(1)) {
+                        ret = [[XComment(" ko foreach: " + $(getSplice()) + " ")], $tagExpr, [XComment(" /ko ")]].Flatten(c => c)
+                    }
+                    ret
+                    ]>;
+                ret
+            | _ => TransformImpl(XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content), splices, counter + 1, loopStack);
+            }
         | Tag(name, XmlAst.AttrSplice(expr, SpliceType.When)   as c :: content) with isWhen = true
         | Tag(name, XmlAst.AttrSplice(expr, SpliceType.Unless) as c :: content) with isWhen = false
-          => 
-          def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);
-          def tagExpr = TransformImpl(tag, nsVars, defaultns);
-          def cond1 = Parse(ToLocation(c), expr);
-          def cond2 = if (isWhen) cond1 else <[ ! $cond1 ]>;
-          <[ if ($cond2) $tagExpr else null ]>
+            => 
+            def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);
+            def tagExpr = TransformImpl(tag, splices, counter + 1, loopStack);
+            def cond1 = Parse(ToLocation(c), expr);
+            def cond2 = if (isWhen) cond1 else <[ ! $cond1 ]>;
+            <[ [if ($cond2) $tagExpr else null] ]>
         
         | Tag(name, content)            => 
-          //assert2(false);
-          mutable nsVars2 = nsVars;
-          mutable defns2=defaultns;
-          def (nsAttrDef, cont, xmlNsVars) = content.Fold(([], [], []), (x, (nsAttrDef, cont, nsVarsDef)) => 
-            match (x)
-            {
-              | XmlAst.AttrSplice(_expr, SpliceType.When) => (nsAttrDef, x :: cont, nsVarsDef)
-              | XmlAst.Attr(Splicable.Value("xmlns")as attr, Splicable.Value(val)) =>
-                  defns2=val;
-                  Util.locate(ToLocation(attr), 
-                  {
-                    (nsAttrDef, cont, nsVarsDef)
-                  });
-              | _ => (nsAttrDef, x :: cont, nsVarsDef)
-            });
-
-          def nameExpr1 = SplicablePExprName(name, nsVars2, defns2);
-          def nameExpr2 = Util.locate(ToLocation(name), <[ $nameExpr1 : L.XName ]>);
-          def cont = nsAttrDef + cont.RevMap(x => <[ $(Transform(x, nsVars2, defns2)) : object ]>);
-          def expr = xmlNsVars + [<[ L.XElement($nameExpr2, array[..$cont]); ]>];
-          <[ { ..$expr } ]>
-          
-        | TagSplice(expr, false)        => 
-          def js = expr;
-          def pexpr = Parse(ToLocation(xmlAst), expr);
-          def texpr = TyperHelper.TypeExpr(pexpr, _typer);
-          def js = match(JsASTBuilder.BuildJsAST(texpr, false).Write().Replace("self.", "")) {
-          | x when x.EndsWith(";") => x.Substring(0, x.Length - 1)
-          | x => x
-          };
-          <[ L.XAttribute("data-bind", "text: " + $js + if($expr != null) "" else "") ]>
-          
-          // TODO: Отладить проверку типа у сплайса утрибута "Тип не должен быть XAttribute".
-          // На сегодня _typer.TypeExpr(expr) не видит переменных объявленных внутри $foreach,
-          // так как они парсятся динамически.
-          
-          //def tExpr = _typer.TypeExpr(expr);
-          //_ = _typer.DelayMacro(_ => 
-          //  match (tExpr.Type.Hint)
-          //  {
-          //    | Some(ty) => 
-          //      //def tExpr = tExpr;
-          //      Macros.DefineCTX(_typer);
-          //      def attrTy = <[ ttype: System.Xml.Linq.XAttribute ]>;
-                
-          //      when (ty.TryRequire(attrTy))
-          //        Message.Error(expr.Location, $"The content of XML elementd can't have $attrTy type");
-
-          //      Some(expr)
-                
-          //    | None => None()
-          //  });
-            
-          //expr
-          
-        | TagSplice(expr, true)             => <[ NColl.NToArray($(Parse(ToLocation(xmlAst), expr))) ]>
-        | AttrSplice(expr, SpliceType.Expr) => <[ $(Parse(ToLocation(xmlAst), expr)) : L.XAttribute ]>
-        | AttrSplice(expr, SpliceType.List) => <[ NColl.NToArray.[L.XAttribute]($(Parse(ToLocation(xmlAst), expr)) : IEnumerable[L.XAttribute]) ]> 
+            def nameExpr1 = SplicablePExprName(name);
+            def nameExpr2 = Util.locate(ToLocation(name), <[ $nameExpr1 : L.XName ]>);
+            mutable cnt = counter;
+            def cont = content.Map(x => <[ $(TransformImpl(x, splices, { cnt++; cnt; })) ]>);            
+            def expr = <[ [L.XElement($nameExpr2, [..$cont].Flatten(c => c).Cast.[object]().CombineAttributes().ToArray())]; ]>;
+            <[ $expr ]>
+        | TagSplice(_, false)        => <[ [L.XAttribute("data-bind", "text: " + $(getSplice()))] ]>
+        | TagSplice(expr, true)             => <[ [NColl.NToArray($(Parse(ToLocation(xmlAst), expr)))] ]>
+        | AttrSplice(expr, SpliceType.Expr) => <[ [$(Parse(ToLocation(xmlAst), expr)) : L.XAttribute] ]>
+        | AttrSplice(expr, SpliceType.List) => <[ [NColl.NToArray.[L.XAttribute]($(Parse(ToLocation(xmlAst), expr)) : IEnumerable[L.XAttribute])]]> 
+        | AttrSplice(_, SpliceType.Foreach)
+        | AttrSplice(_, SpliceType.When)
+        | AttrSplice(_, SpliceType.Unless)  => Message.FatalError("Control instraction must place before attributes.");
+        | Seq(items) => 
+            mutable cnt = counter;
+            def exprs = items.Map(x => <[ $(TransformImpl(x, splices, { cnt++; cnt; })) ]>);
+            <[ { ..$exprs } ]>
+        }
+    }
+    
+    public GetMethodWithSplicesOnly(xmlAst : XmlAst, counter : int = 0) : PExpr
+    {        
+        def varName = "var" + counter.ToString();
+        match (xmlAst)
+        {
+        | Attr(_, Splicable.Expr(str) as expr) => 
+            def value1  = Parse(ToLocation(expr), str);            
+            <[ def $(varName : dyn) = $value1 ]>        
+        | Tag(name, XmlAst.AttrSplice(expr, SpliceType.Foreach) as c :: content) =>
+            def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);                
+            def tagExpr = GetMethodWithSplicesOnly(tag, counter + 1);
+            def header = Parse(ToLocation(c), expr);
+            match(header) {
+            | <[ $x in $xs ]> => <[ foreach($x in { def $(varName : dyn) = $xs; $xs }) { $tagExpr } ]>
+            | _ => <[ ]>
+            }
+        | Tag(name, XmlAst.AttrSplice(expr, SpliceType.When)   as c :: content) with isWhen = true
+        | Tag(name, XmlAst.AttrSplice(expr, SpliceType.Unless) as c :: content) with isWhen = false
+            => 
+            def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);
+            def tagExpr = GetMethodWithSplicesOnly(tag, counter + 1);
+            def cond1 = Parse(ToLocation(c), expr);
+            def cond2 = if (isWhen) cond1 else <[ ! $cond1 ]>;
+            <[ if ($cond2) $tagExpr else null ]>  
+        | Tag(_, content) => 
+            mutable cnt = counter;
+            def splices = content.Map(c => { cnt++; GetMethodWithSplicesOnly(c, cnt) });
+            <[ { ..$splices } ]> 
+        | TagSplice(expr, false)        =>
+            def pexpr = Parse(ToLocation(xmlAst), expr);
+            <[ def $(varName : dyn) = $pexpr ]>
+        | TagSplice(expr, true)             => <[ def $(varName : dyn) = NColl.NToArray($(Parse(ToLocation(xmlAst), expr))) ]>
+        | AttrSplice(expr, SpliceType.Expr) => <[ def $(varName : dyn) = $(Parse(ToLocation(xmlAst), expr)) : L.XAttribute ]>
+        | AttrSplice(expr, SpliceType.List) => <[ def $(varName : dyn) = NColl.NToArray.[L.XAttribute]($(Parse(ToLocation(xmlAst), expr)) : IEnumerable[L.XAttribute]) ]>         
         | AttrSplice(_, SpliceType.Foreach)
         | AttrSplice(_, SpliceType.When)
         | AttrSplice(_, SpliceType.Unless)  => 
-          Message.FatalError("Control instraction must place before attributes.");
-      }
+            Message.FatalError("Control instraction must place before attributes.");        
+        | Seq(items) => 
+            mutable cnt = counter;
+            def exprs = items.Map(x => <[ $(GetMethodWithSplicesOnly(x, { cnt++; cnt; })) ]>);
+            <[ { ..$exprs } ]>
+        | _ => <[ ]>
+        }
     }
+    
+    CleanupCallRefs(expr : PExpr) : PExpr {
+    | Sequence(items) => PExpr.Sequence(items.Map(i => CleanupCallRefs(i)).Filter(c => match(c) { 
+                                                                                       | PExpr.Sequence([]) => false 
+                                                                                       | _ => true 
+                                                                                       }))
+    | MacroCall(name, ns, parms) => PExpr.MacroCall(name, ns, parms.Map(p => 
+                                                            match(p) {
+                                                            | SyntaxElement.Expression(body) => SyntaxElement.Expression(CleanupCallRefs(body))                                                            
+                                                            | _ => p
+                                                            }))
+    | Define(p, Ref(name)) when _methodNames.Any(m => m == name.Id) => PExpr.Define(p, PExpr.Literal(Literal.String(name.Id)))
+    | _ => expr
+    }
+  }
+  
+  public module Ext 
+  {
+      public CombineAttributes(this instance : IEnumerable[object]) : IEnumerable[object]
+      {
+          def values = instance.OfType.[XAttribute]()
+                               .Filter(a => a.Name.LocalName == "data-bind")
+                               .Map(a => a.Value);
+          instance.Filter(x => !(x is XAttribute)).Append(if(values.Any()) [XAttribute("data-bind", $"..$values")] else []);
+      }
   }
 }

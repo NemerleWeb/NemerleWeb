@@ -79,9 +79,10 @@ namespace MVCTest
             }
         }
         
-        public View() : XElement
+        [Html]
+        public View() : string
         {
-            html <# 
+            <# 
             <div xmlns="">
                 <h3>Tasks</h3>
 

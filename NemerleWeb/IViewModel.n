@@ -13,6 +13,6 @@ namespace Nemerle.NemerleWeb
   {
     GetLambdaScript() : string;
     GetViewModelScript() : string;
-    View() : XElement;
+    __View() : list[XElement];
   }
 }

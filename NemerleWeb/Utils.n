@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using System.IO;
+using System.Web;
 
 using Nemerle.Extensions;
 using Nemerle.Xml;
@@ -38,9 +39,9 @@ namespace Nemerle.NemerleWeb
         
     public MakePageHtml[ViewModel](viewModel : IViewModel) : string
     {
-      def doc = viewModel.View();      
+      def doc = viewModel.__View();      
       doc.DescendantNodes().OfType.[XElement]().Where(n => n.IsEmpty).Iter(n => n.Value = string.Empty);
-      def view = doc.ToString(SaveOptions.DisableFormatting);
+      def view = HttpUtility.HtmlDecode(string.Join(Environment.NewLine, doc.Map(x => x.ToString())));
       
       def script = $<#
   <script type='text/javascript'>

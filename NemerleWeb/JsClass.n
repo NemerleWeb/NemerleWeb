@@ -42,6 +42,9 @@ namespace Nemerle.NemerleWeb
                          .Filter(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
                          .Filter(m => !m.IsConstructor)
                          .Filter(m => !viewModelMethods.Any(vm => vm == m.Name))
+                         .Filter(m => m.Name != "View" && m.Name != "__View")
+                         .Filter(m => m.Name != "__SplicesTypeCheck")
+                         .Filter(m => !m.Name.StartsWith("__TyperHelperMethod"))
             }
         }
         
@@ -68,6 +71,7 @@ namespace Nemerle.NemerleWeb
             def staticConstructorBody = GetStaticConstructorBody(Indent);
             def methods = GetMethods(bodyIndent);                        
             def innerClasses = GetNestedClasses();
+            
             def returning = match(ClassType.BaseType.Name) {
                 | "Function" => bodyIndent + "return this.apply;"
                 | "FunctionVoid" => bodyIndent + "return this.apply_void;"
@@ -197,27 +201,10 @@ $(indent)}#>);
         {
             type.IsDerivedFrom(IEnumerableType.TypeInfo) && type.FullName != "System.String";
         }
-        
-        public GetMethodJsAST(method : MethodBuilder) : JsAST 
-        {   
-            match(method.Header.Body) {
-            | FunBody.Typed(typedBody) => JsASTBuilder.BuildJsAST(typedBody, !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor);
-            | FunBody.Parsed => 
-                def oldEmitDebug = Typer.Manager.Options.EmitDebug;
-                Typer.Manager.Options.EmitDebug = false;
-                def methodTyper = Typer(ClassType, null, method, method.Env);
-                methodTyper.RunFullTyping();
-                Typer.Manager.Options.EmitDebug = oldEmitDebug;
-                GetMethodJsAST(method);
-            | _ => 
-                Message.Error("Couldn't type body"); 
-                JsAST.Void();
-            }
-        }
-    
+                
         public TranslateMethodBody(meth : MethodBuilder, indent = "" : string) : string
         {           
-            def ast = GetMethodJsAST(meth);
+            def ast = TyperHelper.GetMethodJsAST(meth, Typer, ClassType);
             ast.Write(indent);
         }
         

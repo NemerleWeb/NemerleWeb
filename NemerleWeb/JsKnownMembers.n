@@ -38,6 +38,9 @@ namespace Nemerle.NemerleWeb
         def typeName = if(type.SystemType != null) type.SystemType.FullName else type.FrameworkTypeName;
         match(member.Name, parms) {
         | ("op_Inequality", _) => JsAST.Call(JsAST.OpCode("!="), parms)
+        | ("op_Equality", _) => JsAST.Call(JsAST.OpCode("=="), parms)
+        | ("op_GreaterThan", _) => JsAST.Call(JsAST.OpCode(">"), parms)
+        | ("op_LessThan", _) => JsAST.Call(JsAST.OpCode("<"), parms)
         | ("ToString", h :: _) => JsAST.Call(JsAST.MethodRef(h, "toString"), [])
         | ("ToString", [])  => JsAST.Call(JsAST.MethodRef(left, "toString"), [])
         | ("Concat", h :: t) when typeName == typeof(string).FullName         => JsAST.Call(JsAST.MethodRef(h, "concat"), t)

@@ -60,7 +60,7 @@ namespace Nemerle.NemerleWeb
     attr1          : XmlAst    = qualifiedName '=' s attrValue;
     attrSplice     : XmlAst    = controlAttrs / splice / spliceList;
     attr           : XmlAst    = attr1 / attrSplice;
-    start          : XmlAst    = s tag s ![Any];
+    start          : XmlAst.Seq = s tag* s ![Any];
   })]
   internal class XmlQuotParser
   {
@@ -275,9 +275,9 @@ namespace Nemerle.NemerleWeb
     }
     
     //start          : Tag       = s tag ![Any];
-    start(_ : NToken, tag : XmlAst, _ : NToken) : XmlAst
+    start(s : NToken, tags : List[XmlAst], e : NToken) : XmlAst.Seq
     {
-      tag
+      XmlAst.Seq(s.StartPos, e.EndPos, tags.NToList())
     }
   }
 }

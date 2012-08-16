@@ -15,8 +15,41 @@ namespace Nemerle.NemerleWeb
 {
     public module TyperHelper
     {
-        public TypeExpr(expr : PExpr, typer : Typer) : TExpr {
-            typer.TypeExpr(expr);
+        static mutable _index : int = 0;
+        
+        public GetSplicesAst(expr : PExpr, typer : Typer) : list[JsAST.DefValue] {
+            JsASTBuilder.BuildJsASTForSplices(GetTypedBody(BuildMethod(expr, typer), typer, typer.CurrentTypeBuilder))
+        }
+        
+        public GetMethodJsAST(method : MethodBuilder, typer : Typer, tb : TypeBuilder) : JsAST 
+        {   
+            JsASTBuilder.BuildJsAST(GetTypedBody(method, typer, tb), !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor);            
+        }
+        
+        GetTypedBody(method : MethodBuilder, typer : Typer, tb : TypeBuilder) : TExpr {
+            match(method.Header.Body) {
+            | FunBody.Typed(typedBody) => typedBody                
+            | FunBody.Parsed => 
+                def oldEmitDebug = typer.Manager.Options.EmitDebug;
+                typer.Manager.Options.EmitDebug = false;
+                def methodTyper = Typer(tb, null, method, method.Env);
+                methodTyper.RunFullTyping();
+                typer.Manager.Options.EmitDebug = oldEmitDebug;
+                GetTypedBody(method, typer, tb);
+            | _ => 
+                Message.Error("Couldn't type body"); 
+                TExpr.Error();
+            }
+        }
+        
+        BuildMethod(expr : PExpr, typer : Typer) : MethodBuilder
+        {
+            def tb = typer.CurrentType;
+            def methodName = "__TyperHelperMethod" + _index;
+            _index++;
+            def meth = tb.DefineAndReturn(<[ decl: $(methodName : dyn)() : void { $expr } ]>) :> MethodBuilder;
+            tb.Compile();
+            meth
         }
     }
 }

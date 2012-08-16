@@ -206,10 +206,23 @@ namespace Nemerle.NemerleWeb
           | _ => None()
           }
       }
+
+      public BuildJsASTForSplices(expr : TExpr) : list[JsAST.DefValue]
+      {
+          mutable jsAst = JsASTBuilder.Build(expr);
+          jsAst = JsASTHelper.FlattenAndRemoveVoids(jsAst);
+          JsASTHelper.IterateAST(jsAst)
+                     .OfType.[JsAST.DefValue]().NToList()
+                     .Map(j => match(j) {
+                     | JsAST.DefValue(name, PropertyGet(left, prop)) => JsAST.DefValue(name, JsAST.FieldRef(left, prop))
+                     | _ => j
+                     });
+      }
       
       public BuildJsAST(expr : TExpr, shouldReturn : bool) : JsAST
       {
-        mutable jsAst = JsASTBuilder.Build(expr);
+        mutable jsAst = JsASTBuilder.Build(expr);        
+        
         jsAst = JsASTHelper.LabelsToNamedWhile(jsAst);
         jsAst = JsASTHelper.TransformBottomUp(jsAst);            
         jsAst = JsASTHelper.FlattenAndRemoveVoids(jsAst);
@@ -217,7 +230,7 @@ namespace Nemerle.NemerleWeb
             
         when(shouldReturn)
             jsAst = JsASTHelper.MakeReturn(jsAst);
-                
+        
         match(jsAst) {
         | Seq => jsAst
         | _ => JsAST.Seq([jsAst])

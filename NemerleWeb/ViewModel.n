@@ -172,9 +172,9 @@ $<#  ko.applyBindings(new $(JsClass.GetProperName(tb))({0}));#>;
         public GetLambdaScript() : string
         { "" } ]>) :> MethodBuilder;
       
-      DefineBindField(cl);
+      //DefineBindField(cl);
       
-      tb.Manager.TypeTreeBuildFinish += m => {
+      tb.Manager.TypeTreeBuildFinish += _ => {
           def lambdas = tb.DeclaredNestedTypes
                           .Filter(t => t.Name.StartsWith("_N__N_"))
                           .Map(t => JsClass(t, "  ", ienType, typer).Write());
@@ -188,42 +188,6 @@ $<#  ko.applyBindings(new $(JsClass.GetProperName(tb))({0}));#>;
           
           tb.Compile();
       };
-    }
-    
-    DefineBindField(jsClass : JsClass) : void
-    {
-        def allProps = jsClass.Properties.Append(jsClass.ComputedProperties);
-        def allPropNames = allProps.Map(p => p.Name);
-        def methodNames = jsClass.Methods.Map(m => m.Name);
-        def tb = jsClass.ClassType;
-        def bind = tb.DefineNestedType(<[ decl: public class bind_type {} ]>);
-        def defineBinding(bindingName, values) {
-            //assert2(false);
-            def typeName = bindingName + "_type";
-            def bindingType = bind.DefineNestedType(<[ decl: public class $(typeName : dyn) {} ]>);     
-            def tp = PExpr.FromQualifiedIdentifier(tb.Manager, typeName);
-            foreach(val in values)
-                bindingType.Define(<[ decl: public $(val : dyn) : string = "data-bind=\"" + $(bindingName : string) + ": " + $(val : string) + "\""]>);
-            bind.Define(<[ decl: public $(bindingName : dyn) : $tp = $tp() ]>);
-            bindingType.Compile();
-        }
-        
-        defineBinding("visible", allPropNames);
-        defineBinding("text", allPropNames);
-        defineBinding("html", allPropNames);
-        defineBinding("css", allPropNames);
-        defineBinding("style", allPropNames);
-        defineBinding("attr", allPropNames);
-        
-        defineBinding("click", methodNames);
-        defineBinding("submit", methodNames);
-        
-        defineBinding("value", allPropNames);
-        
-        def tp = PExpr.FromQualifiedIdentifier(tb.Manager, "bind_type");
-        tb.Define(<[ decl: public static bind : $tp = $tp() ]>);
-        bind.Compile();
-        tb.Compile();
-    }
+    }   
   }
 }
