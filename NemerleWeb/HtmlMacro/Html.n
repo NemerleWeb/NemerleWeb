@@ -23,13 +23,13 @@ namespace Nemerle.NemerleWeb
                 
         match (expr)
         {
-        | PExpr.Sequence(PExpr.Literal(Literal where(RawString = rs)) :: []) =>
+        | PExpr.Sequence(PExpr.Literal(Literal where(RawString = rs)) as litExpr :: []) =>
             if (rs.Length == 0 || rs[0] != '<')
             Message.FatalError(expr.Location, "The literal in 'html' macro must be recursive string.")
             else
             {
             def str = rs.Substring(2, rs.Length - 4);
-            def loc = expr.Location;
+            def loc = litExpr.Location;
             def loc = Location(loc.FileIndex, loc.Line, loc.Column + 2, loc.EndLine, loc.EndColumn - 2);            
             def parser = XmlQuotParser(loc, str);
             match (parser.Parse(str))

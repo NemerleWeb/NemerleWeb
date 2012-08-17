@@ -69,7 +69,7 @@ namespace Nemerle.NemerleWeb
     
     public this(location : NLocation, text : string)
     {
-      _location       = location;
+      _location = location;
       
       def fillLineOffsetMap()
       {

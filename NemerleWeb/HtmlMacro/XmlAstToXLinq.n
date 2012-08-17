@@ -120,9 +120,10 @@ namespace Nemerle.NemerleWeb
         
         match (xmlAst)
         {
-        | Attr(name, Splicable.Expr as value)             => 
+        | Attr(name, Splicable.Expr(exprText) as value)             => 
             def name1   = SplicablePExprName(name);
-            def value1  = SplicablePExprStr(value);            
+            def value1  = SplicablePExprStr(value);
+            
             match(name, value) {
             | (Splicable.Value(v), _) when v == "value" => <[ [L.XAttribute("data-bind", "value: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "click" => <[ [L.XAttribute("data-bind", "click: " + $(getSplice()))] ]>
@@ -157,7 +158,7 @@ namespace Nemerle.NemerleWeb
             def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);
             def tagExpr = TransformImpl(tag, splices, loopStack);
             <[ [[XComment(" ko if: " + $(getSplice()) + " ")], $tagExpr, [XComment(" /ko ")]].Flatten(c => c) ]>
-        | Tag(name, XmlAst.AttrSplice(_, SpliceType.Unless) as c :: content)
+        | Tag(name, XmlAst.AttrSplice(expr, SpliceType.Unless) as c :: content)
             => 
             def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);
             def tagExpr = TransformImpl(tag, splices, loopStack);
@@ -168,7 +169,8 @@ namespace Nemerle.NemerleWeb
             def cont = content.Map(x => <[ $(TransformImpl(x, splices, loopStack)) ]>);            
             def expr = <[ [L.XElement($nameExpr2, [..$cont].Flatten(c => c).Cast.[object]().CombineAttributes().ToArray())]; ]>;
             <[ $expr ]>
-        | TagSplice(_, false)        => <[ [L.XAttribute("data-bind", "text: " + $(getSplice()))] ]>
+        | TagSplice(expr, false)        => 
+            <[ [L.XAttribute("data-bind", "text: " + $(getSplice()))] ]>
         | TagSplice(expr, true)             => <[ [NColl.NToArray($(Parse(ToLocation(xmlAst), expr)))] ]>
         | AttrSplice(expr, SpliceType.Expr) => <[ [$(Parse(ToLocation(xmlAst), expr)) : L.XAttribute] ]>
         | AttrSplice(expr, SpliceType.List) => <[ [NColl.NToArray.[L.XAttribute]($(Parse(ToLocation(xmlAst), expr)) : IEnumerable[L.XAttribute])]]> 
@@ -188,8 +190,8 @@ namespace Nemerle.NemerleWeb
         match (xmlAst)
         {
         | Attr(_, Splicable.Expr(str) as expr) => 
-            def value1  = Parse(ToLocation(expr), str);            
-            <[ def $(varName : dyn) = $value1 ]>        
+            def value1  = Parse(ToLocation(expr), str);
+            <[ def $(varName : dyn) = $value1 ]>
         | Tag(name, XmlAst.AttrSplice(expr, SpliceType.Foreach) as c :: content) =>
             def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);                
             def tagExpr = GetMethodWithSplicesOnly(tag);
