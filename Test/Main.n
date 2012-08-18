@@ -20,17 +20,31 @@ module Program
 }
 
 [ViewModel]
-public class ListsAndCollectionsViewModel
+public partial class ListsAndCollectionsViewModel
 {
     [Record]
-    public class SeatReservation 
+    public partial class SeatReservation 
     {
         public Name : string { get; set; }
-        public Meal : Meal { get; set; }        
+        public Meal : Meal { get; set; }
+        public Root : ListsAndCollectionsViewModel { get; set; }
+        
         public FormattedPrice : string 
         { 
             get { if(Meal != null) Meal.Price.ToString() else "None" } 
         }
+        
+        [Html]
+        public EditTemplate() : string {
+            <#
+                <div>
+                    <td><input value="$(Name)" /></td>
+                    <td><select options="$(Root.AvailableMeals)" data-bind="value: Meal" data-bind="optionsText: MealName"></select></td>
+                    <td>$(FormattedPrice)</td>
+                    <td><a href="#" click="$(Root.RemoveSeat)">Remove</a></td>
+                </div>
+            #>
+        }        
     }
     
     [Record]
@@ -57,21 +71,21 @@ public class ListsAndCollectionsViewModel
     public this() 
     {
         AvailableMeals = [Meal("Potatoes", 1), Meal("Tomatoes", 2)].ToList();
-        Seats = [SeatReservation("Steve", AvailableMeals[0]), 
-                 SeatReservation("Roger", AvailableMeals[1])].ToList();
+        Seats = [SeatReservation("Steve", AvailableMeals[0], this), 
+                 SeatReservation("Roger", AvailableMeals[1], this)].ToList();
         SeatCount = Seats.Count();
     }
     
     public AddSeat() : void 
     {
-        Seats.Add(SeatReservation("", AvailableMeals[0]))
+        Seats.Add(SeatReservation("", AvailableMeals[0], this))
     }
     
     public RemoveSeat(seat : SeatReservation) : bool 
     {        
         Seats.Remove(seat)
     }
-    
+          
     [Html]
     public View() : string {
         <#  
@@ -87,7 +101,7 @@ public class ListsAndCollectionsViewModel
                             <td><select options="$AvailableMeals" data-bind="value: Meal" data-bind="optionsText: MealName"></select></td>
                             <td>$(s.FormattedPrice)</td>
                             <td><a href="#" click="$RemoveSeat">Remove</a></td>
-                        </tr>    
+                        </tr>
                     </tbody>
                 </table>
 
@@ -99,4 +113,4 @@ public class ListsAndCollectionsViewModel
             </div>
         #>
     }
-}
+}   

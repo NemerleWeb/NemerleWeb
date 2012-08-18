@@ -42,9 +42,8 @@ namespace Nemerle.NemerleWeb
                          .Filter(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
                          .Filter(m => !m.IsConstructor)
                          .Filter(m => !viewModelMethods.Any(vm => vm == m.Name))
-                         .Filter(m => m.Name != "View" && m.Name != "__View")
-                         .Filter(m => m.Name != "__SplicesTypeCheck")
-                         .Filter(m => !m.Name.StartsWith("__TyperHelperMethod"))
+                         .Filter(m => m.Name != "View")
+                         .Filter(m => !m.Name.StartsWith("__"))
             }
         }
         

@@ -93,7 +93,7 @@ namespace Nemerle.NemerleWeb
                     JsAST.MethodRef(Build(obj), meth.Name)
             | MultipleAssign                    => Message.Warning(expr.Location, "MultipleAssign not implemented"); JsAST.NotImpl()
             | OpCode(name)                      => ConvertToJsOpCode(name)
-            | PropertyMember(obj, prop)         => JsAST.FieldRef(Build(obj), prop.Name)
+            | PropertyMember(obj, prop)         => JsAST.PropertyGet(Build(obj), prop.Name)
             | SelfTailCall                      => Message.Warning(expr.Location, "SelfTailCall not implemented"); JsAST.NotImpl()
             | Sequence(e1, e2)                  => JsAST.Seq([Build(e1), Build(e2)])
             | StaticEventRef                    => Message.Warning(expr.Location, "StaticEventRef not implemented"); JsAST.NotImpl()

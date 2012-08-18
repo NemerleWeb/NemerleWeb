@@ -37,7 +37,8 @@ namespace Nemerle.NemerleWeb
                 | Some(result) => 
                     def transformer = XmlAstToXLinq(typer, parser);
                     def res = transformer.Transform(result);
-                    mb.DeclaringType.Define(<[decl: public __View() : list[System.Xml.Linq.XElement] { $res; } ]>);
+                    def methodName = $"__$(mb.Name)";
+                    mb.DeclaringType.Define(<[decl: public $(methodName : dyn)() : list[System.Xml.Linq.XElement] { $res; } ]>);
                     res
                 | _ =>
                 def (pos, expected) = parser.GetMaxRollbackPosAndNames();

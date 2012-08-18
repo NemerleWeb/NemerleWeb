@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace Nemerle.NemerleWeb
 {
-  module Template
+  module Template1
   {
     public RootPath : string = Path.GetDirectoryName(typeof(this).Assembly.CodeBase);
     public Ns : XNamespace = XNamespace.Get("http://nemerle.org/Nemerle.NemerleWeb");

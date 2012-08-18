@@ -17,8 +17,20 @@ namespace Nemerle.NemerleWeb
     {
         static mutable _index : int = 0;
         
-        public GetSplicesAst(expr : PExpr, typer : Typer) : list[JsAST.DefValue] {
-            JsASTBuilder.BuildJsASTForSplices(GetTypedBody(BuildMethod(expr, typer), typer, typer.CurrentTypeBuilder))
+        public GetSplicesAst(expr : PExpr, typer : Typer) : IEnumerable[JsAST.DefValue] {            
+            def method = BuildMethod(expr, typer);
+            def oldBody = method.Header.Body;
+            def defs = JsASTBuilder.BuildJsASTForSplices(GetTypedBody(method, typer, typer.CurrentTypeBuilder, false));
+            method.Header.body = oldBody;
+            def defs2 = JsASTBuilder.BuildJsASTForSplices(GetTypedBody(method, typer, typer.CurrentTypeBuilder));            
+            method.Header.body = oldBody;
+            def a = defs.Append(defs2)
+                        .GroupBy(d => match(d) { | JsAST.DefValue(name, _) => name });
+            a.SelectMany(x => match(x.NToList()) {
+                              | JsAST.DefValue(_, Void) :: s :: [] => [s]
+                              | f :: _ :: [] => [f]
+                              | _ => []
+                              });
         }
         
         public GetMethodJsAST(method : MethodBuilder, typer : Typer, tb : TypeBuilder) : JsAST 
@@ -26,14 +38,19 @@ namespace Nemerle.NemerleWeb
             JsASTBuilder.BuildJsAST(GetTypedBody(method, typer, tb), !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor);            
         }
         
-        GetTypedBody(method : MethodBuilder, typer : Typer, tb : TypeBuilder) : TExpr {
+        GetTypedBody(method : MethodBuilder, typer : Typer, tb : TypeBuilder, fullTyping : bool = true) : TExpr {
             match(method.Header.Body) {
-            | FunBody.Typed(typedBody) => typedBody                
+            | FunBody.Typed(typedBody) => typedBody
             | FunBody.Parsed => 
                 def oldEmitDebug = typer.Manager.Options.EmitDebug;
                 typer.Manager.Options.EmitDebug = false;
                 def methodTyper = Typer(tb, null, method, method.Env);
-                methodTyper.RunFullTyping();
+                if(fullTyping) {
+                    methodTyper.RunFullTyping();
+                } else {
+                    def runTyper = methodTyper.GetType().GetMethod("RunTyper", BindingFlags.NonPublic | BindingFlags.Instance);
+                    _ = runTyper.Invoke(methodTyper, array[]);
+                }
                 typer.Manager.Options.EmitDebug = oldEmitDebug;
                 GetTypedBody(method, typer, tb);
             | _ => 
