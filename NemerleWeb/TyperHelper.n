@@ -17,20 +17,24 @@ namespace Nemerle.NemerleWeb
     {
         static mutable _index : int = 0;
         
-        public GetSplicesAst(expr : PExpr, typer : Typer) : IEnumerable[JsAST.DefValue] {            
+        public GetSplices(expr : PExpr, typer : Typer) : Dictionary[int, string] {            
             def method = BuildMethod(expr, typer);
             def oldBody = method.Header.Body;
             def defs = JsASTBuilder.BuildJsASTForSplices(GetTypedBody(method, typer, typer.CurrentTypeBuilder, false));
             method.Header.body = oldBody;
-            def defs2 = JsASTBuilder.BuildJsASTForSplices(GetTypedBody(method, typer, typer.CurrentTypeBuilder));            
-            method.Header.body = oldBody;
-            def a = defs.Append(defs2)
-                        .GroupBy(d => match(d) { | JsAST.DefValue(name, _) => name });
-            a.SelectMany(x => match(x.NToList()) {
-                              | JsAST.DefValue(_, Void) :: s :: [] => [s]
-                              | f :: _ :: [] => [f]
-                              | _ => []
-                              });
+            def defs2 = JsASTBuilder.BuildJsASTForSplices(GetTypedBody(method, typer, typer.CurrentTypeBuilder));
+            
+            defs.Append(defs2)
+                .Flatten(j => 
+                    match(j) {
+                    | JsAST.DefValue(name, val) => 
+                        regexp match(name) {
+                        | <#^var(?<index : int>\d+)$#> => [(index, val.Write())]
+                        | _ => []
+                        }
+                    })
+                .GroupBy((i, _) => i)
+                .ToDictionary(g => g.Key, g => g.FirstOrDefault((_, v) => !string.IsNullOrEmpty(v))[1]);
         }
         
         public GetMethodJsAST(method : MethodBuilder, typer : Typer, tb : TypeBuilder) : JsAST 

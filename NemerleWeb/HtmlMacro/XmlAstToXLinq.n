@@ -77,15 +77,7 @@ namespace Nemerle.NemerleWeb
     {
         assert2(false);
         def splicedMethod = CleanupCallRefs(GetMethodWithSplicesOnly(xmlAsts)); 
-        def defs = TyperHelper.GetSplicesAst(splicedMethod, _typer).NToList();
-        def splices = defs.Flatten(j => 
-                          match(j) {
-                          | JsAST.DefValue(name, val) => 
-                              regexp match(name) {
-                              | <#^var(?<index : int>\d+)$#> => [(index, val.Write())]
-                              | _ => []
-                              }
-                          }).ToDictionary((i, _) => i, (_, v) => v);
+        def splices = TyperHelper.GetSplices(splicedMethod, _typer);        
         _typer.CurrentTypeBuilder.Compile();
         Util.locate(ToLocation(xmlAsts), TransformImpl(xmlAsts, splices))        
     }
