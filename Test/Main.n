@@ -19,40 +19,42 @@ module Program
   }
 }
 
+[Record, JsModel]
+public class SeatReservation 
+{
+    public Name : string { get; set; }
+    public Meal : Meal { get; set; }
+    public Root : ListsAndCollectionsViewModel { get; set; }
+        
+    public FormattedPrice : string 
+    { 
+        get { if(Meal != null) Meal.Price.ToString() else "None" } 
+    }
+        
+    [Html]
+    
+    public EditTemplate() : string {
+        <#
+            <div>
+                <td><input value="$(Name)" /></td>
+                <td><select options="$(Root.AvailableMeals)" data-bind="value: Meal" data-bind="optionsText: MealName"></select></td>
+                <td>$(FormattedPrice)</td>
+                <td><a href="#" click="$(Root.RemoveSeat)">Remove</a></td>
+            </div>
+        #>
+    }        
+}
+
+[Record, JsModel]
+public class Meal 
+{
+    public MealName : string { get; set; }
+    public Price : decimal { get; set; }
+}
+    
 [ViewModel]
 public partial class ListsAndCollectionsViewModel
-{
-    [Record]
-    public partial class SeatReservation 
-    {
-        public Name : string { get; set; }
-        public Meal : Meal { get; set; }
-        public Root : ListsAndCollectionsViewModel { get; set; }
-        
-        public FormattedPrice : string 
-        { 
-            get { if(Meal != null) Meal.Price.ToString() else "None" } 
-        }
-        
-        [Html]
-        public EditTemplate() : string {
-            <#
-                <div>
-                    <td><input value="$(Name)" /></td>
-                    <td><select options="$(Root.AvailableMeals)" data-bind="value: Meal" data-bind="optionsText: MealName"></select></td>
-                    <td>$(FormattedPrice)</td>
-                    <td><a href="#" click="$(Root.RemoveSeat)">Remove</a></td>
-                </div>
-            #>
-        }        
-    }
-    
-    [Record]
-    public class Meal 
-    {
-        public MealName : string { get; set; }
-        public Price : decimal { get; set; }
-    }
+{    
     
     public AvailableMeals : List[Meal] { get; set; }
     public Seats          : List[SeatReservation] { get; set; }

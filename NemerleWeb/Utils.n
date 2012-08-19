@@ -8,6 +8,8 @@ using System.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Web;
+using System.Reflection;
+using System.Runtime.Serialization;
 
 using Nemerle.Extensions;
 using Nemerle.Xml;
@@ -25,10 +27,8 @@ namespace Nemerle.NemerleWeb
       def sb = Text.StringBuilder(value.Length + 2);
       _ = sb.Append(' ') // this char will replased later by '"'.
       .Append(value).Replace(<#"#>, <#""#>).Replace("\n", <#\n#>)
-      .Append('"');
-      
-      sb[0] = '"';
-      
+      .Append('"');      
+      sb[0] = '"';      
       sb.ToString()
     }
     
@@ -39,18 +39,57 @@ namespace Nemerle.NemerleWeb
         
     public MakePageHtml[ViewModel](viewModel : IViewModel) : string
     {
-      def doc = viewModel.__View();      
-      doc.DescendantNodes().OfType.[XElement]().Where(n => n.IsEmpty).Iter(n => n.Value = string.Empty);
-      def view = HttpUtility.HtmlDecode(string.Join(Environment.NewLine, doc.Map(x => x.ToString())));
+        def models = viewModel.GetType()
+                              .Assembly
+                              .GetTypes()
+                              .Where(t => t.GetCustomAttributes(typeof(JsModel), false).Any());
+        def modelTemplates = string.Join(Environment.NewLine, models.Select(t => GetModelTemplates(t)));
+        def modelLambdas = string.Join(Environment.NewLine, models.Select(t => GetModelLambdas(t)));
+        def modelScripts = string.Join(Environment.NewLine, models.Select(t => GetModelScript(t)));
+        
+        def viewHTml = GetHtml(viewModel.__View());
+        
       
-      def script = $<#
-  <script type='text/javascript'>
-    $(viewModel.GetLambdaScript())
-    $(viewModel.GetViewModelScript())
-  </script>
+        def script = $<#
+$modelTemplates
+<script type='text/javascript'>
+  $modelLambdas
+  $modelScripts
+  $(viewModel.GetLambdaScript())
+  $(viewModel.GetViewModelScript())
+</script>
       #>;
       
-      view + script;
+      viewHTml + script;
+    }
+    
+    GetModelScript(type : Type) : string {
+        type.GetMethod("GetModelScript", BindingFlags.Static | BindingFlags.Public).Invoke(null, array[]) :> string;        
+    }
+    
+    GetModelTemplates(type : Type) : string {
+        def model = FormatterServices.GetUninitializedObject(type);
+        string.Join(Environment.NewLine, 
+                    type.GetMethods()
+                        .Where(m => m.Name.StartsWith("__"))
+                        .Select(m => CreateTemplate(GetHtml(m.Invoke(model, array[]) :> list[XElement]), m.Name)))
+    }
+    
+    GetModelLambdas(type : Type) : string {
+        type.GetMethod("GetLambdaScript", BindingFlags.Static | BindingFlags.Public).Invoke(null, array[]) :> string;        
+    }
+    
+    CreateTemplate(html : string, name : string) : string {
+        $<# 
+<script type="text/html" id="$name">
+  $html
+</script>
+        #>
+    }
+    
+    GetHtml(xs : list[XElement]) : string {
+        xs.DescendantNodes().OfType.[XElement]().Where(n => n.IsEmpty).Iter(n => n.Value = string.Empty);
+        HttpUtility.HtmlDecode(string.Join(Environment.NewLine, xs.Map(x => x.ToString())));
     }
   }
 }

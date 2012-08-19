@@ -75,11 +75,11 @@ namespace Nemerle.NemerleWeb
     }
     public Transform(xmlAsts : XmlAst.Seq) : PExpr
     {
-        assert2(false);
-        def splicedMethod = CleanupCallRefs(GetMethodWithSplicesOnly(xmlAsts)); 
-        def splices = TyperHelper.GetSplices(splicedMethod, _typer);        
+        //assert2(false);
+        def splicedMethod = CleanupCallRefs(GetMethodWithSplicesOnly(xmlAsts));
+        def splices = TyperHelper.GetSplices(splicedMethod, _typer);
         _typer.CurrentTypeBuilder.Compile();
-        Util.locate(ToLocation(xmlAsts), TransformImpl(xmlAsts, splices))        
+        Util.locate(ToLocation(xmlAsts), TransformImpl(xmlAsts, splices))
     }
     
     public TransformImpl(xmlAst : XmlAst, splices : Dictionary[int, string], loopStack = null : list[string]) : PExpr
