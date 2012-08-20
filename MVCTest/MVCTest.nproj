@@ -44,6 +44,7 @@
       <Name>Microsoft.Web.Infrastructure</Name>
       <AssemblyName>Microsoft.Web.Infrastructure.dll</AssemblyName>
       <HintPath>..\packages\MicrosoftWebInfrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Nemerle.Compiler">
       <SpecificVersion>False</SpecificVersion>
@@ -74,35 +75,43 @@
       <Name>System.Web.Helpers</Name>
       <AssemblyName>System.Web.Helpers.dll</AssemblyName>
       <HintPath>..\packages\AspNetWebPagesCore.2.0.10906.0\lib\net40\System.Web.Helpers.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>System.Web.Mvc</Name>
       <AssemblyName>System.Web.Mvc.dll</AssemblyName>
       <HintPath>..\packages\AspNetMvc.4.0.10906.0\lib\net40\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>System.Web.Razor</Name>
       <AssemblyName>System.Web.Razor.dll</AssemblyName>
       <HintPath>..\packages\AspNetWebPagesCore.2.0.10906.0\lib\net40\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>System.Web.WebPages</Name>
       <AssemblyName>System.Web.WebPages.dll</AssemblyName>
       <HintPath>..\packages\AspNetWebPagesCore.2.0.10906.0\lib\net40\System.Web.WebPages.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.WebPages.Deployment, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>System.Web.WebPages.Deployment</Name>
       <AssemblyName>System.Web.WebPages.Deployment.dll</AssemblyName>
       <HintPath>..\packages\AspNetWebPagesCore.2.0.10906.0\lib\net40\System.Web.WebPages.Deployment.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>System.Web.WebPages.Razor</Name>
       <AssemblyName>System.Web.WebPages.Razor.dll</AssemblyName>
       <HintPath>..\packages\AspNetWebPagesCore.2.0.10906.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Extensions">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Routing" />
     <Reference Include="System.Xml" />

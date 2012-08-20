@@ -247,10 +247,10 @@ namespace Nemerle.NemerleWeb
   {
       public CombineAttributes(this instance : IEnumerable[object]) : IEnumerable[object]
       {
-          def values = instance.OfType.[XAttribute]()
-                               .Filter(a => a.Name.LocalName == "data-bind")
-                               .Map(a => a.Value);
-          instance.Filter(x => !(x is XAttribute)).Append(if(values.Any()) [XAttribute("data-bind", $"..$values")] else []);
+          def attrs = instance.OfType.[XAttribute]()
+                              .GroupBy(a => a.Name.LocalName)
+                              .Map(a => XAttribute(a.Key, string.Join(",", a.Map(x => x.Value))));
+          instance.Filter(x => !(x is XAttribute)).Append(attrs);
       }
   }
 }

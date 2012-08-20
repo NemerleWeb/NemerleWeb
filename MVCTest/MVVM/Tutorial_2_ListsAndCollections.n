@@ -85,7 +85,7 @@ namespace MVCTest
                     </tbody>
                 </table>
 
-                <button $when(Seats.Count() < 3) click="$AddSeat" enable="$(Seats.Count() < 5)">Reserve another seat</button>
+                <button $when(Seats.Count() < 6) click="$AddSeat" enable="$(Seats.Count() < 5)">Reserve another seat</button>
 
                 <h3 visible="$(TotalSurcharge > 0)">
                     Total surcharge: <span>$TotalSurcharge</span>
