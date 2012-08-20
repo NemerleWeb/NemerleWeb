@@ -9,22 +9,32 @@ using System.Xml.Linq;
 
 namespace Nemerle.NemerleWeb
 {
-  module Template1
+  public class Template[T]
   {
-    public RootPath : string = Path.GetDirectoryName(typeof(this).Assembly.CodeBase);
-    public Ns : XNamespace = XNamespace.Get("http://nemerle.org/Nemerle.NemerleWeb");
-  
-    public Load(path : string) : XElement
+    public DataName : string { get; set; }
+    public TemplateName : string { get; set; }
+    
+    public this(data : IEnumerable[T], template : T -> void -> string) 
     {
-      assert2(!Path.IsPathRooted(path));
-      XElement.Load(Path.Combine(RootPath, path))
     }
     
-    public SetContent(this template : XElement, elemName : string, content : XElement) : void
+    public static @:(t : Template[T]) : XAttribute
     {
-      def elems = template.Descendants(Ns + elemName).ToList();
-      assert2(elems.Count == 1);
-      elems[0].ReplaceWith(content)
+      def templateName = typeof(T).Name + "__" + t.TemplateName;      
+      XAttribute("data-bind", $"template: { name: $templateName, data: $(t.DataName) }")
     }
-  }
+    
+    public SetDataName(name : string) : Template[T]
+    {
+      
+      DataName = name;
+      this
+    }
+    
+    public SetTemplate(name : string) : Template[T]
+    {
+      TemplateName = name;
+      this
+    }
+  }  
 }

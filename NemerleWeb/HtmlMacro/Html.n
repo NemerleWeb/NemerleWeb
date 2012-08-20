@@ -32,6 +32,8 @@ namespace Nemerle.NemerleWeb
             def loc = litExpr.Location;
             def loc = Location(loc.FileIndex, loc.Line, loc.Column + 2, loc.EndLine, loc.EndColumn - 2);            
             def parser = XmlQuotParser(loc, str);
+            
+            
             match (parser.Parse(str))
             {
                 | Some(result) => 
