@@ -16,7 +16,7 @@ namespace MVCTest
     [ViewModel]
     public class SPAViewModel
     {
-        [Record]
+        [Record, JsModel]
         public class Mail
         {   
             public Id : int { get; set; }
@@ -28,7 +28,7 @@ namespace MVCTest
             public Folder : string { get; set; }
         }
         
-        [Record]
+        [Record, JsModel]
         public class FolderData
         {
             public Id : string { get; set; }
@@ -36,9 +36,9 @@ namespace MVCTest
         }
         
         public Folders : List[string] { get; set; }
-        public ChosenFolderId : int { get; set; }
-        public ChosenFolderData : int { get; set; }
-        public ChosenMailData : int { get; set; }
+        public ChosenFolderId : string { get; set; }
+        public ChosenFolderData : FolderData { get; set; }
+        public ChosenMailData : Mail { get; set; }
         
         public this() 
         {
@@ -101,32 +101,30 @@ namespace MVCTest
         {
             <# 
             <div xmlns="">
-                <ul class="folders" data-bind="foreach: Folders">
-                    <li data-bind="text: $data, 
-                                    css: { selected: $data == $root.ChosenFolderId() },
-                                    click: $root.GoToFolder"> </li>
+                <ul class="folders">
+                    <li $foreach(f in Folders) text="$f" css-selected="$(f == ChosenFolderId)" click="$GoToFolder"> </li>
                 </ul>
 
-                <table class="mails" data-bind="with: ChosenFolderData">
+                <table $when(ChosenFolderData != null) class="mails">
                     <thead><tr><th>From</th><th>To</th><th>Subject</th><th>Date</th></tr></thead>
-                    <tbody data-bind="foreach: Mails">
-                        <tr data-bind="click: $root.GoToMail">
-                            <td data-bind="text: From"> </td>
-                            <td data-bind="text: To"> </td>
-                            <td data-bind="text: Subject"> </td>
-                            <td data-bind="text: Date"> </td>
-                        </tr>     
+                    <tbody>
+                        <tr $foreach(m in ChosenFolderData.Mails) click="$GoToMail">
+                            <td>$(m.From)</td>
+                            <td>$(m.To)</td>
+                            <td>$(m.Subject)</td>
+                            <td>$(m.Date)</td>
+                        </tr>
                     </tbody>
                 </table>
 
-                <div class="viewMail" data-bind="with: ChosenMailData">
+                <div $when(ChosenMailData != null) class="viewMail">
                     <div class="mailInfo">
-                        <h1 data-bind="text: Subject"> </h1>
-                        <p><label>From</label>: <span data-bind="text: From"> </span></p>
-                        <p><label>To</label>: <span data-bind="text: To"> </span></p>
-                        <p><label>Date</label>: <span data-bind="text: Date"> </span></p>
+                        <h1>$(ChosenMailData.Subject)</h1>
+                        <p><label>From</label>: <span>$(ChosenMailData.From)</span></p>
+                        <p><label>To</label>: <span>$(ChosenMailData.To)</span></p>
+                        <p><label>Date</label>: <span>$(ChosenMailData.Date)</span></p>
                     </div>
-                    <p class="message" data-bind="html: MessageContent"> </p>
+                    <p class="message" html="$(ChosenMailData.MessageContent)"> </p>
                 </div>
             </div>
             #>

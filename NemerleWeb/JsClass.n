@@ -103,7 +103,7 @@ $staticConstructorBody#>
                 def isArray = TypeIsArray(prop.GetGetter().ReturnType.TypeInfo);
                 match((IsViewmodel, isArray)) {
                 | (true, true) => "ko.observableArray([])"
-                | (true, false) => "ko.observable()"
+                | (true, false) => "ko.observable(null)"
                 | (false, true) => "[]";   
                 | (false, false) => "{}";
                 }

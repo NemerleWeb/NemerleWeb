@@ -62,6 +62,9 @@ namespace MVCTest
         {
             public Save(tasks : IEnumerable[Task]) : string
             {
+              if(tasks == null)
+                "Seems like you don't have any unfinished tasks left!"
+              else
                 $<#
                 Server received $(tasks.Count()) task(s). 
                 $(tasks.Count(t => t.IsDone)) of which are marked as done. 
@@ -86,23 +89,23 @@ namespace MVCTest
             <div xmlns="">
                 <h3>Tasks</h3>
 
-                <form data-bind="submit: AddTask">
-                    Add task: <input data-bind="value: NewTaskText" placeholder="What needs to be done?" />
+                <form submit="$AddTask">
+                    Add task: <input value="$NewTaskText" placeholder="What needs to be done?" />
                     <button type="submit">Add</button>
                 </form>
 
-                <ul data-bind="foreach: Tasks, visible: Tasks().length > 0">
-                    <li>
-                        <input type="checkbox" data-bind="checked: IsDone" />
-                        <input data-bind="value: Title, disable: IsDone" />
-                        <a href="#" data-bind="click: $root.RemoveTask">Delete</a>
+                <ul visible="Tasks().length > 0">
+                    <li $foreach(t in Tasks)>
+                        <input type="checkbox" checked="$(t.IsDone)" />
+                        <input value="$(t.Title)" disable="$(t.IsDone)" />
+                        <a href="#" click="$RemoveTask">Delete</a>
                     </li> 
                 </ul>
 
-                You have <b data-bind="text: IncompleteTasks().length">&nbsp;</b> incomplete task(s)
-                <span data-bind="visible: IncompleteTasks().length == 0"> - it's beer time!</span>
+                You have <b>$(IncompleteTasks.Count())</b> incomplete task(s)
+                <span visible="$(IncompleteTasks.Count() == 0)"> - it's beer time!</span>
 
-                <button data-bind="click: Save">Save</button>
+                <button click="$Save">Save</button>
             </div>
           #>
         }

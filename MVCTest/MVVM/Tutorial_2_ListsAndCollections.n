@@ -78,7 +78,11 @@ namespace MVCTest
                     <tbody>
                         <tr $foreach(s in Seats)>
                             <td><input value="$(s.Name)" /></td>
-                            <td><select options="$AvailableMeals" data-bind="value: Meal" data-bind="optionsText: 'MealName'"></select></td>
+                            <td>
+                              <select value="$(s.Meal)">
+                                <option $foreach(m in AvailableMeals) value="$(s.Meal)">$(m.MealName)</option>
+                              </select>
+                            </td>
                             <td>$(s.FormattedPrice)</td>
                             <td><a href="#" click="$RemoveSeat">Remove</a></td>
                         </tr>    

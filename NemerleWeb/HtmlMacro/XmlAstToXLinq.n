@@ -77,7 +77,7 @@ namespace Nemerle.NemerleWeb
     }
     public Transform(xmlAsts : XmlAst.Seq) : PExpr
     {
-        assert2(false);
+        //assert2(false);
         def splicedMethod = CleanupCallRefs(GetMethodWithSplicesOnly(xmlAsts));
         def splices = TyperHelper.GetSplices(splicedMethod, _typer);
         _typer.CurrentTypeBuilder.Compile();
@@ -85,30 +85,34 @@ namespace Nemerle.NemerleWeb
     }
     
     public TransformImpl(xmlAst : XmlAst, splices : Dictionary[int, string], loopStack = null : list[string]) : PExpr
-    {        
+    {
         _transformCounter++;
         Debug.WriteLine(_transformCounter + ": " + xmlAst.ToString());
         def currentSplice = _transformCounter;
         
         def loopStack = if(loopStack == null) [] else loopStack;
-        def loopSubstitutions = loopStack.Rev().Select((l, i) => (l, string.Join("", NList.Repeat("$parent.", i))));
+        def loopSubstitutions = loopStack.Rev().Select((l, i) => (l, if(i > 0) string.Join(".", NList.Repeat("$parent", i)) else "$data"));
                 
         def transformJsExpr(expr) {
-            match(expr.Trim('\"')) {
-            | x when x + "." == loopStack.LastOrDefault() => "$data"
-            | x when x.StartsWith("self.") => if(loopStack.Length > 0) x.Replace("self.", "$root.") else x.Replace("self.", "") |> transformJsExpr
-            | x when x.EndsWith(";") => x.Substring(0, x.Length - 1) |> transformJsExpr
-            | x => match(loopSubstitutions.Find((l, _) => Regex.IsMatch(x, $"^$l"))) {
-                | Some((l, s)) => Regex.Replace(x, $"^$l", s) |> transformJsExpr
-                | None => x
-                }
-            };
+          def res = if(loopStack.Length > 0) Regex.Replace(expr, <#(^(?<b>)self(?<a>\W)|(?<b>)self(?<a>)|(?<b>\W)self(?<a>)$)#>, "${b}$root${a}") else Regex.Replace(expr, <#(^self\W|\Wself\W|\W$l$)#>, "");
+          def res = if(res.EndsWith(";")) res.Substring(0, res.Length - 1) else res;
+          def res = match(loopSubstitutions.Find((l, _) => Regex.IsMatch(res, $<#(^$l\W|\W$l\W|\W$l$$|^$l$$)#>))) {
+            | Some((l, s)) => Regex.Replace(res, 
+                                             "(" +
+                                            $<#^(?<b>)$l(?<a>\W)|#> +
+                                            $<#(?<b>\W)$l(?<a>\W)|#> +
+                                            $<#(?<b>\W)$l(?<a>)$$|#> +
+                                            $<#^$l$$#> +
+                                             ")", $"$${b}$s$${a}")
+            | None => res
+          }
+          res
         }
                 
         def getSplice() {
             mutable splice;
             if(splices.TryGetValue(currentSplice, out splice))
-                transformJsExpr(if(splice != null) splice else "");
+                transformJsExpr(if(splice != null) splice.Trim('\"') else "");
             else 
                 ""
         }
@@ -120,11 +124,15 @@ namespace Nemerle.NemerleWeb
             
             match(name, value) {
             | (Splicable.Value(v), _) when v == "text" => <[ [L.XAttribute("data-bind", "text: " + $(getSplice()))] ]>
+            | (Splicable.Value(v), _) when v == "html" => <[ [L.XAttribute("data-bind", "html: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "value" => <[ [L.XAttribute("data-bind", "value: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "click" => <[ [L.XAttribute("data-bind", "click: " + $(getSplice()))] ]>
+            | (Splicable.Value(v), _) when v == "submit" => <[ [L.XAttribute("data-bind", "submit: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "enable" => <[ [L.XAttribute("data-bind", "enable: " + $(getSplice()))] ]>
+            | (Splicable.Value(v), _) when v == "disable" => <[ [L.XAttribute("data-bind", "disable: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "visible" => <[ [L.XAttribute("data-bind", "visible: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "options" => <[ [L.XAttribute("data-bind", "options: " + $(getSplice()))] ]>
+            | (Splicable.Value(v), _) when v == "checked" => <[ [L.XAttribute("data-bind", "checked: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v.StartsWith("css-") => <[ [L.XAttribute($v, $(getSplice()))] ]>
             | _ => <[ [L.XAttribute($name1, $value1)] ]>
             }          
@@ -139,15 +147,8 @@ namespace Nemerle.NemerleWeb
             match(header) {
             | <[ $x in $xs ]> => 
                 def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);                
-                def tagExpr = TransformImpl(tag, splices, loopStack.Append([x.ToString() + "."]));
-                def ret = <[ 
-                    mutable ret;
-                    foreach($x in $xs.Take(1)) {
-                        ret = [[XComment(" ko foreach: " + $(getSplice()) + " ")], $tagExpr, [XComment(" /ko ")]].Flatten(c => c)
-                    }
-                    ret
-                    ]>;
-                ret
+                def tagExpr = TransformImpl(tag, splices, loopStack.Append([x.ToString()]));
+                <[ [[XComment(" ko foreach: " + $(getSplice()) + " ")], $tagExpr, [XComment(" /ko ")]].Flatten(c => c) ]>;
             | _ => TransformImpl(XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content), splices, loopStack);
             }
         | Tag(name, XmlAst.AttrSplice(_, SpliceType.When)   :: content) =>            
@@ -257,7 +258,7 @@ namespace Nemerle.NemerleWeb
       public CombineAttributes(this instance : IEnumerable[object]) : IEnumerable[object]
       {
         def xattrs = instance.OfType.[XAttribute]();
-        def cssValue = string.Join(", ", xattrs.Where(a => a.Name.LocalName.StartsWith("css-")).Select(a => $"$(a.Name.LocalName): $(a.Value)"));
+        def cssValue = string.Join(", ", xattrs.Where(a => a.Name.LocalName.StartsWith("css-")).Select(a => $"'$(a.Name.LocalName.Substring(4))': $(a.Value)"));
         def css = "css: {" + cssValue + "}";
         def attrs = xattrs.Where(a => !a.Name.LocalName.StartsWith("css-"))
                           .Concat(if(!string.IsNullOrWhiteSpace(cssValue)) [XAttribute("data-bind", css)] else [])
