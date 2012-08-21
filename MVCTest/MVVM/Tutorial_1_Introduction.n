@@ -29,7 +29,7 @@ namespace MVCTest
     {       
       <#
         <div xmlns="">
-            <p>First name: <strong>$(FirstName.Length)</strong></p>
+            <p>First name: <strong>$FirstName</strong></p>
             <p>Last name: <strong>$LastName</strong></p>
 
             <p>First name: <input value="$FirstName" /></p>
@@ -37,7 +37,7 @@ namespace MVCTest
 
             <p>Full name: <strong>$FullName</strong></p>
 
-            <button click="$CapitalizeLastName">Go caps</button>
+            <button click="$CapitalizeLastName">Capitalize last name</button>
         </div>
       #>;      
     }
