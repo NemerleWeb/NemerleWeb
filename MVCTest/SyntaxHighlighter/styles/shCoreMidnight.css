@@ -58,6 +58,7 @@
   position: relative !important;
   overflow: auto !important;
   font-size: 1em !important;
+  padding: 10px 0 10px 0;  
 }
 .syntaxhighlighter.source {
   overflow: hidden !important;
@@ -71,6 +72,7 @@
 .syntaxhighlighter .line {
   white-space: pre !important;
 }
+
 .syntaxhighlighter table {
   width: 100% !important;
 }
