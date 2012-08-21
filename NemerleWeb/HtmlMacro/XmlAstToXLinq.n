@@ -75,6 +75,7 @@ namespace Nemerle.NemerleWeb
     }
     public Transform(xmlAsts : XmlAst.Seq) : PExpr
     {
+        //assert2(false);
         def splicedMethod = CleanupCallRefs(GetMethodWithSplicesOnly(xmlAsts));
         def splices = TyperHelper.GetSplices(splicedMethod, _typer);
         _typer.CurrentTypeBuilder.Compile();
@@ -91,6 +92,7 @@ namespace Nemerle.NemerleWeb
                 
         def transformJsExpr(expr) {
             match(expr.Trim('\"')) {
+            | x when x + "." == loopStack.LastOrDefault() => "$data"
             | x when x.StartsWith("self.") => if(loopStack.Length > 0) x.Replace("self.", "$root.") else x.Replace("self.", "") |> transformJsExpr
             | x when x.EndsWith(";") => x.Substring(0, x.Length - 1) |> transformJsExpr
             | x => match(loopSubstitutions.Find((l, _) => Regex.IsMatch(x, $"^$l"))) {
@@ -114,6 +116,7 @@ namespace Nemerle.NemerleWeb
             def value1  = SplicablePExprStr(value);
             
             match(name, value) {
+            | (Splicable.Value(v), _) when v == "text" => <[ [L.XAttribute("data-bind", "text: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "value" => <[ [L.XAttribute("data-bind", "value: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "click" => <[ [L.XAttribute("data-bind", "click: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "enable" => <[ [L.XAttribute("data-bind", "enable: " + $(getSplice()))] ]>
@@ -153,11 +156,15 @@ namespace Nemerle.NemerleWeb
             def tagExpr = TransformImpl(tag, splices, loopStack);
             <[ [[XComment(" ko ifnot: " + $(getSplice()) + " ")], $tagExpr, [XComment(" /ko ")]].Flatten(c => c) ]>        
         | Tag(name, XmlAst.AttrSplice(expr, SpliceType.Expr) as exprAst  :: content) =>            
-            assert2(false);            
             def attr = Parse(ToLocation(exprAst), expr);
             def attrPexpr = match(attr) {
-            | <[ Template($data, $a => $b.$templateName) ]> => <[ [Template($data, $a => $b.$templateName).SetDataName($(data.ToString() : string)).SetTemplate($(templateName.ToString() : string)) :> XAttribute] ]>
-            | _ => <[]>
+            | <[ Template($data, $_ => $_.$templateName) ]>
+            | <[ Template($data, _.$templateName) ]> => <[ [Template($data, _.$templateName).SetDataName($(data.ToString() : string)).SetTemplate($(templateName.ToString() : string)) :> XAttribute] ]>
+            | <[ Template($data, $_ => $_.$templateName, { ..$parms }) ]>
+            | <[ Template($data, _.$templateName, { ..$parms }) ]> => 
+                def callbackNames = string.Join(", ", parms.Map(p => p.ToString()));
+                <[ [Template($data, _.$templateName, { ..$parms }).SetDataName($(data.ToString() : string)).SetTemplate($(templateName.ToString() : string)).SetCallbackNames($(callbackNames : string)) :> XAttribute] ]>
+            | _ => Message.FatalError("Uknown Template pattern. Should be Template(Model, _.TemplateName) or Template(Model, _.TemplateName, _.AfterRender, _.AfterAdd, _.AfterRemove). Last 3 parameters are optional.");
             }
             def nameExpr1 = SplicablePExprName(name);
             def nameExpr2 = Util.locate(ToLocation(name), <[ $nameExpr1 : L.XName ]>);            
@@ -249,7 +256,7 @@ namespace Nemerle.NemerleWeb
       {
           def attrs = instance.OfType.[XAttribute]()
                               .GroupBy(a => a.Name.LocalName)
-                              .Map(a => XAttribute(a.Key, string.Join(",", a.Map(x => x.Value))));
+                              .Map(a => XAttribute(a.Key, string.Join(", ", a.Map(x => x.Value))));
           instance.Filter(x => !(x is XAttribute)).Append(attrs);
       }
   }

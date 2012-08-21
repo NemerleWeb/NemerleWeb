@@ -1,5 +1,6 @@
 ﻿using Nemerle.Text;
 using Nemerle.Utility;
+using Nemerle.Collections;
 
 using System;
 using System.Collections.Generic;
@@ -14,19 +15,32 @@ namespace Nemerle.NemerleWeb
     public DataName : string { get; set; }
     public TemplateName : string { get; set; }
     
-    public this(data : IEnumerable[T], template : T -> void -> string) 
+    public IsForeach   : bool { get; }
+    public AfterRender : string { get; private set; }
+    public AfterAdd    : string { get; private set; }
+    public AfterRemove : string { get; private set; }
+    
+    public this(data : IEnumerable[T], template : T -> void -> string, afterRender : T -> void -> void = null, afterAdd : T -> void -> void = null, afterRemove : T -> void -> void = null) 
     {
+        IsForeach = true;
+    }
+    
+    public this(data : T, template : T -> void -> string)
+    {
+        IsForeach = false;
     }
     
     public static @:(t : Template[T]) : XAttribute
     {
       def templateName = typeof(T).Name + "__" + t.TemplateName;      
-      XAttribute("data-bind", $"template: { name: $templateName, data: $(t.DataName) }")
+      if(t.IsForeach) 
+        XAttribute("data-bind", $"template: { name: '$templateName', foreach: $(t.DataName)$(t.AfterRender)$(t.AfterAdd)$(t.AfterRemove) }")
+      else 
+        XAttribute("data-bind", $"template: { name: '$templateName', data: $(t.DataName) }")
     }
     
     public SetDataName(name : string) : Template[T]
-    {
-      
+    {      
       DataName = name;
       this
     }
@@ -34,6 +48,21 @@ namespace Nemerle.NemerleWeb
     public SetTemplate(name : string) : Template[T]
     {
       TemplateName = name;
+      this
+    }
+    
+    public SetCallbackNames(names : string) : Template[T]
+    {
+      match(names.Split(',').Select(n => n.Trim()).NToList()) {
+      | afterRender :: afterAdd :: afterRemove :: []
+      | afterRender :: afterAdd :: [] with afterRemove = null
+      | afterRender :: [] with (afterRemove = null, afterAdd = null)
+      | [] with (afterRender = null, afterRemove = null, afterAdd = null) =>
+        AfterRender = if(afterRender != null) $", afterRender=$afterRender" else "";
+        AfterAdd = if(afterAdd != null) $", afterAdd=$afterAdd" else "";
+        AfterRemove = if(afterRemove != null) $", afterRemove=$afterRemove" else "";
+      | _ => ()
+      }
       this
     }
   }  

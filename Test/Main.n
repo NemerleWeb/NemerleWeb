@@ -30,8 +30,12 @@ public class SeatReservation
     { 
         get { if(Meal != null) Meal.Price.ToString() else "None" } 
     }
-        
-    [Html]    
+    
+    public AfterRender() : void
+    {
+    }
+    
+    [Html]
     public EditTemplate() : string {
         <#
             <div>
@@ -83,7 +87,7 @@ public partial class ListsAndCollectionsViewModel
         Seats.Add(SeatReservation("", AvailableMeals[0], this))
     }
     
-    public RemoveSeat(seat : SeatReservation) : bool 
+    public RemoveSeat(seat : SeatReservation) : bool
     {        
         Seats.Remove(seat)
     }
@@ -99,6 +103,7 @@ public partial class ListsAndCollectionsViewModel
                     </tr></thead>
                     <tbody>
                         <tr $foreach(s in Seats)>
+                            <td><span text="$s"></span></td>
                             <td><input value="$(s.Name)" /></td>
                             <td><select options="$AvailableMeals" data-bind="value: Meal" data-bind="optionsText: MealName"></select></td>
                             <td>$(s.FormattedPrice)</td>
@@ -106,9 +111,9 @@ public partial class ListsAndCollectionsViewModel
                         </tr>
                     </tbody>
                 </table>
-                <button $when(Seats.Count() < 3) click="$AddSeat" enable="$(Seats.Count() < 5)">Reserve another seat</button>
-                <span $(Template(Seats, s => s.EditTemplate))></span>
-                <h3 visible="$(TotalSurcharge > 5)">
+                <button click="$AddSeat" enable="$(Seats.Count() < 5)">Reserve another seat</button>
+                <span $(Template(Seats, _.EditTemplate))></span>
+                <h3 visible="$(TotalSurcharge > 0)">
                     Total surcharge: <span>$TotalSurcharge</span>
                 </h3>
             </div>

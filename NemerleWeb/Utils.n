@@ -72,7 +72,7 @@ $modelTemplates
         string.Join(Environment.NewLine, 
                     type.GetMethods()
                         .Where(m => m.Name.StartsWith("__"))
-                        .Select(m => CreateTemplate(GetHtml(m.Invoke(model, array[]) :> list[XElement]), m.Name)))
+                        .Select(m => CreateTemplate(GetHtml(m.Invoke(model, array[]) :> list[XElement]), m.DeclaringType.Name + "__" + m.Name)))
     }
     
     GetModelLambdas(type : Type) : string {
