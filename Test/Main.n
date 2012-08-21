@@ -113,7 +113,9 @@ public partial class ListsAndCollectionsViewModel
                 </table>
                 <button click="$AddSeat" enable="$(Seats.Count() < 5)">Reserve another seat</button>
                 <span $(Template(Seats, _.EditTemplate))></span>
-                <h3 visible="$(TotalSurcharge > 0)">
+                <h3 css-profitWarning="$(TotalSurcharge > 0)"
+                    css-profitWarning2="$(TotalSurcharge == 0)" 
+                    visible="$(TotalSurcharge > 0)">
                     Total surcharge: <span>$TotalSurcharge</span>
                 </h3>
             </div>
