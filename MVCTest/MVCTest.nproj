@@ -126,6 +126,18 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="bin\MVVM\Tutorial_5_LoadingAndSaving.n">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="bin\MVVM\Tutorial_1_Introduction.n">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="bin\MVVM\Tutorial_2_ListsAndCollections.n">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="bin\MVVM\Tutorial_3_SinglePageApps.n">
+      <SubType>Code</SubType>
+    </Content>
     <Compile Include="Controllers\HomeController.n" />
     <Compile Include="Global.asax.n">
       <DependentUpon>Global.asax</DependentUpon>
@@ -135,15 +147,19 @@
     </Compile>
     <Compile Include="MVVM\Tutorial_1_Introduction.n">
       <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Tutorial_2_ListsAndCollections.n">
       <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Tutorial_3_SinglePageApps.n">
       <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Tutorial_5_LoadingAndSaving.n">
       <SubType>Code</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
   </ItemGroup>
@@ -331,6 +347,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="bin\" />
+    <Folder Include="bin\MVVM\" />
     <Folder Include="Content\" />
     <Folder Include="Content\themes\" />
     <Folder Include="Content\themes\base\" />
