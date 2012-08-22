@@ -94,7 +94,7 @@ namespace MVCTest
                     <button type="submit">Add</button>
                 </form>
 
-                <ul visible="Tasks().length > 0">
+                <ul visible="$(Tasks.Count() > 0)">
                     <li $foreach(t in Tasks)>
                         <input type="checkbox" checked="$(t.IsDone)" />
                         <input value="$(t.Title)" disable="$(t.IsDone)" />
