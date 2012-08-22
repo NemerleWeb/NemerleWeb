@@ -1,16 +1,10 @@
 /*!
-* Note: While Microsoft is not the author of this file, Microsoft is
-* offering you a license subject to the terms of the Microsoft Software
-* License Terms for Microsoft ASP.NET Model View Controller 4 Developer Preview.
-* Microsoft reserves all other rights. The notices below are provided
-* for informational purposes only and are not the license terms under
-* which Microsoft distributed this file.
-*
-* Modernizr v2.0.6
-* http://www.modernizr.com
-*
-* Copyright (c) 2009-2011 Faruk Ates, Paul Irish, Alex Sexton
-*/
+ * Modernizr v2.0.6
+ * http://www.modernizr.com
+ *
+ * Copyright (c) 2009-2011 Faruk Ates, Paul Irish, Alex Sexton
+ * Dual-licensed under the BSD or MIT licenses: www.modernizr.com/license/
+ */
 
 /*
  * Modernizr tests which native CSS3 and HTML5 features are available in
