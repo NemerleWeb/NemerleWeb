@@ -21,6 +21,7 @@
     <UseIISExpress>false</UseIISExpress>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <NameOfLastUsedPublishProfile>Main</NameOfLastUsedPublishProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -294,6 +295,156 @@
     <Content Include="Scripts\sammy.js">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="SyntaxHighlighter\LGPL-LICENSE">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\MIT-LICENSE">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shAutoloader.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushAppleScript.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushAS3.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushBash.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushColdFusion.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushCpp.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushCSharp.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushCss.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushDelphi.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushDiff.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushErlang.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushGroovy.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushJava.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushJavaFX.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushJScript.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushPerl.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushPhp.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushPlain.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushPowerShell.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushPython.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushRuby.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushSass.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushScala.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushSql.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushVb.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shBrushXml.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shCore.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\scripts\shLegacy.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\src\shAutoloader.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\src\shCore.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\src\shLegacy.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shCore.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shCoreDefault.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shCoreDjango.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shCoreEclipse.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shCoreEmacs.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shCoreFadeToGrey.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shCoreMDUltra.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shCoreMidnight.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shCoreRDark.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shThemeDefault.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shThemeDjango.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shThemeEclipse.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shThemeEmacs.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shThemeFadeToGrey.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shThemeMDUltra.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shThemeMidnight.css">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SyntaxHighlighter\styles\shThemeRDark.css">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Views\Home\Introduction.cshtml">
       <SubType>Content</SubType>
     </Content>
@@ -331,6 +482,10 @@
     <Folder Include="Infrastructure" />
     <Folder Include="Properties\" />
     <Folder Include="Scripts\" />
+    <Folder Include="SyntaxHighlighter\" />
+    <Folder Include="SyntaxHighlighter\scripts\" />
+    <Folder Include="SyntaxHighlighter\src\" />
+    <Folder Include="SyntaxHighlighter\styles\" />
     <Folder Include="Views\" />
     <Folder Include="Views\Home\" />
     <Folder Include="Views\Shared\" />
@@ -343,7 +498,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
