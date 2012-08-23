@@ -64,6 +64,15 @@ h1.logo {
     margin: 10px 0 0 15px;
 }
 
+h1.logo a {
+    background-color: #75CCC9;
+    padding: 20px;
+    font-size: 36px;
+    color: #fff;
+    margin: 10px 0 0 15px;
+    text-decoration: none;
+}
+
 h1.logo span {
     padding-left: 20px;
     vertical-align: top;
