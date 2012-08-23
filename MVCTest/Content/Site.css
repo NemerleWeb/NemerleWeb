@@ -69,7 +69,8 @@ h1.logo a {
     padding: 20px;
     font-size: 36px;
     color: #fff;
-    margin: 10px 0 0 15px;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
     text-decoration: none;
 }
 
