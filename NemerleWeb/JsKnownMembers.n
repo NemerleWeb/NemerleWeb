@@ -47,6 +47,12 @@ namespace Nemerle.NemerleWeb
         | ("ToString", [])  => JsAST.Call(JsAST.MethodRef(left, "toString"), [])
         | ("Concat", h :: t) when typeName == typeof(string).FullName         => JsAST.Call(JsAST.MethodRef(h, "concat"), t)
         | ("ToUpper", []) when typeName == typeof(string).FullName            => JsAST.Call(JsAST.MethodRef(left, "toUpperCase"), [])
+        | ("Contains", [sub]) when typeName == typeof(string).FullName        => JsAST.Call(JsAST.OpCode("!="), [JsAST.Call(JsAST.MethodRef(left, "indexOf"), [sub]), JsAST.Literal(JsLiteral.Integer(-1))])
+        | ("IsNullOrEmpty", [str]) when typeName == typeof(string).FullName
+        | ("IsNullOrWhiteSpace", [str]) when typeName == typeof(string).FullName   => 
+          JsAST.Call(JsAST.OpCode("||"), 
+                [JsAST.Call(JsAST.OpCode("==="), [str, JsAST.Literal(JsLiteral.Null())]),
+                 JsAST.Call(JsAST.OpCode("==="), [str, JsAST.Literal(JsLiteral.String(""))])])
         | ("op_Implicit", h :: [])                                            => h
         | ("op_Implicit", h :: t)                                             => JsAST.Seq(h :: t)
         | ("op_Addition", parms)                                              => JsAST.Call(JsAST.OpCode("+"), parms)

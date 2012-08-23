@@ -1,0 +1,19 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
+using System.Linq.Expressions;
+
+namespace Nemerle.NemerleWeb
+{
+  class ViewModelBase[T]
+  {
+    public template[TM](model : Expression[Func[T, TM]], template : Expression[Func[TM, void -> string]]) : XAttribute
+    {null}
+  }
+}

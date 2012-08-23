@@ -8,7 +8,12 @@ namespace MVCTest
   class SamplesViewModel
   {      
     SelectedSample : string { get; set; }
+    
     Samples : List[string] { get; set; }
+    NameList : NameListViewModel { get; set; }
+    NameListSource : string { get; set; }
+    
+    KnockoutSamples : List[string] { get; set; }
     Introduction : IntroductionViewModel { get; set; }
     IntroductionSource : string { get; set; }
     ListsAndCollections : ListsAndCollectionsViewModel { get; set; }
@@ -20,7 +25,10 @@ namespace MVCTest
     ThisPageSource : string { get; set; }
     
     public this() {
-      Samples = ["Introduction", "Lists and collections", "Single page applications", "Loading and saving"].ToList();
+      Samples = ["List of names"].ToList();
+      NameList = NameListViewModel();
+      
+      KnockoutSamples = ["Introduction", "Lists and collections", "Single page applications", "Loading and saving"].ToList();
       SelectSample(Samples[0]);
       Introduction = IntroductionViewModel("John", "Silver");
       ListsAndCollections = ListsAndCollectionsViewModel();
@@ -44,6 +52,11 @@ namespace MVCTest
       
       server.LoadSourceFor("MVVM/Knockout/Tutorial_5_LoadingAndSaving.n", source => {
         SinglePageAppsSource = source;
+        js prettyPrint();
+      });
+      
+      server.LoadSourceFor("MVVM/NameListViewModel.n", source => {
+        NameListSource = source;
         js prettyPrint();
       });
       
@@ -71,10 +84,19 @@ namespace MVCTest
       <# 
         <div class="container">
           <ul class="samples-menu">
-            <li class="header">KnockoutJs tutorials</li>
+            <li class="header">Samples</li>
             <li $foreach(s in Samples) css-selected="$(SelectedSample == s)"><span click="$SelectSample">$s</span></li>
+            <li class="split"></li>
+            <li class="header">KnockoutJs tutorials</li>
+            <li $foreach(s in KnockoutSamples) css-selected="$(SelectedSample == s)"><span click="$SelectSample">$s</span></li>
           </ul>
           <div class="current-sample">
+            <div $when(SelectedSample == "List of names")>
+              <div $(Template(NameList, _.View))></div>
+              <h2>Source</h2>
+              <pre class="prettyprint lang-n prettyprinted">$NameListSource</pre>
+            </div>
+            
             <div $when(SelectedSample == "Introduction")>
               <div $(Template(Introduction, _.View))></div>
               <h2>Source</h2>

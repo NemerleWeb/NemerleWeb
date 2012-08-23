@@ -74,7 +74,7 @@ namespace Nemerle.NemerleWeb
                     JsAST.Seq([JsAST.DefValue(varName, JsAST.Void()), JsASTHelper.DelayAssignment(call, JsAST.LocalRef(varName)), JsAST.Call(op, [head, JsAST.LocalRef(varName)])]).Transform()
                 | Call(OpCode(op), something :: Literal(Null) :: []) 
                 | Call(OpCode(op), Literal(Null) :: something :: []) => 
-                    JsAST.Call(JsAST.OpCode("&&"), [JsAST.Call(JsAST.OpCode(op), [something, JsAST.Literal(JsLiteral.Null())]), JsAST.Call(JsAST.OpCode(op), [JsAST.TypeOf(something), JsAST.Literal(JsLiteral.String("undefined"))])]).Transform() 
+                    JsAST.Call(JsAST.OpCode("||"), [JsAST.Call(JsAST.OpCode(op), [something, JsAST.Literal(JsLiteral.Null())]), JsAST.Call(JsAST.OpCode(op), [JsAST.TypeOf(something), JsAST.Literal(JsLiteral.String("undefined"))])]).Transform() 
                 | Call(func, parms) when parms.OfType.[JsAST.Seq]().Any() =>
                     def newParms = parms.Map(p : JsAST => {
                         def varName = JsASTHelper.GetTemporaryVariableName();
@@ -212,7 +212,7 @@ $(Body.Write())
             public override Write(_ = "" : string) : string {
                 $"$(Obj.Write()).$Method"
             }
-        }
+        }        
         | StaticRef      { Type : string; Member : string;
             public override Write(_ = "" : string) : string {
                 $"$Type.$Member"

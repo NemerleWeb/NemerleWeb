@@ -52,6 +52,10 @@ a {
 .viewMail .mailInfo label { color: #777; font-weight: bold; min-width: 2.75em; text-align:right; display: inline-block; }
 .viewMail .message { padding: 0 1.25em; }
 
+.name-list {
+    font-size: 12px;
+}
+
 .logo-container {
     background-color: #529795;
 }
@@ -100,6 +104,10 @@ h1.logo span {
     border-right: 1px solid #ccc;
     text-align: right;
     padding: 0 20px 0 0px;
+}
+    
+.samples-menu .split {
+    height: 30px;
 }
 
 .samples-menu .header {

@@ -94,6 +94,7 @@ namespace MVCTest
         {
             <# 
             <div xmlns="">
+                <h3>Single page apps</h3>
                 <ul class="folders">
                     <li $foreach(f in Folders) text="$f" css-selected="$(f == ChosenFolderId)" click="$GoToFolder"> </li>
                 </ul>

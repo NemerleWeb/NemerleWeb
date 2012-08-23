@@ -19,6 +19,7 @@ namespace MVCTest
     {       
       <#
         <div xmlns="">
+            <h3>Introduction</h3>
             <p>First name: <strong>$FirstName</strong></p>
             <p>Last name: <strong>$LastName</strong></p>
 

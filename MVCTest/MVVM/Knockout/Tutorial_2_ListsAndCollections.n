@@ -62,6 +62,7 @@ namespace MVCTest
     {
       <#
             <div>
+                <h3>Lists and collections</h3>
                 <h2>Your seat reservations (<span>$(Seats.Count())</span>)</h2>
                 <table>
                     <thead><tr>

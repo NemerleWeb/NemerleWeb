@@ -127,7 +127,7 @@ namespace Nemerle.NemerleWeb
             match(name, value) {
             | (Splicable.Value(v), _) when v == "text" => <[ [L.XAttribute("data-bind", "text: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "html" => <[ [L.XAttribute("data-bind", "html: " + $(getSplice()))] ]>
-            | (Splicable.Value(v), _) when v == "value" => <[ [L.XAttribute("data-bind", "value: " + $(getSplice()))] ]>
+            | (Splicable.Value(v), _) when v == "value" => <[ [L.XAttribute("data-bind", "value: " + $(getSplice()) + ", valueUpdate: \"afterkeydown\"")] ]>
             | (Splicable.Value(v), _) when v == "click" => <[ [L.XAttribute("data-bind", "click: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "submit" => <[ [L.XAttribute("data-bind", "submit: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "enable" => <[ [L.XAttribute("data-bind", "enable: " + $(getSplice()))] ]>
