@@ -67,7 +67,7 @@ namespace Nemerle.NemerleWeb
             | LocalRef(decl)                    => JsAST.LocalRef(decl.Name)
             | MacroEnvelope(expanded = ex, original = org, the_macro = _) => 
                 match(org) { 
-                | <[ foreach($it in $coll) $body  ]> => 
+                /*| <[ foreach($it in $coll) $body  ]> => 
                     def it = it.ToString();
                     def coll = if(coll.TypedObject is TExpr) Build(coll.TypedObject :> TExpr) else JsAST.LocalRef(coll.ToString());
                     def body = match(body) {
@@ -75,7 +75,7 @@ namespace Nemerle.NemerleWeb
                     | pexpr => if(pexpr.TypedObject is TExpr) Build(pexpr.TypedObject :> TExpr) else JsAST.Code(pexpr.ToString());
                     }
                     
-                    JsAST.For(it, coll, body);                    
+                    JsAST.For(it, coll, body);      */              
                 | MacroCall(Name(Id = "js"), _, p :: []) => 
                     match(p) {
                     | SyntaxElement.Expression(Literal(Literal.String(val))) => JsAST.Code(val)

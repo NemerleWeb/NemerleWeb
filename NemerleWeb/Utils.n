@@ -7,9 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Web;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Xml;
 
 using Nemerle.Extensions;
 using Nemerle.Xml;
@@ -72,7 +74,7 @@ $modelTemplates
         string.Join(Environment.NewLine, 
                     type.GetMethods()
                         .Where(m => m.Name.StartsWith("__"))
-                        .Select(m => CreateTemplate(GetHtml(m.Invoke(model, array[]) :> list[XElement]), m.DeclaringType.Name + "__" + m.Name)))
+                        .Select(m => CreateTemplate(GetHtml(m.Invoke(model, array[]) :> list[XElement]), m.DeclaringType.Name + m.Name)))
     }
     
     GetModelLambdas(type : Type) : string {
@@ -88,8 +90,13 @@ $modelTemplates
     }
     
     GetHtml(xs : list[XElement]) : string {
+      using(str = StringWriter())
+      using(writer = XmlTextWriter(str)) {        
+        writer.QuoteChar = '\'';
         xs.DescendantNodes().OfType.[XElement]().Where(n => n.IsEmpty).Iter(n => n.Value = string.Empty);
-        HttpUtility.HtmlDecode(string.Join(Environment.NewLine, xs.Map(x => x.ToString())));
+        xs.Iter(x => x.WriteTo(writer));
+        HttpUtility.HtmlDecode(str.ToString());
+      }
     }
   }
 }

@@ -92,9 +92,11 @@ namespace Nemerle.NemerleWeb
         
         def loopStack = if(loopStack == null) [] else loopStack;
         def loopSubstitutions = loopStack.Rev().Select((l, i) => (l, if(i > 0) string.Join(".", NList.Repeat("$parent", i)) else "$data"));
-                
+        def currentRoot = string.Join(".", NList.Repeat("$parent", loopStack.Length));
+        
         def transformJsExpr(expr) {
-          def res = if(loopStack.Length > 0) Regex.Replace(expr, <#(^(?<b>)self(?<a>\W)|(?<b>)self(?<a>)|(?<b>\W)self(?<a>)$)#>, "${b}$root${a}") else Regex.Replace(expr, <#(^self\W|\Wself\W|\W$l$)#>, "");
+          def res = if(expr.StartsWith("\"") && expr.EndsWith("\"")) expr.Trim('\"') else expr;
+          def res = if(loopStack.Length > 0) Regex.Replace(res, <#(^(?<b>)self(?<a>\W)|(?<b>)self(?<a>)|(?<b>\W)self(?<a>)$)#>, $"$${b}$(currentRoot)$${a}") else Regex.Replace(res, <#(^self\W|\Wself\W|\W$l$)#>, "");
           def res = if(res.EndsWith(";")) res.Substring(0, res.Length - 1) else res;
           def res = match(loopSubstitutions.Find((l, _) => Regex.IsMatch(res, $<#(^$l\W|\W$l\W|\W$l$$|^$l$$)#>))) {
             | Some((l, s)) => Regex.Replace(res, 
@@ -112,7 +114,7 @@ namespace Nemerle.NemerleWeb
         def getSplice() {
             mutable splice;
             if(splices.TryGetValue(currentSplice, out splice))
-                transformJsExpr(if(splice != null) splice.Trim('\"') else "");
+                transformJsExpr(if(splice != null) splice else "");
             else 
                 ""
         }
@@ -258,7 +260,7 @@ namespace Nemerle.NemerleWeb
       public CombineAttributes(this instance : IEnumerable[object]) : IEnumerable[object]
       {
         def xattrs = instance.OfType.[XAttribute]();
-        def cssValue = string.Join(", ", xattrs.Where(a => a.Name.LocalName.StartsWith("css-")).Select(a => $"'$(a.Name.LocalName.Substring(4))': $(a.Value)"));
+        def cssValue = string.Join(", ", xattrs.Where(a => a.Name.LocalName.StartsWith("css-")).Select(a => $"\"$(a.Name.LocalName.Substring(4))\": $(a.Value)"));
         def css = "css: {" + cssValue + "}";
         def attrs = xattrs.Where(a => !a.Name.LocalName.StartsWith("css-"))
                           .Concat(if(!string.IsNullOrWhiteSpace(cssValue)) [XAttribute("data-bind", css)] else [])

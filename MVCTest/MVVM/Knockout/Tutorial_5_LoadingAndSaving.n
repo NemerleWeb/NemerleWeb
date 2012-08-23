@@ -1,19 +1,11 @@
-﻿using Nemerle.Collections;
-using Nemerle.Text;
-using Nemerle.Utility;
-using Nemerle.Extensions;
-
-using System;
+﻿using Nemerle.Extensions;
 using System.Collections.Generic;
 using System.Linq;
-
-using Nemerle.Xml;
 using Nemerle.NemerleWeb;
-using System.Xml.Linq;
 
 namespace MVCTest
 {
-    [ViewModel]
+    [JsModel]
     public class LoadingAndSavingViewModel
     {        
         public class Task

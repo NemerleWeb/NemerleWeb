@@ -126,44 +126,57 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\MVVM\Tutorial_5_LoadingAndSaving.n">
+    <Content Include="bin\MVVM\Knockout\Tutorial_1_Introduction.n">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="bin\MVVM\Tutorial_1_Introduction.n">
+    <Content Include="bin\MVVM\Knockout\Tutorial_2_ListsAndCollections.n">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="bin\MVVM\Tutorial_2_ListsAndCollections.n">
+    <Content Include="bin\MVVM\Knockout\Tutorial_3_SinglePageApps.n">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="bin\MVVM\Tutorial_3_SinglePageApps.n">
+    <Content Include="bin\MVVM\Knockout\Tutorial_5_LoadingAndSaving.n">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="bin\MVVM\Samples.n">
       <SubType>Code</SubType>
     </Content>
     <Compile Include="Controllers\HomeController.n" />
     <Compile Include="Global.asax.n">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\Helpers.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Infrastructure\HtmlHelperExtensions.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MVVM\Tutorial_1_Introduction.n">
+    <Compile Include="MVVM\Knockout\Tutorial_1_Introduction.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\Tutorial_2_ListsAndCollections.n">
+    <Compile Include="MVVM\Knockout\Tutorial_2_ListsAndCollections.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\Tutorial_3_SinglePageApps.n">
+    <Compile Include="MVVM\Knockout\Tutorial_3_SinglePageApps.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\Tutorial_5_LoadingAndSaving.n">
+    <Compile Include="MVVM\Knockout\Tutorial_5_LoadingAndSaving.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\images\bg.jpg">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Content\prettify.css">
       <SubType>Content</SubType>
     </Content>
@@ -343,7 +356,9 @@
     <Folder Include="App_Data\" />
     <Folder Include="bin\" />
     <Folder Include="bin\MVVM\" />
+    <Folder Include="bin\MVVM\Knockout\" />
     <Folder Include="Content\" />
+    <Folder Include="Content\images\" />
     <Folder Include="Content\themes\" />
     <Folder Include="Content\themes\base\" />
     <Folder Include="Content\themes\base\images\" />
@@ -351,6 +366,7 @@
     <Folder Include="Models\" />
     <Folder Include="MVVM" />
     <Folder Include="Infrastructure" />
+    <Folder Include="MVVM\Knockout" />
     <Folder Include="Properties\" />
     <Folder Include="Scripts\" />
     <Folder Include="Views\" />

@@ -11,13 +11,12 @@ using System.Web.Mvc;
 
 using Nemerle.Xml;
 using Nemerle.NemerleWeb;
+using MVCTest;
 
 public module HtmlHelperExtensions
 {
   public static FileContents(this _helper : HtmlHelper, filename : string) : string
   { 
-    def dir = Uri(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase)).LocalPath;
-    def filename = Path.GetFullPath(Path.Combine(dir, filename));
-    File.ReadAllText(filename)
-  }
+    Helpers.LoadSourceFor(filename);
+  }  
 }

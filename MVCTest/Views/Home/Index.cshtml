@@ -2,9 +2,4 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<ul>
-    <li>1. @Html.ActionLink("Introduction", "Introduction")</li>
-    <li>2. @Html.ActionLink("Lists and collections", "ListsAndCollections")</li>
-    <li>3. @Html.ActionLink("Single page applications", "SinglePageApps")</li>
-    <li>4. @Html.ActionLink("Loading and saving", "LoadingAndSaving")</li>
-</ul>
+@Html.Raw(Model)

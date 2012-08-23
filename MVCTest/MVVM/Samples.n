@@ -1,0 +1,108 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using Nemerle.NemerleWeb;
+
+namespace MVCTest
+{
+  [ViewModel]
+  class SamplesViewModel
+  {      
+    SelectedSample : string { get; set; }
+    Samples : List[string] { get; set; }
+    Introduction : IntroductionViewModel { get; set; }
+    IntroductionSource : string { get; set; }
+    ListsAndCollections : ListsAndCollectionsViewModel { get; set; }
+    ListsAndCollectionsSource : string { get; set; }
+    LoadingAndSaving : LoadingAndSavingViewModel { get; set; }
+    LoadingAndSavingSource : string { get; set; }
+    SinglePageApps : SPAViewModel { get; set; }
+    SinglePageAppsSource : string { get; set; }
+    ThisPageSource : string { get; set; }
+    
+    public this() {
+      Samples = ["Introduction", "Lists and collections", "Single page applications", "Loading and saving"].ToList();
+      SelectSample(Samples[0]);
+      Introduction = IntroductionViewModel("John", "Silver");
+      ListsAndCollections = ListsAndCollectionsViewModel();
+      LoadingAndSaving = LoadingAndSavingViewModel();
+      SinglePageApps = SPAViewModel();
+      
+      server.LoadSourceFor("MVVM/Knockout/Tutorial_1_Introduction.n", source => {
+        IntroductionSource = source;
+        js prettyPrint();
+      });
+      
+      server.LoadSourceFor("MVVM/Knockout/Tutorial_2_ListsAndCollections.n", source => {
+        ListsAndCollectionsSource = source;
+        js prettyPrint();
+      });
+      
+      server.LoadSourceFor("MVVM/Knockout/Tutorial_3_SinglePageApps.n", source => {
+        LoadingAndSavingSource = source;
+        js prettyPrint();
+      });
+      
+      server.LoadSourceFor("MVVM/Knockout/Tutorial_5_LoadingAndSaving.n", source => {
+        SinglePageAppsSource = source;
+        js prettyPrint();
+      });
+      
+      server.LoadSourceFor("MVVM/Samples.n", source => {
+        ThisPageSource = source;
+        js prettyPrint();
+      });
+    }
+    
+    SelectSample(sample : string) : void {
+        SelectedSample = sample;
+        js prettyPrint();
+    }
+    
+    public class Server
+    {
+      public LoadSourceFor(sample : string) : string {
+        Helpers.LoadSourceFor(sample);
+      }
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <# 
+        <div class="container">
+          <ul class="samples-menu">
+            <li class="header">KnockoutJs tutorials</li>
+            <li $foreach(s in Samples) css-selected="$(SelectedSample == s)"><span click="$SelectSample">$s</span></li>
+          </ul>
+          <div class="current-sample">
+            <div $when(SelectedSample == "Introduction")>
+              <div $(Template(Introduction, _.View))></div>
+              <h2>Source</h2>
+              <pre class="prettyprint lang-n prettyprinted">$IntroductionSource</pre>
+            </div>
+
+            <div $when(SelectedSample == "Lists and collections")>
+              <div $(Template(ListsAndCollections, _.View))></div>
+              <h2>Source</h2>
+              <pre class="prettyprint lang-n prettyprinted">$ListsAndCollectionsSource</pre>
+            </div>
+
+            <div $when(SelectedSample == "Single page applications")>
+              <div $(Template(SinglePageApps, _.View))></div>
+              <h2>Source</h2>
+              <pre class="prettyprint lang-n prettyprinted">$SinglePageAppsSource</pre>
+            </div>
+
+            <div $when(SelectedSample == "Loading and saving")>
+              <div $(Template(LoadingAndSaving, _.View))></div>
+              <h2>Source</h2>
+              <pre class="prettyprint lang-n prettyprinted">$LoadingAndSavingSource</pre>
+            </div>
+          </div>
+          <h2>Main page source</h2>
+          <pre class="prettyprint lang-n prettyprinted">$ThisPageSource</pre>
+        </div>
+      #>
+    }    
+  }
+}

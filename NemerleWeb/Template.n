@@ -19,6 +19,11 @@ namespace Nemerle.NemerleWeb
     public AfterRender : string { get; private set; }
     public AfterAdd    : string { get; private set; }
     public AfterRemove : string { get; private set; }
+    public Name        : string {
+      get {
+        typeof(T).Name + "__" + TemplateName;
+      }
+    }
     
     public this(data : IEnumerable[T], template : T -> void -> string, afterRender : T -> void -> void = null, afterAdd : T -> void -> void = null, afterRemove : T -> void -> void = null) 
     {
@@ -32,11 +37,11 @@ namespace Nemerle.NemerleWeb
     
     public static @:(t : Template[T]) : XAttribute
     {
-      def templateName = typeof(T).Name + "__" + t.TemplateName;      
+      def templateName = t.Name;      
       if(t.IsForeach) 
-        XAttribute("data-bind", $"template: { name: '$templateName', foreach: $(t.DataName)$(t.AfterRender)$(t.AfterAdd)$(t.AfterRemove) }")
+        XAttribute("data-bind", $<#template: { name: "$templateName", foreach: $(t.DataName)$(t.AfterRender)$(t.AfterAdd)$(t.AfterRemove) }#>)
       else 
-        XAttribute("data-bind", $"template: { name: '$templateName', data: $(t.DataName) }")
+        XAttribute("data-bind", $<#template: { name: "$templateName", data: $(t.DataName) }#>)
     }
     
     public SetDataName(name : string) : Template[T]

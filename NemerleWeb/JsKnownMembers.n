@@ -54,7 +54,7 @@ namespace Nemerle.NemerleWeb
         | ("get_Item", h :: []) when typeName == typeof(List[_]).FullName     => JsAST.Call(JsAST.Indexer(left), [h])
         | ("get_Count", []) when typeName == typeof(List[_]).FullName         => JsAST.FieldRef(left, "length")
         | ("Add",      h :: []) when typeName == typeof(List[_]).FullName     => JsAST.Call(JsAST.MethodRef(PropertyToField(left), "push"), [h])
-        | ("Remove",   h :: []) when typeName == typeof(List[_]).FullName     => JsAST.Call(JsAST.MethodRef(PropertyToField(left), "remove"), [h])
+        | ("Remove",   h :: []) when typeName == typeof(List[_]).FullName     => JsAST.Call(JsAST.MethodRef(PropertyToField(left), "destroy"), [h])
         | ("ToList", h :: []) when typeName == typeof(Enumerable).FullName    => h        
         | ("Count", l :: []) when typeName == typeof(Enumerable).FullName     => JsAST.FieldRef(l, "length")
         //
