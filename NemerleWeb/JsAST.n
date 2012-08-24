@@ -289,7 +289,7 @@ $(indent)})#>
             public override Write(_ : string) : string {
                 $"($(Cond.Write()) ? $(Body.Write()) : $(ElseBody.Write()))"
             }
-        }     
+        }
         | This           {
             public override Write(_ = "" : string) : string {
                 "self"
@@ -313,6 +313,17 @@ $(Body.Write("  "))
 $(Handler.Write("  "))
 }#>
             }
+        }
+        | Tuple          { Args : list[JsAST];
+          public override Write(_indent = "" : string) : string {
+            def values = Args.MapI((i, a) => $"$i: $(a.Write())");
+            $<#{..$values}#>
+          }
+        }
+        | TupleIndexer          { Obj : JsAST; Pos : int;
+          public override Write(_indent = "" : string) : string {            
+            $<#$(Obj.Write())[$Pos]#>
+          }
         }
         | TypeOf         { Expr : JsAST;
             public override Write(_ = "" : string) : string {
@@ -364,7 +375,8 @@ $(Body.Write("  "))
         public static AllowedForAssignment : list[Type] = [typeof(JsAST.Call), typeof(JsAST.MethodRef), typeof(JsAST.LocalRef), 
                                                            typeof(JsAST.Literal), typeof(JsAST.Code), typeof(JsAST.Void), 
                                                            typeof(JsAST.Ternary), typeof(JsAST.NotImpl), typeof(JsAST.Lambda),
-                                                           typeof(JsAST.Array), typeof(JsAST.StaticRef), typeof(JsAST.This)];
+                                                           typeof(JsAST.Array), typeof(JsAST.StaticRef), typeof(JsAST.This), 
+                                                           typeof(JsAST.Tuple), typeof(JsAST.TupleIndexer)];
                                          
         public static Recurse(ast : JsAST, selector : JsAST -> JsAST, topdown : bool = true) : JsAST 
         {
@@ -400,6 +412,8 @@ $(Body.Write("  "))
             | This                        => ast'
             | Try(body, handler)          => JsAST.Try(recurse(body), recurse(handler))
             | TryFinally(body, handler)   => JsAST.TryFinally(recurse(body), recurse(handler))
+            | Tuple(args)                 => JsAST.Tuple(args.Map(recurse))
+            | TupleIndexer(o, pos)        => JsAST.TupleIndexer(recurse(o), pos)
             | TypeOf(expr)                => JsAST.TypeOf(recurse(expr))
             | Undefined                   => ast'            
             | UnaryOperator(op, obj)      => JsAST.UnaryOperator(op, recurse(obj))

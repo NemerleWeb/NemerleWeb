@@ -21,12 +21,13 @@ module Program
   
 [ViewModel]
 public partial class Test
-{   
-  results : List[string] { get; set; }
-  public this() {
-    results = [].ToList();  
-  }
+{  
   
+  public this() {    
+    def a = ("a", "b");
+    def b = a[0];
+  }
+   
   [Html]
   public View() : string {
       <# <div></div> #>

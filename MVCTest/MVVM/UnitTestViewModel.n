@@ -6,23 +6,31 @@ namespace MVCTest
   [ViewModel]
   public class UnitTestViewModel
   {
-    Results : List[string] { get; set; }
+    Results : List[(string * string)] { get; set; }
     
     public this() {      
-      def test(res) {
-        Results.Add(res());
+      def test(description, res) {
+        Results.Add((description, res()));
       }
       Results = [].ToList();
       
-      test(() => {
+      test("return string", () => {
         "Passed"
       });
       
-      test(() => {
+      test("if(true) p else f", () => {
         if(true) {
           "Passed"
         } else {
           "Failed"
+        }
+      });
+      
+      test("if(true) f else p", () => {
+        if(false) {
+          "Failed"
+        } else {
+          "Passed"
         }
       });
     }
@@ -32,7 +40,7 @@ namespace MVCTest
     {
       <#
         <div>
-          <div $foreach(r in Results) css-failed='$r == "Failed"'>$r</div>
+          <div $foreach(r in Results) css-failed='$(r[1] == "Failed")'>$(r[1])</div>
         </div>
       #>
     }
