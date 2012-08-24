@@ -38,6 +38,10 @@ namespace MVCTest
       test("ctor().field", () => {
         Dummy().DummyField
       });
+      
+      test("ctor().prop with if/else inside", () => {
+        Dummy().DummyProp;
+      });
     }
     
     [Html]
@@ -55,6 +59,17 @@ namespace MVCTest
       #>
     }
     
-    class Dummy { public DummyField : string = "Passed"; }
+    class Dummy { 
+      public DummyField : string = "Passed"; 
+      public DummyProp : string
+      {
+        get {
+          if(true)
+            "Passed"
+          else 
+            "Failed"
+        }
+      }
+    }
   }
 }
