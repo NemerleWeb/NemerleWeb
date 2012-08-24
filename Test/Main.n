@@ -13,7 +13,7 @@ module Program
 {
   Main() : void
   {
-      def result = Utils.MakePageHtml(ListsAndCollectionsViewModel());      
+      def result = Utils.MakePageHtml(Test());      
       Console.WriteLine(result);
       _ = Console.ReadKey();
   }
@@ -21,9 +21,14 @@ module Program
   
 [ViewModel]
 public partial class Test
-{         
-    [Html]
-    public View() : string {
-        <#  #>
-    }
+{   
+  results : List[string] { get; set; }
+  public this() {
+    results = [].ToList();  
+  }
+  
+  [Html]
+  public View() : string {
+      <# <div></div> #>
+  }
 }

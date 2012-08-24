@@ -98,7 +98,12 @@ namespace Nemerle.NemerleWeb
             | Sequence(e1, e2)                  => JsAST.Seq([Build(e1), Build(e2)])
             | StaticEventRef                    => Message.Warning(expr.Location, "StaticEventRef not implemented"); JsAST.NotImpl()
             | StaticPropertyRef                 => Message.Warning(expr.Location, "StaticPropertyRef not implemented"); JsAST.NotImpl()
-            | StaticRef(from, mem, _)           => JsAST.StaticRef(JsClass.GetProperName(from.TypeInfo), mem.Name)
+            | StaticRef(from, mem, _)           => 
+              def typeName = if(from.tycon.SystemType != null) from.tycon.SystemType.FullName else from.tycon.FrameworkTypeName;              
+              match(typeName) {
+              | _ when typeName == typeof(Nemerle.Core.list[_].Nil).FullName => JsAST.Array([])
+              | _ => JsAST.StaticRef(JsClass.GetProperName(from.TypeInfo), mem.Name);
+              }
             | Switch                            => Message.Warning(expr.Location, "Switch not implemented"); JsAST.NotImpl()
             | This                              => JsAST.This()
             | Throw                             => Message.Warning(expr.Location, "Throw not implemented"); JsAST.NotImpl()
