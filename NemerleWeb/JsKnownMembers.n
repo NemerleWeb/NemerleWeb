@@ -35,7 +35,11 @@ namespace Nemerle.NemerleWeb
       
       public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
       {
-        def typeName = if(type.SystemType != null) type.SystemType.FullName else type.FrameworkTypeName;
+        def typeName = if(type != null)          
+                        if(type.SystemType != null) type.SystemType.FullName else type.FrameworkTypeName;
+                      else
+                        "";
+            
         match(member.Name, parms) {
         | ("op_Inequality", _) => JsAST.Call(JsAST.OpCode("!="), parms)
         | ("op_Equality", _) => JsAST.Call(JsAST.OpCode("=="), parms)

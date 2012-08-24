@@ -19,106 +19,11 @@ module Program
   }
 }
   
-[Record, JsModel]
-public class SeatReservation 
-{
-    public Name : string { get; set; }
-    public Meal : Meal { get; set; }
-    public Root : ListsAndCollectionsViewModel { get; set; }
-        
-    public FormattedPrice : string 
-    { 
-        get { if(Meal != null) Meal.Price.ToString() else "None" } 
-    }
-    
-    public AfterRender() : void
-    {
-    }
-    
-    [Html]
-    public EditTemplate() : string {
-        <#
-            <div>
-                <td><input value="$(Name)" /></td>
-                <td><select options="$(Root.AvailableMeals)" data-bind="value: Meal" data-bind="optionsText: MealName"></select></td>
-                <td>$(FormattedPrice)</td>
-                <td><a href="#" click="$(Root.RemoveSeat)">Remove</a></td>
-            </div>
-        #>
-    }
-      
-}
-
-[Record, JsModel]
-public class Meal 
-{
-    public MealName : string { get; set; }
-    public Price : decimal { get; set; }
-}
-    
 [ViewModel]
-public partial class ListsAndCollectionsViewModel
-{    
-    
-    public AvailableMeals : List[Meal] { get; set; }
-    public Seats          : List[SeatReservation] { get; set; }
-    public SeatCount      : int;
-    public TotalSurcharge : decimal 
-    { 
-        get { 
-            mutable total = 0m;
-            foreach(seat in Seats) {
-                total = total + seat.Meal.Price;
-            }
-            total
-        }
-    }
-    
-    public this() 
-    {
-        AvailableMeals = [Meal("Potatoes", 1), Meal("Tomatoes", 2)].ToList();
-        Seats = [SeatReservation("Steve", AvailableMeals[0], this), 
-                  SeatReservation("Roger", AvailableMeals[1], this)].ToList();
-        SeatCount = Seats.Count();
-    }
-    
-    public AddSeat() : void 
-    {
-        Seats.Add(SeatReservation("", AvailableMeals[0], this))
-    }
-    
-    public RemoveSeat(seat : SeatReservation) : bool
-    {        
-        Seats.Remove(seat)
-    }
-          
+public partial class Test
+{         
     [Html]
     public View() : string {
-        <#  
-            <div>
-                <h2>Your seat reservations (<span>$(Seats.Count())</span>)</h2>
-                <table>
-                    <thead><tr>
-                        <th>Passenger name</th><th>Meal</th><th>Surcharge</th><th></th>
-                    </tr></thead>
-                    <tbody>
-                        <tr $foreach(s in Seats)>
-                            <td><span text="$s"></span></td>
-                            <td><input value="$(s.Name)" /></td>
-                            <td><select options="$AvailableMeals" data-bind="value: Meal" data-bind="optionsText: MealName"></select></td>
-                            <td>$(s.FormattedPrice)</td>
-                            <td><a href="#" click="$RemoveSeat">Remove</a></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <button click="$AddSeat" enable="$(Seats.Count() < 5)">Reserve another seat</button>
-                <span $(Template(Seats, _.EditTemplate))></span>
-                <h3 css-profitWarning="$(TotalSurcharge > 0)"
-                    css-profitWarning2="$(TotalSurcharge == 0)" 
-                    visible="$(TotalSurcharge > 0)">
-                    Total surcharge: <span>$TotalSurcharge</span>
-                </h3>
-            </div>
-        #>
+        <#  #>
     }
 }

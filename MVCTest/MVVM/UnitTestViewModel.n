@@ -1,0 +1,40 @@
+﻿using Nemerle.NemerleWeb;
+using System.Collections.Generic;
+using System.Linq;
+namespace MVCTest
+{
+  [ViewModel]
+  public class UnitTestViewModel
+  {
+    Results : List[string] { get; set; }
+    
+    public this() {      
+      def test(res) {
+        Results.Add(res());
+      }
+      Results = [].ToList();
+      
+      test(() => {
+        "Passed"
+      });
+      
+      test(() => {
+        if(true) {
+          "Passed"
+        } else {
+          "Failed"
+        }
+      });
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+        <div>
+          <div $foreach(r in Results) css-failed='$r == "Failed"'>$r</div>
+        </div>
+      #>
+    }
+  }
+}

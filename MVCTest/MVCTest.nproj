@@ -175,6 +175,9 @@
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="MVVM\UnitTestViewModel.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
   </ItemGroup>
   <ItemGroup>
@@ -329,18 +332,6 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\sammy.js">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Views\Home\Introduction.cshtml">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Views\Home\ListsAndCollections.cshtml">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Views\Home\LoadingAndSaving.cshtml">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Views\Home\SinglePageApps.cshtml">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Web.config" />

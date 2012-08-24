@@ -14,6 +14,11 @@ namespace MVCTest.Controllers
     public Index() : ActionResult 
     {
       View(Utils.MakePageHtml(SamplesViewModel()) : object);
-    }    
+    }
+    
+    public Tests() : ActionResult
+    {
+      View(Utils.MakePageHtml(UnitTestViewModel()) : object);
+    }
   }
 }
