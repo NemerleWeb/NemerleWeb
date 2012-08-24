@@ -42,6 +42,12 @@ namespace MVCTest
       test("ctor().prop with if/else inside", () => {
         Dummy().DummyProp;
       });
+      
+      test("tuple expansion def (a, b, c) = tuple", () => {
+        def tuple = ("Failed", "Passed", 0);
+        def (_a, b, _c) = tuple;
+        b;
+      });
     }
     
     [Html]

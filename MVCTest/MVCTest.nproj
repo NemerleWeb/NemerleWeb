@@ -334,6 +334,9 @@
     <Content Include="Scripts\sammy.js">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Views\Home\Tests.cshtml">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

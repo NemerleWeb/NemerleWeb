@@ -24,7 +24,8 @@ public partial class Test
 {  
   class Dummy { public DummyField : string = "Passed"; }
   public this() {    
-    def a = Dummy().DummyField;
+    def tuple = ("Failed", "Passed", 0);
+    def (_a, b, _c) = tuple;
   }
    
   [Html]

@@ -13,14 +13,15 @@ namespace MVCTest
     {
       get
       {
-        when(string.IsNullOrWhiteSpace(SearchPattern))
-          SearchPattern = "";
-        
-        def result = List();
-          foreach(name in Names)
-              when(name.ToUpper().Contains(SearchPattern.ToUpper()))
-                  result.Add(name);
-        result
+        if(SearchPattern == null)
+          Names;
+        else {
+          def result = List();
+            foreach(name in Names)
+                when(name.ToUpper().Contains(SearchPattern.ToUpper()))
+                    result.Add(name);
+          result
+        }
       }
     }    
     

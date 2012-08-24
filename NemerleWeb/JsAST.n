@@ -38,7 +38,7 @@ namespace Nemerle.NemerleWeb
                                     }).Filter(e => match(e) {
                                         | StaticRef("Nemerle_Core_Nil[T]", _) => false
                                         | _ => true
-                                    }))            
+                                    }))
                 }
             }
             
