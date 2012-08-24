@@ -48,6 +48,15 @@ namespace MVCTest
         def (_a, b, _c) = tuple;
         b;
       });
+      
+      test("dummy.prop++", () => {
+        def d = Dummy();
+        d.DummyInt++;
+        if(d.DummyInt == 1)
+          "Passed"
+        else
+          "Failed"
+      });
     }
     
     [Html]
@@ -66,7 +75,8 @@ namespace MVCTest
     }
     
     class Dummy { 
-      public DummyField : string = "Passed"; 
+      public DummyInt : int { get; set; }
+      public mutable DummyField : string = "Passed"; 
       public DummyProp : string
       {
         get {

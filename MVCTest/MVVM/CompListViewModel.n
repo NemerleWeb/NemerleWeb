@@ -1,0 +1,56 @@
+﻿using Nemerle.NemerleWeb;
+using System.Linq;
+using System.Collections.Generic;
+using Nemerle.ComputationExpressions;
+
+namespace MVCTest
+{
+  [JsModel]
+  class CompListViewModel
+  {
+    Alphabet : array[string] { get; set; }
+    LetterCount : int { get; set; }
+    Letters : list[string]
+    {
+      get
+      {
+        comp list {
+          for(mutable i = 0; i < LetterCount; i++)
+            yield Alphabet[i];
+        }
+      }
+    }
+    
+    public this() {
+      Alphabet = array["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+      LetterCount = 3;
+    }
+    
+    public More() : void {
+      when(LetterCount < Alphabet.Count())
+        LetterCount++;
+    }
+    
+    public Less() : void {
+      when(LetterCount > 0)
+        LetterCount--;
+    }
+    
+    [Html]
+    public View() : string 
+    {
+      <#
+        <div>
+          <h3>Alphabet</h3>
+          <button click="$More">More</button>
+          <button click="$Less">Less</button>
+          <div class="name-list">
+            <span $foreach(l in Letters)>
+              $(l + " ")
+            </span>
+          </div>
+        </div>
+      #>
+    }
+  }
+}

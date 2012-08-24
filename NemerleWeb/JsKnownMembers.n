@@ -68,14 +68,15 @@ namespace Nemerle.NemerleWeb
         | ("ToList", h :: []) when typeName == typeof(Enumerable).FullName    => h        
         | ("Count", l :: []) when typeName == typeof(Enumerable).FullName     => JsAST.FieldRef(l, "length")
         //
+        | ("NToList", [obj]) when typeName == typeof(Nemerle.Collections.NCollectionsExtensions).FullName => obj
         | ("WriteLine", h :: []) when typeName == typeof(Console).FullName    => JsAST.Call(JsAST.MethodRef(JsAST.LocalRef("console"), "log"), [h])
         //
         | (".ctor", parms) when typeName == typeof(list[_].Cons).FullName     => JsAST.Array(parms.Filter(p => !(p is JsAST.NotImpl()))) //filter out [] in the end
         | (".ctor", parms) when typeName == typeof(List[_]).FullName          => JsAST.Array(parms.Filter(p => !(p is JsAST.NotImpl())))
         | (".ctor", parms) => JsAST.Call(JsAST.Constructor(type), parms)
-        | _ when member.Name.StartsWith("get_")                                               => JsAST.PropertyGet(left, RemoveGetSet(member.Name))
-        | (_, h :: []) when member.Name.StartsWith("set_")                                    => JsAST.PropertySet(left, RemoveGetSet(member.Name), h)            
-        | _                                                                                   => Message.Warning(member.Location, $"$(member.Name) not implemented in JS"); JsAST.Call(JsAST.MethodRef(left, RemoveGetSet(member.Name)), parms)
+        | _ when member.Name.StartsWith("get_")                               => JsAST.PropertyGet(left, RemoveGetSet(member.Name))
+        | (_, h :: []) when member.Name.StartsWith("set_")                    => JsAST.PropertySet(left, RemoveGetSet(member.Name), h)            
+        | _                                                                   => Message.Warning(member.Location, $"$(member.Name) not implemented in JS"); JsAST.Call(JsAST.MethodRef(left, RemoveGetSet(member.Name)), parms)
         }
       }
       

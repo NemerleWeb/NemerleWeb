@@ -20,8 +20,8 @@ namespace Nemerle.NemerleWeb
         | Some(jsast) => jsast
         | _ =>
           match(expr) {
-            | Array                             => Message.Warning(expr.Location, "Array not implemented"); JsAST.NotImpl()
-            | ArrayIndexer                      => Message.Warning(expr.Location, "ArrayIndexer not implemented"); JsAST.NotImpl()
+            | Array(args, _dims)                => JsAST.Array(args.Map(Build))
+            | ArrayIndexer(obj, a :: _)         => JsAST.ArrayIndexer(Build(obj), Build(a))
             | Assign(s, t)                      => JsAST.Assign(Build(s), Build(t))
             | Base                              => Message.Warning(expr.Location, "Base not implemented"); JsAST.NotImpl()
             | Block(body = body)                => Build(body) 

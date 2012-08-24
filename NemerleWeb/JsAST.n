@@ -43,6 +43,11 @@ namespace Nemerle.NemerleWeb
             }
             
         }
+        | ArrayIndexer    { Obj : JsAST; Index : JsAST;
+            public override Write(_ = "" : string) : string {                
+                $<#$(Obj.Write())[$(Index.Write())]#>
+            }
+        }
         | BinaryOperator { Op : string; Left : JsAST; Right : JsAST;
             public override Write(_ = "" : string) : string {
                 $"$(Left.Write()) $Op $(Right.Write())"
@@ -227,6 +232,13 @@ $(Body.Write())
             public override Write(_ = "" : string) : string {
                 $"$(Obj.Write()).$PropertyName($(Value.Write()))"
             }
+            public override Transform() : JsAST {
+              match(Value) {
+              | Call(OpCode("++"), [PropertyGet(obj, name)]) => JsAST.PropertySet(Obj, PropertyName, JsAST.Call(JsAST.OpCode("+"), [JsAST.PropertyGet(obj, name), JsAST.Literal(JsLiteral.Integer(1))]))
+              | Call(OpCode("--"), [PropertyGet(obj, name)]) => JsAST.PropertySet(Obj, PropertyName, JsAST.Call(JsAST.OpCode("-"), [JsAST.PropertyGet(obj, name), JsAST.Literal(JsLiteral.Integer(1))]))
+              | _ => this
+              }
+            }
         }
         | PropertyGet    { Obj : JsAST; PropertyName : string;
             public override Write(_ = "" : string) : string {
@@ -377,7 +389,7 @@ $(Body.Write("  "))
                                                            typeof(JsAST.Ternary), typeof(JsAST.NotImpl), typeof(JsAST.Lambda),
                                                            typeof(JsAST.Array), typeof(JsAST.StaticRef), typeof(JsAST.This), 
                                                            typeof(JsAST.Tuple), typeof(JsAST.TupleIndexer), typeof(JsAST.FieldRef),
-                                                           typeof(JsAST.PropertyGet)];
+                                                           typeof(JsAST.PropertyGet), typeof(JsAST.ArrayIndexer)];
                                          
         public static Recurse(ast : JsAST, selector : JsAST -> JsAST, topdown : bool = true) : JsAST 
         {
@@ -387,6 +399,7 @@ $(Body.Write("  "))
             def result = match(ast') {
             | Assign(l, r)                => JsAST.Assign(recurse(l), recurse(r))
             | Array(v)                    => JsAST.Array(v.Map(recurse))
+            | ArrayIndexer(o, v)          => JsAST.ArrayIndexer(recurse(o), recurse(v))
             | BinaryOperator(o, l, r)     => JsAST.BinaryOperator(o, recurse(l), recurse(r))
             | Break                       => ast'
             | Call(func, parms)           => JsAST.Call(recurse(func), parms.Map(recurse))

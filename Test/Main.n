@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 
 using Nemerle.NemerleWeb;
+using Nemerle.ComputationExpressions;
 
 module Program
 {
@@ -21,15 +22,19 @@ module Program
   
 [ViewModel]
 public partial class Test
-{  
-  class Dummy { public DummyField : string = "Passed"; }
-  public this() {    
-    def tuple = ("Failed", "Passed", 0);
-    def (_a, b, _c) = tuple;
+{    
+  LetterCount : int { get; set; }
+  
+  More() : void {
+    LetterCount++;
   }
-   
+  
   [Html]
-  public View() : string {
-      <# <div></div> #>
+  public View() : string 
+  {
+    <#
+      <div>
+      </div>
+    #>
   }
 }

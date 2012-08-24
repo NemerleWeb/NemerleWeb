@@ -57,6 +57,11 @@
       <HintPath>$(Nemerle)\Nemerle.Compiler.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Nemerle.ComputationExpressions, Version=1.1.856.0, Culture=neutral, PublicKeyToken=e080a9c724e2bfcd">
+      <Name>Nemerle.ComputationExpressions</Name>
+      <AssemblyName>Nemerle.ComputationExpressions.dll</AssemblyName>
+      <HintPath>..\..\..\..\Program Files (x86)\Nemerle\net-4.5\Nemerle.ComputationExpressions.dll</HintPath>
+    </Reference>
     <Reference Include="Nemerle.Macros">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(Nemerle)\Nemerle.Macros.dll</HintPath>
@@ -150,6 +155,10 @@
     </Compile>
     <Compile Include="Infrastructure\HtmlHelperExtensions.n">
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\CompListViewModel.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Knockout\Tutorial_1_Introduction.n">
       <SubType>Code</SubType>
@@ -377,6 +386,14 @@
       <Project>{b1635fea-c0cd-4c8e-a18e-d97d59f21b14}</Project>
       <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <MacroReference Include="Nemerle.ComputationExpressions.Macros, Version=1.1.856.0, Culture=neutral, PublicKeyToken=e080a9c724e2bfcd">
+      <Name>Nemerle.ComputationExpressions.Macros</Name>
+      <AssemblyName>Nemerle.ComputationExpressions.Macros.dll</AssemblyName>
+      <HintPath>..\..\..\..\Program Files (x86)\Nemerle\net-4.5\Nemerle.ComputationExpressions.Macros.dll</HintPath>
+      <Private>False</Private>
+    </MacroReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets" />
