@@ -130,6 +130,17 @@ h1.logo span {
     padding-top: 10px;
 }
 
+.jsast-tests tr td {
+    background-color: greenyellow;
+    padding: 2px 5px;
+    text-align: center;
+}
+
+.jsast-tests tr.failed td {
+    background-color: red;
+    color: #fff;
+}
+
 footer {
     padding: 15px 50px 30px 50px;
     font-size: 14px;

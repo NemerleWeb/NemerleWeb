@@ -372,11 +372,11 @@ $(Body.Write("  "))
         
         public abstract Write(_indent = "" : string) : string { string.Empty; };
         public virtual Transform() : JsAST { this }
-        public static AllowedForAssignment : list[Type] = [typeof(JsAST.Call), typeof(JsAST.MethodRef), typeof(JsAST.LocalRef), 
+        public static AllowedForAssignment : list[Type] = [typeof(JsAST.Call), typeof(JsAST.MethodRef), typeof(JsAST.LocalRef),            
                                                            typeof(JsAST.Literal), typeof(JsAST.Code), typeof(JsAST.Void), 
                                                            typeof(JsAST.Ternary), typeof(JsAST.NotImpl), typeof(JsAST.Lambda),
                                                            typeof(JsAST.Array), typeof(JsAST.StaticRef), typeof(JsAST.This), 
-                                                           typeof(JsAST.Tuple), typeof(JsAST.TupleIndexer)];
+                                                           typeof(JsAST.Tuple), typeof(JsAST.TupleIndexer), typeof(JsAST.FieldRef)];
                                          
         public static Recurse(ast : JsAST, selector : JsAST -> JsAST, topdown : bool = true) : JsAST 
         {

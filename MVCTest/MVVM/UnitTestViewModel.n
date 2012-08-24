@@ -8,6 +8,7 @@ namespace MVCTest
   {
     Results : List[(string * string)] { get; set; }
     
+    
     public this() {      
       def test(description, res) {
         Results.Add((description, res()));
@@ -26,12 +27,16 @@ namespace MVCTest
         }
       });
       
-      test("if(true) f else p", () => {
+      test("if(false) f else p", () => {
         if(false) {
           "Failed"
         } else {
           "Passed"
         }
+      });
+      
+      test("ctor().field", () => {
+        Dummy().DummyField
       });
     }
     
@@ -39,10 +44,17 @@ namespace MVCTest
     public View() : string
     {
       <#
-        <div>
-          <div $foreach(r in Results) css-failed='$(r[1] == "Failed")'>$(r[1])</div>
-        </div>
+        <table class="jsast-tests">
+          <tbody>
+            <tr $foreach(r in Results) css-failed='$(r[1] != "Passed")'>
+              <td>$(r[0])</td>
+              <td>$(r[1])</td>
+            </tr>
+          </tbody>
+        </table>
       #>
     }
+    
+    class Dummy { public DummyField : string = "Passed"; }
   }
 }

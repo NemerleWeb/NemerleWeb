@@ -22,10 +22,9 @@ module Program
 [ViewModel]
 public partial class Test
 {  
-  
+  class Dummy { public DummyField : string = "Passed"; }
   public this() {    
-    def a = ("a", "b");
-    def b = a[0];
+    def a = Dummy().DummyField;
   }
    
   [Html]
