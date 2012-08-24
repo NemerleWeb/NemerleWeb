@@ -156,7 +156,8 @@ $(ElseBody.Write("  "))
 }#>
             }
             public override Transform() : JsAST {
-                match(this) {        
+                match(this) {
+                | If(If(c, t, e), tt, ee)    => JsAST.If(JsAST.Ternary(c, t, e), tt, ee)
                 | If(Call(func, something :: If(c, t, e) :: []), then, els)
                 | If(Call(func, If(c, t, e) :: something :: []), then, els) => JsAST.If(JsAST.Call(func, JsAST.Ternary(c, t, e) :: [something]), then, els).Transform()
                 | If(Call(OpCode as op, Seq as seq :: rest), then, els) =>
@@ -183,6 +184,22 @@ $<#
 if($(Cond.Write())) { 
 $(Body.Write("  "))
 }#>
+            }
+            public override Transform() : JsAST {
+                match(this) {
+                | JustIf(Call(func, [something, If(c, t, e)]), then)
+                | JustIf(Call(func, [If(c, t, e), something]), then) => JsAST.JustIf(JsAST.Call(func, JsAST.Ternary(c, t, e) :: [something]), then).Transform()
+                | JustIf(Call(OpCode as op, Seq as seq :: rest), then) =>
+                    def varName = JsASTHelper.GetTemporaryVariableName();
+                    JsAST.Seq([JsAST.DefValue(varName, JsAST.Void()), JsASTHelper.DelayAssignment(seq, JsAST.LocalRef(varName)), JsAST.JustIf(JsAST.Call(op, JsAST.LocalRef(varName) :: rest), then)]).Transform();                           
+                | JustIf(Call(OpCode as op, Call(MethodRef(Seq as seq,  m), parms) :: rest), then)  =>             
+                    def varName = JsASTHelper.GetTemporaryVariableName();
+                    JsAST.Seq([JsAST.DefValue(varName, JsAST.Void()), JsASTHelper.DelayAssignment(seq, JsAST.LocalRef(varName)), JsAST.JustIf(JsAST.Call(op, JsAST.Call(JsAST.MethodRef(JsAST.LocalRef(varName), m), parms) :: rest), then)]).Transform();
+                | JustIf(Call(OpCode as op, Call as call :: rest), then) =>             
+                    def varName = JsASTHelper.GetTemporaryVariableName();
+                    JsAST.Seq([JsAST.DefValue(varName, call), JsAST.JustIf(JsAST.Call(op, JsAST.LocalRef(varName) :: rest), then)]).Transform()
+                | _ => this
+                }
             }
         }               
         | Label          { Id : int; Body : JsAST;

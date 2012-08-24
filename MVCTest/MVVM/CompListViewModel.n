@@ -9,14 +9,17 @@ namespace MVCTest
   class CompListViewModel
   {
     Alphabet : array[string] { get; set; }
+    OddLettersOnly : bool { get; set; }
     LetterCount : int { get; set; }
     Letters : list[string]
     {
       get
       {
         comp list {
-          for(mutable i = 0; i < LetterCount; i++)
-            yield Alphabet[i];
+          for(mutable i = 0; i < LetterCount; i++) {
+            when(!OddLettersOnly || i % 2 == 1)
+              yield Alphabet[i];
+          }            
         }
       }
     }
@@ -27,7 +30,7 @@ namespace MVCTest
     }
     
     public More() : void {
-      when(LetterCount < Alphabet.Count())
+      when(LetterCount < Alphabet.Count())        
         LetterCount++;
     }
     
@@ -44,6 +47,7 @@ namespace MVCTest
           <h3>Alphabet</h3>
           <button click="$More">More</button>
           <button click="$Less">Less</button>
+          Odd letters only <input type="checkbox" checked="$OddLettersOnly" />
           <div class="name-list">
             <span $foreach(l in Letters)>
               $(l + " ")

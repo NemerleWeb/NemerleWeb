@@ -26,7 +26,10 @@ public partial class Test
   LetterCount : int { get; set; }
   
   More() : void {
-    LetterCount++;
+    def a = true;
+    def b = false;
+    when(a == true && b == false)
+      LetterCount++;    
   }
   
   [Html]
