@@ -35,7 +35,11 @@ namespace Nemerle.NemerleWeb
       
       public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
       {
-        def typeName = if(type.SystemType != null) type.SystemType.FullName else type.FrameworkTypeName;
+        def typeName = if(type != null)          
+                        if(type.SystemType != null) type.SystemType.FullName else type.FrameworkTypeName;
+                      else
+                        "";
+            
         match(member.Name, parms) {
         | ("op_Inequality", _) => JsAST.Call(JsAST.OpCode("!="), parms)
         | ("op_Equality", _) => JsAST.Call(JsAST.OpCode("=="), parms)
@@ -47,6 +51,12 @@ namespace Nemerle.NemerleWeb
         | ("ToString", [])  => JsAST.Call(JsAST.MethodRef(left, "toString"), [])
         | ("Concat", h :: t) when typeName == typeof(string).FullName         => JsAST.Call(JsAST.MethodRef(h, "concat"), t)
         | ("ToUpper", []) when typeName == typeof(string).FullName            => JsAST.Call(JsAST.MethodRef(left, "toUpperCase"), [])
+        | ("Contains", [sub]) when typeName == typeof(string).FullName        => JsAST.Call(JsAST.OpCode("!="), [JsAST.Call(JsAST.MethodRef(left, "indexOf"), [sub]), JsAST.Literal(JsLiteral.Integer(-1))])
+        | ("IsNullOrEmpty", [str]) when typeName == typeof(string).FullName
+        | ("IsNullOrWhiteSpace", [str]) when typeName == typeof(string).FullName   => 
+          JsAST.Call(JsAST.OpCode("||"), 
+                [JsAST.Call(JsAST.OpCode("==="), [str, JsAST.Literal(JsLiteral.Null())]),
+                 JsAST.Call(JsAST.OpCode("==="), [str, JsAST.Literal(JsLiteral.String(""))])])
         | ("op_Implicit", h :: [])                                            => h
         | ("op_Implicit", h :: t)                                             => JsAST.Seq(h :: t)
         | ("op_Addition", parms)                                              => JsAST.Call(JsAST.OpCode("+"), parms)
@@ -58,14 +68,15 @@ namespace Nemerle.NemerleWeb
         | ("ToList", h :: []) when typeName == typeof(Enumerable).FullName    => h        
         | ("Count", l :: []) when typeName == typeof(Enumerable).FullName     => JsAST.FieldRef(l, "length")
         //
+        | ("NToList", [obj]) when typeName == typeof(Nemerle.Collections.NCollectionsExtensions).FullName => obj
         | ("WriteLine", h :: []) when typeName == typeof(Console).FullName    => JsAST.Call(JsAST.MethodRef(JsAST.LocalRef("console"), "log"), [h])
         //
         | (".ctor", parms) when typeName == typeof(list[_].Cons).FullName     => JsAST.Array(parms.Filter(p => !(p is JsAST.NotImpl()))) //filter out [] in the end
         | (".ctor", parms) when typeName == typeof(List[_]).FullName          => JsAST.Array(parms.Filter(p => !(p is JsAST.NotImpl())))
         | (".ctor", parms) => JsAST.Call(JsAST.Constructor(type), parms)
-        | _ when member.Name.StartsWith("get_")                                               => JsAST.PropertyGet(left, RemoveGetSet(member.Name))
-        | (_, h :: []) when member.Name.StartsWith("set_")                                    => JsAST.PropertySet(left, RemoveGetSet(member.Name), h)            
-        | _                                                                                   => Message.Warning(member.Location, $"$(member.Name) not implemented in JS"); JsAST.Call(JsAST.MethodRef(left, RemoveGetSet(member.Name)), parms)
+        | _ when member.Name.StartsWith("get_")                               => JsAST.PropertyGet(left, RemoveGetSet(member.Name))
+        | (_, h :: []) when member.Name.StartsWith("set_")                    => JsAST.PropertySet(left, RemoveGetSet(member.Name), h)            
+        | _                                                                   => Message.Warning(member.Location, $"$(member.Name) not implemented in JS"); JsAST.Call(JsAST.MethodRef(left, RemoveGetSet(member.Name)), parms)
         }
       }
       

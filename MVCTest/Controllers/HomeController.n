@@ -9,32 +9,16 @@ using Nemerle.NemerleWeb;
 
 namespace MVCTest.Controllers
 {
-	public class HomeController : Controller
-	{
-	    public Index() : ActionResult 
-	    {
-            View();
-        }
-    
-        public Introduction() : ActionResult
-        {
-            View(Utils.MakePageHtml(IntroductionViewModel("John", "Silver")) : object)
-        }
-        
-        public ListsAndCollections() : ActionResult
-        {
-            View(Utils.MakePageHtml(ListsAndCollectionsViewModel()) : object)
-        }
-        
-        public SinglePageApps() : ActionResult
-        {
-            View(Utils.MakePageHtml(SPAViewModel()) : object)
-        }
-        
-        public LoadingAndSaving() : ActionResult
-        {            
-            View(Utils.MakePageHtml(LoadingAndSavingViewModel()) : object);
-        }
-        
+  public class HomeController : Controller
+  {
+    public Index() : ActionResult 
+    {
+      View(Utils.MakePageHtml(SamplesViewModel()) : object);
     }
+    
+    public Tests() : ActionResult
+    {
+      View(Utils.MakePageHtml(UnitTestViewModel()) : object);
+    }
+  }
 }

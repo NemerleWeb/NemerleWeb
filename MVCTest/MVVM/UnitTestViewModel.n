@@ -1,0 +1,91 @@
+﻿using Nemerle.NemerleWeb;
+using System.Collections.Generic;
+using System.Linq;
+namespace MVCTest
+{
+  [ViewModel]
+  public class UnitTestViewModel
+  {
+    Results : List[(string * string)] { get; set; }
+    
+    
+    public this() {      
+      def test(description, res) {
+        Results.Add((description, res()));
+      }
+      Results = [].ToList();
+      
+      test("return string", () => {
+        "Passed"
+      });
+      
+      test("if(true) p else f", () => {
+        if(true) {
+          "Passed"
+        } else {
+          "Failed"
+        }
+      });
+      
+      test("if(false) f else p", () => {
+        if(false) {
+          "Failed"
+        } else {
+          "Passed"
+        }
+      });
+      
+      test("ctor().field", () => {
+        Dummy().DummyField
+      });
+      
+      test("ctor().prop with if/else inside", () => {
+        Dummy().DummyProp;
+      });
+      
+      test("tuple expansion def (a, b, c) = tuple", () => {
+        def tuple = ("Failed", "Passed", 0);
+        def (_a, b, _c) = tuple;
+        b;
+      });
+      
+      test("dummy.prop++", () => {
+        def d = Dummy();
+        d.DummyInt++;
+        if(d.DummyInt == 1)
+          "Passed"
+        else
+          "Failed"
+      });
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+        <table class="jsast-tests">
+          <tbody>
+            <tr $foreach(r in Results) css-failed='$(r[1] != "Passed")'>
+              <td>$(r[0])</td>
+              <td>$(r[1])</td>
+            </tr>
+          </tbody>
+        </table>
+      #>
+    }
+    
+    class Dummy { 
+      public DummyInt : int { get; set; }
+      public mutable DummyField : string = "Passed"; 
+      public DummyProp : string
+      {
+        get {
+          if(true)
+            "Passed"
+          else 
+            "Failed"
+        }
+      }
+    }
+  }
+}

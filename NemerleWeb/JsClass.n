@@ -17,6 +17,7 @@ namespace Nemerle.NemerleWeb
         public ClassType : TypeBuilder { get; set; }
         public Indent : string    { get; set; }
         public IEnumerableType : TypeVar { get; set; }
+        public StringType : TypeVar { get; set; }
         public Typer : Typer { get; set; }
         public Properties : list[PropertyBuilder] 
         {
@@ -100,7 +101,7 @@ $staticConstructorBody#>
         GetProperties(indent : string) : string 
         {                                                   
             def propVal(prop : PropertyBuilder) {
-                def isArray = TypeIsArray(prop.GetGetter().ReturnType.TypeInfo);
+                def isArray = TypeIsArray(prop.GetGetter().ReturnType);
                 match((IsViewmodel, isArray)) {
                 | (true, true) => "ko.observableArray([])"
                 | (true, false) => "ko.observable(null)"
@@ -128,7 +129,7 @@ $computedBody
         {
             def fields = ClassType.GetFields().Where(f => !f.IsStatic && f.Name != "server" && !f.Name.StartsWith("_N_") && f.Name != "__constructorParams");
             def fldVal(fld : IField) {
-                if(TypeIsArray(fld.GetMemType().TypeInfo)) "[]" else "{}";
+                if(TypeIsArray(fld.GetMemType())) "[]" else "{}";
             }
             def fieldStrings = fields.Map(f => indent + $<#this.$(f.Name) = $(fldVal(f))#>);
             $<#..$(fieldStrings; ";\n")#>;
@@ -185,7 +186,7 @@ $(indent)}#>);
             def nested = ClassType.DeclaredNestedTypes
                                   .Filter(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server
                                   .Filter(c => !c.Name.StartsWith("_N__N_")) //Not generated class
-                                  .Map(c => JsClass(c, Indent, IEnumerableType, Typer).Write());
+                                  .Map(c => JsClass(c, Indent, IEnumerableType, StringType, Typer).Write());
             $"..$(nested; Environment.NewLine)"
         }
         
@@ -196,9 +197,10 @@ $(indent)}#>);
                      .Iter(t => t.Ast.AddCustomAttribute(<[ Nemerle.NemerleWeb.GeneratedClass ]>));
         }
         
-        TypeIsArray(type : TypeInfo) : bool 
+        TypeIsArray(type : TypeVar) : bool 
         {
-            type.IsDerivedFrom(IEnumerableType.TypeInfo) && type.FullName != "System.String";
+          type.TryRequire(IEnumerableType) && !type.TryRequire(StringType);
+          //type.IsDerivedFrom(IEnumerableType.TypeInfo) && type.FullName != "System.String";
         }
                 
         public TranslateMethodBody(meth : MethodBuilder, indent = "" : string) : string

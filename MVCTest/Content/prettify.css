@@ -1,112 +1,70 @@
-.pln{color:#000}@media screen{.str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun,.opn,.clo{color:#660}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec,.var{color:#606}.fun{color:red}}@media print,projection{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun,.opn,.clo{color:#440}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}pre.prettyprint{padding:5px;border:1px solid #888;}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style-type:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}
-.str
-{
-    color: #EC7600;
+/* Pretty printing styles. Used with prettify.js.
+ *
+ * Name:	Stanley Ng
+ * Email: 	stanleyhlng@googlegroups.com
+ * 
+ * Credits:
+ * https://github.com/chriskempson/tomorrow-theme
+ */
+.pln {
+  color: #4d4d4c; }
+
+.str {
+  color: #7c931c; }
+
+.kwd {
+  color: #8443b0; }
+
+.com {
+  color: #8e908c;
+  font-style: italic; }
+
+.typ {
+  color: #f5871f; }
+
+.lit {
+  color: #eab700; }
+
+.pun {
+  color: #4d4d4c; }
+
+.opn {
+  color: #4d4d4c; }
+
+.clo {
+  color: #4d4d4c; }
+
+.tag {
+  color: #c82829; }
+
+.atn {
+  color: #eab700; }
+
+.atv {
+  color: #3e999f; }
+
+.dec {
+  color: #f5871f; }
+
+.var {
+  color: #c82829; }
+
+.fun {
+  color: #c82829; }
+
+/* Put a border around prettyprinted code snippets. */
+pre.prettyprint {
+  background-color: #ffffff;
+  padding: 10px;
+  border: 1px solid #4d4d4c; 
+  font-family: Consolas, 'Lucida Console', 'DejaVu Sans Mono', monospace
 }
-.kwd
-{
-    color: #93C763;
-}
-.com
-{
-    color: #66747B;
-}
-.typ
-{
-    color: #678CB1;
-}
-.lit
-{
-    color: #FACD22;
-}
-.pun
-{
-    color: #F1F2F3;
-}
-.pln
-{
-    color: #F1F2F3;
-}
-.tag
-{
-    color: #8AC763;
-}
-.atn
-{
-    color: #E0E2E4;
-}
-.atv
-{
-    color: #EC7600;
-}
-.dec
-{
-    color: purple;
-}
-pre.prettyprint
-{
-    border: 0px solid #888;
-}
-ol.linenums
-{
-    margin-top: 0;
-    margin-bottom: 0;
-}
-.prettyprint {
-    background: #000;
-}
-li.L0, li.L1, li.L2, li.L3, li.L4, li.L5, li.L6, li.L7, li.L8, li.L9
-{
-    color: #555;
-    list-style-type: decimal;
-}
-li.L1, li.L3, li.L5, li.L7, li.L9 {
-    background: #111;
-}
-@media print
-{
-    .str
-    {
-        color: #060;
-    }
-    .kwd
-    {
-        color: #006;
-        font-weight: bold;
-    }
-    .com
-    {
-        color: #600;
-        font-style: italic;
-    }
-    .typ
-    {
-        color: #404;
-        font-weight: bold;
-    }
-    .lit
-    {
-        color: #044;
-    }
-    .pun
-    {
-        color: #440;
-    }
-    .pln
-    {
-        color: #000;
-    }
-    .tag
-    {
-        color: #006;
-        font-weight: bold;
-    }
-    .atn
-    {
-        color: #404;
-    }
-    .atv
-    {
-        color: #060;
-    }
-}
+
+/* Specify class=linenums on a pre to get line numbering */
+ol.linenums {
+  color: #8e908c;
+  margin: 0 0 0 40px; }
+
+ol.linenums li {
+  line-height: 18px;
+  padding-left: 12px; }

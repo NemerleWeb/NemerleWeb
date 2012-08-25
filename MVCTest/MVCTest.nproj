@@ -57,6 +57,11 @@
       <HintPath>$(Nemerle)\Nemerle.Compiler.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Nemerle.ComputationExpressions, Version=1.1.856.0, Culture=neutral, PublicKeyToken=e080a9c724e2bfcd">
+      <Name>Nemerle.ComputationExpressions</Name>
+      <AssemblyName>Nemerle.ComputationExpressions.dll</AssemblyName>
+      <HintPath>..\..\..\..\Program Files (x86)\Nemerle\net-4.5\Nemerle.ComputationExpressions.dll</HintPath>
+    </Reference>
     <Reference Include="Nemerle.Macros">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(Nemerle)\Nemerle.Macros.dll</HintPath>
@@ -126,44 +131,68 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\MVVM\Tutorial_5_LoadingAndSaving.n">
+    <Content Include="bin\MVVM\Knockout\Tutorial_1_Introduction.n">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="bin\MVVM\Tutorial_1_Introduction.n">
+    <Content Include="bin\MVVM\Knockout\Tutorial_2_ListsAndCollections.n">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="bin\MVVM\Tutorial_2_ListsAndCollections.n">
+    <Content Include="bin\MVVM\Knockout\Tutorial_3_SinglePageApps.n">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="bin\MVVM\Tutorial_3_SinglePageApps.n">
+    <Content Include="bin\MVVM\Knockout\Tutorial_5_LoadingAndSaving.n">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="bin\MVVM\Samples.n">
       <SubType>Code</SubType>
     </Content>
     <Compile Include="Controllers\HomeController.n" />
     <Compile Include="Global.asax.n">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\Helpers.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Infrastructure\HtmlHelperExtensions.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MVVM\Tutorial_1_Introduction.n">
+    <Compile Include="MVVM\CompListViewModel.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\Tutorial_2_ListsAndCollections.n">
+    <Compile Include="MVVM\Knockout\Tutorial_1_Introduction.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\Tutorial_3_SinglePageApps.n">
+    <Compile Include="MVVM\Knockout\Tutorial_2_ListsAndCollections.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\Tutorial_5_LoadingAndSaving.n">
+    <Compile Include="MVVM\Knockout\Tutorial_3_SinglePageApps.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Knockout\Tutorial_5_LoadingAndSaving.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\NameListViewModel.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\UnitTestViewModel.n">
+      <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\images\bg.jpg">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Content\prettify.css">
       <SubType>Content</SubType>
     </Content>
@@ -314,16 +343,7 @@
     <Content Include="Scripts\sammy.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Views\Home\Introduction.cshtml">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Views\Home\ListsAndCollections.cshtml">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Views\Home\LoadingAndSaving.cshtml">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Views\Home\SinglePageApps.cshtml">
+    <Content Include="Views\Home\Tests.cshtml">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Web.config" />
@@ -343,7 +363,9 @@
     <Folder Include="App_Data\" />
     <Folder Include="bin\" />
     <Folder Include="bin\MVVM\" />
+    <Folder Include="bin\MVVM\Knockout\" />
     <Folder Include="Content\" />
+    <Folder Include="Content\images\" />
     <Folder Include="Content\themes\" />
     <Folder Include="Content\themes\base\" />
     <Folder Include="Content\themes\base\images\" />
@@ -351,6 +373,7 @@
     <Folder Include="Models\" />
     <Folder Include="MVVM" />
     <Folder Include="Infrastructure" />
+    <Folder Include="MVVM\Knockout" />
     <Folder Include="Properties\" />
     <Folder Include="Scripts\" />
     <Folder Include="Views\" />
@@ -363,6 +386,14 @@
       <Project>{b1635fea-c0cd-4c8e-a18e-d97d59f21b14}</Project>
       <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <MacroReference Include="Nemerle.ComputationExpressions.Macros, Version=1.1.856.0, Culture=neutral, PublicKeyToken=e080a9c724e2bfcd">
+      <Name>Nemerle.ComputationExpressions.Macros</Name>
+      <AssemblyName>Nemerle.ComputationExpressions.Macros.dll</AssemblyName>
+      <HintPath>..\..\..\..\Program Files (x86)\Nemerle\net-4.5\Nemerle.ComputationExpressions.Macros.dll</HintPath>
+      <Private>False</Private>
+    </MacroReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets" />

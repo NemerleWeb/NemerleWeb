@@ -1,18 +1,8 @@
-﻿using Nemerle.Collections;
-using Nemerle.Text;
-using Nemerle.Utility;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using Nemerle.Xml;
-using Nemerle.NemerleWeb;
-using System.Xml.Linq;
+﻿using Nemerle.NemerleWeb;
 
 namespace MVCTest
 {
-  [Record, ViewModel]
+  [Record, JsModel]
   public class IntroductionViewModel
   {
     public FirstName     : string { get; set; }
@@ -29,6 +19,7 @@ namespace MVCTest
     {       
       <#
         <div xmlns="">
+            <h3>Introduction</h3>
             <p>First name: <strong>$FirstName</strong></p>
             <p>Last name: <strong>$LastName</strong></p>
 

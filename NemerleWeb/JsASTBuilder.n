@@ -20,8 +20,8 @@ namespace Nemerle.NemerleWeb
         | Some(jsast) => jsast
         | _ =>
           match(expr) {
-            | Array                             => Message.Warning(expr.Location, "Array not implemented"); JsAST.NotImpl()
-            | ArrayIndexer                      => Message.Warning(expr.Location, "ArrayIndexer not implemented"); JsAST.NotImpl()
+            | Array(args, _dims)                => JsAST.Array(args.Map(Build))
+            | ArrayIndexer(obj, a :: _)         => JsAST.ArrayIndexer(Build(obj), Build(a))
             | Assign(s, t)                      => JsAST.Assign(Build(s), Build(t))
             | Base                              => Message.Warning(expr.Location, "Base not implemented"); JsAST.NotImpl()
             | Block(body = body)                => Build(body) 
@@ -67,7 +67,7 @@ namespace Nemerle.NemerleWeb
             | LocalRef(decl)                    => JsAST.LocalRef(decl.Name)
             | MacroEnvelope(expanded = ex, original = org, the_macro = _) => 
                 match(org) { 
-                | <[ foreach($it in $coll) $body  ]> => 
+                /*| <[ foreach($it in $coll) $body  ]> => 
                     def it = it.ToString();
                     def coll = if(coll.TypedObject is TExpr) Build(coll.TypedObject :> TExpr) else JsAST.LocalRef(coll.ToString());
                     def body = match(body) {
@@ -75,7 +75,7 @@ namespace Nemerle.NemerleWeb
                     | pexpr => if(pexpr.TypedObject is TExpr) Build(pexpr.TypedObject :> TExpr) else JsAST.Code(pexpr.ToString());
                     }
                     
-                    JsAST.For(it, coll, body);                    
+                    JsAST.For(it, coll, body);      */              
                 | MacroCall(Name(Id = "js"), _, p :: []) => 
                     match(p) {
                     | SyntaxElement.Expression(Literal(Literal.String(val))) => JsAST.Code(val)
@@ -98,14 +98,19 @@ namespace Nemerle.NemerleWeb
             | Sequence(e1, e2)                  => JsAST.Seq([Build(e1), Build(e2)])
             | StaticEventRef                    => Message.Warning(expr.Location, "StaticEventRef not implemented"); JsAST.NotImpl()
             | StaticPropertyRef                 => Message.Warning(expr.Location, "StaticPropertyRef not implemented"); JsAST.NotImpl()
-            | StaticRef(from, mem, _)           => JsAST.StaticRef(JsClass.GetProperName(from.TypeInfo), mem.Name)
+            | StaticRef(from, mem, _)           => 
+              def typeName = if(from.tycon.SystemType != null) from.tycon.SystemType.FullName else from.tycon.FrameworkTypeName;              
+              match(typeName) {
+              | _ when typeName == typeof(Nemerle.Core.list[_].Nil).FullName => JsAST.Array([])
+              | _ => JsAST.StaticRef(JsClass.GetProperName(from.TypeInfo), mem.Name);
+              }
             | Switch                            => Message.Warning(expr.Location, "Switch not implemented"); JsAST.NotImpl()
             | This                              => JsAST.This()
             | Throw                             => Message.Warning(expr.Location, "Throw not implemented"); JsAST.NotImpl()
             | Try(_, _)                         => Message.Warning(expr.Location, "Try not implemented"); JsAST.NotImpl()
             | TryFinally(b, h)                  => JsAST.TryFinally(Build(b), Build(h))
-            | Tuple                             => Message.Warning(expr.Location, "Tuple not implemented"); JsAST.NotImpl()
-            | TupleIndexer                      => Message.Warning(expr.Location, "TupleIndexer not implemented"); JsAST.NotImpl()
+            | Tuple(args)                       => JsAST.Tuple(args.Map(a => Build(a)))
+            | TupleIndexer(obj, pos, _len)      => JsAST.TupleIndexer(Build(obj), pos)
             | TypeConversion(e, _, _, _)        => Build(e)
             | TypeOf                            => JsAST.NotImpl()
             | Use                               => JsAST.NotImpl()
