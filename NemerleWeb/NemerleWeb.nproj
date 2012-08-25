@@ -159,6 +159,13 @@
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <MacroProjectReference Include="..\..\NemerleWeb.Utils\NemerleWeb.Utils\NemerleWeb.Utils.nproj">
+      <Name>NemerleWeb.Utils</Name>
+      <Project>{a350d2d6-bbe8-4535-bdac-9a8cf9f07fcf}</Project>
+      <Private>False</Private>
+    </MacroProjectReference>
+  </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!--

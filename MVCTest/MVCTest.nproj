@@ -59,7 +59,7 @@
     </Reference>
     <Reference Include="Nemerle.ComputationExpressions">
       <Name>Nemerle.ComputationExpressions</Name>
-      <AssemblyName>Nemerle.ComputationExpressions.dll</AssemblyName>
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>$(Nemerle)\Nemerle.ComputationExpressions.dll</HintPath>
     </Reference>
     <Reference Include="Nemerle.Macros">
