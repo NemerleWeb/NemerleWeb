@@ -9,8 +9,10 @@ namespace MVCTest
     Results : List[(string * string)] { get; set; }
     
     
-    public this() {      
-      def test(description, res) {
+    public this()
+    {
+      def test(description, res)
+      {
         Results.Add((description, res()));
       }
       Results = [].ToList();

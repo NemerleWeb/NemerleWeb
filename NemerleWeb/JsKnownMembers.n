@@ -41,105 +41,66 @@ namespace Nemerle.NemerleWeb
     }
   }
   
-  module JsKnownMembersBase
-  {
-    public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
-    {
-       match(member.Name, parms)
-       {
-        | ("op_Inequality", _) => JsAST.Call(JsAST.OpCode("!="), parms)
-        | ("op_Equality", _) => JsAST.Call(JsAST.OpCode("=="), parms)
-        | ("op_GreaterThan", _) => JsAST.Call(JsAST.OpCode(">"), parms)
-        | ("op_GreaterThanOrEqual", _) => JsAST.Call(JsAST.OpCode(">="), parms)
-        | ("op_LessThan", _) => JsAST.Call(JsAST.OpCode("<"), parms)
-        | ("op_LessThanOrEqual", _) => JsAST.Call(JsAST.OpCode("<="), parms)
-        | _ => throw ArgumentException($"Invalid $(member.Name)");
-      }
-    }
-  }
-  
-  module JsKnownMembersBCL
-  {
-    public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
-    {
-      match(member.Name, parms)
-      {
-        | ("ToString", h :: _) => JsAST.Call(JsAST.MethodRef(h, "toString"), [])
-        | ("ToString", [])  => JsAST.Call(JsAST.MethodRef(left, "toString"), [])
-        | ("Concat", h :: t) when TypeHelper.TypeName(type) == typeof(string).FullName         => JsAST.Call(JsAST.MethodRef(h, "concat"), t)
-        | ("ToUpper", []) when TypeHelper.TypeName(type) == typeof(string).FullName            => JsAST.Call(JsAST.MethodRef(left, "toUpperCase"), [])
-        | ("Contains", [sub]) when TypeHelper.TypeName(type) == typeof(string).FullName        => JsAST.Call(JsAST.OpCode("!="), [JsAST.Call(JsAST.MethodRef(left, "indexOf"), [sub]), JsAST.Literal(JsLiteral.Integer(-1))])
-        | ("IsNullOrEmpty", [str]) when TypeHelper.TypeName(type) == typeof(string).FullName
-        | ("IsNullOrWhiteSpace", [str]) when TypeHelper.TypeName(type) == typeof(string).FullName   => 
-          JsAST.Call(JsAST.OpCode("||"), 
-                [JsAST.Call(JsAST.OpCode("==="), [str, JsAST.Literal(JsLiteral.Null())]),
-                 JsAST.Call(JsAST.OpCode("==="), [str, JsAST.Literal(JsLiteral.String(""))])])
-        | ("op_Implicit", h :: [])                                            => h
-        | ("op_Implicit", h :: t)                                             => JsAST.Seq(h :: t)
-        | ("op_Addition", parms)                                              => JsAST.Call(JsAST.OpCode("+"), parms)
-        //List
-        | ("get_Item", h :: []) when TypeHelper.TypeName(type) == typeof(List[_]).FullName     => JsAST.Call(JsAST.Indexer(left), [h])
-        | ("get_Count", []) when TypeHelper.TypeName(type) == typeof(List[_]).FullName         => JsAST.FieldRef(left, "length")
-        | ("Add",      h :: []) when TypeHelper.TypeName(type) == typeof(List[_]).FullName     => JsAST.Call(JsAST.MethodRef(TypeHelper.PropertyToField(left), "push"), [h])
-        | ("Remove",   h :: []) when TypeHelper.TypeName(type) == typeof(List[_]).FullName     => JsAST.Call(JsAST.MethodRef(TypeHelper.PropertyToField(left), "remove"), [h])
-        | ("ToList", h :: []) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName    => h        
-        //
-        | ("NToList", [obj]) when TypeHelper.TypeName(type) == typeof(Nemerle.Collections.NCollectionsExtensions).FullName => obj
-        | ("WriteLine", h :: []) when TypeHelper.TypeName(type) == typeof(Console).FullName    => JsAST.Call(JsAST.MethodRef(JsAST.LocalRef("console"), "log"), [h])
-        //
-        | (".ctor", parms) when TypeHelper.TypeName(type) == typeof(list[_].Cons).FullName     => JsAST.Array(parms.Filter(p => !(p is JsAST.NotImpl()))) //filter out [] in the end
-        | (".ctor", parms) when TypeHelper.TypeName(type) == typeof(List[_]).FullName          => JsAST.Array(parms.Filter(p => !(p is JsAST.NotImpl())))
-        | (".ctor", parms) => JsAST.Call(JsAST.Constructor(type), parms)
-        | _ when member.Name.StartsWith("get_")                               => JsAST.PropertyGet(left, TypeHelper.RemoveGetSet(member.Name))
-        | (_, h :: []) when member.Name.StartsWith("set_")                    => JsAST.PropertySet(left, TypeHelper.RemoveGetSet(member.Name), h)            
-        | _ => throw ArgumentException($"Invalid $(member.Name)");
-      }
-    }    
-  }
-  
-  module JsKnownMembersLinq
-  {
-    public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
-    {
-      match(member.Name, parms)
-      {
-        | ("Count", l :: []) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName     => JsAST.FieldRef(l, "length")
-        | _ => throw ArgumentException($"Invalid $(member.Name)");
-      }
-    }
-  }
-  
   module JsKnownMembers
   {
       public Convert(call : TExpr.Call, builder : TExpr -> JsAST) : JsAST
       {    
-        //assert2(false);
-        def result = match(call) {
-        | Call(MethodRef(obj = Call(MethodRef(meth = serverMeth, obj = obj), _, _), meth = meth), parms, _) when serverMeth.Name == "get_server" && obj is TExpr.This =>       
-            def parameters = if(parms.Length > 0) parms.Zip(meth.GetParameters()).Take(parms.Length - 1).Map((cp, mp) => (mp.name, builder(cp.expr))) else [];
-            def callback = if(parms.Length > 0) builder(parms.Last().expr) else JsAST.Void();
-            match(callback) { 
-            | Seq(DefValue as dv :: cb :: []) => JsAST.Seq([dv, JsAST.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, cb)])
-            | _ => JsAST.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, callback)
-            }            
-        | Call(MethodRef(obj = o, meth = meth), parms, _) => ConvertMethod(o.Type.TypeInfo, builder(o), meth, parms.Map(p => builder(p.expr)))
-        | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) => ConvertMethod(fromType.TypeInfo, builder(left), meth, parms.Map(p => builder(p.expr)))
-        | Call(OpCode as op, parms, _) => JsAST.Call(builder(op), parms.Map(p => builder(p.expr)))
-        | Call(Base, _, _) => JsAST.Void()        
-        | Call(s, _, _) => Message.Warning($"Unsupported call to $s"); JsAST.Void()
-        }        
-        result
+        match (call)
+        {
+          | Call(MethodRef(obj = Call(MethodRef(meth = serverMeth, obj = obj), _, _), meth = meth), parms, _)
+            when serverMeth.Name == "get_server" && obj is TExpr.This =>
+              def parameters =
+                if (parms.Length > 0) parms.Zip(meth.GetParameters()).Take(parms.Length - 1).Map((cp, mp) => (mp.name, builder(cp.expr)))
+                else [];
+              def callback = if(parms.Length > 0) builder(parms.Last().expr) else JsAST.Void();
+              match(callback)
+              {
+                | Seq(DefValue as dv :: cb :: []) => JsAST.Seq([dv, JsAST.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, cb)])
+                | _ => JsAST.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, callback)
+              }
+                      
+          | Call(MethodRef(obj = o, meth = meth) as m, parms, _) =>
+            // Skip local functions and methods with special attribute
+            if (m.meth.Header.Declaration == null &&
+                !m.meth.IsCustomAttributeDefined("Nemerle.NemerleWeb.SkipViewModelMethodAttribute"))
+              ConvertMethod(o.Type.TypeInfo, builder(o), meth, parms.Map(p => builder(p.expr)))
+            else
+              JsAST.Void();
+          
+          | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) =>
+            // Skip methods with special attribute
+            if (!left.mem.IsCustomAttributeDefined("Nemerle.NemerleWeb.SkipViewModelMethodAttribute"))
+              ConvertMethod(fromType.TypeInfo, builder(left), meth, parms.Map(p => builder(p.expr)))
+            else
+              JsAST.Void();
+                
+          | Call(OpCode as op, parms, _) => JsAST.Call(builder(op), parms.Map(p => builder(p.expr)))
+          | Call(Base, _, _) => JsAST.Void()        
+          | Call(s, _, _) => Message.Warning($"Unsupported call to $s"); JsAST.Void()          
+        }
       }
       
       [MatchCollector(
         JsKnownMembersBase.ConvertMethod,
         JsKnownMembersBCL.ConvertMethod,
+        JsKnownMembersNemerle.ConvertMethod,
         JsKnownMembersLinq.ConvertMethod)]
       public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
       {
-        match(member.Name, parms)
+        match (member.Name, parms)
         {
-          | _ => Message.Warning(member.Location, $"$(member.Name) not implemented in JS"); JsAST.Call(JsAST.MethodRef(left, TypeHelper.RemoveGetSet(member.Name)), parms)
+          | ("apply", _) =>
+            Message.Warning(<#Must implement "apply" method for test case:
+def test(description, res)
+{
+  Results.Add((description, res()));
+}#>);
+            JsAST.Call(JsAST.MethodRef(left, TypeHelper.RemoveGetSet(member.Name)), parms);
+            
+          | _ =>
+            _ = type; _ = left; _ = member; _ = parms;            
+            Message.Error(member.Location, $"$(member.Name) not implemented in JS");
+            JsAST.Call(JsAST.MethodRef(left, TypeHelper.RemoveGetSet(member.Name)), parms)
         }
       }
   }

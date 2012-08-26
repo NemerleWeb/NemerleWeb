@@ -40,7 +40,8 @@ namespace MVCTest
     }
     
     [Html]
-    public View() : string 
+    [SkipViewModelMethod]
+    public View() : string
     {
       <#
         <div>

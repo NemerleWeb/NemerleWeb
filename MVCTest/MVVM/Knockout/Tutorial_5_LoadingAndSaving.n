@@ -75,6 +75,7 @@ namespace MVCTest
         }
         
         [Html]
+        [SkipViewModelMethod]
         public View() : string
         {
             <# 
