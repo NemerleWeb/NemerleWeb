@@ -75,7 +75,6 @@ namespace MVCTest
       });
     }
 
-    [SkipViewModelMethod]
     SelectSample(sample : string) : void {
         SelectedSample = sample;
         js prettyPrint();
@@ -89,7 +88,6 @@ namespace MVCTest
     }
     
     [Html]
-    [SkipViewModelMethod]
     public View() : string
     {
       <# 

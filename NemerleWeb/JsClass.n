@@ -19,34 +19,36 @@ namespace Nemerle.NemerleWeb
         public IEnumerableType : TypeVar { get; set; }
         public StringType : TypeVar { get; set; }
         public Typer : Typer { get; set; }
-        public Properties : list[PropertyBuilder] 
+        
+        public Properties : IEnumerable[PropertyBuilder] 
         {
-            get {
-                def props = ClassType.GetProperties().Filter(p => p.Name != "server").Cast.[PropertyBuilder]();
-                props.Filter(p => !(p.CanRead && !p.CanWrite));
-            }
+          get
+          {
+            def props = ClassType.GetProperties().Where(p => p.Name != "server").Cast.[PropertyBuilder]();
+            props.Filter(p => !(p.CanRead && !p.CanWrite));
+          }
         }
         
         public ComputedProperties : IEnumerable[PropertyBuilder] 
         {
           get
           {
-            def props = ClassType.GetProperties().Filter(p => p.Name != "server").Cast.[PropertyBuilder]();
+            def props = ClassType.GetProperties().Where(p => p.Name != "server").Cast.[PropertyBuilder]();
             props.Where(p => p.CanRead && !p.CanWrite);
           }
         }
         
-        public Methods : list[IMethod] 
+        public Methods : IEnumerable[IMethod] 
         {
           get
           {
             def viewModelMethods = typeof(IViewModel).GetMethods().Select(m => m.Name).ToList();
             ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                      .Filter(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
-                      .Filter(m => !m.IsConstructor)
-                      .Filter(m => !viewModelMethods.Any(vm => vm == m.Name))
-                      .Filter(m => !m.IsCustomAttributeDefined("Nemerle.NemerleWeb.SkipViewModelMethodAttribute"))
-                      .Filter(m => !m.Name.StartsWith("__"));
+                      .Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
+                      .Where(m => !m.IsConstructor)
+                      .Where(m => !viewModelMethods.Any(vm => vm == m.Name))
+                      .Where(m => m.Name != "View")
+                      .Where(m => !m.Name.StartsWith("__"));
           }
         }
         
@@ -175,8 +177,7 @@ $computedBody
             def methodParms(method) {
                 method.GetParameters().Map(p => p.Name);
             }
-            def methods = Methods;
-            def methods = methods.Map(m => 
+            def methods = Methods.Map(m => 
 $<#$(indent)this.$(m.Name) = function(..$(methodParms(m))) { 
 $(TranslateMethodBody(m :> MethodBuilder, indent + "  "))
 $(indent)}#>);

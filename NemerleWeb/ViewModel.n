@@ -15,8 +15,6 @@ using TExpr = Nemerle.Compiler.Typedtree.TExpr;
 
 namespace Nemerle.NemerleWeb
 {
-  public class SkipViewModelMethodAttribute : Attribute {}
-  
   [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
   macro ViewModel(tb : TypeBuilder)
   {

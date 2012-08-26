@@ -1,0 +1,33 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+using Nemerle.NemerleWeb.Utils;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Nemerle.NemerleWeb
+{
+  module JsKnownMembersBase
+  {
+    public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
+    {
+       match(member.Name, parms)
+       {
+         | ("op_Inequality", _) => JsAST.Call(JsAST.OpCode("!="), parms)
+         | ("op_Equality", _) => JsAST.Call(JsAST.OpCode("=="), parms)
+         | ("op_GreaterThan", _) => JsAST.Call(JsAST.OpCode(">"), parms)
+         | ("op_GreaterThanOrEqual", _) => JsAST.Call(JsAST.OpCode(">="), parms)
+         | ("op_LessThan", _) => JsAST.Call(JsAST.OpCode("<"), parms)
+         | ("op_LessThanOrEqual", _) => JsAST.Call(JsAST.OpCode("<="), parms)
+         | _ =>
+          _ = type; _ = left; _ = member; _ = parms;
+          throw ArgumentException($"Invalid $(member.Name)");
+      }
+    }
+  }
+}

@@ -31,7 +31,7 @@ namespace Nemerle.NemerleWeb
       
     public IsGetSet(methodName : string) : bool
     {
-        methodName.StartsWith("get_") || methodName.StartsWith("set_")
+      methodName.StartsWith("get_") || methodName.StartsWith("set_")
     }
       
     public PropertyToField(prop : JsAST) : JsAST
@@ -60,19 +60,10 @@ namespace Nemerle.NemerleWeb
               }
                       
           | Call(MethodRef(obj = o, meth = meth) as m, parms, _) =>
-            // Skip local functions and methods with special attribute
-            if (m.meth.Header.Declaration == null &&
-                !m.meth.IsCustomAttributeDefined("Nemerle.NemerleWeb.SkipViewModelMethodAttribute"))
               ConvertMethod(o.Type.TypeInfo, builder(o), meth, parms.Map(p => builder(p.expr)))
-            else
-              JsAST.Void();
           
           | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) =>
-            // Skip methods with special attribute
-            if (!left.mem.IsCustomAttributeDefined("Nemerle.NemerleWeb.SkipViewModelMethodAttribute"))
               ConvertMethod(fromType.TypeInfo, builder(left), meth, parms.Map(p => builder(p.expr)))
-            else
-              JsAST.Void();
                 
           | Call(OpCode as op, parms, _) => JsAST.Call(builder(op), parms.Map(p => builder(p.expr)))
           | Call(Base, _, _) => JsAST.Void()        
@@ -98,8 +89,8 @@ def test(description, res)
             JsAST.Call(JsAST.MethodRef(left, TypeHelper.RemoveGetSet(member.Name)), parms);
             
           | _ =>
-            _ = type; _ = left; _ = member; _ = parms;            
-            Message.Error(member.Location, $"$(member.Name) not implemented in JS");
+            _ = type; _ = left; _ = member; _ = parms;
+            Message.Warning(member.Location, $"$(member.Name) not implemented in JS");
             JsAST.Call(JsAST.MethodRef(left, TypeHelper.RemoveGetSet(member.Name)), parms)
         }
       }
