@@ -5,78 +5,76 @@ using Nemerle.NemerleWeb;
 
 namespace MVCTest
 {
-    [JsModel]
-    public class LoadingAndSavingViewModel
-    {        
-        public class Task
-        {
-            public Title : string { get; set; }
-            public IsDone : bool { get; set; }
-            public _destroy : bool { get; set; }
-        }
-        
-        public Tasks : List[Task] { get; set; }
-        public NewTaskText : string { get; set; }
-        public IncompleteTasks : IEnumerable[Task]
-        {
-            get {
-                def result = List();
-                foreach(t in Tasks)
-                    when(!t.IsDone)
-                        result.Add(t);
-                result
-            }
-        }
-        
-        public this() {
-            server.Load(tasks => {
-                Tasks = tasks.ToList();
+  [JsModel]
+  public class LoadingAndSavingViewModel
+  {        
+    public class Task
+    {
+      public Title : string { get; set; }
+      public IsDone : bool { get; set; }
+      public _destroy : bool { get; set; }
+    }
+
+    public Tasks : List[Task] { get; set; }
+    public NewTaskText : string { get; set; }
+    public IncompleteTasks : IEnumerable[Task]
+    {
+      get
+      {
+        def result = List();
+        foreach(t in Tasks)
+          when(!t.IsDone)
+            result.Add(t);
+        result
+      }
+    }
+
+    public this()
+    {
+      server.Load(tasks => { Tasks = tasks.ToList(); });
+    }
+
+    AddTask() : void {
+      Tasks.Add(Task() <- (Title = NewTaskText, IsDone = false, _destroy = false));
+      NewTaskText = "";
+    }
+
+    RemoveTask(task : Task) : void {
+      task._destroy = true;
+      _ = Tasks.Remove(task);
+    }
+
+    Save() : void {
+      server.Save(Tasks, result => {                
+                         js alert(result);
             });
-        }
-        
-        AddTask() : void {
-            Tasks.Add(Task() <- (Title = NewTaskText, IsDone = false, _destroy = false));
-            NewTaskText = "";
-        }
-        
-        RemoveTask(task : Task) : void {
-            task._destroy = true;
-            _ = Tasks.Remove(task);
-        }
-        
-        Save() : void {
-            server.Save(Tasks, result => {                
-                js alert(result);
-            });
-        }
-        
-        public class Server
-        {
-            public Save(tasks : IEnumerable[Task]) : string
-            {
-              if(tasks == null)
-                "Seems like you don't have any unfinished tasks left!"
-              else
+    }
+
+    public class Server
+    {
+      public Save(tasks : IEnumerable[Task]) : string
+      {
+        if(tasks == null)
+          "Seems like you don't have any unfinished tasks left!"
+        else
                 $<#
                 Server received $(tasks.Count()) task(s). 
                 $(tasks.Count(t => t.IsDone)) of which are marked as done. 
                 $(tasks.Count(t => t._destroy)) of which are marked for deletion.#>;
-            }
-            
-            public Load() : IEnumerable[Task]
-            {
-                [
-                    Task() <- (Title = "Wire the money to Panama", IsDone = true, _destroy = false),
-                    Task() <- (Title = "Get hair dye, beard trimmer, dark glasses and \"passport\"", IsDone = false, _destroy = false),
-                    Task() <- (Title = "Book taxi to airport", IsDone = false, _destroy = false),
-                    Task() <- (Title = "Arrange for someone to look after the cat", IsDone = false, _destroy = false),
-                ]
-            }
-        }
-        
-        [Html]
-        public View() : string
-        {
+      }
+
+      public Load() : IEnumerable[Task]
+      {
+        yield Task() <- (Title = "Wire the money to Panama", IsDone = true, _destroy = false);
+        yield Task() <- (Title = "Get hair dye, beard trimmer, dark glasses and \"passport\"", IsDone = false, _destroy = false);
+        yield Task() <- (Title = "Book taxi to airport", IsDone = false, _destroy = false);
+        yield Task() <- (Title = "Arrange for someone to look after the cat", IsDone = false, _destroy = false);
+      }
+    }
+
+    [Html]
+    public View() : string
+    {
             <# 
             <div xmlns="">
                 <h3>Loading and saving</h3>
@@ -100,6 +98,6 @@ namespace MVCTest
                 <button click="$Save">Save</button>
             </div>
           #>
-        }
     }
+  }
 }

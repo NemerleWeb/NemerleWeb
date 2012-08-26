@@ -131,6 +131,12 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="bin\MVVM\CompListViewModel.n">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="bin\MVVM\NameListViewModel.n">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="bin\MVVM\Knockout\Tutorial_1_Introduction.n">
       <SubType>Code</SubType>
     </Content>

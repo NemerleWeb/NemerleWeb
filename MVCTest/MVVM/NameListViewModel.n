@@ -15,20 +15,21 @@ namespace MVCTest
       {
         if(SearchPattern == null)
           Names;
-        else {
+        else
+        {
           def result = List();
             foreach(name in Names)
-                when(name.ToUpper().Contains(SearchPattern.ToUpper()))
-                    result.Add(name);
+              when(name.ToUpper().Contains(SearchPattern.ToUpper()))
+                result.Add(name);
           result
         }
       }
     }    
     
-    public this() {
-      server.GetNames(l => {
-        Names = l;
-      });
+    public this()
+    {
+      // TODO: Allow wildcards: server.GetNames(Names = _);
+      server.GetNames(l => Names = l);
     }
     
     public class Server
@@ -38,7 +39,7 @@ namespace MVCTest
         Helpers.GetNames().ToList();
       }
     }
-            
+    
     [Html]
     public View() : string 
     {

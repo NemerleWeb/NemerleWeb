@@ -9,25 +9,26 @@ namespace MVCTest
   {      
     SelectedSample : string { get; set; }
     
-    Samples : List[string] { get; set; }
-    NameList : NameListViewModel { get; set; }
+    Samples : List[string] { get; }
+    NameList : NameListViewModel { get; }
     NameListSource : string { get; set; }
-    CompList : CompListViewModel { get; set; }
+    CompList : CompListViewModel { get; }
     CompListSource : string { get; set; }
     
-    KnockoutSamples : List[string] { get; set; }
-    Introduction : IntroductionViewModel { get; set; }
+    KnockoutSamples : List[string] { get; }
+    Introduction : IntroductionViewModel { get; }
     IntroductionSource : string { get; set; }
-    ListsAndCollections : ListsAndCollectionsViewModel { get; set; }
+    ListsAndCollections : ListsAndCollectionsViewModel { get; }
     ListsAndCollectionsSource : string { get; set; }
-    LoadingAndSaving : LoadingAndSavingViewModel { get; set; }
+    LoadingAndSaving : LoadingAndSavingViewModel { get; }
     LoadingAndSavingSource : string { get; set; }
-    SinglePageApps : SPAViewModel { get; set; }
+    SinglePageApps : SPAViewModel { get; }
     SinglePageAppsSource : string { get; set; }
     
     ThisPageSource : string { get; set; }
     
-    public this() {
+    public this()
+    {
       Samples = ["List of names", "Computation Expressions"].ToList();
       NameList = NameListViewModel();
       CompList = CompListViewModel();
@@ -38,7 +39,7 @@ namespace MVCTest
       ListsAndCollections = ListsAndCollectionsViewModel();
       LoadingAndSaving = LoadingAndSavingViewModel();
       SinglePageApps = SPAViewModel();
-      
+
       server.LoadSourceFor("MVVM/Knockout/Tutorial_1_Introduction.n", source => {
         IntroductionSource = source;
         js prettyPrint();
