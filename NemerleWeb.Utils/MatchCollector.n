@@ -1,0 +1,112 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
+using Nemerle.Compiler.Typedtree;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Nemerle.NemerleWeb.Utils
+{
+  /// <summary>
+  /// Collects match cases from all methods ignoring default cases and combines them into
+  /// the specified method including its content after all cases.  
+  /// </summary>
+  [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Method)]
+  macro MatchCollector(typeBuilder : TypeBuilder, methodBuilder : MethodBuilder, params methods : list[PExpr])
+  {
+    MatchCollectorImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder, methodBuilder, methods)
+  }
+  
+  module MatchCollectorImpl
+  {
+    public DoTransform(typer : Typer, _typeBuilder : TypeBuilder,  methodBuilder : MethodBuilder, methods : list[PExpr]) : void
+    {
+      def parseBody(methodBody)
+      {
+        match (methodBody)
+        {
+          | <[ match ($args) { ..$cases } ]> => (args, cases)
+          | PExpr.Sequence(body) =>
+            match (body)
+            {
+              | [<[ match ($args) { ..$cases } ]>] => (args, cases)
+              | _ => 
+                Message.Error($"$(methodBuilder.Name) method's body must be pattern matching");
+                (null, null)
+            }
+          | _ =>
+            Message.Error($"$(methodBuilder.Name) method's body must be pattern matching");
+            (null, null)
+        }
+      }      
+      def getIMethod(m)
+      {
+        def t = typer.TypeName(m);
+        match (t)
+        {
+          | sr is TExpr.StaticRef => 
+            match (sr.mem)
+            {
+              | method is MethodBuilder => method
+              | _ =>
+                Message.Error($"$m must specify static method");
+                null
+            }
+          | _ =>
+            Message.Error($"$m must specify static method");
+            null
+        }
+      }      
+      def equalHeaders(lh, rh)
+      {
+        lh.Equals(rh, (l, r) => l.name == r.name && l.Type.TryRequire(r.Type));
+      }            
+      def collectCases(methods)
+      { 
+        mutable allCases = [];
+      
+        foreach (m in methods)
+        {
+          def method = getIMethod(m);
+        
+          when (!equalHeaders(method.Header.Parameters, methodBuilder.Header.Parameters))
+            Message.Error($"Method $m must have same parameters");
+            
+          def (_args, cases) = parseBody(method.Body);
+          
+          // TODO: Compare same args by name and by type
+          
+          // Add all cases ignoring wildcard
+          foreach (case in cases)
+          {
+            match (case)
+            {
+              // Skip wildcard
+              | MatchCase([PExpr.Wildcard], _, _) => ()
+              | _ => allCases ::= case;
+            }
+          }
+          
+          // TODO: Better syntax for above
+          // allCases.Add(cases.FilterL(case => !(case is <[ $_ => _ ]>)));
+        }
+        
+        allCases
+      }
+      
+      when (!methodBuilder.IsStatic)
+        Message.Error($"$(methodBuilder.Name) must be static method");
+              
+      def (matchArgs, matchCases) = parseBody(methodBuilder.Body);      
+      def allCases = collectCases(methods);      
+      def body = <[ match ( $matchArgs ) { ..$(allCases.RevAppend(matchCases)) } ]>;
+      
+      methodBuilder.Body = body;
+    }
+  }
+}

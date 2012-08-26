@@ -36,17 +36,17 @@ namespace Nemerle.NemerleWeb
           }
         }
         
-        public Methods : IEnumerable[IMethod] 
+        public Methods : list[IMethod] 
         {
           get
           {
             def viewModelMethods = typeof(IViewModel).GetMethods().Select(m => m.Name).ToList();
             ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                      .Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
-                      .Where(m => !m.IsConstructor)
-                      .Where(m => !viewModelMethods.Any(vm => vm == m.Name))
-                      .Where(m => !m.IsCustomAttributeDefined("Nemerle.NemerleWeb.SkipViewModelMethodAttribute"))
-                      .Where(m => !m.Name.StartsWith("__"));
+                      .Filter(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
+                      .Filter(m => !m.IsConstructor)
+                      .Filter(m => !viewModelMethods.Any(vm => vm == m.Name))
+                      .Filter(m => !m.IsCustomAttributeDefined("Nemerle.NemerleWeb.SkipViewModelMethodAttribute"))
+                      .Filter(m => !m.Name.StartsWith("__"));
           }
         }
         

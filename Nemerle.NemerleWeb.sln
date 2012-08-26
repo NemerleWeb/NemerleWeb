@@ -12,7 +12,7 @@ Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb", "NemerleWeb\Ne
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "MVCTest", "MVCTest\MVCTest.nproj", "{C930DE6F-CDB7-412B-AD69-6E979B919F45}"
 EndProject
-Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Utils", "..\NemerleWeb.Utils\NemerleWeb.Utils\NemerleWeb.Utils.nproj", "{A350D2D6-BBE8-4535-BDAC-9A8CF9F07FCF}"
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Utils", "NemerleWeb.Utils\NemerleWeb.Utils.nproj", "{A350D2D6-BBE8-4535-BDAC-9A8CF9F07FCF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
