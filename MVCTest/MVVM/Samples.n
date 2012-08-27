@@ -14,6 +14,8 @@ namespace MVCTest
     NameListSource : string { get; set; }
     CompList : CompListViewModel { get; }
     CompListSource : string { get; set; }
+    Signal : SignalViewModel { get; set; }
+    SignalSource : string { get; set; }
     
     KnockoutSamples : List[string] { get; }
     Introduction : IntroductionViewModel { get; }
@@ -29,12 +31,13 @@ namespace MVCTest
     
     public this()
     {
-      Samples = ["List of names", "Computation Expressions"].ToList();
+      Samples = ["List of names", "Computation Expressions", "Signal"].ToList();
       NameList = NameListViewModel();
       CompList = CompListViewModel();
+      Signal = SignalViewModel();
       
       KnockoutSamples = ["Introduction", "Lists and collections", "Single page applications", "Loading and saving"].ToList();
-      SelectSample(Samples[0]);
+      SelectSample(Samples[2]);
       Introduction = IntroductionViewModel("John", "Silver");
       ListsAndCollections = ListsAndCollectionsViewModel();
       LoadingAndSaving = LoadingAndSavingViewModel();
@@ -70,6 +73,11 @@ namespace MVCTest
         js prettyPrint();
       });
       
+      server.LoadSourceFor("MVVM/SignalViewModel.n", source => {
+        SignalSource = source;
+        js prettyPrint();
+      });
+      
       server.LoadSourceFor("MVVM/Samples.n", source => {
         ThisPageSource = source;
         js prettyPrint();
@@ -101,6 +109,12 @@ namespace MVCTest
             <li $foreach(s in KnockoutSamples) css-selected="$(SelectedSample == s)"><span click="$SelectSample">$s</span></li>
           </ul>
           <div class="current-sample">
+            <div $when(SelectedSample == "Signal")>
+              <div $(Template(Signal, _.View))></div>
+              <h2>Source</h2>
+              <pre class="prettyprint lang-n prettyprinted">$SignalSource</pre>
+            </div>
+            
             <div $when(SelectedSample == "List of names")>
               <div $(Template(NameList, _.View))></div>
               <h2>Source</h2>

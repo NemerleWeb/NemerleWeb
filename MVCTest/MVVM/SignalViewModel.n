@@ -1,0 +1,59 @@
+using Nemerle.NemerleWeb;
+using System.Collections.Generic;
+using SignalR.Hubs;
+using Nemerle.Late;
+
+namespace MVCTest
+{
+  [JsModel]
+  public class SignalViewModel 
+  {
+    Messages : List[string] { get; set; }
+    CurrentMessage : string { get; set; }
+  
+    SendMessage() : void
+    {
+      server.SendMessage(CurrentMessage, _ => {});
+      CurrentMessage = "";
+    }
+  
+    AddMessage(message : string) : void
+    {
+      Messages.Add(message);
+    }
+  
+    public class Server 
+    {
+      _signalContext : IHubContext;
+    
+      public this()
+      {
+        _signalContext = SignalR.GlobalHost.ConnectionManager.GetHubContext.[SignalViewModelHub]();
+      }
+    
+      public SendMessage(message : string) : string
+      {
+        late _signalContext.Clients.Invoke("AddMessage", array[message]);
+        "";
+      }
+    }
+  
+    [Html]
+    public View() : string
+    {
+      <# 
+        <div>
+          <h3>SignalR</h3>
+          <input value="$CurrentMessage"/>
+          <button click="$SendMessage">Send</button>
+          <ul>
+            <li $foreach(m in Messages)>$m</li>
+          </ul>
+         </div> 
+      #>
+    }
+  }
+}
+
+public class SignalViewModelHub : Hub
+{}

@@ -140,6 +140,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
+    <Compile Include="SignalR\SignalMacro.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Template.n">
       <SubType>Code</SubType>
     </Compile>
@@ -164,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="HtmlMacro\" />
+    <Folder Include="SignalR" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
