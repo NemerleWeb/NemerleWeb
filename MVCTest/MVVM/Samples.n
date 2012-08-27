@@ -14,6 +14,7 @@ namespace MVCTest
     NameListSource : string { get; set; }
     CompList : CompListViewModel { get; set; }
     CompListSource : string { get; set; }
+    Signal : SignalViewModel { get; set; }
     
     KnockoutSamples : List[string] { get; set; }
     Introduction : IntroductionViewModel { get; set; }
@@ -28,12 +29,13 @@ namespace MVCTest
     ThisPageSource : string { get; set; }
     
     public this() {
-      Samples = ["List of names", "Computation Expressions"].ToList();
+      Samples = ["List of names", "Computation Expressions", "Signal"].ToList();
       NameList = NameListViewModel();
       CompList = CompListViewModel();
+      Signal = SignalViewModel();
       
       KnockoutSamples = ["Introduction", "Lists and collections", "Single page applications", "Loading and saving"].ToList();
-      SelectSample(Samples[0]);
+      SelectSample(Samples[2]);
       Introduction = IntroductionViewModel("John", "Silver");
       ListsAndCollections = ListsAndCollectionsViewModel();
       LoadingAndSaving = LoadingAndSavingViewModel();
@@ -100,6 +102,10 @@ namespace MVCTest
             <li $foreach(s in KnockoutSamples) css-selected="$(SelectedSample == s)"><span click="$SelectSample">$s</span></li>
           </ul>
           <div class="current-sample">
+            <div $when(SelectedSample == "Signal")>
+              <div $(Template(Signal, _.View))></div>                            
+            </div>
+            
             <div $when(SelectedSample == "List of names")>
               <div $(Template(NameList, _.View))></div>
               <h2>Source</h2>

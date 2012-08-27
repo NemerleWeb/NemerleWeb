@@ -54,6 +54,7 @@
 
 /* Put a border around prettyprinted code snippets. */
 pre.prettyprint {
+  clear: both;
   background-color: #ffffff;
   padding: 10px;
   border: 1px solid #4d4d4c; 
