@@ -43,7 +43,7 @@ namespace MVCTest
     {
       <# 
         <div>
-          <h3>SignalR</h3>
+          <h3>Signal</h3>
           <input value="$CurrentMessage"/>
           <button click="$SendMessage">Send</button>
           <ul>

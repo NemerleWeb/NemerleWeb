@@ -37,7 +37,7 @@ namespace MVCTest
     }
     
     public Less() : void
-{
+    {
       when(LetterCount > 0)
         LetterCount--;
     }
