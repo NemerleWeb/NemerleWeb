@@ -1,7 +1,7 @@
 ﻿using NemerleWeb;
 using System.Collections.Generic;
 using System.Linq;
-namespace MVCTest
+namespace NemerleWeb.Tests
 {
   [ViewModel]
   public class UnitTestViewModel

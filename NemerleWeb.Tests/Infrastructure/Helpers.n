@@ -1,0 +1,28 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.IO;
+using System.Reflection;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.Tests
+{
+  public module Helpers
+  {
+    public LoadSourceFor(filename : string) : string 
+    {
+      def dir = Uri(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase)).LocalPath;
+      def filename = Path.GetFullPath(Path.Combine(dir, filename));
+      File.ReadAllText(filename)
+    }
+    
+    public GetNames() : list[string]
+    {
+      ["Valentine Harger", "Min Eberly", "Kasandra Andresen", "Shira Maurin", "Cleo Bernardo", "Raymon Forrester", "Glenn Legg", "Francesco Whitwell", "Wen Bardsley", "Vance Lafromboise", "Lula Fleitas", "Eulalia Fenster", "Johnson Gittens", "Roma Caine", "Odessa Rust", "Lenny Gunther", "Antonetta Sylvest", "Jarred Kensey", "Cedric Karner", "Providencia Asbill", "Damion Markum", "Kerstin Wininger", "Shiela Rank", "Blaine Stansfield", "Khalilah Drey", "Sherley Hodak", "Bret Coffield", "Amparo Teamer", "Lorette Stackpole", "Jutta Whelan", "Joanie Liefer", "Rene Dorrell", "Tania Bakke", "Sixta Click", "Keenan Formby", "Jude Muncie", "Morris Debolt", "Ashanti Driver", "Teddy Hulme", "Letisha Dice", "Wanetta Borst", "Beatriz Steinert", "Lessie Costa", "Kasi Mazzola", "Leia Montford", "Calvin Blough", "Lana Pearman", "Erna Jelley", "Mickie Laguerre", "Keena Bushman"];
+    }
+  }
+}

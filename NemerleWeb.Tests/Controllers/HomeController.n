@@ -7,13 +7,13 @@ using System.Web.Mvc;
 using Nemerle;
 using NemerleWeb;
 
-namespace MVCTest.Controllers
+namespace NemerleWeb.Tests.Controllers
 {
   public class HomeController : Controller
   {
-    public Index() : ActionResult 
+    public Index() : ActionResult
     {
-      View(Utils.MakePageHtml(SamplesViewModel()) : object);
+      View(Utils.MakePageHtml(UnitTestViewModel()) : object);
     }
   }
 }

@@ -6,18 +6,18 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{c930de6f-cdb7-412b-ad69-6e979b919f45}</ProjectGuid>
+    <ProjectGuid>{b3748a04-4db2-4668-8aba-3e076572258e}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{edcc3b85-0bad-11db-bc1a-00112fde8b61}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MVCTest</RootNamespace>
-    <AssemblyName>MVCTest</AssemblyName>
+    <RootNamespace>NemerleWeb.Tests</RootNamespace>
+    <AssemblyName>NemerleWeb.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <NemerleVersion>Net-4.5</NemerleVersion>
     <NemerleBinPathRoot Condition=" '$(NemerleBinPathRoot)' == '' ">$(ProgramFiles)\Nemerle</NemerleBinPathRoot>
     <Nemerle Condition=" '$(Nemerle)' == '' ">$(NemerleBinPathRoot)\$(NemerleVersion)</Nemerle>
-    <Name>MVCTest</Name>
+    <Name>NemerleWeb.Tests</Name>
     <UseIISExpress>false</UseIISExpress>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -145,30 +145,6 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\MVVM\CompListViewModel.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\NameListViewModel.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Knockout\Tutorial_1_Introduction.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Knockout\Tutorial_2_ListsAndCollections.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Knockout\Tutorial_3_SinglePageApps.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Knockout\Tutorial_5_LoadingAndSaving.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Samples.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\SignalViewModel.n">
-      <SubType>Code</SubType>
-    </Content>
     <Compile Include="Controllers\HomeController.n" />
     <Compile Include="Global.asax.n">
       <DependentUpon>Global.asax</DependentUpon>
@@ -178,38 +154,6 @@
     </Compile>
     <Compile Include="Infrastructure\HtmlHelperExtensions.n">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MVVM\CompListViewModel.n">
-      <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="MVVM\Knockout\Tutorial_1_Introduction.n">
-      <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="MVVM\Knockout\Tutorial_2_ListsAndCollections.n">
-      <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="MVVM\Knockout\Tutorial_3_SinglePageApps.n">
-      <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="MVVM\Knockout\Tutorial_5_LoadingAndSaving.n">
-      <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="MVVM\NameListViewModel.n">
-      <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="MVVM\Samples.n">
-      <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="MVVM\SignalViewModel.n">
-      <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\UnitTestViewModel.n">
       <SubType>Code</SubType>
@@ -376,9 +320,6 @@
     <Content Include="Scripts\sammy.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Views\Home\Tests.cshtml">
-      <SubType>Content</SubType>
-    </Content>
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -395,8 +336,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="bin\" />
-    <Folder Include="bin\MVVM\" />
-    <Folder Include="bin\MVVM\Knockout\" />
     <Folder Include="Content\" />
     <Folder Include="Content\images\" />
     <Folder Include="Content\themes\" />
@@ -406,7 +345,6 @@
     <Folder Include="Models\" />
     <Folder Include="MVVM" />
     <Folder Include="Infrastructure" />
-    <Folder Include="MVVM\Knockout" />
     <Folder Include="Properties\" />
     <Folder Include="Scripts\" />
     <Folder Include="Views\" />
@@ -445,7 +383,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>62129</DevelopmentServerPort>
+          <DevelopmentServerPort>6387</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>
