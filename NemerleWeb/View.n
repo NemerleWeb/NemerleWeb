@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TExpr = Nemerle.Compiler.Typedtree.TExpr;
 
-namespace Nemerle.NemerleWeb
+namespace NemerleWeb
 {
   [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Method)]
   macro View(tb : TypeBuilder, method : MethodBuilder) 

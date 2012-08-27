@@ -1,4 +1,4 @@
-using Nemerle.NemerleWeb;
+using NemerleWeb;
 using System.Collections.Generic;
 using SignalR.Hubs;
 using Nemerle.Late;

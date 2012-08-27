@@ -15,12 +15,12 @@ using System.Xml;
 
 using Nemerle.Extensions;
 using Nemerle.Xml;
-using Nemerle.NemerleWeb;
+using NemerleWeb;
 using System.Xml.Linq;
 
 using Newtonsoft.Json;
 
-namespace Nemerle.NemerleWeb
+namespace NemerleWeb
 {
   public module Utils
   {

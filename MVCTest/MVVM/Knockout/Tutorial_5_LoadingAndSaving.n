@@ -1,7 +1,7 @@
 ﻿using Nemerle.Extensions;
 using System.Collections.Generic;
 using System.Linq;
-using Nemerle.NemerleWeb;
+using NemerleWeb;
 
 namespace MVCTest
 {

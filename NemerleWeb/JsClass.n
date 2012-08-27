@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Nemerle.NemerleWeb
+namespace NemerleWeb
 {
     [Record]
     public class JsClass
@@ -198,7 +198,7 @@ $(indent)}#>);
         {
             ClassType.DeclaredNestedTypes
                      .Filter(t => t.Name.StartsWith("_N__N_"))
-                     .Iter(t => t.Ast.AddCustomAttribute(<[ Nemerle.NemerleWeb.GeneratedClass ]>));
+                     .Iter(t => t.Ast.AddCustomAttribute(<[ NemerleWeb.GeneratedClass ]>));
         }
         
         TypeIsArray(type : TypeVar) : bool 

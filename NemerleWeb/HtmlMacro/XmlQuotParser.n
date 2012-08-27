@@ -11,7 +11,7 @@ using Nemerle.Peg;
 
 using NLocation = Nemerle.Compiler.Location;
 
-namespace Nemerle.NemerleWeb
+namespace NemerleWeb
 {
   using XmlAst;
   

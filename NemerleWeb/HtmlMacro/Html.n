@@ -5,7 +5,7 @@ using Nemerle.Compiler.Parsetree;
 
 using System.Collections.Generic;
 
-namespace Nemerle.NemerleWeb
+namespace NemerleWeb
 {
   [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Method)]
   public macro Html(_tb : TypeBuilder, mb : MethodBuilder)

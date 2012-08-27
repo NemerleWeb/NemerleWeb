@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 using BF = System.Reflection.BindingFlags;
 using TExpr = Nemerle.Compiler.Typedtree.TExpr;
 
-namespace Nemerle.NemerleWeb
+namespace NemerleWeb
 {
   [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
   macro ViewModel(tb : TypeBuilder)
@@ -38,11 +38,11 @@ namespace Nemerle.NemerleWeb
     public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);
-      def vmInterface = <[ ttype: Nemerle.NemerleWeb.IViewModel ]>;
+      def vmInterface = <[ ttype: NemerleWeb.IViewModel ]>;
       def superTypes = tb.GetDirectSuperTypes();
       
       unless (superTypes != null && superTypes.Exists(t => t.Equals(vmInterface)))
-        tb.AddImplementedInterface(<[ Nemerle.NemerleWeb.IViewModel ]>);
+        tb.AddImplementedInterface(<[ NemerleWeb.IViewModel ]>);
     }
     
     public DoTransformBeforeTypedMembers(_tb : TypeBuilder, _typer : Typer) : void

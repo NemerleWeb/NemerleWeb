@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 using BF = System.Reflection.BindingFlags;
 using TExpr = Nemerle.Compiler.Typedtree.TExpr;
 
-namespace Nemerle.NemerleWeb 
+namespace NemerleWeb 
 {
   macro signal_macro(expr) 
   syntax("signal", expr)

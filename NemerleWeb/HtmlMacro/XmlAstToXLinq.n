@@ -14,11 +14,11 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using L = System.Xml.Linq;
-using X = Nemerle.NemerleWeb;
+using X = NemerleWeb;
 using SCG = System.Collections.Generic;
 using NColl = Nemerle.Collections.NCollectionsExtensions;
 
-namespace Nemerle.NemerleWeb
+namespace NemerleWeb
 {  
   class XmlAstToXLinq
   {

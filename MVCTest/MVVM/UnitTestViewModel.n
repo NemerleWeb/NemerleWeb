@@ -1,4 +1,4 @@
-﻿using Nemerle.NemerleWeb;
+﻿using NemerleWeb;
 using System.Collections.Generic;
 using System.Linq;
 namespace MVCTest
