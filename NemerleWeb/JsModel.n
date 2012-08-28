@@ -6,6 +6,7 @@ using Nemerle.Text;
 using Nemerle.Utility;
 
 using System;
+using System.Web;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace NemerleWeb
       Macros.DefineCTX(typer);
       def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");
       def serverMethods = Dictionary();
-      when(serverClass != null)
+      if(serverClass != null)
       {          
           def env = typer.Manager.CoreEnv;
           def env = env.EnterIntoNamespace(tb.NamespaceNode);
@@ -72,9 +73,16 @@ namespace NemerleWeb
                   ]>);
               | _ => ()              
           }
-        
+          ctb.Define(<[ decl:
+              public __SetSignalRConnectionId(id : string) : System.Web.Mvc.ActionResult
+              {                
+                HttpContext.Current.Session["SignalRConnectionId"] = id;
+                Content("");
+              }]>);
           ptb.Compile();
           ctb.Compile();
+      } else {
+        tb.DefineNestedType(<[ decl: public class Server {} ]>).Compile();
       }
     
       //assert2(false);      
@@ -86,7 +94,11 @@ namespace NemerleWeb
       _ = tb.DefineWithSource(<[ decl:
         public static GetModelScript() : string
         {
-          $result
+          def signalRScript = match(typeof(Server).GetMethod("GetSignalRScript")) {
+          | x when x != null => x.Invoke(null, array[]).ToString()
+          | _ => ""
+          };
+          ($result).Replace("{{{SignalR}}}", signalRScript)
         }
         ]>);
         
@@ -100,7 +112,7 @@ namespace NemerleWeb
           def lambdas = tb.DeclaredNestedTypes
                           .Filter(t => t.Name.StartsWith("_N__N_"))
                           .Map(t => JsClass(t, "  ", ienType, stringType, typer).Write());
-          def lambdas = $"..$(lambdas; Environment.NewLine)";          
+          def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");          
           lambdaMeth.Body = <[ $lambdas ]>;          
           tb.Compile();
       };

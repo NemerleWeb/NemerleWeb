@@ -45,6 +45,7 @@
       <Name>Microsoft.Web.Infrastructure</Name>
       <AssemblyName>Microsoft.Web.Infrastructure.dll</AssemblyName>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Nemerle">
       <SpecificVersion>False</SpecificVersion>
@@ -80,7 +81,7 @@
     <Reference Include="SignalR.Hosting.AspNet, Version=0.5.1.10822, Culture=neutral, PublicKeyToken=null">
       <Name>SignalR.Hosting.AspNet</Name>
       <AssemblyName>SignalR.Hosting.AspNet.dll</AssemblyName>
-      <HintPath>..\packages\SignalR.Hosting.AspNet.0.5.3\lib\net45\SignalR.Hosting.AspNet.dll</HintPath>
+      <HintPath>..\packages\SignalR.Hosting.AspNet.0.5.3\lib\net40\SignalR.Hosting.AspNet.dll</HintPath>
     </Reference>
     <Reference Include="SignalR.Hosting.Common, Version=0.5.1.10822, Culture=neutral, PublicKeyToken=null">
       <Name>SignalR.Hosting.Common</Name>

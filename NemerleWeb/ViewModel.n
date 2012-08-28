@@ -6,6 +6,7 @@ using Nemerle.Text;
 using Nemerle.Utility;
 
 using System;
+using System.Web;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,7 +55,7 @@ namespace NemerleWeb
       Macros.DefineCTX(typer);
       def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");
       def serverMethods = Dictionary();
-      when(serverClass != null)
+      if(serverClass != null)
       {          
           def env = typer.Manager.CoreEnv;
           def env = env.EnterIntoNamespace(tb.NamespaceNode);
@@ -96,11 +97,18 @@ namespace NemerleWeb
                     public $(methodName : name) (..$(fparms)) : void
                     {}
                   ]>);
-              | _ => ()              
+              | _ => ()
           }
-        
+          ctb.Define(<[ decl:
+              public __SetSignalRConnectionId(id : string) : System.Web.Mvc.ActionResult
+              {                
+                HttpContext.Current.Session["SignalRConnectionId"] = id;
+                Content("");
+              }]>);
           ptb.Compile();
           ctb.Compile();
+      } else {
+        tb.DefineNestedType(<[ decl: public class Server {} ]>).Compile();
       }
     
       //assert2(false);
@@ -159,9 +167,13 @@ $<#  ko.applyBindings(new $(JsClass.GetProperName(tb))({0}));#>;
       _ = tb.DefineWithSource(<[ decl:
         public GetViewModelScript() : string
         {
+          def signalRScript = match(typeof(Server).GetMethod("GetSignalRScript")) {
+          | x when x != null => x.Invoke(null, array[]).ToString()
+          | _ => ""
+          };
           def sb = System.Text.StringBuilder();          
           _ = sb.AppendLine($toTypedObjectFunction);
-          _ = sb.AppendLine($result);
+          _ = sb.AppendLine(($result).Replace("{{{SignalR}}}", signalRScript));
           def paramList = __constructorParams.Map(obj => "ToTypedObject(" + Utils.ToJson(obj) + ")");
           _ = sb.AppendLine(string.Format($applyBindings, $"..$(paramList)"));
           sb.ToString()
@@ -171,14 +183,12 @@ $<#  ko.applyBindings(new $(JsClass.GetProperName(tb))({0}));#>;
       def lambdaMeth = tb.DefineAndReturn(<[ decl: 
         public GetLambdaScript() : string
         { "" } ]>) :> MethodBuilder;
-      
-      //DefineBindField(cl);
-      
+            
       tb.Manager.TypeTreeBuildFinish += _ => {
           def lambdas = tb.DeclaredNestedTypes
                           .Filter(t => t.Name.StartsWith("_N__N_"))
                           .Map(t => JsClass(t, "  ", ienType, stringType, typer).Write());
-          def lambdas = $"..$(lambdas; Environment.NewLine)";
+          def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");
           
           lambdaMeth.Body = <[ 
             def sb = System.Text.StringBuilder();

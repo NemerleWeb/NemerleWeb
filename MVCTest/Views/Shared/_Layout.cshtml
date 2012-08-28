@@ -26,19 +26,5 @@
         <footer>
             Github: <a href="https://github.com/ionoy/NemerleWeb">https://github.com/ionoy/NemerleWeb</a>
         </footer>
-        <script>
-            $(function () {
-                // Proxy created on the fly
-                var chat = $.connection.signalViewModelHub;
-
-                // Declare a function on the chat hub so the server can invoke it
-                chat.AddMessage = function (message) {
-                    alert(message);
-                };
-
-                // Start the connection
-                $.connection.hub.start();
-            });
-        </script>
     </body>
 </html>

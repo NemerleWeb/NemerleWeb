@@ -141,6 +141,15 @@ h1.logo span {
     color: #fff;
 }
 
+.chat td:nth-child(2) {
+    font-weight: bold;
+    padding-right: 20px;
+}
+
+.chat td:nth-child(3) {
+    font-style: italic;
+}
+
 footer {
     padding: 15px 50px 30px 50px;
     font-size: 14px;

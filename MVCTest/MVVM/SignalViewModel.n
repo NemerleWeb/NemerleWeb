@@ -1,5 +1,9 @@
 using NemerleWeb;
+using Nemerle.Extensions;
+using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Linq;
 using SignalR.Hubs;
 using Nemerle.Late;
 
@@ -8,32 +12,55 @@ namespace MVCTest
   [JsModel]
   public class SignalViewModel 
   {
-    Messages : List[string] { get; set; }
+    [JsModel, Record]
+    public class Message 
+    {
+      public Name : string;
+      public Message : string;
+      public Timestamp : string;
+    }
+    
+    Messages : List[Message] { get; set; }
+    Name : string { get; set; }
     CurrentMessage : string { get; set; }
-  
+    
+    public this()
+    {
+      server.GetLastMessages(messages => {
+        foreach(msg in messages)
+          AddMessage(msg);
+      });
+    }
+    
     SendMessage() : void
     {
-      server.SendMessage(CurrentMessage, _ => {});
+      server.SendMessage(Name, CurrentMessage, _ => {});
       CurrentMessage = "";
     }
   
-    AddMessage(message : string) : void
+    AddMessage(message : Message) : void
     {
       Messages.Add(message);
     }
   
     public class Server 
-    {
-      _signalContext : IHubContext;
-    
-      public this()
+    {      
+      public static _lastMessages : ConcurrentQueue[Message] = ConcurrentQueue.[Message]();
+      
+      public GetLastMessages() : List[Message]
       {
-        _signalContext = SignalR.GlobalHost.ConnectionManager.GetHubContext.[SignalViewModelHub]();
+        _lastMessages.ToList()
       }
-    
-      public SendMessage(message : string) : string
+      
+      public SendMessage(name : string, message : string) : string
       {
-        late _signalContext.Clients.Invoke("AddMessage", array[message]);
+        def msg = Message(if(string.IsNullOrWhiteSpace(name)) "anon" else name, message, DateTime.Now.ToString());
+        broadcast client.AddMessage(msg);
+        _lastMessages.Enqueue(msg);
+        when(_lastMessages.Count > 10) {
+          mutable msg;
+          _lastMessages.TryDequeue(out msg);
+        }
         "";
       }
     }
@@ -43,17 +70,25 @@ namespace MVCTest
     {
       <# 
         <div>
-          <h3>Signal</h3>
-          <input value="$CurrentMessage"/>
-          <button click="$SendMessage">Send</button>
-          <ul>
-            <li $foreach(m in Messages)>$m</li>
-          </ul>
+          <h3>Chat using SignalR</h3>
+          <p>
+            This sample shows how duplex communication works. Zero configuration is required from developer. 
+            Just use "signal" or "broadcast" keywords and macro will generate all necessery code for you.
+          </p>
+          <form>
+            <div>Name: <input value="$Name"/></div>
+            <div>Message: <input value="$CurrentMessage"/></div>
+            <input type="submit" click="$SendMessage" value="Send" />
+          </form>
+          <table class="chat">
+            <tbody>
+              <tr $foreach(m in Messages)>
+                <td>$(m.Timestamp)</td><td>$(m.Name + ": ")</td><td>$(m.Message)</td>
+              </tr>
+            </tbody>
+          </table>
          </div> 
       #>
     }
   }
 }
-
-public class SignalViewModelHub : Hub
-{}

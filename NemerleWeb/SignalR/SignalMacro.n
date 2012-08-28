@@ -4,14 +4,18 @@ using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
 using Nemerle.Text;
 using Nemerle.Utility;
+using Nemerle.Late;
 
 using System;
+using System.Web;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BF = System.Reflection.BindingFlags;
 using TExpr = Nemerle.Compiler.Typedtree.TExpr;
+
+using SignalR.Hubs;
 
 namespace NemerleWeb 
 {
@@ -22,30 +26,75 @@ namespace NemerleWeb
     SignalImpl.TransformSignal(expr, ctx);
   }
   
+  macro broadcast_macro(expr) 
+  syntax("broadcast", expr)
+  {
+    def ctx = Macros.ImplicitCTX();
+    SignalImpl.TransformBroadcast(expr, ctx);
+  }
+  
   public module SignalImpl
   {
-    public TransformSignal(expr : PExpr, typer : Typer) : PExpr {
-      CreateGetSignalIfNeeded(typer.CurrentTypeBuilder);
-      <[]>
+    public TransformSignal(expr : PExpr, typer : Typer) : PExpr 
+    {
+      CreateSignalIfNeeded(typer.CurrentTypeBuilder);      
+      def hubName = typer.CurrentTypeBuilder.DeclaringType.Name + "Hub";
+      match(expr) {
+      | <[ $_.$method(..$parms) ]> => 
+              <[  def __signalClients = SignalR.GlobalHost.ConnectionManager.GetHubContext.[$(hubName : dyn)]().Clients; 
+                  def __signalConnectionId = HttpContext.Current.Session["SignalRConnectionId"];
+                  def _ = late __signalClients[__signalConnectionId].Invoke($(method.ToString() : string), array[..$parms]) ]>
+      | _ => Message.FatalError(expr.Location, "Invalid 'signal' macro call. Syntax: signal client.MethodName(parameters)");
+      }      
     }
     
-    public CreateGetSignalIfNeeded(tb : TypeBuilder) : void {
-      when(!tb.GetMethods().Any(m => m.Name == "GetSignal")) {
-        def hubName = tb.Name + "Hub";
-        tb.Define(<[ decl: GetSignal() : string {
-          <#
-          var #> + $(hubName : string) + <# = $.connection.#> + $(hubName : string) + <#;
-
-          // Declare a function on the chat hub so the server can invoke it
-          chat.AddMessage = function (message) {
-              alert(message);
-          };
-
-          // Start the connection
-          $.connection.hub.start();
-          #>
-        } ]>);
-      }        
+    public TransformBroadcast(expr : PExpr, typer : Typer) : PExpr 
+    {
+      CreateSignalIfNeeded(typer.CurrentTypeBuilder);
+      def hubName = typer.CurrentTypeBuilder.DeclaringType.Name + "Hub";
+      match(expr) {
+      | <[ $_.$method(..$parms) ]> => 
+              <[  def __signalClients = SignalR.GlobalHost.ConnectionManager.GetHubContext.[$(hubName : dyn)]().Clients; 
+                  def _ = late __signalClients.Invoke($(method.ToString() : string), array[..$parms]) ]>
+      | _ => Message.FatalError(expr.Location, "Invalid 'broadcast' macro call. Syntax: broadcast client.MethodName(parameters)");
+      }     
+    }
+    
+    public CreateSignalIfNeeded(tb : TypeBuilder) : void 
+    {
+      when(!tb.GetMethods().Any(m => m.Name == "GetSignalRScript")) 
+      {
+        def declaringType = tb.DeclaringType :> TypeBuilder;
+        def hubName = declaringType.Name + "Hub";
+        def jsHubName = char.ToLowerInvariant(hubName[0]) + hubName.Substring(1);
+        def methods = tb.DeclaringType
+                        .GetMembers(BF.Instance | BF.DeclaredOnly | BF.Public | BF.NonPublic)
+                        .OfType.[IMethod]();
+        def methods = JsClass.FilterMethods(methods)
+                             .Select(m => (m.Name, $"..$(m.GetParameters().Select(p => p.Name))"))
+                             .Select(((name, parms), _) => 
+$<# 
+  $jsHubName.$name = function($parms) {
+    self.$name($parms);
+  }; #>);
+  
+        def methods = $<#..$(methods; "")#>;
+        tb.Define(<[ decl: 
+          public static GetSignalRScript() : string 
+          {
+            <#
+            var #> + $(jsHubName : string) + <# = $.connection.#> + $(jsHubName : string) + <#;
+            #> + $(methods : string) + <#
+            $.connection.hub.start({}, function() {
+              $.get('/#> + $(declaringType.Name) + <#/__SetSignalRConnectionId', {id: this.id});
+            });
+            #>
+          } ]>);
+        
+        tb.Define(<[ decl: client : $(declaringType.ParsedTypeName) = $(declaringType.ParsedTypeName)() ]>);
+        
+        tb.DefineNestedType(<[ decl: public class $(hubName : dyn) : HubBase {} ]>).Compile();
+      }
     }
   }
 }

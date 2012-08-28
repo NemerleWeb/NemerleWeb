@@ -41,14 +41,9 @@ namespace NemerleWeb
         public Methods : IEnumerable[IMethod] 
         {
           get
-          {
-            def viewModelMethods = typeof(IViewModel).GetMethods().Select(m => m.Name).ToList();
-            ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                      .Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
-                      .Where(m => !m.IsConstructor)
-                      .Where(m => !viewModelMethods.Any(vm => vm == m.Name))
-                      .Where(m => m.Name != "View")
-                      .Where(m => !m.Name.StartsWith("__"));
+          {            
+            def methods = ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            FilterMethods(methods);
           }
         }
         
@@ -91,6 +86,7 @@ $fields
 $methods
 $constructorBody
 $computedProperties
+{{{SignalR}}}
 $returning
 $(Indent)}
 $staticConstructorBody#>
@@ -215,6 +211,16 @@ $(indent)}#>);
         
         public static GetProperName(type : TypeInfo) : string {
             type.FullName.Replace(".", "_")
+        }
+        
+        public static FilterMethods(methods : IEnumerable[IMethod]) : IEnumerable[IMethod]
+        {
+          def viewModelMethods = typeof(IViewModel).GetMethods().Select(m => m.Name).ToList();
+          methods.Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
+                 .Where(m => !m.IsConstructor)
+                 .Where(m => !viewModelMethods.Any(vm => vm == m.Name))
+                 .Where(m => m.Name != "View")
+                 .Where(m => !m.Name.StartsWith("__"))
         }
     }
 }
