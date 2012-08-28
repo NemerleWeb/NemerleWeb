@@ -18,7 +18,10 @@ namespace NemerleWeb
     {
       match(member.Name, parms)
       {
-        | ("Count", l :: []) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName     => JsAST.FieldRef(l, "length")
+        | ("Count", l :: []) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
+          JsAST.FieldRef(l, "length")
+        | ("Where", l :: []) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
+          JsAST.MethodRef(l, "where")
         | _ =>
           _ = type; _ = left; _ = member; _ = parms;
           throw ArgumentException($"Invalid $(member.Name)");

@@ -14,8 +14,6 @@ Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "Test", "Test\Test.nproj", "
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Utils", "NemerleWeb.Utils\NemerleWeb.Utils.nproj", "{A350D2D6-BBE8-4535-BDAC-9A8CF9F07FCF}"
 EndProject
-Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Tests", "NemerleWeb.Tests\NemerleWeb.Tests.nproj", "{B3748A04-4DB2-4668-8ABA-3E076572258E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,10 +32,6 @@ Global
 		{A350D2D6-BBE8-4535-BDAC-9A8CF9F07FCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A350D2D6-BBE8-4535-BDAC-9A8CF9F07FCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A350D2D6-BBE8-4535-BDAC-9A8CF9F07FCF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B3748A04-4DB2-4668-8ABA-3E076572258E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B3748A04-4DB2-4668-8ABA-3E076572258E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B3748A04-4DB2-4668-8ABA-3E076572258E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B3748A04-4DB2-4668-8ABA-3E076572258E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,13 +1,23 @@
 ﻿using NemerleWeb;
+using Nemerle.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+
 namespace NemerleWeb.Tests
 {
   [ViewModel]
   public class UnitTestViewModel
   {
-    Results : List[(string * string)] { get; set; }
+    Results : List[(string * bool)] { get; set; }
     
+    class SomeDisposable : IDisposable
+    {
+      public Dispose() : void
+      {
+        _ = "Do something";
+      }
+    }
     
     public this()
     {
@@ -17,48 +27,171 @@ namespace NemerleWeb.Tests
       }
       Results = [].ToList();
       
-      test("return string", () => {
-        "Passed"
+      test("simple", () =>
+      {
+        true
       });
       
-      test("if(true) p else f", () => {
-        if(true) {
-          "Passed"
-        } else {
-          "Failed"
-        }
+      test("simple negative", () =>
+      {
+        !false
       });
       
-      test("if(false) f else p", () => {
-        if(false) {
-          "Failed"
-        } else {
-          "Passed"
-        }
+      test("simple double negative", () =>
+      {
+        ! !true
       });
       
-      test("ctor().field", () => {
-        Dummy().DummyField
+      test("simple triple negative", () =>
+      {
+        ! ! !false
       });
       
-      test("ctor().prop with if/else inside", () => {
-        Dummy().DummyProp;
+      test("if(true) p else f", () =>
+      {
+        if(true)
+          true
+        else
+          false
       });
       
-      test("tuple expansion def (a, b, c) = tuple", () => {
-        def tuple = ("Failed", "Passed", 0);
+      test("if(false) f else p", () =>
+      {
+        if(false)
+          false
+        else
+          true
+      });
+      
+      test("ctor().field", () =>
+      {
+        _ = Dummy().DummyField;
+        true
+      });
+      
+      test("ctor().prop with if/else inside", () =>
+      {
+        _ = Dummy().DummyProp;
+        true
+      });
+      
+      test("tuple expansion def (a, b, c) = tuple", () =>
+      {
+        def tuple = ("Failed", true, 0);
         def (_a, b, _c) = tuple;
         b;
       });
       
-      test("dummy.prop++", () => {
+      test("dummy.prop++", () =>
+      {
         def d = Dummy();
         d.DummyInt++;
-        if(d.DummyInt == 1)
-          "Passed"
-        else
-          "Failed"
+        
+        d.DummyInt == 1
       });
+      
+      test("when", () =>
+      {
+        when(true)
+          _ = ();
+        
+        true
+      });
+      
+      test("for when", () =>
+      {
+        for(mutable i = 0; i != 1; i++)
+          when(true)
+            _ = ();
+        
+        true
+      });
+      
+      test("for when variable", () =>
+      {
+        mutable res = false;
+        
+        for(mutable i = 0; i != 1; i++)
+          when(true)
+            res = true;
+        
+        res
+      });
+      
+      test("neste if else", () =>
+      {
+        mutable i = 0;
+        
+        if(i == 0)
+        {
+          i++;
+          
+          if(i == 2)
+            false
+          else
+            if(i == 1)
+              true
+            else
+              false
+        }
+        else
+          if(i != 10)
+            false
+          else
+            true
+      });
+      
+      test("list initialization", () =>
+      {
+        def l1 = List([1, 2, 3]);
+        def l2 = [1, 2, 3].ToList();
+        // TODO: #8
+        def l3 = List() <- [1, 2, 3];
+        
+        mutable res = true;
+        
+        // TODO: #10
+        //for(mutable i = 0; i < l1.Count; i++)
+        //  when(l1[i] != l2[i] || l1[i] != l3[i])
+        //    res = false;
+            
+        res
+      });
+      
+      test("using", () =>
+      {
+        using (s = SomeDisposable())
+        {
+          _ = "Do something";
+        }
+        
+        true
+      });
+      
+      // TODO: #11
+      //test("linq where", () =>
+      //{
+      //  def l = [1, 2, 3, 4, 5, 6].ToList();
+      //  def r = l.Where(x => x > 4);
+        
+      //  mutable res = true;
+      //  mutable i = 0;
+      //  using (e = r.GetEnumerator())
+      //  {
+      //    while (e.MoveNext())
+      //    {
+      //      when (e.Current != i + 1)
+      //        res = false;
+      //    }
+      //  }
+        
+      //  res
+      //});
+      
+      //test("linq select", () =>
+      //{
+      //  "Passed"
+      //});
     }
     
     [Html]
@@ -67,7 +200,7 @@ namespace NemerleWeb.Tests
       <#
         <table class="jsast-tests">
           <tbody>
-            <tr $foreach(r in Results) css-failed='$(r[1] != "Passed")'>
+            <tr $foreach(r in Results) css-failed='$(r[1] == false)'>
               <td>$(r[0])</td>
               <td>$(r[1])</td>
             </tr>
@@ -76,12 +209,14 @@ namespace NemerleWeb.Tests
       #>
     }
     
-    class Dummy { 
+    class Dummy 
+    {
       public DummyInt : int { get; set; }
       public mutable DummyField : string = "Passed"; 
       public DummyProp : string
       {
-        get {
+        get
+        {
           if(true)
             "Passed"
           else 
