@@ -144,16 +144,14 @@ namespace NemerleWeb.Tests
       test("list initialization", () =>
       {
         def l1 = List([1, 2, 3]);
-        def l2 = [1, 2, 3].ToList();
-        // TODO: #8
+        def l2 = [1, 2, 3].ToList();        
         def l3 = List() <- [1, 2, 3];
         
         mutable res = true;
-        
-        // TODO: #10
-        //for(mutable i = 0; i < l1.Count; i++)
-        //  when(l1[i] != l2[i] || l1[i] != l3[i])
-        //    res = false;
+                
+        for(mutable i = 0; i < l1.Count; i++)
+          when(l1[i] != l2[i] || l1[i] != l3[i])
+            res = false;
             
         res
       });

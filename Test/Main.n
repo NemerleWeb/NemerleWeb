@@ -26,12 +26,7 @@ public partial class Test
 {    
   public this()
   {
-    def l1 = List([1, 2, 3]);
-    def l2 = [1, 2, 3].ToList();
-    def l3 = List() <- [1, 2, 3];
-    
-    when(l1[0] != l2[0] || l1[1] != l3[1])
-      ()
+    def f = [1, 2, 3].Where(i => i < 2);
   }
   
   [Html]
