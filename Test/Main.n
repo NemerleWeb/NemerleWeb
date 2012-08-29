@@ -1,5 +1,7 @@
 ﻿using Nemerle.Collections;
 using Nemerle.Xml;
+using Nemerle.Extensions;
+using Nemerle.ComputationExpressions;
 
 using System;
 using System.Linq;
@@ -8,7 +10,6 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 
 using NemerleWeb;
-using Nemerle.ComputationExpressions;
 
 module Program
 {
@@ -23,14 +24,14 @@ module Program
 [ViewModel]
 public partial class Test
 {    
-  LetterCount : int { get; set; }
-  
-  More() : void
+  public this()
   {
-    def a = true;
-    def b = false;
-    when(a == true && b == false)
-      LetterCount++;    
+    def l1 = List([1, 2, 3]);
+    def l2 = [1, 2, 3].ToList();
+    def l3 = List() <- [1, 2, 3];
+    
+    when(l1[0] != l2[0] || l1[1] != l3[1])
+      ()
   }
   
   [Html]

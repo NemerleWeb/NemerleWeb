@@ -229,7 +229,7 @@ namespace NemerleWeb
         mutable jsAst = JsASTBuilder.Build(expr);        
         
         jsAst = JsASTHelper.LabelsToNamedWhile(jsAst);
-        jsAst = JsASTHelper.TransformBottomUp(jsAst);            
+        jsAst = JsASTHelper.TransformBottomUp(jsAst);
         jsAst = JsASTHelper.FlattenAndRemoveVoids(jsAst);
         jsAst = JsASTHelper.RemoveEmptyBranches(jsAst);
             
