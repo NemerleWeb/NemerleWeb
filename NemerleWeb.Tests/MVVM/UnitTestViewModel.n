@@ -179,21 +179,25 @@ namespace NemerleWeb.Tests
         true
       });
       
-      test("try catch finally", () =>
+      test("try finally", () =>
       {
         try
         {
-          throw SomeException();
-        }
-        catch
-        {
-          | _ is ArgumentException => false
-          | e is SomeException => _ = e.Message; true
-          | _ => false
+          true
         }
         finally
         {
-          _ = "Do something";
+        }
+      });
+      
+      test("variant", () =>
+      {
+        def v = DummyVariant.Case3(false) : DummyVariant;
+        match(v)
+        {
+        | Case1 => false
+        | Case2 => false
+        | Case3(val) => val == false
         }
       });
       
@@ -252,6 +256,16 @@ namespace NemerleWeb.Tests
             "Failed"
         }
       }
+    }
+    
+    [JsModel]
+    variant DummyVariant
+    {
+      | Case1 { A : string }
+      | Case2 { B : int }
+      | Case3 { C : bool }
+      
+      public D : bool = true;
     }
   }
 }

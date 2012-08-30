@@ -74,7 +74,7 @@ namespace NemerleWeb
             | r => r
             }
             JsAST.Seq(newExprs.Rev())
-        | TryFinally(b, h) => JsAST.TryFinally(delayAssignment(b), delayAssignment(h))
+        | TryFinally(body, handler) => JsAST.TryFinally(delayAssignment(body), handler)
         | Assign(l, r)     => JsAST.Assign(l, delayAssignment(r))
         | If(c, t, e)      => JsAST.If(c, delayAssignment(t), delayAssignment(e))
         | ServerCall(m, t, ps, c) => JsAST.ServerCall(m, t, ps.Map(p => (p[0], delayAssignment(p[1]))), delayAssignment(c))
@@ -100,7 +100,8 @@ namespace NemerleWeb
     
     public MakeReturn(ast : JsAST) : JsAST 
     {
-        JsAST.Seq([JsAST.DefValue("__returnValue", JsAST.Void()), DelayAssignment(ast, JsAST.LocalRef("__returnValue")), JsAST.Return(JsAST.LocalRef("__returnValue"))])        
+      | Void => ast
+      | _ => JsAST.Seq([JsAST.DefValue("__returnValue", JsAST.Void()), DelayAssignment(ast, JsAST.LocalRef("__returnValue")), JsAST.Return(JsAST.LocalRef("__returnValue"))])        
     }
     
     public GetTemporaryVariableName() : string 

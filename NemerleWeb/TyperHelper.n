@@ -47,27 +47,37 @@ namespace NemerleWeb
             match(method.Header.Body)
             {
             | FunBody.Typed(typedBody) => typedBody
-            | FunBody.Parsed =>
-              def oldEmitDebug = typer.Manager.Options.EmitDebug;
-              typer.Manager.Options.EmitDebug = false;
-              def mb = method :> MethodBuilder;
-              def methodTyper = Typer(tb, null, mb, mb.Env);
-                  
-              if(fullTyping)
-                methodTyper.RunFullTyping();
-              else
-              {
-                def runTyper = methodTyper.GetType().GetMethod("RunTyper", BindingFlags.NonPublic | BindingFlags.Instance);
-                _ = runTyper.Invoke(methodTyper, array[]);
-              } 
+            | FunBody.Parsed(parsed) =>
+              match(parsed) {
+              | <[ {} ]>
+              | <[ { base () } ]> => TExpr.Literal(Literal.Void())
+              | _ => 
+                def oldEmitDebug = typer.Manager.Options.EmitDebug;
+                typer.Manager.Options.EmitDebug = false;
+                def mb = method :> MethodBuilder;
+                def methodTyper = Typer(tb, null, mb, mb.Env);
               
-              typer.Manager.Options.EmitDebug = oldEmitDebug;
-              GetTypedBody(method, typer, tb);
+                if(fullTyping)
+                  methodTyper.RunFullTyping();
+                else
+                {
+                  def runTyper = methodTyper.GetType().GetMethod("RunTyper", BindingFlags.NonPublic | BindingFlags.Instance);
+                  _ = runTyper.Invoke(methodTyper, array[]);
+                }                
               
+                typer.Manager.Options.EmitDebug = oldEmitDebug;
+                GetTypedBody(method, typer, tb);
+              }
+            | FunBody.Abstract => TExpr.Literal(Literal.Void())
             | null =>
-              Message.Error("External methods should not be used in this method");
-              TExpr.Error();              
+              // External method don't have body
+              def mi = method :> LibraryReference.ExternalMethodInfo;
+              
+              Message.Error($"External methods are not implemented: $(mi.GetName())");
+              TExpr.Error();
+              
             | _ =>
+              assert2(false);
               Message.Error("Couldn't type body"); 
               TExpr.Error();
             }

@@ -66,15 +66,19 @@ $modelTemplates
     }
     
     GetModelScript(type : Type) : string {
-        type.GetMethod("GetModelScript", BindingFlags.Static | BindingFlags.Public).Invoke(null, array[]) :> string;        
+      type.GetMethod("GetModelScript", BindingFlags.Static | BindingFlags.Public).Invoke(null, array[]) :> string;        
     }
     
     GetModelTemplates(type : Type) : string {
+      if(!type.IsAbstract) {
         def model = FormatterServices.GetUninitializedObject(type);
         string.Join(Environment.NewLine, 
                     type.GetMethods()
                         .Where(m => m.Name.StartsWith("__"))
                         .Select(m => CreateTemplate(GetHtml(m.Invoke(model, array[]) :> list[XElement]), m.DeclaringType.Name + m.Name)))
+      } else {
+        ""
+      }
     }
     
     GetModelLambdas(type : Type) : string {

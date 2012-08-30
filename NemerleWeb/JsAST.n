@@ -146,6 +146,11 @@ $(Body.Write("  "))
                 "/* No goto writer implementation */"
             }
         }
+        | HasType        { Obj : JsAST; TypeName : string;
+          public override Write(_indent = "" : string) : string {
+            $"$(Obj.Write()).constructor === $TypeName"
+          }
+        }
         | If             { Cond : JsAST; Body : JsAST; ElseBody : JsAST;
             public override Write(_indent = "" : string) : string {
 $<# 
@@ -339,6 +344,11 @@ $(indent)})#>
                 "self"
             }
         }
+        | Throw          { Obj : JsAST;
+            public override Write(_ = "" : string) : string {
+                $"throw $(Obj.Write())"
+            }
+        }
         | Try            { Body : JsAST; Handler : JsAST;
             public override Write(_indent = "" : string) : string {
 $<#
@@ -439,6 +449,7 @@ $(Body.Write("  "))
             | DefValue(name, val)         => JsAST.DefValue(name, recurse(val))
             | For(it, coll, body)         => JsAST.For(it, recurse(coll), recurse(body))
             | Goto                        => ast'        
+            | HasType(obj, type)          => JsAST.HasType(recurse(obj), type)
             | If(cond, then, els)         => JsAST.If(recurse(cond), recurse(then), recurse(els))
             | JustIf(cond, then)          => JsAST.JustIf(recurse(cond), recurse(then))
             | Label(id, body)             => JsAST.Label(id, recurse(body))
@@ -456,6 +467,7 @@ $(Body.Write("  "))
             | Switch(expr, cases)         => JsAST.Switch(recurse(expr), cases.Map(recurse).Cast.[JsAST.SwitchCase]().NToList())
             | Ternary(cond, then, els)    => JsAST.Ternary(recurse(cond), recurse(then), recurse(els))
             | This                        => ast'
+            | Throw(obj)                  => JsAST.Throw(recurse(obj))
             | Try(body, handler)          => JsAST.Try(recurse(body), recurse(handler))
             | TryFinally(body, handler)   => JsAST.TryFinally(recurse(body), recurse(handler))
             | Tuple(args)                 => JsAST.Tuple(args.Map(recurse))
