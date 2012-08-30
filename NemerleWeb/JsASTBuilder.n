@@ -43,7 +43,7 @@ namespace NemerleWeb
             | FieldMember(obj, fld)             => JsAST.FieldRef(Build(obj), fld.Name) 
             | FieldOf                           => Message.Warning(expr.Location, "FieldOf not implemented"); JsAST.NotImpl()
             | Goto(target, _)                   => JsAST.Goto(target)
-            | HasType                           => Message.Warning(expr.Location, "HasType not implemented"); JsAST.NotImpl()
+            | HasType(expr, type)               => JsAST.HasType(Build(expr), JsClass.GetProperName(type.TypeInfo))
             | If(cond, then, els, _, _)         => JsAST.If(Build(cond), Build(then), Build(els))
             | ImplicitValueTypeCtor             => Message.Warning(expr.Location, "ImplicitValueTypeCtor not implemented"); JsAST.NotImpl()
             | Label(id, body)                   => JsAST.Label(id, Build(body))
@@ -106,7 +106,7 @@ namespace NemerleWeb
               }
             | Switch                            => Message.Warning(expr.Location, "Switch not implemented"); JsAST.NotImpl()
             | This                              => JsAST.This()
-            | Throw                             => Message.Warning(expr.Location, "Throw not implemented"); JsAST.NotImpl()
+            | Throw(expr)                       => JsAST.Throw(Build(expr))
             | Try(_, _)                         => Message.Warning(expr.Location, "Try not implemented"); JsAST.NotImpl()
             | TryFinally(b, h)                  => JsAST.TryFinally(Build(b), Build(h))
             | Tuple(args)                       => JsAST.Tuple(args.Map(a => Build(a)))

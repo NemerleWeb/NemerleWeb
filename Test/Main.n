@@ -20,12 +20,31 @@ module Program
       _ = Console.ReadKey();
   }
 }
-  
+
+[JsModel]
+variant RgbColor {
+   | Red
+   | Yellow
+   | Green
+   | Different {
+       red : float;
+       green : float;
+       blue : float;
+     }
+ }
+
 [ViewModel]
 public partial class Test
 {
   public this()
   {  
+    def color = RgbColor.Different(1.0f, 1.0f, 1.0f) : RgbColor;
+    match (color) {
+      | RgbColor.Red => "red"
+      | RgbColor.Yellow => "yellow"
+      | RgbColor.Green => "green"
+      | RgbColor.Different (r, g, b) => $"rgb($r, $g, $b)"
+    }
   }
   
   [Html]

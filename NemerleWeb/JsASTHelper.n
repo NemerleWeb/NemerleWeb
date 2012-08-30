@@ -100,7 +100,8 @@ namespace NemerleWeb
     
     public MakeReturn(ast : JsAST) : JsAST 
     {
-        JsAST.Seq([JsAST.DefValue("__returnValue", JsAST.Void()), DelayAssignment(ast, JsAST.LocalRef("__returnValue")), JsAST.Return(JsAST.LocalRef("__returnValue"))])        
+      | Void => ast
+      | _ => JsAST.Seq([JsAST.DefValue("__returnValue", JsAST.Void()), DelayAssignment(ast, JsAST.LocalRef("__returnValue")), JsAST.Return(JsAST.LocalRef("__returnValue"))])        
     }
     
     public GetTemporaryVariableName() : string 

@@ -166,6 +166,16 @@ namespace NemerleWeb.Tests
         true
       });
       
+      test("variant", () =>
+      {
+        def v = DummyVariant.Case3(false) : DummyVariant;
+        match(v) {
+        | Case1 => false
+        | Case2 => false
+        | Case3(v) => v == false
+        }
+      });
+      
       // TODO: #11
       //test("linq where", () =>
       //{
@@ -221,6 +231,16 @@ namespace NemerleWeb.Tests
             "Failed"
         }
       }
+    }
+    
+    [JsModel]
+    variant DummyVariant
+    {
+      | Case1 { A : string }
+      | Case2 { B : int }
+      | Case3 { C : bool }
+      
+      public D : bool = true;
     }
   }
 }

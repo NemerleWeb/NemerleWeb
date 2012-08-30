@@ -53,6 +53,7 @@ namespace NemerleWeb
     public DoTransform(tb : TypeBuilder, typer : Typer) : void
     {            
       Macros.DefineCTX(typer);
+      assert2(false);
       def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");
       def serverMethods = Dictionary();
       if(serverClass != null)
