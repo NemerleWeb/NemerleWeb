@@ -89,7 +89,13 @@ namespace NemerleWeb
                     }
                   ]>);
                   
-                  serverMethods.Add(method.Name, fparms);
+                  // TODO: Maybe need to be changed
+                  if (serverMethods.ContainsKey(method.Name))
+                  {
+                    serverMethods[method.Name] += fparms;
+                  }
+                  else
+                    serverMethods.Add(method.Name, fparms);
                   
                   def fparms = fparms.Append([<[ parameter: callback : $(method.ReturnType : typed) -> void ]>]);
                   

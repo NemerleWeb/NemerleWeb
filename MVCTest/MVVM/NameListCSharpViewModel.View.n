@@ -1,0 +1,25 @@
+﻿using NemerleWeb;
+using System.Linq;
+using System.Collections.Generic;
+
+namespace MVCTest
+{
+  partial class NameListCSharpViewModel
+  {
+    [Html]
+    public View() : string 
+    {
+      <#
+        <div>
+          <h3>List of names</h3>
+          Filter: <input value="$SearchPattern" />
+          <div class="name-list">
+            <span $foreach(n in FilteredNames)>
+              $(n + ", ")
+            </span>
+          </div>
+        </div>
+      #>
+    }
+  }
+}

@@ -170,6 +170,12 @@
     <Content Include="bin\MVVM\SignalViewModel.n">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="bin\MVVM\NameListCSharpViewModel.cs">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="bin\MVVM\NameListCSharpViewModel.View.n">
+      <DependentUpon>bin\MVVM\NameListCSharpViewModel.cs</DependentUpon>
+    </Content>
     <Compile Include="Controllers\HomeController.n" />
     <Compile Include="Global.asax.n">
       <DependentUpon>Global.asax</DependentUpon>
@@ -304,6 +310,14 @@
     </Content>
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Compile Include="MVVM\NameListCSharpViewModel.cs">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\NameListCSharpViewModel.View.n">
+      <DependentUpon>MVVM\NameListCSharpViewModel.cs</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>

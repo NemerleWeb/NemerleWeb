@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using NemerleWeb;
 
 namespace MVCTest
@@ -12,6 +13,8 @@ namespace MVCTest
     Samples : List[string] { get; }
     NameList : NameListViewModel { get; }
     NameListSource : string { get; set; }
+    NameListCSharp : NameListCSharpViewModel { get; }
+    NameListCSharpSource : string { get; set; }
     CompList : CompListViewModel { get; }
     CompListSource : string { get; set; }
     Signal : SignalViewModel { get; set; }
@@ -31,8 +34,9 @@ namespace MVCTest
     
     public this()
     {
-      Samples = ["List of names", "Computation Expressions", "Chat using SignalR"].ToList();
+      Samples = ["List of names", "List of names C#", "Computation Expressions", "Chat using SignalR"].ToList();
       NameList = NameListViewModel();
+      NameListCSharp = NameListCSharpViewModel();
       CompList = CompListViewModel();
       Signal = SignalViewModel();
       
@@ -68,6 +72,11 @@ namespace MVCTest
         js prettyPrint();
       });
       
+      server.LoadSourceFor2("MVVM/NameListCSharpViewModel.cs", "MVVM/NameListCSharpViewModel.View.n", source => {
+        NameListCSharpSource = source;
+        js prettyPrint();
+      });
+      
       server.LoadSourceFor("MVVM/CompListViewModel.n", source => {
         CompListSource = source;
         js prettyPrint();
@@ -91,8 +100,14 @@ namespace MVCTest
     
     public class Server
     {
-      public LoadSourceFor(sample : string) : string {
+      public LoadSourceFor(sample : string) : string
+      {
         Helpers.LoadSourceFor(sample);
+      }
+      
+      public LoadSourceFor2(sample1 : string, sample2 : string) : string
+      {
+        $<#..$([sample1, sample2]; "\n"; Helpers.LoadSourceFor)#>
       }
     }
     
@@ -119,6 +134,12 @@ namespace MVCTest
               <div $(Template(NameList, _.View))></div>
               <h2>Source</h2>
               <pre class="prettyprint lang-n prettyprinted">$NameListSource</pre>
+            </div>
+            
+            <div $when(SelectedSample == "List of names C#")>
+              <div $(Template(NameListCSharp, _.View))></div>
+              <h2>Source</h2>
+              <pre class="prettyprint lang-n prettyprinted">$NameListCSharpSource</pre>
             </div>
             
             <div $when(SelectedSample == "Computation Expressions")>

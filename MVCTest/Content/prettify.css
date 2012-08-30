@@ -58,7 +58,8 @@ pre.prettyprint {
   background-color: #ffffff;
   padding: 10px;
   border: 1px solid #4d4d4c; 
-  font-family: Consolas, 'Lucida Console', 'DejaVu Sans Mono', monospace
+  font-family: Consolas, 'Lucida Console', 'DejaVu Sans Mono', monospace;
+  overflow: auto;
 }
 
 /* Specify class=linenums on a pre to get line numbering */
