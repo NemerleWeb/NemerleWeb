@@ -72,7 +72,7 @@ namespace MVCTest
         js prettyPrint();
       });
       
-      server.LoadSourceFor2("MVVM/NameListCSharpViewModel.cs", "MVVM/NameListCSharpViewModel.View.n", source => {
+      server.LoadSourceForList(["MVVM/NameListCSharpViewModel.cs", "MVVM/NameListCSharpViewModel.View.n"], source => {
         NameListCSharpSource = source;
         js prettyPrint();
       });
@@ -105,9 +105,9 @@ namespace MVCTest
         Helpers.LoadSourceFor(sample);
       }
       
-      public LoadSourceFor2(sample1 : string, sample2 : string) : string
+      public LoadSourceForList(samples : IEnumerable[string]) : string
       {
-        $<#..$([sample1, sample2]; "\n"; Helpers.LoadSourceFor)#>
+        $<#..$(samples; "\n"; Helpers.LoadSourceFor)#>
       }
     }
     

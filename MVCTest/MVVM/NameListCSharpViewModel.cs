@@ -28,7 +28,6 @@ namespace MVCTest
     
     public NameListCSharpViewModel()
     {
-      // TODO: Workaround for C#, because operator= return type of variable, not void as in Nemerle.
       server.GetNames(l => { Names = l; });
     }
     
