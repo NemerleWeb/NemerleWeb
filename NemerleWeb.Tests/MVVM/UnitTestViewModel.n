@@ -172,7 +172,7 @@ namespace NemerleWeb.Tests
         match(v) {
         | Case1 => false
         | Case2 => false
-        | Case3(v) => v == false
+        | Case3(val) => val == false
         }
       });
       
