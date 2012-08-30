@@ -25,15 +25,14 @@ namespace NemerleWeb
             method.Header.body = oldBody;
             def defs2 = JsASTBuilder.BuildJsASTForSplices(GetTypedBody(method, typer, typer.CurrentTypeBuilder));
             
-            defs.Append(defs2)
-                .Flatten(j => 
-                    match(j) {
-                    | JsAST.DefValue(name, val) => 
-                        regexp match(name) {
-                        | <#^var(?<index : int>\d+)$#> => [(index, val.Write())]
-                        | _ => []
-                        }
-                    })
+            defs.Concat(defs2)
+                .Cast.[JsAST.DefValue]()
+                .SelectMany(j =>
+                  regexp match(j.Name)
+                  {
+                  | <#^var(?<index : int>\d+)$#> => [(index, j.Val.Write())]
+                  | _ => []
+                  })
                 .GroupBy((i, _) => i)
                 .ToDictionary(g => g.Key, g => g.FirstOrDefault((_, v) => !string.IsNullOrEmpty(v))[1]);
         }
@@ -60,19 +59,14 @@ namespace NemerleWeb
               {
                 def runTyper = methodTyper.GetType().GetMethod("RunTyper", BindingFlags.NonPublic | BindingFlags.Instance);
                 _ = runTyper.Invoke(methodTyper, array[]);
-              }
-                
+              } 
               
               typer.Manager.Options.EmitDebug = oldEmitDebug;
               GetTypedBody(method, typer, tb);
               
             | null =>
-              // External method don't have body
-              def mi = method :> LibraryReference.ExternalMethodInfo;
-              
-              Message.Error($"External methods are not implemented: $(mi.GetName())");
-              TExpr.Error();
-              
+              Message.Error("External methods should not be used in this method");
+              TExpr.Error();              
             | _ =>
               Message.Error("Couldn't type body"); 
               TExpr.Error();

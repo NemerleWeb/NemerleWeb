@@ -11,11 +11,24 @@ namespace NemerleWeb.Tests
   {
     Results : List[(string * bool)] { get; set; }
     
+    [JsModel]
     class SomeDisposable : IDisposable
     {
       public Dispose() : void
       {
         _ = "Do something";
+      }
+    }
+    
+    [JsModel]
+    class SomeException : Exception
+    {
+      public override Message : string
+      {
+        get
+        {
+          "Some message"
+        }
       }
     }
     
@@ -118,7 +131,7 @@ namespace NemerleWeb.Tests
         res
       });
       
-      test("neste if else", () =>
+      test("nested if else", () =>
       {
         mutable i = 0;
         
@@ -164,6 +177,24 @@ namespace NemerleWeb.Tests
         }
         
         true
+      });
+      
+      test("try catch finally", () =>
+      {
+        try
+        {
+          throw SomeException();
+        }
+        catch
+        {
+          | _ is ArgumentException => false
+          | e is SomeException => _ = e.Message; true
+          | _ => false
+        }
+        finally
+        {
+          _ = "Do something";
+        }
       });
       
       // TODO: #11

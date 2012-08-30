@@ -30,6 +30,7 @@ namespace NemerleWeb
           get
           {
             ClassType.GetProperties()
+                     .Where(_ is PropertyBuilder)
                      .Where(p => p.Name != "server")
                      .Where(p => !HasGetterNoSetter(p))
           }
@@ -40,6 +41,7 @@ namespace NemerleWeb
           get
           {
             ClassType.GetProperties()
+                     .Where(_ is PropertyBuilder)
                      .Where(p => p.Name != "server")
                      .Where(p => HasGetterNoSetter(p));
           }
@@ -159,7 +161,8 @@ $computedBody
         {
             //assert2(false);
             def ctor = Constructor;
-            if(ctor != null) {
+            if(ctor != null)
+            {
                 def ctorBody = TranslateMethodBody(ctor, indent);
                 def endIndex = ctorBody.IndexOf("js constructor end");
                 if(endIndex != -1) ctorBody.Substring(0, endIndex - 1) else ctorBody
@@ -173,7 +176,7 @@ $computedBody
             def ctors = ClassType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic);            
             def ctor = ctors.FirstOrDefault();
             if(ctor != null)
-                TranslateMethodBody(ctor,indent);
+                TranslateMethodBody(ctor,indent)
             else
                 ""
         }
