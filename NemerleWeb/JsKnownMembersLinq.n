@@ -22,6 +22,8 @@ namespace NemerleWeb
           JsAST.FieldRef(l, "length")
         | ("Where", l :: []) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
           JsAST.MethodRef(l, "where")
+        | ("Select", l :: []) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
+          JsAST.MethodRef(l, "select")
         | _ =>
           _ = type; _ = left; _ = member; _ = parms;
           throw ArgumentException($"Invalid $(member.Name)");

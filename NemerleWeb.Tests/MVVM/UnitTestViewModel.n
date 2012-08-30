@@ -221,10 +221,58 @@ namespace NemerleWeb.Tests
       //  res
       //});
       
-      //test("linq select", () =>
-      //{
-      //  "Passed"
-      //});
+      test("multiple assign", () =>
+      {
+        def (a, b) = (1, 2);
+        
+        true
+      });
+      
+      #if AA
+      // TODO: Support foreach
+      test("foreach", () =>
+      {
+        def l = [1, 2, 3].ToList();
+        
+        mutable res = true;
+        mutable i = 0;
+        foreach (e in l)
+        {
+          when (e != i + 1)
+            res = false;
+          i++;
+        }
+        
+        res
+      });
+      
+      test("foreach with", () =>
+      {
+        def l = [1, 2, 3].ToList();
+        
+        mutable res = true;
+        foreach (e in l with i)
+          when (e != i + 1)
+            res = false;
+        
+        res
+      });
+      #endif
+      
+      #if AA
+      test("linq select", () =>
+      {
+        def l = [1, 2, 3].ToList();
+        
+        mutable res = true;        
+        def seq = l.Select(x => x);
+        foreach (e in seq with i)
+          when (e != i + 1)
+            res = false;
+        
+        res
+      });
+      #endif
     }
     
     [Html]
