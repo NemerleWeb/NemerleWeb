@@ -69,11 +69,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <MacroReference Include="Nemerle.ComputationExpressions.Macros, Version=1.1.856.0, Culture=neutral, PublicKeyToken=e080a9c724e2bfcd">
+    <MacroReference Include="Nemerle.ComputationExpressions.Macros">
       <Name>Nemerle.ComputationExpressions.Macros</Name>
       <AssemblyName>Nemerle.ComputationExpressions.Macros.dll</AssemblyName>
-      <HintPath>..\..\..\..\Program Files (x86)\Nemerle\net-4.5\Nemerle.ComputationExpressions.Macros.dll</HintPath>
+      <HintPath>$(Nemerle)\Nemerle.ComputationExpressions.Macros.dll</HintPath>
       <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
     </MacroReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />

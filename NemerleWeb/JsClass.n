@@ -20,21 +20,28 @@ namespace NemerleWeb
         public StringType : TypeVar { get; set; }
         public Typer : Typer { get; set; }
         
-        public Properties : IEnumerable[PropertyBuilder] 
+        private HasGetterNoSetter(p : IProperty) : bool
+        {
+          p.GetGetter() != null && p.GetSetter() == null
+        }
+        
+        public Properties : IEnumerable[IProperty] 
         {
           get
           {
-            def props = ClassType.GetProperties().Where(p => p.Name != "server").Cast.[PropertyBuilder]();
-            props.Filter(p => !(p.CanRead && !p.CanWrite));
+            ClassType.GetProperties()
+                     .Where(p => p.Name != "server")
+                     .Where(p => !HasGetterNoSetter(p))
           }
         }
         
-        public ComputedProperties : IEnumerable[PropertyBuilder] 
+        public ComputedProperties : IEnumerable[IProperty] 
         {
           get
           {
-            def props = ClassType.GetProperties().Where(p => p.Name != "server").Cast.[PropertyBuilder]();
-            props.Where(p => p.CanRead && !p.CanWrite);
+            ClassType.GetProperties()
+                     .Where(p => p.Name != "server")
+                     .Where(p => HasGetterNoSetter(p));
           }
         }
         
@@ -100,28 +107,31 @@ $staticConstructorBody#>
         
         GetProperties(indent : string) : string 
         {                                                   
-            def propVal(prop : PropertyBuilder) {
-                def isArray = TypeIsArray(prop.GetGetter().ReturnType);
-                match((IsViewmodel, isArray)) {
-                | (true, true) => "ko.observableArray([])"
-                | (true, false) => "ko.observable(null)"
-                | (false, true) => "[]";   
-                | (false, false) => "{}";
-                }
+            def propVal(prop : IProperty)
+            {
+              def isArray = TypeIsArray(prop.GetGetter().ReturnType);
+              match((IsViewmodel, isArray))
+              {
+              | (true, true) => "ko.observableArray([])"
+              | (true, false) => "ko.observable(null)"
+              | (false, true) => "[]";   
+              | (false, false) => "{}";
+              }
             }
-            def propStrings = Properties.Map(p => indent + $<#this.$(p.Name) = $(propVal(p))#>);
+            def propStrings = Properties.Select(p => indent + $<#this.$(p.Name) = $(propVal(p))#>);
             $<#..$(propStrings; ";\n")#>;
         }
         
         GetComputedProperties(indent : string) : string 
         {                              
-            def propVal(prop : PropertyBuilder) {
-                def computedBody = TranslateMethodBody(prop.GetGetter() :> MethodBuilder, indent);                    
+            def propVal(prop : IProperty)
+            {
+                def computedBody = TranslateMethodBody(prop.GetGetter(), indent);
 $<#ko.computed(function() {
 $computedBody
 })#>
             }
-            def propStrings = ComputedProperties.Map(p => indent + $<#this.$(p.Name) = $(propVal(p))#>);
+            def propStrings = ComputedProperties.Select(p => indent + $<#this.$(p.Name) = $(propVal(p))#>);
             $<#..$(propStrings; ";\n")#>;
         }
         
@@ -131,7 +141,7 @@ $computedBody
             def fldVal(fld : IField) {
                 if(TypeIsArray(fld.GetMemType())) "[]" else "{}";
             }
-            def fieldStrings = fields.Map(f => indent + $<#this.$(f.Name) = $(fldVal(f))#>);
+            def fieldStrings = fields.Select(f => indent + $<#this.$(f.Name) = $(fldVal(f))#>);
             $<#..$(fieldStrings; ";\n")#>;
         }
         
@@ -141,7 +151,7 @@ $computedBody
             def fldVal(_fld : IField) {
                 "{}";                    
             }
-            def fieldStrings = fields.Map(f => indent + $<#$(ClassType.Name).$(f.Name) = $(fldVal(f))#>);
+            def fieldStrings = fields.Select(f => indent + $<#$(ClassType.Name).$(f.Name) = $(fldVal(f))#>);
             $<#..$(fieldStrings; ";\n")#>;
         }
         
@@ -150,7 +160,7 @@ $computedBody
             //assert2(false);
             def ctor = Constructor;
             if(ctor != null) {
-                def ctorBody = TranslateMethodBody(ctor :> MethodBuilder, indent);
+                def ctorBody = TranslateMethodBody(ctor, indent);
                 def endIndex = ctorBody.IndexOf("js constructor end");
                 if(endIndex != -1) ctorBody.Substring(0, endIndex - 1) else ctorBody
             }
@@ -161,7 +171,7 @@ $computedBody
         GetStaticConstructorBody(indent : string) : string 
         {
             def ctors = ClassType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic);            
-            def ctor = ctors.FirstOrDefault() :> MethodBuilder;
+            def ctor = ctors.FirstOrDefault();
             if(ctor != null)
                 TranslateMethodBody(ctor,indent);
             else
@@ -171,11 +181,11 @@ $computedBody
         GetMethods(indent : string) : string 
         {
             def methodParms(method) {
-                method.GetParameters().Map(p => p.Name);
+                method.GetParameters().Select(p => p.Name);
             }
-            def methods = Methods.Map(m => 
+            def methods = Methods.Select(m => 
 $<#$(indent)this.$(m.Name) = function(..$(methodParms(m))) { 
-$(TranslateMethodBody(m :> MethodBuilder, indent + "  "))
+$(TranslateMethodBody(m, indent + "  "))
 $(indent)}#>);
 
             $<#..$(methods; "\n")#>
@@ -184,16 +194,16 @@ $(indent)}#>);
         GetNestedClasses() : string 
         {            
             def nested = ClassType.DeclaredNestedTypes
-                                  .Filter(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server
-                                  .Filter(c => !c.Name.StartsWith("_N__N_")) //Not generated class
-                                  .Map(c => JsClass(c, Indent, IEnumerableType, StringType, Typer).Write());
+                                  .Where(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server
+                                  .Where(c => !c.Name.StartsWith("_N__N_")) //Not generated class
+                                  .Select(c => JsClass(c, Indent, IEnumerableType, StringType, Typer).Write());
             $"..$(nested; Environment.NewLine)"
         }
         
         ApplyAttributesToGeneratedClasses() : void
         {
             ClassType.DeclaredNestedTypes
-                     .Filter(t => t.Name.StartsWith("_N__N_"))
+                     .Where(t => t.Name.StartsWith("_N__N_"))
                      .Iter(t => t.Ast.AddCustomAttribute(<[ NemerleWeb.GeneratedClass ]>));
         }
         
@@ -203,7 +213,7 @@ $(indent)}#>);
           //type.IsDerivedFrom(IEnumerableType.TypeInfo) && type.FullName != "System.String";
         }
                 
-        public TranslateMethodBody(meth : MethodBuilder, indent = "" : string) : string
+        public TranslateMethodBody(meth : IMethod, indent = "" : string) : string
         {           
             def ast = TyperHelper.GetMethodJsAST(meth, Typer, ClassType);
             ast.Write(indent);

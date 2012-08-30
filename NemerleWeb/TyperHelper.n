@@ -17,7 +17,8 @@ namespace NemerleWeb
     {
         static mutable _index : int = 0;
         
-        public GetSplices(expr : PExpr, typer : Typer) : Dictionary[int, string] {            
+        public GetSplices(expr : PExpr, typer : Typer) : Dictionary[int, string]
+        {            
             def method = BuildMethod(expr, typer);
             def oldBody = method.Header.Body;
             def defs = JsASTBuilder.BuildJsASTForSplices(GetTypedBody(method, typer, typer.CurrentTypeBuilder, false));
@@ -37,29 +38,44 @@ namespace NemerleWeb
                 .ToDictionary(g => g.Key, g => g.FirstOrDefault((_, v) => !string.IsNullOrEmpty(v))[1]);
         }
         
-        public GetMethodJsAST(method : MethodBuilder, typer : Typer, tb : TypeBuilder) : JsAST 
+        public GetMethodJsAST(method : IMethod, typer : Typer, tb : TypeBuilder) : JsAST 
         {   
             JsASTBuilder.BuildJsAST(GetTypedBody(method, typer, tb), !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor);            
         }
         
-        GetTypedBody(method : MethodBuilder, typer : Typer, tb : TypeBuilder, fullTyping : bool = true) : TExpr {
-            match(method.Header.Body) {
+        GetTypedBody(method : IMethod, typer : Typer, tb : TypeBuilder, fullTyping : bool = true) : TExpr
+        {
+            match(method.Header.Body)
+            {
             | FunBody.Typed(typedBody) => typedBody
-            | FunBody.Parsed => 
-                def oldEmitDebug = typer.Manager.Options.EmitDebug;
-                typer.Manager.Options.EmitDebug = false;
-                def methodTyper = Typer(tb, null, method, method.Env);
-                if(fullTyping) {
-                    methodTyper.RunFullTyping();
-                } else {
-                    def runTyper = methodTyper.GetType().GetMethod("RunTyper", BindingFlags.NonPublic | BindingFlags.Instance);
-                    _ = runTyper.Invoke(methodTyper, array[]);
-                }
-                typer.Manager.Options.EmitDebug = oldEmitDebug;
-                GetTypedBody(method, typer, tb);
-            | _ => 
-                Message.Error("Couldn't type body"); 
-                TExpr.Error();
+            | FunBody.Parsed =>
+              def oldEmitDebug = typer.Manager.Options.EmitDebug;
+              typer.Manager.Options.EmitDebug = false;
+              def mb = method :> MethodBuilder;
+              def methodTyper = Typer(tb, null, mb, mb.Env);
+                  
+              if(fullTyping)
+                methodTyper.RunFullTyping();
+              else
+              {
+                def runTyper = methodTyper.GetType().GetMethod("RunTyper", BindingFlags.NonPublic | BindingFlags.Instance);
+                _ = runTyper.Invoke(methodTyper, array[]);
+              }
+                
+              
+              typer.Manager.Options.EmitDebug = oldEmitDebug;
+              GetTypedBody(method, typer, tb);
+              
+            | null =>
+              // External method don't have body
+              def mi = method :> LibraryReference.ExternalMethodInfo;
+              
+              Message.Error($"External methods are not implemented: $(mi.GetName())");
+              TExpr.Error();
+              
+            | _ =>
+              Message.Error("Couldn't type body"); 
+              TExpr.Error();
             }
         }
         
