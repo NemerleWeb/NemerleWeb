@@ -15,5 +15,10 @@ namespace MVCTest.Controllers
     {
       View(Utils.MakePageHtml(SamplesViewModel()) : object);
     }
+    
+    public TestPage() : ActionResult 
+    {
+      View(Utils.MakePageHtml(TestPageViewModel()) : object);
+    }
   }
 }

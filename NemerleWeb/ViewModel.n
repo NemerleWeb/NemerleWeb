@@ -44,6 +44,17 @@ namespace NemerleWeb
       
       unless (superTypes != null && superTypes.Exists(t => t.Equals(vmInterface)))
         tb.AddImplementedInterface(<[ NemerleWeb.IViewModel ]>);
+        
+      def baseType = <[ NemerleWeb.ViewModelBase[$(tb.ParsedTypeName)] ]>;
+      
+      when(tb.Ast is TopDeclaration.Class) {
+        def ast = tb.Ast :> TopDeclaration.Class; 
+        ast.t_extends ::=  baseType;
+      } 
+      when(tb.Ast is TopDeclaration.Variant) {
+        def ast = tb.Ast :> TopDeclaration.Variant; 
+        ast.t_extends ::=  baseType;
+      }
     }
     
     public DoTransformBeforeTypedMembers(_tb : TypeBuilder, _typer : Typer) : void

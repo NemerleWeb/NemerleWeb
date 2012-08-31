@@ -22,8 +22,29 @@ namespace NemerleWeb
     JsModelImpl.DoTransform(tb, Macros.ImplicitCTX())
   }
   
+  [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
+  macro JsModel(tb : TypeBuilder)
+  {
+    JsModelImpl.DoTransformBeforeInheritance(tb, Macros.ImplicitCTX())
+  }
+  
   module JsModelImpl
   {       
+    public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
+    {
+      Macros.DefineCTX(typer);
+        
+      def baseType = <[ NemerleWeb.ViewModelBase[$(tb.ParsedTypeName)] ]>;
+      when(tb.Ast is TopDeclaration.Class) {
+        def ast = tb.Ast :> TopDeclaration.Class; 
+        ast.t_extends ::=  baseType;
+      } 
+      when(tb.Ast is TopDeclaration.Variant) {
+        def ast = tb.Ast :> TopDeclaration.Variant; 
+        ast.t_extends ::=  baseType;
+      } 
+    }
+    
     public DoTransform(tb : TypeBuilder, typer : Typer) : void
     {            
       Macros.DefineCTX(typer);

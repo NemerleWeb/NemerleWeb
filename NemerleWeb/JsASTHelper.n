@@ -78,7 +78,7 @@ namespace NemerleWeb
         | Assign(l, r)     => JsAST.Assign(l, delayAssignment(r))
         | If(c, t, e)      => JsAST.If(c, delayAssignment(t), delayAssignment(e))
         | ServerCall(m, t, ps, c) => JsAST.ServerCall(m, t, ps.Map(p => (p[0], delayAssignment(p[1]))), delayAssignment(c))
-        | Switch(e, cases) => JsAST.Switch(e, cases.Map(c => JsAST.SwitchCase(c.Id, delayAssignment(c.Body))))
+        | Switch(e, cases, deflt) => JsAST.Switch(e, cases.Map(c => JsAST.SwitchCase(c.Id, delayAssignment(c.Body))), delayAssignment(deflt))
         | WhileNamed(c, b, n) => 
             def newBody = match(b) {
             | Seq(bodyItems) => 

@@ -106,7 +106,7 @@ namespace NemerleWeb
               | _ when typeName == typeof(Nemerle.Core.list[_].Nil).FullName => JsAST.Array([])
               | _ => JsAST.StaticRef(JsClass.GetProperName(from.TypeInfo), mem.Name);
               }
-            | Switch                            => Message.Warning(expr.Location, "Switch not implemented"); JsAST.NotImpl()
+            | Switch(expr, defCase, cases)      => JsAST.Switch(Build(expr), cases.Map((id, ex) => JsAST.SwitchCase(id, Build(ex))), if(defCase.IsSome) Build(defCase.Value) else JsAST.Void())
             | This                              => JsAST.This()
             | Throw(expr)                       => JsAST.Throw(Build(expr))
             | Try(_, _)                         => Message.Warning("Try is not implmemented"); JsAST.NotImpl();

@@ -19,7 +19,7 @@ namespace NemerleWeb.Tests
         _ = "Do something";
       }
     }
-    
+    /*
     [JsModel]
     class SomeException : Exception
     {
@@ -31,7 +31,7 @@ namespace NemerleWeb.Tests
         }
       }
     }
-    
+    */
     public this()
     {
       def test(description, res)

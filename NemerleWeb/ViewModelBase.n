@@ -11,9 +11,21 @@ using System.Linq.Expressions;
 
 namespace NemerleWeb
 {
-  class ViewModelBase[T]
+  public class ViewModelBase[T]
   {
-    public template[TM](model : Expression[Func[T, TM]], template : Expression[Func[TM, void -> string]]) : XAttribute
-    {null}
+    public template[TM](model : Expression[Func[T, TM]]) : string
+    {
+      /*
+      , template : Expression[Func[TM, void -> string]]
+      match(model.Body, template.Body)
+      {
+        | (model is Expressions.MemberExpression, template is Expressions.MemberExpression) => 
+          def modelName = model.Member.Name;
+          def templateName = template.Member.Name;
+          $"template: { name: '$modelName' data: '$templateName'}"
+        | _ => "incorrect template binding"
+      }   */
+      ""
+    }
   }
 }

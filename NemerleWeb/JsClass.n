@@ -85,16 +85,22 @@ namespace NemerleWeb
           def bodyIndent = Indent + "  ";
           def constructorParams = GetConstructorParams();
           def properties = GetProperties(bodyIndent, parentPtr);
-          def computedProperties = GetComputedProperties(bodyIndent, parentPtr);
+          def computedProperties = GetComputedProperties(bodyIndent, parentPtr, !isAbstract);
           def fields = GetFields(bodyIndent, parentPtr);
           def constructorBody = GetConstructorBody(bodyIndent);
           def staticConstructorBody = GetStaticConstructorBody(Indent);
-          def methods = GetMethods(bodyIndent, parentPtr);
+          def methods = GetMethods(bodyIndent, parentPtr, !isAbstract);
           def (nestedClassesString, nestedClasses) = GetNestedClasses();
           
           def returning = match(ClassType.BaseType.Name) {
-              | "Function" => bodyIndent + "return this.apply;"
-              | "FunctionVoid" => bodyIndent + "return this.apply_void;"
+              | "Function" => bodyIndent + 
+<#return function() {
+  _self.apply.apply(_self, arguments);
+}#>
+              | "FunctionVoid" => bodyIndent + 
+<#return function() {
+  _self.apply_void.apply(_self, arguments);
+}#>
               | _ => ""
           };
           
@@ -118,7 +124,7 @@ namespace NemerleWeb
 $<#
 $nestedClassesString
 $(Indent)function $(GetProperName(ClassType))(..$constructorParams) {
-$(bodyIndent)var self = this;
+$(bodyIndent)var _self = this;
 $constructorBody
 {{{SignalR}}}
 $returning
@@ -136,7 +142,7 @@ $staticConstructorBody#>
 $<#
 $nestedClassesString
 $(Indent)function $(GetProperName(ClassType))(..$constructorParams) {
-$(bodyIndent)var self = this;
+$(bodyIndent)var _self = this;
 $properties
 $fields
 $methods
@@ -172,24 +178,33 @@ $staticConstructorBody#>
             $<#..$(propStrings; ";\n")#>;
         }
         
-        GetComputedProperties(indent : string, parentPtr : string) : string 
+        GetComputedProperties(indent : string, parentPtr : string, hasSelf : bool) : string 
         {                              
-            def propVal(prop : IProperty)
-            {
-                def computedBody = TranslateMethodBody(prop.GetGetter(), indent);
+          def self = if(hasSelf) "" else "var _self = this;";
+          def propVal(prop : IProperty)
+          {
+              def computedBody = TranslateMethodBody(prop.GetGetter(), indent);
 $<#ko.computed(function() {
+$self
 $computedBody
-})#>
-            }
-            def propStrings = ComputedProperties.Select(p => indent + $<#$parentPtr.$(p.Name) = $(propVal(p))#>);
-            $<#..$(propStrings; ";\n")#>;
+}, this)#>
+          }
+          def propStrings = ComputedProperties.Select(p => indent + $<#$parentPtr.$(p.Name) = $(propVal(p))#>);
+          $<#..$(propStrings; ";\n")#>;
         }
         
         GetFields(indent : string, parentPtr : string) : string 
         {
             def fields = Fields;
             def fldVal(fld : IField) {
-                if(TypeIsArray(fld.GetMemType())) "[]" else "{}";
+              def isArray = TypeIsArray(fld.GetMemType());
+              match((IsViewmodel, isArray))
+              {
+              | (true, true) => "ko.observableArray([])"
+              | (true, false) => "ko.observable(null)"
+              | (false, true) => "[]";   
+              | (false, false) => "{}";
+              }
             }
             def fieldStrings = fields.Select(f => indent + $<#$parentPtr.$(f.Name) = $(fldVal(f))#>);
             $<#..$(fieldStrings; ";\n")#>;
@@ -229,13 +244,15 @@ $computedBody
                 ""
         }
         
-        GetMethods(indent : string, parentPtr : string) : string 
+        GetMethods(indent : string, parentPtr : string, hasSelf : bool) : string 
         {
-            def methodParms(method) {
-                method.GetParameters().Select(p => p.Name);
-            }
-            def methods = Methods.Select(m => 
+          def self = if(hasSelf) "" else "var _self = this;";
+          def methodParms(method) {
+              method.GetParameters().Select(p => p.Name);
+          }
+          def methods = Methods.Select(m => 
 $<#$(indent)$parentPtr.$(m.Name) = function(..$(methodParms(m))) { 
+$self
 $(TranslateMethodBody(m, indent + "  "))
 $(indent)}#>);
 

@@ -218,6 +218,13 @@
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="MVVM\TestPageViewModel.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\VariantsAndMatchingViewModel.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
   </ItemGroup>
   <ItemGroup>

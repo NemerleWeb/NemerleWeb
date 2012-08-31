@@ -77,9 +77,16 @@ namespace NemerleWeb
                 | Call(OpCode as op, head :: (Call(MethodRef(Seq,  _), _) as call) :: []) => 
                     def varName = JsASTHelper.GetTemporaryVariableName();
                     JsAST.Seq([JsAST.DefValue(varName, JsAST.Void()), JsASTHelper.DelayAssignment(call, JsAST.LocalRef(varName)), JsAST.Call(op, [head, JsAST.LocalRef(varName)])]).Transform()
-                | Call(OpCode(op), something :: Literal(Null) :: []) 
-                | Call(OpCode(op), Literal(Null) :: something :: []) => 
-                    JsAST.Call(JsAST.OpCode("||"), [JsAST.Call(JsAST.OpCode(op), [something, JsAST.Literal(JsLiteral.Null())]), JsAST.Call(JsAST.OpCode(op), [JsAST.TypeOf(something), JsAST.Literal(JsLiteral.String("undefined"))])]).Transform() 
+                | Call(OpCode("==="), something :: Literal(Null) :: []) 
+                | Call(OpCode("==="), [Literal(Null), something]) => 
+                    JsAST.Call(JsAST.OpCode("||"), 
+                               [JsAST.Call(JsAST.OpCode("==="), [something, JsAST.Literal(JsLiteral.Null())]), 
+                                JsAST.Call(JsAST.OpCode("==="), [JsAST.TypeOf(something), JsAST.Literal(JsLiteral.String("undefined"))])]).Transform() 
+                | Call(OpCode("!=="), something :: Literal(Null) :: []) 
+                | Call(OpCode("!=="), [Literal(Null), something]) => 
+                    JsAST.Call(JsAST.OpCode("&&"), 
+                               [JsAST.Call(JsAST.OpCode("!=="), [something, JsAST.Literal(JsLiteral.Null())]), 
+                                JsAST.Call(JsAST.OpCode("!=="), [JsAST.TypeOf(something), JsAST.Literal(JsLiteral.String("undefined"))])]).Transform() 
                 | Call(func, parms) when parms.OfType.[JsAST.Seq]().Any() =>
                     def newParms = parms.Map(p : JsAST => {
                         def varName = JsASTHelper.GetTemporaryVariableName();
@@ -307,16 +314,18 @@ $(Body.Write())
                 $<#..$(ss; Environment.NewLine)#>
             }
         }
-        | Switch         { Expr : JsAST; Cases : list[JsAST.SwitchCase];
+        | Switch         { Expr : JsAST; Cases : list[JsAST.SwitchCase]; DefaultExpr : JsAST;
             public override Write(_indent = "" : string) : string {
 $<#switch($(Expr.Write())) {
 ..$(Cases; "\n"; e => e.Write("  "))
+default:
+  $(DefaultExpr.Write())
 }#>
             }
         }
         | SwitchCase     { Id : int; Body : JsAST;
             public override Write(_indent = "" : string) : string {
-$<#$Id:
+$<#case $Id:
 $(Body.Write("  "))
 break;#>
             }
@@ -341,7 +350,7 @@ $(indent)})#>
         }
         | This           {
             public override Write(_ = "" : string) : string {
-                "self"
+                "_self"
             }
         }
         | Throw          { Obj : JsAST;
@@ -431,7 +440,7 @@ $(Body.Write("  "))
                                                            typeof(JsAST.Ternary), typeof(JsAST.NotImpl), typeof(JsAST.Lambda),
                                                            typeof(JsAST.Array), typeof(JsAST.StaticRef), typeof(JsAST.This), 
                                                            typeof(JsAST.Tuple), typeof(JsAST.TupleIndexer), typeof(JsAST.FieldRef),
-                                                           typeof(JsAST.PropertyGet), typeof(JsAST.ArrayIndexer)];
+                                                           typeof(JsAST.PropertyGet), typeof(JsAST.ArrayIndexer), typeof(JsAST.Label)];
                                          
         public static Recurse(ast : JsAST, selector : JsAST -> JsAST, topdown : bool = true) : JsAST 
         {
@@ -464,7 +473,7 @@ $(Body.Write("  "))
             | Return(expr)                => JsAST.Return(recurse(expr))
             | Seq(items)                  => JsAST.Seq(items.Map(recurse))
             | ServerCall(meth, ty, parms, callback) => JsAST.ServerCall(meth, ty, parms.Map(p => (p[0], recurse(p[1]))), recurse(callback))
-            | Switch(expr, cases)         => JsAST.Switch(recurse(expr), cases.Map(recurse).Cast.[JsAST.SwitchCase]().NToList())
+            | Switch(expr, cases, deflt)  => JsAST.Switch(recurse(expr), cases.Map(recurse).Cast.[JsAST.SwitchCase]().NToList(), recurse(deflt))
             | Ternary(cond, then, els)    => JsAST.Ternary(recurse(cond), recurse(then), recurse(els))
             | This                        => ast'
             | Throw(obj)                  => JsAST.Throw(recurse(obj))

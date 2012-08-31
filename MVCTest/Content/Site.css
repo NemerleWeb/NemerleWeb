@@ -117,7 +117,7 @@ h1.logo span {
 }
 
 .samples-menu span {
-    font-size: 14px;
+    font-size: 12px;
     cursor: pointer;
 }
 
@@ -148,6 +148,15 @@ h1.logo span {
 
 .chat td:nth-child(3) {
     font-style: italic;
+}
+
+.color-input {
+    width: 22px;
+}
+
+.color-box {
+    width: 32px;
+    height: 32px;
 }
 
 footer {

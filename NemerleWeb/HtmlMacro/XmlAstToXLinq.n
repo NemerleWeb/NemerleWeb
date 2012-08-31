@@ -77,7 +77,6 @@ namespace NemerleWeb
     }
     public Transform(xmlAsts : XmlAst.Seq) : PExpr
     {
-        //assert2(false);
         def splicedMethod = CleanupCallRefs(GetMethodWithSplicesOnly(xmlAsts));
         def splices = TyperHelper.GetSplices(splicedMethod, _typer);
         _typer.CurrentTypeBuilder.Compile();
@@ -96,7 +95,7 @@ namespace NemerleWeb
         
         def transformJsExpr(expr) {
           def res = if(expr.StartsWith("\"") && expr.EndsWith("\"")) expr.Trim('\"') else expr;
-          def res = if(loopStack.Length > 0) Regex.Replace(res, <#(^(?<b>)self(?<a>\W)|(?<b>)self(?<a>)|(?<b>\W)self(?<a>)$)#>, $"$${b}$(currentRoot)$${a}") else Regex.Replace(res, <#(^self\W|\Wself\W|\W$l$)#>, "");
+          def res = if(loopStack.Length > 0) Regex.Replace(res, <#(^(?<b>)_self(?<a>\W)|(?<b>)_self(?<a>)|(?<b>\W)_self(?<a>)$)#>, $"$${b}$(currentRoot)$${a}") else Regex.Replace(res, <#(^_self\W|\W_self\W|\W$l$)#>, "");
           def res = if(res.EndsWith(";")) res.Substring(0, res.Length - 1) else res;
           def res = match(loopSubstitutions.Find((l, _) => Regex.IsMatch(res, $<#(^$l\W|\W$l\W|\W$l$$|^$l$$)#>))) {
             | Some((l, s)) => Regex.Replace(res, 
@@ -120,10 +119,7 @@ namespace NemerleWeb
         }
         
         match (xmlAst) {
-        | Attr(name, Splicable.Expr(_) as value)             => 
-            def name1   = SplicablePExprName(name);
-            def value1  = SplicablePExprStr(value);
-            
+        | Attr(name, Splicable.Expr as value)             => 
             match(name, value) {
             | (Splicable.Value(v), _) when v == "text" => <[ [L.XAttribute("data-bind", "text: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "html" => <[ [L.XAttribute("data-bind", "html: " + $(getSplice()))] ]>
@@ -135,8 +131,15 @@ namespace NemerleWeb
             | (Splicable.Value(v), _) when v == "visible" => <[ [L.XAttribute("data-bind", "visible: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "options" => <[ [L.XAttribute("data-bind", "options: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "checked" => <[ [L.XAttribute("data-bind", "checked: " + $(getSplice()))] ]>
+            | (Splicable.Value(v), _) when v == "template" => 
+              def expr = SplicablePExprStr(value);
+              <[ [L.XAttribute("data-bind", $expr)] ]>
             | (Splicable.Value(v), _) when v.StartsWith("css-") => <[ [L.XAttribute($v, $(getSplice()))] ]>
-            | _ => <[ [L.XAttribute($name1, $value1)] ]>
+            | (Splicable.Value(v), _) when v.StartsWith("style-") => <[ [L.XAttribute($v, $(getSplice()))] ]>
+            | _ => 
+              def name1   = SplicablePExprName(name);
+              def value1  = SplicablePExprStr(value);
+              <[ [L.XAttribute($name1, $value1)] ]>
             }          
         | Attr(name, value)             => 
             def nameExpr   = SplicablePExprName(name);          
@@ -203,7 +206,11 @@ namespace NemerleWeb
         {
         | Attr(_, Splicable.Expr(str) as expr) => 
             def value1  = Parse(ToLocation(expr), str);
-            <[ def $(varName : dyn) = $value1 ]>
+            match(value1)
+            {
+            | <[ template(..$parms) ]> => <[ ]>
+            | _ => <[ def $(varName : dyn) = $value1 ]>
+            }
         | Tag(name, XmlAst.AttrSplice(expr, SpliceType.Foreach) as c :: content) =>
             def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);                
             def tagExpr = GetMethodWithSplicesOnly(tag);
@@ -250,7 +257,7 @@ namespace NemerleWeb
                                                             | SyntaxElement.Expression(body) => SyntaxElement.Expression(CleanupCallRefs(body))                                                            
                                                             | _ => p
                                                             }))
-    | Define(p, Ref(name)) when _methodNames.Any(m => m == name.Id) => PExpr.Define(p, PExpr.Literal(Literal.String("self." + name.Id)))
+    | Define(p, Ref(name)) when _methodNames.Any(m => m == name.Id) => PExpr.Define(p, PExpr.Literal(Literal.String("_self." + name.Id)))
     | _ => expr
     }
   }
@@ -262,8 +269,12 @@ namespace NemerleWeb
         def xattrs = instance.OfType.[XAttribute]();
         def cssValue = string.Join(", ", xattrs.Where(a => a.Name.LocalName.StartsWith("css-")).Select(a => $"\"$(a.Name.LocalName.Substring(4))\": $(a.Value)"));
         def css = "css: {" + cssValue + "}";
+        def styleValue = string.Join(", ", xattrs.Where(a => a.Name.LocalName.StartsWith("style-")).Select(a => $"\"$(a.Name.LocalName.Substring(6))\": $(a.Value)"));
+        def style = "style: {" + styleValue + "}";
         def attrs = xattrs.Where(a => !a.Name.LocalName.StartsWith("css-"))
+                          .Where(a => !a.Name.LocalName.StartsWith("style-"))
                           .Concat(if(!string.IsNullOrWhiteSpace(cssValue)) [XAttribute("data-bind", css)] else [])
+                          .Concat(if(!string.IsNullOrWhiteSpace(styleValue)) [XAttribute("data-bind", style)] else [])
                           .GroupBy(a => a.Name.LocalName)
                           .Map(a => XAttribute(a.Key, string.Join(", ", a.Map(x => x.Value))));
         instance.Filter(x => !(x is XAttribute)).Append(attrs);

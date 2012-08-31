@@ -1,0 +1,97 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using NemerleWeb;
+
+namespace MVCTest
+{
+  [JsModel]
+  public variant Color
+  {
+    | Red
+    | Green
+    | Blue
+    | Other {
+      R : int;
+      G : int;
+      B : int;      
+    }
+    
+    public Style : string
+    {
+      get 
+      {
+        match(this) 
+        {
+        | Red   => "rgb(255, 0, 0)"
+        | Green => "rgb(0, 255, 0)"
+        | Blue  => "rgb(0, 0, 255)"
+        | Other(r, g, b) => $"rgb($r, $g, $b)"
+        | _ => "rgb(0,0,0)"
+        }
+      }
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+        <div class="color-box" style-background-color="$Style"></div>
+      #>
+    }
+  }
+  
+  [JsModel]
+  public class VariantsAndMatchingViewModel
+  { 
+    AvailableColors : list[(int * string)] { get { [(0, "Red"), (1, "Green"), (2, "Blue"), (3, "Other")] }  }
+    CurrentColorId : int { get; set; }
+    
+    public OtherColor : Color.Other {
+      get {
+        if(CurrentColor != null && CurrentColor is Color.Other)
+          CurrentColor :> Color.Other
+        else
+          null
+      }
+    }
+    
+    public CurrentColor : Color {
+      get {
+        match(CurrentColorId) {
+        | 0 => Color.Red()
+        | 1 => Color.Green()
+        | 2 => Color.Blue()
+        | 3 => Color.Other(0, 0, 0)
+        | _ => null;
+        }
+      }
+    }
+      
+    [Html]
+    public View() : string
+    {
+      <#
+        <div>
+          <select value="$CurrentColorId">
+            <option $foreach(color in AvailableColors) value="$(color[0])" text="$(color[1])" />
+          </select>
+          <span $when(OtherColor != null)> 
+            <input class="color-input" value="$(OtherColor.R)" />
+            <input class="color-input" value="$(OtherColor.G)" />
+            <input class="color-input" value="$(OtherColor.B)" />
+          </span>
+          <div $when(CurrentColor != null)>
+           
+          </div>
+        </div>
+      #>
+    }
+  }
+}

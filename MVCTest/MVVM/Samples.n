@@ -19,6 +19,8 @@ namespace MVCTest
     CompListSource : string { get; set; }
     Signal : SignalViewModel { get; set; }
     SignalSource : string { get; set; }
+    Variants : VariantsAndMatchingViewModel { get; set; }
+    VariantsSource : string { get; set; }
     
     KnockoutSamples : List[string] { get; }
     Introduction : IntroductionViewModel { get; }
@@ -34,11 +36,12 @@ namespace MVCTest
     
     public this()
     {
-      Samples = ["List of names", "List of names C#", "Computation Expressions", "Chat using SignalR"].ToList();
+      Samples = ["List of names", "List of names C#", "Computation Expressions", "Chat using SignalR", "Variants and Pattern Matching"].ToList();
       NameList = NameListViewModel();
       NameListCSharp = NameListCSharpViewModel();
       CompList = CompListViewModel();
       Signal = SignalViewModel();
+      Variants = VariantsAndMatchingViewModel();
       
       KnockoutSamples = ["Introduction", "Lists and collections", "Single page applications", "Loading and saving"].ToList();
       SelectSample(Samples[2]);
@@ -84,6 +87,11 @@ namespace MVCTest
       
       server.LoadSourceFor("MVVM/SignalViewModel.n", source => {
         SignalSource = source;
+        js prettyPrint();
+      });
+      
+      server.LoadSourceFor("MVVM/VariantsAndMatchingViewModel.n", source => {
+        VariantsSource = source;
         js prettyPrint();
       });
       
@@ -146,6 +154,12 @@ namespace MVCTest
               <div $(Template(CompList, _.View))></div>
               <h2>Source</h2>
               <pre class="prettyprint lang-n prettyprinted">$CompListSource</pre>
+            </div>
+            
+            <div $when(SelectedSample == "Variants and Pattern Matching")>
+              <div $(Template(Variants, _.View))></div>
+              <h2>Source</h2>
+              <pre class="prettyprint lang-n prettyprinted">$VariantsSource</pre>
             </div>
             
             <div $when(SelectedSample == "Introduction")>
