@@ -15,13 +15,14 @@ namespace NemerleWeb
   internal module TypeHelper
   {
     [Memoize]
+    private InternalTypeName(type : TypeInfo) : string
+    {
+      if (type.SystemType != null) type.SystemType.FullName else type.FrameworkTypeName;
+    }
+    
     public TypeName(type : TypeInfo) : string
     {
-      if (type != null)          
-        if (type.SystemType != null) type.SystemType.FullName
-        else                         type.FrameworkTypeName;
-      else
-        "";
+      if (type != null) InternalTypeName(type) else "";
     }
                   
     public RemoveGetSet(methodName : string) : string
@@ -38,6 +39,25 @@ namespace NemerleWeb
     {          
       | PropertyGet(obj, name) => JsAST.FieldRef(obj, name)
       | _ => prop
+    }
+  }
+  
+  internal module JsKnownMembersHelper
+  {
+    public Default(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
+    {
+      Message.Warning(
+        member.Location,
+        $"Invalid $(member.Name) with $(TypeHelper.TypeName(type)) type, params: ..$parms" +
+        " not implemented in JS");
+      JsAST.Call(JsAST.MethodRef(left, TypeHelper.RemoveGetSet(member.Name)), parms)
+    }
+    
+    public DefaultThrow(type : TypeInfo, _left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
+    {
+      throw ArgumentException(
+        $"Invalid $(member.Name) with $(TypeHelper.TypeName(type)) type, params: ..$parms" +
+        " not implemented in JS. $(member.Location)");
     }
   }
   
@@ -80,21 +100,7 @@ namespace NemerleWeb
       {
         match (member.Name, parms)
         {
-          | ("apply", _) =>
-            Message.Warning(<#Must implement "apply" method for test case:
-def test(description, res)
-{
-  Results.Add((description, res()));
-}#>);
-            JsAST.Call(JsAST.MethodRef(left, TypeHelper.RemoveGetSet(member.Name)), parms);
-            
-          | _ =>
-            _ = type; _ = left; _ = member; _ = parms;
-            Message.Warning(
-              member.Location,
-              $"Invalid $(member.Name) with $(TypeHelper.TypeName(type)) type, params: ..$parms" +
-              " not implemented in JS");
-            JsAST.Call(JsAST.MethodRef(left, TypeHelper.RemoveGetSet(member.Name)), parms)
+          | _ => JsKnownMembersHelper.Default(type, left, member, parms)
         }
       }
   }

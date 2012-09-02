@@ -19,9 +19,7 @@ namespace NemerleWeb
       match(member.Name, parms)
       {
         | ("NToList", [obj]) when TypeHelper.TypeName(type) == typeof(Nemerle.Collections.NCollectionsExtensions).FullName => obj
-        | _ =>
-          _ = type; _ = left; _ = member; _ = parms;
-          throw ArgumentException($"Invalid $(member.Name)");
+        | _ => JsKnownMembersHelper.DefaultThrow(type, left, member, parms)
       } 
     }
   }

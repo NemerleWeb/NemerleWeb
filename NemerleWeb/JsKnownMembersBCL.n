@@ -47,9 +47,7 @@ namespace NemerleWeb
         | (".ctor", parms) => JsAST.Call(JsAST.Constructor(type), parms)
         | _ when member.Name.StartsWith("get_")                               => JsAST.PropertyGet(left, TypeHelper.RemoveGetSet(member.Name))
         | (_, h :: []) when member.Name.StartsWith("set_")                    => JsAST.PropertySet(left, TypeHelper.RemoveGetSet(member.Name), h)            
-        | _ =>
-          _ = type; _ = left; _ = member; _ = parms;
-          throw ArgumentException($"Invalid $(member.Name) with $(TypeHelper.TypeName(type)) type, params: ..$parms");
+        | _ => JsKnownMembersHelper.DefaultThrow(type, left, member, parms)
       }
     }    
   }

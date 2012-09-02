@@ -12,46 +12,160 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  module JsKnownMembersLinq
+  module StringExtensions
   {
+    public static FirstCharacterToLower(this str : string) : string 
+    {
+      if (String.IsNullOrEmpty(str) || Char.IsLower(str, 0))
+        str
+      else
+        Char.ToLowerInvariant(str[0]).ToString() + str.Substring(1);
+    }
+  }
+  
+  module JsLinqExtensions
+  {
+    public static AsEnumerable(this seq : JsAST) : JsAST
+    {
+      JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [seq])
+    }
+    
+    public static Call(this seq : JsAST, method : string, parms : list[JsAST]) : JsAST
+    {
+      JsAST.Call(JsAST.MethodRef(seq, method.FirstCharacterToLower()), parms)
+    }
+  }
+  
+  module JsKnownMembersLinq
+  { 
     public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
     {
       match(member.Name, parms)
       {
-        | ("Count", [l]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
-          JsAST.FieldRef(l, "length")
+      | (_, _) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
+        match (parms)
+        {
+        | [seq] =>
+          match (member.Name)
+          {
+          | "AsEnumerable" => seq.AsEnumerable();
+          | "Count" => JsAST.FieldRef(seq, "length")
+          | "All"
+          | "Average"
+          | "Cast"          
+          | "Empty"
+          | "First"
+          | "FirstOrDefault"
+          | "Last"
+          | "LastOrDefault"
+          | "LongCount"
+          | "Max"
+          | "Min"
+          | "OfType"
+          | "Reverse"
+          | "Single"
+          | "SingleOrDefault"
+          | "Sum"
+          | "ToList" => seq.AsEnumerable().Call(member.Name, [])
+          | _ => JsKnownMembersHelper.Default(type, left, member, parms)
+          }
           
-        | ("All", [l, f]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
-          // Enumerable.from(l).all(s)
-          JsAST.Call(JsAST.MethodRef(JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [l]), "all"), [f])
+        | [seq, arg1] =>
+          match (member.Name)
+          {
+          | "Aggregate"
+          | "All"
+          | "Average"
+          | "Concat"
+          | "Contains"
+          | "Count"
+          | "DefaultIfEmpty"
+          | "ElementAt"
+          | "ElementAtOrDefault"
+          | "Except"
+          | "First"
+          | "FirstOrDefault"
+          | "GroupBy"
+          | "Intersect"
+          | "Last"
+          | "LastOrDefault"
+          | "LongCount"
+          | "Max"
+          | "Min"
+          | "OrderBy"
+          | "Repeat"
+          | "Select"
+          | "SelectMany"
+          | "SequenceEqual"
+          | "Single"
+          | "SingleOrDefault"
+          | "Skip"
+          | "SkipWhile"
+          | "Sum"
+          | "Take"
+          | "TakeWhile"
+          | "ThenBy"
+          | "ThenByDescending"
+          | "ToDictionary"          
+          | "ToLookup"
+          | "Union"
+          | "Where" => seq.AsEnumerable().Call(member.Name, [arg1])
+                              
+          // Exception
+          | "Range" => JsAST.Call(JsAST.StaticRef("Enumerable" , "range"), [seq, arg1])
+          | _ => JsKnownMembersHelper.Default(type, left, member, parms)
+          }
           
-        | ("Concat", [l, s]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
-          // Enumerable.from(l).concat(s)
-          JsAST.Call(JsAST.MethodRef(JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [l]), "concat"), [s])
-          
-        | ("OrderBy", [l, f]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
-          // Enumerable.from(l).orderBy(s)
-          JsAST.Call(JsAST.MethodRef(JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [l]), "orderBy"), [f])
-          
-        | ("Where", [l, f]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
-          // Enumerable.from(l).where(s)
-          JsAST.Call(JsAST.MethodRef(JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [l]), "where"), [f])
-          
-        | ("Select", [l, f]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>          
-          // Enumerable.from(l).select(s)
-          JsAST.Call(JsAST.MethodRef(JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [l]), "select"), [f])
-          
-        | ("Skip", [l, n]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
-          // Enumerable.from(l).skip(n)
-          JsAST.Call(JsAST.MethodRef(JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [l]), "skip"), [n])
-          
-        | ("Take", [l, n]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
-          // Enumerable.from(l).take(n)
-          JsAST.Call(JsAST.MethodRef(JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [l]), "take"), [n])
-          
-        | _ =>
-          _ = type; _ = left; _ = member; _ = parms;
-          throw ArgumentException($"Invalid $(member.Name) with $(TypeHelper.TypeName(type)) type, params: ..$parms");
+        | [seq, arg1, arg2] =>
+          match (member.Name)
+          {
+          | "Aggregate"
+          | "Contains"
+          | "Count"
+          | "Except"
+          | "GroupBy"
+          | "Intersect"
+          | "OrderBy"
+          | "SelectMany"
+          | "SequenceEqual"
+          | "ThenBy"
+          | "ThenByDescending"
+          | "ToDictionary"
+          | "ToLookup"
+          | "Union"
+          | "Zip" => seq.AsEnumerable().Call(member.Name, [arg1, arg2])
+          | _ => JsKnownMembersHelper.Default(type, left, member, parms)
+          }
+        
+        | [seq, arg1, arg2, arg3] =>
+          match (member.Name)
+          {
+          | "Aggregate"
+          | "GroupBy"
+          | "ToDictionary"
+          | "ToLookup" => seq.AsEnumerable().Call(member.Name, [arg1, arg2, arg3])
+          | _ => JsKnownMembersHelper.Default(type, left, member, parms)
+          }
+        
+        | [seq, arg1, arg2, arg3, arg4] =>
+          match (member.Name)
+          {
+          | "GroupBy"
+          | "GroupJoin"
+          | "Join" => seq.AsEnumerable().Call(member.Name, [arg1, arg2, arg3, arg4])
+          | _ => JsKnownMembersHelper.Default(type, left, member, parms)
+          }
+        
+        | [seq, arg1, arg2, arg3, arg4, arg5] =>
+          match (member.Name)
+          {
+          | "GroupJoin"
+          | "Join" => seq.AsEnumerable().Call(member.Name, [arg1, arg2, arg3, arg4, arg5])
+          | _ => JsKnownMembersHelper.Default(type, left, member, parms)
+          }
+        | _ => JsKnownMembersHelper.Default(type, left, member, parms)
+        }
+      | _ => JsKnownMembersHelper.DefaultThrow(type, left, member, parms)
       }
     }
   }
