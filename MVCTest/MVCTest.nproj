@@ -328,10 +328,6 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="PageTemplate.htm">
-      <SubType>Content</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Scripts\jquery-1.8.0-vsdoc.js">
       <SubType>Content</SubType>
     </Content>

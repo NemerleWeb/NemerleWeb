@@ -228,7 +228,7 @@ namespace NemerleWeb.Tests
         true
       });
       
-      #if AA
+      //#if AA
       // TODO: Support foreach
       test("foreach", () =>
       {
@@ -257,8 +257,7 @@ namespace NemerleWeb.Tests
         
         res
       });
-      #endif
-      
+            
       #if AA
       test("linq select", () =>
       {

@@ -56,10 +56,12 @@ namespace MVCTest
       {
         def msg = Message(if(string.IsNullOrWhiteSpace(name)) "anon" else name, message, DateTime.Now.ToString());
         broadcast client.AddMessage(msg);
+        
         _lastMessages.Enqueue(msg);
-        when(_lastMessages.Count > 10) {
-          mutable msg;
-          _lastMessages.TryDequeue(out msg);
+        when(_lastMessages.Count > 10)
+        {
+          mutable lastMsg;
+          _ = _lastMessages.TryDequeue(out lastMsg);
         }
         "";
       }

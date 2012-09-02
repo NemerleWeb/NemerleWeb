@@ -194,24 +194,85 @@ namespace NemerleWeb
       }
       
       TryToConvertKnownTemplates(expr : TExpr) : option[JsAST]
-      { 
-          match(expr) {
-          | DefValIn(LocalValue as lv, Call(func = MethodRef(meth = getenum, obj = collection)), body) when lv.Name == "enumerator" && getenum.Name == "GetEnumerator" => 
-            match(body) {
-            | TryFinally(Sequence(Literal, Label(body = MacroEnvelope(expanded = ifexpr))), Call(func = MethodRef(meth = disp))) when disp.Name == "Dispose" => 
-                match(ifexpr) { 
-                | If(cond = Call(OpCode("=="), Parm(expr = TypeConversion(expr = Call(func = MethodRef(meth = movnxt)))) :: Parm(expr = TypeConversion(expr = Literal(Literal.Bool(true)))) :: [], _), e_then = ifbody) when movnxt.Name == "MoveNext" => 
-                    match(ifbody) {
-                    | Label(_, TypeConversion(expr = Sequence(DefValIn(body = DefValIn(body = Sequence(_, foreachbody)), name = iterName), _))) => 
-                        Some(JsAST.For(iterName.Name, Build(collection), Build(foreachbody))) 
-                    | _ => None()
-                    }            
-                | _ => None()
-                }
-            | _ => None() 
+      {
+        match (expr)
+        {
+        // Use Enumerator
+        | DefValIn(LocalValue as lv, Call(func = MethodRef(meth = getenum, obj = collection)), body)
+          when lv.Name == "enumerator" && getenum.Name == "GetEnumerator" =>
+            
+          match(body)
+          {
+          // try { (); if (MoveNext) Current } finally { _.Dispose() }
+          | TryFinally(
+              Sequence(Literal, Label(body = MacroEnvelope(expanded = ifexpr))),
+              Call(func = MethodRef(meth = disp)))
+            when disp.Name == "Dispose" => 
+              
+            match(ifexpr)
+            {
+            | If(
+                cond = Call(OpCode("=="),
+                [Parm(expr = TypeConversion(expr = Call(func = MethodRef(meth = movnxt)))),
+                  Parm(expr = TypeConversion(expr = Literal(Literal.Bool(true))))],
+                _), e_then = ifbody) when movnxt.Name == "MoveNext" => 
+              
+              match(ifbody)
+              {
+              | Label(
+                  _,
+                  TypeConversion(
+                  expr = Sequence(DefValIn(body = DefValIn(body = Sequence(_, foreachbody)), name = iterName), _))) =>
+                Some(JsAST.For(iterName.Name, Build(collection), Build(foreachbody))) 
+              | _ => None()
+              }            
+            | _ => None()
             }
-          | _ => None()
+            
+          // try { (); if (MoveNext) Current } finally { _.Dispose() }
+          | TryFinally(
+              Sequence(
+                Literal,
+                DefValIn(name = name, val = val, body = Label(body = MacroEnvelope(expanded = ifexpr)))),
+              Call(func = MethodRef(meth = disp)))
+             when disp.Name == "Dispose" =>              
+            
+            match (ifexpr)
+            {
+            | If(
+                cond = Call(OpCode("=="),
+                [Parm(expr = TypeConversion(expr = Call(func = MethodRef(meth = movnxt)))),
+                  Parm(expr = TypeConversion(expr = Literal(Literal.Bool(true))))],
+                _), e_then = ifbody) when movnxt.Name == "MoveNext" => 
+             
+             match(ifbody)
+              {
+              | Label(
+                  _,
+                  TypeConversion(
+                  expr = Sequence(DefValIn(body = DefValIn(body = Sequence(_, foreachbody)), name = iterName), _))) =>
+                Some(
+                  JsAST.Seq
+                  ([
+                    JsAST.DefValue(name.Name, Build(val)),
+                    JsAST.For
+                    (
+                      iterName.Name,
+                      Build(collection),
+                      JsAST.Seq
+                      ([
+                        Build(foreachbody),
+                        JsAST.Call(JsAST.OpCode("++"), [JsAST.LocalRef(name.Name)])
+                      ]))
+                  ]))
+              | _ => None()
+              }
+            | _ => None()
+            }
+          | _ => None() 
           }
+        | _ => None()
+        }
       }
 
       public BuildJsASTForSplices(expr : TExpr) : list[JsAST.DefValue]

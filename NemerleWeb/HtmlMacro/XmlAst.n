@@ -97,8 +97,8 @@ namespace NemerleWeb
         | AttrSplice(expr, SpliceType.List) | TagSplice(expr, true)  => $"..$$$expr"
         | AttrSplice(expr, SpliceType.Expr) | TagSplice(expr, false) => $"$$$expr"
         | AttrSplice(expr, SpliceType.Foreach) => $"$$foreach $expr"
-        | AttrSplice(expr, SpliceType.When) => $"$$foreach $expr"
-        | AttrSplice(expr, SpliceType.Unless) => $"$$foreach $expr"
+        | AttrSplice(expr, SpliceType.When) => $"$$when $expr"
+        | AttrSplice(expr, SpliceType.Unless) => $"$$unless $expr"
         | Seq(items) => $"..$items"
       }
     }
