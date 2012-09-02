@@ -67,6 +67,13 @@
       <HintPath>$(Nemerle)\Nemerle.Macros.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <MacroReference Include="Nemerle.Linq">
+      <Name>Nemerle.Linq</Name>
+      <AssemblyName>Nemerle.Linq.dll</AssemblyName>
+      <HintPath>$(Nemerle)\Nemerle.Linq.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </MacroReference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
       <Name>Newtonsoft.Json</Name>
