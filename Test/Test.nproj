@@ -76,6 +76,13 @@
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </MacroReference>
+    <MacroReference Include="Nemerle.Linq">
+      <Name>Nemerle.Linq</Name>
+      <AssemblyName>Nemerle.Linq.dll</AssemblyName>
+      <HintPath>$(Nemerle)\Nemerle.Linq.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </MacroReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <!--
