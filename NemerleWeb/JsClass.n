@@ -31,7 +31,7 @@ namespace NemerleWeb
           {
             ClassType.GetFields()
                      .Where(f => !f.IsStatic)
-                     .Where(f => f.Name != "server" && !f.Name.StartsWith("_N_") && f.Name != "__constructorParams")
+                     .Where(f => f.Name != "server" && f.Name != "__constructorParams")
           }
         }
         
@@ -200,10 +200,8 @@ $computedBody
               def isArray = TypeIsArray(fld.GetMemType());
               match((IsViewmodel, isArray))
               {
-              | (true, true) => "ko.observableArray([])"
-              | (true, false) => "ko.observable(null)"
-              | (false, true) => "[]";   
-              | (false, false) => "{}";
+              | (_, true) => "ko.observableArray([])"
+              | (_, false) => "ko.observable(null)"
               }
             }
             def fieldStrings = fields.Select(f => indent + $<#$parentPtr.$(f.Name) = $(fldVal(f))#>);

@@ -37,14 +37,6 @@ namespace MVCTest
         }
       }
     }
-    
-    [Html]
-    public View() : string
-    {
-      <#
-        <div class="color-box" style-background-color="$Style"></div>
-      #>
-    }
   }
   
   [JsModel]
@@ -69,16 +61,17 @@ namespace MVCTest
         | 1 => Color.Green()
         | 2 => Color.Blue()
         | 3 => Color.Other(0, 0, 0)
-        | _ => null;
+        | _ => Color.Red();
         }
       }
-    }
-      
+    }      
+    
     [Html]
     public View() : string
     {
       <#
         <div>
+          <div $when(CurrentColor != null) class="color-box" style-background-color="$(CurrentColor.Style)"></div>
           <select value="$CurrentColorId">
             <option $foreach(color in AvailableColors) value="$(color[0])" text="$(color[1])" />
           </select>
@@ -87,9 +80,6 @@ namespace MVCTest
             <input class="color-input" value="$(OtherColor.G)" />
             <input class="color-input" value="$(OtherColor.B)" />
           </span>
-          <div $when(CurrentColor != null)>
-           
-          </div>
         </div>
       #>
     }

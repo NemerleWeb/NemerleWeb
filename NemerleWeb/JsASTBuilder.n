@@ -42,7 +42,7 @@ namespace NemerleWeb
             | Delayed                           => Message.Warning(expr.Location, "Delayed not implemented"); JsAST.NotImpl()
             | Error                             => Message.Warning(expr.Location, "Error not implemented"); JsAST.NotImpl()
             | EventMember                       => Message.Warning(expr.Location, "EventMember not implemented"); JsAST.NotImpl()
-            | FieldMember(obj, fld)             => JsAST.FieldRef(Build(obj), fld.Name) 
+            | FieldMember(obj, fld)             => JsAST.FieldRef(Build(obj), fld.Name, false) 
             | FieldOf                           => Message.Warning(expr.Location, "FieldOf not implemented"); JsAST.NotImpl()
             | Goto(target, _)                   => JsAST.Goto(target)
             | HasType(expr, type)               => JsAST.HasType(Build(expr), JsClass.GetProperName(type.TypeInfo))
@@ -282,7 +282,8 @@ namespace NemerleWeb
           JsASTHelper.IterateAST(jsAst)
                      .OfType.[JsAST.DefValue]().NToList()
                      .Map(j => match(j) {
-                     | JsAST.DefValue(name, PropertyGet(left, prop)) => JsAST.DefValue(name, JsAST.FieldRef(left, prop))
+                     | JsAST.DefValue(name, PropertyGet(left, prop)) => JsAST.DefValue(name, JsAST.FieldRef(left, prop, true))
+                     | JsAST.DefValue(name, FieldRef(left, prop, false)) => JsAST.DefValue(name, JsAST.FieldRef(left, prop, true))
                      | _ => j
                      });
       }

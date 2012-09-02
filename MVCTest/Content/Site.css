@@ -155,12 +155,14 @@ h1.logo span {
 }
 
 .color-box {
-    width: 32px;
-    height: 32px;
+    width: 50px;
+    height: 50px;
+    border: 1px solid #666;
+    margin-bottom: 20px;
 }
 
 footer {
     padding: 15px 50px 30px 50px;
     font-size: 14px;
-    text-align: right;
+    text-align: right;    
 }

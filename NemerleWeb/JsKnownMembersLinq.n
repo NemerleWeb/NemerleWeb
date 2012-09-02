@@ -19,7 +19,7 @@ namespace NemerleWeb
       match(member.Name, parms)
       {
         | ("Count", [l]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
-          JsAST.FieldRef(l, "length")
+          JsAST.FieldRef(l, "length", true)
           
         | ("All", [l, f]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
           // Enumerable.from(l).all(s)
