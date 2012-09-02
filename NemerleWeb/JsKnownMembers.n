@@ -90,7 +90,10 @@ def test(description, res)
             
           | _ =>
             _ = type; _ = left; _ = member; _ = parms;
-            Message.Warning(member.Location, $"$(member.Name) not implemented in JS");
+            Message.Warning(
+              member.Location,
+              $"Invalid $(member.Name) with $(TypeHelper.TypeName(type)) type, params: ..$parms" +
+              " not implemented in JS");
             JsAST.Call(JsAST.MethodRef(left, TypeHelper.RemoveGetSet(member.Name)), parms)
         }
       }

@@ -258,20 +258,71 @@ namespace NemerleWeb.Tests
         res
       });
             
-      #if AA
       test("linq select", () =>
       {
         def l = [1, 2, 3].ToList();
         
-        mutable res = true;        
-        def seq = l.Select(x => x);
+        mutable res = true;
+        def seq = l.Select(x => x + 1);
         foreach (e in seq with i)
-          when (e != i + 1)
+          when (e != i)
             res = false;
         
         res
       });
-      #endif
+      
+      test("linq where", () =>
+      {
+        def l = [1, 2, 3].ToList();
+        
+        mutable res = true;
+        def seq = l.Where(_ > 2);
+        foreach (e in seq with i)
+          when (i > 0)
+            res = false;
+        
+        res
+      });
+      
+      test("linq all", () =>
+      {
+        def l = [1, 3, 5].ToList();
+        
+        mutable res = true;
+        l.All(x => x % 2 == 1);
+      });
+      
+      test("linq take skip", () =>
+      {
+        def l = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].ToList();
+        
+        mutable res = true;
+        def seq1 = l.Take(5);
+        foreach (e in seq1)
+          when (e > 5)
+            res = false;
+        
+        def seq2 = seq1.Skip(4);
+        foreach (e in seq2)
+          when (e != 10)
+            res = false;
+        
+        res
+      });
+      
+      test("linq concat", () =>
+      {
+        def l1 = [1, 2, 3, 4].ToList();
+        def l2 = [5, 6, 7, 8, 9, 10].ToList();
+        
+        mutable res = false;
+        def seq = l1.Concat(l2);
+        foreach (e in seq)
+          when (e == 10)
+            res = true;
+        
+        res
+      });
     }
     
     [Html]

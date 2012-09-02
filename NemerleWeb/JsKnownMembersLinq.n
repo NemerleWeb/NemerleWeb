@@ -18,15 +18,40 @@ namespace NemerleWeb
     {
       match(member.Name, parms)
       {
-        | ("Count", l :: []) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
+        | ("Count", [l]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
           JsAST.FieldRef(l, "length")
-        | ("Where", l :: []) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
-          JsAST.MethodRef(l, "where")
-        | ("Select", l :: []) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
-          JsAST.MethodRef(l, "select")
+          
+        | ("All", [l, f]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
+          // Enumerable.from(l).all(s)
+          JsAST.Call(JsAST.MethodRef(JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [l]), "all"), [f])
+          
+        | ("Concat", [l, s]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
+          // Enumerable.from(l).concat(s)
+          JsAST.Call(JsAST.MethodRef(JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [l]), "concat"), [s])
+          
+        | ("OrderBy", [l, f]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
+          // Enumerable.from(l).orderBy(s)
+          JsAST.Call(JsAST.MethodRef(JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [l]), "orderBy"), [f])
+          
+        | ("Where", [l, f]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
+          // Enumerable.from(l).where(s)
+          JsAST.Call(JsAST.MethodRef(JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [l]), "where"), [f])
+          
+        | ("Select", [l, f]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>          
+          // Enumerable.from(l).select(s)
+          JsAST.Call(JsAST.MethodRef(JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [l]), "select"), [f])
+          
+        | ("Skip", [l, n]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
+          // Enumerable.from(l).skip(n)
+          JsAST.Call(JsAST.MethodRef(JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [l]), "skip"), [n])
+          
+        | ("Take", [l, n]) when TypeHelper.TypeName(type) == typeof(Enumerable).FullName =>
+          // Enumerable.from(l).take(n)
+          JsAST.Call(JsAST.MethodRef(JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [l]), "take"), [n])
+          
         | _ =>
           _ = type; _ = left; _ = member; _ = parms;
-          throw ArgumentException($"Invalid $(member.Name)");
+          throw ArgumentException($"Invalid $(member.Name) with $(TypeHelper.TypeName(type)) type, params: ..$parms");
       }
     }
   }

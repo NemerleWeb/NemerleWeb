@@ -26,7 +26,7 @@ namespace NemerleWeb
          | ("op_LessThanOrEqual", _) => JsAST.Call(JsAST.OpCode("<="), parms)
          | _ =>
           _ = type; _ = left; _ = member; _ = parms;
-          throw ArgumentException($"Invalid $(member.Name)");
+          throw ArgumentException($"Invalid $(member.Name) with $(TypeHelper.TypeName(type)) type, params: ..$parms");
       }
     }
   }

@@ -49,7 +49,7 @@ namespace NemerleWeb
         | (_, h :: []) when member.Name.StartsWith("set_")                    => JsAST.PropertySet(left, TypeHelper.RemoveGetSet(member.Name), h)            
         | _ =>
           _ = type; _ = left; _ = member; _ = parms;
-          throw ArgumentException($"Invalid $(member.Name)");
+          throw ArgumentException($"Invalid $(member.Name) with $(TypeHelper.TypeName(type)) type, params: ..$parms");
       }
     }    
   }
