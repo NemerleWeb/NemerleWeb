@@ -19,6 +19,7 @@ namespace NemerleWeb
             }
             public override Transform() : JsAST {
                 match(this) {
+                | Assign(FieldRef(obj, field, ext), val) => if(!ext) JsAST.PropertySet(obj, field, val) else this
                 | Assign(l, r) when !AllowedForAssignment.Any(al => al == r.GetType()) => JsASTHelper.DelayAssignment(r, l);
                 | _ => this
                 }
@@ -267,9 +268,12 @@ $(Body.Write())
                 $"$Type.$Member"
             }
         }
-        | FieldRef       { Obj : JsAST; Parameter : string;
+        | FieldRef       { Obj : JsAST; Parameter : string; IsExternal : bool;
             public override Write(_ = "" : string) : string {
-                $"$(Obj.Write()).$Parameter"
+                if(IsExternal)
+                  $"$(Obj.Write()).$Parameter"
+                else
+                  $"$(Obj.Write()).$Parameter()"
             }
         }
         | PropertySet    { Obj : JsAST; PropertyName : string; Value : JsAST;
@@ -467,7 +471,7 @@ $(Body.Write("  "))
             | LocalRef                    => ast'
             | MethodRef(obj, meth)        => JsAST.MethodRef(recurse(obj), meth)
             | OpCode                      => ast'
-            | FieldRef(obj, parm)         => JsAST.FieldRef(recurse(obj), parm)
+            | FieldRef(obj, parm, ext)    => JsAST.FieldRef(recurse(obj), parm, ext)
             | PropertySet(obj, prop, val) => JsAST.PropertySet(recurse(obj), prop, recurse(val))
             | PropertyGet(obj, prop)      => JsAST.PropertyGet(recurse(obj), prop)
             | Return(expr)                => JsAST.Return(recurse(expr))

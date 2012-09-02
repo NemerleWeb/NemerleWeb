@@ -10,8 +10,7 @@ using System.Linq;
 namespace NemerleWeb
 {
   public module JsASTHelper
-  { 
-    
+  {     
     allowedCallTargets : list[Type] = [typeof(JsAST.LocalRef), typeof(JsAST.Literal)];
     mutable temporaryVariableCounter : int = 0;
     

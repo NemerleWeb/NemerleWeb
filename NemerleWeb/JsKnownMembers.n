@@ -35,10 +35,13 @@ namespace NemerleWeb
       methodName.StartsWith("get_") || methodName.StartsWith("set_")
     }
       
-    public PropertyToField(prop : JsAST) : JsAST
-    {          
-      | PropertyGet(obj, name) => JsAST.FieldRef(obj, name)
+    public PropertyToField(prop : JsAST, isObservable : bool) : JsAST
+    {   
+      match(prop)
+      {
+      | PropertyGet(obj, name) => JsAST.FieldRef(obj, name, !isObservable)
       | _ => prop
+      }
     }
   }
   
