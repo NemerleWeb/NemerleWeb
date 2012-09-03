@@ -343,6 +343,35 @@ namespace NemerleWeb.Tests
       {
         [].ToList().FirstOrDefault() == 0 && [].ToList().LastOrDefault() == 0;
       });
+      
+      #if AA
+      test("linq first last", () =>
+      {
+        mutable res = true;
+        def empty = [].ToList();
+        try
+        {
+          _ = empty.First();
+          res = false;
+        }
+        catch
+        {
+          | _ => ()
+        }
+        
+        try
+        {
+          _ = empty.Last();
+          res = false;
+        }
+        catch
+        {
+          | _ => ()
+        }
+        
+        res
+      });
+      #endif
     }
     
     [Html]
