@@ -159,6 +159,9 @@
     <Compile Include="JsModelAttribute.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="TName.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
     <Compile Include="SignalR\HubBase.n">
       <SubType>Code</SubType>
@@ -185,6 +188,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ViewModelBase.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ViewModelExtensions.n">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

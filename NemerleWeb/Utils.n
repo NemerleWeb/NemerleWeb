@@ -75,7 +75,7 @@ $modelTemplates
         string.Join(Environment.NewLine, 
                     type.GetMethods()
                         .Where(m => m.Name.StartsWith("__"))
-                        .Select(m => CreateTemplate(GetHtml(m.Invoke(model, array[]) :> list[XElement]), m.DeclaringType.Name + m.Name)))
+                        .Select(m => CreateTemplate(GetHtml(m.Invoke(model, array[]) :> list[XElement]), JsClass.GetProperName(m.DeclaringType) + m.Name)))
       } else {
         ""
       }

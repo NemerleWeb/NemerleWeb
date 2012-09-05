@@ -433,7 +433,7 @@ $(Body.Write("  "))
                 Val = "";
             }
             public override Write(_ = "" : string) : string {
-                $"/* Not implemented: $Val */"
+                $<#"Not implemented: $Val "#>
             }
         }
         

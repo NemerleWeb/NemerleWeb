@@ -1,109 +1,84 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Nemerle;
 using NemerleWeb;
 
 namespace MVCTest
 {
+  [JsModel, Record]  
+  class Sample
+  {
+    public Name : string { get; set; }
+    public SourceFiles : list[string] { get; set; }
+    public Source : string { get; set; }
+    public Instance : ViewModel { get; set; }
+    public TemplateName : string { get; set; }
+  }
+  
   [ViewModel]
   class SamplesViewModel
   {      
-    SelectedSample : string { get; set; }
+    SelectedSample : Sample { get; set; }
     
-    Samples : List[string] { get; }
-    NameList : NameListViewModel { get; }
-    NameListSource : string { get; set; }
-    NameListCSharp : NameListCSharpViewModel { get; }
-    NameListCSharpSource : string { get; set; }
-    CompList : CompListViewModel { get; }
-    CompListSource : string { get; set; }
+    Samples : List[Sample] { get; set; }
+    KnockoutSamples : List[Sample] { get; set; }
+    
+    NameList : NameListViewModel { get; set; }
+    NameListCSharp : NameListCSharpViewModel { get; set; }
+    CompList : CompListViewModel { get; set; }
     Signal : SignalViewModel { get; set; }
-    SignalSource : string { get; set; }
-    Variants : VariantsAndMatchingViewModel { get; set; }
-    VariantsSource : string { get; set; }
+    Variants : VariantsAndMatchingViewModel { get; set; }    
+    Introduction : IntroductionViewModel { get; set; }
+    ListsAndCollections : ListsAndCollectionsViewModel { get; set; }
+    LoadingAndSaving : LoadingAndSavingViewModel { get; set; }
+    SinglePageApps : SPAViewModel { get; set; }
     
-    KnockoutSamples : List[string] { get; }
-    Introduction : IntroductionViewModel { get; }
-    IntroductionSource : string { get; set; }
-    ListsAndCollections : ListsAndCollectionsViewModel { get; }
-    ListsAndCollectionsSource : string { get; set; }
-    LoadingAndSaving : LoadingAndSavingViewModel { get; }
-    LoadingAndSavingSource : string { get; set; }
-    SinglePageApps : SPAViewModel { get; }
-    SinglePageAppsSource : string { get; set; }
-    
+    Sources : List[string * string] { get; set; }
     ThisPageSource : string { get; set; }
-    
+        
     public this()
     {
-      Samples = ["List of names", "List of names C#", "Computation Expressions", "Chat using SignalR", "Variants and Pattern Matching"].ToList();
       NameList = NameListViewModel();
       NameListCSharp = NameListCSharpViewModel();
       CompList = CompListViewModel();
       Signal = SignalViewModel();
       Variants = VariantsAndMatchingViewModel();
-      
-      KnockoutSamples = ["Introduction", "Lists and collections", "Single page applications", "Loading and saving"].ToList();
-      SelectSample(Samples[2]);
       Introduction = IntroductionViewModel("John", "Silver");
       ListsAndCollections = ListsAndCollectionsViewModel();
       LoadingAndSaving = LoadingAndSavingViewModel();
       SinglePageApps = SPAViewModel();
-
-      server.LoadSourceFor("MVVM/Knockout/Tutorial_1_Introduction.n", source => {
-        IntroductionSource = source;
-        js prettyPrint();
-      });
+            
+      Samples = [Sample("List of names", ["MVVM/NameListViewModel.n"], "", NameList : ViewModel, tname template(_.NameList)),  // in tname template(_.NameList) second parameter is View by default
+                 Sample("List of names C#", ["MVVM/NameListCSharpViewModel.cs", "MVVM/NameListCSharpViewModel.View.n"], "", NameListCSharp : ViewModel, tname template(_.NameListCSharp)), 
+                 Sample("Computation Expressions", ["MVVM/CompListViewModel.n"], "", CompList : ViewModel, tname template(_.CompList, _.View)), 
+                 Sample("Chat using SignalR", ["MVVM/SignalViewModel.n"], "", Signal : ViewModel, tname template(_.Signal, _.View)), 
+                 Sample("Variants and Pattern Matching", ["MVVM/VariantsAndMatchingViewModel.n"], "", Variants : ViewModel, tname template(_.Variants, _.View))].ToList();
       
-      server.LoadSourceFor("MVVM/Knockout/Tutorial_2_ListsAndCollections.n", source => {
-        ListsAndCollectionsSource = source;
-        js prettyPrint();
-      });
-      
-      server.LoadSourceFor("MVVM/Knockout/Tutorial_3_SinglePageApps.n", source => {
-        SinglePageAppsSource = source;        
-        js prettyPrint();
-      });
-      
-      server.LoadSourceFor("MVVM/Knockout/Tutorial_5_LoadingAndSaving.n", source => {
-        LoadingAndSavingSource = source;
-        js prettyPrint();
-      });
-      
-      server.LoadSourceFor("MVVM/NameListViewModel.n", source => {
-        NameListSource = source;
-        js prettyPrint();
-      });
-      
-      server.LoadSourceForList(["MVVM/NameListCSharpViewModel.cs", "MVVM/NameListCSharpViewModel.View.n"], source => {
-        NameListCSharpSource = source;
-        js prettyPrint();
-      });
-      
-      server.LoadSourceFor("MVVM/CompListViewModel.n", source => {
-        CompListSource = source;
-        js prettyPrint();
-      });
-      
-      server.LoadSourceFor("MVVM/SignalViewModel.n", source => {
-        SignalSource = source;
-        js prettyPrint();
-      });
-      
-      server.LoadSourceFor("MVVM/VariantsAndMatchingViewModel.n", source => {
-        VariantsSource = source;
-        js prettyPrint();
-      });
-      
+      KnockoutSamples = [Sample("Introduction", ["MVVM/Knockout/Tutorial_1_Introduction.n"], "", Introduction : ViewModel, tname template(_.Introduction)), 
+                         Sample("Lists and collections", ["MVVM/Knockout/Tutorial_2_ListsAndCollections.n"], "", ListsAndCollections : ViewModel, tname template(_.ListsAndCollections)), 
+                         Sample ("Single page applications", ["MVVM/Knockout/Tutorial_3_SinglePageApps.n"], "", SinglePageApps : ViewModel, tname template(_.SinglePageApps)), 
+                         Sample("Loading and saving", ["MVVM/Knockout/Tutorial_5_LoadingAndSaving.n"], "", SinglePageApps : ViewModel, tname template(_.SinglePageApps))].ToList();
+                 
+      SelectedSample = Samples[2];
+                         
+      foreach(sample in Samples) {
+        server.LoadSourceForList(sample.SourceFiles, source => {
+          sample.Source = source;
+          js prettyPrint();
+        });        
+      }
+            
       server.LoadSourceFor("MVVM/Samples.n", source => {
         ThisPageSource = source;
         js prettyPrint();
       });
     }
-
-    SelectSample(sample : string) : void {
-        SelectedSample = sample;
-        js prettyPrint();
+    
+    SelectSample(sample : Sample) : void 
+    {
+      def sample = Samples.Concat(KnockoutSamples).FirstOrDefault(s => s.Name == sample.Name);
+      SelectedSample = sample;
     }
     
     public class Server
@@ -126,64 +101,16 @@ namespace MVCTest
         <div class="container">
           <ul class="samples-menu">
             <li class="header">Samples</li>
-            <li $foreach(s in Samples) css-selected="$(SelectedSample == s)"><span click="$SelectSample">$s</span></li>
+            <li $foreach(s in Samples) css-selected="$(SelectedSample.Name == s.Name)"><span click="$SelectSample">$(s.Name)</span></li>
             <li class="split"></li>
             <li class="header">KnockoutJs tutorials</li>
-            <li $foreach(s in KnockoutSamples) css-selected="$(SelectedSample == s)"><span click="$SelectSample">$s</span></li>
-          </ul>
-          <div class="current-sample">
-            <div $when(SelectedSample == "Chat using SignalR")>
-              <div $(Template(Signal, _.View))></div>
+            <li $foreach(s in KnockoutSamples) css-selected="$(SelectedSample.Name == s.Name)"><span click="$SelectSample">$(s.Name)</span></li>
+          </ul>          
+          <div $foreach(s in Samples.Concat(KnockoutSamples)) class="current-sample">
+            <div $when(SelectedSample.Name == s.Name)>
+              <div template="$(template(s.Instance, s.TemplateName))"></div>
               <h2>Source</h2>
-              <pre class="prettyprint lang-n prettyprinted">$SignalSource</pre>
-            </div>
-            
-            <div $when(SelectedSample == "List of names")>
-              <div $(Template(NameList, _.View))></div>
-              <h2>Source</h2>
-              <pre class="prettyprint lang-n prettyprinted">$NameListSource</pre>
-            </div>
-            
-            <div $when(SelectedSample == "List of names C#")>
-              <div $(Template(NameListCSharp, _.View))></div>
-              <h2>Source</h2>
-              <pre class="prettyprint lang-n prettyprinted">$NameListCSharpSource</pre>
-            </div>
-            
-            <div $when(SelectedSample == "Computation Expressions")>
-              <div $(Template(CompList, _.View))></div>
-              <h2>Source</h2>
-              <pre class="prettyprint lang-n prettyprinted">$CompListSource</pre>
-            </div>
-            
-            <div $when(SelectedSample == "Variants and Pattern Matching")>
-              <div $(Template(Variants, _.View))></div>
-              <h2>Source</h2>
-              <pre class="prettyprint lang-n prettyprinted">$VariantsSource</pre>
-            </div>
-            
-            <div $when(SelectedSample == "Introduction")>
-              <div $(Template(Introduction, _.View))></div>
-              <h2>Source</h2>
-              <pre class="prettyprint lang-n prettyprinted">$IntroductionSource</pre>
-            </div>
-
-            <div $when(SelectedSample == "Lists and collections")>
-              <div $(Template(ListsAndCollections, _.View))></div>
-              <h2>Source</h2>
-              <pre class="prettyprint lang-n prettyprinted">$ListsAndCollectionsSource</pre>
-            </div>
-
-            <div $when(SelectedSample == "Single page applications")>
-              <div $(Template(SinglePageApps, _.View))></div>
-              <h2>Source</h2>
-              <pre class="prettyprint lang-n prettyprinted">$SinglePageAppsSource</pre>
-            </div>
-
-            <div $when(SelectedSample == "Loading and saving")>
-              <div $(Template(LoadingAndSaving, _.View))></div>
-              <h2>Source</h2>
-              <pre class="prettyprint lang-n prettyprinted">$LoadingAndSavingSource</pre>
+              <pre class="prettyprint lang-n prettyprinted"></pre>
             </div>
           </div>
           <h2>Main page source</h2>

@@ -81,7 +81,12 @@ namespace NemerleWeb
                 | Seq(DefValue as dv :: cb :: []) => JsAST.Seq([dv, JsAST.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, cb)])
                 | _ => JsAST.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, callback)
               }
-                      
+          | Call(MethodRef(_, meth, _, _), [modelParm, viewParm], _) when meth.Name == "GetTemplateName" =>             
+            match(modelParm, viewParm)
+            {
+            | (Parm(expr = TExpr.Literal(Literal.String(model))), Parm(expr = TExpr.Literal(Literal.String(view)))) => JsAST.Code($"getTemplateName(this.$model(), '$view')")
+            | _ => Message.FatalError("Invalid GetTemplateName call, use 'name' macro")
+            }
           | Call(MethodRef(obj = o, meth = meth) as m, parms, _) =>
               ConvertMethod(o.Type.TypeInfo, builder(o), meth, parms.Map(p => builder(p.expr)))
           

@@ -21,17 +21,35 @@ module Program
   }
 }
 
+[JsModel]
+public class SomeModel
+{
+  [Html]
+  public View() : string
+  {
+    <#
+      <div></div>
+    #>
+  }  
+}
+
 [ViewModel]
 public partial class Test
 {
-  public CurrentColor : string { get; set; }
+  public Model : SomeModel { get; set; }
+  public TemplateName : string { get; set; }
+  
+  public this() 
+  {
+    name template(_.Model, _.View)
+  }
   
   [Html]
   public View() : string 
   {
     <#
       <div>
-        <div template="$(template(m => m.CurrentColor))"></div>
+        <div template="$(template(m => m.Model, m => m.View()))"></div>
       </div>
     #>
   }

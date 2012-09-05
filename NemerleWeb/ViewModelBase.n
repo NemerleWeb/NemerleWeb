@@ -4,6 +4,7 @@ using Nemerle.Text;
 using Nemerle.Utility;
 
 using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
@@ -11,21 +12,42 @@ using System.Linq.Expressions;
 
 namespace NemerleWeb
 {
-  public class ViewModelBase[T]
+  public class ViewModel {}
+  public class ViewModelBase[T] : ViewModel
   {
     public template[TM](model : Expression[Func[T, TM]]) : string
-    {
-      /*
-      , template : Expression[Func[TM, void -> string]]
+    { 
+      def hasView = typeof(TM).GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                              .Any(m => m.Name == "View" && m.ReturnType == typeof(string));
+                              
+      match(hasView, model.Body)
+      {
+        | (true, model is Expressions.MemberExpression) => 
+          def modelName = model.Member.Name;
+          def templateName = typeof(TM).Name + "__View";
+          $"template: { name: '$templateName', data: $modelName}"
+        | _ => throw ArgumentException("Incorrect template binding, you should supply model with View() : string method or use different template method")
+      }   
+    }
+    
+    public template[TM](model : Expression[Func[T, TM]], template : Expression[Func[TM, string]]) : string
+    { 
       match(model.Body, template.Body)
       {
-        | (model is Expressions.MemberExpression, template is Expressions.MemberExpression) => 
+        | (model is Expressions.MemberExpression, template is Expressions.MethodCallExpression) => 
           def modelName = model.Member.Name;
-          def templateName = template.Member.Name;
-          $"template: { name: '$modelName' data: '$templateName'}"
-        | _ => "incorrect template binding"
-      }   */
+          def templateName = typeof(TM).Name + "__" + template.Method.Name;
+          $"template: { name: '$templateName' data: $modelName}"
+        | _ => throw ArgumentException("Incorrect template binding: " + model.ToString() + " " + template.ToString())
+      }   
+    }
+    
+    public template[TM](model : ViewModel, template : string) : string
+    {
       ""
     }
+        
+    public GetTemplateName(modelName : string, viewName : string) : string
+    { "" }
   }
 }

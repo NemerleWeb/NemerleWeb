@@ -76,11 +76,12 @@ namespace NemerleWeb
       })
     }
     public Transform(xmlAsts : XmlAst.Seq) : PExpr
-    {
-        def splicedMethod = CleanupCallRefs(GetMethodWithSplicesOnly(xmlAsts));
-        def splices = TyperHelper.GetSplices(splicedMethod, _typer);
-        _typer.CurrentTypeBuilder.Compile();
-        Util.locate(ToLocation(xmlAsts), TransformImpl(xmlAsts, splices))
+    {          
+      //assert2(false);
+      def splicedMethod = CleanupCallRefs(GetMethodWithSplicesOnly(xmlAsts));
+      def splices = TyperHelper.GetSplices(splicedMethod, _typer);  
+      _typer.CurrentTypeBuilder.Compile();
+      Util.locate(ToLocation(xmlAsts), TransformImpl(xmlAsts, splices))
     }
     
     public TransformImpl(xmlAst : XmlAst, splices : Dictionary[int, string], loopStack = null : list[string]) : PExpr
@@ -95,7 +96,10 @@ namespace NemerleWeb
         
         def transformJsExpr(expr) {
           def res = if(expr.StartsWith("\"") && expr.EndsWith("\"")) expr.Trim('\"') else expr;
-          def res = if(loopStack.Length > 0) Regex.Replace(res, <#(^(?<b>)_self(?<a>\W)|(?<b>)_self(?<a>)|(?<b>\W)_self(?<a>)$)#>, $"$${b}$(currentRoot)$${a}") else Regex.Replace(res, <#(^_self\W|\W_self\W|\W$l$)#>, "");
+          def res = if(loopStack.Length > 0) 
+                      Regex.Replace(res, <#(^(?<b>)_self(?<a>\W)|(?<b>)_self(?<a>)|(?<b>\W)_self(?<a>)$)#>, $"$${b}$(currentRoot)$${a}") 
+                    else 
+                      Regex.Replace(res, <#(^(?<b>)_self\W|(?<b>\W)_self\W)#>, "${b}");
           def res = if(res.EndsWith(";")) res.Substring(0, res.Length - 1) else res;
           def res = match(loopSubstitutions.Find((l, _) => Regex.IsMatch(res, $<#(^$l\W|\W$l\W|\W$l$$|^$l$$)#>))) {
             | Some((l, s)) => Regex.Replace(res, 
@@ -131,15 +135,25 @@ namespace NemerleWeb
             | (Splicable.Value(v), _) when v == "visible" => <[ [L.XAttribute("data-bind", "visible: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "options" => <[ [L.XAttribute("data-bind", "options: " + $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "checked" => <[ [L.XAttribute("data-bind", "checked: " + $(getSplice()))] ]>
-            | (Splicable.Value(v), _) when v == "template" => 
-              def expr = SplicablePExprStr(value);
-              <[ [L.XAttribute("data-bind", $expr)] ]>
+            | (Splicable.Value(v), _) when v == "template" =>
+              def pexpr = SplicablePExprStr(value);
+              def binding = match(pexpr) 
+              {
+                | <[ template(_.$model, _.$view()) ]>  => $<#template: { name: getTemplateName($model(), "$view"), data: $model }#>
+                | <[ template(_.$model) ]>  => $<#template: { name: getTemplateName($model(), 'View'), data: $model }#>
+                | <[ template($l, $r) ]> => 
+                  def splice = getSplice();
+                  def (p1, p2) = regexp match(splice)
+                  {
+                  | <#\$parent\.template\((?<p1>.+),(?<p2>.+)\)#> => (p1, p2)
+                  | _ => ("", "")
+                  };
+                  $<#template: { name: getTemplateName($p1(), "View"), data: $p2 }#>
+              }
+              <[ [L.XAttribute("data-bind", $binding)] ]>
             | (Splicable.Value(v), _) when v.StartsWith("css-") => <[ [L.XAttribute($v, $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v.StartsWith("style-") => <[ [L.XAttribute($v, $(getSplice()))] ]>
-            | _ => 
-              def name1   = SplicablePExprName(name);
-              def value1  = SplicablePExprStr(value);
-              <[ [L.XAttribute($name1, $value1)] ]>
+            | _ => <[ [L.XAttribute($(SplicablePExprName(name)), $(SplicablePExprStr(value)))] ]>
             }          
         | Attr(name, value)             => 
             def nameExpr   = SplicablePExprName(name);          
@@ -153,19 +167,19 @@ namespace NemerleWeb
             | <[ $x in $xs ]> => 
                 def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);                
                 def tagExpr = TransformImpl(tag, splices, loopStack.Append([x.ToString()]));
-                <[ [[XComment(" ko foreach: " + $(getSplice()) + " ")], $tagExpr, [XComment(" /ko ")]].Flatten(c => c) ]>;
+                def splice = getSplice();
+                <[ [[XComment(" ko foreach: " + $splice + " ")], $tagExpr, [XComment(" /ko ")]].Flatten(c => c) ]>;
             | _ => TransformImpl(XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content), splices, loopStack);
             }
         | Tag(name, XmlAst.AttrSplice(_, SpliceType.When)   :: content) =>            
             def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);
             def tagExpr = TransformImpl(tag, splices, loopStack);
             <[ [[XComment(" ko if: " + $(getSplice()) + " ")], $tagExpr, [XComment(" /ko ")]].Flatten(c => c) ]>        
-        | Tag(name, XmlAst.AttrSplice(_, SpliceType.Unless) :: content)
-            => 
+        | Tag(name, XmlAst.AttrSplice(_, SpliceType.Unless) :: content) => 
             def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);
             def tagExpr = TransformImpl(tag, splices, loopStack);
             <[ [[XComment(" ko ifnot: " + $(getSplice()) + " ")], $tagExpr, [XComment(" /ko ")]].Flatten(c => c) ]>        
-        | Tag(name, content)            => 
+        | Tag(name, content)                => 
             def nameExpr1 = SplicablePExprName(name);
             def nameExpr2 = Util.locate(ToLocation(name), <[ $nameExpr1 : L.XName ]>);            
             def cont = content.Map(x => <[ $(TransformImpl(x, splices, loopStack)) ]>);            
@@ -173,20 +187,7 @@ namespace NemerleWeb
             <[ $expr ]>
         | TagSplice(_, false)               => <[ [L.XAttribute("data-bind", "text: " + $(getSplice()))] ]>
         | TagSplice(expr, true)             => <[ [NColl.NToArray($(Parse(ToLocation(xmlAst), expr)))] ]>
-        | AttrSplice(expr, SpliceType.Expr) as exprAst => 
-            def attr = Parse(ToLocation(exprAst), expr);
-            def attrPexpr = match(attr) {
-            | <[ Template($data, $_ => $_.$templateName) ]>
-            | <[ Template($data, _.$templateName) ]> => <[ [Template($data, _.$templateName).SetDataName($(data.ToString() : string)).SetTemplate($(templateName.ToString() : string)) :> XAttribute] ]>
-            | <[ Template($data, $_ => $_.$templateName, $parms) ]>
-            | <[ Template($data, _.$templateName, $parms) ]> => 
-                def p = parms;
-                <[ ($attr) :> XAttribute ]>
-                //def callbackNames = string.Join(", ", parms.Map(p => p.ToString()));
-                //<[ [Template($data, _.$templateName, $parms).SetDataName($(data.ToString() : string)).SetTemplate($(templateName.ToString() : string)).SetCallbackNames($(callbackNames : string)) :> XAttribute] ]>
-            | _ => <[ ($attr) :> XAttribute ]>;
-            }
-          <[ $attrPexpr ]>
+        | AttrSplice(expr, SpliceType.Expr) as exprAst => <[ ($(Parse(ToLocation(exprAst), expr))) :> XAttribute ]>;
         | AttrSplice(expr, SpliceType.List) => <[ [NColl.NToArray.[L.XAttribute]($(Parse(ToLocation(xmlAst), expr)) : IEnumerable[L.XAttribute])]]> 
         | AttrSplice(_, SpliceType.Foreach)
         | AttrSplice(_, SpliceType.When)
@@ -204,13 +205,7 @@ namespace NemerleWeb
         def varName = "var" + _spliceCounter.ToString();
         match (xmlAst)
         {
-        | Attr(_, Splicable.Expr(str) as expr) => 
-            def value1  = Parse(ToLocation(expr), str);
-            match(value1)
-            {
-            | <[ template(..$parms) ]> => <[ ]>
-            | _ => <[ def $(varName : dyn) = $value1 ]>
-            }
+        | Attr(_, Splicable.Expr(str) as expr) => <[ def $(varName : dyn) = $(Parse(ToLocation(expr), str)) ]>
         | Tag(name, XmlAst.AttrSplice(expr, SpliceType.Foreach) as c :: content) =>
             def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);                
             def tagExpr = GetMethodWithSplicesOnly(tag);
@@ -239,7 +234,7 @@ namespace NemerleWeb
         | AttrSplice(_, SpliceType.Foreach)
         | AttrSplice(_, SpliceType.When)
         | AttrSplice(_, SpliceType.Unless)  => 
-            Message.FatalError("Control instruction must place before attributes.");        
+            Message.FatalError("Control instructions must be placed before attributes in Tag definition.");        
         | Seq(items) =>
             def exprs = items.Map(x => <[ $(GetMethodWithSplicesOnly(x)) ]>);
             <[ { ..$exprs } ]>

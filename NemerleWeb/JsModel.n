@@ -33,7 +33,7 @@ namespace NemerleWeb
     public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);
-        
+      
       def baseType = <[ NemerleWeb.ViewModelBase[$(tb.ParsedTypeName)] ]>;
       when(tb.Ast is TopDeclaration.Class) {
         def ast = tb.Ast :> TopDeclaration.Class; 

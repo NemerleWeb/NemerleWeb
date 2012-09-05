@@ -31,6 +31,7 @@ namespace NemerleWeb
           {
             ClassType.GetFields()
                      .Where(f => !f.IsStatic)
+                     .Where(f => !f.Name.StartsWith("_N_") || !IsViewmodel)
                      .Where(f => f.Name != "server" && f.Name != "__constructorParams")
           }
         }
@@ -95,11 +96,11 @@ namespace NemerleWeb
           def returning = match(ClassType.BaseType.Name) {
               | "Function" => bodyIndent + 
 <#return function() {
-  _self.apply.apply(_self, arguments);
+  return _self.apply.apply(_self, arguments);
 }#>
               | "FunctionVoid" => bodyIndent + 
 <#return function() {
-  _self.apply_void.apply(_self, arguments);
+  return _self.apply_void.apply(_self, arguments);
 }#>
               | _ => ""
           };
@@ -285,8 +286,19 @@ $(indent)}#>);
           ast.Write(indent);
         }
         
-        public static GetProperName(type : TypeInfo) : string {
-          type.FullName.Replace(".", "_")
+        public static GetProperName(type : TypeInfo) : string 
+        {          
+          GetProperName(type.FullName)
+        }
+        
+        public static GetProperName(type : Type) : string 
+        {
+          GetProperName(type.FullName)
+        }
+        
+        static GetProperName(fullName : string) : string
+        {
+          fullName.Replace(".", "_")
         }
         
         public static FilterMethods(methods : IEnumerable[IMethod]) : IEnumerable[IMethod]

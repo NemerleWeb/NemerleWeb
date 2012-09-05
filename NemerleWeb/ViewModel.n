@@ -179,6 +179,16 @@ function ToTypedObject(obj) {
     return obj;
 };
 #>;        
+      def getTemplateNameFunction = 
+<#
+function getTemplateName(model, viewName) {
+  if(!model)
+    return "";
+    
+  return model.constructor.name + "__" + viewName;
+}
+#>;
+
       def applyBindings = 
 $<#  ko.applyBindings(new $(JsClass.GetProperName(tb))({0}));#>;
       _ = tb.DefineWithSource(<[ decl:
@@ -188,7 +198,8 @@ $<#  ko.applyBindings(new $(JsClass.GetProperName(tb))({0}));#>;
           | x when x != null => x.Invoke(null, array[]).ToString()
           | _ => ""
           };
-          def sb = System.Text.StringBuilder();          
+          def sb = System.Text.StringBuilder();
+          _ = sb.AppendLine($getTemplateNameFunction);
           _ = sb.AppendLine($toTypedObjectFunction);
           _ = sb.AppendLine(($result).Replace("{{{SignalR}}}", signalRScript));
           def paramList = __constructorParams.Map(obj => "ToTypedObject(" + Utils.ToJson(obj) + ")");

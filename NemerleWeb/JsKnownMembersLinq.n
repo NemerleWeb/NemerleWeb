@@ -49,7 +49,7 @@ namespace NemerleWeb
           match (member.Name)
           {
           | "AsEnumerable" => seq.AsEnumerable();
-          | "Count" => JsAST.FieldRef(seq, "length", false)
+          | "Count" => JsAST.FieldRef(seq, "length", true)
           | "All"
           | "Average"
           | "Cast"          
