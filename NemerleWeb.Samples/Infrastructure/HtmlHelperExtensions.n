@@ -11,7 +11,7 @@ using System.Web.Mvc;
 
 using Nemerle.Xml;
 using NemerleWeb;
-using MVCTest;
+using NemerleWeb.Samples;
 
 public module HtmlHelperExtensions
 {

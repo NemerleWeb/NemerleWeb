@@ -7,7 +7,7 @@ using System.Linq;
 using SignalR.Hubs;
 using Nemerle.Late;
 
-namespace MVCTest
+namespace NemerleWeb.Samples
 {
   [JsModel]
   public class SignalViewModel 

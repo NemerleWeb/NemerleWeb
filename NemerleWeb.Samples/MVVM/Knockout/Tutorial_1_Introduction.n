@@ -1,6 +1,6 @@
 ﻿using NemerleWeb;
 
-namespace MVCTest
+namespace NemerleWeb.Samples
 {
   [Record, JsModel]
   public class IntroductionViewModel

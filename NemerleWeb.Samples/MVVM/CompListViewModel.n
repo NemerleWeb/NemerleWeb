@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Nemerle.ComputationExpressions;
 
-namespace MVCTest
+namespace NemerleWeb.Samples
 {
   [JsModel]
   class CompListViewModel

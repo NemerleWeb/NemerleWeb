@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NemerleWeb;
 
-namespace MVCTest
+namespace NemerleWeb.Samples
 {
   [JsModel]
   public class LoadingAndSavingViewModel

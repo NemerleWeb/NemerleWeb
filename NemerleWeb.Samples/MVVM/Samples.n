@@ -4,7 +4,7 @@ using System.Text;
 using Nemerle;
 using NemerleWeb;
 
-namespace MVCTest
+namespace NemerleWeb.Samples
 {
   [JsModel, Record]  
   class Sample
@@ -49,27 +49,36 @@ namespace MVCTest
       LoadingAndSaving = LoadingAndSavingViewModel();
       SinglePageApps = SPAViewModel();
             
-      Samples = [Sample("List of names", ["MVVM/NameListViewModel.n"], "", NameList : ViewModel, tname template(_.NameList)),  // in tname template(_.NameList) second parameter is View by default
-                 Sample("List of names C#", ["MVVM/NameListCSharpViewModel.cs", "MVVM/NameListCSharpViewModel.View.n"], "", NameListCSharp : ViewModel, tname template(_.NameListCSharp)), 
-                 Sample("Computation Expressions", ["MVVM/CompListViewModel.n"], "", CompList : ViewModel, tname template(_.CompList, _.View)), 
-                 Sample("Chat using SignalR", ["MVVM/SignalViewModel.n"], "", Signal : ViewModel, tname template(_.Signal, _.View)), 
-                 Sample("Variants and Pattern Matching", ["MVVM/VariantsAndMatchingViewModel.n"], "", Variants : ViewModel, tname template(_.Variants, _.View))].ToList();
+      Samples = 
+      [
+        Sample("List of names", ["MVVM/NameListViewModel.n"], "", NameList, tname template(_.NameList)),  // in tname template(_.NameList) second parameter is View by default
+        Sample("List of names C#", ["MVVM/NameListCSharpViewModel.cs", "MVVM/NameListCSharpViewModel.View.n"], "", NameListCSharp, tname template(_.NameListCSharp)), 
+        Sample("Computation Expressions", ["MVVM/CompListViewModel.n"], "", CompList, tname template(_.CompList, _.View)), 
+        Sample("Chat using SignalR", ["MVVM/SignalViewModel.n"], "", Signal, tname template(_.Signal, _.View)), 
+        Sample("Variants and Pattern Matching", ["MVVM/VariantsAndMatchingViewModel.n"], "", Variants, tname template(_.Variants, _.View))
+      ].ToList();
       
-      KnockoutSamples = [Sample("Introduction", ["MVVM/Knockout/Tutorial_1_Introduction.n"], "", Introduction : ViewModel, tname template(_.Introduction)), 
-                         Sample("Lists and collections", ["MVVM/Knockout/Tutorial_2_ListsAndCollections.n"], "", ListsAndCollections : ViewModel, tname template(_.ListsAndCollections)), 
-                         Sample ("Single page applications", ["MVVM/Knockout/Tutorial_3_SinglePageApps.n"], "", SinglePageApps : ViewModel, tname template(_.SinglePageApps)), 
-                         Sample("Loading and saving", ["MVVM/Knockout/Tutorial_5_LoadingAndSaving.n"], "", SinglePageApps : ViewModel, tname template(_.SinglePageApps))].ToList();
+      KnockoutSamples =
+      [
+        Sample("Introduction", ["MVVM/Knockout/Tutorial_1_Introduction.n"], "", Introduction, tname template(_.Introduction)), 
+        Sample("Lists and collections", ["MVVM/Knockout/Tutorial_2_ListsAndCollections.n"], "", ListsAndCollections, tname template(_.ListsAndCollections)), 
+        Sample ("Single page applications", ["MVVM/Knockout/Tutorial_3_SinglePageApps.n"], "", SinglePageApps, tname template(_.SinglePageApps)), 
+        Sample("Loading and saving", ["MVVM/Knockout/Tutorial_5_LoadingAndSaving.n"], "", SinglePageApps, tname template(_.SinglePageApps))
+      ].ToList();
                  
       SelectedSample = Samples[2];
                          
-      foreach(sample in Samples) {
-        server.LoadSourceForList(sample.SourceFiles, source => {
+      foreach(sample in Samples)
+      {
+        server.LoadSourceForList(sample.SourceFiles, source =>
+        {
           sample.Source = source;
           js prettyPrint();
         });        
       }
             
-      server.LoadSourceFor("MVVM/Samples.n", source => {
+      server.LoadSourceFor("MVVM/Samples.n", source =>
+      {
         ThisPageSource = source;
         js prettyPrint();
       });

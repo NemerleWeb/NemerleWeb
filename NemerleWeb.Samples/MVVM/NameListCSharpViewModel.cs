@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 
-namespace MVCTest
+namespace NemerleWeb.Samples
 {
   [JsModel]
   partial class NameListCSharpViewModel

@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{371432
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb", "NemerleWeb\NemerleWeb.nproj", "{B1635FEA-C0CD-4C8E-A18E-D97D59F21B14}"
 EndProject
-Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "MVCTest", "MVCTest\MVCTest.nproj", "{C930DE6F-CDB7-412B-AD69-6E979B919F45}"
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Samples", "NemerleWeb.Samples\NemerleWeb.Samples.nproj", "{C930DE6F-CDB7-412B-AD69-6E979B919F45}"
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Utils", "NemerleWeb.Utils\NemerleWeb.Utils.nproj", "{A350D2D6-BBE8-4535-BDAC-9A8CF9F07FCF}"
 EndProject
