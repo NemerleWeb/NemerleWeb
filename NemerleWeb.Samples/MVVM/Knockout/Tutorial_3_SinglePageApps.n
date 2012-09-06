@@ -42,7 +42,7 @@ namespace NemerleWeb.Samples
                         self.ChosenFolderId(this.params.folder);
                         self.ChosenMailData(null);
                         $.get("/SPAViewModel/Folder", { folder: this.params.folder }, function(result) { 
-                            self.ChosenFolderData(ToTypedObject(result)) 
+                            self.ChosenFolderData(NemerleWeb.ToTypedObject(result)) 
                         });
                     });
                     
@@ -50,7 +50,7 @@ namespace NemerleWeb.Samples
                         self.ChosenFolderId(this.params.folder);
                         self.ChosenMailData(null);
                         $.get("/SPAViewModel/Mail", { mailId: this.params.mailId }, function(result) { 
-                            self.ChosenMailData(ToTypedObject(result)) 
+                            self.ChosenMailData(NemerleWeb.ToTypedObject(result)) 
                         });
                     });
                     

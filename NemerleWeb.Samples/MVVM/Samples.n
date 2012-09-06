@@ -23,6 +23,13 @@ namespace NemerleWeb.Samples
     
     Samples : List[Sample] { get; set; }
     KnockoutSamples : List[Sample] { get; set; }
+    AllSamples : array[Sample] 
+    {
+      get
+      {
+        Samples.Concat(KnockoutSamples).ToArray()
+      }
+    }
     
     NameList : NameListViewModel { get; set; }
     NameListCSharp : NameListCSharpViewModel { get; set; }
@@ -63,25 +70,34 @@ namespace NemerleWeb.Samples
         Sample("Introduction", ["MVVM/Knockout/Tutorial_1_Introduction.n"], "", Introduction, tname template(_.Introduction)), 
         Sample("Lists and collections", ["MVVM/Knockout/Tutorial_2_ListsAndCollections.n"], "", ListsAndCollections, tname template(_.ListsAndCollections)), 
         Sample ("Single page applications", ["MVVM/Knockout/Tutorial_3_SinglePageApps.n"], "", SinglePageApps, tname template(_.SinglePageApps)), 
-        Sample("Loading and saving", ["MVVM/Knockout/Tutorial_5_LoadingAndSaving.n"], "", SinglePageApps, tname template(_.SinglePageApps))
+        Sample("Loading and saving", ["MVVM/Knockout/Tutorial_5_LoadingAndSaving.n"], "", LoadingAndSaving, tname template(_.LoadingAndSaving))
       ].ToList();
                  
       SelectedSample = Samples[2];
-                         
-      foreach(sample in Samples)
-      {
-        server.LoadSourceForList(sample.SourceFiles, source =>
-        {
-          sample.Source = source;
-          js prettyPrint();
-        });        
-      }
+            
+      LoadSamples(Samples);
+      LoadSamples(KnockoutSamples);
             
       server.LoadSourceFor("MVVM/Samples.n", source =>
       {
         ThisPageSource = source;
         js prettyPrint();
       });
+    }
+    
+    LoadSamples(samples : List[Sample]) : void
+    {
+      for(mutable i = 0; i < samples.Count; i++)      
+        LoadSample(samples, i)      
+    }
+    
+    LoadSample(samples : List[Sample], index : int) : void
+    {      
+      server.LoadSourceForList(samples[index].SourceFiles, source =>
+      {          
+        samples[index].Source = source;
+        js prettyPrint();
+      });  
     }
     
     SelectSample(sample : Sample) : void 
@@ -114,12 +130,12 @@ namespace NemerleWeb.Samples
             <li class="split"></li>
             <li class="header">KnockoutJs tutorials</li>
             <li $foreach(s in KnockoutSamples) css-selected="$(SelectedSample.Name == s.Name)"><span click="$SelectSample">$(s.Name)</span></li>
-          </ul>          
-          <div $foreach(s in Samples.Concat(KnockoutSamples)) class="current-sample">
-            <div $when(SelectedSample.Name == s.Name)>
+          </ul>
+          <div $foreach(s in AllSamples)>
+            <div $when(SelectedSample.Name == s.Name) class="current-sample">
               <div template="$(template(s.Instance, s.TemplateName))"></div>
               <h2>Source</h2>
-              <pre class="prettyprint lang-n prettyprinted"></pre>
+              <pre class="prettyprint lang-n prettyprinted">$(s.Source)</pre>
             </div>
           </div>
           <h2>Main page source</h2>

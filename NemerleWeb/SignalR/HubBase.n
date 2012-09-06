@@ -19,7 +19,7 @@ namespace NemerleWeb
       null
     }  
     
-    public Reconnect(groups : IEnumerable[string]) : Task
+    public Reconnect(_groups : IEnumerable[string]) : Task
     {
       null
     }    

@@ -116,11 +116,6 @@ namespace NemerleWeb
     {
       ToLocation(node.StartPos, node.EndPos)
     }
-
-    public ToLocation(tok : NToken) : NLocation
-    {
-      ToLocation(tok.StartPos, tok.EndPos)
-    }
     
     //unprefixedName : Splicable = xmlName;
     unprefixedName(name : NToken) : Splicable

@@ -21,36 +21,25 @@ module Program
   }
 }
 
-[JsModel]
-public class SomeModel
-{
-  [Html]
-  public View() : string
-  {
-    <#
-      <div></div>
-    #>
-  }  
-}
-
 [ViewModel]
 public partial class Test
-{
-  public Model : SomeModel { get; set; }
-  public TemplateName : string { get; set; }
-  
+{  
   public this() 
   {
-    name template(_.Model, _.View)
+    def samples = [1,2,3].ToList();
+    for(mutable i = 0; i < samples.Count; i++)
+    {
+                
+    }
   }
+  
+  
   
   [Html]
   public View() : string 
   {
     <#
-      <div>
-        <div template="$(template(m => m.Model, m => m.View()))"></div>
-      </div>
+      <div></div>
     #>
   }
 }

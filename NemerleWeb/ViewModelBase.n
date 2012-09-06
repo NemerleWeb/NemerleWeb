@@ -42,12 +42,12 @@ namespace NemerleWeb
       }   
     }
     
-    public template[TM](model : ViewModel, template : string) : string
+    public template[TM](_model : ViewModel, _template : string) : string
     {
       ""
     }
         
-    public GetTemplateName(modelName : string, viewName : string) : string
+    public GetTemplateName(_modelName : string, _viewName : string) : string
     { "" }
   }
 }

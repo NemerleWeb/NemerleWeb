@@ -169,9 +169,6 @@
     <Compile Include="SignalR\SignalMacro.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Template.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="TransformView.n">
       <SubType>Code</SubType>
     </Compile>

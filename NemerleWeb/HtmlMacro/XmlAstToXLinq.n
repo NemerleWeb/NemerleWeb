@@ -139,16 +139,17 @@ namespace NemerleWeb
               def pexpr = SplicablePExprStr(value);
               def binding = match(pexpr) 
               {
-                | <[ template(_.$model, _.$view()) ]>  => $<#template: { name: getTemplateName($model(), "$view"), data: $model }#>
-                | <[ template(_.$model) ]>  => $<#template: { name: getTemplateName($model(), 'View'), data: $model }#>
-                | <[ template($l, $r) ]> => 
+                | <[ template(_.$model, _.$view()) ]>  => $<#template: { name: NemerleWeb.GetTemplateName($model(), "$view"), data: $model }#>
+                | <[ template(_.$model) ]>  => $<#template: { name: NemerleWeb.GetTemplateName($model(), 'View'), data: $model }#>
+                | <[ template($_l, $_r) ]> => 
                   def splice = getSplice();
                   def (p1, p2) = regexp match(splice)
                   {
                   | <#\$parent\.template\((?<p1>.+),(?<p2>.+)\)#> => (p1, p2)
                   | _ => ("", "")
                   };
-                  $<#template: { name: getTemplateName($p1(), "View"), data: $p2 }#>
+                  $<#template: { name: $p2, data: $p1 }#>
+                | _ => Message.FatalError($"Invalid patter expression: $pexpr")
               }
               <[ [L.XAttribute("data-bind", $binding)] ]>
             | (Splicable.Value(v), _) when v.StartsWith("css-") => <[ [L.XAttribute($v, $(getSplice()))] ]>
@@ -164,7 +165,7 @@ namespace NemerleWeb
         | Tag(name, XmlAst.AttrSplice(expr, SpliceType.Foreach) as c :: content) =>
             def header = Parse(ToLocation(c), expr);
             match(header) {
-            | <[ $x in $xs ]> => 
+            | <[ $x in $_xs ]> => 
                 def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content);                
                 def tagExpr = TransformImpl(tag, splices, loopStack.Append([x.ToString()]));
                 def splice = getSplice();

@@ -50,12 +50,12 @@ namespace NemerleWeb
           {
           | "AsEnumerable" => seq.AsEnumerable();
           | "Count" => JsAST.FieldRef(seq, "length", true)
+          | "FirstOrDefault" => seq.AsEnumerable().Call(member.Name, [JsAST.Literal(JsLiteral.Null())])
           | "All"
           | "Average"
           | "Cast"          
           | "Empty"
           | "First"
-          | "FirstOrDefault"
           | "Last"
           | "LastOrDefault"
           | "LongCount"
@@ -66,13 +66,15 @@ namespace NemerleWeb
           | "Single"
           | "SingleOrDefault"
           | "Sum"
-          | "ToList" => seq.AsEnumerable().Call(member.Name, [])
+          | "ToArray"
+          | "ToList" => seq.AsEnumerable().Call(member.Name, [])          
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
           }
           
         | [seq, arg1] =>
           match (member.Name)
           {
+          | "FirstOrDefault" => seq.AsEnumerable().Call(member.Name, [JsAST.Literal(JsLiteral.Null()), arg1])
           | "Aggregate"
           | "All"
           | "Average"
@@ -84,7 +86,6 @@ namespace NemerleWeb
           | "ElementAtOrDefault"
           | "Except"
           | "First"
-          | "FirstOrDefault"
           | "GroupBy"
           | "Intersect"
           | "Last"

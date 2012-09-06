@@ -64,6 +64,7 @@ namespace NemerleWeb
     public DoTransform(tb : TypeBuilder, typer : Typer) : void
     {            
       Macros.DefineCTX(typer);
+            
       def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");
       def serverMethods = Dictionary();
       if(serverClass != null)
@@ -128,7 +129,6 @@ namespace NemerleWeb
         tb.DefineNestedType(<[ decl: public class Server {} ]>).Compile();
       }
     
-      //assert2(false);
       def addParams(parms, expr) : PExpr {
           match(parms) {
           | head :: tail => 
@@ -147,48 +147,6 @@ namespace NemerleWeb
       tb.Define(<[ decl: __constructorParams : List[object] ]>);
       def result = cl.Write();
       
-      def toTypedObjectFunction = 
-<#
-function ToTypedObject(obj) {
-    if(typeof obj === "string") {
-        try {
-            obj = JSON.parse(obj);
-        } catch(e) {
-        }
-    }
-    
-    if(!!obj.$type) {
-        //var typename = obj.$type.replace(/.*\+(.+),.+/, "$1");
-        var typename = obj.$type.replace(".", "_").replace("+", "_").replace(/(.+),.+/, "$1");
-        var newObj = eval('new ' + typename + '()');        
-        for(var p in obj) {
-            if(obj.hasOwnProperty(p) && newObj.hasOwnProperty(p)) {
-                if(typeof newObj[p] === "function")
-                    newObj[p](ToTypedObject(obj[p]));
-                else 
-                    newObj[p] = ToTypedObject(obj[p]);
-            }
-        }
-        return newObj;
-    }               
-    if(obj instanceof Array) {
-        var newArr = [];
-        for (var i=0, l = obj.length; i < l; newArr.push(ToTypedObject(obj[i++])));
-        return newArr;
-    }
-    return obj;
-};
-#>;        
-      def getTemplateNameFunction = 
-<#
-function getTemplateName(model, viewName) {
-  if(!model)
-    return "";
-    
-  return model.constructor.name + "__" + viewName;
-}
-#>;
-
       def applyBindings = 
 $<#  ko.applyBindings(new $(JsClass.GetProperName(tb))({0}));#>;
       _ = tb.DefineWithSource(<[ decl:
@@ -199,10 +157,8 @@ $<#  ko.applyBindings(new $(JsClass.GetProperName(tb))({0}));#>;
           | _ => ""
           };
           def sb = System.Text.StringBuilder();
-          _ = sb.AppendLine($getTemplateNameFunction);
-          _ = sb.AppendLine($toTypedObjectFunction);
           _ = sb.AppendLine(($result).Replace("{{{SignalR}}}", signalRScript));
-          def paramList = __constructorParams.Map(obj => "ToTypedObject(" + Utils.ToJson(obj) + ")");
+          def paramList = __constructorParams.Map(obj => "NemerleWeb.ToTypedObject(" + Utils.ToJson(obj) + ")");
           _ = sb.AppendLine(string.Format($applyBindings, $"..$(paramList)"));
           sb.ToString()
         }
