@@ -27,12 +27,7 @@ namespace NemerleWeb
   {
     public static AsEnumerable(this seq : JsAST) : JsAST
     {
-      JsAST.Call(JsAST.StaticRef("Enumerable" , "from"), [seq])
-    }
-    
-    public static Call(this seq : JsAST, method : string, parms : list[JsAST]) : JsAST
-    {
-      JsAST.Call(JsAST.MethodRef(seq, method.FirstCharacterToLower()), parms)
+      "Enumerable".StaticCall("from", [seq])
     }
   }
   
@@ -50,14 +45,14 @@ namespace NemerleWeb
           {
           | "AsEnumerable" => seq.AsEnumerable();
           | "Count" => JsAST.FieldRef(seq, "length", true)
-          | "FirstOrDefault" => seq.AsEnumerable().Call(member.Name, [JsAST.Literal(JsLiteral.Null())])
+          | "FirstOrDefault" => seq.AsEnumerable().MethodCall(member.Name, [JsAST.Literal(JsLiteral.Null())])
           | "All"
           | "Average"
           | "Cast"          
           | "Empty"
           | "First"
-          | "Last"
-          | "LastOrDefault"
+          | "Last" => seq.AsEnumerable().MethodCall(member.Name, [])          
+          | "LastOrDefault" => seq.AsEnumerable().MethodCall(member.Name, [JsAST.Literal(JsLiteral.Null())])
           | "LongCount"
           | "Max"
           | "Min"
@@ -67,14 +62,14 @@ namespace NemerleWeb
           | "SingleOrDefault"
           | "Sum"
           | "ToArray"
-          | "ToList" => seq.AsEnumerable().Call(member.Name, [])          
+          | "ToList" => seq.AsEnumerable().MethodCall(member.Name, [])          
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
           }
           
         | [seq, arg1] =>
           match (member.Name)
           {
-          | "FirstOrDefault" => seq.AsEnumerable().Call(member.Name, [JsAST.Literal(JsLiteral.Null()), arg1])
+          | "FirstOrDefault" => seq.AsEnumerable().MethodCall(member.Name, [JsAST.Literal(JsLiteral.Null()), arg1])
           | "Aggregate"
           | "All"
           | "Average"
@@ -88,8 +83,8 @@ namespace NemerleWeb
           | "First"
           | "GroupBy"
           | "Intersect"
-          | "Last"
-          | "LastOrDefault"
+          | "Last" => seq.AsEnumerable().MethodCall(member.Name, [arg1])          
+          | "LastOrDefault" => seq.AsEnumerable().MethodCall(member.Name, [JsAST.Literal(JsLiteral.Null()), arg1])
           | "LongCount"
           | "Max"
           | "Min"
@@ -110,10 +105,10 @@ namespace NemerleWeb
           | "ToDictionary"          
           | "ToLookup"
           | "Union"
-          | "Where" => seq.AsEnumerable().Call(member.Name, [arg1])
+          | "Where" => seq.AsEnumerable().MethodCall(member.Name, [arg1])
                               
           // Exception
-          | "Range" => JsAST.Call(JsAST.StaticRef("Enumerable" , "range"), [seq, arg1])
+          | "Range" => "Enumerable".StaticCall("range", [seq, arg1])
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
           }
           
@@ -134,7 +129,7 @@ namespace NemerleWeb
           | "ToDictionary"
           | "ToLookup"
           | "Union"
-          | "Zip" => seq.AsEnumerable().Call(member.Name, [arg1, arg2])
+          | "Zip" => seq.AsEnumerable().MethodCall(member.Name, [arg1, arg2])
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
           }
         
@@ -144,7 +139,7 @@ namespace NemerleWeb
           | "Aggregate"
           | "GroupBy"
           | "ToDictionary"
-          | "ToLookup" => seq.AsEnumerable().Call(member.Name, [arg1, arg2, arg3])
+          | "ToLookup" => seq.AsEnumerable().MethodCall(member.Name, [arg1, arg2, arg3])
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
           }
         
@@ -153,7 +148,7 @@ namespace NemerleWeb
           {
           | "GroupBy"
           | "GroupJoin"
-          | "Join" => seq.AsEnumerable().Call(member.Name, [arg1, arg2, arg3, arg4])
+          | "Join" => seq.AsEnumerable().MethodCall(member.Name, [arg1, arg2, arg3, arg4])
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
           }
         
@@ -161,7 +156,7 @@ namespace NemerleWeb
           match (member.Name)
           {
           | "GroupJoin"
-          | "Join" => seq.AsEnumerable().Call(member.Name, [arg1, arg2, arg3, arg4, arg5])
+          | "Join" => seq.AsEnumerable().MethodCall(member.Name, [arg1, arg2, arg3, arg4, arg5])
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
           }
         | _ => JsKnownMembersHelper.Default(type, left, member, parms)

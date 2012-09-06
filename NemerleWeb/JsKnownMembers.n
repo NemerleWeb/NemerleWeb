@@ -45,6 +45,19 @@ namespace NemerleWeb
       }
     }
   }
+
+  internal module JsAstExtensions
+  {
+    public static MethodCall(this self : JsAST, method : string, parms : list[JsAST]) : JsAST
+    {
+      JsAST.Call(JsAST.MethodRef(self, method.FirstCharacterToLower()), parms)
+    }
+    
+    public static StaticCall(this type : string, method : string, parms : list[JsAST]) : JsAST
+    {
+      JsAST.Call(JsAST.StaticRef(type, method.FirstCharacterToLower()), parms)
+    }
+  }
   
   internal module JsKnownMembersHelper
   {
@@ -101,6 +114,7 @@ namespace NemerleWeb
       [MatchCollector(
         JsKnownMembersBase.ConvertMethod,
         JsKnownMembersBCL.ConvertMethod,
+        JsKnownMembersBCLString.ConvertMethod,
         JsKnownMembersNemerle.ConvertMethod,
         JsKnownMembersLinq.ConvertMethod)]
       public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
