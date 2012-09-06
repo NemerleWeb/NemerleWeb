@@ -141,6 +141,9 @@
     <Compile Include="JsKnownMembersBCL.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JsKnownMembersBCLString.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JsKnownMembersLinq.n">
       <SubType>Code</SubType>
     </Compile>

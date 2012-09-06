@@ -160,13 +160,13 @@ namespace NemerleWeb.Tests
         def l2 = [1, 2, 3].ToList();        
         def l3 = List() <- [1, 2, 3];
         
-        mutable res = true;
+        mutable count = 0;
                 
         for(mutable i = 0; i < l1.Count; i++)
-          when(l1[i] != l2[i] || l1[i] != l3[i])
-            res = false;
+          when(l1[i] == l2[i] && l1[i] == l3[i])
+            count++;
             
-        res
+        count == l1.Count
       });
       
       test("using", () =>
@@ -207,7 +207,7 @@ namespace NemerleWeb.Tests
       //  def l = [1, 2, 3, 4, 5, 6].ToList();
       //  def r = l.Where(x => x > 4);
         
-      //  mutable res = true;
+      //  mutable res = false;
       //  mutable i = 0;
       //  using (e = r.GetEnumerator())
       //  {
@@ -228,67 +228,64 @@ namespace NemerleWeb.Tests
         true
       });
       
-      //#if AA
-      // TODO: Support foreach
       test("foreach", () =>
       {
         def l = [1, 2, 3].ToList();
         
-        mutable res = true;
+        mutable count = 0;
         mutable i = 0;
         foreach (e in l)
         {
-          when (e != i + 1)
-            res = false;
+          when (e == i + 1)
+            count++;
           i++;
         }
         
-        res
+        count == l.Count
       });
       
       test("foreach with", () =>
       {
         def l = [1, 2, 3].ToList();
         
-        mutable res = true;
+        mutable count = 0;
         foreach (e in l with i)
-          when (e != i + 1)
-            res = false;
+          when (e == i + 1)
+            count++;
         
-        res
+        count == l.Count;
       });
             
       test("linq select", () =>
       {
         def l = [1, 2, 3].ToList();
         
-        mutable res = true;
+        mutable count = 0;
         def seq = l.Select(x => x + 1);
         foreach (e in seq with i)
-          when (e != i)
-            res = false;
+          when (e == i + 2)
+            count++;
         
-        res
+        count == l.Count
       });
       
       test("linq where", () =>
       {
         def l = [1, 2, 3].ToList();
         
-        mutable res = true;
+        mutable count = 0;
         def seq = l.Where(_ > 2);
         foreach (e in seq with i)
-          when (i > 0)
-            res = false;
+          when (i == 0)
+            count++;
         
-        res
+        count == 1
       });
       
       test("linq all", () =>
       {
         def l = [1, 3, 5].ToList();
         
-        mutable res = true;
         l.All(x => x % 2 == 1);
       });
       
@@ -296,18 +293,18 @@ namespace NemerleWeb.Tests
       {
         def l = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].ToList();
         
-        mutable res = true;
+        mutable count = 0;
         def seq1 = l.Take(5);
         foreach (e in seq1)
-          when (e > 5)
-            res = false;
+          when (e <= 5)
+            count++;
         
         def seq2 = seq1.Skip(4);
         foreach (e in seq2)
-          when (e != 10)
-            res = false;
+          when (e == 10)
+            count++;
         
-        res
+        count == 6
       });
       
       test("linq concat", () =>
@@ -315,13 +312,16 @@ namespace NemerleWeb.Tests
         def l1 = [1, 2, 3, 4].ToList();
         def l2 = [5, 6, 7, 8, 9, 10].ToList();
         
-        mutable res = false;
+        mutable count = 0;
         def seq = l1.Concat(l2);
         foreach (e in seq)
+        {
+          count++;
           when (e == 10)
-            res = true;
+            count++;
+        }
         
-        res
+        count == 11
       });
       
       test("linq intersect first last", () =>
@@ -329,14 +329,14 @@ namespace NemerleWeb.Tests
         def l1 = [1, 2, 3, 4].ToList();
         def l2 = [5, 6, 1, 2].ToList();
         
-        mutable res = true;
+        mutable count = 0;
         
         def intersect = l2.Skip(2).Take(2).Intersect(l1.Take(2));
-        when (intersect.Count() != 2) res = false;
-        when (intersect.First() != 1) res = false;
-        when (intersect.Last() != 2) res = false;
+        when (intersect.Count() == 2) count++;
+        when (intersect.First() == 1) count++;
+        when (intersect.Last() == 2) count++;
         
-        res
+        count == 3;
       });
       
       test("linq firstOrDefault lastOrDefault", () =>

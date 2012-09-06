@@ -20,16 +20,7 @@ namespace NemerleWeb
       match(member.Name, parms)
       {
         | ("ToString", h :: _) => JsAST.Call(JsAST.MethodRef(h, "toString"), [])
-        | ("ToString", [])  => JsAST.Call(JsAST.MethodRef(left, "toString"), [])
-        | ("Concat", JsAST.Array(h :: t) :: _) when TypeHelper.TypeName(type) == typeof(string).FullName => JsAST.Call(JsAST.MethodRef(h, "concat"), t)
-        | ("Concat", h :: t) when TypeHelper.TypeName(type) == typeof(string).FullName         => JsAST.Call(JsAST.MethodRef(h, "concat"), t)
-        | ("ToUpper", []) when TypeHelper.TypeName(type) == typeof(string).FullName            => JsAST.Call(JsAST.MethodRef(left, "toUpperCase"), [])
-        | ("Contains", [sub]) when TypeHelper.TypeName(type) == typeof(string).FullName        => JsAST.Call(JsAST.OpCode("!="), [JsAST.Call(JsAST.MethodRef(left, "indexOf"), [sub]), JsAST.Literal(JsLiteral.Integer(-1))])
-        | ("IsNullOrEmpty", [str]) when TypeHelper.TypeName(type) == typeof(string).FullName
-        | ("IsNullOrWhiteSpace", [str]) when TypeHelper.TypeName(type) == typeof(string).FullName   => 
-          JsAST.Call(JsAST.OpCode("||"), 
-                [JsAST.Call(JsAST.OpCode("==="), [str, JsAST.Literal(JsLiteral.Null())]),
-                 JsAST.Call(JsAST.OpCode("==="), [str, JsAST.Literal(JsLiteral.String(""))])])
+        | ("ToString", [])  => JsAST.Call(JsAST.MethodRef(left, "toString"), [])        
         | ("op_Implicit", h :: [])                                            => h
         | ("op_Implicit", h :: t)                                             => JsAST.Seq(h :: t)
         | ("op_Addition", parms)                                              => JsAST.Call(JsAST.OpCode("+"), parms)

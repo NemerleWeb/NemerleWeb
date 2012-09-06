@@ -1,0 +1,64 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+using NemerleWeb.Utils;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  module JsKnownMembersBCLString
+  { 
+    public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
+    {
+      match(member.Name, parms)
+      {
+      | (_, _) when TypeHelper.TypeName(type) == typeof(String).FullName =>
+        match (parms)
+        {
+        | [self] =>
+          match (member.Name)
+          {
+          | _ => JsKnownMembersHelper.Default(type, left, member, parms)
+          }
+          
+        | [self, arg1] =>
+          match (member.Name)
+          {
+          | _ => JsKnownMembersHelper.Default(type, left, member, parms)
+          }
+          
+        | [self, arg1, arg2] =>
+          match (member.Name)
+          {
+          | _ => JsKnownMembersHelper.Default(type, left, member, parms)
+          }
+          
+        | [self, arg1, arg2, arg3] =>
+          match (member.Name)
+          {
+          | _ => JsKnownMembersHelper.Default(type, left, member, parms)
+          }
+          
+        //| ("Concat", JsAST.Array(h :: t) :: _) when TypeHelper.TypeName(type) == typeof(string).FullName => JsAST.Call(JsAST.MethodRef(h, "concat"), t)
+        //| ("Concat", h :: t) when TypeHelper.TypeName(type) == typeof(string).FullName         => JsAST.Call(JsAST.MethodRef(h, "concat"), t)
+        //| ("ToUpper", []) when TypeHelper.TypeName(type) == typeof(string).FullName            => JsAST.Call(JsAST.MethodRef(left, "toUpperCase"), [])
+        //| ("Contains", [sub]) when TypeHelper.TypeName(type) == typeof(string).FullName        => JsAST.Call(JsAST.OpCode("!="), [JsAST.Call(JsAST.MethodRef(left, "indexOf"), [sub]), JsAST.Literal(JsLiteral.Integer(-1))])
+        //| ("IsNullOrEmpty", [str]) when TypeHelper.TypeName(type) == typeof(string).FullName
+        //| ("IsNullOrWhiteSpace", [str]) when TypeHelper.TypeName(type) == typeof(string).FullName   => 
+        //  JsAST.Call(JsAST.OpCode("||"), 
+        //        [JsAST.Call(JsAST.OpCode("==="), [str, JsAST.Literal(JsLiteral.Null())]),
+        //         JsAST.Call(JsAST.OpCode("==="), [str, JsAST.Literal(JsLiteral.String(""))])])
+          
+        | _ => JsKnownMembersHelper.Default(type, left, member, parms)
+        }
+      | _ => JsKnownMembersHelper.DefaultThrow(type, left, member, parms)
+      }
+    }
+  }
+}
