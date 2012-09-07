@@ -61,8 +61,8 @@ namespace NemerleWeb
           | "Single"
           | "SingleOrDefault"
           | "Sum"
-          | "ToArray"
-          | "ToList" => seq.AsEnumerable().MethodCall(member.Name, [])
+          | "ToArray" => seq.AsEnumerable().MethodCall(member.Name, [])
+          | "ToList" when TypeHelper.TypeName(type) == typeof(Enumerable).FullName => seq
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
           }
           

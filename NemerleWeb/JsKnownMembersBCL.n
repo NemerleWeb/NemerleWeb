@@ -25,7 +25,7 @@ namespace NemerleWeb
         | ("op_Implicit", h :: t)                                             => JsAST.Seq(h :: t)
         | ("op_Addition", parms)                                              => JsAST.Call(JsAST.OpCode("+"), parms)
         //List
-        | ("get_Item", h :: []) when TypeHelper.TypeName(type) == typeof(List[_]).FullName     => JsAST.Call(JsAST.Indexer(left), [h])
+        | ("get_Item", [h]) when TypeHelper.TypeName(type) == typeof(List[_]).FullName         => JsAST.Call(JsAST.Indexer(left), [h])
         | ("get_Count", []) when TypeHelper.TypeName(type) == typeof(List[_]).FullName         => JsAST.FieldRef(left, "length", true)
         | ("Add",      h :: []) when TypeHelper.TypeName(type) == typeof(List[_]).FullName     => JsAST.Call(JsAST.MethodRef(TypeHelper.PropertyToField(left, false), "push"), [h])
         | ("Remove",   h :: []) when TypeHelper.TypeName(type) == typeof(List[_]).FullName     => JsAST.Call(JsAST.MethodRef(TypeHelper.PropertyToField(left, false), "remove"), [h])        
