@@ -23,17 +23,10 @@ module Program
 
 [ViewModel]
 public partial class Test
-{  
+{
   public this() 
   {
-    def samples = [1,2,3].ToList();
-    for(mutable i = 0; i < samples.Count; i++)
-    {
-                
-    }
-  }
-  
-  
+  }  
   
   [Html]
   public View() : string 

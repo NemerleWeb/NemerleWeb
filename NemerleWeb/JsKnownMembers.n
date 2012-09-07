@@ -80,59 +80,61 @@ namespace NemerleWeb
   
   module JsKnownMembers
   {
-      public Convert(call : TExpr.Call, builder : TExpr -> JsAST) : JsAST
-      {   
-        match (call)
-        {
-          | Call(MethodRef(obj = Call(MethodRef(meth = serverMeth, obj = obj), _, _), meth = meth), parms, _)
-            when serverMeth.Name == "get_server" && obj is TExpr.This =>
-              def parameters =
-                if (parms.Length > 0) parms.Zip(meth.GetParameters()).Take(parms.Length - 1).Map((cp, mp) => (mp.name, builder(cp.expr)))
-                else [];
-              def callback = if(parms.Length > 0) builder(parms.Last().expr) else JsAST.Void();
-              match(callback)
-              {
-                | Seq(DefValue as dv :: cb :: []) => JsAST.Seq([dv, JsAST.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, cb)])
-                | _ => JsAST.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, callback)
-              }
-          | Call(MethodRef(_, meth, _, _), [modelParm, viewParm], _) when meth.Name == "GetTemplateName" =>             
-            match(modelParm, viewParm)
+    public Convert(call : TExpr.Call, builder : TExpr -> JsAST) : JsAST
+    {
+      match (call)
+      {
+        | Call(MethodRef(obj = Call(MethodRef(meth = serverMeth, obj = obj), _, _), meth = meth), parms, _)
+          when serverMeth.Name == "get_server" && obj is TExpr.This =>
+            def parameters =
+              if (parms.Length > 0) parms.Zip(meth.GetParameters()).Take(parms.Length - 1).Map((cp, mp) => (mp.name, builder(cp.expr)))
+              else [];
+            def callback = if(parms.Length > 0) builder(parms.Last().expr) else JsAST.Void();
+            match(callback)
             {
-            | (Parm(expr = TExpr.Literal(Literal.String(model))), Parm(expr = TExpr.Literal(Literal.String(view)))) => JsAST.Code($"NemerleWeb.GetTemplateName(this.$model(), '$view')")
-            | _ => Message.FatalError("Invalid GetTemplateName call, use 'name' macro")
+              | Seq(DefValue as dv :: cb :: []) => JsAST.Seq([dv, JsAST.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, cb)])
+              | _ => JsAST.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, callback)
             }
-          | Call(MethodRef(obj = o, meth = meth), parms, _) => ConvertMethod(o.Type.TypeInfo, builder(o), meth, parms.Map(p => builder(p.expr)))
-          | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) =>
-              ConvertMethod(fromType.TypeInfo, builder(left), meth, parms.Map(p => builder(p.expr)))
+        | Call(MethodRef(_, meth, _, _), [modelParm, viewParm], _) when meth.Name == "GetTemplateName" =>             
+          match(modelParm, viewParm)
+          {
+          | (Parm(expr = TExpr.Literal(Literal.String(model))), Parm(expr = TExpr.Literal(Literal.String(view)))) =>
+            JsAST.Code($"NemerleWeb.GetTemplateName(this.$model(), '$view')")
+          | _ => Message.FatalError("Invalid GetTemplateName call, use 'name' macro")
+          }
+        | Call(MethodRef(obj = o, meth = meth), parms, _) =>
+          ConvertMethod(o.Type.TypeInfo, builder(o), meth, parms.Map(p => builder(p.expr)))
+        | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) =>
+            ConvertMethod(fromType.TypeInfo, builder(left), meth, parms.Map(p => builder(p.expr)))
                 
-          | Call(OpCode as op, parms, _) => JsAST.Call(builder(op), parms.Map(p => builder(p.expr)))
-          | Call(Base, _, _) => JsAST.Void()        
-          | Call(s, _, _) => Message.Warning($"Unsupported call to $s"); JsAST.Void()          
-        }
+        | Call(OpCode as op, parms, _) => JsAST.Call(builder(op), parms.Map(p => builder(p.expr)))
+        | Call(Base, _, _) => JsAST.Void()        
+        | Call(s, _, _) => Message.Warning($"Unsupported call to $s"); JsAST.Void()          
       }
+    }
       
-      [MatchCollector(
-        JsKnownMembersBase.ConvertMethod,
-        JsKnownMembersBCL.ConvertMethod,
-        JsKnownMembersBCLString.ConvertMethod,
-        JsKnownMembersNemerle.ConvertMethod,
-        JsKnownMembersLinq.ConvertMethod)]
-      public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
+    [MatchCollector(
+      JsKnownMembersBase.ConvertMethod,
+      JsKnownMembersBCL.ConvertMethod,
+      JsKnownMembersBCLString.ConvertMethod,
+      JsKnownMembersNemerle.ConvertMethod,
+      JsKnownMembersLinq.ConvertMethod)]
+    public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
+    {
+      match (member.Name, parms)
       {
-        match (member.Name, parms)
-        {
-          | _ => JsKnownMembersHelper.Default(type, left, member, parms)
-        }
+        | _ => JsKnownMembersHelper.Default(type, left, member, parms)
       }
+    }
       
-      public ConvertField(obj : TExpr, field : IField, builder : TExpr -> JsAST) : JsAST
+    public ConvertField(obj : TExpr, field : IField, builder : TExpr -> JsAST) : JsAST
+    {
+      match(field)
       {
-        match(field)
-        {
-        //| _ when field.Name == "hd" && field.DeclaringType.FullName == "Nemerle.Core.Cons[T]" => JsAST.Call(JsAST.Indexer(builder(obj)), [JsAST.Literal(JsLiteral.Integer(0))])
-        //| _ when field.Name == "tl" && field.DeclaringType.FullName == "Nemerle.Core.Cons[T]" => JsAST.Call(JsAST.MethodRef(builder(obj), "splice"), [JsAST.Literal(JsLiteral.Integer(1))])        
-        | _ => JsAST.FieldRef(builder(obj), field.Name, false) 
-        }
+      //| _ when field.Name == "hd" && field.DeclaringType.FullName == "Nemerle.Core.Cons[T]" => JsAST.Call(JsAST.Indexer(builder(obj)), [JsAST.Literal(JsLiteral.Integer(0))])
+      //| _ when field.Name == "tl" && field.DeclaringType.FullName == "Nemerle.Core.Cons[T]" => JsAST.Call(JsAST.MethodRef(builder(obj), "splice"), [JsAST.Literal(JsLiteral.Integer(1))])        
+      | _ => JsAST.FieldRef(builder(obj), field.Name, false) 
       }
+    }
   }
 }

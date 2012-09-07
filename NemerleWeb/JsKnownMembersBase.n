@@ -16,17 +16,19 @@ namespace NemerleWeb
   {
     public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
     {
-       match(member.Name, parms)
-       {
-         | ("op_Inequality", _) => JsAST.Call(JsAST.OpCode("!="), parms)
-         | ("op_Equality", _) => JsAST.Call(JsAST.OpCode("=="), parms)
-         | ("op_GreaterThan", _) => JsAST.Call(JsAST.OpCode(">"), parms)
-         | ("op_GreaterThanOrEqual", _) => JsAST.Call(JsAST.OpCode(">="), parms)
-         | ("op_LessThan", _) => JsAST.Call(JsAST.OpCode("<"), parms)
-         | ("op_LessThanOrEqual", _) => JsAST.Call(JsAST.OpCode("<="), parms)
-         | _ =>
-          _ = type; _ = left; _ = member; _ = parms;
-          throw ArgumentException($"Invalid $(member.Name) with $(TypeHelper.TypeName(type)) type, params: ..$parms");
+      match(member.Name, parms)
+      {
+      | ("op_Inequality", _) => JsAST.Call(JsAST.OpCode("!="), parms)
+      | ("op_Equality", _) => JsAST.Call(JsAST.OpCode("=="), parms)
+      | ("op_GreaterThan", _) => JsAST.Call(JsAST.OpCode(">"), parms)
+      | ("op_GreaterThanOrEqual", _) => JsAST.Call(JsAST.OpCode(">="), parms)
+      | ("op_LessThan", _) => JsAST.Call(JsAST.OpCode("<"), parms)
+      | ("op_LessThanOrEqual", _) => JsAST.Call(JsAST.OpCode("<="), parms)
+      | _ when member.Name.StartsWith("get_") =>
+        JsAST.PropertyGet(left, TypeHelper.RemoveGetSet(member.Name))
+      | (_, [h]) when member.Name.StartsWith("set_") =>
+        JsAST.PropertySet(left, TypeHelper.RemoveGetSet(member.Name), h)            
+      | _ => JsKnownMembersHelper.DefaultThrow(type, left, member, parms)
       }
     }
   }

@@ -62,7 +62,7 @@ namespace NemerleWeb
           | "SingleOrDefault"
           | "Sum"
           | "ToArray"
-          | "ToList" => seq.AsEnumerable().MethodCall(member.Name, [])          
+          | "ToList" => seq.AsEnumerable().MethodCall(member.Name, [])
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
           }
           

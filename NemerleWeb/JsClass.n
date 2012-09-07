@@ -93,7 +93,7 @@ namespace NemerleWeb
           def methods = GetMethods(bodyIndent, parentPtr, !isAbstract);
           def (nestedClassesString, nestedClasses) = GetNestedClasses();
           
-          def returning = match(ClassType.BaseType.Name) {
+          def returning = match(ClassType.BaseType?.Name) {
               | "Function" => bodyIndent + 
 <#return function() {
   return _self.apply.apply(_self, arguments);
