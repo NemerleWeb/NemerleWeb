@@ -27,12 +27,12 @@ NemerleWeb = {
                 return newArr;
         }
         return obj;
-    },
+    },    
     GetTemplateName: function (model, viewName) {
         if(!model)
             return "";
     
-        return model.constructor.name + "__" + viewName;
+        return model.getConstructorName() + "__" + viewName;
     }
 }
 
@@ -66,3 +66,9 @@ Array.prototype.tl = function () {
 
 Array.prototype.Head = Array.propertyIsEnumerable.hd;
 Array.prototype.Tail = Array.propertyIsEnumerable.tl;
+
+Object.prototype.getConstructorName = function () {
+    var funcNameRegex = /function (.{1,})\(/;
+    var results = (funcNameRegex).exec((this).constructor.toString());
+    return (results && results.length > 1) ? results[1] : "";
+};

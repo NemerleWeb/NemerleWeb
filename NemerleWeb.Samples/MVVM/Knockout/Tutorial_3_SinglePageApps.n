@@ -34,23 +34,22 @@ namespace NemerleWeb.Samples
         
         public this() 
         {
-            Folders = ["Inbox", "Archive", "Sent", "Spam"].ToList();
-            js self = this;
+            Folders = ["Inbox", "Archive", "Sent", "Spam"].ToList();            
             js <#
                 Sammy(function() {
                     this.get("#:folder", function() {
-                        self.ChosenFolderId(this.params.folder);
-                        self.ChosenMailData(null);
+                        _self.ChosenFolderId(this.params.folder);
+                        _self.ChosenMailData(null);
                         $.get("/SPAViewModel/Folder", { folder: this.params.folder }, function(result) { 
-                            self.ChosenFolderData(NemerleWeb.ToTypedObject(result)) 
+                            _self.ChosenFolderData(NemerleWeb.ToTypedObject(result)) 
                         });
                     });
                     
                     this.get("#:folder/:mailId", function() {
-                        self.ChosenFolderId(this.params.folder);
-                        self.ChosenMailData(null);
+                        _self.ChosenFolderId(this.params.folder);
+                        _self.ChosenMailData(null);
                         $.get("/SPAViewModel/Mail", { mailId: this.params.mailId }, function(result) { 
-                            self.ChosenMailData(NemerleWeb.ToTypedObject(result)) 
+                            _self.ChosenMailData(NemerleWeb.ToTypedObject(result)) 
                         });
                     });
                     
