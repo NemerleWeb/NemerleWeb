@@ -18,10 +18,12 @@ namespace NemerleWeb
     {
       match(member.Name, parms)
       {
+      | ("Concat", JsAST.Array(h :: t) :: _) when TypeHelper.TypeName(type) == typeof(string).FullName => JsAST.Call(JsAST.MethodRef(h, "concat"), t)	
+      | ("Concat", h :: t) when TypeHelper.TypeName(type) == typeof(string).FullName         => JsAST.Call(JsAST.MethodRef(h, "concat"), t)
       | (_, _) when TypeHelper.TypeName(type) == typeof(String).FullName =>
         match (parms)
         {
-        | [self] =>
+        | [] =>
           match (member.Name)
           {
           | "get_Length" => JsAST.FieldRef(left, "length", true)
@@ -36,8 +38,8 @@ namespace NemerleWeb
           | "IsNormalized" => JsKnownMembersHelper.Default(type, left, member, parms)
           | "IsNullOrEmpty" =>
             JsAST.Call(JsAST.OpCode("||"),
-                [JsAST.Call(JsAST.OpCode("==="), [self, JsAST.Literal(JsLiteral.Null())]),
-                 JsAST.Call(JsAST.OpCode("==="), [self, JsAST.Literal(JsLiteral.String(""))])])
+                [JsAST.Call(JsAST.OpCode("==="), [left, JsAST.Literal(JsLiteral.Null())]),
+                 JsAST.Call(JsAST.OpCode("==="), [left, JsAST.Literal(JsLiteral.String(""))])])
                  
           | "IsNullOrWhiteSpace"
           | "Normalize"
@@ -53,7 +55,7 @@ namespace NemerleWeb
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
           }
           
-        | [self, arg1] =>
+        | [arg1] =>
           match (member.Name)
           {
           | "Compare"
@@ -62,8 +64,8 @@ namespace NemerleWeb
           | "Concat" =>
             match (arg1)
             {
-            | JsAST.Array(a) => self.MethodCall("concat", a)
-            |  _ => self.MethodCall("concat", [arg1])
+            | JsAST.Array(a) => left.MethodCall("concat", a)
+            |  _ => left.MethodCall("concat", [arg1])
             }
           
           | "Contains" =>
@@ -92,7 +94,7 @@ namespace NemerleWeb
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
           }
           
-        | [self, arg1, arg2] =>
+        | [arg1, arg2] =>
           match (member.Name)
           {
           | "Compare"
@@ -116,7 +118,7 @@ namespace NemerleWeb
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
           }
           
-        | [self, arg1, arg2, arg3] =>
+        | [arg1, arg2, arg3] =>
           match (member.Name)
           {
           | "Compare"
@@ -134,7 +136,7 @@ namespace NemerleWeb
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
           }
         
-        | [self, arg1, arg2, arg3, arg4] =>
+        | [arg1, arg2, arg3, arg4] =>
           match (member.Name)
           {
           | "Compare"
@@ -144,14 +146,13 @@ namespace NemerleWeb
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
           }
           
-        | [self, arg1, arg2, arg3, arg4, arg5] =>
+        | [arg1, arg2, arg3, arg4, arg5] =>
           match (member.Name)
           {
           | "Compare"
           | _ => JsKnownMembersHelper.Default(type, left, member, parms)
-          }
-       
-        | [self, arg1, arg2, arg3, arg4, arg5, arg6] =>
+          }       
+        | [arg1, arg2, arg3, arg4, arg5, arg6] =>
           match (member.Name)
           {
           | "Compare"
