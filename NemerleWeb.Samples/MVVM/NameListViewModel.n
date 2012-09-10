@@ -32,6 +32,11 @@ namespace NemerleWeb.Samples
       server.GetNames(l => Names = l);
     }
     
+    public Reload() : void 
+    {
+      server.GetNames(l => Names = l);
+    }
+    
     public class Server
     {
       public GetNames() : List[string]
@@ -46,6 +51,7 @@ namespace NemerleWeb.Samples
       <#
         <div>
           <h3>List of names</h3>
+          <button click="$Reload">Reload</button>
           Filter: <input value="$SearchPattern" />
           <div class="name-list">
             <span $foreach(n in FilteredNames)>

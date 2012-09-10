@@ -32,7 +32,12 @@ NemerleWeb = {
         if(!model)
             return "";
     
-        return model.getConstructorName() + "__" + viewName;
+        return NemerleWeb.GetConstructorName(model) + "__" + viewName;
+    },
+    GetConstructorName: function (model) {
+        var funcNameRegex = /function (.{1,})\(/;
+        var results = (funcNameRegex).exec(model.constructor.toString());
+        return (results && results.length > 1) ? results[1] : "";
     }
 }
 
@@ -64,11 +69,6 @@ Array.prototype.tl = function () {
     return this.splice(1);
 }
 
-Array.prototype.Head = Array.propertyIsEnumerable.hd;
-Array.prototype.Tail = Array.propertyIsEnumerable.tl;
+Array.prototype.Head = Array.prototype.hd;
+Array.prototype.Tail = Array.prototype.tl;
 
-Object.prototype.getConstructorName = function () {
-    var funcNameRegex = /function (.{1,})\(/;
-    var results = (funcNameRegex).exec((this).constructor.toString());
-    return (results && results.length > 1) ? results[1] : "";
-};
