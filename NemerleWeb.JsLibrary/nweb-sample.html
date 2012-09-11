@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <script type="text/javascript" src="jquery-1.8.0.js"></script>
+    <script type="text/javascript" src="nweb.js"></script>		
+  </head>
+  <body>
+    <ul>
+      <li nw-repeat="i in Items">
+        <div nw-template="TestTemplate: i"></div>        
+      </li>
+    </ul>
+    <button nw-click="OneToEleven">One -> Eleven</button>
+    <button nw-click="AddFour">Add "Four"</button>
+    <div></div>
+    <input nw-value="FirstName" />
+    <input nw-value="LastName" />
+    <span nw-text="FullName"></span>
+
+    <script type="html/html" id="TestTemplate">
+      <span nw-text="Name"></span>
+      <span>: </span>
+      <span nw-text="Value"></span>
+      <button nw-click="Mutate">Multiply by 2</button>
+    </script>
+
+    <script type="text/javascript">
+      function Main() {
+        var multiplyValBy2 = function() {
+          this.Value = this.Value * 2;
+        }
+        this.Items = [
+          { Name: "One", Value: 1, Mutate: multiplyValBy2},
+          { Name: "Two", Value: 2, Mutate: multiplyValBy2},
+          { Name: "Three", Value: 3, Mutate: multiplyValBy2}
+        ];
+
+        this.FirstName = "Mihhail";
+        this.LastName = "Maslakov";
+
+        this.FullName = function() {
+          return this.FirstName + " " + this.LastName;
+        }
+        this.OneToEleven = function() {
+          this.Items[0].Name = "Eleven";
+          this.Items[0].Value = 11;
+        }
+        this.AddFour = function() {
+          this.Items.push({Name: "Four", Value: 4, Mutate: multiplyValBy2});
+        }
+      }
+      var main = new Main();
+      nweb.go(main);
+    </script>
+  </body>
+</html>
