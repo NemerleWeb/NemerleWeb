@@ -72,7 +72,9 @@ namespace NemerleWeb.Samples
                         <tr $foreach(s in Seats)>
                             <td><input value="$(s.Name)" /></td>
                             <td>
-                              <select options="$AvailableMeals" data-bind="value: Meal" data-bind='optionsText: "MealName"'></select>
+                              <select>
+                                <option $foreach(meal in AvailableMeals) value="$(s.Meal)">$(meal.MealName)</option>
+                              </select>
                             </td>
                             <td>$(s.FormattedPrice)</td>
                             <td><a href="#" click="$RemoveSeat">Remove</a></td>

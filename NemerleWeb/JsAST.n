@@ -280,15 +280,12 @@ $(Body.Write())
         }
         | FieldRef       { Obj : JsAST; Parameter : string; IsExternal : bool;
             public override Write(_ = "" : string) : string {
-                if(IsExternal)
-                  $"$(Obj.Write()).$Parameter"
-                else
-                  $"$(Obj.Write()).$Parameter()"
+                $"$(Obj.Write()).$Parameter"
             }
         }
         | PropertySet    { Obj : JsAST; PropertyName : string; Value : JsAST;
             public override Write(_ = "" : string) : string {
-                $"$(Obj.Write()).$PropertyName($(Value.Write()))"
+                $"$(Obj.Write()).$PropertyName = $(Value.Write())"
             }
             public override Transform() : JsAST {
               match(Value) {
@@ -300,7 +297,7 @@ $(Body.Write())
         }
         | PropertyGet    { Obj : JsAST; PropertyName : string;
             public override Write(_ = "" : string) : string {
-                $"$(Obj.Write()).$PropertyName()"
+                $"$(Obj.Write()).$PropertyName"
             }
         }
         | OpCode         { Name : string;
@@ -346,15 +343,16 @@ break;#>
         }
         | ServerCall     { MethodName : string; TypeName : string; Parameters : list[string * JsAST]; Callback : JsAST;
             public override Write(indent = "" : string) : string {
-                def jsparms = Parameters.Map((name, val) => $"$name :' + ko.toJSON($(val.Write())) + '");
+                def jsparms = Parameters.Map((name, val) => $"$name :' + JSON.stringify($(val.Write())) + '");
 $<#$$.ajax({
 $(indent)url: '/$TypeName/$MethodName',
 $(indent)type: 'POST',
 $(indent)dataType: 'json',
 $(indent)contentType: 'application/json; charset=utf-8',
 $(indent)data: '{..$jsparms}',
-$(indent)success: function(result) { $(Callback.Write())(NemerleWeb.ToTypedObject(result)) }
-$(indent)})#>
+$(indent)success: function(result) { $(Callback.Write())(nweb.utils.toTypedObject(result)) }
+$(indent)});
+nweb.invalidate();#>
             }
         }    
         | Ternary        { Cond : JsAST; Body : JsAST; ElseBody : JsAST;

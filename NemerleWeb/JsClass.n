@@ -167,13 +167,7 @@ $staticConstructorBody#>
             def propVal(prop : IProperty)
             {
               def isArray = TypeIsArray(prop.GetGetter().ReturnType);
-              match((IsViewmodel, isArray))
-              {
-              | (true, true) => "ko.observableArray([])"
-              | (true, false) => "ko.observable(null)"
-              | (false, true) => "[]";   
-              | (false, false) => "{}";
-              }
+              if(isArray) "{}" else "[]"
             }
             def propStrings = Properties.Select(p => indent + $<#$parentPtr.$(p.Name) = $(propVal(p))#>);
             $<#..$(propStrings; ";\n")#>;
@@ -185,10 +179,10 @@ $staticConstructorBody#>
           def propVal(prop : IProperty)
           {
               def computedBody = TranslateMethodBody(prop.GetGetter(), indent);
-$<#ko.computed(function() {
+$<#function() {
 $self
 $computedBody
-}, this)#>
+}#>
           }
           def propStrings = ComputedProperties.Select(p => indent + $<#$parentPtr.$(p.Name) = $(propVal(p))#>);
           $<#..$(propStrings; ";\n")#>;
@@ -199,11 +193,7 @@ $computedBody
             def fields = Fields;
             def fldVal(fld : IField) {
               def isArray = TypeIsArray(fld.GetMemType());
-              match((IsViewmodel, isArray))
-              {
-              | (_, true) => "ko.observableArray([])"
-              | (_, false) => "ko.observable(null)"
-              }
+              if(isArray) "{}" else "[]"
             }
             def fieldStrings = fields.Select(f => indent + $<#$parentPtr.$(f.Name) = $(fldVal(f))#>);
             $<#..$(fieldStrings; ";\n")#>;

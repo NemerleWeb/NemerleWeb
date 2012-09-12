@@ -157,7 +157,7 @@ nweb = {
     var changeFound;
     do {
       changeFound = false;
-      for(var i in bindings) {
+      for (var i = 0; i < bindings.length; i++) {
         var binding = bindings[i];
         var newValue = binding.getValue();
 
@@ -196,5 +196,75 @@ nweb.utils = {
   },
   isFunction: function(obj) {    
     return obj && {}.toString.call(obj) == '[object Function]';
+  },
+  toTypedObject: function (obj) {
+      if (typeof obj === "string") {
+          try {
+              obj = JSON.parse(obj);
+          } catch (e) {
+          }
+      }
+
+      if (!!obj.$type) {
+          var typename = obj.$type.replace(/\./g, "_").replace(/\+/g, "_").replace(/(.+),.+/g, "$1");
+          var newObj = eval('new ' + typename + '()');
+          for (var p in obj) {
+              if (obj.hasOwnProperty(p) && newObj.hasOwnProperty(p)) {
+                  if (typeof newObj[p] === "function")
+                      newObj[p](nweb.utils.toTypedObject(obj[p]));
+                  else
+                      newObj[p] = nweb.utils.toTypedObject(obj[p]);
+              }
+          }
+          return newObj;
+      }
+      if (obj instanceof Array) {
+          var newArr = [];
+          for (var i = 0, l = obj.length; i < l; newArr.push(nweb.utils.toTypedObject(obj[i++])));
+          return newArr;
+      }
+      return obj;
+  },
+  getTemplateName: function (model, viewName) {
+      if (!model)
+          return "";
+
+      return nweb.utils.getConstructorName(model) + "__" + viewName;
+  },
+  getConstructorName: function (model) {
+      var funcNameRegex = /function (.{1,})\(/;
+      var results = (funcNameRegex).exec(model.constructor.toString());
+      return (results && results.length > 1) ? results[1] : "";
   }
 }
+
+Array.prototype.getEnumerator = function () {
+    this.__enumeratorIndex = -1;
+    this.Current = null;
+    return this;
+}
+
+Array.prototype.dispose = Array.prototype.getEnumerator;
+
+Array.prototype.moveNext = function () {
+    if (typeof this.__enumeratorIndex === 'undefined')
+        this.__enumeratorIndex = -1;
+    this.__enumeratorIndex++;
+    this.Current = this[this.__enumeratorIndex];
+    return this.__enumeratorIndex < this.length;
+}
+
+Array.prototype.current = function () {
+    return this[this.__enumeratorIndex];
+}
+
+Array.prototype.hd = function () {
+    return this[0];
+}
+
+Array.prototype.tl = function () {
+    return this.splice(1);
+}
+
+Array.prototype.Head = Array.prototype.hd;
+Array.prototype.Tail = Array.prototype.tl;
