@@ -57,8 +57,9 @@ namespace NemerleWeb
       }
     }
     
-    public DoTransformBeforeTypedMembers(_tb : TypeBuilder, _typer : Typer) : void
+    public DoTransformBeforeTypedMembers(tb : TypeBuilder, typer : Typer) : void
     {
+      CreateResourceController(tb, typer);
     }
     
     public DoTransform(tb : TypeBuilder, typer : Typer) : void
@@ -182,6 +183,31 @@ $<#  ko.applyBindings(new $(JsClass.GetProperName(tb))({0}));#>;
           
           tb.Compile();
       };
-    }   
+    }
+    
+    CreateResourceController(tb : TypeBuilder, typer : Typer) : void
+    {
+      def env = typer.Manager.CoreEnv;
+      def controllerName = "NemerleWebResourceController";
+      match(env.LookupType([controllerName])) 
+      {
+      | Some => ()
+      | None => 
+        env.Define(<[ decl: 
+          public class $(controllerName : usesite) : System.Web.Mvc.Controller
+          {
+            public NemerleWebJs() : System.Web.Mvc.ActionResult
+            {
+              def sb = System.Text.StringBuilder();
+              foreach(file in ["NemerleWeb.Scripts.jquery-1.6.4.js", "NemerleWeb.Scripts.jquery.signalR-0.5.3.js", "NemerleWeb.Scripts.nweb.js"])
+                using (def stream = typeof(NemerleWeb.JsAST).Assembly.GetManifestResourceStream(file))
+                using (def reader = System.IO.StreamReader(stream))
+                    sb.Append(reader.ReadToEnd());
+              Content(sb.ToString());
+            }
+          }
+        ]>).Compile();  
+      }      
+    }
   }
 }
