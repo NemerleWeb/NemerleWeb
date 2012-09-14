@@ -40,7 +40,7 @@ namespace NemerleWeb
     {   
       match(prop)
       {
-      | PropertyGet(obj, name) => JsAST.FieldRef(obj, name, !isObservable)
+      | PropertyGet(obj, name, false) => JsAST.FieldRef(obj, name, !isObservable)
       | _ => prop
       }
     }
@@ -124,7 +124,7 @@ namespace NemerleWeb
       match (member.Name, parms)
       {
         | _ when member.Name.StartsWith("get_") =>
-          JsAST.PropertyGet(left, TypeHelper.RemoveGetSet(member.Name))
+          JsAST.PropertyGet(left, TypeHelper.RemoveGetSet(member.Name), false)
         | (_, [h]) when member.Name.StartsWith("set_") =>
           JsAST.PropertySet(left, TypeHelper.RemoveGetSet(member.Name), h)
         | _ => JsKnownMembersHelper.Default(type, left, member, parms)

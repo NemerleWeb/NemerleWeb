@@ -395,6 +395,9 @@
     <Content Include="Scripts\nemerleweb.js">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\nweb.js">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\prettify.js">
       <SubType>Content</SubType>
     </Content>

@@ -42,7 +42,7 @@ namespace NemerleWeb
         | (".ctor", lambda :: _) when type.FullName == "System.Func"                           => lambda
         | (".ctor", lambda :: _) when type.FullName == "System.Action"                         => lambda
         | (".ctor", parms) => JsAST.Call(JsAST.Constructor(type), parms)
-        | _ when member.Name.StartsWith("get_")                               => JsAST.PropertyGet(left, TypeHelper.RemoveGetSet(member.Name))
+        | _ when member.Name.StartsWith("get_")                               => JsAST.PropertyGet(left, TypeHelper.RemoveGetSet(member.Name), false)
         | (_, h :: []) when member.Name.StartsWith("set_")                    => JsAST.PropertySet(left, TypeHelper.RemoveGetSet(member.Name), h)            
         | _ => JsKnownMembersHelper.DefaultThrow(type, left, member, parms)
       }

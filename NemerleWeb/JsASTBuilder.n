@@ -91,7 +91,7 @@ namespace NemerleWeb
                 JsAST.MethodRef(Build(obj), meth.Name)
         | MultipleAssign(assigns)           => JsAST.Seq(assigns.Map((l, e) => JsAST.DefValue(l.Name, Build(e))))
         | OpCode(name)                      => ConvertToJsOpCode(name)
-        | PropertyMember(obj, prop)         => JsAST.PropertyGet(Build(obj), prop.Name)
+        | PropertyMember(obj, prop)         => JsAST.PropertyGet(Build(obj), prop.Name, JsClass.HasGetterNoSetter(prop))
         | SelfTailCall                      => Message.Warning(expr.Location, "SelfTailCall not implemented"); JsAST.NotImpl("SelfTailCall")
         | Sequence(e1, e2)                  => JsAST.Seq([Build(e1), Build(e2)])
         | StaticEventRef                    => Message.Warning(expr.Location, "StaticEventRef not implemented"); JsAST.NotImpl("StaticEventRef")
@@ -306,9 +306,9 @@ namespace NemerleWeb
           JsASTHelper.IterateAST(jsAst)
                      .OfType.[JsAST.DefValue]().NToList()
                      .Map(j => match(j) {
-                     | JsAST.DefValue(name, PropertyGet(left, prop)) => JsAST.DefValue(name, JsAST.FieldRef(left, prop, true))
+                     | JsAST.DefValue(name, PropertyGet(left, prop, false)) => JsAST.DefValue(name, JsAST.FieldRef(left, prop, true))
                      | DefValue(name, FieldRef(left, prop, false)) => JsAST.DefValue(name, JsAST.FieldRef(left, prop, true))
-                     | DefValue(name, Call(MethodRef(Method = "template") as template, [PropertyGet(l1, r1), PropertyGet as p2])) => 
+                     | DefValue(name, Call(MethodRef(Method = "template") as template, [PropertyGet(l1, r1, false), PropertyGet as p2])) => 
                         JsAST.DefValue(name, JsAST.Call(template, [JsAST.FieldRef(l1, r1, true), p2]))
                      | _ => j
                      });

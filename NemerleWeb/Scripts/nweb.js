@@ -8,21 +8,29 @@ nweb = {
       var child = el.childNodes[i];      
       if(child.nodeType != 1)
         continue;
+        
+      if (child.hasAttribute("nw-repeat"))
+          nweb.applyRepeatBinding(model, child, bindings, loopStack);
 
-      if(child.hasAttribute("nw-text")) {
+      if(child.hasAttribute("nw-text"))
         nweb.applyTextBinding(model, child, bindings, loopStack);
-      } else if(child.hasAttribute("nw-value")) {
-        nweb.applyValueBinding(model, child, bindings, loopStack);
-      } else if(child.hasAttribute("nw-click")) {
-        nweb.applyClickBinding(model, child, bindings, loopStack);
-      } else if(child.hasAttribute("nw-repeat")) {
-        nweb.applyRepeatBinding(model, child, bindings, loopStack);
-        continue;        
-      } else if(child.hasAttribute("nw-template")) {
-        nweb.applyTemplateBinding(model, child, bindings, loopStack);
-      } else if(child.hasAttribute("nw-if")) {
+      
+      if (child.hasAttribute("nw-value"))
+          nweb.applyValueBinding(model, child, bindings, loopStack);
 
-      }
+      if (child.hasAttribute("nw-click"))
+          nweb.applyClickBinding(model, child, bindings, loopStack);
+
+
+      if (child.hasAttribute("nw-template"))
+          nweb.applyTemplateBinding(model, child, bindings, loopStack);
+
+      if (child.hasAttribute("nw-when"))
+          nweb.applyIfBinding(model, child, bindings, loopStack, false);
+
+      if (child.hasAttribute("nw-unless"))
+          nweb.applyIfBinding(model, child, bindings, loopStack, true);
+        
       nweb.applyBindings(model, child, bindings, loopStack);
     }
   },
@@ -91,12 +99,12 @@ nweb = {
         for (var i = 0; i < binding.generatedEls.length; i++)
           $(binding.generatedEls[i]).remove();
 
-        binding.bindings = [];
+        binding.subBindings = [];
 
         for (var i = 0; i < array.length; i++) {
           var newEl = $(html).removeAttr("nw-repeat")
                              .insertAfter(el);
-          nweb.applyBindings(model, newEl[0], binding.bindings, loopStack.concat({name: repeat[1], val: array[i]}));
+          nweb.applyBindings(model, newEl[0], binding.subBindings, loopStack.concat({ name: repeat[1], val: array[i] }));
           binding.generatedEls.push(newEl[0]);
         };
       }
@@ -119,6 +127,37 @@ nweb = {
       }
     };
     bindings.push(binding);
+  },
+  applyIfBinding: function (model, el, bindings, loopStack, negate) {
+      var expr = el.getAttribute("nw-when");      
+      var parsed = nweb.parseExpression(model, expr, loopStack);
+      var $el = $(el);
+      var prev = $el.prev();
+      var parent = $el.parent();
+      var binding = {
+          el: el,
+          getValue: function () {
+              return nweb.getParsedValue(parsed);
+          },
+          apply: function () {
+              var value = binding.getValue();
+              binding.subBindings = [];
+
+              if (value == !negate) {
+                  if (prev)
+                      prev.insertAfter(el);
+                  else
+                      parent.prepend(el);                  
+
+                  nweb.applyBindings(prop, el, binding.subBindings, loopStack);
+              } else {
+                  $el.remove();
+              }
+          }
+      };
+
+      $el.remove();
+      bindings.push(binding);
   },
   parseExpression: function(model, prop, loopStack) {
     for (var i = 0; i < loopStack.length; i++)
@@ -168,14 +207,17 @@ nweb = {
           }
 
           binding.oldValue = newValue.slice();
-          nweb.invalidate(binding.bindings);
+          if(binding.subBindings)
+            nweb.invalidate(binding.subBindings);
         } else {
           if(binding.oldValue !== newValue) {
             changeFound = true;
             binding.apply();
             binding.oldValue = newValue;
+            if (binding.subBindings)
+                nweb.invalidate(binding.subBindings);
           }
-        }        
+        }
       }
     } while(changeFound)
   },

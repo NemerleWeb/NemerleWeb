@@ -289,15 +289,18 @@ $(Body.Write())
             }
             public override Transform() : JsAST {
               match(Value) {
-              | Call(OpCode("++"), [PropertyGet(obj, name)]) => JsAST.PropertySet(Obj, PropertyName, JsAST.Call(JsAST.OpCode("+"), [JsAST.PropertyGet(obj, name), JsAST.Literal(JsLiteral.Integer(1))]))
-              | Call(OpCode("--"), [PropertyGet(obj, name)]) => JsAST.PropertySet(Obj, PropertyName, JsAST.Call(JsAST.OpCode("-"), [JsAST.PropertyGet(obj, name), JsAST.Literal(JsLiteral.Integer(1))]))
+              | Call(OpCode("++"), [PropertyGet(obj, name, isget)]) => JsAST.PropertySet(Obj, PropertyName, JsAST.Call(JsAST.OpCode("+"), [JsAST.PropertyGet(obj, name, isget), JsAST.Literal(JsLiteral.Integer(1))]))
+              | Call(OpCode("--"), [PropertyGet(obj, name, isget)]) => JsAST.PropertySet(Obj, PropertyName, JsAST.Call(JsAST.OpCode("-"), [JsAST.PropertyGet(obj, name, isget), JsAST.Literal(JsLiteral.Integer(1))]))
               | _ => this
               }
             }
         }
-        | PropertyGet    { Obj : JsAST; PropertyName : string;
+        | PropertyGet    { Obj : JsAST; PropertyName : string; IsGetOnly : bool;
             public override Write(_ = "" : string) : string {
-                $"$(Obj.Write()).$PropertyName"
+                if(!IsGetOnly) 
+                  $"$(Obj.Write()).$PropertyName"
+                else
+                  $"$(Obj.Write()).$PropertyName()"
             }
         }
         | OpCode         { Name : string;
@@ -350,9 +353,12 @@ $(indent)type: 'POST',
 $(indent)dataType: 'json',
 $(indent)contentType: 'application/json; charset=utf-8',
 $(indent)data: '{..$jsparms}',
-$(indent)success: function(result) { $(Callback.Write())(nweb.utils.toTypedObject(result)) }
+$(indent)success: function(result) { 
+  $(Callback.Write())(nweb.utils.toTypedObject(result));
+  nweb.invalidate();
+}
 $(indent)});
-nweb.invalidate();#>
+#>
             }
         }    
         | Ternary        { Cond : JsAST; Body : JsAST; ElseBody : JsAST;
@@ -362,7 +368,7 @@ nweb.invalidate();#>
         }
         | This           {
             public override Write(_ = "" : string) : string {
-                "_self"
+                "self"
             }
         }
         | Throw          { Obj : JsAST;
@@ -487,7 +493,7 @@ $(Body.Write("  "))
             | OpCode                      => ast'
             | Object(fields)              => JsAST.Object(fields.Map((name, body) => (name, recurse(body))))
             | PropertySet(obj, prop, val) => JsAST.PropertySet(recurse(obj), prop, recurse(val))
-            | PropertyGet(obj, prop)      => JsAST.PropertyGet(recurse(obj), prop)
+            | PropertyGet(obj, prop, igt) => JsAST.PropertyGet(recurse(obj), prop, igt)
             | Return(expr)                => JsAST.Return(recurse(expr))
             | Seq(items)                  => JsAST.Seq(items.Map(recurse))
             | ServerCall(meth, ty, parms, callback) => JsAST.ServerCall(meth, ty, parms.Map(p => (p[0], recurse(p[1]))), recurse(callback))

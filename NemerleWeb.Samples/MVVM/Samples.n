@@ -102,7 +102,6 @@ namespace NemerleWeb.Samples
     
     SelectSample(sample : Sample) : void 
     {
-      def sample = Samples.Concat(KnockoutSamples).FirstOrDefault(s => s.Name == sample.Name);
       SelectedSample = sample;
     }
     

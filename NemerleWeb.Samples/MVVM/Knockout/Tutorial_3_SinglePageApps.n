@@ -38,18 +38,18 @@ namespace NemerleWeb.Samples
             js <#
                 Sammy(function() {
                     this.get("#:folder", function() {
-                        _self.ChosenFolderId(this.params.folder);
-                        _self.ChosenMailData(null);
+                        self.ChosenFolderId = this.params.folder;
+                        self.ChosenMailData = null;
                         $.get("/SPAViewModel/Folder", { folder: this.params.folder }, function(result) { 
-                            _self.ChosenFolderData(NemerleWeb.ToTypedObject(result)) 
+                            self.ChosenFolderData = nweb.utils.toTypedObject(result);
                         });
                     });
                     
                     this.get("#:folder/:mailId", function() {
-                        _self.ChosenFolderId(this.params.folder);
-                        _self.ChosenMailData(null);
+                        self.ChosenFolderId = this.params.folder;
+                        self.ChosenMailData = null;
                         $.get("/SPAViewModel/Mail", { mailId: this.params.mailId }, function(result) { 
-                            _self.ChosenMailData(NemerleWeb.ToTypedObject(result)) 
+                            self.ChosenMailData = nweb.utils.toTypedObject(result); 
                         });
                     });
                     

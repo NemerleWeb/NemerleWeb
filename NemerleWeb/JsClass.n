@@ -20,7 +20,7 @@ namespace NemerleWeb
         public StringType : TypeVar { get; set; }
         public Typer : Typer { get; set; }
         
-        private HasGetterNoSetter(p : IProperty) : bool
+        public static HasGetterNoSetter(p : IProperty) : bool
         {
           p.GetGetter() != null && p.GetSetter() == null
         }
@@ -96,11 +96,11 @@ namespace NemerleWeb
           def returning = match(ClassType.BaseType?.Name) {
               | "Function" => bodyIndent + 
 <#return function() {
-  return _self.apply.apply(_self, arguments);
+  return self.apply.apply(self, arguments);
 }#>
               | "FunctionVoid" => bodyIndent + 
 <#return function() {
-  return _self.apply_void.apply(_self, arguments);
+  return self.apply_void.apply(self, arguments);
 }#>
               | _ => ""
           };
@@ -125,7 +125,7 @@ namespace NemerleWeb
 $<#
 $nestedClassesString
 $(Indent)function $(GetProperName(ClassType))(..$constructorParams) {
-$(bodyIndent)var _self = this;
+$(bodyIndent)var self = this;
 $constructorBody
 {{{SignalR}}}
 $returning
@@ -143,7 +143,7 @@ $staticConstructorBody#>
 $<#
 $nestedClassesString
 $(Indent)function $(GetProperName(ClassType))(..$constructorParams) {
-$(bodyIndent)var _self = this;
+$(bodyIndent)var self = this;
 $properties
 $fields
 $methods
@@ -166,8 +166,11 @@ $staticConstructorBody#>
         {                                                   
             def propVal(prop : IProperty)
             {
-              def isArray = TypeIsArray(prop.GetGetter().ReturnType);
-              if(isArray) "{}" else "[]"
+              def type = prop.GetGetter().ReturnType;
+              def isArray = TypeIsArray(type);
+              if(isArray) 
+                "[]" 
+              else if(type.TypeInfo.FullName == "System.String") <#""#> else "{}";                
             }
             def propStrings = Properties.Select(p => indent + $<#$parentPtr.$(p.Name) = $(propVal(p))#>);
             $<#..$(propStrings; ";\n")#>;
@@ -175,7 +178,7 @@ $staticConstructorBody#>
         
         GetComputedProperties(indent : string, parentPtr : string, hasSelf : bool) : string 
         {                              
-          def self = if(hasSelf) "" else "var _self = this;";
+          def self = if(hasSelf) "" else "var self = this;";
           def propVal(prop : IProperty)
           {
               def computedBody = TranslateMethodBody(prop.GetGetter(), indent);
@@ -192,8 +195,11 @@ $computedBody
         {
             def fields = Fields;
             def fldVal(fld : IField) {
-              def isArray = TypeIsArray(fld.GetMemType());
-              if(isArray) "{}" else "[]"
+              def type = fld.GetMemType();
+              def isArray = TypeIsArray(type);
+              if(isArray) 
+                "[]" 
+              else if(type.TypeInfo.FullName == "System.String") <#""#> else "{}";
             }
             def fieldStrings = fields.Select(f => indent + $<#$parentPtr.$(f.Name) = $(fldVal(f))#>);
             $<#..$(fieldStrings; ";\n")#>;
@@ -235,7 +241,7 @@ $computedBody
         
         GetMethods(indent : string, parentPtr : string, hasSelf : bool) : string 
         {
-          def self = if(hasSelf) "" else "var _self = this;";
+          def self = if(hasSelf) "" else "var self = this;";
           def methodParms(method) {
               method.GetParameters().Select(p => p.Name);
           }
