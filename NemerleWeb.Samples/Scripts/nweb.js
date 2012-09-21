@@ -141,7 +141,8 @@ nweb = {
     } else {
       $(el).change(function() {
         nweb.execute(function() {
-          eval(expr + " = $el.val();");
+          var newVal = nweb.getValue(el);
+          eval(expr + " = newVal;");
         });
       })
     };
@@ -151,7 +152,7 @@ nweb = {
         return nweb.getParsedValue(model, expr, loopStack);
       },
       apply: function(value) {
-        $el.val(value);
+        nweb.setValue($el[0], value);        
       }
     };
   },
@@ -341,7 +342,7 @@ nweb = {
     var changeFound;
     do {
       changeFound = false;
-      for (var i = 0; i < bindings.length; i++) {
+      for (var i = bindings.length - 1; i >= 0; i--) {
         var binding = bindings[i];
         var newValue = binding.getValue();
 
@@ -379,6 +380,28 @@ nweb = {
     else
         $el[0].__nw_parent.prepend($el);
   },
+  getValue: function(el) {
+    if(el.tagName == "SELECT") {
+      var selected = $("option:selected", el)[0];
+      if(selected)
+        return selected[nweb.dataKey];
+    } else {
+      return $(el).val();
+    }
+  },
+  setValue: function(el, val) {
+    if(el.tagName == "SELECT") {
+      var toSelect = $("option", el).filter(function() {
+        return this[nweb.dataKey] == val;
+      }).prop("selected", false);
+      toSelect.prop("selected", true);
+    } else if(el.tagName == "OPTION") {
+      el[nweb.dataKey] = val;
+    } else {
+      $(el).val(val);
+    }
+  },
+  dataKey: "__nw_value_data",
   bindings: []  
 };
 
