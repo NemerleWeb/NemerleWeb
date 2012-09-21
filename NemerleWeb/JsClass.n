@@ -170,7 +170,10 @@ $staticConstructorBody#>
               def isArray = TypeIsArray(type);
               if(isArray) 
                 "[]" 
-              else if(type.TypeInfo.FullName == "System.String") <#""#> else "{}";                
+              else 
+                if(type.TypeInfo.FullName == "System.String") <#""#> 
+                else if(type.TypeInfo.FullName == "System.Boolean") "false"
+                else if(type.TypeInfo.FullName == "System.Int32") "0" else "{}";
             }
             def propStrings = Properties.Select(p => indent + $<#$parentPtr.$(p.Name) = $(propVal(p))#>);
             $<#..$(propStrings; ";\n")#>;

@@ -3,47 +3,64 @@ nweb = {
     nweb.applyBindings(model, document.body, nweb.bindings, []);
     nweb.invalidate(nweb.bindings);
   },
-  applyBindings: function(model, el, bindings, loopStack, startWithSelf) {
-    var applyElement = function(currentEl) {
-      if(currentEl.nodeType != 1)
-        return;
-
-      if (currentEl.hasAttribute("nw-repeat")) {        
-        nweb.applyRepeatBinding(model, currentEl, bindings, loopStack);
-        return;
-      }
-      if (currentEl.hasAttribute("nw-text"))
-        nweb.applyTextBinding(model, currentEl, bindings, loopStack);
-      if (currentEl.hasAttribute("nw-value"))
-        nweb.applyValueBinding(model, currentEl, bindings, loopStack);
-      if (currentEl.hasAttribute("nw-checked"))
-        nweb.applyCheckedBinding(model, currentEl, bindings, loopStack);
-      if (currentEl.hasAttribute("nw-click"))
-        nweb.applyClickBinding(model, currentEl, bindings, loopStack);
-      if (currentEl.hasAttribute("nw-template"))
-        nweb.applyTemplateBinding(model, currentEl, bindings, loopStack);
-      if (currentEl.hasAttribute("nw-when")) {
-        nweb.applyIfBinding(model, currentEl, bindings, loopStack, false);
-        return;
-      }
-      if (currentEl.hasAttribute("nw-unless")) {
-        nweb.applyIfBinding(model, currentEl, bindings, loopStack, true);
-        return;
-      }
-
-      nweb.applyBindings(model, currentEl, bindings, loopStack, false);
-    }
-    if(startWithSelf)
-      applyElement(el)
-    for(var i = 0; i < el.childNodes.length; i++) {
-      var child = el.childNodes[i];   
-      applyElement(child);
-    }
+  binds: function(name) {
+    var binds = {
+      "nw-repeat": nweb.getRepeatBinding,
+      "nw-text": nweb.getTextBinding,
+      "nw-value": nweb.getValueBinding,
+      "nw-checked": nweb.getCheckedBinding,
+      "nw-template": nweb.getTemplateBinding,
+      "nw-when": nweb.getWhenBinding,
+      "nw-unless": nweb.getUnlessBinding,
+      "nw-css": nweb.getCssBinding,
+      "nw-style": nweb.getStyleBinding,
+      "nw-visible": nweb.getVisibleBinding,
+      "nw-disable": nweb.getDisableBinding,
+      "nw-enable": nweb.getEnableBinding,
+      "nw-click": nweb.getClickBinding,
+      "nw-submit": nweb.getSubmitBinding      
+    };
+    return binds[name];
   },
-  applyTextBinding: function(model, el, bindings, loopStack) {
-    var prop = el.getAttribute("nw-text");
-    var expr = nweb.parseExpression(model, prop, loopStack);
-    var binding = {
+  applyBindings: function(model, el, bindings, loopStack, isInsideTemplate) {
+    if(el.nodeType != 1)
+        return;
+    
+    var attrs = nweb.utils.getElementAttributes(el);
+
+    for(var i = 0; i < attrs.length; i++) {
+      var attrName = attrs[i].nodeName;
+      if(attrName.indexOf("nw-") == 0) {
+        var binder = nweb.binds(attrName);
+        
+        if(typeof binder === 'undefined')
+          throw "Unrecognized nw- attribute: " + attrName;
+        
+        if(!el.__nw_is_repeat) {
+          var attrValue = attrs[i].nodeValue;          
+          var binding = binder(model, el, bindings, loopStack, attrValue);
+
+          if(typeof binding !== 'undefined')
+            bindings.push(binding);
+
+          console.log("binded " + attrName);
+        }        
+      }
+    }
+
+    for(var i = attrs.length - 1; i >= 0; i--)
+      if(attrs[i].nodeName.indexOf("nw-") === 0)
+        el.removeAttribute(attrs[i].nodeName);
+    
+    if(el.__nw_is_template && !isInsideTemplate)
+      return;
+
+    for(var i = 0; i < el.childNodes.length; i++)
+      nweb.applyBindings(model, el.childNodes[i], bindings, loopStack);
+  },
+  getTextBinding: function(model, el, bindings, loopStack, attrVal) {
+    var expr = nweb.parseExpression(model, attrVal, loopStack);
+    return {
       el: el,
       getValue: function() {
         return nweb.getParsedValue(model, expr, loopStack);
@@ -52,22 +69,69 @@ nweb = {
         el.innerHTML = nweb.utils.htmlEncode(value);
       }
     };
-    bindings.push(binding);
   },
-  applyValueBinding: function(model, el, bindings, loopStack) {
-    var prop = el.getAttribute("nw-value");
-    var expr = nweb.parseExpression(model, prop, loopStack);
-    var $el = $(el);
-    var binding = {
+  getCssBinding: function(model, el, bindings, loopStack, attrVal) {
+    var css = /(.+):\s(.+)/.exec(attrVal);
+    var expr = nweb.parseExpression(model, css[2], loopStack);
+    return {
       el: el,
       getValue: function() {
         return nweb.getParsedValue(model, expr, loopStack);
       },
       apply: function(value) {
-        $el.val(value);
+        if(value)
+          $(el).addClass(css[1]);
+        else
+          $(el).removeClass(css[1]);
       }
     };
-
+  },
+  getStyleBinding: function(model, el, bindings, loopStack, attrVal) {
+    var style = /(.+):\s(.+)/.exec(attrVal);
+    var expr = nweb.parseExpression(model, style[2], loopStack);
+    return {
+      el: el,
+      getValue: function() {
+        return nweb.getParsedValue(model, expr, loopStack);
+      },
+      apply: function(value) {        
+        $(el).css(style[1], style[2]);
+      }
+    };
+  },
+  getVisibleBinding: function(model, el, bindings, loopStack, attrVal) {    
+    var expr = nweb.parseExpression(model, attrVal, loopStack);
+    return {
+      el: el,
+      getValue: function() {
+        return nweb.getParsedValue(model, expr, loopStack);
+      },
+      apply: function(value) {        
+        if(value)
+          $(el).show();
+        else
+          $(el).hide();
+      }
+    };
+  },
+  getDisableBinding: function(model, el, bindings, loopStack, attrVal, isEnable) {
+    var expr = nweb.parseExpression(model, attrVal, loopStack);
+    return {
+      el: el,
+      getValue: function() {
+        return nweb.getParsedValue(model, expr, loopStack);
+      },
+      apply: function(value) {        
+        $(el).prop("disabled", value && !isEnable);
+      }
+    };
+  },
+  getEnableBinding: function(model, el, bindings, loopStack, attrVal) {    
+    return nweb.getDisableBinding(model, el, bindings, loopStack, attrVal, true);
+  },
+  getValueBinding: function(model, el, bindings, loopStack, attrVal) {
+    var expr = nweb.parseExpression(model, attrVal, loopStack);
+    var $el = $(el);
     if($el.is(":text")) {
       $el.on("keyup", function() {
         nweb.execute(function() {
@@ -81,14 +145,27 @@ nweb = {
         });
       })
     };
-
-    bindings.push(binding);
+    return {
+      el: el,
+      getValue: function() {
+        return nweb.getParsedValue(model, expr, loopStack);
+      },
+      apply: function(value) {
+        $el.val(value);
+      }
+    };
   },
-  applyCheckedBinding: function(model, el, bindings, loopStack) {
-    var prop = el.getAttribute("nw-checked");
-    var expr = nweb.parseExpression(model, prop, loopStack);
+  getCheckedBinding: function(model, el, bindings, loopStack, attrVal) {
+    var expr = nweb.parseExpression(model, attrVal, loopStack);
     var $el = $(el);
-    var binding = {
+
+    $(el).change(function() {
+      nweb.execute(function() {
+        eval(expr + " = $el.prop('checked');");
+      });
+    })
+
+    return {
       el: el,
       getValue: function() {
         return nweb.getParsedValue(model, expr, loopStack);
@@ -97,20 +174,16 @@ nweb = {
         $el.prop("checked", value);
       }
     };
-
-    $(el).change(function() {
-      nweb.execute(function() {
-        eval(expr + " = $el.prop('checked');");
-      });
-    })
-
-    bindings.push(binding);
   },
-  applyRepeatBinding: function(model, el, bindings, loopStack) {
-    var repeat = /(.+)\sin\s(.+)/.exec(el.getAttribute("nw-repeat"));
+  getRepeatBinding: function(model, el, bindings, loopStack, attrVal) {
+    var $el = $(el);
+    var repeat = /(.+)\sin\s(.+)/.exec(attrVal);
     var html = el.outerHTML;    
-    var expr = nweb.parseExpression(model, repeat[2], loopStack);
-    el.style.display = "none";
+    var expr = nweb.parseExpression(model, repeat[2], loopStack);    
+
+    $el = nweb.utils.replaceWith($el, $("<!-- repeat " + expr + " -->"));
+    el.__nw_is_template = true;
+    el.__nw_is_repeat = true;
 
     var binding = {
       el: el,
@@ -127,81 +200,117 @@ nweb = {
 
         binding.generatedEls = [];
         binding.subBindings = [];
-        for (var i = 0; i < array.length; i++) {
-          var newEl = $(html).removeAttr("nw-repeat");
-          if(binding.generatedEls.length > 0)
-            binding.generatedEls[binding.generatedEls.length - 1].after(newEl);
-          else
-            newEl.insertAfter(el);
-          nweb.applyBindings(model, newEl[0], binding.subBindings, loopStack.concat({ name: repeat[1], val: array[i] }), true);
-          binding.generatedEls.push(newEl);
+
+        for (var i = array.length - 1; i >= 0; i--) {
+          var $newEl = $(html).removeAttr("nw-repeat");
+          
+          $newEl.insertAfter($el);
+
+          nweb.applyBindings(model, $newEl[0], binding.subBindings, loopStack.concat({ name: repeat[1], val: array[i] }), true);
+          binding.generatedEls.push($newEl);
+
+          console.log("applied repeat binding");
         };
       }
     };
-    bindings.push(binding);
+    return binding;
   },
-  applyTemplateBinding: function(model, el, bindings, loopStack) {
+  getTemplateBinding: function(model, el, bindings, loopStack, attrVal) {
+    var $el = $(el);
     var template = /(.+):\s(.+)/.exec(el.getAttribute("nw-template"));
-    
-    var parsedName = nweb.parseExpression(model, template[1], loopStack);
-    var parsedVal = nweb.parseExpression(model, template[2], loopStack);
+    var parsedVal;
+
+    if(!template) {
+      template = /(.+)/.exec(el.getAttribute("nw-template"));
+      parsedVal = model;
+    } else {
+      parsedVal = nweb.parseExpression(model, template[2], loopStack);
+    }
+
+    var parsedName = nweb.parseExpression(model, template[1], loopStack);    
     var html = $("#" + nweb.getParsedValue(model, parsedName, loopStack)).html();
+    el.__nw_is_template = true;
 
     var binding = {
       el: el,
+      subBindings: [],
       getValue: function() {
         return nweb.getParsedValue(model, parsedVal, loopStack);
       },
       apply: function(value) {
-        var prop = value;    
-        $(el).html(html);
-        nweb.applyBindings(prop, el, bindings, loopStack);
+        $el = nweb.utils.replaceWith($el, $(html).removeAttr("nw-template"));
+        nweb.applyBindings(value, $el[0], binding.subBindings = [], loopStack, true);
+        console.log("applied template binding");
       }
     };
-    bindings.push(binding);
+    return binding;
   },
-  applyIfBinding: function (model, el, bindings, loopStack, negate) {
-      var expr = negate ? el.getAttribute("nw-unless") : el.getAttribute("nw-when");
-      var expr = nweb.parseExpression(model, expr, loopStack);
-      var $el = $(el);
-      var prev = $el.prev();
-      var parent = $el.parent();
-      var binding = {
-          el: el,
-          getValue: function () {
-              return nweb.getParsedValue(model, expr, loopStack);
-          },
-          apply: function (value) {
-              var value = value;
-              binding.subBindings = [];
+  getWhenBinding: function (model, el, bindings, loopStack, attrVal, isUnless) {
+    var $el = $(el);
+    var expr = nweb.parseExpression(model, attrVal, loopStack);        
+    var html = el.outerHTML;
+    
+    $el = nweb.utils.replaceWith($el, $("<!-- " + expr + " -->"));
+    el.__nw_is_template = true;
 
-              if (value == !negate) {
-                  if (prev.length > 0)
-                      prev.after(el);
-                  else
-                      parent.prepend(el);
+    var binding = {
+      el: el,
+      subBindings: [],
+      getValue: function () {
+        return nweb.getParsedValue(model, expr, loopStack);
+      },
+      apply: function (value) {
+        binding.subBindings = [];
 
-                  nweb.applyBindings(model, el, binding.subBindings, loopStack);
-              } else {
-                  $el.remove();
-              }
-          }
-      };
+        if (value && !isUnless) {
+          $el = nweb.utils.replaceWith($el, $(html));
 
-      $el.remove();
-      bindings.push(binding);
+          if(isUnless)
+            $el.removeAttr("nw-unless");
+          else
+            $el.removeAttr("nw-when");
+
+          nweb.applyBindings(model, $el[0], binding.subBindings, loopStack, true);
+
+          console.log("applied when binding");
+        } else {
+          $el.hide();
+        }
+      }
+    };
+    return binding;
   },
-  applyClickBinding: function(model, el, bindings, loopStack) {
-    var prop = el.getAttribute("nw-click");
-    var parsed = nweb.parseExpression(model, prop, loopStack);
+  getUnlessBinding: function (model, el, bindings, loopStack, attrVal) {
+    return getWhenBinding(model, el, bindings, loopStack, attrValue, true)
+  },
+  getClickBinding: function(model, el, bindings, loopStack, attrVal) {
+    var parsed = nweb.parseExpression(model, attrVal, loopStack);
     $(el).on("click", function() {
       nweb.execute(function() {
         nweb.getParsedValue(model, parsed, loopStack);  
       })
     });
   },
-  parseExpression: function(model, prop, loopStack) {
-    var expr = nweb.applyLoopStackToExpr(prop, loopStack);
+  getSubmitBinding: function(model, el, bindings, loopStack, attrVal) {
+    var parsed = nweb.parseExpression(model, attrVal, loopStack);
+    $(el).on("submit", function() {
+      nweb.execute(function() {
+        nweb.getParsedValue(model, parsed, loopStack);  
+      })
+    });
+  },
+  applyLoopStackToExpr: function(expr, loopStack) {
+    for (var i = loopStack.length - 1; i >= 0; i--) {
+      var loop = loopStack[i];
+      var re = new RegExp("(\\W|^)" + loop.name + "(\\W|$)", "g");
+      expr = expr.replace(re, "$1loopStack[" + i + "].val$2");
+    };
+    return expr;
+  },
+  parseExpression: function(model, expr, loopStack) {
+    if(expr == "self")
+      return "model";
+    var expr = nweb.applyLoopStackToExpr(expr, loopStack);
     return expr.replace("self.", "model.");
   },
   getParsedValue: function(model, parsedExpr, loopStack) {
@@ -218,18 +327,9 @@ nweb = {
         else
           return val;
       } catch(e) {
-        console.log("Error getting: " + parsedExpr);
-        return null;
+        throw "Error evaluating: " + parsedExpr + " " + e;
       }
     }
-  },
-  applyLoopStackToExpr: function(expr, loopStack) {
-    for (var i = 0; i < loopStack.length; i++) {
-      var loop = loopStack[i];
-      var re = new RegExp("(\\W|^)" + loop.name + "(\\W|$)", "g");
-      expr = expr.replace(re, "$1loopStack[" + i + "].val$2");
-    };
-    return expr;
   },
   execute: function(code) {
     code();
@@ -245,13 +345,16 @@ nweb = {
         var binding = bindings[i];
         var newValue = binding.getValue();
 
+        if(typeof newValue === 'undefined')
+          continue;
+
         if(nweb.utils.isArray(newValue)) {
           if(!binding.oldValue || !nweb.utils.areArraysEqual(newValue, binding.oldValue)) {
             changeFound = true;  
             binding.apply(newValue);
           }
 
-          binding.oldValue = newValue.slice();        
+          binding.oldValue = newValue.slice();
         } else {
           if(binding.oldValue !== newValue) {
             changeFound = true;
@@ -259,10 +362,22 @@ nweb = {
             binding.oldValue = newValue;
           }
         }
+
         if (binding.subBindings)
-            nweb.invalidate(binding.subBindings);
+          nweb.invalidate(binding.subBindings);
       }
     } while(changeFound)
+  },
+  savePosition: function($el) {
+      $el[0].__nw_prev = $el.prev();
+      $el[0].__nw_parent = $el.parent();      
+  },
+  restoreInSavedPosition: function($el) {
+    console.log("restore in saved position: " + $el[0].__nw_prev.length + " ----- " + $el[0].__nw_parent.length);
+    if ($el[0].__nw_prev.length > 0)
+        $el[0].__nw_prev.after($el);
+    else
+        $el[0].__nw_parent.prepend($el);
   },
   bindings: []  
 };
@@ -321,6 +436,20 @@ nweb.utils = {
   },
   htmlDecode: function(value) {
     return $('<div/>').html(value).text();
+  },
+  getElementAttributes: function(el) {
+    var arr = [];
+    for (var i = 0, attrs = el.attributes, l = attrs.length; i < l; i++){
+      arr.push(attrs[i]);      
+    }
+    arr.sort(function(a, b) {
+      return a.nodeName == "nw-repeat" ? -1 : 1;
+    });
+    return arr;
+  },
+  replaceWith: function($el, $newEl) {
+    $el.replaceWith($newEl);
+    return $newEl;
   }
 }
 
@@ -354,3 +483,25 @@ Array.prototype.tl = function () {
 
 Array.prototype.Head = Array.prototype.hd;
 Array.prototype.Tail = Array.prototype.tl;
+
+Array.prototype.remove = function() {
+  var what, ax;
+  while(arguments.length && this.length){
+    what = arguments[--arguments.length];
+    while((ax = this.indexOf(what)) != -1) {
+      this.splice(ax, 1);
+    }
+  }
+  return this;
+}
+
+if(!Array.prototype.indexOf){
+  Array.prototype.indexOf = function(what, i) {
+    i = i || 0;
+    while(i < this.length) {
+      if(this[i] === what) return i;
+      ++i;
+    }
+    return -1;
+  }
+}
