@@ -23,7 +23,8 @@ namespace NemerleWeb
             def oldBody = method.Header.Body;
             def defs = JsASTBuilder.BuildJsASTForSplices(GetTypedBody(method, typer, typer.CurrentTypeBuilder, false));
             method.Header.body = oldBody;
-            def defs2 = JsASTBuilder.BuildJsASTForSplices(GetTypedBody(method, typer, typer.CurrentTypeBuilder));
+            def tt = GetTypedBody(method, typer, typer.CurrentTypeBuilder);
+            def defs2 = JsASTBuilder.BuildJsASTForSplices(tt);
             
             defs.Concat(defs2)
                 .Cast.[JsAST.DefValue]()

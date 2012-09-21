@@ -392,9 +392,6 @@
     <Content Include="Scripts\modernizr-2.0.6-development-only.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\nemerleweb.js">
-      <SubType>Content</SubType>
-    </Content>
     <Content Include="Scripts\nweb.js">
       <SubType>Content</SubType>
     </Content>

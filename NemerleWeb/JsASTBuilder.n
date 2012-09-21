@@ -305,10 +305,9 @@ namespace NemerleWeb
           jsAst = JsASTHelper.FlattenAndRemoveVoids(jsAst);
           JsASTHelper.IterateAST(jsAst)
                      .OfType.[JsAST.DefValue]().NToList()
-                     .Map(j => match(j) {
-                     | JsAST.DefValue(name, PropertyGet(left, prop, false)) => JsAST.DefValue(name, JsAST.FieldRef(left, prop, true))
-                     | DefValue(name, FieldRef(left, prop, false)) => JsAST.DefValue(name, JsAST.FieldRef(left, prop, true))
-                     | DefValue(name, Call(MethodRef(Method = "template") as template, [PropertyGet(l1, r1, false), PropertyGet as p2])) => 
+                     .Map(j => match(j) {                     
+                     | JsAST.DefValue(name, FieldRef(left, prop, false)) => JsAST.DefValue(name, JsAST.FieldRef(left, prop, true))
+                     | JsAST.DefValue(name, Call(MethodRef(Method = "template") as template, [PropertyGet(l1, r1, false), PropertyGet as p2])) => 
                         JsAST.DefValue(name, JsAST.Call(template, [JsAST.FieldRef(l1, r1, true), p2]))
                      | _ => j
                      });
