@@ -42,6 +42,7 @@ namespace NemerleWeb.Samples
                         self.ChosenMailData = null;
                         $.get("/SPAViewModel/Folder", { folder: this.params.folder }, function(result) { 
                             self.ChosenFolderData = nweb.utils.toTypedObject(result);
+                            nweb.invalidate();
                         });
                     });
                     
@@ -49,7 +50,8 @@ namespace NemerleWeb.Samples
                         self.ChosenFolderId = this.params.folder;
                         self.ChosenMailData = null;
                         $.get("/SPAViewModel/Mail", { mailId: this.params.mailId }, function(result) { 
-                            self.ChosenMailData = nweb.utils.toTypedObject(result); 
+                            self.ChosenMailData = nweb.utils.toTypedObject(result);
+                            nweb.invalidate();
                         });
                     });
                     
@@ -63,7 +65,7 @@ namespace NemerleWeb.Samples
         }
         
         public GoToMail(mail : Mail) : void {
-            js location.hash = mail.Folder() + '/' + mail.Id();
+            js location.hash = mail.Folder + '/' + mail.Id;
         }
         
         public class Server

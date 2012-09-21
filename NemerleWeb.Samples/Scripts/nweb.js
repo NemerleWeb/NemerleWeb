@@ -7,6 +7,7 @@ nweb = {
     var binds = {
       "nw-repeat": nweb.getRepeatBinding,
       "nw-text": nweb.getTextBinding,
+      "nw-html": nweb.getHtmlBinding,
       "nw-value": nweb.getValueBinding,
       "nw-checked": nweb.getCheckedBinding,
       "nw-template": nweb.getTemplateBinding,
@@ -70,6 +71,18 @@ nweb = {
       }
     };
   },
+  getHtmlBinding: function(model, el, bindings, loopStack, attrVal) {
+    var expr = nweb.parseExpression(model, attrVal, loopStack);
+    return {
+      el: el,
+      getValue: function() {
+        return nweb.getParsedValue(model, expr, loopStack);
+      },
+      apply: function(value) {
+        el.innerHTML = value;
+      }
+    };
+  },
   getCssBinding: function(model, el, bindings, loopStack, attrVal) {
     var css = /(.+):\s(.+)/.exec(attrVal);
     var expr = nweb.parseExpression(model, css[2], loopStack);
@@ -95,7 +108,7 @@ nweb = {
         return nweb.getParsedValue(model, expr, loopStack);
       },
       apply: function(value) {        
-        $(el).css(style[1], style[2]);
+        $(el).css(style[1], value);
       }
     };
   },
