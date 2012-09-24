@@ -1,0 +1,181 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+using NemerleWeb.Utils;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  module JsKnownMembersString
+  {
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(string), Handler); 
+    }
+    
+    private Handler(left : JsAST, member : IMember, parms : list[JsAST]) : option[JsAST]
+    {
+      match (parms)
+      {
+      | [] =>
+        match (member.Name)
+        {
+        | "get_Length" => Some(JsAST.FieldRef(left, "length", true))
+        | "Clone" => Some(left)
+        | "Copy"
+        | "GetEnumerator"
+        | "GetHashCode"
+        | "GetType"
+        | "GetTypeCode"
+        | "Intern"
+        | "IsInterned"
+        | "IsNormalized" => None()
+        | "IsNullOrEmpty" =>
+          Some(JsAST.Call(JsAST.OpCode("||"),
+              [JsAST.Call(JsAST.OpCode("==="), [left, JsAST.Literal(JsLiteral.Null())]),
+                JsAST.Call(JsAST.OpCode("==="), [left, JsAST.Literal(JsLiteral.String(""))])]))
+                 
+        | "IsNullOrWhiteSpace"
+        | "Normalize"
+        | "ToCharArray" => None()
+        | "ToLower" => Some(left.MethodCall("toLowerCase", []))
+        | "ToLowerInvariant"
+        | "ToString" => None()
+        | "ToUpper" => Some(left.MethodCall("toUpperCase", []))
+        | "ToUpperInvariant"
+        | "Trim"
+        | "TrimEnd"
+        | "TrimStart"
+        | _ => None()
+        }
+          
+      | [arg1] =>
+        match (member.Name)
+        {
+        | "Compare"
+        | "CompareOrdinal"
+        | "CompareTo" => None()
+        | "Concat" =>
+          match (arg1)
+          {
+          | JsAST.Array(a) => Some(left.MethodCall("concat", a))
+          |  _ => Some(left.MethodCall("concat", parms))
+          }
+          
+        | "Contains" =>
+          Some(JsAST.Call(
+            JsAST.OpCode("!="),
+            [
+              JsAST.Call(
+                JsAST.MethodRef(left, "indexOf"),
+                [arg1]),
+              JsAST.Literal(JsLiteral.Integer(-1))
+            ]))
+            
+        | "EndsWith"
+        | "Equals"
+        | "Format"
+        | "IndexOf"
+        | "IndexOfAny"
+        | "IsNormalized"
+        | "Join"
+        | "LastIndexOf"
+        | "LastIndexOfAny"
+        | "Normalize"
+        | "PadLeft"
+        | "PadRight"
+        | "Remove"
+        | "Split"
+        | "StartsWith"
+        | "Substring"
+        | "ToLower"        
+        | "ToUpper"
+        | "Trim" => None()
+        
+        | "ToString" => Some(JsAST.Call(JsAST.MethodRef(arg1, "toString"), []))
+        
+        | _ => None()
+        }
+          
+      | [arg1, arg2] =>
+        match (member.Name)
+        {
+        
+        | "Concat" =>
+          match (arg2)
+          {
+          | JsAST.Array(a) => Some(arg1.MethodCall("concat", a))
+          |  _ => Some(arg1.MethodCall("concat", parms))
+          }
+        
+        | "Compare"
+        | "EndsWith"
+        | "Equals"
+        | "Format"
+        | "IndexOf"
+        | "IndexOfAny"
+        | "Insert"
+        | "LastIndexOf"          
+        | "LastIndexOfAny"
+        | "PadLeft"
+        | "PadRight"
+        | "Remove"
+        | "Replace"
+        | "Split"
+        | "StartsWith"
+        | "Substring"
+        | "ToCharArray"
+        | _ => None()
+        }
+          
+      | [arg1, arg2, arg3] =>
+        match (member.Name)
+        {
+        | "Compare"
+        | "Concat"
+        | "CopyTo"
+        | "Equals"
+        | "Format"
+        | "IndexOf"
+        | "IndexOfAny"
+        | "Join"
+        | "LastIndexOf"
+        | "LastIndexOfAny"
+        | "Split"
+        | "StartsWith"
+        | _ => None()
+        }
+        
+      | [arg1, arg2, arg3, arg4] =>
+        match (member.Name)
+        {
+        | "Compare"
+        | "CompareOrdinal"
+        | "IndexOf"
+        | "LastIndexOf"
+        | _ => None()
+        }
+          
+      | [arg1, arg2, arg3, arg4, arg5] =>
+        match (member.Name)
+        {
+        | "Compare"
+        | _ => None()
+        }       
+      | [arg1, arg2, arg3, arg4, arg5, arg6] =>
+        match (member.Name)
+        {
+        | "Compare"
+        | _ => None()
+        }
+      | _ => None()
+      }
+    }
+  }
+}

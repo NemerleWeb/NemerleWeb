@@ -67,7 +67,7 @@ namespace NemerleWeb
     _location : NLocation;
     _lineOffsetMap : array[int];
     
-    public this(location : NLocation, text : string)
+    public this(location : NLocation, [NotNull] text : string)
     {
       _location = location;
       
@@ -112,7 +112,7 @@ namespace NemerleWeb
       result
     }
     
-    public ToLocation(node : PegLocated) : NLocation
+    public ToLocation([NotNull] node : PegLocated) : NLocation
     {
       ToLocation(node.StartPos, node.EndPos)
     }

@@ -1,0 +1,86 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  /// <summary>
+  /// Description of JsKnownMembersOperators
+  /// </summary>
+  module JsKnownMembersOperators
+  {
+    public Register() : void
+    {
+      def opcodeAst(opcode, parms) { JsAST.Call(JsAST.OpCode(opcode), parms) }
+      def registerOpcode(opcodeName, opcode)
+      {
+        JsKnownMembers.RegisterMember(opcodeName, (_, _, parms) => Some(opcodeAst(opcode, parms)));
+      }
+      
+      registerOpcode("op_Inequality", "!==");
+      registerOpcode("op_Equality", "===");
+      registerOpcode("op_GreaterThan", ">");
+      registerOpcode("op_GreaterThanOrEqual", ">=");
+      registerOpcode("op_LessThan", "<");
+      registerOpcode("op_LessThanOrEqual", "<=");
+      
+      registerOpcode("op_Addition", "+");
+      registerOpcode("op_Subtraction", "-");
+      registerOpcode("op_Multiply", "*");
+      registerOpcode("op_Division", "/");      
+      registerOpcode("op_Modulus", "%");
+      registerOpcode("op_ExclusiveOr", "^");
+      registerOpcode("op_BitwiseAnd", "&");
+      registerOpcode("op_BitwiseOr", "|");
+      registerOpcode("op_LogicalAnd", "&&");
+      registerOpcode("op_LogicalOr", "||");
+      
+      registerOpcode("op_MultiplicationAssignment", "*=");
+      registerOpcode("op_SubtractionAssignment", "-=");
+      registerOpcode("op_ExclusiveOrAssignment", "^=");
+      registerOpcode("op_LeftShiftAssignment", "<<=");
+      registerOpcode("op_ModulusAssignment", "%=");
+      registerOpcode("op_AdditionAssignment", "+=");
+      registerOpcode("op_DivisionAssignment", "/=");
+      registerOpcode("op_BitwiseAndAssignment", "&=");
+      registerOpcode("op_BitwiseOrAssignment", "|=");
+            
+      registerOpcode("op_LeftShift", "<<");
+      registerOpcode("op_RightShift", ">>");
+      registerOpcode("op_UnsignedRightShift", ">>>");
+      
+      registerOpcode("op_Comma", ",");
+
+      // Unary
+      registerOpcode("op_Decrement", "--");
+      registerOpcode("op_Increment", "++");
+      registerOpcode("op_UnaryNegation", "-");
+      registerOpcode("op_UnaryPlus", "+");
+      registerOpcode("op_OnesComplement", "~");
+      
+      def registerCastOpcode(opcodeName)
+      {
+        JsKnownMembers.RegisterMember(
+          opcodeName,
+          (_, _, parms) =>
+            match (parms)
+            {
+            | [h] => Some(h)
+            | h :: t => Some(JsAST.Seq(h :: t))
+            | _ => None()
+            });
+      }
+      
+      registerCastOpcode("op_Implicit");
+      registerCastOpcode("op_Explicit");
+      
+      // Unsupported
+      //op_SignedRightShift
+    }
+  }
+}

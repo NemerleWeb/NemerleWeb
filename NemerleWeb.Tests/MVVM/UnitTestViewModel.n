@@ -171,10 +171,10 @@ namespace NemerleWeb.Tests
       
       test("using", () =>
       {
-        using (s = SomeDisposable())
-        {
-          _ = "Do something";
-        }
+        //using (s = SomeDisposable())
+        //{
+        //  _ = "Do something";
+        //}
         
         true
       });
@@ -261,9 +261,9 @@ namespace NemerleWeb.Tests
         def l = [1, 2, 3].ToList();
         
         mutable count = 0;
-        def seq = l.Select(x => x + 1);
+        def seq = l.Select(x => x);
         foreach (e in seq with i)
-          when (e == i + 2)
+          when (e == i + 1)
             count++;
         
         count == l.Count
@@ -339,9 +339,14 @@ namespace NemerleWeb.Tests
         count == 3;
       });
       
-      test("linq firstOrDefault lastOrDefault", () =>
+      test("linq firstOrDefault lastOrDefault empty", () =>
       {
-        [].ToList().FirstOrDefault() == 0 && [].ToList().LastOrDefault() == 0;
+        List([]).FirstOrDefault() == null && List([]).LastOrDefault() == null;
+      });
+      
+      test("linq firstOrDefault lastOrDefault full", () =>
+      {
+        List([1]).FirstOrDefault() == 1 && List([1]).LastOrDefault() == 1;
       });
       
       #if AA

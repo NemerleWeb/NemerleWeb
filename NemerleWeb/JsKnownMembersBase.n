@@ -3,8 +3,6 @@ using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
 using Nemerle.Compiler;
-using Nemerle.Compiler.Typedtree;
-using NemerleWeb.Utils;
 
 using System;
 using System.Collections.Generic;
@@ -12,20 +10,26 @@ using System.Linq;
 
 namespace NemerleWeb
 {
+  /// <summary>
+  /// Description of JsKnownMembersBase.
+  /// </summary>
   module JsKnownMembersBase
   {
-    public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
-    {
-      match(member.Name, parms)
-      {
-      | ("op_Inequality", _) => JsAST.Call(JsAST.OpCode("!="), parms)
-      | ("op_Equality", _) => JsAST.Call(JsAST.OpCode("=="), parms)
-      | ("op_GreaterThan", _) => JsAST.Call(JsAST.OpCode(">"), parms)
-      | ("op_GreaterThanOrEqual", _) => JsAST.Call(JsAST.OpCode(">="), parms)
-      | ("op_LessThan", _) => JsAST.Call(JsAST.OpCode("<"), parms)
-      | ("op_LessThanOrEqual", _) => JsAST.Call(JsAST.OpCode("<="), parms)
-      | _ => JsKnownMembersHelper.DefaultThrow(type, left, member, parms)
-      }
+    public Register() : void
+    {      
+      // Constructor case
+      JsKnownMembers.RegisterDefaultMember(
+        ".ctor",
+        (type, _, parms) =>
+          Some(JsAST.Call(JsAST.Constructor(type), parms)));
+      
+      JsKnownMembers.RegisterDefaultMember("ToString",
+        (_, left, parms) =>
+          match (parms)
+          {
+          | [] => Some(left.MethodCall("toString", parms))
+          | _ => None()
+          });
     }
   }
 }

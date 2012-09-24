@@ -14,7 +14,7 @@ using System.Linq;
 namespace NemerleWeb
 {
   macro Js(parameters : PExpr)
-  syntax ("js", parameters) 
+  syntax ("js", parameters)
   {
     JsImpl.DoTransform(Macros.ImplicitCTX(), parameters)
   }

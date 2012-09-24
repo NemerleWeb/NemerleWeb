@@ -1,0 +1,33 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+using NemerleWeb.Utils;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  /// <summary>
+  /// Description of JsKnownMembersObject.
+  /// </summary>
+  module JsKnownMembersObject
+  {
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(object), Handler); 
+    }
+    
+    private Handler(_left : JsAST, _member : IMember, parms : list[JsAST]) : option[JsAST]
+    {
+      match (parms)
+      {
+      | _ => None()
+      }
+    }
+  }
+}

@@ -1,0 +1,53 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+using NemerleWeb.Utils;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  /// <summary>
+  /// Description of JsKnownMembersSCGList.
+  /// </summary>
+  module JsKnownMembersSCGList
+  {
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(List[_]), Handler); 
+    }
+    
+    private Handler(left : JsAST, member : IMember, parms : list[JsAST]) : option[JsAST]
+    {
+      if (member.Name == ".ctor")
+        Some(JsAST.Array(parms.Filter(p => !(p is JsAST.NotImpl()))))
+      else      
+        match (parms)
+        {
+        | [] =>
+          match (member.Name)
+          {
+          | "get_Count" => Some(JsAST.FieldRef(left, "length", true))
+          | "GetEnumerator" => Some(left.MethodCall(member.Name, parms))
+          | _ => None()
+          }
+        
+        | [_] =>
+          match (member.Name)
+          {
+          | "get_Item" => Some(JsAST.Call(JsAST.Indexer(left), parms))
+          | "Add" => Some(JsAST.Call(JsAST.MethodRef(TypeHelper.PropertyToField(left, false), "push"), parms))
+          | "Remove" => Some(JsAST.Call(JsAST.MethodRef(TypeHelper.PropertyToField(left, false), "remove"), parms))
+          | _ => None()
+          }
+        
+        | _ => None()
+        }
+    }
+  }
+}

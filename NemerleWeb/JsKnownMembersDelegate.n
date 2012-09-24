@@ -1,0 +1,37 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  /// <summary>
+  /// Description of JsKnownMembersDelegate
+  /// </summary>
+  module JsKnownMembersDelegate
+  {
+    public Register() : void
+    {
+      def register(name)
+      {
+        JsKnownMembers.RegisterType(
+          name,
+          (_, _, parms) =>
+          {
+            match (parms)
+            {
+            | [lambda, _] => Some(lambda)
+            | _ => None()
+          }});
+      }
+      
+      register("System.Action");
+      register("System.Func");
+    }
+  }
+}

@@ -1,4 +1,5 @@
 ﻿using Nemerle;
+using Nemerle.Assertions;
 using Nemerle.Collections;
 using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
@@ -28,14 +29,14 @@ namespace NemerleWeb
     mutable _transformCounter : int = 0;
     mutable _spliceCounter : int = 0;
     
-    public this(typer : Typer, parser : XmlQuotParser)
+    public this([NotNull] typer : Typer, [NotNull] parser : XmlQuotParser)
     {
       _typer  = typer;
       _parser = parser;
       _methodNames = typer.CurrentType.GetMethods().Map(m => m.Name);
     }
           
-    public ToLocation(node : PegLocated) : Location
+    public ToLocation([NotNull] node : PegLocated) : Location
     {
       _parser.ToLocation(node)
     }
@@ -75,7 +76,7 @@ namespace NemerleWeb
         | Splicable.ControlExpr     => assert(false)
       })
     }
-    public Transform(xmlAsts : XmlAst.Seq) : PExpr
+    public Transform([NotNull] xmlAsts : XmlAst.Seq) : PExpr
     {          
       //assert2(false);
       def splicedMethod = CleanupCallRefs(GetMethodWithSplicesOnly(xmlAsts));
@@ -86,7 +87,7 @@ namespace NemerleWeb
       res;
     }
     
-    public TransformImpl(xmlAst : XmlAst, splices : Dictionary[int, string], loopStack = null : list[string]) : PExpr
+    public TransformImpl([NotNull] xmlAst : XmlAst, [NotNull] splices : Dictionary[int, string], loopStack = null : list[string]) : PExpr
     {
         _transformCounter++;
         Debug.WriteLine(_transformCounter + ": " + xmlAst.ToString());
@@ -148,9 +149,10 @@ namespace NemerleWeb
         | Text(Splicable.Value(value))  => <[ [L.XText($(value : string))] ]>
         | Text(_)  => assert(false);
         | Tag(name, XmlAst.AttrSplice(expr, SpliceType.Foreach) as c :: content) =>
+        
             def header = Parse(ToLocation(c), expr);
             match(header) {
-            | <[ $x in $xs ]> => 
+            | <[ $x in $_xs ]> => 
                 def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, 
                                          CreateAttribute("nw-repeat", x.ToString() + " in " + getSplice()) :: content);                
                 def tagExpr = TransformImpl(tag, splices, loopStack.Append([x.ToString()]));
@@ -186,7 +188,7 @@ namespace NemerleWeb
         }
     }
     
-    public GetMethodWithSplicesOnly(xmlAst : XmlAst) : PExpr
+    public GetMethodWithSplicesOnly([NotNull] xmlAst : XmlAst) : PExpr
     {        
         _spliceCounter++;
         Debug.WriteLine(_spliceCounter + ": " + xmlAst.ToString());

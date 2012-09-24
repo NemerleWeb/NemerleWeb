@@ -24,7 +24,7 @@ module Program
 [ViewModel]
 public partial class Test
 {
-  public this() 
+  public this()
   {
   }  
   

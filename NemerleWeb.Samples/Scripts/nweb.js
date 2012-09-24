@@ -541,3 +541,11 @@ if(!Array.prototype.indexOf){
     return -1;
   }
 }
+
+// TODO: Maybe move
+var Nemerle_Utility_Identity = {};
+Nemerle_Utility_Identity.prototype.Instance = {
+    Invoke: function (x) {
+        return x;
+    }
+};

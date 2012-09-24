@@ -1,0 +1,35 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+using NemerleWeb.Utils;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  module JsKnownMembersNemerleList
+  {
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(list[_].Cons), Handler);      
+    }
+    
+    private Handler(_left : JsAST, member : IMember, parms : list[JsAST]) : option[JsAST]
+    {
+      match (parms)
+      {
+      | _ =>
+        match (member.Name)
+        {
+        | ".ctor" => Some(JsAST.Array(parms.Filter(p => !(p is JsAST.NotImpl()))))
+        | _ => None()
+        }
+      }
+    }
+  }
+}

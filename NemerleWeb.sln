@@ -12,8 +12,6 @@ Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb", "NemerleWeb\Ne
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Samples", "NemerleWeb.Samples\NemerleWeb.Samples.nproj", "{C930DE6F-CDB7-412B-AD69-6E979B919F45}"
 EndProject
-Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Utils", "NemerleWeb.Utils\NemerleWeb.Utils.nproj", "{A350D2D6-BBE8-4535-BDAC-9A8CF9F07FCF}"
-EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Tests", "NemerleWeb.Tests\NemerleWeb.Tests.nproj", "{B3748A04-4DB2-4668-8ABA-3E076572258E}"
 EndProject
 Global
@@ -30,10 +28,6 @@ Global
 		{C930DE6F-CDB7-412B-AD69-6E979B919F45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C930DE6F-CDB7-412B-AD69-6E979B919F45}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C930DE6F-CDB7-412B-AD69-6E979B919F45}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A350D2D6-BBE8-4535-BDAC-9A8CF9F07FCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A350D2D6-BBE8-4535-BDAC-9A8CF9F07FCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A350D2D6-BBE8-4535-BDAC-9A8CF9F07FCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A350D2D6-BBE8-4535-BDAC-9A8CF9F07FCF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B3748A04-4DB2-4668-8ABA-3E076572258E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B3748A04-4DB2-4668-8ABA-3E076572258E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3748A04-4DB2-4668-8ABA-3E076572258E}.Release|Any CPU.ActiveCfg = Release|Any CPU

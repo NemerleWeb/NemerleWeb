@@ -1,42 +1,20 @@
 ﻿using Nemerle;
+using Nemerle.Assertions;
 using Nemerle.Collections;
-using Nemerle.Text;
-using Nemerle.Utility;
 using Nemerle.Compiler;
 using Nemerle.Compiler.Typedtree;
+using Nemerle.Imperative;
 using NemerleWeb.Utils;
 
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace NemerleWeb
 {
   internal module TypeHelper
-  {
-    [Memoize]
-    private InternalTypeName(type : TypeInfo) : string
-    {
-      if (type.SystemType != null) type.SystemType.FullName else type.FrameworkTypeName;
-    }
-    
-    public TypeName(type : TypeInfo) : string
-    {
-      if (type != null) InternalTypeName(type) else "";
-    }
-                  
-    public RemoveGetSet(methodName : string) : string
-    {
-      if (IsGetSet(methodName)) methodName.Substring(4) else methodName
-    }
-      
-    public IsGetSet(methodName : string) : bool
-    {
-      methodName.StartsWith("get_") || methodName.StartsWith("set_")
-    }
-      
-    public PropertyToField(prop : JsAST, isObservable : bool) : JsAST
+  {   
+    public PropertyToField([NotNull] prop : JsAST, isObservable : bool) : JsAST
     {   
       match(prop)
       {
@@ -46,41 +24,55 @@ namespace NemerleWeb
     }
   }
 
+  internal module StringExtensions
+  {
+    public static FirstCharacterToLower([NotNull] this str : string) : string 
+    {
+      if (str.Length == 0 || Char.IsLower(str, 0))
+        str
+      else
+        Char.ToLowerInvariant(str[0]).ToString() + str.Substring(1);
+    }
+  }
+  
+  // Mini lifting
   internal module JsAstExtensions
   {
-    public static MethodCall(this self : JsAST, method : string, parms : list[JsAST]) : JsAST
+    public static MethodCall(this self : JsAST, [NotNull] method : string, [NotNull] parms : list[JsAST]) : JsAST
     {
       JsAST.Call(JsAST.MethodRef(self, method.FirstCharacterToLower()), parms)
     }
     
-    public static StaticCall(this type : string, method : string, parms : list[JsAST]) : JsAST
+    public static StaticCall(this type : string, [NotNull] method : string, [NotNull] parms : list[JsAST]) : JsAST
     {
       JsAST.Call(JsAST.StaticRef(type, method.FirstCharacterToLower()), parms)
     }
   }
   
-  internal module JsKnownMembersHelper
-  {
-    public Default(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
-    {
-      Message.Warning(
-        member.Location,
-        $"Invalid $(member.Name) with $(TypeHelper.TypeName(type)) type, params: ..$parms" +
-        " not implemented in JS");
-      JsAST.Call(JsAST.MethodRef(left, TypeHelper.RemoveGetSet(member.Name)), parms)
-    }
-    
-    public DefaultThrow(type : TypeInfo, _left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
-    {
-      throw ArgumentException(
-        $"Invalid $(member.Name) with $(TypeHelper.TypeName(type)) type, params: ..$parms" +
-        " not implemented in JS. $(member.Location)");
-    }
-  }
-  
   module JsKnownMembers
   {
-    public Convert(call : TExpr.Call, builder : TExpr -> JsAST) : JsAST
+    static this()
+    {
+      JsKnownMembersBase.Register(); 
+      JsKnownMembersOperators.Register(); 
+      JsKnownMembersDelegate.Register();
+      JsKnownMembersObject.Register();
+      JsKnownMembersString.Register();
+      JsKnownMembersIDisposable.Register();
+      JsKnownMembersConsole.Register();
+      JsKnownMembersConvert.Register();
+      
+      JsKnownMembersSCGList.Register();
+      JsKnownMembersIEnumerable.Register();
+      JsKnownMembersEnumerator.Register();
+      
+      JsKnownMembersLinqEnumerable.Register();
+      
+      JsKnownMembersNemerleList.Register();
+      JsKnownMembersNemerleNCollectionsExtensions.Register();
+    }
+    
+    public Convert([NotNull] call : TExpr.Call, [NotNull] builder : TExpr -> JsAST) : JsAST
     {
       match (call)
       {
@@ -112,26 +104,106 @@ namespace NemerleWeb
         | Call(s, _, _) => Message.Warning($"Unsupported call to $s"); JsAST.Void()          
       }
     }
-      
-    [MatchCollector(
-      JsKnownMembersBase.ConvertMethod,
-      JsKnownMembersBCL.ConvertMethod,
-      JsKnownMembersBCLString.ConvertMethod,
-      JsKnownMembersNemerle.ConvertMethod,
-      JsKnownMembersLinq.ConvertMethod)]
-    public ConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
+    
+    #region ConvertMethod
+    
+    internal type ConvertTypeHandler = JsAST * IMember * list[JsAST] -> option[JsAST];
+    
+    // typeof().FullName -> Handler
+    private static _convertTypeHandlers : Dictionary[string, ConvertTypeHandler] = Dictionary();
+    
+    internal type ConvertMemberHandler = TypeInfo * JsAST * list[JsAST] -> option[JsAST];
+    
+    // memberName -> Handler
+    private static _convertMemberHandlers : Dictionary[string, ConvertMemberHandler] = Dictionary();
+    
+    // Default memberName -> Handler
+    private static _convertDefaultMemberHandlers : Dictionary[string, ConvertMemberHandler] = Dictionary();
+
+    /// <summary>
+    /// Convert method.
+    /// Note: type can be null.
+    /// </summary>
+    public ConvertMethod(type : TypeInfo, [NotNull] left : JsAST, [NotNull] member : IMember, [NotNull] parms : list[JsAST]) : JsAST
     {
-      match (member.Name, parms)
+      // First try convert member by name
+      def memberName = member.Name;
+      mutable memberHandler;
+      when (_convertMemberHandlers.TryGetValue(memberName, out memberHandler))
+        when (memberHandler(type, left, parms) is Some(ast))
+          return ast;
+      
+      // If no member handler found, try method handler
+      def typeName = TypeName(type);
+      mutable typeHandler;
+      when (_convertTypeHandlers.TryGetValue(typeName, out typeHandler))
+        when (typeHandler(left, member, parms) is Some(ast))
+          return ast;
+          
+      // Try using just FullName if SystemType
+      when (type != null && type.SystemType != null)
+        when (_convertTypeHandlers.TryGetValue(type.FullName, out typeHandler))
+          when (typeHandler(left, member, parms) is Some(ast))
+            return ast;
+          
+      // Nothing found, try default dictionary
+      when (_convertDefaultMemberHandlers.TryGetValue(memberName, out memberHandler))
+        when (memberHandler(type, left, parms) is Some(ast))
+          return ast;
+      
+      // Process low level naming
+      DefaultConvertMethod(type, left, member, parms)
+    }
+    
+    private DefaultConvertMethod(type : TypeInfo, left : JsAST, member : IMember, parms : list[JsAST]) : JsAST
+    {     
+      def propertyName = RemoveGetSet(member.Name);
+      
+      match (parms)
       {
-        | _ when member.Name.StartsWith("get_") =>
-          JsAST.PropertyGet(left, TypeHelper.RemoveGetSet(member.Name), false)
-        | (_, [h]) when member.Name.StartsWith("set_") =>
-          JsAST.PropertySet(left, TypeHelper.RemoveGetSet(member.Name), h)
-        | _ => JsKnownMembersHelper.Default(type, left, member, parms)
+      | _ when member.Name.StartsWith("get_") =>
+        def prop = member.DeclaringType
+                          .GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                          .FirstOrDefault(m => m.Name == propertyName) :> IProperty;
+        if(prop != null)
+          JsAST.PropertyGet(left, propertyName, JsClass.HasGetterNoSetter(prop))
+        else
+          JsAST.PropertyGet(left, propertyName, false)        
+      | [h] when member.Name.StartsWith("set_") =>
+        JsAST.PropertySet(left, propertyName, h)
+      | _ => 
+        // TODO: Change to Error
+        Message.Warning(
+          member.Location,
+          $"Invalid $(member.Name) with $(TypeName(type)) type, params: ..$parms not implemented in JS");
+          
+        left.MethodCall(propertyName, parms)
       }
     }
+    
+    public RegisterType([NotNull] type : Type, [NotNull] handler : ConvertTypeHandler) : void
+    {
+      _convertTypeHandlers.Add(type.FullName, handler);
+    }
+    
+    public RegisterType([NotNull] type : string, [NotNull] handler : ConvertTypeHandler) : void
+    {
+      _convertTypeHandlers.Add(type, handler);
+    }
+    
+    public RegisterMember([NotNull] memberName : string, [NotNull] handler : ConvertMemberHandler) : void
+    {
+      _convertMemberHandlers.Add(memberName, handler);
+    }
+    
+    public RegisterDefaultMember([NotNull] memberName : string, [NotNull] handler : ConvertMemberHandler) : void
+    {
+      _convertDefaultMemberHandlers.Add(memberName, handler);
+    }
+    
+    #endregion
       
-    public ConvertField(obj : TExpr, field : IField, builder : TExpr -> JsAST) : JsAST
+    public ConvertField([NotNull] obj : TExpr, [NotNull] field : IField, [NotNull] builder : TExpr -> JsAST) : JsAST
     {
       match(field)
       {
@@ -140,5 +212,30 @@ namespace NemerleWeb
       | _ => JsAST.FieldRef(builder(obj), field.Name, false) 
       }
     }
+    
+    #region Helper methods
+    
+    [Memoize]
+    private InternalTypeName(type : TypeInfo) : string
+    {
+      if (type.SystemType != null) type.SystemType.FullName else type.FrameworkTypeName;
+    }
+    
+    private TypeName(type : TypeInfo) : string
+    {
+      if (type != null) InternalTypeName(type) else "";
+    }
+                  
+    private RemoveGetSet([NotNull] methodName : string) : string
+    {
+      if (IsGetSet(methodName)) methodName.Substring(4) else methodName
+    }
+      
+    private IsGetSet(methodName : string) : bool
+    {
+      methodName.StartsWith("get_") || methodName.StartsWith("set_")
+    }
+    
+    #endregion
   }
 }

@@ -1,0 +1,41 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+using NemerleWeb.Utils;
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  /// <summary>
+  /// Description of JsKnownMembersIEnumerable.
+  /// </summary>
+  module JsKnownMembersIEnumerable
+  {
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(IEnumerable), Handler);      
+      JsKnownMembers.RegisterType(typeof(IEnumerable[_]), Handler);
+    }
+    
+    private Handler(left : JsAST, member : IMember, parms : list[JsAST]) : option[JsAST]
+    {
+      match (parms)
+      {
+      | [] =>
+        match (member.Name)
+        {
+        | "GetEnumerator" => Some(left.MethodCall(member.Name, parms))
+        | _ => None()
+        }
+      | _ => None()
+      }
+    }
+  }
+}

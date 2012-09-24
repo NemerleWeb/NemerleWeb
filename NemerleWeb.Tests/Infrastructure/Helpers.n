@@ -13,7 +13,7 @@ namespace NemerleWeb.Tests
 {
   public module Helpers
   {
-    public LoadSourceFor(filename : string) : string 
+    public LoadSourceFor([NotNull] filename : string) : string 
     {
       def dir = Uri(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase)).LocalPath;
       def filename = Path.GetFullPath(Path.Combine(dir, filename));

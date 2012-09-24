@@ -1,0 +1,162 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+using NemerleWeb.Utils;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  module JsLinqExtensions
+  {
+    public static AsEnumerable(this seq : JsAST) : JsAST
+    {
+      "Enumerable".StaticCall("from", [seq])
+    }
+  }
+  
+  module JsKnownMembersLinqEnumerable
+  {
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(Enumerable), Handler); 
+    }
+    
+    private Handler(_left : JsAST, member : IMember, parms : list[JsAST]) : option[JsAST]
+    {
+      match (parms)
+      {
+      | [seq] =>
+        match (member.Name)
+        {
+        | "AsEnumerable" => Some(seq.AsEnumerable())
+        | "Count" => Some(JsAST.FieldRef(seq, "length", true))        
+        
+        | "All"
+        | "Average"
+        | "Cast"          
+        | "Empty"
+        | "First"
+        | "Last"
+        | "LongCount"
+        | "Max"
+        | "Min"
+        | "OfType"
+        | "Reverse"
+        | "Single"
+        | "SingleOrDefault"
+        | "Sum"        
+        | "ToArray" => Some(seq.AsEnumerable().MethodCall(member.Name, []))
+        
+        | "ToList" => Some(seq)
+        
+        | "FirstOrDefault"
+        | "LastOrDefault" =>  Some(seq.AsEnumerable().MethodCall(member.Name, [JsAST.Literal(JsLiteral.Null())]))
+
+        | _ => None()
+        }
+          
+      | [seq, arg1] =>
+        match (member.Name)
+        {        
+        | "Aggregate"
+        | "All"
+        | "Average"
+        | "Concat"
+        | "Contains"
+        | "Count"
+        | "DefaultIfEmpty"
+        | "ElementAt"
+        | "ElementAtOrDefault"
+        | "Except"
+        | "First"
+        | "GroupBy"
+        | "Intersect"
+        | "Last"        
+        | "LongCount"
+        | "Max"
+        | "Min"
+        | "OrderBy"
+        | "Repeat"
+        | "Select"
+        | "SelectMany"
+        | "SequenceEqual"
+        | "Single"
+        | "SingleOrDefault"
+        | "Skip"
+        | "SkipWhile"
+        | "Sum"
+        | "Take"
+        | "TakeWhile"
+        | "ThenBy"
+        | "ThenByDescending"
+        | "ToDictionary"          
+        | "ToLookup"
+        | "Union"
+        | "Where" => Some(seq.AsEnumerable().MethodCall(member.Name, [arg1]))
+        
+        | "FirstOrDefault"
+        | "LastOrDefault" =>  Some(seq.AsEnumerable().MethodCall(member.Name, [JsAST.Literal(JsLiteral.Null()), arg1]))
+                              
+        // Special method
+        | "Range" => Some("Enumerable".StaticCall("range", [seq, arg1]))
+        | _ => None()
+        }
+          
+      | [seq, arg1, arg2] =>
+        match (member.Name)
+        {
+        | "Aggregate"
+        | "Contains"
+        | "Count"
+        | "Except"
+        | "GroupBy"
+        | "Intersect"
+        | "OrderBy"
+        | "SelectMany"
+        | "SequenceEqual"
+        | "ThenBy"
+        | "ThenByDescending"
+        | "ToDictionary"
+        | "ToLookup"
+        | "Union"
+        | "Zip" => Some(seq.AsEnumerable().MethodCall(member.Name, [arg1, arg2]))
+        | _ => None()
+        }
+        
+      | [seq, arg1, arg2, arg3] =>
+        match (member.Name)
+        {
+        | "Aggregate"
+        | "GroupBy"
+        | "ToDictionary"
+        | "ToLookup" => Some(seq.AsEnumerable().MethodCall(member.Name, [arg1, arg2, arg3]))
+        | _ => None()
+        }
+        
+      | [seq, arg1, arg2, arg3, arg4] =>
+        match (member.Name)
+        {
+        | "GroupBy"
+        | "GroupJoin"
+        | "Join" => Some(seq.AsEnumerable().MethodCall(member.Name, [arg1, arg2, arg3, arg4]))
+        | _ => None()
+        }
+        
+      | [seq, arg1, arg2, arg3, arg4, arg5] =>
+        match (member.Name)
+        {
+        | "GroupJoin"
+        | "Join" => Some(seq.AsEnumerable().MethodCall(member.Name, [arg1, arg2, arg3, arg4, arg5]))
+        | _ => None()
+        }
+      | _ => None()
+      }
+    }
+  }
+}

@@ -39,7 +39,7 @@ namespace NemerleWeb
         JsonConvert.SerializeObject(value, JsonSerializerSettings() <- TypeNameHandling = TypeNameHandling.Objects);
     }
         
-    public MakePageHtml[ViewModel](viewModel : IViewModel) : string
+    public MakePageHtml[ViewModel]([NotNull] viewModel : IViewModel) : string
     {
         def models = viewModel.GetType()
                               .Assembly

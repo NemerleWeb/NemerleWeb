@@ -138,16 +138,43 @@
     <Compile Include="JsKnownMembersBase.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersBCL.n">
+    <Compile Include="JsKnownMembersDelegate.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersBCLString.n">
+    <Compile Include="JsKnownMembersConsole.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersLinq.n">
+    <Compile Include="JsKnownMembersConvert.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersNemerle.n">
+    <Compile Include="JsKnownMembersIDisposable.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JsKnownMembersIEnumerable.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JsKnownMembersNemerleNCollectionsExtensions.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JsKnownMembersEnumerator.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JsKnownMembersSCGList.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JsKnownMembersString.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JsKnownMembersLinqEnumerable.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JsKnownMembersNemerleList.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JsKnownMembersObject.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JsKnownMembersOperators.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JsLiteral.n">
@@ -231,13 +258,6 @@
     <Content Include="Scripts\jquery.signalR-0.5.3.min.js">
       <SubType>Content</SubType>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <MacroProjectReference Include="..\NemerleWeb.Utils\NemerleWeb.Utils.nproj">
-      <Name>NemerleWeb.Utils</Name>
-      <Project>{a350d2d6-bbe8-4535-bdac-9a8cf9f07fcf}</Project>
-      <Private>False</Private>
-    </MacroProjectReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

@@ -15,7 +15,7 @@ using NemerleWeb.Tests;
 
 public module HtmlHelperExtensions
 {
-  public static FileContents(this _helper : HtmlHelper, filename : string) : string
+  public static FileContents(this _helper : HtmlHelper, [NotNull] filename : string) : string
   { 
     Helpers.LoadSourceFor(filename);
   }  

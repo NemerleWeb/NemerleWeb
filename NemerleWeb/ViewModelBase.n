@@ -15,7 +15,7 @@ namespace NemerleWeb
   public class ViewModel {}
   public class ViewModelBase[T] : ViewModel
   {
-    public template[TM](model : Expression[Func[T, TM]]) : string
+    public template[TM]([NotNull] model : Expression[Func[T, TM]]) : string
     { 
       def hasView = typeof(TM).GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                               .Any(m => m.Name == "View" && m.ReturnType == typeof(string));
@@ -30,7 +30,7 @@ namespace NemerleWeb
       }   
     }
     
-    public template[TM](model : Expression[Func[T, TM]], template : Expression[Func[TM, string]]) : string
+    public template[TM]([NotNull] model : Expression[Func[T, TM]], template : Expression[Func[TM, string]]) : string
     { 
       match(model.Body, template.Body)
       {
@@ -42,12 +42,12 @@ namespace NemerleWeb
       }   
     }
     
-    public template[TM](_model : ViewModel, _template : string) : string
+    public template[TM]([NotNull] _model : ViewModel, [NotNull] _template : string) : string
     {
       ""
     }
         
-    public GetTemplateName(_modelName : string, _viewName : string) : string
+    public GetTemplateName([NotNull] _modelName : string, [NotNull] _viewName : string) : string
     { "" }
   }
 }

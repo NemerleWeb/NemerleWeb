@@ -1,0 +1,44 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+using NemerleWeb.Utils;
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  /// <summary>
+  /// Description of JsKnownMembersSCGEnumerator.
+  /// </summary>
+  module JsKnownMembersEnumerator
+  {
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(IEnumerator), Handler);
+      JsKnownMembers.RegisterType(typeof(IEnumerator[_]), Handler);
+      JsKnownMembers.RegisterType("System.Collections.Generic.Enumerator[T]", Handler);
+      JsKnownMembers.RegisterType("System.Collections.Generic.List`1+Enumerator", Handler);
+    }
+    
+    private Handler(left : JsAST, member : IMember, parms : list[JsAST]) : option[JsAST]
+    {
+      match (parms)
+      {
+      | [] =>
+        match (member.Name)
+        {
+        | "MoveNext" => Some(JsAST.Call(JsAST.MethodRef(left, "moveNext"), []))
+        | "get_Current" => Some(left.MethodCall("current", parms))
+        | _ => None()
+        }
+      | _ => None()
+      }
+    }
+  }
+}

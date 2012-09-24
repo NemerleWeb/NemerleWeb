@@ -184,7 +184,7 @@ namespace NemerleWeb
       };
     }
     
-    CreateResourceController(tb : TypeBuilder, typer : Typer) : void
+    CreateResourceController(_tb : TypeBuilder, typer : Typer) : void
     {
       def env = typer.Manager.CoreEnv;
       def controllerName = "NemerleWebResourceController";
