@@ -44,27 +44,24 @@ namespace NemerleWeb.Samples
   { 
     AvailableColors : list[(int * string)] { get { [(0, "Red"), (1, "Green"), (2, "Blue"), (3, "Other")] }  }
     CurrentColorId : int { get; set; }
-    
-    public OtherColor : Color.Other {
-      get {
-        if(CurrentColor != null && CurrentColor is Color.Other)
-          CurrentColor :> Color.Other
-        else
-          null
-      }
-    }
-    
+    OtherColor : Color.Other;
+        
     public CurrentColor : Color {
       get {
         match(CurrentColorId) {
         | 0 => Color.Red()
         | 1 => Color.Green()
         | 2 => Color.Blue()
-        | 3 => Color.Other(0, 0, 0)
+        | 3 => OtherColor
         | _ => Color.Red();
         }
       }
     }      
+    
+    public this()
+    {
+      OtherColor = Color.Other(0, 0, 0);
+    }
     
     [Html]
     public View() : string
