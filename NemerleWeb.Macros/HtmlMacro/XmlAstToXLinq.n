@@ -252,23 +252,4 @@ namespace NemerleWeb
       XmlAst.Attr(0, 0, Splicable.Value(0, 0, name), Splicable.Value(0, 0, val))
     }
   }
-  
-  public module Ext 
-  {
-      public CombineAttributes(this instance : IEnumerable[object]) : IEnumerable[object]
-      {
-        def xattrs = instance.OfType.[XAttribute]();
-        def cssValue = string.Join(", ", xattrs.Where(a => a.Name.LocalName.StartsWith("css-")).Select(a => $"\"$(a.Name.LocalName.Substring(4))\": $(a.Value)"));
-        def css = "css: {" + cssValue + "}";
-        def styleValue = string.Join(", ", xattrs.Where(a => a.Name.LocalName.StartsWith("style-")).Select(a => $"\"$(a.Name.LocalName.Substring(6))\": $(a.Value)"));
-        def style = "style: {" + styleValue + "}";
-        def attrs = xattrs.Where(a => !a.Name.LocalName.StartsWith("css-"))
-                          .Where(a => !a.Name.LocalName.StartsWith("style-"))
-                          .Concat(if(!string.IsNullOrWhiteSpace(cssValue)) [XAttribute("data-bind", css)] else [])
-                          .Concat(if(!string.IsNullOrWhiteSpace(styleValue)) [XAttribute("data-bind", style)] else [])
-                          .GroupBy(a => a.Name.LocalName)
-                          .Map(a => XAttribute(a.Key, string.Join(", ", a.Map(x => x.Value))));
-        instance.Filter(x => !(x is XAttribute)).Append(attrs);
-      }
-  }
 }

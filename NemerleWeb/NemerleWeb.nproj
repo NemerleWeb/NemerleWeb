@@ -91,30 +91,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(Nemerle)\Nemerle.Compiler.dll</HintPath>
     </Reference>
-    <Reference Include="Nemerle.Macros">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(Nemerle)\Nemerle.Macros.dll</HintPath>
-    </Reference>
-    <Reference Include="Nemerle.Peg">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(Nemerle)\Nemerle.Peg.dll</HintPath>
-    </Reference>
-    <Reference Include="Nemerle.Peg.Macros">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(Nemerle)\Nemerle.Peg.Macros.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HtmlMacro\Html.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="HtmlMacro\XmlAst.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="HtmlMacro\XmlAstToXLinq.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="HtmlMacro\XmlQuotParser.n">
+    <Compile Include="HtmlMacro\Ext.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IPage.n">
@@ -180,29 +159,14 @@
     <Compile Include="JsLiteral.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Js.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="UnitAttribute.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Unit.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Scripts\Scripts.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="TName.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
     <Compile Include="SignalR\HubBase.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="SignalR\SignalMacro.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TransformView.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="TyperHelper.n">
@@ -211,18 +175,12 @@
     <Compile Include="Utils.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="View.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Page.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="PageBase.n">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="HtmlMacro\" />
+    <Folder Include="HtmlMacro" />
     <Folder Include="Scripts\" />
     <Folder Include="SignalR" />
     <Folder Include="Properties\" />
