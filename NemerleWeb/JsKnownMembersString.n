@@ -134,7 +134,7 @@ namespace NemerleWeb
         | _ => None()
         }
           
-      | [arg1, arg2, arg3] =>
+      | [_arg1, _arg2, _arg3] =>
         match (member.Name)
         {
         | "Compare"
@@ -152,7 +152,7 @@ namespace NemerleWeb
         | _ => None()
         }
         
-      | [arg1, arg2, arg3, arg4] =>
+      | [_arg1, _arg2, _arg3, _arg4] =>
         match (member.Name)
         {
         | "Compare"
@@ -162,13 +162,13 @@ namespace NemerleWeb
         | _ => None()
         }
           
-      | [arg1, arg2, arg3, arg4, arg5] =>
+      | [_arg1, _arg2, _arg3, _arg4, _arg5] =>
         match (member.Name)
         {
         | "Compare"
         | _ => None()
         }       
-      | [arg1, arg2, arg3, arg4, arg5, arg6] =>
+      | [_arg1, _arg2, _arg3, _arg4, _arg5, _arg6] =>
         match (member.Name)
         {
         | "Compare"

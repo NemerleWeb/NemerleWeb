@@ -19,6 +19,23 @@ namespace NemerleWeb.Tests
         _ = "Do something";
       }
     }
+    
+    [JsModel, Record]
+    class TestCast
+    {
+      public I : int { get; set; }
+      
+      public static @:(i : int) : TestCast
+      {
+        TestCast(i)
+      }
+      
+      public static @:>(i : long) : TestCast
+      {
+        TestCast(i :> int)
+      }
+    }
+    
     /*
     [JsModel]
     class SomeException : Exception
@@ -154,6 +171,16 @@ namespace NemerleWeb.Tests
             true
       });
       
+      test("casting", () =>
+      {
+        def x = 1;
+        
+        def y : TestCast = x;
+        def z = 1l :> TestCast;
+        
+        y.I == z.I
+      });
+      
       test("list initialization", () =>
       {
         def l1 = List([1, 2, 3]);
@@ -200,26 +227,6 @@ namespace NemerleWeb.Tests
         | Case3(val) => val == false
         }
       });
-      
-      // TODO: #11
-      //test("linq where", () =>
-      //{
-      //  def l = [1, 2, 3, 4, 5, 6].ToList();
-      //  def r = l.Where(x => x > 4);
-        
-      //  mutable res = false;
-      //  mutable i = 0;
-      //  using (e = r.GetEnumerator())
-      //  {
-      //    while (e.MoveNext())
-      //    {
-      //      when (e.Current != i + 1)
-      //        res = false;
-      //    }
-      //  }
-        
-      //  res
-      //});
       
       test("multiple assign", () =>
       {

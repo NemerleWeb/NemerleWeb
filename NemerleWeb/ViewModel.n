@@ -102,7 +102,6 @@ namespace NemerleWeb
                     }
                   ]>);
                   
-                  // TODO: Maybe need to be changed
                   if (serverMethods.ContainsKey(method.Name))
                   {
                     serverMethods[method.Name] += fparms;

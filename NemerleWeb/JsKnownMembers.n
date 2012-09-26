@@ -172,7 +172,7 @@ namespace NemerleWeb
       | [h] when member.Name.StartsWith("set_") =>
         JsAST.PropertySet(left, propertyName, h)
       | _ => 
-        // TODO: Change to Error
+        // TODO: Change to Error #23
         Message.Warning(
           member.Location,
           $"Invalid $(member.Name) with $(TypeName(type)) type, params: ..$parms not implemented in JS");

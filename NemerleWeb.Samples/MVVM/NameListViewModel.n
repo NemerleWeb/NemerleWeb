@@ -28,7 +28,6 @@ namespace NemerleWeb.Samples
     
     public this()
     {
-      // TODO: Allow wildcards: server.GetNames(Names = _);
       server.GetNames(l => Names = l);
     }
     

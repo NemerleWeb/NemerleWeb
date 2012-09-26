@@ -15,49 +15,46 @@ namespace NemerleWeb
 
   internal module HtmlImpl
   {
-    mutable _debug = true;
-    
-    internal ToXLinq(typer : Typer, mb : MethodBuilder) : PExpr
+    internal ToXLinq(typer : Typer, mb : MethodBuilder) : void
     {   
       def expr = mb.Body;
-                
+      
       match (expr)
       {
-        | PExpr.Sequence(PExpr.Literal(Literal where(RawString = rs)) as litExpr :: []) =>
-          if (rs.Length == 0 || rs[0] != '<')
-            Message.FatalError(expr.Location, "The literal in 'html' macro must be recursive string.")
-          else
-          {
-            def str = rs.Substring(2, rs.Length - 4);
-            def loc = litExpr.Location;
-            def loc = Location(loc.FileIndex, loc.Line, loc.Column + 2, loc.EndLine, loc.EndColumn - 2);            
-            def parser = XmlQuotParser(loc, str);
+      | PExpr.Sequence(PExpr.Literal(Literal where(RawString = rs)) as litExpr :: []) =>
+        if (rs.Length == 0 || rs[0] != '<')
+          Message.FatalError(expr.Location, "The literal in 'html' macro must be recursive string.")
+        else
+        {
+          def str = rs.Substring(2, rs.Length - 4);
+          def loc = litExpr.Location;
+          def loc = Location(loc.FileIndex, loc.Line, loc.Column + 2, loc.EndLine, loc.EndColumn - 2);            
+          def parser = XmlQuotParser(loc, str);
                         
-            match (parser.Parse(str))
-            {
-              | Some(result) => 
-                def transformer = XmlAstToXLinq(typer, parser);
-                def res = transformer.Transform(result);
-                def methodName = $"__$(mb.Name)";
-                mb.DeclaringType.Define(<[decl: public $(methodName : dyn)() : list[System.Xml.Linq.XElement] { $res; } ]>);
-                mb.DeclaringType.Compile();
-                <[]>
-              | _ =>
-                def (pos, expected) = parser.GetMaxRollbackPosAndNames();
-                def expected = expected.NToList();
+          match (parser.Parse(str))
+          {
+          | Some(result) => 
+            def transformer = XmlAstToXLinq(typer, parser);
+            def res = transformer.Transform(result);
+            def methodName = $"__$(mb.Name)";
+            mb.DeclaringType.Define(<[decl: public $(methodName : dyn)() : list[System.Xml.Linq.XElement] { $res; } ]>);
+            mb.DeclaringType.Compile();
+          | _ =>
+            def (pos, expected) = parser.GetMaxRollbackPosAndNames();
+            def expected = expected.NToList();
                 
-                def msg = if (expected.IsEmpty) "Unexpected character."
-                          else
-                            match (expected.DivideLast())
-                            {
-                              | ([], last)        => $"Expected $last."
-                              | (expected,  last) => $"Expected ..$expected or $last."
-                            };
-                Message.FatalError(parser.ToLocation(pos, pos + 1), msg)
-            }
+            def msg = if (expected.IsEmpty) "Unexpected character."
+                      else
+                        match (expected.DivideLast())
+                        {
+                        | ([], last)        => $"Expected $last."
+                        | (expected,  last) => $"Expected ..$expected or $last."
+                        };
+            Message.FatalError(parser.ToLocation(pos, pos + 1), msg)
           }
+        }
           
-        | _ => Message.FatalError(expr.Location, "You must pass recursive string with XML literal into 'html' macro.")
+      | _ => Message.FatalError(expr.Location, "You must pass recursive string with XML literal into 'html' macro.")
       }
     }
   }
