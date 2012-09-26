@@ -1,4 +1,6 @@
-nweb = {
+"use strict";
+
+var nweb = {
   go: function(model) {    
     nweb.applyBindings(model, document.body, nweb.bindings, []);
     nweb.invalidate(nweb.bindings);
@@ -543,9 +545,8 @@ if(!Array.prototype.indexOf){
 }
 
 // TODO: Maybe move
-var Nemerle_Utility_Identity = {};
-Nemerle_Utility_Identity.prototype.Instance = {
-    Invoke: function (x) {
+var Nemerle_Utility_Identity = {
+    Instance: function (x) {
         return x;
     }
 };

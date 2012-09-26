@@ -225,7 +225,7 @@ namespace NemerleWeb.Tests
       {
         def (a, b) = (1, 2);
         
-        true
+        a < b
       });
       
       test("foreach", () =>
@@ -275,7 +275,7 @@ namespace NemerleWeb.Tests
         
         mutable count = 0;
         def seq = l.Where(_ > 2);
-        foreach (e in seq with i)
+        foreach (_ in seq with i)
           when (i == 0)
             count++;
         

@@ -177,7 +177,7 @@ namespace NemerleWeb
           member.Location,
           $"Invalid $(member.Name) with $(TypeName(type)) type, params: ..$parms not implemented in JS");
           
-        left.MethodCall(propertyName, parms)
+        JsAST.Call(JsAST.MethodRef(left, propertyName), parms)
       }
     }
     

@@ -83,7 +83,7 @@ namespace NemerleWeb
       def splices = TyperHelper.GetSplices(splicedMethod, _typer);  
       _typer.CurrentTypeBuilder.Compile();
       def res = Util.locate(ToLocation(xmlAsts), TransformImpl(xmlAsts, splices));
-      Message.Hint(res.ToString());
+      //Message.Hint(res.ToString());
       res;
     }
     
