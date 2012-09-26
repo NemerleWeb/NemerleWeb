@@ -389,10 +389,22 @@
     <Content Include="Scripts\lang-n.js">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\linq.js">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\modernizr-2.0.6-development-only.js">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\nweb.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\NWebJs.Tests\simple-repeat.html">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\NWebJs.Tests\simple-select.html">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\NWebJs.Tests\simple-template.html">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\prettify.js">
@@ -434,6 +446,7 @@
     <Folder Include="MVVM\Knockout" />
     <Folder Include="Properties\" />
     <Folder Include="Scripts\" />
+    <Folder Include="Scripts\NWebJs.Tests\" />
     <Folder Include="Views\" />
     <Folder Include="Views\Home\" />
     <Folder Include="Views\Shared\" />
