@@ -1,6 +1,6 @@
 ﻿/*--------------------------------------------------------------------------
  * linq.js - LINQ for JavaScript
- * ver 3.0.1-Beta2 (July. 26th, 2012)
+ * ver 3.0.2-RC (Sep. 16th, 2012)
  *
  * created and maintained by neuecc <ils@neue.cc>
  * licensed under MIT License
@@ -224,11 +224,15 @@
 
     Enumerable.choice = function () // variable argument
     {
-        var args = (arguments[0] instanceof Array) ? arguments[0] : arguments;
+        var args = arguments;
 
         return new Enumerable(function () {
             return new IEnumerator(
-                Functions.Blank,
+                function () {
+                    args = (args[0] instanceof Array) ? args[0]
+                        : (args[0].getEnumerator != null) ? args[0].toArray()
+                        : args;
+                },
                 function () {
                     return this.yieldReturn(args[Math.floor(Math.random() * args.length)]);
                 },
@@ -238,12 +242,16 @@
 
     Enumerable.cycle = function () // variable argument
     {
-        var args = (arguments[0] instanceof Array) ? arguments[0] : arguments;
+        var args = arguments;
 
         return new Enumerable(function () {
             var index = 0;
             return new IEnumerator(
-                Functions.Blank,
+                function () {
+                    args = (args[0] instanceof Array) ? args[0]
+                        : (args[0].getEnumerator != null) ? args[0].toArray()
+                        : args;
+                },
                 function () {
                     if (index >= args.length) index = 0;
                     return this.yieldReturn(args[index++]);
@@ -300,6 +308,23 @@
                             else enumerator.moveNext();
 
                             return (enumerator.atEnd()) ? false : this.yieldReturn(enumerator.item());
+                        },
+                        Functions.Blank);
+                });
+            }
+
+            // WinMD IIterable<T>
+            if (typeof Windows === Types.Object && typeof obj.first === Types.Function) {
+                return new Enumerable(function () {
+                    var isFirst = true;
+                    var enumerator;
+                    return new IEnumerator(
+                        function () { enumerator = obj.first(); },
+                        function () {
+                            if (isFirst) isFirst = false;
+                            else enumerator.moveNext();
+
+                            return (enumerator.hasCurrent) ? this.yieldReturn(enumerator.current) : this.yieldBreak();
                         },
                         Functions.Blank);
                 });
@@ -702,10 +727,7 @@
 
     // Overload:function(func)
     // Overload:function(seed,func<value,element>)
-    // Overload:function(seed,func<value,element>,resultSelector)
-    Enumerable.prototype.scan = function (seed, func, resultSelector) {
-        if (resultSelector != null) return this.scan(seed, func).select(resultSelector);
-
+    Enumerable.prototype.scan = function (seed, func) {
         var isUseSeed;
         if (func == null) {
             func = Utils.createLambda(seed); // arguments[0]
@@ -1218,11 +1240,60 @@
         });
     };
 
-    Enumerable.prototype.alternate = function (value) {
-        value = Enumerable.make(value);
-        return this.selectMany(function (elem) {
-            return Enumerable.make(elem).concat(value);
-        }).takeExceptLast();
+    Enumerable.prototype.alternate = function (alternateValueOrSequence) {
+        var source = this;
+
+        return new Enumerable(function () {
+            var buffer;
+            var enumerator;
+            var alternateSequence;
+            var alternateEnumerator;
+
+            return new IEnumerator(
+                function () {
+                    if (alternateValueOrSequence instanceof Array || alternateValueOrSequence.getEnumerator != null) {
+                        alternateSequence = Enumerable.from(Enumerable.from(alternateValueOrSequence).toArray()); // freeze
+                    }
+                    else {
+                        alternateSequence = Enumerable.make(alternateValueOrSequence);
+                    }
+                    enumerator = source.getEnumerator();
+                    if (enumerator.moveNext()) buffer = enumerator.current();
+                },
+                function () {
+                    while (true) {
+                        if (alternateEnumerator != null) {
+                            if (alternateEnumerator.moveNext()) {
+                                return this.yieldReturn(alternateEnumerator.current());
+                            }
+                            else {
+                                alternateEnumerator = null;
+                            }
+                        }
+
+                        if (buffer == null && enumerator.moveNext()) {
+                            buffer = enumerator.current(); // hasNext
+                            alternateEnumerator = alternateSequence.getEnumerator();
+                            continue; // GOTO
+                        }
+                        else if (buffer != null) {
+                            var retVal = buffer;
+                            buffer = null;
+                            return this.yieldReturn(retVal);
+                        }
+
+                        return this.yieldBreak();
+                    }
+                },
+                function () {
+                    try {
+                        Utils.dispose(enumerator);
+                    }
+                    finally {
+                        Utils.dispose(alternateEnumerator);
+                    }
+                });
+        });
     };
 
     // Overload:function(value)
@@ -1243,6 +1314,7 @@
 
     Enumerable.prototype.defaultIfEmpty = function (defaultValue) {
         var source = this;
+        if (defaultValue === undefined) defaultValue = null;
 
         return new Enumerable(function () {
             var enumerator;
@@ -1254,7 +1326,8 @@
                     if (enumerator.moveNext()) {
                         isFirst = false;
                         return this.yieldReturn(enumerator.current());
-                    } else if (isFirst) {
+                    }
+                    else if (isFirst) {
                         isFirst = false;
                         return this.yieldReturn(defaultValue);
                     }
@@ -1664,7 +1737,8 @@
     // Overload:function(seed,func)
     // Overload:function(seed,func,resultSelector)
     Enumerable.prototype.aggregate = function (seed, func, resultSelector) {
-        return this.scan(seed, func, resultSelector).last();
+        resultSelector = Utils.createLambda(resultSelector);
+        return resultSelector(this.scan(seed, func, resultSelector).last());
     };
 
     // Overload:function()
@@ -1743,6 +1817,7 @@
     };
 
     Enumerable.prototype.elementAtOrDefault = function (index, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
         var value;
         var found = false;
         this.forEach(function (x, i) {
@@ -1773,10 +1848,9 @@
         return value;
     };
 
-    // Overload:function(defaultValue)
-    // Overload:function(defaultValue,predicate)
-    Enumerable.prototype.firstOrDefault = function (defaultValue, predicate) {
-        if (predicate != null) return this.where(predicate).firstOrDefault(defaultValue);
+    Enumerable.prototype.firstOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
+        if (predicate != null) return this.where(predicate).firstOrDefault(null, defaultValue);
 
         var value;
         var found = false;
@@ -1806,8 +1880,9 @@
 
     // Overload:function(defaultValue)
     // Overload:function(defaultValue,predicate)
-    Enumerable.prototype.lastOrDefault = function (defaultValue, predicate) {
-        if (predicate != null) return this.where(predicate).lastOrDefault(defaultValue);
+    Enumerable.prototype.lastOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
+        if (predicate != null) return this.where(predicate).lastOrDefault(null, defaultValue);
 
         var value;
         var found = false;
@@ -1838,8 +1913,9 @@
 
     // Overload:function(defaultValue)
     // Overload:function(defaultValue,predicate)
-    Enumerable.prototype.singleOrDefault = function (defaultValue, predicate) {
-        if (predicate != null) return this.where(predicate).singleOrDefault(defaultValue);
+    Enumerable.prototype.singleOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
+        if (predicate != null) return this.where(predicate).singleOrDefault(null, defaultValue);
 
         var value;
         var found = false;
@@ -2443,7 +2519,7 @@
 
         if (comparison == 0) {
             if (this.child != null) return this.child.compare(index1, index2);
-            comparison = Utils.compare(index1, index2);
+            return Utils.compare(index1, index2);
         }
 
         return (this.descending) ? -comparison : comparison;
@@ -2482,6 +2558,7 @@
     };
 
     ArrayEnumerable.prototype.elementAtOrDefault = function (index, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
         var source = this.getSource();
         return (0 <= index && index < source.length)
             ? source[index]
@@ -2495,7 +2572,8 @@
             : Enumerable.prototype.first.apply(this, arguments);
     };
 
-    ArrayEnumerable.prototype.firstOrDefault = function (defaultValue, predicate) {
+    ArrayEnumerable.prototype.firstOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
         if (predicate != null) {
             return Enumerable.prototype.firstOrDefault.apply(this, arguments);
         }
@@ -2511,7 +2589,8 @@
             : Enumerable.prototype.last.apply(this, arguments);
     };
 
-    ArrayEnumerable.prototype.lastOrDefault = function (defaultValue, predicate) {
+    ArrayEnumerable.prototype.lastOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
         if (predicate != null) {
             return Enumerable.prototype.lastOrDefault.apply(this, arguments);
         }
@@ -2906,7 +2985,10 @@
     Grouping.prototype = new ArrayEnumerable();
 
     // module export
-    if (typeof module !== Types.Undefined && module.exports) {
+    if (typeof define === Types.Function && define.amd) { // AMD
+        define("linqjs", [], function () { return Enumerable; });
+    }
+    else if (typeof module !== Types.Undefined && module.exports) { // Node
         module.exports = Enumerable;
     }
     else {
