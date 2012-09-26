@@ -117,16 +117,16 @@
     <Compile Include="HtmlMacro\XmlQuotParser.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IViewModel.n">
+    <Compile Include="IPage.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsAST.n">
+    <Compile Include="JsAst.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsASTBuilder.n">
+    <Compile Include="JsAstBuilder.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsASTHelper.n">
+    <Compile Include="JsAstHelper.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JsClass.n">
@@ -183,10 +183,10 @@
     <Compile Include="Js.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsModel.n">
+    <Compile Include="UnitAttribute.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsModelAttribute.n">
+    <Compile Include="Unit.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Scripts\Scripts.n">
@@ -214,13 +214,10 @@
     <Compile Include="View.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ViewModel.n">
+    <Compile Include="Page.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ViewModelBase.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ViewModelExtensions.n">
+    <Compile Include="PageBase.n">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

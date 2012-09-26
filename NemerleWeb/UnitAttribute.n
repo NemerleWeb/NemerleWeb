@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace NemerleWeb
 {    
-    [AttributeUsage(AttributeTargets.Class)]
-    public class JsModel : Attribute
-    {}
+  [AttributeUsage(AttributeTargets.Class)]
+  public class UnitAttribute : Attribute
+  {}
 }

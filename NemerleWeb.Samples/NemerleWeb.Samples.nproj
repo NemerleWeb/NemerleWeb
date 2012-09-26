@@ -193,7 +193,7 @@
     <Compile Include="Infrastructure\HtmlHelperExtensions.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MVVM\CompListViewModel.n">
+    <Compile Include="MVVM\CompListPage.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -213,7 +213,7 @@
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\NameListViewModel.n">
+    <Compile Include="MVVM\NameListPage.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -221,14 +221,14 @@
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\SignalViewModel.n">
+    <Compile Include="MVVM\SignalPage.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\TestPageViewModel.n">
+    <Compile Include="MVVM\TestPage.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MVVM\VariantsAndMatchingViewModel.n">
+    <Compile Include="MVVM\VariantsAndMatchingPage.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -324,12 +324,12 @@
     </Content>
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Compile Include="MVVM\NameListCSharpViewModel.cs">
+    <Compile Include="MVVM\NameListCSharpPage.cs">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\NameListCSharpViewModel.View.n">
-      <DependentUpon>MVVM\NameListCSharpViewModel.cs</DependentUpon>
+    <Compile Include="MVVM\NameListCSharpPage.View.n">
+      <DependentUpon>MVVM\NameListCSharpPage.cs</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Content Include="packages.config">
@@ -457,8 +457,6 @@
       <Project>{b1635fea-c0cd-4c8e-a18e-d97d59f21b14}</Project>
       <Private>True</Private>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <MacroReference Include="Nemerle.ComputationExpressions.Macros">
       <Name>Nemerle.ComputationExpressions.Macros</Name>
       <AssemblyName>Nemerle.ComputationExpressions.Macros.dll</AssemblyName>

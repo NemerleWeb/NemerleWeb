@@ -6,12 +6,12 @@ using System.Linq;
 
 namespace NemerleWeb.Tests
 {
-  [ViewModel]
-  public class UnitTestViewModel
+  [Page]
+  public class UnitTestPage
   {
     Results : List[(string * bool)] { get; set; }
     
-    [JsModel]
+    [Unit]
     class SomeDisposable : IDisposable
     {
       public Dispose() : void
@@ -20,7 +20,7 @@ namespace NemerleWeb.Tests
       }
     }
     
-    [JsModel, Record]
+    [Unit, Record]
     class TestCast
     {
       public I : int { get; set; }
@@ -37,7 +37,7 @@ namespace NemerleWeb.Tests
     }
     
     /*
-    [JsModel]
+    [Unit]
     class SomeException : Exception
     {
       public override Message : string
@@ -390,7 +390,7 @@ namespace NemerleWeb.Tests
     public View() : string
     {
       <#
-        <table class="jsast-tests">
+        <table class="JsAst-tests">
           <tbody>
             <tr $foreach(r in Results) css-failed='$(r[1] == false)'>
               <td>$(r[0])</td>
@@ -417,7 +417,7 @@ namespace NemerleWeb.Tests
       }
     }
     
-    [JsModel]
+    [Unit]
     variant DummyVariant
     {
       | Case1 { A : string }

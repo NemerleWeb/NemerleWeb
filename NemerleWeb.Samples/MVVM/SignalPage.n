@@ -9,10 +9,10 @@ using Nemerle.Late;
 
 namespace NemerleWeb.Samples
 {
-  [JsModel]
-  public class SignalViewModel 
+  [Unit]
+  public class SignalPage 
   {
-    [JsModel, Record]
+    [Unit, Record]
     public class Message 
     {
       public Name : string;

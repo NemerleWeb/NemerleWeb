@@ -22,14 +22,14 @@ namespace NemerleWeb
       JsKnownMembers.RegisterType(typeof(Console), Handler); 
     }
     
-    private Handler(_left : JsAST, member : IMember, parms : list[JsAST]) : option[JsAST]
+    private Handler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
       match (parms)
       {
       | [obj] =>
         match (member.Name)
         {
-        | "WriteLine" => Some(JsAST.Call(JsAST.MethodRef(JsAST.LocalRef("console"), "log"), [obj]))
+        | "WriteLine" => Some(JsAst.Call(JsAst.MethodRef(JsAst.LocalRef("console"), "log"), [obj]))
         | _ => None()
         }
       | _ => None()

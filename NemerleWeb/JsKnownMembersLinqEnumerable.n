@@ -14,7 +14,7 @@ namespace NemerleWeb
 {
   module JsLinqExtensions
   {
-    public static AsEnumerable(this seq : JsAST) : JsAST
+    public static AsEnumerable(this seq : JsAst) : JsAst
     {
       "Enumerable".StaticCall("from", [seq])
     }
@@ -27,7 +27,7 @@ namespace NemerleWeb
       JsKnownMembers.RegisterType(typeof(Enumerable), Handler); 
     }
     
-    private Handler(_left : JsAST, member : IMember, parms : list[JsAST]) : option[JsAST]
+    private Handler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
       match (parms)
       {
@@ -35,7 +35,7 @@ namespace NemerleWeb
         match (member.Name)
         {
         | "AsEnumerable" => Some(seq.AsEnumerable())
-        | "Count" => Some(JsAST.FieldRef(seq, "length", true))        
+        | "Count" => Some(JsAst.FieldRef(seq, "length", true))        
         
         | "All"
         | "Average"
@@ -56,7 +56,7 @@ namespace NemerleWeb
         | "ToList" => Some(seq)
         
         | "FirstOrDefault"
-        | "LastOrDefault" =>  Some(seq.AsEnumerable().MethodCall(member.Name, [JsAST.Literal(JsLiteral.Null())]))
+        | "LastOrDefault" =>  Some(seq.AsEnumerable().MethodCall(member.Name, [JsAst.Literal(JsLiteral.Null())]))
 
         | _ => None()
         }
@@ -101,7 +101,7 @@ namespace NemerleWeb
         | "Where" => Some(seq.AsEnumerable().MethodCall(member.Name, [arg1]))
         
         | "FirstOrDefault"
-        | "LastOrDefault" =>  Some(seq.AsEnumerable().MethodCall(member.Name, [JsAST.Literal(JsLiteral.Null()), arg1]))
+        | "LastOrDefault" =>  Some(seq.AsEnumerable().MethodCall(member.Name, [JsAst.Literal(JsLiteral.Null()), arg1]))
                               
         // Special method
         | "Range" => Some("Enumerable".StaticCall("range", [seq, arg1]))

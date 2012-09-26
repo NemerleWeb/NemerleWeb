@@ -40,17 +40,17 @@ namespace NemerleWeb
         JsonConvert.SerializeObject(value, JsonSerializerSettings() <- TypeNameHandling = TypeNameHandling.Objects);
     }
         
-    public MakePageHtml[ViewModel]([NotNull] viewModel : IViewModel) : string
+    public MakePageHtml[Page]([NotNull] page : IPage) : string
     {
-        def models = viewModel.GetType()
-                              .Assembly
-                              .GetTypes()
-                              .Where(t => t.GetCustomAttributes(typeof(JsModel), false).Any());
+        def models = page.GetType()
+                         .Assembly
+                         .GetTypes()
+                         .Where(t => t.GetCustomAttributes(typeof(UnitAttribute), false).Any());
         def modelTemplates = string.Join(Environment.NewLine, models.Select(t => GetModelTemplates(t)));
         def modelLambdas = string.Join(Environment.NewLine, models.Select(t => GetModelLambdas(t)));
         def modelScripts = string.Join(Environment.NewLine, models.Select(t => GetModelScript(t)));
         
-        def viewHTml = GetHtml(viewModel.__View());
+        def viewHTml = GetHtml(page.__View());
         
       
         def script = $<#
@@ -58,35 +58,40 @@ $modelTemplates
 <script type='text/javascript'>
   $modelLambdas
   $modelScripts
-  $(viewModel.GetLambdaScript())
-  $(viewModel.GetViewModelScript())
+  $(page.GetLambdaScript())
+  $(page.GetPageScript())
 </script>
       #>;
       
       viewHTml + script;
     }
     
-    GetModelScript(type : Type) : string {
+    GetModelScript(type : Type) : string
+    {
       type.GetMethod("GetModelScript", BindingFlags.Static | BindingFlags.Public).Invoke(null, array[]) :> string;        
     }
     
-    GetModelTemplates(type : Type) : string {
-      if(!type.IsAbstract) {
+    GetModelTemplates(type : Type) : string
+    {
+      if(!type.IsAbstract)
+      {
         def model = FormatterServices.GetUninitializedObject(type);
         string.Join(Environment.NewLine, 
                     type.GetMethods()
                         .Where(m => m.Name.StartsWith("__"))
                         .Select(m => CreateTemplate(GetHtml(m.Invoke(model, array[]) :> list[XElement]), JsClass.GetProperName(m.DeclaringType) + m.Name)))
-      } else {
-        ""
       }
+      else
+        ""
     }
     
-    GetModelLambdas(type : Type) : string {
+    GetModelLambdas(type : Type) : string
+    {
         type.GetMethod("GetLambdaScript", BindingFlags.Static | BindingFlags.Public).Invoke(null, array[]) :> string;        
     }
     
-    CreateTemplate(html : string, name : string) : string {
+    CreateTemplate(html : string, name : string) : string
+    {
         $<# 
 <script type="text/html" id="$name">
   $html
@@ -94,9 +99,11 @@ $modelTemplates
         #>
     }
     
-    GetHtml(xs : list[XElement]) : string {
+    GetHtml(xs : list[XElement]) : string
+    {
       using(str = StringWriter())
-      using(writer = XmlTextWriter(str)) {        
+      using(writer = XmlTextWriter(str))
+      {
         writer.QuoteChar = '\'';
         xs.DescendantNodes().OfType.[XElement]().Where(n => n.IsEmpty).Iter(n => n.Value = string.Empty);
         xs.Iter(x => x.WriteTo(writer));

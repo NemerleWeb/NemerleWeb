@@ -74,13 +74,6 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NemerleWeb\NemerleWeb.nproj">
-      <Name>NemerleWeb</Name>
-      <Project>{b1635fea-c0cd-4c8e-a18e-d97d59f21b14}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <MacroReference Include="Nemerle.ComputationExpressions.Macros">
       <Name>Nemerle.ComputationExpressions.Macros</Name>
       <AssemblyName>Nemerle.ComputationExpressions.Macros.dll</AssemblyName>
@@ -100,6 +93,13 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NemerleWeb\NemerleWeb.nproj">
+      <Name>NemerleWeb</Name>
+      <Project>{b1635fea-c0cd-4c8e-a18e-d97d59f21b14}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

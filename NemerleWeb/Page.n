@@ -15,26 +15,38 @@ using BF = System.Reflection.BindingFlags;
 using TExpr = Nemerle.Compiler.Typedtree.TExpr;
 
 namespace NemerleWeb
-{    
-  [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Class)]
-  macro JsModel(tb : TypeBuilder) 
-  {
-    JsModelImpl.DoTransform(tb, Macros.ImplicitCTX())
-  }
-  
+{
   [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
-  macro JsModel(tb : TypeBuilder)
+  macro Page(tb : TypeBuilder)
   {
-    JsModelImpl.DoTransformBeforeInheritance(tb, Macros.ImplicitCTX())
+    PageImpl.DoTransformBeforeInheritance(tb, Macros.ImplicitCTX())
   }
   
-  module JsModelImpl
-  {       
+  [MacroUsage(MacroPhase.BeforeTypedMembers, MacroTargets.Class)]
+  macro Page(tb : TypeBuilder) 
+  {
+    PageImpl.DoTransformBeforeTypedMembers(tb, Macros.ImplicitCTX())
+  }
+  
+  [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Class)]
+  macro Page(tb : TypeBuilder) 
+  {
+    PageImpl.DoTransform(tb, Macros.ImplicitCTX())
+  }
+  
+  module PageImpl
+  {    
     public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);
+      def vmInterface = <[ ttype: NemerleWeb.IPage ]>;
+      def superTypes = tb.GetDirectSuperTypes();
       
-      def baseType = <[ NemerleWeb.ViewModelBase[$(tb.ParsedTypeName)] ]>;
+      unless (superTypes != null && superTypes.Exists(t => t.Equals(vmInterface)))
+        tb.AddImplementedInterface(<[ NemerleWeb.IPage ]>);
+        
+      def baseType = <[ NemerleWeb.PageBase[$(tb.ParsedTypeName)] ]>;
+      
       when(tb.Ast is TopDeclaration.Class) {
         def ast = tb.Ast :> TopDeclaration.Class; 
         ast.t_extends ::=  baseType;
@@ -42,12 +54,18 @@ namespace NemerleWeb
       when(tb.Ast is TopDeclaration.Variant) {
         def ast = tb.Ast :> TopDeclaration.Variant; 
         ast.t_extends ::=  baseType;
-      } 
+      }
+    }
+    
+    public DoTransformBeforeTypedMembers(tb : TypeBuilder, typer : Typer) : void
+    {
+      CreateResourceController(tb, typer);
     }
     
     public DoTransform(tb : TypeBuilder, typer : Typer) : void
     {            
       Macros.DefineCTX(typer);
+      
       def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");
       def serverMethods = Dictionary();
       if(serverClass != null)
@@ -84,7 +102,12 @@ namespace NemerleWeb
                     }
                   ]>);
                   
-                  serverMethods.Add(method.Name, fparms);
+                  if (serverMethods.ContainsKey(method.Name))
+                  {
+                    serverMethods[method.Name] += fparms;
+                  }
+                  else
+                    serverMethods.Add(method.Name, fparms);
                   
                   def fparms = fparms.Append([<[ parameter: callback : $(method.ReturnType : typed) -> void ]>]);
                   
@@ -92,7 +115,7 @@ namespace NemerleWeb
                     public $(methodName : name) (..$(fparms)) : void
                     {}
                   ]>);
-              | _ => ()              
+              | _ => ()
           }
           ctb.Define(<[ decl:
               public __SetSignalRConnectionId(id : string) : System.Web.Mvc.ActionResult
@@ -106,37 +129,83 @@ namespace NemerleWeb
         tb.DefineNestedType(<[ decl: public class Server {} ]>).Compile();
       }
     
-      //assert2(false);      
+      def addParams(parms, expr) : PExpr {
+          match(parms) {
+          | head :: tail => 
+          def newExpr = <[ $expr; __constructorParams.Add($(head : dyn)); ]>;
+          addParams(tail, newExpr);                
+          | [] => expr
+          }              
+      }          
       def ienType = <[ ttype : System.Collections.IEnumerable ]>;
       def stringType = <[ ttype : System.String ]>;
       def cl = JsClass(tb, "  ", ienType, stringType, typer);
+      def constructor = cl.Constructor;
+      def constructorParams = if(constructor != null) constructor.GetParameters().Map(p => p.Name) else [];
+      def ctor = constructor :> MethodBuilder;
+      ctor.Body = addParams(constructorParams, <[ $(ctor.Body); "js constructor end"; __constructorParams = List(); ]>);
+      tb.Define(<[ decl: __constructorParams : List[object] ]>);
       def result = cl.Write();
       
+      def applyBindings = $<#  nweb.go(new $(JsClass.GetProperName(tb))({0}));#>;
       _ = tb.DefineWithSource(<[ decl:
-        public static GetModelScript() : string
+        public GetPageScript() : string
         {
           def signalRScript = match(typeof(Server).GetMethod("GetSignalRScript")) {
           | x when x != null => x.Invoke(null, array[]).ToString()
           | _ => ""
           };
-          ($result).Replace("{{{SignalR}}}", signalRScript)
+          def sb = System.Text.StringBuilder();
+          _ = sb.AppendLine(($result).Replace("{{{SignalR}}}", signalRScript));
+          def paramList = __constructorParams.Map(obj => "nweb.utils.toTypedObject(" + Utils.ToJson(obj) + ")");
+          _ = sb.AppendLine(string.Format($applyBindings, $"..$(paramList)"));
+          sb.ToString()
         }
         ]>);
         
       def lambdaMeth = tb.DefineAndReturn(<[ decl: 
-        public static GetLambdaScript() : string
-        { "" } ]>) :> MethodBuilder;          
-      
-      tb.GetModifiers().AddCustomAttribute(<[ NemerleWeb.JsModel ]>);
-        
+        public GetLambdaScript() : string
+        { "" } ]>) :> MethodBuilder;
+            
       tb.Manager.TypeTreeBuildFinish += _ => {
           def lambdas = tb.DeclaredNestedTypes
                           .Filter(t => t.Name.StartsWith("_N__N_"))
                           .Map(t => JsClass(t, "  ", ienType, stringType, typer).Write());
-          def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");          
-          lambdaMeth.Body = <[ $lambdas ]>;          
+          def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");
+          
+          lambdaMeth.Body = <[ 
+            def sb = System.Text.StringBuilder();
+            _ = sb.AppendLine($lambdas);
+            sb.ToString()
+          ]>;
+          
           tb.Compile();
       };
-    }   
+    }
+    
+    CreateResourceController(_tb : TypeBuilder, typer : Typer) : void
+    {
+      def env = typer.Manager.CoreEnv;
+      def controllerName = "NemerleWebResourceController";
+      match(env.LookupType([controllerName])) 
+      {
+      | Some => ()
+      | None => 
+        env.Define(<[ decl: 
+          public class $(controllerName : usesite) : System.Web.Mvc.Controller
+          {
+            public NemerleWebJs() : System.Web.Mvc.ActionResult
+            {
+              def sb = System.Text.StringBuilder();
+              foreach(file in ["NemerleWeb.Scripts.jquery-1.8.0.js", "NemerleWeb.Scripts.jquery.signalR-0.5.3.js"])
+                using(stream = typeof(NemerleWeb.JsAst).Assembly.GetManifestResourceStream(file))
+                using(reader = System.IO.StreamReader(stream))
+                  _ = sb.Append(reader.ReadToEnd());
+              Content(sb.ToString(), "text/javascript");
+            }
+          }
+        ]>).Compile();  
+      }      
+    }
   }
 }

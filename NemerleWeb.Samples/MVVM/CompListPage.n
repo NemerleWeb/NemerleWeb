@@ -5,8 +5,8 @@ using Nemerle.ComputationExpressions;
 
 namespace NemerleWeb.Samples
 {
-  [JsModel]
-  class CompListViewModel
+  [Unit]
+  class CompListPage
   {
     Alphabet : array[string] { get; set; }
     OddLettersOnly : bool { get; set; }

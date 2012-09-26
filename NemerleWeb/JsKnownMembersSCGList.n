@@ -22,17 +22,17 @@ namespace NemerleWeb
       JsKnownMembers.RegisterType(typeof(List[_]), Handler); 
     }
     
-    private Handler(left : JsAST, member : IMember, parms : list[JsAST]) : option[JsAST]
+    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
       if (member.Name == ".ctor")
-        Some(JsAST.Array(parms.Filter(p => !(p is JsAST.NotImpl()))))
+        Some(JsAst.Array(parms.Filter(p => !(p is JsAst.NotImpl()))))
       else      
         match (parms)
         {
         | [] =>
           match (member.Name)
           {
-          | "get_Count" => Some(JsAST.FieldRef(left, "length", true))
+          | "get_Count" => Some(JsAst.FieldRef(left, "length", true))
           | "GetEnumerator" => Some(left.MethodCall(member.Name, parms))
           | _ => None()
           }
@@ -40,9 +40,9 @@ namespace NemerleWeb
         | [_] =>
           match (member.Name)
           {
-          | "get_Item" => Some(JsAST.Call(JsAST.Indexer(left), parms))
-          | "Add" => Some(JsAST.Call(JsAST.MethodRef(TypeHelper.PropertyToField(left, false), "push"), parms))
-          | "Remove" => Some(JsAST.Call(JsAST.MethodRef(TypeHelper.PropertyToField(left, false), "remove"), parms))
+          | "get_Item" => Some(JsAst.Call(JsAst.Indexer(left), parms))
+          | "Add" => Some(JsAst.Call(JsAst.MethodRef(TypeHelper.PropertyToField(left, false), "push"), parms))
+          | "Remove" => Some(JsAst.Call(JsAst.MethodRef(TypeHelper.PropertyToField(left, false), "remove"), parms))
           | _ => None()
           }
         

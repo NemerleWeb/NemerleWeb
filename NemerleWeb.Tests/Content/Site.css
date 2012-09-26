@@ -130,13 +130,13 @@ h1.logo span {
     padding-top: 10px;
 }
 
-.jsast-tests tr td {
+.JsAst-tests tr td {
     background-color: greenyellow;
     padding: 2px 5px;
     text-align: center;
 }
 
-.jsast-tests tr.failed td {
+.JsAst-tests tr.failed td {
     background-color: red;
     color: #fff;
 }

@@ -19,14 +19,14 @@ namespace NemerleWeb
       JsKnownMembers.RegisterType(typeof(string), Handler); 
     }
     
-    private Handler(left : JsAST, member : IMember, parms : list[JsAST]) : option[JsAST]
+    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
       match (parms)
       {
       | [] =>
         match (member.Name)
         {
-        | "get_Length" => Some(JsAST.FieldRef(left, "length", true))
+        | "get_Length" => Some(JsAst.FieldRef(left, "length", true))
         | "Clone" => Some(left)
         | "Copy"
         | "GetEnumerator"
@@ -37,9 +37,9 @@ namespace NemerleWeb
         | "IsInterned"
         | "IsNormalized" => None()
         | "IsNullOrEmpty" =>
-          Some(JsAST.Call(JsAST.OpCode("||"),
-              [JsAST.Call(JsAST.OpCode("==="), [left, JsAST.Literal(JsLiteral.Null())]),
-                JsAST.Call(JsAST.OpCode("==="), [left, JsAST.Literal(JsLiteral.String(""))])]))
+          Some(JsAst.Call(JsAst.OpCode("||"),
+              [JsAst.Call(JsAst.OpCode("==="), [left, JsAst.Literal(JsLiteral.Null())]),
+                JsAst.Call(JsAst.OpCode("==="), [left, JsAst.Literal(JsLiteral.String(""))])]))
                  
         | "IsNullOrWhiteSpace"
         | "Normalize"
@@ -64,18 +64,18 @@ namespace NemerleWeb
         | "Concat" =>
           match (arg1)
           {
-          | JsAST.Array(a) => Some(left.MethodCall("concat", a))
+          | JsAst.Array(a) => Some(left.MethodCall("concat", a))
           |  _ => Some(left.MethodCall("concat", parms))
           }
           
         | "Contains" =>
-          Some(JsAST.Call(
-            JsAST.OpCode("!="),
+          Some(JsAst.Call(
+            JsAst.OpCode("!="),
             [
-              JsAST.Call(
-                JsAST.MethodRef(left, "indexOf"),
+              JsAst.Call(
+                JsAst.MethodRef(left, "indexOf"),
                 [arg1]),
-              JsAST.Literal(JsLiteral.Integer(-1))
+              JsAst.Literal(JsLiteral.Integer(-1))
             ]))
             
         | "EndsWith"
@@ -98,7 +98,7 @@ namespace NemerleWeb
         | "ToUpper"
         | "Trim" => None()
         
-        | "ToString" => Some(JsAST.Call(JsAST.MethodRef(arg1, "toString"), []))
+        | "ToString" => Some(JsAst.Call(JsAst.MethodRef(arg1, "toString"), []))
         
         | _ => None()
         }
@@ -110,7 +110,7 @@ namespace NemerleWeb
         | "Concat" =>
           match (arg2)
           {
-          | JsAST.Array(a) => Some(arg1.MethodCall("concat", a))
+          | JsAst.Array(a) => Some(arg1.MethodCall("concat", a))
           |  _ => Some(arg1.MethodCall("concat", parms))
           }
         
