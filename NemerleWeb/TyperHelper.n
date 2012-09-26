@@ -31,7 +31,7 @@ namespace NemerleWeb
                 .SelectMany(j =>
                   regexp match(j.Name)
                   {
-                  | <#^var(?<index : int>\d+)$#> => [(index, j.Val.Write())]
+                  | <#^_var(?<index : int>\d+)$#> => [(index, j.Val.Write())]
                   | _ => []
                   })
                 .GroupBy((i, _) => i)

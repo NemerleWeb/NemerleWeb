@@ -60,12 +60,12 @@ namespace NemerleWeb.Samples
             #>;
         }
         
-        public GoToFolder(folder : int) : void {
-            js location.hash = folder;
+        public GoToFolder(_folder : int) : void {
+            js location.hash = _folder;
         }
         
-        public GoToMail(mail : Mail) : void {
-            js location.hash = mail.Folder + '/' + mail.Id;
+        public GoToMail(_mail : Mail) : void {
+            js location.hash = _mail.Folder + '/' + _mail.Id;
         }
         
         public class Server

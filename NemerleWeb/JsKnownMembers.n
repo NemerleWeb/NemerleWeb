@@ -100,7 +100,8 @@ namespace NemerleWeb
             ConvertMethod(fromType.TypeInfo, builder(left), meth, parms.Map(p => builder(p.expr)))
                 
         | Call(OpCode as op, parms, _) => JsAst.Call(builder(op), parms.Map(p => builder(p.expr)))
-        | Call(Base, _, _) => JsAst.Void()        
+        | Call(Base, _, _)
+        | Call(Delayed, _, _) => JsAst.Void()
         | Call(s, _, _) => Message.Warning($"Unsupported call to $s"); JsAst.Void()          
       }
     }

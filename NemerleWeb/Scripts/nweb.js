@@ -45,8 +45,6 @@ var nweb = {
 
           if(typeof binding !== 'undefined')
             bindings.push(binding);
-
-          console.log("binded " + attrName);
         }        
       }
     }
@@ -224,8 +222,6 @@ var nweb = {
 
           nweb.applyBindings(model, $newEl[0], binding.subBindings, loopStack.concat({ name: repeat[1], val: array[i] }), true);
           binding.generatedEls.push($newEl);
-
-          console.log("applied repeat binding");
         };
       }
     };
@@ -255,8 +251,7 @@ var nweb = {
       },
       apply: function(value) {
         $el = nweb.utils.replaceWith($el, $(html).removeAttr("nw-template"));
-        nweb.applyBindings(value, $el[0], binding.subBindings = [], loopStack, true);
-        console.log("applied template binding");
+        nweb.applyBindings(value, $el[0], binding.subBindings = [], loopStack, true);        
       }
     };
     return binding;
@@ -287,8 +282,6 @@ var nweb = {
             $el.removeAttr("nw-when");
 
           nweb.applyBindings(model, $el[0], binding.subBindings, loopStack, true);
-
-          console.log("applied when binding");
         } else {
           $el.hide();
         }
@@ -388,8 +381,7 @@ var nweb = {
       $el[0].__nw_prev = $el.prev();
       $el[0].__nw_parent = $el.parent();      
   },
-  restoreInSavedPosition: function($el) {
-    console.log("restore in saved position: " + $el[0].__nw_prev.length + " ----- " + $el[0].__nw_parent.length);
+  restoreInSavedPosition: function($el) {    
     if ($el[0].__nw_prev.length > 0)
         $el[0].__nw_prev.after($el);
     else

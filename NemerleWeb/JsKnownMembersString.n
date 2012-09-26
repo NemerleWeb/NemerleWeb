@@ -111,9 +111,8 @@ namespace NemerleWeb
           match (arg2)
           {
           | JsAst.Array(a) => Some(arg1.MethodCall("concat", a))
-          |  _ => Some(arg1.MethodCall("concat", parms))
-          }
-        
+          |  _ => Some(arg1.MethodCall("concat", [arg2]))
+          }        
         | "Compare"
         | "EndsWith"
         | "Equals"

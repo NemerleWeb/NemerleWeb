@@ -197,7 +197,7 @@ namespace NemerleWeb
             public NemerleWebJs() : System.Web.Mvc.ActionResult
             {
               def sb = System.Text.StringBuilder();
-              foreach(file in ["NemerleWeb.Scripts.jquery-1.8.0.js", "NemerleWeb.Scripts.jquery.signalR-0.5.3.js"])
+              foreach(file in ["NemerleWeb.Scripts.jquery-1.8.0.js", "NemerleWeb.Scripts.jquery.signalR-0.5.3.js", "NemerleWeb.Scripts.nweb.js"])
                 using(stream = typeof(NemerleWeb.JsAst).Assembly.GetManifestResourceStream(file))
                 using(reader = System.IO.StreamReader(stream))
                   _ = sb.Append(reader.ReadToEnd());

@@ -78,12 +78,10 @@ namespace NemerleWeb
     }
     public Transform([NotNull] xmlAsts : XmlAst.Seq) : PExpr
     {          
-      //assert2(false);
       def splicedMethod = CleanupCallRefs(GetMethodWithSplicesOnly(xmlAsts));
       def splices = TyperHelper.GetSplices(splicedMethod, _typer);  
       _typer.CurrentTypeBuilder.Compile();
       def res = Util.locate(ToLocation(xmlAsts), TransformImpl(xmlAsts, splices));
-      //Message.Hint(res.ToString());
       res;
     }
     
@@ -192,7 +190,7 @@ namespace NemerleWeb
     {        
         _spliceCounter++;
         Debug.WriteLine(_spliceCounter + ": " + xmlAst.ToString());
-        def varName = "var" + _spliceCounter.ToString();
+        def varName = "_var" + _spliceCounter.ToString();
         match (xmlAst)
         {
         | Attr(_, Splicable.Expr(str) as expr) => <[ def $(varName : dyn) = $(Parse(ToLocation(expr), str)) ]>
@@ -215,7 +213,7 @@ namespace NemerleWeb
             def tagExpr = GetMethodWithSplicesOnly(tag);
             def cond1 = Parse(ToLocation(c), expr);
             def cond2 = if (isWhen) cond1 else <[ ! $cond1 ]>;
-            <[ if ({ def $(varName : dyn) = $cond2; $cond2}) $tagExpr else null ]>
+            <[ when ({ def $(varName : dyn) = $cond2; $cond2}) $tagExpr ]>
         | Tag(_, content) =>             
             def splices = content.Map(c => GetMethodWithSplicesOnly(c));
             <[ { ..$splices } ]> 
