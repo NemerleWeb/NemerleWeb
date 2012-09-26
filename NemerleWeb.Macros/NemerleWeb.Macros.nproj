@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NemerleVersion>Net-4.5</NemerleVersion>
+    <NemerleBinPathRoot Condition=" '$(NemerleBinPathRoot)' == '' ">$(ProgramFiles)\Nemerle</NemerleBinPathRoot>
+    <NoStdLib>true</NoStdLib>
+    <Nemerle Condition=" '$(Nemerle)' == '' ">$(NemerleBinPathRoot)\$(NemerleVersion)</Nemerle>
+    <Name>NemerleWeb.Macros</Name>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{b1454534-cabd-4abe-cc8e-ddff34f51b14}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NemerleWeb</RootNamespace>
+    <AssemblyName>NemerleWeb.Macros</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>$(OutputPath)\$(MSBuildProjectName).xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="Nemerle, Version=1.1.948.0, Culture=neutral, PublicKeyToken=e080a9c724e2bfcd">
+      <Name>Nemerle</Name>
+      <AssemblyName>Nemerle.dll</AssemblyName>
+      <HintPath>$(Nemerle)\Nemerle.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="Nemerle.Compiler">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(Nemerle)\Nemerle.Compiler.dll</HintPath>
+    </Reference>
+    <Reference Include="SignalR, Version=0.5.1.10822, Culture=neutral, PublicKeyToken=null">
+      <Name>SignalR</Name>
+      <AssemblyName>SignalR.dll</AssemblyName>
+      <HintPath>..\packages\SignalR.Server.0.5.3\lib\net40\SignalR.dll</HintPath>
+    </Reference>
+    <Reference Include="SignalR.Hosting.AspNet, Version=0.5.1.10822, Culture=neutral, PublicKeyToken=null">
+      <Name>SignalR.Hosting.AspNet</Name>
+      <AssemblyName>SignalR.Hosting.AspNet.dll</AssemblyName>
+      <HintPath>..\packages\SignalR.Hosting.AspNet.0.5.3\lib\net40\SignalR.Hosting.AspNet.dll</HintPath>
+    </Reference>
+    <Reference Include="SignalR.Hosting.Common, Version=0.5.1.10822, Culture=neutral, PublicKeyToken=null">
+      <Name>SignalR.Hosting.Common</Name>
+      <AssemblyName>SignalR.Hosting.Common.dll</AssemblyName>
+      <HintPath>..\packages\SignalR.Hosting.Common.0.5.3\lib\net40\SignalR.Hosting.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Nemerle.Peg">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(Nemerle)\Nemerle.Peg.dll</HintPath>
+    </Reference>
+    <MacroReference Include="Nemerle.Peg.Macros">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(Nemerle)\Nemerle.Peg.Macros.dll</HintPath>
+    </MacroReference>
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="HtmlMacro\XmlAst.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HtmlMacro\XmlAstToXLinq.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HtmlMacro\XmlQuotParser.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HtmlMacro\Html.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Js.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Page.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SignalR\SignalMacro.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TName.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Unit.n">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="HtmlMacro\" />
+    <Folder Include="SignalR" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="packages.config">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NemerleWeb\NemerleWeb.nproj">
+      <Name>NemerleWeb</Name>
+      <Project>{b1635fea-c0cd-4c8e-a18e-d97d59f21b14}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <!--
+		To modify your build process, add your task inside one of the targets below and uncomment it. 
+		Other similar extension points exist, see Microsoft.Common.targets.
+
+	<Target Name="BeforeBuild">
+	</Target>
+	<Target Name="AfterBuild">
+	</Target>
+	-->
+</Project>

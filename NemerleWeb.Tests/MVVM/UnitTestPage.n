@@ -390,7 +390,7 @@ namespace NemerleWeb.Tests
     public View() : string
     {
       <#
-        <table class="JsAst-tests">
+        <table class="jsast-tests">
           <tbody>
             <tr $foreach(r in Results) css-failed='$(r[1] == false)'>
               <td>$(r[0])</td>
