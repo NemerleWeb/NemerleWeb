@@ -45,9 +45,9 @@ namespace NemerleWeb.Samples
     }
 
     Save() : void {
-      server.Save(Tasks, result => {                
-                         js alert(result);
-            });
+      server.Save(Tasks, _result => {                
+        js alert(_result);
+      });
     }
 
     public class Server

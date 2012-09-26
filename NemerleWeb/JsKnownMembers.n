@@ -174,9 +174,10 @@ namespace NemerleWeb
         JsAst.PropertySet(left, propertyName, h)
       | _ => 
         // TODO: Change to Error #23
-        Message.Warning(
-          member.Location,
-          $"Invalid $(member.Name) with $(TypeName(type)) type, params: ..$parms not implemented in JS");
+        when(type?.BaseType?.FullName != "NemerleWeb.PageBase")
+          Message.Warning(
+            member.Location,
+            $"Invalid $(member.Name) with $(TypeName(type)) type, params: ..$parms not implemented in JS");
           
         JsAst.Call(JsAst.MethodRef(left, propertyName), parms)
       }

@@ -81,7 +81,7 @@ namespace NemerleWeb
                 }                    
             | _ => Build(ex)
             }                
-        | Match(expr, _)                    => Message.Warning(expr.Location, "Match not implemented"); JsAst.NotImpl("Match")
+        | Match(_, _)                       => JsAst.NotImpl("Match")
         | MethodAddress                     => JsAst.Literal(JsLiteral.String(""))
         | MethodOf                          => Message.Warning(expr.Location, "MethodOf not implemented"); JsAst.NotImpl("MethodOf")
         | MethodRef(obj, meth, _, _)        => 

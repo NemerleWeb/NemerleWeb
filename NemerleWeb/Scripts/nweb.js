@@ -413,127 +413,127 @@ var nweb = {
 };
 
 nweb.utils = {
-  isArray: function(obj) {
-    return Object.prototype.toString.call(obj) === '[object Array]';
-  },
-  areArraysEqual: function(a1, a2) {    
-    return JSON.stringify(a1) == JSON.stringify(a2);
-  },
-  isFunction: function(obj) {    
-    return obj && {}.toString.call(obj) == '[object Function]';
-  },
-  toTypedObject: function (obj) {
-      if (typeof obj === "string") {
-          try {
-              obj = JSON.parse(obj);
-          } catch (e) {
-          }
-      }
+    isArray: function(obj) {
+        return Object.prototype.toString.call(obj) === '[object Array]';
+    },
+    areArraysEqual: function(a1, a2) {
+        return JSON.stringify(a1) == JSON.stringify(a2);
+    },
+    isFunction: function(obj) {
+        return obj && { }.toString.call(obj) == '[object Function]';
+    },
+    toTypedObject: function(obj) {
+        if (typeof obj === "string") {
+            try {
+                obj = JSON.parse(obj);
+            } catch(e) {
+            }
+        }
 
-      if (!!obj.$type) {
-          var typename = obj.$type.replace(/\./g, "_").replace(/\+/g, "_").replace(/(.+),.+/g, "$1");
-          var newObj = eval('new ' + typename + '()');
-          for (var p in obj) {
-              if (obj.hasOwnProperty(p) && newObj.hasOwnProperty(p)) {
-                  if (typeof newObj[p] === "function")
-                      newObj[p](nweb.utils.toTypedObject(obj[p]));
-                  else
-                      newObj[p] = nweb.utils.toTypedObject(obj[p]);
-              }
-          }
-          return newObj;
-      }
-      if (obj instanceof Array) {
-          var newArr = [];
-          for (var i = 0, l = obj.length; i < l; newArr.push(nweb.utils.toTypedObject(obj[i++])));
-          return newArr;
-      }
-      return obj;
-  },
-  getTemplateName: function (model, viewName) {
-      if (!model)
-          return "";
+        if (!!obj.$type) {
+            var typename = obj.$type.replace(/\./g, "_").replace(/\+/g, "_").replace(/(.+),.+/g, "$1");
+            var newObj = eval('new ' + typename + '()');
+            for (var p in obj) {
+                if (obj.hasOwnProperty(p) && newObj.hasOwnProperty(p)) {
+                    if (typeof newObj[p] === "function")
+                        newObj[p](nweb.utils.toTypedObject(obj[p]));
+                    else
+                        newObj[p] = nweb.utils.toTypedObject(obj[p]);
+                }
+            }
+            return newObj;
+        }
+        if (obj instanceof Array) {
+            var newArr = [];
+            for (var i = 0, l = obj.length; i < l; newArr.push(nweb.utils.toTypedObject(obj[i++]))) ;
+            return newArr;
+        }
+        return obj;
+    },
+    getTemplateName: function(model, viewName) {
+        if (!model)
+            return "";
 
-      return nweb.utils.getConstructorName(model) + "__" + viewName;
-  },
-  getConstructorName: function (model) {
-      var funcNameRegex = /function (.{1,})\(/;
-      var results = (funcNameRegex).exec(model.constructor.toString());
-      return (results && results.length > 1) ? results[1] : "";
-  },
-  htmlEncode: function(value){
-    return $('<div/>').text(value).html();
-  },
-  htmlDecode: function(value) {
-    return $('<div/>').html(value).text();
-  },
-  getElementAttributes: function(el) {
-    var arr = [];
-    for (var i = 0, attrs = el.attributes, l = attrs.length; i < l; i++){
-      arr.push(attrs[i]);      
+        return nweb.utils.getConstructorName(model) + "__" + viewName;
+    },
+    getConstructorName: function(model) {
+        var funcNameRegex = /function (.{1,})\(/;
+        var results = (funcNameRegex).exec(model.constructor.toString());
+        return (results && results.length > 1) ? results[1] : "";
+    },
+    htmlEncode: function(value) {
+        return $('<div/>').text(value).html();
+    },
+    htmlDecode: function(value) {
+        return $('<div/>').html(value).text();
+    },
+    getElementAttributes: function(el) {
+        var arr = [];
+        for (var i = 0, attrs = el.attributes, l = attrs.length; i < l; i++) {
+            arr.push(attrs[i]);
+        }
+        arr.sort(function(a, b) {
+            return a.nodeName == "nw-repeat" ? -1 : 1;
+        });
+        return arr;
+    },
+    replaceWith: function($el, $newEl) {
+        $el.replaceWith($newEl);
+        return $newEl;
     }
-    arr.sort(function(a, b) {
-      return a.nodeName == "nw-repeat" ? -1 : 1;
-    });
-    return arr;
-  },
-  replaceWith: function($el, $newEl) {
-    $el.replaceWith($newEl);
-    return $newEl;
-  }
-}
+};
 
-Array.prototype.getEnumerator = function () {
+Array.prototype.getEnumerator = function() {
     this.__enumeratorIndex = -1;
     this.Current = null;
     return this;
-}
+};
 
 Array.prototype.dispose = Array.prototype.getEnumerator;
 
-Array.prototype.moveNext = function () {
+Array.prototype.moveNext = function() {
     if (typeof this.__enumeratorIndex === 'undefined')
         this.__enumeratorIndex = -1;
     this.__enumeratorIndex++;
     this.Current = this[this.__enumeratorIndex];
     return this.__enumeratorIndex < this.length;
-}
+};
 
-Array.prototype.current = function () {
+Array.prototype.current = function() {
     return this[this.__enumeratorIndex];
-}
+};
 
-Array.prototype.hd = function () {
+Array.prototype.hd = function() {
     return this[0];
-}
+};
 
-Array.prototype.tl = function () {
+Array.prototype.tl = function() {
     return this.splice(1);
-}
+};
 
 Array.prototype.Head = Array.prototype.hd;
 Array.prototype.Tail = Array.prototype.tl;
 
 Array.prototype.remove = function() {
-  var what, ax;
-  while(arguments.length && this.length){
-    what = arguments[--arguments.length];
-    while((ax = this.indexOf(what)) != -1) {
-      this.splice(ax, 1);
+    var what, ax;
+    while (arguments.length && this.length) {
+        what = arguments[--arguments.length];
+        while ((ax = this.indexOf(what)) != -1) {
+            this.splice(ax, 1);
+        }
     }
-  }
-  return this;
-}
+    return this;
+};
 
-if(!Array.prototype.indexOf){
-  Array.prototype.indexOf = function(what, i) {
-    i = i || 0;
-    while(i < this.length) {
-      if(this[i] === what) return i;
-      ++i;
-    }
-    return -1;
-  }
+if (!Array.prototype.indexOf) {
+    Array.prototype.indexOf = function (what, i) {
+        i = i || 0;
+        while (i < this.length) {
+            if (this[i] === what) return i;
+            ++i;
+        }
+        return -1;
+    };
 }
 
 // TODO: Maybe move
