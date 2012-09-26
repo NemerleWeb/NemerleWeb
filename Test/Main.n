@@ -21,7 +21,7 @@ module Program
   }
 }
 
-[ViewModel]
+[Page]
 public partial class Test
 {
   public this()

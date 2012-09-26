@@ -26,14 +26,14 @@ namespace NemerleWeb
       JsKnownMembers.RegisterType("System.Collections.Generic.List`1+Enumerator", Handler);
     }
     
-    private Handler(left : JsAST, member : IMember, parms : list[JsAST]) : option[JsAST]
+    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
       match (parms)
       {
       | [] =>
         match (member.Name)
         {
-        | "MoveNext" => Some(JsAST.Call(JsAST.MethodRef(left, "moveNext"), []))
+        | "MoveNext" => Some(JsAst.Call(JsAst.MethodRef(left, "moveNext"), []))
         | "get_Current" => Some(left.MethodCall("current", parms))
         | _ => None()
         }

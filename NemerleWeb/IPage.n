@@ -9,10 +9,10 @@ using System.Xml.Linq;
 
 namespace NemerleWeb
 {
-  public interface IViewModel
+  public interface IPage
   {
     GetLambdaScript() : string;
-    GetViewModelScript() : string;
+    GetPageScript() : string;
     __View() : list[XElement];
   }
 }

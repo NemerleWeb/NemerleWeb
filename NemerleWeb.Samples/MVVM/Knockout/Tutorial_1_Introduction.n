@@ -2,8 +2,8 @@
 
 namespace NemerleWeb.Samples
 {
-  [Record, JsModel]
-  public class IntroductionViewModel
+  [Record, Unit]
+  public class IntroductionPage
   {
     public FirstName     : string { get; set; }
     public LastName      : string { get; set; }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace NemerleWeb.Samples
 {
-  partial class NameListCSharpViewModel
+  partial class NameListCSharpPage
   {
     [Html]
     public View() : string 

@@ -21,13 +21,13 @@ namespace NemerleWeb
         {            
             def method = BuildMethod(expr, typer);
             def oldBody = method.Header.Body;
-            def defs = JsASTBuilder.BuildJsASTForSplices(GetTypedBody(method, typer, typer.CurrentTypeBuilder, false));
+            def defs = JsAstBuilder.BuildJsAstForSplices(GetTypedBody(method, typer, typer.CurrentTypeBuilder, false));
             method.Header.body = oldBody;
             def tt = GetTypedBody(method, typer, typer.CurrentTypeBuilder);
-            def defs2 = JsASTBuilder.BuildJsASTForSplices(tt);
+            def defs2 = JsAstBuilder.BuildJsAstForSplices(tt);
             
             defs.Concat(defs2)
-                .Cast.[JsAST.DefValue]()
+                .Cast.[JsAst.DefValue]()
                 .SelectMany(j =>
                   regexp match(j.Name)
                   {
@@ -38,9 +38,9 @@ namespace NemerleWeb
                 .ToDictionary(g => g.Key, g => g.FirstOrDefault((_, v) => !string.IsNullOrEmpty(v))[1]);
         }
         
-        public GetMethodJsAST(method : IMethod, typer : Typer, tb : TypeBuilder) : JsAST 
+        public GetMethodJsAst(method : IMethod, typer : Typer, tb : TypeBuilder) : JsAst 
         {   
-            JsASTBuilder.BuildJsAST(GetTypedBody(method, typer, tb), !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor);            
+            JsAstBuilder.BuildJsAst(GetTypedBody(method, typer, tb), !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor);            
         }
         
         GetTypedBody(method : IMethod, typer : Typer, tb : TypeBuilder, fullTyping : bool = true) : TExpr

@@ -11,8 +11,8 @@ using NemerleWeb;
 
 namespace NemerleWeb.Samples
 {
-  [ViewModel]
-  public class TestPageViewModel
+  [Page]
+  public class TestPagePage
   {
     items : List[string] { get; set; }
     selected : string { get; set; }

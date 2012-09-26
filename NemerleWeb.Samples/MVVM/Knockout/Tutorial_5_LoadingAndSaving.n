@@ -5,8 +5,8 @@ using NemerleWeb;
 
 namespace NemerleWeb.Samples
 {
-  [JsModel]
-  public class LoadingAndSavingViewModel
+  [Unit]
+  public class LoadingAndSavingPage
   {        
     public class Task
     {

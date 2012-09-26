@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 namespace NemerleWeb.Samples
 {
-  [JsModel]
-  partial class NameListCSharpViewModel
+  [Unit]
+  partial class NameListCSharpPage
   {
     List<string> Names { get; set; }
     string SearchPattern { get; set; }    
@@ -26,7 +26,7 @@ namespace NemerleWeb.Samples
       }
     }    
     
-    public NameListCSharpViewModel()
+    public NameListCSharpPage()
     {
       server.GetNames(l => { Names = l; });
     }

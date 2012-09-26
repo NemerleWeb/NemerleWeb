@@ -5,10 +5,10 @@ using NemerleWeb;
 
 namespace NemerleWeb.Samples
 {
-    [JsModel]
-    public class SPAViewModel
+    [Unit]
+    public class SPAPage
     {
-        [Record, JsModel]
+        [Record, Unit]
         public class Mail
         {   
             public Id : int { get; set; }
@@ -20,7 +20,7 @@ namespace NemerleWeb.Samples
             public Folder : string { get; set; }
         }
         
-        [Record, JsModel]
+        [Record, Unit]
         public class FolderData
         {
             public Id : string { get; set; }
@@ -40,7 +40,7 @@ namespace NemerleWeb.Samples
                     this.get("#:folder", function() {
                         self.ChosenFolderId = this.params.folder;
                         self.ChosenMailData = null;
-                        $.get("/SPAViewModel/Folder", { folder: this.params.folder }, function(result) { 
+                        $.get("/SPAPage/Folder", { folder: this.params.folder }, function(result) { 
                             self.ChosenFolderData = nweb.utils.toTypedObject(result);
                             nweb.invalidate();
                         });
@@ -49,7 +49,7 @@ namespace NemerleWeb.Samples
                     this.get("#:folder/:mailId", function() {
                         self.ChosenFolderId = this.params.folder;
                         self.ChosenMailData = null;
-                        $.get("/SPAViewModel/Mail", { mailId: this.params.mailId }, function(result) { 
+                        $.get("/SPAPage/Mail", { mailId: this.params.mailId }, function(result) { 
                             self.ChosenMailData = nweb.utils.toTypedObject(result);
                             nweb.invalidate();
                         });

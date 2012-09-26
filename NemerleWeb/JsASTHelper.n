@@ -9,61 +9,61 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  public module JsASTHelper
+  public module JsAstHelper
   {     
-    allowedCallTargets : list[Type] = [typeof(JsAST.LocalRef), typeof(JsAST.Literal)];
+    allowedCallTargets : list[Type] = [typeof(JsAst.LocalRef), typeof(JsAst.Literal)];
     mutable temporaryVariableCounter : int = 0;
     
-    public TransformBottomUp(ast : JsAST) : JsAST
+    public TransformBottomUp(ast : JsAst) : JsAst
     {   
-        JsAST.Recurse(ast, a => a.Transform(), false)
+        JsAst.Recurse(ast, a => a.Transform(), false)
     }
     
-    public RemoveEmptyBranches(ast : JsAST) : JsAST
+    public RemoveEmptyBranches(ast : JsAst) : JsAst
     {
-        JsAST.Recurse(ast, a : JsAST =>
+        JsAst.Recurse(ast, a : JsAst =>
         match(a) { 
         | While(_, Void) 
-        | While(_, Undefined) => JsAST.Void()
+        | While(_, Undefined) => JsAst.Void()
         | If(cond, then, Undefined) 
-        | If(cond, then, Void) => JsAST.JustIf(cond, then)
+        | If(cond, then, Void) => JsAst.JustIf(cond, then)
         | JustIf(_, Void) 
-        | JustIf(_, Undefined) => JsAST.Void()        
+        | JustIf(_, Undefined) => JsAst.Void()        
         | _ => a
         }, false);
     }
     
-    public FlattenAndRemoveVoids(ast : JsAST) : JsAST    
+    public FlattenAndRemoveVoids(ast : JsAst) : JsAst    
     {
-        JsAST.Recurse(ast, a : JsAST => {
-            def flatten(a' : JsAST) : JsAST {
-            | Seq(s0) when s0.Any(e => e is JsAST.Seq)  => 
+        JsAst.Recurse(ast, a : JsAst => {
+            def flatten(a' : JsAst) : JsAst {
+            | Seq(s0) when s0.Any(e => e is JsAst.Seq)  => 
                 def r = s0.Flatten(e => 
                     match(e) {
-                    | JsAST.Seq(xs) => xs
+                    | JsAst.Seq(xs) => xs
                     | x => [x]
                 });
-                flatten(JsAST.Seq(r.Filter(rr => !(rr is JsAST.Void))));
+                flatten(JsAst.Seq(r.Filter(rr => !(rr is JsAst.Void))));
             | _ => a'
             }
             flatten(a);
         });
     }
     
-    public LabelsToNamedWhile(ast : JsAST) : JsAST 
+    public LabelsToNamedWhile(ast : JsAst) : JsAst 
     {
-        def gotos = IterateAST(ast).OfType.[JsAST.Goto]().ToDictionary(k => k.LabelId);
-        def r = JsAST.Recurse(ast, a : JsAST => 
+        def gotos = IterateAST(ast).OfType.[JsAst.Goto]().ToDictionary(k => k.LabelId);
+        def r = JsAst.Recurse(ast, a : JsAst => 
         match(a) {
-        | Label(id, body) when gotos.ContainsKey(id) => JsAST.WhileNamed(JsAST.Literal(JsLiteral.Bool(true)), JsAST.Seq([body, JsAST.Break()]), "l" + id.ToString()); //ConvertLabelToSwitch(l)
+        | Label(id, body) when gotos.ContainsKey(id) => JsAst.WhileNamed(JsAst.Literal(JsLiteral.Bool(true)), JsAst.Seq([body, JsAst.Break()]), "l" + id.ToString()); //ConvertLabelToSwitch(l)
         | Label(_, body)  => body
-        | Goto(id)        => JsAST.Continue("l" + id.ToString())
+        | Goto(id)        => JsAst.Continue("l" + id.ToString())
         | _ => a
         });        
         r
     }
     
-    public DelayAssignment(expr : JsAST, left : JsAST) : JsAST
+    public DelayAssignment(expr : JsAst, left : JsAst) : JsAst
     {
         def delayAssignment = DelayAssignment(_, left);
         match(expr) {
@@ -72,35 +72,35 @@ namespace NemerleWeb
             | last :: allButLast => delayAssignment(last) :: allButLast
             | r => r
             }
-            JsAST.Seq(newExprs.Rev())
-        | TryFinally(body, handler) => JsAST.TryFinally(delayAssignment(body), handler)
-        | Assign(l, r)     => JsAST.Assign(l, delayAssignment(r))
-        | If(c, t, e)      => JsAST.If(c, delayAssignment(t), delayAssignment(e))
-        | ServerCall(m, t, ps, c) => JsAST.ServerCall(m, t, ps.Map(p => (p[0], delayAssignment(p[1]))), delayAssignment(c))
-        | Switch(e, cases, deflt) => JsAST.Switch(e, cases.Map(c => JsAST.SwitchCase(c.Id, delayAssignment(c.Body))), delayAssignment(deflt))
+            JsAst.Seq(newExprs.Rev())
+        | TryFinally(body, handler) => JsAst.TryFinally(delayAssignment(body), handler)
+        | Assign(l, r)     => JsAst.Assign(l, delayAssignment(r))
+        | If(c, t, e)      => JsAst.If(c, delayAssignment(t), delayAssignment(e))
+        | ServerCall(m, t, ps, c) => JsAst.ServerCall(m, t, ps.Map(p => (p[0], delayAssignment(p[1]))), delayAssignment(c))
+        | Switch(e, cases, deflt) => JsAst.Switch(e, cases.Map(c => JsAst.SwitchCase(c.Id, delayAssignment(c.Body))), delayAssignment(deflt))
         | WhileNamed(c, b, n) => 
             def newBody = match(b) {
             | Seq(bodyItems) => 
                 def newItems = match(bodyItems.Rev()) {
-                | Break :: secondToLast :: rest => JsAST.Break() :: delayAssignment(secondToLast) :: rest;
+                | Break :: secondToLast :: rest => JsAst.Break() :: delayAssignment(secondToLast) :: rest;
                 | last :: rest => delayAssignment(last) :: rest;
                 | [] => []
                 }
-                JsAST.Seq(newItems.Rev())
-            | something => JsAST.Assign(left, delayAssignment(something))
+                JsAst.Seq(newItems.Rev())
+            | something => JsAst.Assign(left, delayAssignment(something))
             }
-            JsAST.WhileNamed(c, newBody, n)
-        | e when JsAST.AllowedForAssignment.Any(al => al == e.GetType()) => JsAST.Assign(left, e)
+            JsAst.WhileNamed(c, newBody, n)
+        | e when JsAst.AllowedForAssignment.Any(al => al == e.GetType()) => JsAst.Assign(left, e)
         | Undefined
-        | Void => JsAST.Void()
+        | Void => JsAst.Void()
         | _ => expr
         }
     }
     
-    public MakeReturn(ast : JsAST) : JsAST 
+    public MakeReturn(ast : JsAst) : JsAst 
     {
       | Void => ast
-      | _ => JsAST.Seq([JsAST.DefValue("__returnValue", JsAST.Void()), DelayAssignment(ast, JsAST.LocalRef("__returnValue")), JsAST.Return(JsAST.LocalRef("__returnValue"))])        
+      | _ => JsAst.Seq([JsAst.DefValue("__returnValue", JsAst.Void()), DelayAssignment(ast, JsAst.LocalRef("__returnValue")), JsAst.Return(JsAst.LocalRef("__returnValue"))])        
     }
     
     public GetTemporaryVariableName() : string 
@@ -109,10 +109,10 @@ namespace NemerleWeb
         $"_N_T_temp_var_$temporaryVariableCounter";
     }
     
-    public IterateAST(ast : JsAST) : IEnumerable[JsAST] 
+    public IterateAST(ast : JsAst) : IEnumerable[JsAst] 
     {
         def lst = List();
-        _ = JsAST.Recurse(ast, a => {
+        _ = JsAst.Recurse(ast, a => {
             lst.Add(a);
             a
         });

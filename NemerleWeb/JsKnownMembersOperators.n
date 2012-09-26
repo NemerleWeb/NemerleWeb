@@ -16,7 +16,7 @@ namespace NemerleWeb
   {
     public Register() : void
     {
-      def opcodeAst(opcode, parms) { JsAST.Call(JsAST.OpCode(opcode), parms) }
+      def opcodeAst(opcode, parms) { JsAst.Call(JsAst.OpCode(opcode), parms) }
       def registerOpcode(opcodeName, opcode)
       {
         JsKnownMembers.RegisterMember(opcodeName, (_, _, parms) => Some(opcodeAst(opcode, parms)));
@@ -71,7 +71,7 @@ namespace NemerleWeb
             match (parms)
             {
             | [h] => Some(h)
-            | h :: t => Some(JsAST.Seq(h :: t))
+            | h :: t => Some(JsAst.Seq(h :: t))
             | _ => None()
             });
       }

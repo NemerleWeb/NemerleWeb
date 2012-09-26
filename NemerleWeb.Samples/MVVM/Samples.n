@@ -6,18 +6,18 @@ using NemerleWeb;
 
 namespace NemerleWeb.Samples
 {
-  [JsModel, Record]  
+  [Unit, Record]  
   class Sample
   {
     public Name : string { get; set; }
     public SourceFiles : list[string] { get; set; }
     public Source : string { get; set; }
-    public Instance : ViewModel { get; set; }
+    public Instance : Page { get; set; }
     public TemplateName : string { get; set; }
   }
   
-  [ViewModel]
-  class SamplesViewModel
+  [Page]
+  class SamplesPage
   {      
     SelectedSample : Sample { get; set; }
     
@@ -31,38 +31,38 @@ namespace NemerleWeb.Samples
       }
     }
     
-    NameList : NameListViewModel { get; set; }
-    NameListCSharp : NameListCSharpViewModel { get; set; }
-    CompList : CompListViewModel { get; set; }
-    Signal : SignalViewModel { get; set; }
-    Variants : VariantsAndMatchingViewModel { get; set; }    
-    Introduction : IntroductionViewModel { get; set; }
-    ListsAndCollections : ListsAndCollectionsViewModel { get; set; }
-    LoadingAndSaving : LoadingAndSavingViewModel { get; set; }
-    SinglePageApps : SPAViewModel { get; set; }
+    NameList : NameListPage { get; set; }
+    NameListCSharp : NameListCSharpPage { get; set; }
+    CompList : CompListPage { get; set; }
+    Signal : SignalPage { get; set; }
+    Variants : VariantsAndMatchingPage { get; set; }    
+    Introduction : IntroductionPage { get; set; }
+    ListsAndCollections : ListsAndCollectionsPage { get; set; }
+    LoadingAndSaving : LoadingAndSavingPage { get; set; }
+    SinglePageApps : SPAPage { get; set; }
     
     Sources : List[string * string] { get; set; }
     ThisPageSource : string { get; set; }
         
     public this()
     {
-      NameList = NameListViewModel();
-      NameListCSharp = NameListCSharpViewModel();
-      CompList = CompListViewModel();
-      Signal = SignalViewModel();
-      Variants = VariantsAndMatchingViewModel();
-      Introduction = IntroductionViewModel("John", "Silver");
-      ListsAndCollections = ListsAndCollectionsViewModel();
-      LoadingAndSaving = LoadingAndSavingViewModel();
-      SinglePageApps = SPAViewModel();
+      NameList = NameListPage();
+      NameListCSharp = NameListCSharpPage();
+      CompList = CompListPage();
+      Signal = SignalPage();
+      Variants = VariantsAndMatchingPage();
+      Introduction = IntroductionPage("John", "Silver");
+      ListsAndCollections = ListsAndCollectionsPage();
+      LoadingAndSaving = LoadingAndSavingPage();
+      SinglePageApps = SPAPage();
             
       Samples = 
       [
-        Sample("List of names", ["MVVM/NameListViewModel.n"], "", NameList, tname template(_.NameList)),  // in tname template(_.NameList) second parameter is View by default
-        Sample("List of names C#", ["MVVM/NameListCSharpViewModel.cs", "MVVM/NameListCSharpViewModel.View.n"], "", NameListCSharp, tname template(_.NameListCSharp)), 
-        Sample("Computation Expressions", ["MVVM/CompListViewModel.n"], "", CompList, tname template(_.CompList, _.View)), 
-        Sample("Chat using SignalR", ["MVVM/SignalViewModel.n"], "", Signal, tname template(_.Signal, _.View)), 
-        Sample("Variants and Pattern Matching", ["MVVM/VariantsAndMatchingViewModel.n"], "", Variants, tname template(_.Variants, _.View))
+        Sample("List of names", ["MVVM/NameListPage.n"], "", NameList, tname template(_.NameList)),  // in tname template(_.NameList) second parameter is View by default
+        Sample("List of names C#", ["MVVM/NameListCSharpPage.cs", "MVVM/NameListCSharpPage.View.n"], "", NameListCSharp, tname template(_.NameListCSharp)), 
+        Sample("Computation Expressions", ["MVVM/CompListPage.n"], "", CompList, tname template(_.CompList, _.View)), 
+        Sample("Chat using SignalR", ["MVVM/SignalPage.n"], "", Signal, tname template(_.Signal, _.View)), 
+        Sample("Variants and Pattern Matching", ["MVVM/VariantsAndMatchingPage.n"], "", Variants, tname template(_.Variants, _.View))
       ].ToList();
       
       KnockoutSamples =

@@ -13,8 +13,8 @@ using System.Linq.Expressions;
 
 namespace NemerleWeb
 {
-  public class ViewModel {}
-  public class ViewModelBase[T] : ViewModel
+  public class Page {}
+  public class PageBase[T] : Page
   {
     public template[TM]([NotNull] model : Expression[Func[T, TM]]) : string
     { 
@@ -43,7 +43,7 @@ namespace NemerleWeb
       }   
     }
     
-    public template[TM]([NotNull] _model : ViewModel, [NotNull] _template : string) : string
+    public template[TM]([NotNull] _model : Page, [NotNull] _template : string) : string
     {
       ""
     }

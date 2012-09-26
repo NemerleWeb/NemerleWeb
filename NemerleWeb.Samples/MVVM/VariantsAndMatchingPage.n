@@ -11,7 +11,7 @@ using NemerleWeb;
 
 namespace NemerleWeb.Samples
 {
-  [JsModel]
+  [Unit]
   public variant Color
   {
     | Red
@@ -39,8 +39,8 @@ namespace NemerleWeb.Samples
     }
   }
   
-  [JsModel]
-  public class VariantsAndMatchingViewModel
+  [Unit]
+  public class VariantsAndMatchingPage
   { 
     AvailableColors : list[(int * string)] { get { [(0, "Red"), (1, "Green"), (2, "Blue"), (3, "Other")] }  }
     CurrentColorId : int { get; set; }

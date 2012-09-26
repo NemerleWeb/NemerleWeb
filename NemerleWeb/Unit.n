@@ -17,24 +17,24 @@ using TExpr = Nemerle.Compiler.Typedtree.TExpr;
 namespace NemerleWeb
 {    
   [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Class)]
-  macro JsModel(tb : TypeBuilder) 
+  macro Unit(tb : TypeBuilder) 
   {
-    JsModelImpl.DoTransform(tb, Macros.ImplicitCTX())
+    UnitImpl.DoTransform(tb, Macros.ImplicitCTX())
   }
   
   [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
-  macro JsModel(tb : TypeBuilder)
+  macro Unit(tb : TypeBuilder)
   {
-    JsModelImpl.DoTransformBeforeInheritance(tb, Macros.ImplicitCTX())
+    UnitImpl.DoTransformBeforeInheritance(tb, Macros.ImplicitCTX())
   }
   
-  module JsModelImpl
+  module UnitImpl
   {       
     public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);
       
-      def baseType = <[ NemerleWeb.ViewModelBase[$(tb.ParsedTypeName)] ]>;
+      def baseType = <[ NemerleWeb.PageBase[$(tb.ParsedTypeName)] ]>;
       when(tb.Ast is TopDeclaration.Class) {
         def ast = tb.Ast :> TopDeclaration.Class; 
         ast.t_extends ::=  baseType;
@@ -127,7 +127,7 @@ namespace NemerleWeb
         public static GetLambdaScript() : string
         { "" } ]>) :> MethodBuilder;          
       
-      tb.GetModifiers().AddCustomAttribute(<[ NemerleWeb.JsModel ]>);
+      tb.GetModifiers().AddCustomAttribute(<[ NemerleWeb.UnitAttribute ]>);
         
       tb.Manager.TypeTreeBuildFinish += _ => {
           def lambdas = tb.DeclaredNestedTypes
