@@ -76,6 +76,7 @@ namespace NemerleWeb
 $<# 
   $jsHubName.$name = function($parms) {
     self.$name($parms);
+    nweb.invalidate();
   }; #>);
   
         def methods = $<#..$(methods; "")#>;
