@@ -109,7 +109,7 @@ namespace NemerleWeb
                   else
                     serverMethods.Add(method.Name, fparms);
                   
-                  def fparms = fparms.Append([<[ parameter: callback : $(method.ReturnType : typed) -> void ]>]);
+                  def fparms = fparms.Append([<[ parameter: _callback : $(method.ReturnType : typed) -> void ]>]);
                   
                   ptb.Define(<[ decl:                   
                     public $(methodName : name) (..$(fparms)) : void

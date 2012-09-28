@@ -28,14 +28,14 @@ namespace NemerleWeb.Samples
     {
       Alphabet = array["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
       LetterCount = 3;
-    }
-    
+    } 
+ 
     public More() : void
     {
       when (LetterCount < Alphabet.Count())        
         LetterCount++;
     }
-    
+
     public Less() : void
     {
       when(LetterCount > 0)

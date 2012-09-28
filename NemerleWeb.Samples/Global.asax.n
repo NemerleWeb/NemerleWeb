@@ -35,7 +35,6 @@ namespace NemerleWeb.Samples
         protected Application_Start() : void
         {
             AreaRegistration.RegisterAllAreas();
-
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
         }
