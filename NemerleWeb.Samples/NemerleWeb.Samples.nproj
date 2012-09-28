@@ -154,36 +154,6 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\MVVM\CompListPage.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\NameListPage.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Knockout\Tutorial_1_Introduction.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Knockout\Tutorial_2_ListsAndCollections.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Knockout\Tutorial_3_SinglePageApps.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Knockout\Tutorial_5_LoadingAndSaving.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Samples.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\SignalPage.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\NameListCSharpPage.cs">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\NameListCSharpPage.View.n">
-      <DependentUpon>bin\MVVM\NameListCSharpPage.cs</DependentUpon>
-    </Content>
     <Compile Include="Controllers\HomeController.n" />
     <Compile Include="Global.asax.n">
       <DependentUpon>Global.asax</DependentUpon>
