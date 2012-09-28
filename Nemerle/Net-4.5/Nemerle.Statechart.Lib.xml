@@ -1,0 +1,364 @@
+<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>c:\dev\open-source\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.Statechart.Lib.xml</name>
+  </assembly>
+  <members>
+    <member name="T:Nemerle.Statechart.ListUtils">
+      <summary>
+        <para>List utilities
+ </para>
+      </summary>
+
+</member>
+    <member name="M:Nemerle.Statechart.ListUtils.FirstElems``1(Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,System.Boolean})">
+      <summary>
+        <para>Elements to first finded if not found returns all
+ </para>
+      </summary>
+
+</member>
+    <member name="M:Nemerle.Statechart.ListUtils.SplitFind``1(Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,System.Boolean})" />
+    <member name="M:Nemerle.Statechart.ListUtils.RemoveDuplicates``1(Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,``0,System.Boolean})">
+      <summary>
+        <para>Removes duplicates defined with equality predicate
+ </para>
+      </summary>
+ <param name="lst"><para>list</para></param>
+ <param name="eq_pred"><para>Function that shows equality of two elements</para></param>
+
+</member>
+    <member name="M:Nemerle.Statechart.ListUtils.RemoveDuplicatesSort``1(Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,``0,System.Int32})">
+      <summary>
+        <para>Removes duplicates defined with equality predicate with auto sorting
+ </para>
+      </summary>
+ <param name="lst"><para>list</para></param>
+ <param name="eq_pred"><para>Function that shows equality of two elements</para></param>
+
+</member>
+    <member name="M:Nemerle.Statechart.ListUtils.PartitionType``2(Nemerle.Core.list{``0})">
+      <summary>
+        <para>Return from list only correspond to result type with partition of others
+ </para>
+      </summary>
+ <param name="lst"><para>list</para></param>
+ <returns><para>result * left elements</para></returns>
+
+</member>
+    <member name="M:Nemerle.Statechart.ListUtils.PartitionAround``1(Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,System.Boolean})" />
+    <member name="M:Nemerle.Statechart.ListUtils.PartitionFirst``1(Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,System.Boolean})" />
+    <member name="M:Nemerle.Statechart.ListUtils.FilterType``2(Nemerle.Core.list{``0})" />
+    <member name="M:Nemerle.Statechart.ListUtils.FindType``2(Nemerle.Core.list{``0})">
+      <summary>
+        <para>Find first element corresponds to result type
+ </para>
+      </summary>
+ <param name="lst"><para>список</para></param>
+ <returns><para>результат * оставшиеся элементы</para></returns>
+
+</member>
+    <member name="M:Nemerle.Statechart.ListUtils.FilterValues``2(Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,Nemerle.Core.option{``1}})" />
+    <member name="M:Nemerle.Statechart.ListUtils.FilterValues``2(System.Collections.Generic.IEnumerable{``0},Nemerle.Builtins.Function{``0,Nemerle.Core.option{``1}})" />
+    <member name="M:Nemerle.Statechart.ListUtils.Exclude``2(Nemerle.Core.list{``0},Nemerle.Core.list{``1},Nemerle.Builtins.Function{``0,``1,System.Boolean})">
+      <summary>
+        <para>Excludes elements from list that not exist in second list
+ </para>
+      </summary>
+ <param name="lst"><para>list</para></param>
+ <param name="lst2"><para>list 2</para></param>
+ <param name="eq"><para>comparator</para></param>
+ <returns><para>result</para></returns>
+
+</member>
+    <member name="M:Nemerle.Statechart.ListUtils.MapIndex``2(Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,System.Int32,``1})" />
+    <member name="M:Nemerle.Statechart.ListUtils.FindSingle``2(Nemerle.Core.list{Nemerle.Builtins.Tuple{``0,Nemerle.Core.list{``1}}},Nemerle.Builtins.Function{``1,System.Boolean})" />
+    <member name="M:Nemerle.Statechart.ListUtils.FindSingleList``2(Nemerle.Core.list{Nemerle.Builtins.Tuple{``0,Nemerle.Core.list{``1}}},Nemerle.Builtins.Function{``1,System.Boolean})" />
+    <member name="M:Nemerle.Statechart.ListUtils.MapDefault``2(Nemerle.Core.option{``0},Nemerle.Builtins.Function{``0,``1},``1)" />
+    <member name="M:Nemerle.Statechart.ListUtils.%+``2(Nemerle.Core.list{``0},Nemerle.Core.list{``1})" />
+    <member name="M:Nemerle.Statechart.ListUtils.&amp;+``3(Nemerle.Core.list{``1},Nemerle.Core.list{``2})" />
+    <member name="M:Nemerle.Statechart.ListUtils.Duplicates``1(Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,``0,System.Int32})">
+      <summary>
+        <para>Returns duplicates according to comparator
+ </para>
+      </summary>
+ <param name="lst"><para>list</para></param>
+ <param name="comp"><para>comparator</para></param>
+ <returns><para>duplicates</para></returns>
+
+</member>
+    <member name="M:Nemerle.Statechart.ListUtils.DuplicatesPartition``1(Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,``0,System.Int32})" />
+    <member name="M:Nemerle.Statechart.ListUtils.FindDelimited``1(Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,System.Boolean})" />
+    <member name="M:Nemerle.Statechart.ListUtils.ElementsEqual``1(Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,``0,System.Boolean})" />
+    <member name="M:Nemerle.Statechart.ListUtils.ChopLastN``1(Nemerle.Core.list{``0},System.Int32)" />
+    <member name="M:Nemerle.Statechart.ListUtils.Exclude``1(Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,System.Boolean})" />
+    <member name="M:Nemerle.Statechart.ListUtils.FindIndex``1(Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,System.Boolean})" />
+    <member name="M:Nemerle.Statechart.ListUtils.Exclude``1(Nemerle.Core.list{``0},Nemerle.Core.list{``0})" />
+    <member name="M:Nemerle.Statechart.ListUtils.%::``1(Nemerle.Core.option{``0},Nemerle.Core.list{``0})" />
+    <member name="F:Nemerle.Statechart.ListUtils.not_empty_err" />
+    <member name="M:Nemerle.Statechart.ListUtils.SplitLast``1(Nemerle.Core.list{``0})" />
+    <member name="M:Nemerle.Statechart.ListUtils.Last``1(Nemerle.Core.list{``0})" />
+    <member name="M:Nemerle.Statechart.ListUtils.RemoveDupFirst``1(Nemerle.Core.list{``0},Nemerle.Core.list{``0},Nemerle.Builtins.Function{``0,``0,System.Boolean})" />
+    <member name="T:Nemerle.Statechart._N_operator905413888_3906Macro" />
+    <member name="M:Nemerle.Statechart._N_operator905413888_3906Macro.#ctor" />
+    <member name="F:Nemerle.Statechart._N_operator905413888_3906Macro.my_usage" />
+    <member name="F:Nemerle.Statechart._N_operator905413888_3906Macro.keywords" />
+    <member name="M:Nemerle.Statechart._N_operator905413888_3906Macro.#cctor" />
+    <member name="M:Nemerle.Statechart._N_operator905413888_3906Macro.get_Location" />
+    <member name="P:Nemerle.Statechart._N_operator905413888_3906Macro.Location" />
+    <member name="M:Nemerle.Statechart._N_operator905413888_3906Macro.get_IsInherited" />
+    <member name="P:Nemerle.Statechart._N_operator905413888_3906Macro.IsInherited" />
+    <member name="M:Nemerle.Statechart._N_operator905413888_3906Macro.get_Keywords" />
+    <member name="P:Nemerle.Statechart._N_operator905413888_3906Macro.Keywords" />
+    <member name="M:Nemerle.Statechart._N_operator905413888_3906Macro.GetName" />
+    <member name="M:Nemerle.Statechart._N_operator905413888_3906Macro.get_Name" />
+    <member name="P:Nemerle.Statechart._N_operator905413888_3906Macro.Name" />
+    <member name="M:Nemerle.Statechart._N_operator905413888_3906Macro.get_Namespace" />
+    <member name="P:Nemerle.Statechart._N_operator905413888_3906Macro.Namespace" />
+    <member name="M:Nemerle.Statechart._N_operator905413888_3906Macro.GetNamespace" />
+    <member name="M:Nemerle.Statechart._N_operator905413888_3906Macro.get_Usage" />
+    <member name="P:Nemerle.Statechart._N_operator905413888_3906Macro.Usage" />
+    <member name="M:Nemerle.Statechart._N_operator905413888_3906Macro.get_IsTailRecursionTransparent" />
+    <member name="P:Nemerle.Statechart._N_operator905413888_3906Macro.IsTailRecursionTransparent" />
+    <member name="M:Nemerle.Statechart._N_operator905413888_3906Macro.CallTransform(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Statechart._N_operator905413888_3906Macro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
+    <member name="M:Nemerle.Statechart._N_operator905413888_3906Macro.SyntaxExtension" />
+    <member name="T:Nemerle.Statechart._N_operator911097836_3908Macro" />
+    <member name="M:Nemerle.Statechart._N_operator911097836_3908Macro.#ctor" />
+    <member name="F:Nemerle.Statechart._N_operator911097836_3908Macro.my_usage" />
+    <member name="F:Nemerle.Statechart._N_operator911097836_3908Macro.keywords" />
+    <member name="M:Nemerle.Statechart._N_operator911097836_3908Macro.#cctor" />
+    <member name="M:Nemerle.Statechart._N_operator911097836_3908Macro.get_Location" />
+    <member name="P:Nemerle.Statechart._N_operator911097836_3908Macro.Location" />
+    <member name="M:Nemerle.Statechart._N_operator911097836_3908Macro.get_IsInherited" />
+    <member name="P:Nemerle.Statechart._N_operator911097836_3908Macro.IsInherited" />
+    <member name="M:Nemerle.Statechart._N_operator911097836_3908Macro.get_Keywords" />
+    <member name="P:Nemerle.Statechart._N_operator911097836_3908Macro.Keywords" />
+    <member name="M:Nemerle.Statechart._N_operator911097836_3908Macro.GetName" />
+    <member name="M:Nemerle.Statechart._N_operator911097836_3908Macro.get_Name" />
+    <member name="P:Nemerle.Statechart._N_operator911097836_3908Macro.Name" />
+    <member name="M:Nemerle.Statechart._N_operator911097836_3908Macro.get_Namespace" />
+    <member name="P:Nemerle.Statechart._N_operator911097836_3908Macro.Namespace" />
+    <member name="M:Nemerle.Statechart._N_operator911097836_3908Macro.GetNamespace" />
+    <member name="M:Nemerle.Statechart._N_operator911097836_3908Macro.get_Usage" />
+    <member name="P:Nemerle.Statechart._N_operator911097836_3908Macro.Usage" />
+    <member name="M:Nemerle.Statechart._N_operator911097836_3908Macro.get_IsTailRecursionTransparent" />
+    <member name="P:Nemerle.Statechart._N_operator911097836_3908Macro.IsTailRecursionTransparent" />
+    <member name="M:Nemerle.Statechart._N_operator911097836_3908Macro.CallTransform(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Statechart._N_operator911097836_3908Macro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
+    <member name="M:Nemerle.Statechart._N_operator911097836_3908Macro.SyntaxExtension" />
+    <member name="T:Nemerle.Statechart.MapHelper" />
+    <member name="M:Nemerle.Statechart.MapHelper._N_wild_find_9149(Nemerle.Statechart.MapHelper._N_closureOf_loop_9141)" />
+    <member name="M:Nemerle.Statechart.MapHelper._N_is_first_9104(Nemerle.Compiler.TraverseContext)" />
+    <member name="M:Nemerle.Statechart.MapHelper.GetParam(System.Int32)" />
+    <member name="M:Nemerle.Statechart.MapHelper.GetParams(System.Int32)" />
+    <member name="M:Nemerle.Statechart.MapHelper.MapCreate(Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="T:Nemerle.Statechart.MapUtils">
+      <summary>
+        <para>Description of Class1.
+ </para>
+      </summary>
+
+</member>
+    <member name="M:Nemerle.Statechart.MapUtils.Keys``2(Nemerle.Collections.Map{``0,``1})" />
+    <member name="M:Nemerle.Statechart.MapUtils.Values``2(Nemerle.Collections.Map{``0,``1})" />
+    <member name="T:Nemerle.Statechart.MathUtils">
+      <summary>
+        <para>Description of MathUtils.
+ </para>
+      </summary>
+
+</member>
+    <member name="M:Nemerle.Statechart.MathUtils.UpperDiv(System.Int32,System.Int32)" />
+    <member name="T:Nemerle.Statechart.TwoOption`1" />
+    <member name="M:Nemerle.Statechart.TwoOption`1.get_HasValue" />
+    <member name="P:Nemerle.Statechart.TwoOption`1.HasValue" />
+    <member name="M:Nemerle.Statechart.TwoOption`1.get_IsOne" />
+    <member name="P:Nemerle.Statechart.TwoOption`1.IsOne" />
+    <member name="M:Nemerle.Statechart.TwoOption`1.get_IsTwo" />
+    <member name="P:Nemerle.Statechart.TwoOption`1.IsTwo" />
+    <member name="M:Nemerle.Statechart.TwoOption`1.get_IsNone" />
+    <member name="P:Nemerle.Statechart.TwoOption`1.IsNone" />
+    <member name="M:Nemerle.Statechart.TwoOption`1.get_First" />
+    <member name="P:Nemerle.Statechart.TwoOption`1.First" />
+    <member name="M:Nemerle.Statechart.TwoOption`1.get_Second" />
+    <member name="P:Nemerle.Statechart.TwoOption`1.Second" />
+    <member name="M:Nemerle.Statechart.TwoOption`1.Map``1(Nemerle.Builtins.Function{`0,``0})" />
+    <member name="M:Nemerle.Statechart.TwoOption`1.MapToList``1(Nemerle.Builtins.Function{`0,``0})" />
+    <member name="M:Nemerle.Statechart.TwoOption`1.ToList" />
+    <member name="M:Nemerle.Statechart.TwoOption`1.Iter(Nemerle.Builtins.FunctionVoid{`0})" />
+    <member name="M:Nemerle.Statechart.TwoOption`1.get_Value" />
+    <member name="P:Nemerle.Statechart.TwoOption`1.Value" />
+    <member name="M:Nemerle.Statechart.TwoOption`1.Compare``1(Nemerle.Core.option{``0},Nemerle.Core.option{``0},Nemerle.Builtins.Function{``0,``0,System.Int32})" />
+    <member name="M:Nemerle.Statechart.TwoOption`1.ToString" />
+    <member name="M:Nemerle.Statechart.TwoOption`1._N_GetVariantCode" />
+    <member name="M:Nemerle.Statechart.TwoOption`1._N_GetVariantCodeSafe(Nemerle.Statechart.TwoOption{`0})" />
+    <member name="M:Nemerle.Statechart.TwoOption`1._N_GetVariantCodeObject(System.Object)" />
+    <member name="M:Nemerle.Statechart.TwoOption`1.#ctor" />
+    <member name="T:Nemerle.Statechart.TwoOption`1.None`0" />
+    <member name="T:Nemerle.Statechart.TwoOption`1.One`0" />
+    <member name="T:Nemerle.Statechart.TwoOption`1.Two`0" />
+    <member name="T:Nemerle.Statechart.StringUtils">
+      <summary>
+        <para>Description of String.
+ </para>
+      </summary>
+
+</member>
+    <member name="M:Nemerle.Statechart.StringUtils.GetSub(System.String,System.Char,System.Char)" />
+    <member name="M:Nemerle.Statechart.StringUtils.GetSub(System.String,System.Char)" />
+    <member name="T:Nemerle.Statechart.single_funcMacro" />
+    <member name="M:Nemerle.Statechart.single_funcMacro.#ctor" />
+    <member name="F:Nemerle.Statechart.single_funcMacro.my_usage" />
+    <member name="F:Nemerle.Statechart.single_funcMacro.keywords" />
+    <member name="M:Nemerle.Statechart.single_funcMacro.#cctor" />
+    <member name="M:Nemerle.Statechart.single_funcMacro.get_Location" />
+    <member name="P:Nemerle.Statechart.single_funcMacro.Location" />
+    <member name="M:Nemerle.Statechart.single_funcMacro.get_IsInherited" />
+    <member name="P:Nemerle.Statechart.single_funcMacro.IsInherited" />
+    <member name="M:Nemerle.Statechart.single_funcMacro.get_Keywords" />
+    <member name="P:Nemerle.Statechart.single_funcMacro.Keywords" />
+    <member name="M:Nemerle.Statechart.single_funcMacro.GetName" />
+    <member name="M:Nemerle.Statechart.single_funcMacro.get_Name" />
+    <member name="P:Nemerle.Statechart.single_funcMacro.Name" />
+    <member name="M:Nemerle.Statechart.single_funcMacro.get_Namespace" />
+    <member name="P:Nemerle.Statechart.single_funcMacro.Namespace" />
+    <member name="M:Nemerle.Statechart.single_funcMacro.GetNamespace" />
+    <member name="M:Nemerle.Statechart.single_funcMacro.get_Usage" />
+    <member name="P:Nemerle.Statechart.single_funcMacro.Usage" />
+    <member name="M:Nemerle.Statechart.single_funcMacro.get_IsTailRecursionTransparent" />
+    <member name="P:Nemerle.Statechart.single_funcMacro.IsTailRecursionTransparent" />
+    <member name="M:Nemerle.Statechart.single_funcMacro.CallTransform(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Statechart.single_funcMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
+    <member name="M:Nemerle.Statechart.single_funcMacro.SyntaxExtension" />
+    <member name="T:Nemerle.Statechart.wildcardMacro" />
+    <member name="M:Nemerle.Statechart.wildcardMacro.#ctor" />
+    <member name="F:Nemerle.Statechart.wildcardMacro.my_usage" />
+    <member name="F:Nemerle.Statechart.wildcardMacro.keywords" />
+    <member name="M:Nemerle.Statechart.wildcardMacro.#cctor" />
+    <member name="M:Nemerle.Statechart.wildcardMacro.get_Location" />
+    <member name="P:Nemerle.Statechart.wildcardMacro.Location" />
+    <member name="M:Nemerle.Statechart.wildcardMacro.get_IsInherited" />
+    <member name="P:Nemerle.Statechart.wildcardMacro.IsInherited" />
+    <member name="M:Nemerle.Statechart.wildcardMacro.get_Keywords" />
+    <member name="P:Nemerle.Statechart.wildcardMacro.Keywords" />
+    <member name="M:Nemerle.Statechart.wildcardMacro.GetName" />
+    <member name="M:Nemerle.Statechart.wildcardMacro.get_Name" />
+    <member name="P:Nemerle.Statechart.wildcardMacro.Name" />
+    <member name="M:Nemerle.Statechart.wildcardMacro.get_Namespace" />
+    <member name="P:Nemerle.Statechart.wildcardMacro.Namespace" />
+    <member name="M:Nemerle.Statechart.wildcardMacro.GetNamespace" />
+    <member name="M:Nemerle.Statechart.wildcardMacro.get_Usage" />
+    <member name="P:Nemerle.Statechart.wildcardMacro.Usage" />
+    <member name="M:Nemerle.Statechart.wildcardMacro.get_IsTailRecursionTransparent" />
+    <member name="P:Nemerle.Statechart.wildcardMacro.IsTailRecursionTransparent" />
+    <member name="M:Nemerle.Statechart.wildcardMacro.CallTransform(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Statechart.wildcardMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
+    <member name="M:Nemerle.Statechart.wildcardMacro.SyntaxExtension" />
+    <member name="T:Nemerle.Statechart._N_operator1617874543_3920Macro" />
+    <member name="M:Nemerle.Statechart._N_operator1617874543_3920Macro.#ctor" />
+    <member name="F:Nemerle.Statechart._N_operator1617874543_3920Macro.my_usage" />
+    <member name="F:Nemerle.Statechart._N_operator1617874543_3920Macro.keywords" />
+    <member name="M:Nemerle.Statechart._N_operator1617874543_3920Macro.#cctor" />
+    <member name="M:Nemerle.Statechart._N_operator1617874543_3920Macro.get_Location" />
+    <member name="P:Nemerle.Statechart._N_operator1617874543_3920Macro.Location" />
+    <member name="M:Nemerle.Statechart._N_operator1617874543_3920Macro.get_IsInherited" />
+    <member name="P:Nemerle.Statechart._N_operator1617874543_3920Macro.IsInherited" />
+    <member name="M:Nemerle.Statechart._N_operator1617874543_3920Macro.get_Keywords" />
+    <member name="P:Nemerle.Statechart._N_operator1617874543_3920Macro.Keywords" />
+    <member name="M:Nemerle.Statechart._N_operator1617874543_3920Macro.GetName" />
+    <member name="M:Nemerle.Statechart._N_operator1617874543_3920Macro.get_Name" />
+    <member name="P:Nemerle.Statechart._N_operator1617874543_3920Macro.Name" />
+    <member name="M:Nemerle.Statechart._N_operator1617874543_3920Macro.get_Namespace" />
+    <member name="P:Nemerle.Statechart._N_operator1617874543_3920Macro.Namespace" />
+    <member name="M:Nemerle.Statechart._N_operator1617874543_3920Macro.GetNamespace" />
+    <member name="M:Nemerle.Statechart._N_operator1617874543_3920Macro.get_Usage" />
+    <member name="P:Nemerle.Statechart._N_operator1617874543_3920Macro.Usage" />
+    <member name="M:Nemerle.Statechart._N_operator1617874543_3920Macro.get_IsTailRecursionTransparent" />
+    <member name="P:Nemerle.Statechart._N_operator1617874543_3920Macro.IsTailRecursionTransparent" />
+    <member name="M:Nemerle.Statechart._N_operator1617874543_3920Macro.CallTransform(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Statechart._N_operator1617874543_3920Macro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
+    <member name="M:Nemerle.Statechart._N_operator1617874543_3920Macro.SyntaxExtension" />
+    <member name="T:Nemerle.Statechart._N_operator_654988927_3922Macro" />
+    <member name="M:Nemerle.Statechart._N_operator_654988927_3922Macro.#ctor" />
+    <member name="F:Nemerle.Statechart._N_operator_654988927_3922Macro.my_usage" />
+    <member name="F:Nemerle.Statechart._N_operator_654988927_3922Macro.keywords" />
+    <member name="M:Nemerle.Statechart._N_operator_654988927_3922Macro.#cctor" />
+    <member name="M:Nemerle.Statechart._N_operator_654988927_3922Macro.get_Location" />
+    <member name="P:Nemerle.Statechart._N_operator_654988927_3922Macro.Location" />
+    <member name="M:Nemerle.Statechart._N_operator_654988927_3922Macro.get_IsInherited" />
+    <member name="P:Nemerle.Statechart._N_operator_654988927_3922Macro.IsInherited" />
+    <member name="M:Nemerle.Statechart._N_operator_654988927_3922Macro.get_Keywords" />
+    <member name="P:Nemerle.Statechart._N_operator_654988927_3922Macro.Keywords" />
+    <member name="M:Nemerle.Statechart._N_operator_654988927_3922Macro.GetName" />
+    <member name="M:Nemerle.Statechart._N_operator_654988927_3922Macro.get_Name" />
+    <member name="P:Nemerle.Statechart._N_operator_654988927_3922Macro.Name" />
+    <member name="M:Nemerle.Statechart._N_operator_654988927_3922Macro.get_Namespace" />
+    <member name="P:Nemerle.Statechart._N_operator_654988927_3922Macro.Namespace" />
+    <member name="M:Nemerle.Statechart._N_operator_654988927_3922Macro.GetNamespace" />
+    <member name="M:Nemerle.Statechart._N_operator_654988927_3922Macro.get_Usage" />
+    <member name="P:Nemerle.Statechart._N_operator_654988927_3922Macro.Usage" />
+    <member name="M:Nemerle.Statechart._N_operator_654988927_3922Macro.get_IsTailRecursionTransparent" />
+    <member name="P:Nemerle.Statechart._N_operator_654988927_3922Macro.IsTailRecursionTransparent" />
+    <member name="M:Nemerle.Statechart._N_operator_654988927_3922Macro.CallTransform(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Statechart._N_operator_654988927_3922Macro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
+    <member name="M:Nemerle.Statechart._N_operator_654988927_3922Macro.SyntaxExtension" />
+    <member name="T:Nemerle.Statechart.obj_assignMacro" />
+    <member name="M:Nemerle.Statechart.obj_assignMacro.#ctor" />
+    <member name="F:Nemerle.Statechart.obj_assignMacro.my_usage" />
+    <member name="F:Nemerle.Statechart.obj_assignMacro.keywords" />
+    <member name="M:Nemerle.Statechart.obj_assignMacro.#cctor" />
+    <member name="M:Nemerle.Statechart.obj_assignMacro.get_Location" />
+    <member name="P:Nemerle.Statechart.obj_assignMacro.Location" />
+    <member name="M:Nemerle.Statechart.obj_assignMacro.get_IsInherited" />
+    <member name="P:Nemerle.Statechart.obj_assignMacro.IsInherited" />
+    <member name="M:Nemerle.Statechart.obj_assignMacro.get_Keywords" />
+    <member name="P:Nemerle.Statechart.obj_assignMacro.Keywords" />
+    <member name="M:Nemerle.Statechart.obj_assignMacro.GetName" />
+    <member name="M:Nemerle.Statechart.obj_assignMacro.get_Name" />
+    <member name="P:Nemerle.Statechart.obj_assignMacro.Name" />
+    <member name="M:Nemerle.Statechart.obj_assignMacro.get_Namespace" />
+    <member name="P:Nemerle.Statechart.obj_assignMacro.Namespace" />
+    <member name="M:Nemerle.Statechart.obj_assignMacro.GetNamespace" />
+    <member name="M:Nemerle.Statechart.obj_assignMacro.get_Usage" />
+    <member name="P:Nemerle.Statechart.obj_assignMacro.Usage" />
+    <member name="M:Nemerle.Statechart.obj_assignMacro.get_IsTailRecursionTransparent" />
+    <member name="P:Nemerle.Statechart.obj_assignMacro.IsTailRecursionTransparent" />
+    <member name="M:Nemerle.Statechart.obj_assignMacro.CallTransform(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Statechart.obj_assignMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
+    <member name="M:Nemerle.Statechart.obj_assignMacro.SyntaxExtension" />
+    <member name="T:Nemerle.Statechart.Utils" />
+    <member name="M:Nemerle.Statechart.Utils.CreateAssign(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Statechart.Utils.CreateSingleFunc(Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Statechart.Utils.GetRetExpr(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="T:Nemerle.Statechart.Tree`1" />
+    <member name="M:Nemerle.Statechart.Tree`1.#ctor" />
+    <member name="M:Nemerle.Statechart.Tree`1._N_GetVariantCode" />
+    <member name="M:Nemerle.Statechart.Tree`1._N_GetVariantCodeSafe(Nemerle.Statechart.Tree{`0})" />
+    <member name="M:Nemerle.Statechart.Tree`1._N_GetVariantCodeObject(System.Object)" />
+    <member name="T:Nemerle.Statechart.Tree`1.Item`0" />
+    <member name="T:Nemerle.Statechart.Tree`1.Section`0" />
+    <member name="T:Nemerle.Statechart.Path`1" />
+    <member name="M:Nemerle.Statechart.Path`1.#ctor" />
+    <member name="M:Nemerle.Statechart.Path`1._N_GetVariantCode" />
+    <member name="M:Nemerle.Statechart.Path`1._N_GetVariantCodeSafe(Nemerle.Statechart.Path{`0})" />
+    <member name="M:Nemerle.Statechart.Path`1._N_GetVariantCodeObject(System.Object)" />
+    <member name="T:Nemerle.Statechart.Path`1.Top`0" />
+    <member name="T:Nemerle.Statechart.Path`1.Node`0" />
+    <member name="T:Nemerle.Statechart.Loc`1" />
+    <member name="F:Nemerle.Statechart.Loc`1.tree" />
+    <member name="F:Nemerle.Statechart.Loc`1.path" />
+    <member name="M:Nemerle.Statechart.Loc`1.left" />
+    <member name="M:Nemerle.Statechart.Loc`1.right" />
+    <member name="M:Nemerle.Statechart.Loc`1.up" />
+    <member name="M:Nemerle.Statechart.Loc`1.down" />
+    <member name="M:Nemerle.Statechart.Loc`1.#ctor(Nemerle.Statechart.Tree{`0},Nemerle.Statechart.Path{`0})" />
+    <member name="T:_N_MacroContexts" />
+    <member name="M:_N_MacroContexts.#cctor" />
+    <member name="F:_N_MacroContexts.serialized" />
+    <member name="F:_N_MacroContexts.contexts" />
+    <member name="F:_N_MacroContexts.last_manager" />
+    <member name="M:_N_MacroContexts.Get(System.Int32,Nemerle.Compiler.ManagerClass)" />
+    <member name="M:_N_MacroContexts.Clear" />
+  </members>
+</doc>
