@@ -41,8 +41,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
-    <Reference Include="Nemerle, Version=1.1.948.0, Culture=neutral, PublicKeyToken=e080a9c724e2bfcd">
+    <Reference Include="Nemerle">
       <Name>Nemerle</Name>
+      <SpecificVersion>False</SpecificVersion>
       <AssemblyName>Nemerle.dll</AssemblyName>
       <HintPath>$(Nemerle)\Nemerle.dll</HintPath>
     </Reference>
