@@ -104,6 +104,7 @@ namespace NemerleWeb.Samples
     SelectSample(sample : Sample) : void 
     {
       SelectedSample = sample;
+      js prettyPrint();
     }
     
     public class Server
