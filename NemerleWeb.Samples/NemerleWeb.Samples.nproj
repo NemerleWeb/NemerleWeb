@@ -57,6 +57,11 @@
       <HintPath>$(Nemerle)\Nemerle.Compiler.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Nemerle.Macros">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(Nemerle)\Nemerle.Macros.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Nemerle.ComputationExpressions">
       <Name>Nemerle.ComputationExpressions</Name>
       <SpecificVersion>False</SpecificVersion>
@@ -148,10 +153,10 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\MVVM\CompListViewModel.n">
+    <Content Include="bin\MVVM\CompListPage.n">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="bin\MVVM\NameListViewModel.n">
+    <Content Include="bin\MVVM\NameListPage.n">
       <SubType>Code</SubType>
     </Content>
     <Content Include="bin\MVVM\Knockout\Tutorial_1_Introduction.n">
@@ -169,14 +174,14 @@
     <Content Include="bin\MVVM\Samples.n">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="bin\MVVM\SignalViewModel.n">
+    <Content Include="bin\MVVM\SignalPage.n">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="bin\MVVM\NameListCSharpViewModel.cs">
+    <Content Include="bin\MVVM\NameListCSharpPage.cs">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="bin\MVVM\NameListCSharpViewModel.View.n">
-      <DependentUpon>bin\MVVM\NameListCSharpViewModel.cs</DependentUpon>
+    <Content Include="bin\MVVM\NameListCSharpPage.View.n">
+      <DependentUpon>bin\MVVM\NameListCSharpPage.cs</DependentUpon>
     </Content>
     <Compile Include="Controllers\HomeController.n" />
     <Compile Include="Global.asax.n">
