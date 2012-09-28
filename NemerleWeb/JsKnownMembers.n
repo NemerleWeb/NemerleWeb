@@ -173,9 +173,9 @@ namespace NemerleWeb
       | [h] when member.Name.StartsWith("set_") =>
         JsAst.PropertySet(left, propertyName, h)
       | _ => 
-        // TODO: Change to Error #23
-        when(type?.BaseType?.FullName != "NemerleWeb.PageBase")
-          Message.Warning(
+        when(type?.BaseType?.FullName != "NemerleWeb.PageBase" &&
+             !(type == null && member.Name == "apply"))
+          Message.Error(
             member.Location,
             $"Invalid $(member.Name) with $(TypeName(type)) type, params: ..$parms not implemented in JS");
           

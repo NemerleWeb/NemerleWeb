@@ -269,8 +269,10 @@ $(Body.Write())
             }
         }
         | MethodRef      { Obj : JsAst; Method : string;
-            public override Write(_ = "" : string) : string {
-                $"$(Obj.Write()).$Method"
+            public override Write(_ = "" : string) : string
+            {
+              def delimiter = if (Obj is Literal(JsLiteral.Integer)) " " else "";
+              $"$(Obj.Write())$(delimiter).$Method"
             }
         }        
         | StaticRef      { Type : string; Member : string;

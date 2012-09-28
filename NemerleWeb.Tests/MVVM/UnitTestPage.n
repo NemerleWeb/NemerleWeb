@@ -196,6 +196,77 @@ namespace NemerleWeb.Tests
         count == l1.Count
       });
       
+      test("string concat 1", () =>
+      {
+        "ab" == string.Concat("a", "b")
+      });
+      
+      test("string concat 2", () =>
+      {
+        def a = "a";
+        def b = "b";
+        "ab" == a + b
+      });
+      
+      test("string concat 3", () =>
+      {
+        def a = "a";
+        def b = "b";
+        def c = "c";
+        "abc" == a + b + c
+      });
+      
+      test("string concat 4", () =>
+      {
+        def a = "a";
+        def b = "b";
+        def c = "c";
+        def d = "d";
+        "abcd" == a + b + c + d
+      });
+      
+      test("string concat 5", () =>
+      {
+        def a = "a";
+        def b = "b";
+        def c = "c";
+        def d = "d";
+        "abcdabcdabcd" == a + b + c + d + a + b + c + d + a + b + c + d
+      });
+      
+      test("string concat 6", () =>
+      {
+        "abc" == string.Concat("a", string.Concat("b", string.Concat("c")))
+      });
+      
+      test("string concat 7", () =>
+      {
+        def l = ["a", "b", "c"].ToList();
+        "abc" == string.Concat(l);
+      });
+      
+      test("string concat 8", () =>
+      {
+        def l = [1, 2, 3].ToList();
+        "123" == string.Concat(l);
+      });
+      
+      test("string concat 9", () =>
+      {
+        "12" == string.Concat(1, string.Concat(2))
+      });
+      
+      test("string concat 10", () =>
+      {
+        "1" == string.Concat(1)
+      });
+      
+      test("string concat 11", () =>
+      {
+        "123" == string.Concat(1, 2, 3)
+      });
+      
+      
       test("using", () =>
       {
         //using (s = SomeDisposable())

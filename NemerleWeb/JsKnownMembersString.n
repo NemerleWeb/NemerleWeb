@@ -21,6 +21,12 @@ namespace NemerleWeb
     
     private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
+      def toString(arg : JsAst)
+      {
+      | JsAst.Literal(JsLiteral.String) => arg        
+      | _ => arg.MethodCall("toString", [])
+      }
+          
       match (parms)
       {
       | [] =>
@@ -45,8 +51,8 @@ namespace NemerleWeb
         | "Normalize"
         | "ToCharArray" => None()
         | "ToLower" => Some(left.MethodCall("toLowerCase", []))
-        | "ToLowerInvariant"
-        | "ToString" => None()
+        | "ToLowerInvariant" => None()
+        | "ToString" => Some(toString(left))
         | "ToUpper" => Some(left.MethodCall("toUpperCase", []))
         | "ToUpperInvariant"
         | "Trim"
@@ -61,11 +67,17 @@ namespace NemerleWeb
         | "Compare"
         | "CompareOrdinal"
         | "CompareTo" => None()
-        | "Concat" =>
+        | "Concat" =>          
           match (arg1)
           {
-          | JsAst.Array(a) => Some(left.MethodCall("concat", a))
-          |  _ => Some(left.MethodCall("concat", parms))
+          | JsAst.Array(Values = values) =>
+            match (values)
+            {
+            | [] => None()
+            | [v] => Some(toString(v))
+            | _ => Some(toString(values.Head).MethodCall("concat", values.Tail))
+            }
+          | _ => Some(toString(arg1))
           }
           
         | "Contains" =>
@@ -98,21 +110,15 @@ namespace NemerleWeb
         | "ToUpper"
         | "Trim" => None()
         
-        | "ToString" => Some(JsAst.Call(JsAst.MethodRef(arg1, "toString"), []))
+        | "ToString" => Some(arg1.MethodCall("toString", []))
         
         | _ => None()
         }
           
       | [arg1, arg2] =>
         match (member.Name)
-        {
-        
-        | "Concat" =>
-          match (arg2)
-          {
-          | JsAst.Array(a) => Some(arg1.MethodCall("concat", a))
-          |  _ => Some(arg1.MethodCall("concat", [arg2]))
-          }        
+        {        
+        | "Concat" => Some(toString(arg1).MethodCall("concat", [arg2]))
         | "Compare"
         | "EndsWith"
         | "Equals"
@@ -133,11 +139,11 @@ namespace NemerleWeb
         | _ => None()
         }
           
-      | [_arg1, _arg2, _arg3] =>
+      | [arg1, arg2, arg3] =>
         match (member.Name)
         {
+        | "Concat" => Some(toString(arg1).MethodCall("concat", [arg2, arg3]))
         | "Compare"
-        | "Concat"
         | "CopyTo"
         | "Equals"
         | "Format"
@@ -151,9 +157,10 @@ namespace NemerleWeb
         | _ => None()
         }
         
-      | [_arg1, _arg2, _arg3, _arg4] =>
+      | [arg1, arg2, arg3, arg4] =>
         match (member.Name)
         {
+        | "Concat" => Some(toString(arg1).MethodCall("concat", [arg2, arg3, arg4]))
         | "Compare"
         | "CompareOrdinal"
         | "IndexOf"
