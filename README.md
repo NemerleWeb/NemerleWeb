@@ -3,7 +3,7 @@ It uses reactive data model which allows creating rich internet applications.
 
 ##New to NemerleWeb ?
 
-You can see samples on [Demo site](http://user1663.netfx45lab.discountasp.net/)
+You can see samples on [Demo site](http://moiety.apphb.com/)
 
 Currently there is no documentation wiki, you are free to help us.
 
