@@ -1,0 +1,198 @@
+<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>c:\dev\open-source\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.Statechart.Generator.xml</name>
+  </assembly>
+  <members>
+    <member name="T:Nemerle.Statechart.GenCtx" />
+    <member name="M:Nemerle.Statechart.GenCtx.#ctor" />
+    <member name="M:Nemerle.Statechart.GenCtx.get_IsInEventHandler" />
+    <member name="P:Nemerle.Statechart.GenCtx.IsInEventHandler" />
+    <member name="F:Nemerle.Statechart.GenCtx.HaveActionsAfter" />
+    <member name="M:Nemerle.Statechart.GenCtx._N_GetVariantCode" />
+    <member name="M:Nemerle.Statechart.GenCtx._N_GetVariantCodeSafe(Nemerle.Statechart.GenCtx)" />
+    <member name="M:Nemerle.Statechart.GenCtx._N_GetVariantCodeObject(System.Object)" />
+    <member name="T:Nemerle.Statechart.GenCtx.Normal" />
+    <member name="T:Nemerle.Statechart.GenCtx.InEventHandler" />
+    <member name="T:Nemerle.Statechart.GenElement" />
+    <member name="F:Nemerle.Statechart.GenElement._N_decl_map_4162" />
+    <member name="M:Nemerle.Statechart.GenElement.get_decl_map" />
+    <member name="M:Nemerle.Statechart.GenElement.set_decl_map(Nemerle.Collections.Map{System.String,System.String})" />
+    <member name="P:Nemerle.Statechart.GenElement.decl_map" />
+    <member name="F:Nemerle.Statechart.GenElement.name" />
+    <member name="F:Nemerle.Statechart.GenElement.exec_name" />
+    <member name="M:Nemerle.Statechart.GenElement.#ctor(System.String)" />
+    <member name="M:Nemerle.Statechart.GenElement.#ctor(System.String,System.String,Nemerle.Collections.Map{System.String,System.String})" />
+    <member name="M:Nemerle.Statechart.GenElement.#ctor(System.String,Nemerle.Collections.Map{System.String,System.String})" />
+    <member name="M:Nemerle.Statechart.GenElement.CreateEndExecName" />
+    <member name="M:Nemerle.Statechart.GenElement.CreateExecName(System.String)" />
+    <member name="M:Nemerle.Statechart.GenElement.get_IsDestDeclared" />
+    <member name="P:Nemerle.Statechart.GenElement.IsDestDeclared" />
+    <member name="M:Nemerle.Statechart.GenElement.get_IsDeclared" />
+    <member name="P:Nemerle.Statechart.GenElement.IsDeclared" />
+    <member name="M:Nemerle.Statechart.GenElement.get_Declared" />
+    <member name="P:Nemerle.Statechart.GenElement.Declared" />
+    <member name="M:Nemerle.Statechart.GenElement.ToString" />
+    <member name="T:Nemerle.Statechart.GenAction">
+      <summary>
+        <para>Description of GenAction.
+ </para>
+      </summary>
+
+</member>
+    <member name="F:Nemerle.Statechart.GenAction.node" />
+    <member name="F:Nemerle.Statechart.GenAction.inlined_actions" />
+    <member name="M:Nemerle.Statechart.GenAction.#ctor(System.String,Nemerle.Statechart.PathNode,Nemerle.Collections.Map{System.String,System.String})" />
+    <member name="M:Nemerle.Statechart.GenAction.#ctor(System.String,System.String,Nemerle.Statechart.PathNode,Nemerle.Collections.Map{System.String,System.String})" />
+    <member name="M:Nemerle.Statechart.GenAction.get_action" />
+    <member name="P:Nemerle.Statechart.GenAction.action" />
+    <member name="F:Nemerle.Statechart.GenAction.end_name" />
+    <member name="M:Nemerle.Statechart.GenAction.get_ExecExpr" />
+    <member name="P:Nemerle.Statechart.GenAction.ExecExpr" />
+    <member name="M:Nemerle.Statechart.GenAction.ToString" />
+    <member name="M:Nemerle.Statechart.GenAction.CreateExecActionName" />
+    <member name="M:Nemerle.Statechart.GenAction.TryInline" />
+    <member name="M:Nemerle.Statechart.GenAction.CreateActions(Nemerle.Statechart.PathNode,Nemerle.Collections.Map{System.String,System.String})" />
+    <member name="M:Nemerle.Statechart.GenAction.GetActions(Nemerle.Statechart.PathNode,Nemerle.Collections.Map{System.String,System.String})" />
+    <member name="M:Nemerle.Statechart.GenAction.CreateEndName" />
+    <member name="M:Nemerle.Statechart.GenAction.create_act_name(Nemerle.Statechart.Actions,Nemerle.Statechart.PathNode,Nemerle.Collections.Map{System.String,System.String})" />
+    <member name="M:Nemerle.Statechart.GenAction.get_Node" />
+    <member name="P:Nemerle.Statechart.GenAction.Node" />
+    <member name="M:Nemerle.Statechart.GenAction.get_InlinedActions" />
+    <member name="P:Nemerle.Statechart.GenAction.InlinedActions" />
+    <member name="T:Nemerle.Statechart.StaticGenerator" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_get_join_16740(Nemerle.Statechart.PseudoStateNode.Join)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_create_history_16662(Nemerle.Statechart.StaticGenerator._N_closureOf_DefineHistory_16633,Nemerle.Statechart.StateHistory)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_def_history_16650(Nemerle.Statechart.StaticGenerator._N_closureOf_DefineHistory_16633,Nemerle.Core.list{Nemerle.Statechart.StateHistory})" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_get_run_hist_body_16641(Nemerle.Statechart.StaticGenerator._N_closureOf_DefineHistory_16633,Nemerle.Statechart.StateTransition.Default)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_create_body_16527(Nemerle.Statechart.StateHistory)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_create_body_16482(Nemerle.Statechart.StaticGenerator._N_closureOf_DefineHistoryPaths_16472,Nemerle.Statechart.HistoryPath)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_get_body_16384(Nemerle.Statechart.StaticGenerator._N_closureOf_get_choice_body_16374,Nemerle.Statechart.DecisionNode,System.Boolean)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_get_body_16302(Nemerle.Statechart.StaticGenerator._N_closureOf_get_junction_body_16292,Nemerle.Statechart.DecisionNode,System.Boolean)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_create_reaction_body_15802(Nemerle.Statechart.StaticGenerator._N_closureOf_create_regions_15763,Nemerle.Statechart.StateEvent)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_create_region_reaction_15796(Nemerle.Statechart.FsmState.ConcurrentSubRegion,Nemerle.Statechart.StateEvent)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_def_tran_body_15336(Nemerle.Statechart.StaticGenerator._N_closureOf_DefineTransitions_15301,Nemerle.Core.list{Nemerle.Statechart.StateTransition})" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_get_body_15230(Nemerle.Statechart.StaticGenerator._N_closureOf_DefineTransBody_15220,Nemerle.Statechart.StateTransition)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_get_check_14871(Nemerle.Statechart.StaticGenerator._N_closureOf_GetCheck_14842,Nemerle.Statechart.FsmState.ConcurrentRegion,Nemerle.Core.list{Nemerle.Statechart.FsmState})" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_find_14606(Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Statechart.FsmState.ConcurrentSubRegion,Nemerle.Compiler.Parsetree.PExpr.Call}},Nemerle.Statechart.FsmState.ConcurrentSubRegion)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_sub_region_14595(Nemerle.Statechart.StateTransition)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_enter_region_14577(Nemerle.Statechart.StaticGenerator._N_closureOf_GetDestination_14510,Nemerle.Core.list{Nemerle.Statechart.FsmState.ConcurrentRegion})" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_create_activity_14001(Nemerle.Statechart.StaticGenerator._N_closureOf_DefineDoActivity_13993,Nemerle.Statechart.StateAction.Do)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_get_body_13648(Nemerle.Statechart.StaticGenerator._N_closureOf_DefineEvents_13640,Nemerle.Statechart.GenElement)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_get_body_12975(Nemerle.Statechart.StaticGenerator._N_closureOf_DefineActionEvent_12967,Nemerle.Statechart.GenAction)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_action_for_name_12503(Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_get_body_12115(Nemerle.Statechart.StaticGenerator._N_closureOf_DefineIsInState_12078,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_create_comp_expr_12088(Nemerle.Statechart.StaticGenerator._N_closureOf_DefineIsInState_12078,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_get_task_name_11011(Nemerle.Statechart.StateAction.Do)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_stop_activity_11004(Nemerle.Statechart.StateAction.Do)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator._N_get_act_9548(Nemerle.Statechart.StaticGenerator._N_closureOf_GetActions_9525,Nemerle.Statechart.PathNode)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.#cctor" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetExecStateName(Nemerle.Statechart.FsmState,Nemerle.Statechart.GenCtx)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetSubRegionsExit(Nemerle.Core.list{Nemerle.Statechart.FsmState.ConcurrentSubRegion})" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.IsEmpty(Nemerle.Statechart.PathNode)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetHistoryClear(Nemerle.Core.list{Nemerle.Statechart.StateHistory})" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.get_sub_region_name(Nemerle.Statechart.FsmState.ConcurrentSubRegion)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetActions(Nemerle.Statechart.PathNode,Nemerle.Collections.Map{System.String,System.String},System.Boolean)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetActions(Nemerle.Core.list{Nemerle.Statechart.PathNode},Nemerle.Collections.Map{System.String,System.String},System.Boolean)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetForceStateChange(Nemerle.Statechart.TransitionDestination,Nemerle.Statechart.GenCtx)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineMain" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineInit">
+      <summary>
+        <para>Define initial class structure
+ </para>
+      </summary>
+
+</member>
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineTerminate" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineIsInState" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.Init" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.InitActionNames" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.Define(Nemerle.Compiler.Parsetree.ClassMember)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.Define(Nemerle.Compiler.TypeBuilder,Nemerle.Compiler.Parsetree.ClassMember)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.Define(Nemerle.Compiler.TypeBuilder,Nemerle.Core.list{Nemerle.Compiler.Parsetree.ClassMember})" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.Define(Nemerle.Core.list{Nemerle.Compiler.Parsetree.ClassMember})" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineNested(Nemerle.Compiler.TypeBuilder,Nemerle.Compiler.Parsetree.ClassMember.TypeDeclaration)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineNested(Nemerle.Compiler.Parsetree.ClassMember.TypeDeclaration)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineEvent(System.String)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineEvent(System.String,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PParameter},Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.merge_and" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineActionEvent(Nemerle.Core.list{Nemerle.Statechart.GenAction})" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineMethod(System.String,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineMethods(Nemerle.Core.list{Nemerle.Builtins.Tuple{System.String,Nemerle.Compiler.Parsetree.PExpr}})" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.get_history_run_name(Nemerle.Statechart.StateHistory,System.String)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.get_action_call(System.String)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.get_guard_call(System.String)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.get_event_call(System.String)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.MergeExprAnd(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.MergeExpr(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Builtins.Function{Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetId(Nemerle.Statechart.IdType)" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.analyser" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.ty" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.tran_events" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.events" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.events_call" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.actions" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.decls" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.action_for" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.event_for" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.macro_actions" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.constructor" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.guard_for" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.history_paths" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.history_transitions" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.history_def_transitions" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.ChartName" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.init_exprs" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.gen_members" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.compile_list" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.state_builders" />
+    <member name="F:Nemerle.Statechart.StaticGenerator.method_decls" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.FinalizeGen" />
+    <member name="F:Nemerle.Statechart.StaticGenerator._N_WithSources_5129" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.get_WithSources" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.set_WithSources(System.Boolean)" />
+    <member name="P:Nemerle.Statechart.StaticGenerator.WithSources" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.#ctor(Nemerle.Statechart.FsmAnalyser,Nemerle.Compiler.TypeBuilder)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.Generate" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineStates(Nemerle.Compiler.TypeBuilder,Nemerle.Statechart.FsmState)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.get_TopState" />
+    <member name="P:Nemerle.Statechart.StaticGenerator.TopState" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineStates" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineSubMachine(Nemerle.Compiler.TypeBuilder,Nemerle.Statechart.FsmState.SubMachine)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineEvents" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineGuards" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineDoActivity" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineActions" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetTransitionFunction(Nemerle.Core.list{Nemerle.Statechart.StateTransition})" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetTransitionFunction(Nemerle.Core.list{Nemerle.Builtins.Tuple{System.String,Nemerle.Statechart.StateTransition}})" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetActions(Nemerle.Statechart.PathNode,System.Boolean)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetActions(Nemerle.Core.list{Nemerle.Statechart.PathNode},System.Boolean)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetDestination(Nemerle.Statechart.TransitionDestination,Nemerle.Statechart.GenCtx)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GuardNeedBody(Nemerle.Statechart.GuardNode)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.get_guard_cond_expr(Nemerle.Statechart.GuardNode,Nemerle.Statechart.GenCtx)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetCheck(Nemerle.Statechart.CheckNode,Nemerle.Statechart.GenCtx)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetGuards(Nemerle.Core.list{Nemerle.Statechart.GuardNode},Nemerle.Statechart.GenCtx)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetGuardedBody(Nemerle.Statechart.StateTransition,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Statechart.GenCtx)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetPostConditions(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Statechart.TransitionPostConditions,Nemerle.Statechart.GenCtx)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetBody(Nemerle.Statechart.StateTransition,Nemerle.Statechart.GenCtx)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetBody(Nemerle.Statechart.PathNode,Nemerle.Statechart.TransitionDestination,Nemerle.Statechart.TransitionPostConditions,Nemerle.Statechart.GenCtx)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.GetTransitionBody(Nemerle.Statechart.StateTransition,Nemerle.Statechart.GenCtx)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineTransBody(Nemerle.Core.list{Nemerle.Statechart.StateTransition},Nemerle.Statechart.GenCtx,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineTransitions(Nemerle.Compiler.TypeBuilder,Nemerle.Statechart.FsmState)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineTransitionActions" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineActions(Nemerle.Compiler.TypeBuilder,Nemerle.Statechart.FsmState)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineRegions(Nemerle.Compiler.TypeBuilder)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.get_junction_body(Nemerle.Statechart.DecisionNode,Nemerle.Statechart.GenCtx,System.Boolean)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.get_choice_body(Nemerle.Statechart.DecisionNode,Nemerle.Statechart.GenCtx,System.Boolean)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineHistoryPaths(Nemerle.Compiler.TypeBuilder,Nemerle.Statechart.FsmState)" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefineHistory" />
+    <member name="M:Nemerle.Statechart.StaticGenerator.DefinePseudo" />
+    <member name="T:_N_MacroContexts" />
+    <member name="M:_N_MacroContexts.#cctor" />
+    <member name="F:_N_MacroContexts.serialized" />
+    <member name="F:_N_MacroContexts.contexts" />
+    <member name="F:_N_MacroContexts.last_manager" />
+    <member name="M:_N_MacroContexts.Get(System.Int32,Nemerle.Compiler.ManagerClass)" />
+    <member name="M:_N_MacroContexts.Clear" />
+  </members>
+</doc>
