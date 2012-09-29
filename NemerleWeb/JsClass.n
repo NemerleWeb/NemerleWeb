@@ -304,10 +304,10 @@ $(indent)}#>);
       {
         def pageMethods = typeof(IPage).GetMethods().Select(m => m.Name);
         methods.Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
-                .Where(m => !m.IsConstructor)
-                .Where(m => !pageMethods.Any(vm => vm == m.Name))
-                .Where(m => m.Name != "View")
-                .Where(m => !m.Name.StartsWith("__"))
+               .Where(m => !m.IsConstructor)
+               .Where(m => !pageMethods.Any(vm => vm == m.Name))
+               .Where(m => m.Name != "View")
+               .Where(m => !m.Name.StartsWith("__"))
       }
   }
 }

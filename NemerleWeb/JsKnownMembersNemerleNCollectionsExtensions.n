@@ -19,7 +19,12 @@ namespace NemerleWeb
       JsKnownMembers.RegisterType(typeof(NCollectionsExtensions), Handler);
     }
     
-    private Handler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      if (left is JsAst.StaticRef) StaticHandler(left, member, parms) else None()
+    }
+    
+    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
       match (parms)
       {

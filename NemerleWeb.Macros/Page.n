@@ -169,8 +169,8 @@ namespace NemerleWeb
             
       tb.Manager.TypeTreeBuildFinish += _ => {
           def lambdas = tb.DeclaredNestedTypes
-                          .Filter(t => t.Name.StartsWith("_N__N_"))
-                          .Map(t => JsClass(t, "  ", ienType, stringType, typer).Write());
+                          .Where(t => t.Name.StartsWith("_N__N_"))
+                          .Select(t => JsClass(t, "  ", ienType, stringType, typer).Write());
           def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");
           
           lambdaMeth.Body = <[ 

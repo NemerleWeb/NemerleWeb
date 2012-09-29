@@ -24,9 +24,11 @@ namespace NemerleWeb
     
     private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
-      if (member.Name == ".ctor")
-        Some(JsAst.Array(parms.Filter(p => !(p is JsAst.NotImpl()))))
-      else      
+      (if (left is JsAst.StaticRef) StaticHandler else ObjectHandler)(left, member, parms)
+    }
+    
+    private ObjectHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
         match (parms)
         {
         | [] =>
@@ -48,6 +50,19 @@ namespace NemerleWeb
         
         | _ => None()
         }
+    }
+     
+    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      match (parms)
+      {
+      | _ =>
+        match (member.Name)
+        {
+        | ".ctor" => Some(JsAst.Array(parms.Where(p => !(p is JsAst.NotImpl())).NToList()))
+        | _ => None()
+        }
+      }
     }
   }
 }

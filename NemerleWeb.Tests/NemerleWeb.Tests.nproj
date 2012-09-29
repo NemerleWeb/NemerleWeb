@@ -46,6 +46,7 @@
       <Name>Microsoft.Web.Infrastructure</Name>
       <AssemblyName>Microsoft.Web.Infrastructure.dll</AssemblyName>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Nemerle">
       <SpecificVersion>False</SpecificVersion>
@@ -57,11 +58,23 @@
       <HintPath>$(Nemerle)\Nemerle.Compiler.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Nemerle.Macros">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(Nemerle)\Nemerle.Macros.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Nemerle.ComputationExpressions">
       <Name>Nemerle.ComputationExpressions</Name>
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(Nemerle)\Nemerle.ComputationExpressions.dll</HintPath>
     </Reference>
+    <MacroReference Include="Nemerle.Linq">
+      <Name>Nemerle.Linq</Name>
+      <AssemblyName>Nemerle.Linq.dll</AssemblyName>
+      <HintPath>$(Nemerle)\Nemerle.Linq.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </MacroReference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
       <Name>Newtonsoft.Json</Name>
@@ -76,7 +89,7 @@
     <Reference Include="SignalR.Hosting.AspNet, Version=0.5.1.10822, Culture=neutral, PublicKeyToken=null">
       <Name>SignalR.Hosting.AspNet</Name>
       <AssemblyName>SignalR.Hosting.AspNet.dll</AssemblyName>
-      <HintPath>..\packages\SignalR.Hosting.AspNet.0.5.3\lib\net45\SignalR.Hosting.AspNet.dll</HintPath>
+      <HintPath>..\packages\SignalR.Hosting.AspNet.0.5.3\lib\net40\SignalR.Hosting.AspNet.dll</HintPath>
     </Reference>
     <Reference Include="SignalR.Hosting.Common, Version=0.5.1.10822, Culture=neutral, PublicKeyToken=null">
       <Name>SignalR.Hosting.Common</Name>

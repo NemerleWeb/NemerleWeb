@@ -90,13 +90,13 @@ namespace NemerleWeb
                                 JsAst.Call(JsAst.OpCode("!=="), [JsAst.TypeOf(something), JsAst.Literal(JsLiteral.String("undefined"))])]).Transform()                 
                 
                                 | Call(func, parms) when parms.OfType.[JsAst.Seq]().Any() =>
-                    def newParms = parms.Map(p : JsAst => {
+                    def newParms = parms.Select(p : JsAst => {
                         def varName = JsAstHelper.GetTemporaryVariableName();
                         match(p) {
                         | xs is Seq => (JsAst.Seq([JsAst.DefValue(varName, JsAst.Void()), JsAstHelper.DelayAssignment(xs, JsAst.LocalRef(varName))]), JsAst.LocalRef(varName))
                         | x => (JsAst.Void(), x)
                         }
-                    });
+                    }).NToList();
                     def paramInits = JsAst.Seq(newParms.Filter((i, _)=> !(i is JsAst.Void)).Map((i, _) => i));
                     def newParms = newParms.Map((_, p) => p);
                     JsAst.Seq([paramInits, JsAst.Call(func, newParms)])                    
@@ -325,8 +325,8 @@ $(Body.Write())
         }
         | Seq            { Items : list[JsAst];
             public override Write(indent = "" : string) : string {
-                def ss = Items.Filter(i => !(i is JsAst.Void))
-                              .Map(i => indent + i.Write() + ";");                
+                def ss = Items.Where(i => !(i is JsAst.Void))
+                              .Select(i => indent + i.Write() + ";");                
                 $<#..$(ss; Environment.NewLine)#>
             }
         }

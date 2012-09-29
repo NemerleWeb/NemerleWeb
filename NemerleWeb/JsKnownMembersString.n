@@ -19,40 +19,36 @@ namespace NemerleWeb
       JsKnownMembers.RegisterType(typeof(string), Handler); 
     }
     
+    private JsToString(arg : JsAst) : JsAst
+    {
+    | JsAst.Literal(JsLiteral.String) => arg        
+    | _ => arg.MethodCall("toString", [])
+    }
+    
     private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
-      def toString(arg : JsAst)
-      {
-      | JsAst.Literal(JsLiteral.String) => arg        
-      | _ => arg.MethodCall("toString", [])
-      }
-          
+      (if (left is JsAst.StaticRef) StaticHandler else ObjectHandler)(left, member, parms)
+    }
+    
+    private ObjectHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
       match (parms)
       {
       | [] =>
         match (member.Name)
         {
         | "get_Length" => Some(JsAst.FieldRef(left, "length", true))
-        | "Clone" => Some(left)
-        | "Copy"
+        | "Clone" => Some(left)        
         | "GetEnumerator"
         | "GetHashCode"
         | "GetType"
-        | "GetTypeCode"
-        | "Intern"
-        | "IsInterned"
-        | "IsNormalized" => None()
-        | "IsNullOrEmpty" =>
-          Some(JsAst.Call(JsAst.OpCode("||"),
-              [JsAst.Call(JsAst.OpCode("==="), [left, JsAst.Literal(JsLiteral.Null())]),
-                JsAst.Call(JsAst.OpCode("==="), [left, JsAst.Literal(JsLiteral.String(""))])]))
-                 
-        | "IsNullOrWhiteSpace"
+        | "GetTypeCode"        
+        | "IsNormalized"
         | "Normalize"
         | "ToCharArray" => None()
         | "ToLower" => Some(left.MethodCall("toLowerCase", []))
         | "ToLowerInvariant" => None()
-        | "ToString" => Some(toString(left))
+        | "ToString" => Some(JsToString(left))
         | "ToUpper" => Some(left.MethodCall("toUpperCase", []))
         | "ToUpperInvariant"
         | "Trim"
@@ -67,19 +63,6 @@ namespace NemerleWeb
         | "Compare"
         | "CompareOrdinal"
         | "CompareTo" => None()
-        | "Concat" =>          
-          match (arg1)
-          {
-          | JsAst.Array(Values = values) =>
-            match (values)
-            {
-            | [] => None()
-            | [v] => Some(toString(v))
-            | _ => Some(toString(values.Head).MethodCall("concat", values.Tail))
-            }
-          | _ => Some(toString(arg1))
-          }
-          
         | "Contains" =>
           Some(JsAst.Call(
             JsAst.OpCode("!="),
@@ -90,13 +73,12 @@ namespace NemerleWeb
               JsAst.Literal(JsLiteral.Integer(-1))
             ]))
             
-        | "EndsWith"
+        | "EndsWith"        
         | "Equals"
         | "Format"
         | "IndexOf"
         | "IndexOfAny"
-        | "IsNormalized"
-        | "Join"
+        | "IsNormalized"        
         | "LastIndexOf"
         | "LastIndexOfAny"
         | "Normalize"
@@ -108,17 +90,14 @@ namespace NemerleWeb
         | "Substring"
         | "ToLower"        
         | "ToUpper"
-        | "Trim" => None()
-        
-        | "ToString" => Some(arg1.MethodCall("toString", []))
-        
+        | "Trim" => None()        
+        | "ToString" => Some(JsToString(left))
         | _ => None()
         }
           
-      | [arg1, arg2] =>
+      | [_arg1, _arg2] =>
         match (member.Name)
-        {        
-        | "Concat" => Some(toString(arg1).MethodCall("concat", [arg2]))
+        {                
         | "Compare"
         | "EndsWith"
         | "Equals"
@@ -139,17 +118,15 @@ namespace NemerleWeb
         | _ => None()
         }
           
-      | [arg1, arg2, arg3] =>
+      | [_arg1, _arg2, _arg3] =>
         match (member.Name)
-        {
-        | "Concat" => Some(toString(arg1).MethodCall("concat", [arg2, arg3]))
+        {        
         | "Compare"
         | "CopyTo"
         | "Equals"
         | "Format"
         | "IndexOf"
         | "IndexOfAny"
-        | "Join"
         | "LastIndexOf"
         | "LastIndexOfAny"
         | "Split"
@@ -157,10 +134,9 @@ namespace NemerleWeb
         | _ => None()
         }
         
-      | [arg1, arg2, arg3, arg4] =>
+      | [_arg1, _arg2, _arg3, _arg4] =>
         match (member.Name)
-        {
-        | "Concat" => Some(toString(arg1).MethodCall("concat", [arg2, arg3, arg4]))
+        {        
         | "Compare"
         | "CompareOrdinal"
         | "IndexOf"
@@ -178,6 +154,63 @@ namespace NemerleWeb
         match (member.Name)
         {
         | "Compare"
+        | _ => None()
+        }
+      | _ => None()
+      }
+    }
+    
+    private StaticHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      match (parms)
+      {
+      | [arg1] =>
+        match (member.Name)
+        {
+        | "Concat" =>
+          match (arg1)
+          {
+          | JsAst.Array(Values = values) =>
+            match (values)
+            {
+            | [] => None()
+            | [v] => Some(JsToString(v))
+            | _ => Some(JsToString(values.Head).MethodCall("concat", values.Tail))
+            }
+          | _ => Some(JsToString(arg1))
+          }
+        | "Copy"
+        | "Intern"
+        | "IsInterned" => None()
+        | "IsNullOrEmpty" =>
+          Some(JsAst.Call(JsAst.OpCode("||"),
+              [JsAst.Call(JsAst.OpCode("==="), [left, JsAst.Literal(JsLiteral.Null())]),
+                JsAst.Call(JsAst.OpCode("==="), [left, JsAst.Literal(JsLiteral.String(""))])]))
+                 
+        | "IsNullOrWhiteSpace"
+        | _ => None()
+        }
+      | [arg1, arg2] =>
+        match (member.Name)
+        {
+        | "Concat" => Some(JsToString(arg1).MethodCall("concat", [arg2]))
+        | "Equals"
+        | "Join"
+        | _ => None()
+        }
+      | [arg1, arg2, arg3] =>
+        match (member.Name)
+        {
+        | "Concat" => Some(JsToString(arg1).MethodCall("concat", [arg2, arg3]))
+        | "Equals"
+        | _ => None()
+        }
+      | [arg1, arg2, arg3, arg4] =>
+        match (member.Name)
+        {
+        | "Concat" => Some(JsToString(arg1).MethodCall("concat", [arg2, arg3, arg4]))
+        | "Equals"
+        | "Join"
         | _ => None()
         }
       | _ => None()
