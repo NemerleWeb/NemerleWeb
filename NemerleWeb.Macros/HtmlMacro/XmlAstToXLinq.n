@@ -234,15 +234,12 @@ namespace NemerleWeb
     }
     
     CleanupCallRefs(expr : PExpr) : PExpr {
-    | Sequence(items) => PExpr.Sequence(items.Map(i => CleanupCallRefs(i)).Filter(c => match(c) { 
-                                                                                       | PExpr.Sequence([]) => false 
-                                                                                       | _ => true 
-                                                                                       }))
-    | MacroCall(name, ns, parms) => PExpr.MacroCall(name, ns, parms.Map(p => 
+    | Sequence(items) => PExpr.Sequence(items.Select(i => CleanupCallRefs(i)).Where(c => !(c is PExpr.Sequence([]))).NToList())
+    | MacroCall(name, ns, parms) => PExpr.MacroCall(name, ns, parms.Select(p => 
                                                             match(p) {
                                                             | SyntaxElement.Expression(body) => SyntaxElement.Expression(CleanupCallRefs(body))                                                            
                                                             | _ => p
-                                                            }))
+                                                            }).NToList())
     | Define(p, Ref(name)) when _methodNames.Any(m => m == name.Id) => PExpr.Define(p, PExpr.Literal(Literal.String("self." + name.Id)))
     | _ => expr
     }

@@ -22,11 +22,21 @@ namespace NemerleWeb
       JsKnownMembers.RegisterType(typeof(Convert), Handler);
     }
     
-    private Handler(_left : JsAst, _member : IMember, parms : list[JsAst]) : option[JsAst]
+    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      if (left is JsAst.StaticRef) StaticHandler(left, member, parms) else None()
+    }
+    
+    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
       match (parms)
       {
-      | [arg1] => Some(arg1.MethodCall("toString", []))
+      | [arg1] =>
+        match(member.Name)
+        {
+        | "ToString" => Some(arg1.MethodCall("toString", []))
+        | _ => None()
+        }
       | _ => None()
       }
     }

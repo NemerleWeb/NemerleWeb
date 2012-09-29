@@ -22,12 +22,9 @@ namespace NemerleWeb
       JsKnownMembers.RegisterType(typeof(object), Handler); 
     }
     
-    private Handler(_left : JsAst, _member : IMember, parms : list[JsAst]) : option[JsAst]
+    private Handler(_left : JsAst, _member : IMember, _parms : list[JsAst]) : option[JsAst]
     {
-      match (parms)
-      {
-      | _ => None()
-      }
+      None()
     }
   }
 }
