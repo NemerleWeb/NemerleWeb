@@ -15,5 +15,10 @@ namespace NemerleWeb.Tests.Controllers
     {
       View(Utils.MakePageHtml(UnitTestPage()) : object);
     }
+    
+    public TemplateTests() : ActionResult
+    {
+      View("Index", Utils.MakePageHtml(TemplateTestsPage()) : object);
+    }
   }
 }

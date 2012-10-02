@@ -123,16 +123,36 @@ namespace NemerleWeb
               def pexpr = SplicablePExprStr(value);
               def binding = match(pexpr)
               {
-                | <[ template(_.$model, _.$view()) ]>  => $<#nweb.utils.getTemplateName($model: "$view"), $model#>
-                | <[ template(_.$model) ]>             => $<#nweb.utils.getTemplateName($model: 'View'), $model#>
-                | <[ template($_l, $_r) ]>             => 
+                | <[ template(_.$model) ]>             => $<#nweb.utils.getTemplateName(self.$model, "View"): self.$model#>
+                | <[ template(_.$model, _.$view) ]>
+                | <[ template(_.$model, _.$view()) ]>  => $<#nweb.utils.getTemplateName(self.$model, "$view"): self.$model#>
+                | <[ template($model) ]> with view = <[ View ]>
+                | <[ template($model, _.$view) ]>
+                | <[ template($model, _.$view()) ]> => 
+                  def splice = getSplice();
+                  def p = regexp match(splice.Replace(System.Environment.NewLine, ""))
+                  {
+                  | <#self.template\((?<p>.+),.+#> => p
+                  | <#self.template\((?<p>.+).+#> => p
+                  | _ => ""
+                  };
+                  $<#nweb.utils.getTemplateName($p, "$view"): $p#>
+                | <[ template(_.$model, $_r) ]> =>
+                  def splice = getSplice();
+                  def p = regexp match(splice.Replace(System.Environment.NewLine, ""))
+                  {
+                  | <#self.template\((.+),(?<p>.+)\)#> => p
+                  | _ => ""
+                  };
+                  $<#nweb.utils.getTemplateName(self.$model, $p): self.$model#>
+                | <[ template($model, $_r) ]> => 
                   def splice = getSplice();
                   def (p1, p2) = regexp match(splice)
                   {
                   | <#self.template\((?<p1>.+),(?<p2>.+)\)#> => (p1, p2)
                   | _ => ("", "")
                   };
-                  $<#$p2: $p1#>
+                  $<#nweb.utils.getTemplateName($p1, $p2): $p1#>
                 | _ => Message.FatalError($"Invalid patter expression: $pexpr")
               }
               <[ [L.XAttribute("nw-template", $binding)] ]>

@@ -16,38 +16,46 @@ namespace NemerleWeb
   public class Page {}
   public class PageBase[T] : Page
   {
-    public template[TM]([NotNull] model : Expression[Func[T, TM]]) : string
+    public template[TM](_model : T -> TM) : string
     { 
-      def hasView = typeof(TM).GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                              .Any(m => m.Name == "View" && m.ReturnType == typeof(string));
-                              
-      match(hasView, model.Body)
-      {
-        | (true, model is Expressions.MemberExpression) => 
-          def modelName = model.Member.Name;
-          def templateName = typeof(TM).Name + "__View";
-          $"template: { name: '$templateName', data: $modelName}"
-        | _ => throw ArgumentException("Incorrect template binding, you should supply model with View() : string method or use different template method")
-      }   
-    }
-    
-    public template[TM]([NotNull] model : Expression[Func[T, TM]], template : Expression[Func[TM, string]]) : string
-    { 
-      match(model.Body, template.Body)
-      {
-        | (model is Expressions.MemberExpression, template is Expressions.MethodCallExpression) => 
-          def modelName = model.Member.Name;
-          def templateName = typeof(TM).Name + "__" + template.Method.Name;
-          $"template: { name: '$templateName' data: $modelName}"
-        | _ => throw ArgumentException("Incorrect template binding: " + model.ToString() + " " + template.ToString())
-      }   
-    }
-    
-    public template[TM]([NotNull] _model : Page, [NotNull] _template : string) : string
-    {
       ""
     }
-        
+
+    public template[TM](_model : T -> TM, _view : string) : string
+    { 
+      ""
+    }
+    
+    public template[TM](_model : T -> TM, _view : TM -> void -> string) : string
+    { 
+      ""
+    }
+    
+    public template[TM](_model : T -> TM, _view : TM -> string) : string
+    { 
+      ""
+    }
+
+    public template[TM](_model : TM) : string
+    { 
+      ""
+    }
+    
+    public template[TM](_model : TM, _view : string) : string
+    { 
+      ""
+    }
+    
+    public template[TM](_model : TM, _view : TM -> string) : string
+    { 
+      ""
+    }
+    
+    public template[TM](_model : TM, _view : TM -> void -> string) : string
+    { 
+      ""
+    }
+    
     public GetTemplateName([NotNull] _modelName : string, [NotNull] _viewName : string) : string
     { "" }
   }

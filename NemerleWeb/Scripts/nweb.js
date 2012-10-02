@@ -320,7 +320,7 @@ var nweb = {
     if(expr == "self")
       return "model";
     var expr = nweb.applyLoopStackToExpr(expr, loopStack);
-    return expr.replace("self.", "model.");
+    return expr.replace(/self\./g, "model.");
   },
   getParsedValue: function(model, parsedExpr, loopStack) {
     if(parsedExpr.length === 0)
@@ -452,7 +452,7 @@ nweb.utils = {
     },
     getTemplateName: function(model, viewName) {
         if (!model)
-            return "";
+            throw "Model passed in template() cannot be null or undefined";
 
         return nweb.utils.getConstructorName(model) + "__" + viewName;
     },

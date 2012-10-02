@@ -2,11 +2,21 @@
 using Nemerle.Collections;
 using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
-
+using Nemerle.IO;
+using System;
+using System.Xml;
 using System.Collections.Generic;
 
 namespace NemerleWeb
 {
+  //tb.GetModifiers().AddCustomAttribute(<[ NemerleWeb.UnitAttribute ]>);
+  
+  [MacroUsage(MacroPhase.BeforeTypedMembers, MacroTargets.Method)]
+  public macro Html(_ : TypeBuilder, meth : ParsedMethod)
+  {
+    meth.AddCustomAttribute(<[ NemerleWeb.IgnoreAttribute ]>);
+  }
+  
   [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Method)]
   public macro Html(_tb : TypeBuilder, mb : MethodBuilder)
   {
@@ -16,7 +26,7 @@ namespace NemerleWeb
   internal module HtmlImpl
   {
     internal ToXLinq(typer : Typer, mb : MethodBuilder) : void
-    {   
+    {
       def expr = mb.Body;
       
       match (expr)

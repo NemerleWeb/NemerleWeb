@@ -173,7 +173,7 @@ $staticConstructorBody#>
             else 
               if(type.TypeInfo.FullName == "System.String") <#""#> 
               else if(type.TypeInfo.FullName == "System.Boolean") "false"
-              else if(type.TypeInfo.FullName == "System.Int32") "0" else "{}";
+              else if(type.TypeInfo.FullName == "System.Int32") "0" else "null";
           }
           def propStrings = Properties.Select(p => indent + $<#$parentPtr.$(p.Name) = $(propVal(p))#>);
           $<#..$(propStrings; ";\n")#>;
@@ -202,7 +202,7 @@ $computedBody
             def isArray = TypeIsArray(type);
             if(isArray) 
               "[]" 
-            else if(type.TypeInfo.FullName == "System.String") <#""#> else "{}";
+            else if(type.TypeInfo.FullName == "System.String") <#""#> else "null";
           }
           def fieldStrings = fields.Select(f => indent + $<#$parentPtr.$(f.Name) = $(fldVal(f))#>);
           $<#..$(fieldStrings; ";\n")#>;
@@ -212,7 +212,7 @@ $computedBody
       {
           def fields = ClassType.GetFields().Where(f => f.IsStatic);
           def fldVal(_fld : IField) {
-              "{}";                    
+              "null";
           }
           def fieldStrings = fields.Select(f => indent + $<#$(ClassType.Name).$(f.Name) = $(fldVal(f))#>);
           $<#..$(fieldStrings; ";\n")#>;
@@ -270,8 +270,8 @@ $(indent)}#>);
       ApplyAttributesToGeneratedClasses() : void
       {
           ClassType.DeclaredNestedTypes
-                    .Where(t => t.Name.StartsWith("_N__N_"))
-                    .Iter(t => t.Ast.AddCustomAttribute(<[ NemerleWeb.GeneratedClass ]>));
+                   .Where(t => t.Name.StartsWith("_N__N_"))
+                   .Iter(t => t.Ast.AddCustomAttribute(<[ NemerleWeb.GeneratedClass ]>));
       }
         
       TypeIsArray(type : TypeVar) : bool 
@@ -297,13 +297,14 @@ $(indent)}#>);
         
       static GetProperName(fullName : string) : string
       {
-        fullName.Replace(".", "_")
+        fullName.Replace(".", "_").Replace("+", "_")
       }
         
       public static FilterMethods(methods : IEnumerable[IMethod]) : IEnumerable[IMethod]
       {
         def pageMethods = typeof(IPage).GetMethods().Select(m => m.Name);
         methods.Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
+               .Where(m => !m.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
                .Where(m => !m.IsConstructor)
                .Where(m => !pageMethods.Any(vm => vm == m.Name))
                .Where(m => m.Name != "View")
