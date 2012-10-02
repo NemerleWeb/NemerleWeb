@@ -97,6 +97,9 @@
     <Compile Include="HtmlMacro\Ext.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IgnoreAttribute.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="IPage.n">
       <SubType>Code</SubType>
     </Compile>
