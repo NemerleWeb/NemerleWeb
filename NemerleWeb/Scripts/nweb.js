@@ -25,9 +25,11 @@ var nweb = {
     };
     return binds[name];
   },
-  applyBindings: function(model, el, bindings, loopStack, isInsideTemplate) {
+  applyBindings: function (model, el, bindings, loopStack, isInsideTemplate) {
+    if(!el)
+      throw "Argument null or undefined exception: el in applyBindings"
     if(el.nodeType != 1)
-        return;
+      return;
     
     var attrs = nweb.utils.getElementAttributes(el);
 

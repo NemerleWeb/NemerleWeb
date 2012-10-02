@@ -14,7 +14,6 @@ namespace NemerleWeb.Samples
     public SourceFiles : list[string] { get; set; }
     public Source : string { get; set; }
     public Instance : Page { get; set; }
-    public TemplateName : string { get; set; }
   }
   
   [Page]
@@ -59,19 +58,19 @@ namespace NemerleWeb.Samples
             
       Samples = 
       [
-        Sample("List of names", ["MVVM/NameListPage.n"], "", NameList, tname template(_.NameList)),  // in tname template(_.NameList) second parameter is View by default
-        Sample("List of names C#", ["MVVM/NameListCSharpPage.cs", "MVVM/NameListCSharpPage.View.n"], "", NameListCSharp, tname template(_.NameListCSharp)), 
-        Sample("Computation Expressions", ["MVVM/CompListPage.n"], "", CompList, tname template(_.CompList, _.View)), 
+        Sample("List of names", ["MVVM/NameListPage.n"], "", NameList),  // in tname template(_.NameList) second parameter is View by default
+        Sample("List of names C#", ["MVVM/NameListCSharpPage.cs", "MVVM/NameListCSharpPage.View.n"], "", NameListCSharp), 
+        Sample("Computation Expressions", ["MVVM/CompListPage.n"], "", CompList), 
         //Sample("Chat using SignalR", ["MVVM/SignalPage.n"], "", Signal, tname template(_.Signal, _.View)), 
-        Sample("Variants and Pattern Matching", ["MVVM/VariantsAndMatchingPage.n"], "", Variants, tname template(_.Variants, _.View))
+        Sample("Variants and Pattern Matching", ["MVVM/VariantsAndMatchingPage.n"], "", Variants)
       ].ToList();
       
       KnockoutSamples =
       [
-        Sample("Introduction", ["MVVM/Knockout/Tutorial_1_Introduction.n"], "", Introduction, tname template(_.Introduction)), 
-        Sample("Lists and collections", ["MVVM/Knockout/Tutorial_2_ListsAndCollections.n"], "", ListsAndCollections, tname template(_.ListsAndCollections)), 
-        Sample ("Single page applications", ["MVVM/Knockout/Tutorial_3_SinglePageApps.n"], "", SinglePageApps, tname template(_.SinglePageApps)), 
-        Sample("Loading and saving", ["MVVM/Knockout/Tutorial_5_LoadingAndSaving.n"], "", LoadingAndSaving, tname template(_.LoadingAndSaving))
+        Sample("Introduction", ["MVVM/Knockout/Tutorial_1_Introduction.n"], "", Introduction), 
+        Sample("Lists and collections", ["MVVM/Knockout/Tutorial_2_ListsAndCollections.n"], "", ListsAndCollections), 
+        Sample ("Single page applications", ["MVVM/Knockout/Tutorial_3_SinglePageApps.n"], "", SinglePageApps), 
+        Sample("Loading and saving", ["MVVM/Knockout/Tutorial_5_LoadingAndSaving.n"], "", LoadingAndSaving)
       ].ToList();
                  
       SelectedSample = Samples[2];
@@ -136,7 +135,7 @@ namespace NemerleWeb.Samples
           </ul>
           <div $foreach(s in AllSamples)>
             <div $when(SelectedSample.Name == s.Name) class="current-sample">
-              <div template="$(template(s.Instance, s.TemplateName))"></div>
+              <div template="$(template(s.Instance))"></div>
               <h2>Source</h2>
               <pre class="prettyprint lang-n prettyprinted">$(s.Source)</pre>
             </div>
