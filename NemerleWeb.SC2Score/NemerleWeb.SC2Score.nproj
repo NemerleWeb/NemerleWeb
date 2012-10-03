@@ -163,9 +163,6 @@
     <Compile Include="Properties\AssemblyInfo.n" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\images\bg.jpg">
-      <SubType>Content</SubType>
-    </Content>
     <Content Include="Content\images\glyphicons-halflings-white.png">
       <SubType>Content</SubType>
     </Content>
