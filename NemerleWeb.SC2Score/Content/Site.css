@@ -1,0 +1,19 @@
+body {
+    width: 960px;
+    margin: 0 auto;
+}
+
+.tourney-list-container {
+    width: 960px;
+    height: 45px;
+    overflow: hidden;
+}
+
+.tourney-list {
+    width: 20000px;
+    margin: 0;
+}
+
+.tourney-list li {
+    margin: 1px;
+}
