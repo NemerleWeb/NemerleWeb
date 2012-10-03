@@ -347,8 +347,9 @@ break;#>
             }
         }
         | ServerCall     { MethodName : string; TypeName : string; Parameters : list[string * JsAst]; Callback : JsAst;
-            public override Write(indent = "" : string) : string {
-                def jsparms = Parameters.Map((name, val) => $"$name :' + JSON.stringify($(val.Write())) + '");
+            public override Write(indent = "" : string) : string {                            
+              def jsparms = Parameters.Map((name, val) => $"$name :' + JSON.stringify($(val.Write())) + '");
+              def callback = Callback.Write().TrimEnd(';');
 $<#$$.ajax({
 $(indent)url: '/$TypeName/$MethodName',
 $(indent)type: 'POST',
@@ -356,7 +357,7 @@ $(indent)dataType: 'json',
 $(indent)contentType: 'application/json; charset=utf-8',
 $(indent)data: '{..$jsparms}',
 $(indent)success: function(result) { 
-  $(Callback.Write())(nweb.utils.toTypedObject(result));
+  $(callback)(nweb.utils.toTypedObject(result));
   nweb.invalidate();
 }
 $(indent)});
