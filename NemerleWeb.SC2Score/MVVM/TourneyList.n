@@ -1,0 +1,57 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.SC2Score
+{
+  [Unit, Record]
+  public class Tourney
+  {
+    public Name : string;
+  }
+  
+  [Unit]
+  public class TourneyList
+  {
+    public All : List[Tourney] { get; set; }
+    public Selected : Tourney { get; set; }
+    
+    public this()
+    {
+      server.LoadFrontPageTourneys(tourneys => { All = tourneys });
+    }
+    
+    public SelectTourney(tourney : Tourney) : void
+    {
+      Selected = tourney;
+    }
+    
+    public class Server
+    {
+      public LoadFrontPageTourneys() : List[Tourney]
+      {
+        [Tourney("DreamHack Open - Bucharest"), Tourney("WCS Asia Finals"), Tourney("NASL Season 4"), Tourney("IPTL Season 1"),
+         Tourney("GSTL Season 3"), Tourney("MLG vs Proleague Invit."), Tourney("OSL Season 1"), Tourney("GSL Season 4")].ToList();
+      }
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+        <div class="tourney-list-container">
+          <ul class="tourney-list">
+            <li $foreach(t in All) 
+                click="$SelectTourney"
+                class="btn btn-info">$(t.Name)</li>
+          </ul>
+        </div>
+      #>
+    }
+  }
+}
