@@ -26,8 +26,8 @@ var nweb = {
     return binds[name];
   },
   applyBindings: function (model, el, bindings, loopStack, isInsideTemplate) {
-    if(!el)
-      throw "Argument null or undefined exception: el in applyBindings"
+    if (!el)
+      throw "Argument null or undefined exception: el in applyBindings";
     if(el.nodeType != 1)
       return;
     
@@ -41,7 +41,7 @@ var nweb = {
         if(typeof binder === 'undefined')
           throw "Unrecognized nw- attribute: " + attrName;
         
-        if(!el.__nw_is_repeat) {
+        if(!el.__nw_is_repeat && !el.__nw_is_template) {
           var attrValue = attrs[i].nodeValue;          
           var binding = binder(model, el, bindings, loopStack, attrValue);
 
@@ -454,7 +454,7 @@ nweb.utils = {
     },
     getTemplateName: function(model, viewName) {
         if (!model)
-            throw "Model passed in template() cannot be null or undefined";
+            throw "Model passed in template() cannot be null or undefined. Make sure, you initialized members that are used in templating.";
 
         return nweb.utils.getConstructorName(model) + "__" + viewName;
     },
@@ -474,8 +474,12 @@ nweb.utils = {
         for (var i = 0, attrs = el.attributes, l = attrs.length; i < l; i++) {
             arr.push(attrs[i]);
         }
-        arr.sort(function(a, b) {
-            return a.nodeName == "nw-repeat" ? -1 : 1;
+        arr.sort(function (a, b) {
+          if (a.nodeName == "nw-repeat")
+            return -2;
+          if (a.nodeName == "nw-when" || a.nodeName == "nw-unless")
+            return -1;
+          return 1;
         });
         return arr;
     },
