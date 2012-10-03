@@ -190,15 +190,17 @@ namespace NemerleWeb
 
       public BuildJsAstForSplices(expr : TExpr) : list[JsAst.DefValue]
       {
-          mutable JsAst = JsAstBuilder.Build(expr);
-          JsAst = JsAstHelper.FlattenAndRemoveVoids(JsAst);
-          JsAstHelper.IterateAST(JsAst)
-                     .OfType.[JsAst.DefValue]().NToList()
-                     .Map(j => match(j) {                     
+          mutable ast = JsAstBuilder.Build(expr);
+          ast = JsAstHelper.FlattenAndRemoveVoids(ast);
+          JsAstHelper.IterateAST(ast)
+                     .Where(a => a is JsAst.DefValue || a is JsAst.Assign)
+                     .NToList()
+                     .Map.[JsAst, JsAst.DefValue](j => match(j) {
                      | JsAst.DefValue(name, FieldRef(left, prop, false)) => JsAst.DefValue(name, JsAst.FieldRef(left, prop, true))
                      | JsAst.DefValue(name, Call(MethodRef(Method = "template") as template, [PropertyGet(l1, r1, false), PropertyGet as p2])) => 
-                        JsAst.DefValue(name, JsAst.Call(template, [JsAst.FieldRef(l1, r1, true), p2]))
-                     | _ => j
+                       JsAst.DefValue(name, JsAst.Call(template, [JsAst.FieldRef(l1, r1, true), p2]))
+                     | JsAst.Assign(JsAst.LocalRef(name), r) => JsAst.DefValue(name, r)
+                     | JsAst.DefValue => j :> JsAst.DefValue
                      });
       }
       

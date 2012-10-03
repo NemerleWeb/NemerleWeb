@@ -57,7 +57,7 @@ namespace NemerleWeb
                 typer.Manager.Options.EmitDebug = false;
                 def mb = method :> MethodBuilder;
                 def methodTyper = Typer(tb, null, mb, mb.Env);
-              
+                
                 if(fullTyping)
                   methodTyper.RunFullTyping();
                 else

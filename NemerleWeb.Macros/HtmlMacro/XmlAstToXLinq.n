@@ -78,8 +78,8 @@ namespace NemerleWeb
     }
     public Transform([NotNull] xmlAsts : XmlAst.Seq) : PExpr
     {          
-      def splicedMethod = CleanupCallRefs(GetMethodWithSplicesOnly(xmlAsts));
-      def splices = TyperHelper.GetSplices(splicedMethod, _typer);  
+      def splicedMethod = CleanupCallRefs(<[ $(GetMethodWithSplicesOnly(xmlAsts)) ]>);
+      def splices = TyperHelper.GetSplices(splicedMethod, _typer);
       _typer.CurrentTypeBuilder.Compile();
       def res = Util.locate(ToLocation(xmlAsts), TransformImpl(xmlAsts, splices));
       res;
@@ -239,7 +239,8 @@ namespace NemerleWeb
             <[ { ..$splices } ]> 
         | TagSplice(expr, false)        =>
             def pexpr = Parse(ToLocation(xmlAst), expr);
-            <[ def $(varName : dyn) = $pexpr ]>
+            <[ def $(varName : dyn) = $pexpr;
+               _ = $(varName : dyn); ]>
         | TagSplice(expr, true)             => <[ def $(varName : dyn) = NColl.NToArray($(Parse(ToLocation(xmlAst), expr))) ]>
         | AttrSplice(expr, SpliceType.Expr) => <[ def $(varName : dyn) = $(Parse(ToLocation(xmlAst), expr)) : L.XAttribute ]>
         | AttrSplice(expr, SpliceType.List) => <[ def $(varName : dyn) = NColl.NToArray.[L.XAttribute]($(Parse(ToLocation(xmlAst), expr)) : IEnumerable[L.XAttribute]) ]>         
