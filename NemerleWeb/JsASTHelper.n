@@ -103,6 +103,20 @@ namespace NemerleWeb
       | _ => JsAst.Seq([JsAst.DefValue("__returnValue", JsAst.Void()), DelayAssignment(ast, JsAst.LocalRef("__returnValue")), JsAst.Return(JsAst.LocalRef("__returnValue"))])        
     }
     
+    public MakeReturningFunction(ast : JsAst) : JsAst
+    {
+      | _ => JsAst.DefFunction(JsAst.Void(), [], MakeReturn(ast))
+    }
+    
+    public Append(ast : JsAst, toAppend : JsAst) : JsAst
+    {
+      match(ast) 
+      {
+      | Seq(xs) => JsAst.Seq(xs.Append([toAppend]))
+      | _ => JsAst.Seq([ast, toAppend])
+      }
+    }
+    
     public GetTemporaryVariableName() : string 
     {
         temporaryVariableCounter++;

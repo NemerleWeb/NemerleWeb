@@ -95,13 +95,15 @@ namespace NemerleWeb
           
         def returning = match(ClassType.BaseType?.Name) {
             | "Function" => bodyIndent + 
-<#return function() {
+/*<#return function() {
 return self.apply.apply(self, arguments);
-}#>
+}#>*/
+<#return self.apply;#>
             | "FunctionVoid" => bodyIndent + 
-<#return function() {
+/*<#return function() {
 return self.apply_void.apply(self, arguments);
-}#>
+}#>*/
+<#return self.apply_void;#>
             | _ => ""
         };
           

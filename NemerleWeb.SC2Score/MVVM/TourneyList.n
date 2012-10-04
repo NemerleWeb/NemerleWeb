@@ -20,6 +20,7 @@ namespace NemerleWeb.SC2Score
   {
     public All : List[Tourney] { get; set; }
     public Selected : Tourney { get; set; }
+    public LeftOffset : int { get; set; }
     
     public this()
     {
@@ -29,6 +30,17 @@ namespace NemerleWeb.SC2Score
     public SelectTourney(tourney : Tourney) : void
     {
       Selected = tourney;
+    }
+    
+    public HandleDragging() : void 
+    {      
+      handle mousedown md {
+        def oldOffset = LeftOffset;        
+        handle mousemove mm until mouseup {          
+          def diff = md.pageX - mm.pageX;
+          LeftOffset = oldOffset - diff;
+        }
+      }
     }
     
     public class Server
@@ -45,7 +57,9 @@ namespace NemerleWeb.SC2Score
     {
       <#
         <div class="tourney-list-container">
-          <ul class="tourney-list">
+          <ul class="tourney-list" 
+              events="$HandleDragging"
+              style-margin-left="$(LeftOffset + "px")">
             <li $foreach(t in All) 
                 click="$SelectTourney"
                 class="btn btn-info">$(t.Name)</li>
