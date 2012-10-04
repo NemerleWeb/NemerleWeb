@@ -35,40 +35,32 @@ namespace NemerleWeb
   {
     public Impl(eventName : PExpr, eventArgs : PExpr, body : PExpr, typer : Typer) : PExpr
     {
-      def updateUi = GetUpdateExpr(typer);
       <[ 
         NemerleWeb.Events.Handle($(eventName.ToString() : string), $eventArgs => {
           $body;
-          $updateUi
+          NemerleWeb.Events.Invalidate();
         });
       ]>
     }
     
     public UntilImpl(eventName : PExpr, eventArgs : PExpr, untilEventName : PExpr, body : PExpr, typer : Typer) : PExpr
     {
-      def updateUi = GetUpdateExpr(typer);
       <[ 
         NemerleWeb.Events.HandleUntil($(eventName.ToString() : string), $(untilEventName.ToString() : string), $eventArgs => {
           $body;
-          $updateUi
+          NemerleWeb.Events.Invalidate();
         });
       ]>
     }
     
     public OnceImpl(eventName : PExpr, eventArgs : PExpr, body : PExpr, typer : Typer) : PExpr
     {
-      def updateUi = GetUpdateExpr(typer);
       <[ 
         NemerleWeb.Events.HandleOnce($(eventName.ToString() : string), $eventArgs => {
           $body;
-          $updateUi
+          NemerleWeb.Events.Invalidate();
         });
       ]>
-    }
-    
-    private GetUpdateExpr(typer : Typer) : PExpr
-    {
-      <[ NemerleWeb.Events.Invalidate() ]>
     }
   }
 }
