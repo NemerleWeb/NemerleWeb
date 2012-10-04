@@ -11,20 +11,20 @@ namespace NemerleWeb
 {  
   public module Events
   {
-    public Handle(eventName : string, callback : NemerleWeb.MouseEventArgs -> void) : void 
+    public Handle(_eventName : string, _callback : NemerleWeb.EventData -> void) : void 
     {}
     
-    public HandleUntil(eventName : string, untilName : string, callback : NemerleWeb.MouseEventArgs -> void) : void 
+    public HandleUntil(_eventName : string, _untilName : string, _callback : NemerleWeb.EventData -> void) : void 
     {}
     
-    public HandleOnce(eventName : string, callback : NemerleWeb.MouseEventArgs -> void) : void 
+    public HandleOnce(_eventName : string, _callback : NemerleWeb.EventData -> void) : void 
     {}
     
     public Invalidate() : void 
     {};
   }
   
-  public class MouseEventArgs
+  public class EventData
   {
     public altKey : bool;
     public attrChange : object;
@@ -46,7 +46,7 @@ namespace NemerleWeb
     public metaKey : bool;
     public offsetX : int;
     public offsetY : int;
-    public originalEvent : MouseEventArgs;
+    public originalEvent : EventData;
     public pageX : int;
     public pageY : int;
     public relatedNode : object;
