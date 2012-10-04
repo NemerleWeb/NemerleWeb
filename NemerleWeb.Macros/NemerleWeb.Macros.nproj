@@ -87,6 +87,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventsDSL\Macros.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="HtmlMacro\XmlAst.n">
       <SubType>Code</SubType>
     </Compile>
@@ -117,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="HtmlMacro\" />
+    <Folder Include="EventsDSL" />
     <Folder Include="SignalR" />
   </ItemGroup>
   <ItemGroup>

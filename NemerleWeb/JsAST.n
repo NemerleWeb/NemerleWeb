@@ -122,10 +122,7 @@ namespace NemerleWeb
         }
         | DefFunction    { Obj : JsAst; Parameters : list[JsAst]; Body : JsAst;
             public override Write(_indent = "" : string) : string {
-$<#function(..$(Parameters; ";"; p => p.Write("")) {
-$(Body.Write("  "))
-}
-#>
+$<#function(..$(Parameters; ";"; p => p.Write(""))) { $(Body.Write("  ")) }#>
             }
         }
         | DefValue       { Name : string; Val : JsAst;

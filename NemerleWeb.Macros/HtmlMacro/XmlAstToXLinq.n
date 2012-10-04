@@ -119,6 +119,7 @@ namespace NemerleWeb
             | (Splicable.Value(v), _) when v == "disable"  => <[ [L.XAttribute("nw-disable", $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "visible"  => <[ [L.XAttribute("nw-visible", $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "checked"  => <[ [L.XAttribute("nw-checked", $(getSplice()))] ]>
+            | (Splicable.Value(v), _) when v == "events"  => <[ [L.XAttribute("nw-events", $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "template" =>
               def pexpr = SplicablePExprStr(value);
               def binding = match(pexpr)

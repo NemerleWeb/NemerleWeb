@@ -1,0 +1,77 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+using NemerleWeb.Utils;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  module JsKnownMembersEventsDSL
+  {
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(NemerleWeb.Events), Handler);      
+    }
+    
+    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      match (parms)
+      {
+      | [eventName, callback] =>
+        match (member.Name)
+        {
+        | "Handle" => 
+          def cb = CreateCallback(callback);
+          def code = $<#$$(this).bind($(eventName.Write()), (($(cb.Write())))())#>;
+          Some(JsAst.Code(code))
+        | "HandleOnce" => 
+          def tempVarName = JsAstHelper.GetTemporaryVariableName();
+          def cb = CreateCallback(callback);
+          Some(JsAst.Code($<#
+            var $tempVarName = ($(cb.Write()))();
+            $$(this).bind($(eventName.Write()), function(a) {
+              $tempVarName(a);
+              $$(this).unbind($(eventName.Write()), $tempVarName);
+            });
+          #>))
+        | _ => None()
+        }
+      | [eventName, untilName, callback] =>
+        match(member.Name)
+        {
+        | "HandleUntil" =>
+          def tempVarName = JsAstHelper.GetTemporaryVariableName();
+          def eventName = eventName.Write();
+          def cb = CreateCallback(callback);
+          
+          Some(JsAst.Code($<#
+            var $tempVarName = ($(cb.Write()))();
+            $$(this).bind($eventName, $tempVarName)
+                    .bind($(untilName.Write()), function() {
+              $$(this).unbind($eventName, $tempVarName);
+            });
+          #>))
+        | _ => None();
+        }
+      | [] =>
+        match(member.Name)
+        {
+        | "Invalidate" => Some(JsAst.Code("nweb.invalidate()"))
+        | _ => None();
+        }
+      | _ => Message.FatalError("Unknown Events expression")
+      }
+    }
+    
+    private CreateCallback(ast : JsAst) : JsAst
+    {
+      JsAstHelper.MakeReturningFunction(ast);
+    }
+  }
+}

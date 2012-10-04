@@ -21,7 +21,8 @@ var nweb = {
       "nw-disable": nweb.getDisableBinding,
       "nw-enable": nweb.getEnableBinding,
       "nw-click": nweb.getClickBinding,
-      "nw-submit": nweb.getSubmitBinding      
+      "nw-submit": nweb.getSubmitBinding,
+      "nw-events": nweb.getEventsBinding
     };
     return binds[name];
   },
@@ -310,6 +311,11 @@ var nweb = {
       })
     });
   },
+  getEventsBinding: function(model, el, bindings, loopStack, attrVal) {
+    var parsed = nweb.parseExpression(model, attrVal, loopStack);
+    var method = nweb.getParsedValue(model, parsed, loopStack, el);
+    method.apply(el);
+  },
   applyLoopStackToExpr: function(expr, loopStack) {
     for (var i = loopStack.length - 1; i >= 0; i--) {
       var loop = loopStack[i];
@@ -324,16 +330,16 @@ var nweb = {
     var expr = nweb.applyLoopStackToExpr(expr, loopStack);
     return expr.replace(/self\./g, "model.");
   },
-  getParsedValue: function(model, parsedExpr, loopStack) {
+  getParsedValue: function(model, parsedExpr, loopStack, returnFunction) {
     if(parsedExpr.length === 0)
       return null;
     else {      
       try {
         var val = eval(parsedExpr);
-        if(nweb.utils.isFunction(val)) {
+        if(nweb.utils.isFunction(val) && !returnFunction) {
           if(loopStack.length > 0)
             return val(loopStack[loopStack.length - 1].val);
-          return val();
+          return val(functionParams);
         }
         else
           return val;
