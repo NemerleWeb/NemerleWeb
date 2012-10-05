@@ -49,7 +49,6 @@ namespace NemerleWeb
           def tempVarName = JsAstHelper.GetTemporaryVariableName();
           def eventName = eventName.Write();
           def cb = CreateCallback(callback);
-          
           Some(JsAst.Code($<#
             var $tempVarName = ($(cb.Write()))();
             $$(this).bind($eventName, $tempVarName)

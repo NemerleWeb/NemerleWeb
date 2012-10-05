@@ -18,11 +18,10 @@ namespace NemerleWeb
                 $"$(Left.Write()) = $(Right.Write())"
             }
             public override Transform() : JsAst {
-                match(this) {
-                | Assign(FieldRef(obj, field, ext), val) => if(!ext) JsAst.PropertySet(obj, field, val) else this
-                | Assign(l, r) when !AllowedForAssignment.Any(al => al == r.GetType()) => JsAstHelper.DelayAssignment(r, l);
-                | _ => this
-                }
+              match(this) {
+              | Assign(l, r) when !AllowedForAssignment.Any(al => al == r.GetType()) => JsAstHelper.DelayAssignment(r, l);
+              | _ => this
+              }
             }
         }
         | Array          { Values : list[JsAst];
@@ -288,9 +287,7 @@ $(Body.Write())
             }
             public override Transform() : JsAst {
               match(Value) {
-              | Call(OpCode("++"), [PropertyGet(obj, name, isget)]) => JsAst.PropertySet(Obj, PropertyName, JsAst.Call(JsAst.OpCode("+"), [JsAst.PropertyGet(obj, name, isget), JsAst.Literal(JsLiteral.Integer(1))]))
-              | Call(OpCode("--"), [PropertyGet(obj, name, isget)]) => JsAst.PropertySet(Obj, PropertyName, JsAst.Call(JsAst.OpCode("-"), [JsAst.PropertyGet(obj, name, isget), JsAst.Literal(JsLiteral.Integer(1))]))
-              | _ => this
+              | _ => JsAst.Assign(JsAst.FieldRef(Obj, PropertyName, false), Value).Transform()
               }
             }
         }
