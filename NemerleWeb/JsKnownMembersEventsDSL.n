@@ -23,37 +23,40 @@ namespace NemerleWeb
     {
       match (parms)
       {
-      | [eventName, callback] =>
+      | [eventName, JsAst.Literal(JsLiteral.String(context)), callback] =>
         match (member.Name)
         {
         | "Handle" => 
           def cb = CreateCallback(callback);
-          def code = $<#$$(this).bind($(eventName.Write()), (($(cb.Write())))())#>;
+          def context = GetContext(context);
+          def code = $<#$$($context).bind($(eventName.Write()), (($(cb.Write())))())#>;
           Some(JsAst.Code(code))
         | "HandleOnce" => 
           def tempVarName = JsAstHelper.GetTemporaryVariableName();
+          def context = GetContext(context);
           def cb = CreateCallback(callback);
           Some(JsAst.Code($<#
             var $tempVarName = ($(cb.Write()))();
-            $$(this).bind($(eventName.Write()), function(a) {
+            $$($context).bind($(eventName.Write()), function(a) {
               $tempVarName(a);
-              $$(this).unbind($(eventName.Write()), $tempVarName);
+              $$($context).unbind($(eventName.Write()), $tempVarName);
             });
           #>))
         | _ => None()
         }
-      | [eventName, untilName, callback] =>
+      | [eventName, JsAst.Literal(JsLiteral.String(context)), untilName, callback] =>
         match(member.Name)
         {
         | "HandleUntil" =>
           def tempVarName = JsAstHelper.GetTemporaryVariableName();
           def eventName = eventName.Write();
+          def context = GetContext(context);
           def cb = CreateCallback(callback);
           Some(JsAst.Code($<#
             var $tempVarName = ($(cb.Write()))();
-            $$(this).bind($eventName, $tempVarName)
+            $$($context).bind($eventName, $tempVarName)
                     .bind($(untilName.Write()), function() {
-              $$(this).unbind($eventName, $tempVarName);
+              $$($context).unbind($eventName, $tempVarName);
             });
           #>))
         | _ => None();
@@ -71,6 +74,11 @@ namespace NemerleWeb
     private CreateCallback(ast : JsAst) : JsAst
     {
       JsAstHelper.MakeReturningFunction(ast);
+    }
+    
+    private GetContext(context : string) : string
+    {
+      if(context == "this" || context == "window" || context == "document") $<#$context#> else $<#"$context"#>;
     }
   }
 }
