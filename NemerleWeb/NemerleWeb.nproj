@@ -94,6 +94,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventsDSL\EventData.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="EventsDSL\Events.n">
       <SubType>Code</SubType>
     </Compile>
@@ -148,6 +151,9 @@
     <Compile Include="JsKnownMembersEnumerator.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JsKnownMembersPage.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JsKnownMembersSCGList.n">
       <SubType>Code</SubType>
     </Compile>
@@ -164,6 +170,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JsKnownMembersOperators.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JsLib.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JsLiteral.n">

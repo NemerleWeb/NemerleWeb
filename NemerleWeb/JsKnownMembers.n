@@ -71,6 +71,7 @@ namespace NemerleWeb
       JsKnownMembersNemerleList.Register();
       JsKnownMembersNemerleNCollectionsExtensions.Register();
       JsKnownMembersEventsDSL.Register();
+      JsKnownMembersPage.Register();
     }
     
     public Convert([NotNull] call : TExpr.Call, [NotNull] builder : TExpr -> JsAst) : JsAst
@@ -112,7 +113,8 @@ namespace NemerleWeb
     internal type ConvertTypeHandler = JsAst * IMember * list[JsAst] -> option[JsAst];
     
     // typeof().FullName -> Handler
-    private static _convertTypeHandlers : Dictionary[string, ConvertTypeHandler] = Dictionary();
+    private static _convertTypeHandlers : Dictionary[string, ConvertTypeHandler] = Dictionary();    
+    private static _convertBaseTypeHandlers : Dictionary[string, ConvertTypeHandler] = Dictionary();
     
     internal type ConvertMemberHandler = TypeInfo * JsAst * list[JsAst] -> option[JsAst];
     
@@ -147,7 +149,14 @@ namespace NemerleWeb
         when (_convertTypeHandlers.TryGetValue(type.FullName, out typeHandler))
           when (typeHandler(left, member, parms) is Some(ast))
             return ast;
-          
+            
+      //Try looking for base types
+      foreach(subType in GetSubTypeList(type))
+        when (subType != null && subType.SystemType != null)
+          when (_convertBaseTypeHandlers.TryGetValue(subType.SystemType.FullName, out typeHandler))
+            when (typeHandler(left, member, parms) is Some(ast))
+              return ast;
+              
       // Nothing found, try default dictionary
       when (_convertDefaultMemberHandlers.TryGetValue(memberName, out memberHandler))
         when (memberHandler(type, left, parms) is Some(ast))
@@ -194,6 +203,11 @@ namespace NemerleWeb
       _convertTypeHandlers.Add(type, handler);
     }
     
+    public RegisterBaseType([NotNull] type : Type, [NotNull] handler : ConvertTypeHandler) : void
+    {
+      _convertBaseTypeHandlers.Add(type.FullName, handler);
+    }
+    
     public RegisterMember([NotNull] memberName : string, [NotNull] handler : ConvertMemberHandler) : void
     {
       _convertMemberHandlers.Add(memberName, handler);
@@ -202,6 +216,16 @@ namespace NemerleWeb
     public RegisterDefaultMember([NotNull] memberName : string, [NotNull] handler : ConvertMemberHandler) : void
     {
       _convertDefaultMemberHandlers.Add(memberName, handler);
+    }
+    
+    public GetSubTypeList(type : TypeInfo) : list[TypeInfo]
+    {   
+    | null => []
+    | _ =>
+      match(type.BaseType) {        
+      | null => []
+      | baseType => baseType :: GetSubTypeList(baseType)
+      }
     }
     
     #endregion

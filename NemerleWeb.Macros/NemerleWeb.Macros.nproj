@@ -87,7 +87,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventsDSL\Macros.n">
+    <Compile Include="EventsDSL\EventsMacros.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="HtmlMacro\XmlAst.n">

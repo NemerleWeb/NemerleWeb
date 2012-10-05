@@ -1,0 +1,50 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  public class EventData
+  {
+    public altKey : bool;
+    public attrChange : object;
+    public attrName : string;
+    public bubbles : bool;
+    public button : int;
+    public buttons : object;
+    public cancelable : bool;
+    public clientX : int;
+    public clientY : int;
+    public ctrlKey: bool;
+    public currentTarget : object;
+    public data : object;
+    public delegateTarget : object;
+    public eventPhase : int;
+    public fromElement : object;
+    public handleObj : object;
+    public isDefaultPrevented : bool;    
+    public metaKey : bool;
+    public offsetX : int;
+    public offsetY : int;
+    public originalEvent : EventData;
+    public pageX : int;
+    public pageY : int;
+    public relatedNode : object;
+    public relatedTarget : object;
+    public screenX : int;
+    public screenY : int;
+    public shiftKey : bool;
+    public srcElement : object;
+    public target : object;
+    public timeStamp : int;
+    public toElement : object;
+    public type : string;
+    public view : object;
+    public which: int;
+  }
+}

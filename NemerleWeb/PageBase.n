@@ -58,5 +58,17 @@ namespace NemerleWeb
     
     public GetTemplateName([NotNull] _modelName : string, [NotNull] _viewName : string) : string
     { "" }
+    
+    public setTimeout(_callback : void -> void, _timeoutMilliseconds : int) : int
+    { 0 }
+    
+    public clearTimeout(_id : int) : void 
+    {}
+    
+    public setInterval(_callback : void -> void, _timeoutMilliseconds : int) : int
+    { 0 }
+    
+    public clearInterval(_id : int) : void 
+    {}
   }
 }
