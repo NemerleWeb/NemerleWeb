@@ -11,13 +11,13 @@ namespace NemerleWeb
 {  
   public module Events
   {
-    public Handle(_eventName : string, _callback : NemerleWeb.EventData -> void) : void 
+    public Handle(_eventName : string, _context : string, _callback : NemerleWeb.EventData -> void) : void 
     {}
     
-    public HandleUntil(_eventName : string, _untilName : string, _callback : NemerleWeb.EventData -> void) : void 
+    public HandleUntil(_eventName : string, _context : string, _untilName : string, _callback : NemerleWeb.EventData -> void) : void 
     {}
     
-    public HandleOnce(_eventName : string, _callback : NemerleWeb.EventData -> void) : void 
+    public HandleOnce(_eventName : string, _context : string, _callback : NemerleWeb.EventData -> void) : void 
     {}
     
     public Invalidate() : void 

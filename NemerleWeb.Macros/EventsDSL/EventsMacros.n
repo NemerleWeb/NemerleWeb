@@ -13,48 +13,48 @@ using System.Linq;
 
 namespace NemerleWeb
 {      
-  macro HandleOnce(eventName, eventArgs, body)   
-  syntax ("handle", eventName, eventArgs, "once", body) 
+  macro HandleOnce(eventName, eventArgs, context : string, body)   
+  syntax ("handle", eventName, eventArgs, context, "once", body) 
   {    
-    HandleImpl.OnceImpl(eventName, eventArgs, body);
+    HandleImpl.OnceImpl(eventName, eventArgs, context, body);
   }
   
-  macro HandleUntil(eventName, eventArgs, untilEventName, body)   
-  syntax ("handle", eventName, eventArgs, "until", untilEventName, body) 
+  macro HandleUntil(eventName, eventArgs, context : string, untilEventName, body)   
+  syntax ("handle", eventName, eventArgs, context, "until", untilEventName, body) 
   {    
-    HandleImpl.UntilImpl(eventName, eventArgs, untilEventName, body);
+    HandleImpl.UntilImpl(eventName, eventArgs, context, untilEventName, body);
   }
   
-  macro Handle(eventName, eventArgs, body)   
-  syntax ("handle", eventName, eventArgs, body) 
+  macro Handle(eventName, eventArgs, context : string, body)   
+  syntax ("handle", eventName, eventArgs, context, body) 
   {
-    HandleImpl.Impl(eventName, eventArgs, body);
+    HandleImpl.Impl(eventName, eventArgs, context, body);
   }
   
   module HandleImpl
   {
-    public Impl(eventName : PExpr, eventArgs : PExpr, body : PExpr, throttleDelay = 0 : int) : PExpr
+    public Impl(eventName : PExpr, eventArgs : PExpr, context : string, body : PExpr, throttleDelay = 0 : int) : PExpr
     {      
       <[ 
-        NemerleWeb.Events.Handle($(eventName.ToString() : string), $eventArgs => {
+        NemerleWeb.Events.Handle($(eventName.ToString() : string), $context, $eventArgs => {
           _ = $(GetBody(body, throttleDelay))
         });
       ]>
     }
     
-    public UntilImpl(eventName : PExpr, eventArgs : PExpr, untilEventName : PExpr, body : PExpr, throttleDelay = 0 : int) : PExpr
+    public UntilImpl(eventName : PExpr, eventArgs : PExpr, context : string, untilEventName : PExpr, body : PExpr, throttleDelay = 0 : int) : PExpr
     {
       <[ 
-        NemerleWeb.Events.HandleUntil($(eventName.ToString() : string), $(untilEventName.ToString() : string), $eventArgs => {
+        NemerleWeb.Events.HandleUntil($(eventName.ToString() : string), $context, $(untilEventName.ToString() : string), $eventArgs => {
           _ = $(GetBody(body, throttleDelay))
         });
       ]>
     }
     
-    public OnceImpl(eventName : PExpr, eventArgs : PExpr, body : PExpr) : PExpr
+    public OnceImpl(eventName : PExpr, eventArgs : PExpr, context : string, body : PExpr) : PExpr
     {
       <[ 
-        NemerleWeb.Events.HandleOnce($(eventName.ToString() : string), $eventArgs => {
+        NemerleWeb.Events.HandleOnce($(eventName.ToString() : string), $context, $eventArgs => {
           _ = $(GetBody(body, 0))
         });
       ]>

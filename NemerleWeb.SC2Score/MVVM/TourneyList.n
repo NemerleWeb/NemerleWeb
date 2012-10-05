@@ -34,9 +34,9 @@ namespace NemerleWeb.SC2Score
     
     public HandleDragging() : void 
     {
-      handle mousedown md {
+      handle mousedown md "this" {
         mutable lastX = md.pageX;
-        handle mousemove mm until mouseup {                    
+        handle mousemove mm "window" until mouseup {                    
           LeftOffset += mm.pageX - lastX;
           LeftOffset = if(LeftOffset > 0) 0 else LeftOffset;
           lastX = mm.pageX;
