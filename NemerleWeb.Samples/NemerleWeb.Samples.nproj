@@ -437,6 +437,7 @@
   </Target>
   <PropertyGroup>
     <YourDestinationDirectory>$(TargetDir)MVVM</YourDestinationDirectory>
+    <YourDestinationDirectory2>$(TargetDir)_PublishedWebsites\NemerleWeb.Samples\bin\MVVM</YourDestinationDirectory2>
     <YourSourceDirectory>$(ProjectDir)MVVM</YourSourceDirectory>
   </PropertyGroup>
   <Target Name="AfterBuild">
@@ -446,6 +447,8 @@
 
     <Copy SourceFiles="@(YourFilesToCopy)"
           DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(YourFilesToCopy)"
+          DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory2)\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
