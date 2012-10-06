@@ -166,42 +166,33 @@
     </Compile>
     <Compile Include="MVVM\CompListPage.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Knockout\Tutorial_1_Introduction.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Knockout\Tutorial_2_ListsAndCollections.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Knockout\Tutorial_3_SinglePageApps.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Knockout\Tutorial_5_LoadingAndSaving.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\NameListPage.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\SignalPage.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\TestPage.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MVVM\VariantsAndMatchingPage.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
   </ItemGroup>
@@ -297,11 +288,9 @@
     <Content Include="Content\Site.css" />
     <Compile Include="MVVM\NameListCSharpPage.cs">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\NameListCSharpPage.View.n">
       <DependentUpon>MVVM\NameListCSharpPage.cs</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Content Include="packages.config">
       <SubType>Content</SubType>
@@ -396,42 +385,10 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="bin\MVVM\CompListPage.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\NameListPage.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Knockout\Tutorial_1_Introduction.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Knockout\Tutorial_2_ListsAndCollections.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Knockout\Tutorial_3_SinglePageApps.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Knockout\Tutorial_5_LoadingAndSaving.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\Samples.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\SignalPage.n">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\NameListCSharpPage.cs">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="bin\MVVM\NameListCSharpPage.View.n">
-      <DependentUpon>bin\MVVM\NameListCSharpPage.cs</DependentUpon>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="bin\" />
-    <Folder Include="bin\MVVM\" />
-    <Folder Include="bin\MVVM\Knockout\" />
     <Folder Include="Content\" />
     <Folder Include="Content\images\" />
     <Folder Include="Content\themes\" />
@@ -475,11 +432,21 @@
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
+       Other similar extension points exist, see Microsoft.Common.targets. -->
   <Target Name="BeforeBuild">
   </Target>
+  <PropertyGroup>
+    <YourDestinationDirectory>$(TargetDir)MVVM</YourDestinationDirectory>
+    <YourSourceDirectory>$(ProjectDir)MVVM</YourSourceDirectory>
+  </PropertyGroup>
   <Target Name="AfterBuild">
-  </Target> -->
+    <CreateItem Include="$(YourSourceDirectory)\**\*.*">
+      <Output TaskParameter="Include" ItemName="YourFilesToCopy" />
+    </CreateItem>
+
+    <Copy SourceFiles="@(YourFilesToCopy)"
+          DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
   </Target>
