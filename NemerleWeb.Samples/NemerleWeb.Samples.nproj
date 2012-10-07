@@ -433,14 +433,12 @@
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets. -->
-  <Target Name="BeforeBuild">
-  </Target>
   <PropertyGroup>
     <YourDestinationDirectory>$(TargetDir)MVVM</YourDestinationDirectory>
     <YourDestinationDirectory2>$(TargetDir)_PublishedWebsites\NemerleWeb.Samples\bin\MVVM</YourDestinationDirectory2>
     <YourSourceDirectory>$(ProjectDir)MVVM</YourSourceDirectory>
   </PropertyGroup>
-  <Target Name="AfterBuild">
+  <Target Name="BeforeBuild">
     <CreateItem Include="$(YourSourceDirectory)\**\*.*">
       <Output TaskParameter="Include" ItemName="YourFilesToCopy" />
     </CreateItem>
@@ -449,6 +447,8 @@
           DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(YourFilesToCopy)"
           DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory2)\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+  <Target Name="AfterBuild">    
   </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
