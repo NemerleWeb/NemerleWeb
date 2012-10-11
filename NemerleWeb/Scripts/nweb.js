@@ -207,7 +207,12 @@ var nweb = {
       generatedEls: [],
       subBindings: [],
       getValue: function() {
-        return nweb.getParsedValue(model, expr, loopStack);
+          var ret = nweb.getParsedValue(model, expr, loopStack);
+
+          if (ret.toArray)
+              return ret.toArray();
+          else
+              return ret;
       },
       apply: function(value) {
         var array = value;

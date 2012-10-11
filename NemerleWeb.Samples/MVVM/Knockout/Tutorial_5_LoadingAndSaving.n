@@ -21,11 +21,7 @@ namespace NemerleWeb.Samples
     {
       get
       {
-        def result = List();
-        foreach(t in Tasks)
-          when(!t.IsDone)
-            result.Add(t);
-        result
+        Tasks.Where(t => !t.IsDone)
       }
     }
     
@@ -33,11 +29,7 @@ namespace NemerleWeb.Samples
     {
       get
       {
-        def result = List();
-        foreach(t in Tasks)
-          when(!t.IsDestroyed)
-            result.Add(t);
-        result
+        Tasks.Where(t => !t.IsDestroyed)
       }
     }
 
