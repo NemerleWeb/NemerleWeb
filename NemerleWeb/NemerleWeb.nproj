@@ -181,9 +181,6 @@
     <Compile Include="UnitAttribute.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Scripts\Scripts.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
     <Compile Include="SignalR\HubBase.n">
       <SubType>Code</SubType>
@@ -212,6 +209,9 @@
     <Content Include="Scripts\jquery-1.6.4-vsdoc.js">
       <SubType>Content</SubType>
     </Content>
+    <EmbeddedResource Include="Scripts\linq.js">
+      <SubType>Content</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Scripts\nweb.js">
       <SubType>Content</SubType>
     </EmbeddedResource>
