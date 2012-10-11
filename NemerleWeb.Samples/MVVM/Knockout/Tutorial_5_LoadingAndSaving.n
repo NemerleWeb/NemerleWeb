@@ -12,10 +12,10 @@ namespace NemerleWeb.Samples
     {
       public Title : string { get; set; }
       public IsDone : bool { get; set; }
-      public _destroy : bool { get; set; }
     }
 
     public Tasks : List[Task] { get; set; }
+    public RemovedTasks : int { get; set; }
     public NewTaskText : string { get; set; }
     public IncompleteTasks : IEnumerable[Task]
     {
@@ -35,40 +35,40 @@ namespace NemerleWeb.Samples
     }
 
     AddTask() : void {
-      Tasks.Add(Task() <- (Title = NewTaskText, IsDone = false, _destroy = false));
+      Tasks.Add(Task() <- (Title = NewTaskText, IsDone = false));
       NewTaskText = "";
     }
 
     RemoveTask(task : Task) : void {
-      task._destroy = true;
+      RemovedTasks++;
       _ = Tasks.Remove(task);
     }
 
     Save() : void {
-      server.Save(Tasks, _result => {                
+      server.Save(Tasks, RemovedTasks, _result => {                
         js alert(_result);
       });
     }
 
     public class Server
     {
-      public Save(tasks : IEnumerable[Task]) : string
+      public Save(tasks : IEnumerable[Task], removedTasks : int) : string
       {
         if(tasks == null)
           "Seems like you don't have any unfinished tasks left!"
         else
-                $<#
-                Server received $(tasks.Count()) task(s). 
-                $(tasks.Count(t => t.IsDone)) of which are marked as done. 
-                $(tasks.Count(t => t._destroy)) of which are marked for deletion.#>;
+          $<#
+            Server received $(tasks.Count() + removedTasks) task(s). 
+            $(tasks.Count(t => t.IsDone)) of which are marked as done. 
+            $(removedTasks) of which are marked for deletion.#>;
       }
 
       public Load() : IEnumerable[Task]
       {
-        yield Task() <- (Title = "Wire the money to Panama", IsDone = true, _destroy = false);
-        yield Task() <- (Title = "Get hair dye, beard trimmer, dark glasses and \"passport\"", IsDone = false, _destroy = false);
-        yield Task() <- (Title = "Book taxi to airport", IsDone = false, _destroy = false);
-        yield Task() <- (Title = "Arrange for someone to look after the cat", IsDone = false, _destroy = false);
+        yield Task() <- (Title = "Wire the money to Panama", IsDone = true);
+        yield Task() <- (Title = "Get hair dye, beard trimmer, dark glasses and \"passport\"", IsDone = false);
+        yield Task() <- (Title = "Book taxi to airport", IsDone = false);
+        yield Task() <- (Title = "Arrange for someone to look after the cat", IsDone = false);
       }
     }
 
