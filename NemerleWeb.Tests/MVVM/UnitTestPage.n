@@ -377,7 +377,7 @@ namespace NemerleWeb.Tests
           when (e <= 5)
             count++;
         
-        def seq2 = seq1.Skip(4);
+        def seq2 = l.Skip(9);
         foreach (e in seq2)
           when (e == 10)
             count++;
