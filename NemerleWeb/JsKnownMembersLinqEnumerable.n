@@ -39,12 +39,11 @@ namespace NemerleWeb
       | [seq] =>
         match (member.Name)
         {
-        | "AsEnumerable" => Some(seq.AsEnumerable())
-        | "Count" => Some(JsAst.FieldRef(seq, "length", true))        
-        
+        | "AsEnumerable" => Some(seq.AsEnumerable())        
         | "All"
         | "Average"
-        | "Cast"          
+        | "Cast"
+        | "Count"
         | "Empty"
         | "First"
         | "Last"
@@ -56,13 +55,10 @@ namespace NemerleWeb
         | "Single"
         | "SingleOrDefault"
         | "Sum"        
-        | "ToArray" => Some(seq.AsEnumerable().MethodCall(member.Name, []))
-        
-        | "ToList" => Some(seq)
-        
+        | "ToArray" => Some(seq.AsEnumerable().MethodCall(member.Name, []))        
+        | "ToList" => Some(seq)        
         | "FirstOrDefault"
         | "LastOrDefault" =>  Some(seq.AsEnumerable().MethodCall(member.Name, [JsAst.Literal(JsLiteral.Null())]))
-
         | _ => None()
         }
           
