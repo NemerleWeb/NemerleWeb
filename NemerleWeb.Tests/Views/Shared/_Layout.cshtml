@@ -5,12 +5,9 @@
     <title>@ViewBag.Title</title>
     <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/prettify.css")" rel="stylesheet" type="text/css" />
-    <script src="@Url.Content("~/Scripts/jquery-1.8.0.min.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/knockout-2.1.0.debug.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/jquery.signalR-0.5.3.min.js")" type="text/javascript"></script>
+    <script src="@Url.Action("NemerleWebJs", "NemerleWebResource")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/sammy.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/prettify.js")" type="text/javascript"></script>
-     <script src="@Url.Action("NemerleWebJs", "NemerleWebResource")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/lang-n.js")" type="text/javascript"></script>
     <script src="/signalr/hubs" type="text/javascript"></script>
     <style>
@@ -25,7 +22,7 @@
             @RenderBody()
         </div>
         <footer>
-            Github: <a href="https://github.com/ionoy/NemerleWeb">https://github.com/ionoy/NemerleWeb</a>
+            Github: <a href="https://github.com/NemerleWeb/NemerleWeb">https://github.com/NemerleWeb/NemerleWeb</a>
         </footer>
         <script>
         </script>
