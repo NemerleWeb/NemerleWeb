@@ -109,7 +109,7 @@ namespace NemerleWeb
       //assert2(false);      
       def ienType = <[ ttype : System.Collections.IEnumerable ]>;
       def stringType = <[ ttype : System.String ]>;
-      def cl = JsClass(tb, "  ", ienType, stringType, typer);
+      def cl = JsClass(tb, "  ", typer);
       def result = cl.Write();
       
       _ = tb.DefineWithSource(<[ decl:
@@ -132,7 +132,7 @@ namespace NemerleWeb
       tb.Manager.TypeTreeBuildFinish += _ => {
           def lambdas = tb.DeclaredNestedTypes
                           .Where(t => t.Name.StartsWith("_N__N_"))
-                          .Select(t => JsClass(t, "  ", ienType, stringType, typer).Write());
+                          .Select(t => JsClass(t, "  ", typer).Write());
           def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");          
           lambdaMeth.Body = <[ $lambdas ]>;          
           tb.Compile();

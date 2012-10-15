@@ -168,6 +168,7 @@ namespace NemerleWeb
         match (member.Name)
         {
         | "Concat" =>
+          assert2(false);
           match (arg1)
           {
           | JsAst.Array(Values = values) =>
@@ -177,6 +178,7 @@ namespace NemerleWeb
             | [v] => Some(JsToString(v))
             | _ => Some(JsToString(values.Head).MethodCall("concat", values.Tail))
             }
+          | LocalRef(_, Some(type)) when JsClass.TypeIsArray(type) => Some(arg1.MethodCall("join", [JsAst.Literal(JsLiteral.String(""))]))
           | _ => Some(JsToString(arg1))
           }
         | "Copy"

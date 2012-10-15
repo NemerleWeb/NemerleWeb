@@ -100,7 +100,7 @@ namespace NemerleWeb
     public MakeReturn(ast : JsAst) : JsAst 
     {
       | Void => ast
-      | _ => JsAst.Seq([JsAst.DefValue("__returnValue", JsAst.Void()), DelayAssignment(ast, JsAst.LocalRef("__returnValue")), JsAst.Return(JsAst.LocalRef("__returnValue"))])        
+      | _ => JsAst.Seq([JsAst.DefValue("__returnValue", JsAst.Void()), DelayAssignment(ast, JsAst.LocalRef("__returnValue", None())), JsAst.Return(JsAst.LocalRef("__returnValue", None()))])        
     }
     
     public MakeReturningFunction(ast : JsAst) : JsAst
