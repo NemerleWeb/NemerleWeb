@@ -89,7 +89,6 @@ namespace NemerleWeb
     {
         _transformCounter++;
         Debug.WriteLine(_transformCounter + ": " + xmlAst.ToString());
-        def currentSplice = _transformCounter;        
         def loopStack = if(loopStack == null) [] else loopStack;
         
         def transformJsExpr(expr) {
@@ -101,7 +100,7 @@ namespace NemerleWeb
                 
         def getSplice() {
             mutable splice;
-            if(splices.TryGetValue(currentSplice, out splice))
+            if(splices.TryGetValue(_transformCounter, out splice))
                 transformJsExpr(if(splice != null) splice else "");
             else 
                 ""
@@ -190,11 +189,31 @@ namespace NemerleWeb
             <[ $tagExpr ]>        
         | Tag(name, content)                => 
             def nameExpr1 = SplicablePExprName(name);
-            def nameExpr2 = Util.locate(ToLocation(name), <[ $nameExpr1 : L.XName ]>);            
-            def cont = content.Map(x => <[ $(TransformImpl(x, splices, loopStack)) ]>);            
+            def nameExpr2 = Util.locate(ToLocation(name), <[ $nameExpr1 : L.XName ]>);
+            
+            def textAndSplices = content.Filter(c => c is XmlAst.Text || c is XmlAst.TagSplice);
+            def rest = content.Filter(c => !(c is XmlAst.Text || c is XmlAst.TagSplice));
+            
+            def cont = if(textAndSplices.Any(t => t is XmlAst.TagSplice)) {
+                            def asStrings = textAndSplices.Map(t : XmlAst => {                              
+                              match(t) {
+                              | XmlAst.Text(Splicable.Value(value)) => $<#"$value"#>
+                              | XmlAst.TagSplice => 
+                                _transformCounter++;
+                                getSplice();
+                              | _ => Message.FatalError(ToLocation(t), "Unknown splice inside node text")
+                              }
+                            });
+                            
+                            def result = string.Join(" + ", asStrings);
+                            rest.Map(x => <[ $(TransformImpl(x, splices, loopStack)) ]>).Append([<[ [L.XAttribute("nw-text", $result)] ]>])
+                          } else {
+                            content.Map(x => <[ $(TransformImpl(x, splices, loopStack)) ]>);
+                          }
             <[ [L.XElement($nameExpr2, 
                   [..$cont].Flatten(c => c).Cast.[object]().CombineAttributes().ToArray())]; ]>;            
-        | TagSplice(_, false)               => <[ [L.XAttribute("nw-text", $(getSplice()))] ]>
+        | TagSplice(t, false)               => 
+          <[ [L.XAttribute("nw-text", $(getSplice()))] ]>
         | TagSplice(expr, true)             => <[ [NColl.NToArray($(Parse(ToLocation(xmlAst), expr)))] ]>
         | AttrSplice(expr, SpliceType.Expr) as exprAst => <[ ($(Parse(ToLocation(exprAst), expr))) :> XAttribute ]>;
         | AttrSplice(expr, SpliceType.List) => <[ [NColl.NToArray.[L.XAttribute]($(Parse(ToLocation(xmlAst), expr)) : IEnumerable[L.XAttribute])]]> 
@@ -235,9 +254,21 @@ namespace NemerleWeb
             def cond1 = Parse(ToLocation(c), expr);
             def cond2 = if (isWhen) cond1 else <[ ! $cond1 ]>;
             <[ when ({ def $(varName : dyn) = $cond2; $cond2}) $tagExpr ]>
-        | Tag(_, content) =>             
-            def splices = content.Map(c => GetMethodWithSplicesOnly(c));
-            <[ { ..$splices } ]> 
+        | Tag(_, content) =>
+          def textAndSplices = content.Filter(c => c is XmlAst.Text || c is XmlAst.TagSplice);
+          def rest = content.Filter(c => !(c is XmlAst.Text || c is XmlAst.TagSplice));
+            
+          def splices = if(textAndSplices.Any(t => t is XmlAst.TagSplice)) {
+                          def asStrings = textAndSplices.Map(t : XmlAst => 
+                            match(t) {
+                            | XmlAst.TagSplice => GetMethodWithSplicesOnly(t)
+                            | _ => <[]>
+                            });
+                          rest.Map(x => GetMethodWithSplicesOnly(x)).Append(asStrings)
+                        } else {
+                          content.Map(x => GetMethodWithSplicesOnly(x));
+                        }
+          <[ { ..$splices } ]> 
         | TagSplice(expr, false)        =>
             def pexpr = Parse(ToLocation(xmlAst), expr);
             <[ def $(varName : dyn) = $pexpr;

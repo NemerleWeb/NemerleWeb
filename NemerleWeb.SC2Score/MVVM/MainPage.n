@@ -14,10 +14,12 @@ namespace NemerleWeb.SC2Score
   {
     public Chat : Chat;
     public TourneyList : TourneyList;
+    public CurrentUser : User;
     
-    public this() 
+    public this(user : User) 
     {
       TourneyList = TourneyList();
+      CurrentUser = user;
     }
     
     [Html]
@@ -25,6 +27,7 @@ namespace NemerleWeb.SC2Score
     {
       <#
         <div>
+          <div class="login-info">Logged $(CurrentUser.Name) in as $(CurrentUser.Name)</div>
           <div template="$(template(TourneyList, _.View))"></div>
           <div class="main-container">
             <div class="chat"></div>
@@ -33,5 +36,11 @@ namespace NemerleWeb.SC2Score
         </div>
       #>
     }
+  }
+  
+  [Unit, Record]
+  public class User
+  {
+    public Name : string;    
   }
 }

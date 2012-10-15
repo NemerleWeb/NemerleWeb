@@ -443,7 +443,7 @@ nweb.utils = {
             }
         }
 
-        if (!!obj.$type) {
+        if (obj != null && !!obj.$type) {
             var typename = obj.$type.replace(/\./g, "_").replace(/\+/g, "_").replace(/(.+),.+/g, "$1");
             var newObj = eval('new ' + typename + '()');
             for (var p in obj) {
