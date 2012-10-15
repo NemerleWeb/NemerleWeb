@@ -372,15 +372,20 @@ var nweb = {
 
         if(nweb.utils.isArray(newValue)) {
           if(!binding.oldValue || !nweb.utils.areArraysEqual(newValue, binding.oldValue)) {
-            changeFound = true;  
+            changeFound = true;
             binding.apply(newValue);
           }
 
+          //We need to nudge GC into freeing memory from old instance
+          //In theory, this shouldn't be needed, but somehow memory is not freed without this line
+          delete binding.oldValue; 
           binding.oldValue = newValue.slice();
         } else {
           if(binding.oldValue !== newValue) {
             changeFound = true;
             binding.apply(newValue);
+
+            delete binding.oldValue;
             binding.oldValue = newValue;
           }
         }
