@@ -18,7 +18,8 @@ namespace NemerleWeb.SC2Score
     
     public this()
     {
-      server.LoadFrontPageTourneys(tourneys => { All = tourneys });
+      //server.LoadFrontPageTourneys(tourneys => { All = tourneys });
+      this.setInterval(GenerateTourneys, 1);
     }
     
     public SelectTourney(tourney : Tourney) : void
@@ -36,6 +37,12 @@ namespace NemerleWeb.SC2Score
           lastX = mm.pageX;
         }
       }
+    }
+    
+    public GenerateTourneys() : void
+    {
+      All = [Tourney("DreamHack Open - Bucharest"), Tourney("WCS Asia Finals"), Tourney("NASL Season 4"), Tourney("IPTL Season 1"),
+             Tourney("GSTL Season 3"), Tourney("MLG vs Proleague Invit."), Tourney("OSL Season 1"), Tourney("GSL Season 4")].ToList();
     }
     
     public class Server

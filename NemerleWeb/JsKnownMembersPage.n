@@ -26,10 +26,16 @@ namespace NemerleWeb
       {
       | ("setTimeout", [callback, milliseconds]) => 
         def cb = JsAstHelper.MakeReturningFunction(callback);
-        Some(JsAst.Code($"setTimeout(($(cb.Write()))(), $(milliseconds.Write()))"))
+        Some(JsAst.Code(
+$<# var ___cb = ($(cb.Write()))();
+ setTimeout(function() { ___cb(); nweb.invalidate() }, $(milliseconds.Write()))#>))
       | ("setInterval", [callback, milliseconds]) => 
         def cb = JsAstHelper.MakeReturningFunction(callback);
-        Some(JsAst.Code($"setInterval(($(cb.Write()))(), $(milliseconds.Write()))"))
+        Some(JsAst.Code(
+$<# var ___cb = ($(cb.Write()))();
+ setInterval(function() { 
+ ___cb(); nweb.invalidate() 
+}, $(milliseconds.Write()))#>))
       | ("clearTimeout", [id]) => Some(JsAst.Code($"clearTimeout($(id.Write()))"))
       | ("clearInterval", [id]) => Some(JsAst.Code($"clearInterval($(id.Write()))"))
       | _ => None()

@@ -187,9 +187,11 @@ namespace NemerleWeb
         | "IsNullOrEmpty" =>
           Some(JsAst.Call(JsAst.OpCode("||"),
               [JsAst.Call(JsAst.OpCode("==="), [arg1, JsAst.Literal(JsLiteral.Null())]),
+                JsAst.Call(JsAst.OpCode("==="), [arg1, JsAst.Literal(JsLiteral.String(""))])]))                 
+        | "IsNullOrWhiteSpace" => //TODO: add regex AST for / / syntax, then we can compare arg.replace(/\s/g, "") and ""
+          Some(JsAst.Call(JsAst.OpCode("||"),
+              [JsAst.Call(JsAst.OpCode("==="), [arg1, JsAst.Literal(JsLiteral.Null())]),
                 JsAst.Call(JsAst.OpCode("==="), [arg1, JsAst.Literal(JsLiteral.String(""))])]))
-                 
-        | "IsNullOrWhiteSpace"
         | _ => None()
         }
       | [arg1, arg2] =>
