@@ -186,8 +186,8 @@ namespace NemerleWeb
         | "IsInterned" => None()
         | "IsNullOrEmpty" =>
           Some(JsAst.Call(JsAst.OpCode("||"),
-              [JsAst.Call(JsAst.OpCode("==="), [left, JsAst.Literal(JsLiteral.Null())]),
-                JsAst.Call(JsAst.OpCode("==="), [left, JsAst.Literal(JsLiteral.String(""))])]))
+              [JsAst.Call(JsAst.OpCode("==="), [arg1, JsAst.Literal(JsLiteral.Null())]),
+                JsAst.Call(JsAst.OpCode("==="), [arg1, JsAst.Literal(JsLiteral.String(""))])]))
                  
         | "IsNullOrWhiteSpace"
         | _ => None()

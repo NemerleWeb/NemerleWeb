@@ -344,7 +344,7 @@ var nweb = {
         if(nweb.utils.isFunction(val) && !returnFunction) {
           if(loopStack.length > 0)
             return val(loopStack[loopStack.length - 1].val);
-          return val(functionParams);
+          return val();
         }
         else
           return val;

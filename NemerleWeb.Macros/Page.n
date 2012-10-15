@@ -91,7 +91,10 @@ namespace NemerleWeb
                   def parameters = method.GetParameters().Map(p => <[ $(p.Name : usesite) : $(p.ty : typed) ]>);              
                   def fparms = parameters.Map(PParameter);
                   def methodName = ctb.ParsedName.NewName(method.Name);
-                            
+                  
+                  when(method.ReturnType.TryRequire(<[ ttype: void ]>))
+                    Message.FatalError("Server methods cannot return void, please return something");
+                    
                   ctb.Define(<[ decl: 
                     public $(methodName : name) (..$fparms) : System.Web.Mvc.ActionResult
                     {
