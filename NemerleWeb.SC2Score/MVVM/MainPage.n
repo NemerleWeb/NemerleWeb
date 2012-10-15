@@ -26,7 +26,10 @@ namespace NemerleWeb.SC2Score
       <#
         <div>
           <div template="$(template(TourneyList, _.View))"></div>
-          <div $when(TourneyList.Selected != null)>$(TourneyList.Selected.Name)</div>
+          <div class="main-container">
+            <div class="chat"></div>
+            <div class="tourney-info"></div>
+          </div>
         </div>
       #>
     }

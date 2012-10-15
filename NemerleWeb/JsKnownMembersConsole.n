@@ -34,7 +34,7 @@ namespace NemerleWeb
       | [obj] =>
         match (member.Name)
         {
-        | "WriteLine" => Some(JsAst.Call(JsAst.MethodRef(JsAst.LocalRef("console"), "log"), [obj]))
+        | "WriteLine" => Some(JsAst.Call(JsAst.MethodRef(JsAst.LocalRef("console", None()), "log"), [obj]))
         | _ => None()
         }
       | _ => None()

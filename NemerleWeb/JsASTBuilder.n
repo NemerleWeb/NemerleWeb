@@ -62,7 +62,7 @@ namespace NemerleWeb
             | _ => Message.Error("Unmatched literal"); JsAst.NotImpl();
             }
         | LocalFunRef                       => Message.Warning(expr.Location, "LocalFunRef not implemented"); JsAst.NotImpl("LocalFunRef")
-        | LocalRef(decl)                    => JsAst.LocalRef(decl.Name)
+        | LocalRef(decl)                    => JsAst.LocalRef(decl.Name, if(decl.Type.TypeInfo != null) Some(decl.Type) else None())
         | MacroEnvelope(expanded = ex, original = org, the_macro = _) => 
             match(org) { 
             /*| <[ foreach($it in $coll) $body  ]> => 
@@ -198,7 +198,7 @@ namespace NemerleWeb
                      | JsAst.DefValue(name, FieldRef(left, prop, false)) => JsAst.DefValue(name, JsAst.FieldRef(left, prop, true))
                      | JsAst.DefValue(name, Call(MethodRef(Method = "template") as template, [PropertyGet(l1, r1, false), PropertyGet as p2])) => 
                        JsAst.DefValue(name, JsAst.Call(template, [JsAst.FieldRef(l1, r1, true), p2]))
-                     | JsAst.Assign(JsAst.LocalRef(name), r) => JsAst.DefValue(name, r)
+                     | JsAst.Assign(JsAst.LocalRef(name, _type), r) => JsAst.DefValue(name, r)
                      | JsAst.DefValue => j :> JsAst.DefValue
                      });
       }

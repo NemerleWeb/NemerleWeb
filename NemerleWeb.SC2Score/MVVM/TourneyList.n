@@ -8,13 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace NemerleWeb.SC2Score
-{
-  [Unit, Record]
-  public class Tourney
-  {
-    public Name : string;
-  }
-  
+{ 
   [Unit]
   public class TourneyList
   {

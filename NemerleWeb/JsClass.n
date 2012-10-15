@@ -15,11 +15,11 @@ namespace NemerleWeb
   public class JsClass
   {
       public ClassType : TypeBuilder { get; set; }
-      public Indent : string    { get; set; }
-      public IEnumerableType : TypeVar { get; set; }
-      public StringType : TypeVar { get; set; }
+      public Indent : string    { get; set; }      
       public Typer : Typer { get; set; }
-        
+      
+      public static StringType : TypeVar { get; set; }
+      public static IEnumerableType : TypeVar { get; set; }  
       public static HasGetterNoSetter(p : IProperty) : bool
       {
         p.GetGetter() != null && p.GetSetter() == null
@@ -264,7 +264,7 @@ $(indent)}#>);
           def nested = ClassType.DeclaredNestedTypes
                                 .Where(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server
                                 .Where(c => !c.Name.StartsWith("_N__N_")) //Not generated class
-                                .Select(c => JsClass(c, Indent, IEnumerableType, StringType, Typer))
+                                .Select(c => JsClass(c, Indent, Typer))
                                 .ToList();
           ($"..$(nested; Environment.NewLine; _.Write())", nested)
       }
@@ -275,18 +275,18 @@ $(indent)}#>);
                    .Where(t => t.Name.StartsWith("_N__N_"))
                    .Iter(t => t.Ast.AddCustomAttribute(<[ NemerleWeb.GeneratedClass ]>));
       }
-        
-      TypeIsArray(type : TypeVar) : bool 
-      {
-        type.TryRequire(IEnumerableType) && !type.TryRequire(StringType);
-      }
                 
       public TranslateMethodBody(meth : IMethod, indent = "" : string) : string
       { 
         def ast = TyperHelper.GetMethodJsAst(meth, Typer, ClassType);
         ast.Write(indent);
       }
-        
+      
+      public static TypeIsArray(type : TypeVar) : bool 
+      {
+        type.TryRequire(IEnumerableType) && !type.TryRequire(StringType);
+      }
+      
       public static GetProperName(type : TypeInfo) : string 
       {          
         GetProperName(type.FullName)
