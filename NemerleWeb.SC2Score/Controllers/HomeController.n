@@ -13,7 +13,18 @@ namespace NemerleWeb.SC2Score.Controllers
   {
     public Index() : ActionResult
     {
-      View(Utils.MakePageHtml(MainPage()) : object);
+      View(Utils.MakePageHtml(MainPage(User(GetUserId()))) : object);
+    }
+    
+    private GetUserId() : string
+    {
+      def id = Random().Next();
+      if(Session["CurrentUserName"] != null)
+        Session["CurrentUserName"].ToString()
+      else {
+        Session["CurrentUserName"] = "anon" + id;
+        "anon" + id
+      }      
     }
   }
 }
