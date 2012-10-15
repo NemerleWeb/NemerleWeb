@@ -12,13 +12,58 @@ namespace NemerleWeb.SC2Score
   [Unit]
   public class Chat
   {
-     
+    [Record]
+    public class Message 
+    {
+      public Author : string { get; set; }
+      public Text : string { get; set; }
+    }
+    
+    public CurrentUser : User { get; set; }
+    public CurrentMessage : string { get; set; }
+    public Messages : List[Message] { get; set; }    
+    
+    public this(user : User)
+    {
+      CurrentUser = user;
+    }
+    
+    public ReceiveMessage(userName : string, message : string) : void
+    {      
+      Messages.Add(Message(userName, message));
+    }
+    
+    public Send() : void
+    {
+      when(!string.IsNullOrEmpty(CurrentMessage))
+        server.NewMessage(CurrentUser.Name, CurrentMessage, _result => {});
+      CurrentMessage = "";
+    }
+    
+    public class Server
+    {
+      public NewMessage(userName : string, message : string) : string
+      {
+        broadcast client.ReceiveMessage(userName, message);
+        "";
+      }
+    }
+    
     [Html]
     public View() : string
     {
       <#
-        <div>
-        
+        <div class="chat-container">
+          <div class="messages">
+            <div $foreach(m in Messages) class="message">
+              <span class="message-author">$(m.Author)</span>: 
+              <span class="message-text">$(m.Text)</span>
+            </div>
+          </div>
+          <div class="chat-new-message">
+            <input value="$CurrentMessage" />
+            <button click="$Send" class="btn">Send</button>
+          </div>
         </div>
       #>
     }

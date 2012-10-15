@@ -21,3 +21,12 @@ body {
 .tourney-list li {
     margin: 1px;
 }
+
+.main-container {
+    overflow: hidden;
+}
+
+.chat-container {
+    float: left;
+    width: 280px;
+}
