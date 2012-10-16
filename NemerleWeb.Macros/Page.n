@@ -152,7 +152,10 @@ namespace NemerleWeb
       tb.Define(<[ decl: __constructorParams : List[object] ]>);
       def result = cl.Write();
       
-      def applyBindings = $<#  nweb.go(new $(JsClass.GetProperName(tb))({0}));#>;
+      def applyBindings = $<#
+$$(function() {{ 
+  nweb.go(new $(JsClass.GetProperName(tb))({0}));
+}});#>;
       _ = tb.DefineWithSource(<[ decl:
         public GetPageScript() : string
         {

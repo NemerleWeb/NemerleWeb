@@ -85,11 +85,14 @@ $<#
           {
             <#
             var #> + $(jsHubName : string) + <# = $.connection.#> + $(jsHubName : string) + <#;
-            #> + $(methods : string) + <#
-            $.connection.hub.start({}, function() {
-              $.get('/#> + $(declaringType.Name) + <#/__SetSignalRConnectionId', {id: this.id});
-            });
-            #>
+            #> + $(methods : string) + 
+<#
+setTimeout(function() {
+  $.connection.hub.start({}, function() {
+    $.get('/#> + $(declaringType.Name) + <#/__SetSignalRConnectionId', {id: this.id});
+  });
+}, 1000);
+  #>
           } ]>);
         
         tb.Define(<[ decl: client : $(declaringType.ParsedTypeName) = $(declaringType.ParsedTypeName)() ]>);
