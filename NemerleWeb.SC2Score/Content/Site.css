@@ -19,14 +19,37 @@ body {
 }
 
 .tourney-list li {
-    margin: 1px;
+    margin: 1px 2px 1px 0;
 }
 
 .main-container {
     overflow: hidden;
+    margin-top: 2px;
 }
 
 .chat-container {
     float: left;
     width: 280px;
+}
+
+.chat-container .messages {
+    height: 500px;
+    background-color: #eee;
+    margin-bottom: 2px;
+    position: relative;
+    overflow-y: scroll;
+}
+
+.chat-container .messages .messages-container {
+    max-height: 500px;
+    position: absolute;
+    bottom: 0;
+}
+
+.chat-container .message  {
+    margin-left: 3px;
+}
+
+.chat-container .chat-new-message input {
+    width: 222px;
 }
