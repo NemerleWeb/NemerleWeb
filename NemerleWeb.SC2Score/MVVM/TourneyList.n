@@ -18,8 +18,8 @@ namespace NemerleWeb.SC2Score
     
     public this()
     {
-      //server.LoadFrontPageTourneys(tourneys => { All = tourneys });
-      this.setInterval(GenerateTourneys, 1);
+      server.LoadFrontPageTourneys(tourneys => { All = tourneys });
+      //this.setInterval(GenerateTourneys, 1);
     }
     
     public SelectTourney(tourney : Tourney) : void
