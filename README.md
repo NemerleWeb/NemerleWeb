@@ -7,7 +7,7 @@ It uses reactive data model which allows creating rich internet applications.
 
 ##New to NemerleWeb ?
 
-You can see samples on [Demo site](nemerlewebsamples.apphb.com/), tests running on [Tests site](http://nemerlewebtests.apphb.com/)
+You can see samples on [Demo site](http:/nemerlewebsamples.apphb.com/), tests running on [Tests site](http://nemerlewebtests.apphb.com/)
 
 Currently there is no documentation wiki, you are free to help us.
 
