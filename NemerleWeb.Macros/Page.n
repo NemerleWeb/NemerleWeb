@@ -212,7 +212,7 @@ $$(function() {{
                 "NemerleWeb.Scripts.nweb.js"
               ];
               
-              def sb = System.Text.StringBuilder();              
+              def sb = System.Text.StringBuilder();
               foreach(file in scripts)
                 using(stream = typeof(NemerleWeb.JsAst).Assembly.GetManifestResourceStream(file))
                 using(reader = System.IO.StreamReader(stream))

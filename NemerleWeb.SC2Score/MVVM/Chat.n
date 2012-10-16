@@ -22,7 +22,7 @@ namespace NemerleWeb.SC2Score
     public CurrentUser : User { get; set; }
     public CurrentMessage : string { get; set; }
     public Messages : List[Message] { get; set; }    
-    public MessagesHeight : int { get; set; }
+    public MessagesScroll : int { get; set; }
     
     public this(user : User)
     {
@@ -31,7 +31,10 @@ namespace NemerleWeb.SC2Score
     
     public ReceiveMessage(userName : string, message : string) : void
     {      
-      Messages.Add(Message(userName, message));      
+      Messages.Add(Message(userName, message));
+      MessagesScroll = Messages.Count() * 100;
+      when(Messages.Count() > 50)
+        Messages.Remove(Messages[0]);
     }
     
     public Send() : void
@@ -61,8 +64,8 @@ namespace NemerleWeb.SC2Score
     {
       <#
         <div class="chat-container">
-          <div class="messages">
-            <div class="messages-container" attr-scrollHeight="$MessagesHeight" attr-scrollTop="$MessagesHeight">
+          <div class="messages" attr-scrollTop="$MessagesScroll">
+            <div class="messages-container">
               <div $foreach(m in Messages) class="message">
                 <span class="message-author">$(m.Author)</span>: 
                 <span class="message-text">$(m.Text)</span>

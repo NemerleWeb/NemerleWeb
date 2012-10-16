@@ -69,15 +69,15 @@ var nweb = {
       }
     }
 
-    for(var i = attrs.length - 1; i >= 0; i--)
-      if(attrs[i].nodeName.indexOf("nw-") === 0)
-        el.removeAttribute(attrs[i].nodeName);
+    for(var j = attrs.length - 1; j >= 0; j--)
+      if(attrs[j].nodeName.indexOf("nw-") === 0)
+        el.removeAttribute(attrs[j].nodeName);
     
     if(el.__nw_is_template && !isInsideTemplate)
       return;
 
-    for(var i = 0; i < el.childNodes.length; i++)
-      nweb.applyBindings(model, el.childNodes[i], bindings, loopStack);
+    for(var l = 0; l < el.childNodes.length; l++)
+      nweb.applyBindings(model, el.childNodes[l], bindings, loopStack);
   },
   getTextBinding: function(model, el, bindings, loopStack, attrVal) {
     var expr = nweb.parseExpression(model, attrVal, loopStack);
@@ -128,7 +128,7 @@ var nweb = {
         return nweb.getParsedValue(model, expr, loopStack);
       },
       apply: function (value) {
-        $(el).attr(attr[1], value);
+        el[attr[1]] = value;
       }
     };
   },
@@ -190,7 +190,7 @@ var nweb = {
           var newVal = nweb.getValue(el);
           eval(expr + " = newVal;");
         });
-      })
+      });
     };
     return {
       el: el,
@@ -247,8 +247,8 @@ var nweb = {
       apply: function(value) {
         var array = value;
 
-        for (var i = 0; i < binding.generatedEls.length; i++)
-          binding.generatedEls[i].remove();
+        for (var j = 0; j < binding.generatedEls.length; j++)
+          binding.generatedEls[j].remove();
 
         binding.generatedEls = [];
         binding.subBindings = [];
@@ -267,7 +267,7 @@ var nweb = {
   },
   getTemplateBinding: function(model, el, bindings, loopStack, attrVal) {
     var $el = $(el);
-    var template = /(.+):\s(.+)/.exec(el.getAttribute("nw-template"));
+    var template = /(.+):\s(.+)/.exec(attrVal);
     var parsedVal;
 
     if(!template) {
@@ -328,7 +328,7 @@ var nweb = {
     return binding;
   },
   getUnlessBinding: function (model, el, bindings, loopStack, attrVal) {
-    return getWhenBinding(model, el, bindings, loopStack, attrValue, true);
+    return getWhenBinding(model, el, bindings, loopStack, attrVal, true);
   },
   getClickBinding: function(model, el, bindings, loopStack, attrVal) {
     var parsed = nweb.parseExpression(model, attrVal, loopStack);
@@ -368,8 +368,8 @@ var nweb = {
   parseExpression: function(model, expr, loopStack) {
     if(expr == "self")
       return "model";
-    var expr = nweb.applyLoopStackToExpr(expr, loopStack);
-    return expr.replace(/self\./g, "model.");
+    var e = nweb.applyLoopStackToExpr(expr, loopStack);
+    return e.replace(/self\./g, "model.");
   },
   getParsedValue: function(model, parsedExpr, loopStack, returnFunction) {
     if(parsedExpr.length === 0)
@@ -446,6 +446,7 @@ var nweb = {
       var selected = $("option:selected", el)[0];
       if(selected)
         return selected[nweb.dataKey];
+      return $("option", el)[0][nweb.dataKey];
     } else {
       return $(el).val();
     }
