@@ -22,6 +22,7 @@ namespace NemerleWeb
     private JsToString(arg : JsAst) : JsAst
     {
     | JsAst.Literal(JsLiteral.String) => arg        
+    | JsAst.LocalRef(_, Some(type)) when type.TryRequire(JsClass.StringType) => arg
     | _ => arg.MethodCall("toString", [])
     }
     
@@ -168,7 +169,6 @@ namespace NemerleWeb
         match (member.Name)
         {
         | "Concat" =>
-          assert2(false);
           match (arg1)
           {
           | JsAst.Array(Values = values) =>
