@@ -7,7 +7,7 @@ namespace NemerleWeb
 {
   public module Ext 
   {
-      public CombineAttributes(this instance : IEnumerable[object]) : IEnumerable[object]
+      public CombineAttributes[T](this instance : IEnumerable[T]) : IEnumerable[object]
       {
         def xattrs = instance.OfType.[XAttribute]();
         def cssValue = string.Join(", ", xattrs.Where(a => a.Name.LocalName.StartsWith("css-")).Select(a => $"\"$(a.Name.LocalName.Substring(4))\": $(a.Value)"));
@@ -20,7 +20,7 @@ namespace NemerleWeb
                           .Concat(if(!string.IsNullOrWhiteSpace(styleValue)) [XAttribute("data-bind", style)] else [])
                           .GroupBy(a => a.Name.LocalName)
                           .Select(a => XAttribute(a.Key, string.Join(", ", a.Select(x => x.Value))));
-        instance.Where(x => !(x is XAttribute)).Concat(attrs);
+        instance.Where(x : object => !(x is XAttribute)).Concat(attrs);
       }
   }
 }
