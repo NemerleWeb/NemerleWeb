@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>c:\dev\open-source\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.ComputationExpressions.Macros.xml</name>
+    <name>c:\Projects\prv\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.ComputationExpressions.Macros.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.ComputationExpressions.Extensions.ArrayBuilder">
@@ -182,8 +182,8 @@
       </summary>
 
 </member>
-    <member name="M:Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_run_10577(Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_closureOf_Run_10548,Nemerle.Compiler.TypeInfo,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_delay_10565(Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_closureOf_Run_10548,Nemerle.Compiler.TypeInfo,Nemerle.Compiler.Parsetree.PExpr.Typed)" />
+    <member name="M:Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_run_10581(Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_closureOf_Run_10552,Nemerle.Compiler.TypeInfo,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_delay_10569(Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_closureOf_Run_10552,Nemerle.Compiler.TypeInfo,Nemerle.Compiler.Parsetree.PExpr.Typed)" />
     <member name="M:Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro.#ctor">
       <summary>
         <para>Wraps the F#-like computation expression in the result at the final step.

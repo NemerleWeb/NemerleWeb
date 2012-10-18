@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>c:\dev\open-source\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.WPF.xml</name>
+    <name>c:\Projects\prv\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.WPF.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.WPF.DependencyProperty_property_postscanMacro" />
@@ -53,9 +53,9 @@
     <member name="M:Nemerle.WPF.DependencyProperty_method_postscanMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.WPF.DependencyProperty_method_postscanMacro.SyntaxExtension" />
     <member name="T:Nemerle.WPF.DependencyPropertyImpl" />
-    <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_checkAccessorAttributes_11023(Nemerle.Compiler.Parsetree.ClassMember.Function)" />
-    <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_accessor_11014(Nemerle.WPF.DependencyPropertyImpl._N_closureOf_Implement_11003,Nemerle.Core.option{Nemerle.Compiler.Parsetree.ClassMember.Function})" />
-    <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_define_10324(Nemerle.WPF.DependencyPropertyImpl._N_closureOf_DeclareFields_10307,Nemerle.Compiler.Parsetree.ClassMember.Field)" />
+    <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_checkAccessorAttributes_11029(Nemerle.Compiler.Parsetree.ClassMember.Function)" />
+    <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_accessor_11020(Nemerle.WPF.DependencyPropertyImpl._N_closureOf_Implement_11009,Nemerle.Core.option{Nemerle.Compiler.Parsetree.ClassMember.Function})" />
+    <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_define_10330(Nemerle.WPF.DependencyPropertyImpl._N_closureOf_DeclareFields_10313,Nemerle.Compiler.Parsetree.ClassMember.Field)" />
     <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_check_9313(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.WPF.DependencyPropertyImpl.PropertyFieldName(System.String)" />
     <member name="M:Nemerle.WPF.DependencyPropertyImpl.PropertyKeyFieldName(System.String)" />
