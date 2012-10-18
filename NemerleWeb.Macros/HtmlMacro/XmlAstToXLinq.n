@@ -215,12 +215,12 @@ namespace NemerleWeb
                             });
                             
                             def result = string.Join(" + ", asStrings);
-                            rest.Map(x => <[ $(TransformImpl(x, splices, loopStack)) ]>).Append([<[ [L.XAttribute("nw-text", $result)] ]>])
+                            rest.Select(x => <[ $(TransformImpl(x, splices, loopStack)) ]>).Concat([<[ [L.XAttribute("nw-text", $result)] ]>])
                           } else {
-                            content.Map(x => <[ $(TransformImpl(x, splices, loopStack)) ]>);
+                            content.Select(x => <[ $(TransformImpl(x, splices, loopStack)) ]>);
                           }
             <[ [L.XElement($nameExpr2, 
-                  [..$cont].Flatten(c => c).Cast.[object]().CombineAttributes().ToArray())]; ]>;            
+                  [..$(cont.NToList())].SelectMany(c => c).Cast.[object]().CombineAttributes().ToArray())]; ]>;            
         | TagSplice(t, false)               => 
           <[ [L.XAttribute("nw-text", $(getSplice()))] ]>
         | TagSplice(expr, true)             => <[ [NColl.NToArray($(Parse(ToLocation(xmlAst), expr)))] ]>
