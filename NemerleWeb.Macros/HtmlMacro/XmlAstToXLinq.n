@@ -94,16 +94,16 @@ namespace NemerleWeb
         def transformJsExpr(expr) {
           def res = if(expr.StartsWith("\"") && expr.EndsWith("\"")) expr.Trim('\"') else expr;
           //def res = Regex.Replace(res, <#(^(?<b>)_self\W|(?<b>\W)_self\W)#>, "${b}");
-          def res = if(res.EndsWith(";")) res.Substring(0, res.Length - 1) else res;
+          def res = if(res.EndsWith(";")) res.Substring(0, res.Length - 1) else res;          
           res
         }
                 
         def getSplice() {
-            mutable splice;
-            if(splices.TryGetValue(_transformCounter, out splice))
-                transformJsExpr(if(splice != null) splice else "");
-            else 
-                ""
+          mutable splice;
+          if(splices.TryGetValue(_transformCounter, out splice))
+              transformJsExpr(splice ?? "");
+          else 
+              ""
         }
         
         match (xmlAst) {
@@ -174,7 +174,7 @@ namespace NemerleWeb
             match(header) {
             | <[ $x in $_xs ]> => 
                 def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, 
-                                         CreateAttribute("nw-repeat", x.ToString() + " in " + getSplice()) :: content);                
+                                         CreateAttribute("nw-repeat", x.ToString() + " in " + getSplice()) :: content);
                 def tagExpr = TransformImpl(tag, splices, loopStack.Append([x.ToString()]));
                 <[ $tagExpr ]>;
             | _ => TransformImpl(XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content), splices);
@@ -199,7 +199,14 @@ namespace NemerleWeb
             def cont = if(textAndSplices.Any(t => t is XmlAst.TagSplice)) {
                             def asStrings = textAndSplices.Map(t : XmlAst => {                              
                               match(t) {
-                              | XmlAst.Text(Splicable.Value(value)) => $<#"$value"#>
+                              | XmlAst.Text(Splicable.Value(value)) =>
+                                def prepareValue(value)
+                                {
+                                  def res = value.Replace("\r", "").Replace("\n", "");
+                                  def res = res.Replace("\"", "\\");
+                                  res
+                                }
+                                $<#"$(prepareValue(value))"#>
                               | XmlAst.TagSplice => 
                                 _transformCounter++;
                                 getSplice();

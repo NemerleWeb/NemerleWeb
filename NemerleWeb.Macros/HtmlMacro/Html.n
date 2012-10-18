@@ -27,6 +27,11 @@ namespace NemerleWeb
   {
     internal ToXLinq(typer : Typer, mb : MethodBuilder) : void
     {
+      Macros.DefineCTX(typer);
+       
+      JsClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
+      JsClass.StringType = <[ ttype : System.String ]>;
+      
       def expr = mb.Body;
       
       match (expr)
