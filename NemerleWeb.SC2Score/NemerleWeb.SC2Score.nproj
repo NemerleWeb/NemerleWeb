@@ -63,10 +63,10 @@
       <HintPath>$(Nemerle)\Nemerle.ComputationExpressions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Nemerle.Macros, Version=1.1.948.0, Culture=neutral, PublicKeyToken=5291d186334f6101">
+    <Reference Include="Nemerle.Macros">
       <Name>Nemerle.Macros</Name>
       <AssemblyName>Nemerle.Macros.dll</AssemblyName>
-      <HintPath>..\Nemerle\Net-4.5\Nemerle.Macros.dll</HintPath>
+      <HintPath>$(Nemerle)\Nemerle.Macros.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
       <Name>Newtonsoft.Json</Name>
