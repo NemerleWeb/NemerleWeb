@@ -450,12 +450,26 @@ $(Body.Write("  "))
         
         public abstract Write(_indent = "" : string) : string { string.Empty; };
         public virtual Transform() : JsAst { this }
-        public static AllowedForAssignment : list[Type] = [typeof(JsAst.Call), typeof(JsAst.MethodRef), typeof(JsAst.LocalRef),            
-                                                           typeof(JsAst.Literal), typeof(JsAst.Code), typeof(JsAst.Void), 
-                                                           typeof(JsAst.Ternary), typeof(JsAst.NotImpl), typeof(JsAst.Lambda),
-                                                           typeof(JsAst.Array), typeof(JsAst.StaticRef), typeof(JsAst.This), 
-                                                           typeof(JsAst.Tuple), typeof(JsAst.TupleIndexer), typeof(JsAst.FieldRef),
-                                                           typeof(JsAst.PropertyGet), typeof(JsAst.ArrayIndexer), typeof(JsAst.Label)];
+        public static AllowedForAssignment : list[Type] =
+        [
+          typeof(JsAst.Call),
+          typeof(JsAst.MethodRef),
+          typeof(JsAst.LocalRef),            
+          typeof(JsAst.Literal), 
+          typeof(JsAst.Code),
+          typeof(JsAst.Void), 
+          typeof(JsAst.Ternary),
+          typeof(JsAst.NotImpl),
+          typeof(JsAst.Lambda),
+          typeof(JsAst.Array),
+          typeof(JsAst.StaticRef), 
+          typeof(JsAst.This), 
+          typeof(JsAst.Tuple),
+          typeof(JsAst.TupleIndexer), typeof(JsAst.FieldRef),
+          typeof(JsAst.PropertyGet),
+          typeof(JsAst.ArrayIndexer),
+          typeof(JsAst.Label)
+        ];
                                          
         public static Recurse(ast : JsAst, selector : JsAst -> JsAst, topdown : bool = true) : JsAst 
         {
@@ -495,7 +509,7 @@ $(Body.Write("  "))
             | Seq(items)                  => JsAst.Seq(items.Map(recurse))
             | ServerCall(meth, ty, parms, callback) => JsAst.ServerCall(meth, ty, parms.Map(p => (p[0], recurse(p[1]))), recurse(callback))
             | StaticRef(type, member)     => JsAst.StaticRef(type, member);
-            | Switch(expr, cases, deflt)  => JsAst.Switch(recurse(expr), cases.Map(recurse).Cast.[JsAst.SwitchCase]().NToList(), recurse(deflt))
+            | Switch(expr, cases, deflt)  => JsAst.Switch(recurse(expr), cases.Select(recurse).Cast.[JsAst.SwitchCase]().NToList(), recurse(deflt))
             | SwitchCase(id, case)        => JsAst.SwitchCase(id, recurse(case))
             | Ternary(cond, then, els)    => JsAst.Ternary(recurse(cond), recurse(then), recurse(els))
             | This                        => ast'

@@ -27,7 +27,6 @@ namespace NemerleWeb
             def defs2 = JsAstBuilder.BuildJsAstForSplices(tt);
             
             defs.Concat(defs2)
-                .Cast.[JsAst.DefValue]()
                 .SelectMany(j =>
                   regexp match(j.Name)
                   {
