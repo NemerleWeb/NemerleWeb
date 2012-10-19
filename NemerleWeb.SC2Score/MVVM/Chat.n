@@ -48,7 +48,6 @@ namespace NemerleWeb.SC2Score
     {
       when(e.which == 13) {
         Send();
-        js console.log("EnterKeypress")
       }
     }
     
