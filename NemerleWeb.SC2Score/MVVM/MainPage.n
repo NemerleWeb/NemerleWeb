@@ -32,7 +32,7 @@ namespace NemerleWeb.SC2Score
           <div template="$(template(TourneyList, _.View))"></div>
           <div class="main-container">
             <div class="chat" template="$(template(Chat, _.View))"></div>
-            <div class="tourney-info"></div>
+            <div $when(TourneyList.Selected != null) class="tourney-info">$(TourneyList.Selected.Rendered)</div>
           </div>
         </div>
       #>

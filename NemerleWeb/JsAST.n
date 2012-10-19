@@ -251,11 +251,12 @@ $(Body.Write())
         | Literal        { Value : JsLiteral;
             public override Write(_ = "" : string) : string {
                 match(this) {
-                | Literal(Null)                                => "null"
-                | Literal(Integer(val))                        => $"$val"
-                | Literal(Float(val))                          => $"$val"
-                | Literal(String(val))                         => $<#"$val"#>
-                | Literal(Bool(val))                           => $"$(val.ToString().ToLower())"
+                | Literal(Null)         => "null"
+                | Literal(Integer(val)) => $"$val"
+                | Literal(Float(val))   => $"$val"
+                | Literal(String(val))  => $<#"$val"#>
+                | Literal(Bool(val))    => $"$(val.ToString().ToLower())"
+                | Literal(Regexp(pat, mod)) => $<#new RegExp($(pat.Write()), $(mod.Write()))#>
                 }
             }
         }

@@ -1,0 +1,38 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+using Nemerle.Utility;
+
+using System;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  module JsKnownMembersRegex
+  {
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(JsRegexp), Handler);      
+    }
+    
+    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      ObjectHandler(left, member, parms)
+    }
+    
+    private ObjectHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      match(member.Name)
+      {
+      | "compile" => Some(JsAst.Call(JsAst.MethodRef(left, "compile"), []))
+      | "test"    => Some(JsAst.Call(JsAst.MethodRef(left, "test"), parms))
+      | "exec"    => Some(JsAst.Call(JsAst.MethodRef(left, "exec"), parms))
+      }
+    }
+  }
+}
+
