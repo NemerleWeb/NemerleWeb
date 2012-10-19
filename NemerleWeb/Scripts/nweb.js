@@ -182,7 +182,6 @@ var nweb = {
       $el.on("keyup", function() {
         nweb.execute(function() {
           eval(expr + " = $el.val();");
-          console.log("keyup setval: " + $el.val());
         });
       });
     } else {
@@ -356,7 +355,7 @@ var nweb = {
     var event = /(.+):\s(.+)/.exec(attrVal);
     var methodString = nweb.parseExpression(model, event[2], loopStack);
     var method = nweb.getParsedValue(model, methodString, loopStack, el);
-    $(el).bind(event[1], method);
+    $(el).bind(event[1], function (e) { method(e); nweb.invalidate(); });
   },
   applyLoopStackToExpr: function(expr, loopStack) {
     for (var i = loopStack.length - 1; i >= 0; i--) {
