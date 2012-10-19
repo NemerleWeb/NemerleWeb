@@ -16,6 +16,7 @@ namespace NemerleWeb
     | Float { val : double }
     | Bool { val : bool; }
     | String { val : string; }
+    | Regexp { pattern : JsAst; modifiers : JsAst }
     | Null
     
     [OverrideObjectEquals]

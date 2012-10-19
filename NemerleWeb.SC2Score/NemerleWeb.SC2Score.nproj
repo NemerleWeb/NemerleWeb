@@ -168,9 +168,6 @@
     <Compile Include="MVVM\TourneyList.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MVVM\TourneySourceParser.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
   </ItemGroup>
   <ItemGroup>

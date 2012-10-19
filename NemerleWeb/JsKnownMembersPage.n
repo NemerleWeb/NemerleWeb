@@ -38,6 +38,7 @@ $<# var ___cb = ($(cb.Write()))();
 }, $(milliseconds.Write()))#>))
       | ("clearTimeout", [id]) => Some(JsAst.Code($"clearTimeout($(id.Write()))"))
       | ("clearInterval", [id]) => Some(JsAst.Code($"clearInterval($(id.Write()))"))
+      | ("re", [pat, modifiers]) => Some(JsAst.Literal(JsLiteral.Regexp(pat, modifiers)))
       | _ => None()
       }
     }

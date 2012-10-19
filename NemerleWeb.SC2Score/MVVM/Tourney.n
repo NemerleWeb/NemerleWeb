@@ -13,18 +13,24 @@ namespace NemerleWeb.SC2Score
   public class Tourney
   {
     public Name : string;
-    public Source : string;
+    public Source : string;    
+    public Rendered : string
+    {
+      get 
+      {
+        if(re(<#\s{20}#>, "g").test(Source))
+          "true"
+        else
+          "false"
+      }
+    }
     
     public this(name : string)
     {
-      Name = name;      
+      Name = name;
+      Source = <# This is a test source #>;
     }
-    
-    public Rendered() : string
-    {
-      TourneySourceParser(Source).GetRenderedHtml();
-    }
-    
+           
     [Html]
     public SourceView() : string
     {
@@ -36,5 +42,5 @@ namespace NemerleWeb.SC2Score
     {
       <#<div class="rendered-tourney">$Rendered</div>#>
     }
-  }
+  }  
 }

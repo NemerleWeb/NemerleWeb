@@ -199,6 +199,7 @@ namespace NemerleWeb
                      | JsAst.DefValue(name, Call(MethodRef(Method = "template") as template, [PropertyGet(l1, r1, false), PropertyGet as p2])) => 
                        JsAst.DefValue(name, JsAst.Call(template, [JsAst.FieldRef(l1, r1, true), p2]))
                      | JsAst.Assign(JsAst.LocalRef(name, _type), r) => JsAst.DefValue(name, r)
+                     | JsAst.Assign(JsAst.FieldRef(obj, name, _), r) => JsAst.DefValue(name, r)
                      | JsAst.DefValue => j :> JsAst.DefValue
                      });
       }
