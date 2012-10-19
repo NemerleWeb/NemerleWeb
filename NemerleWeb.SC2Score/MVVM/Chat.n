@@ -46,8 +46,10 @@ namespace NemerleWeb.SC2Score
     
     public MessageKeypress(e : EventData) : void
     {
-      when(e.which == 13)
+      when(e.which == 13) {
         Send();
+        js console.log("EnterKeypress")
+      }
     }
     
     public class Server

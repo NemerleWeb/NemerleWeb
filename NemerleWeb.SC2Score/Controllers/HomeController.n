@@ -17,13 +17,13 @@ namespace NemerleWeb.SC2Score.Controllers
     }
     
     private GetUserId() : string
-    {
-      def id = Random().Next();
+    {      
       if(Session["CurrentUserName"] != null)
         Session["CurrentUserName"].ToString()
       else {
-        Session["CurrentUserName"] = "anon" + id;
-        "anon" + id
+        def name = "anon" + Random().Next();
+        Session["CurrentUserName"] = name;
+        name
       }      
     }
   }

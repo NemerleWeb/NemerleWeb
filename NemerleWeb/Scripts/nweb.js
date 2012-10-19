@@ -182,6 +182,7 @@ var nweb = {
       $el.on("keyup", function() {
         nweb.execute(function() {
           eval(expr + " = $el.val();");
+          console.log("keyup setval: " + $el.val());
         });
       });
     } else {
