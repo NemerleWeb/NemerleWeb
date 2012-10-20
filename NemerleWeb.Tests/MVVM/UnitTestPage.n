@@ -269,10 +269,10 @@ namespace NemerleWeb.Tests
       
       test("using", () =>
       {
-        //using (s = SomeDisposable())
-        //{
-        //  _ = "Do something";
-        //}
+        using (s = SomeDisposable())
+        {
+          _ = "Do something";
+        }
         
         true
       });
@@ -427,7 +427,6 @@ namespace NemerleWeb.Tests
         List([1]).FirstOrDefault() == 1 && List([1]).LastOrDefault() == 1;
       });
       
-      #if AA
       test("linq first last", () =>
       {
         mutable res = true;
@@ -454,7 +453,50 @@ namespace NemerleWeb.Tests
         
         res
       });
-      #endif
+      
+      test("array index", () =>
+      {
+        def a = array[1, 2, 3];
+        a[0] == 1
+      });
+      
+      //test("regexp exec 1", () =>
+      //{
+      //  def res = re("pattern").exec("pattern");
+      //  res[0] == "pattern"
+      //});
+      
+      //test("regexp exec 2", () =>
+      //{
+      //  def res = re("pattern", "i").exec("pattern");
+      //  res[0] == "pattern"
+      //});
+      
+      test("regexp test", () =>
+      {
+        re("pattern").test("pattern")
+      });
+      
+      test("regexp compile 1", () =>
+      {
+        def pat = re("pattern");
+        pat.compile();
+        pat.test("pattern")
+      });
+      
+      test("regexp compile 2", () =>
+      {
+        def pat = re("something");
+        pat.compile("pattern");
+        pat.test("pattern")
+      });
+      
+      test("regexp compile 3", () =>
+      {
+        def pat = re("something");
+        pat.compile("pattern", "i");
+        pat.test("PATTERN")
+      });
     }
     
     [Html]

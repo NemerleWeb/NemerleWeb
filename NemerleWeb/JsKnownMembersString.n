@@ -161,7 +161,7 @@ namespace NemerleWeb
       }
     }
     
-    private StaticHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
       match (parms)
       {

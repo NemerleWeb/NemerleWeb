@@ -11,8 +11,10 @@ namespace NemerleWeb
 {  
   public class JsRegexp
   {
-    public compile() : void {};
-    public exec(_input : string) : List[string] { null };
-    public test(_input : string) : bool { false };
+    public compile() : void {}
+    public compile(_input : string) : void {}
+    public compile(_input : string, _modifier : string) : void {}
+    public exec(_input : string) : array[string] { null }
+    public test(_input : string) : bool { false }
   }
 }

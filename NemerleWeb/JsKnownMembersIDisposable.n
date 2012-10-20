@@ -31,7 +31,33 @@ namespace NemerleWeb
     {
       match (parms)
       {
-      | [] => Some(left.MethodCall(member.Name, parms))
+      | [] when member.Name.ToUpperInvariant() == "DISPOSE" => 
+      
+      // if (left.dispose && typeof left.dispose == "function") left.dispose();
+      // else left.Dispose();
+      
+      Some(
+        JsAst.If
+        (
+          JsAst.Call
+          (
+            JsAst.OpCode("&&"),
+            [
+              JsAst.FieldRef(left, "dispose", false),              
+              JsAst.Call
+              (
+                JsAst.OpCode("==="),
+                [
+                  JsAst.TypeOf(JsAst.FieldRef(left, "dispose", false)),
+                  JsAst.Literal(JsLiteral.String("function"))
+                ]
+              )
+            ]
+          ),
+          left.MethodCall("dispose", parms),
+          JsAst.Call(JsAst.MethodRef(left, "Dispose"), parms)
+        ))
+      
       | _ => None()
       }
     }
