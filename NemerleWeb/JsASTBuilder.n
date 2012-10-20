@@ -190,21 +190,21 @@ namespace NemerleWeb
 
       public BuildJsAstForSplices(expr : TExpr) : IEnumerable[JsAst.DefValue]
       {
-          def ast = JsAstBuilder.Build(expr);
-          def ast = JsAstHelper.FlattenAndRemoveVoids(ast);
-          JsAstHelper.IterateAST(ast)
-                     .Where(a => a is JsAst.DefValue || a is JsAst.Assign)
-                     .Select.[JsAst, JsAst.DefValue](j =>
-                       match(j)
-                       {
-                        | JsAst.DefValue(name, FieldRef(left, prop, false)) => JsAst.DefValue(name, JsAst.FieldRef(left, prop, true))
-                        | JsAst.DefValue(name, Call(MethodRef(Method = "template") as template, [PropertyGet(l1, r1, false), PropertyGet as p2])) => 
-                          JsAst.DefValue(name, JsAst.Call(template, [JsAst.FieldRef(l1, r1, true), p2]))
-                        | JsAst.Assign(JsAst.LocalRef(name, _type), r) => JsAst.DefValue(name, r)
-                        | JsAst.Assign(JsAst.FieldRef(obj, name, _), r) => JsAst.DefValue(name, r)
-                        | JsAst.DefValue => j :> JsAst.DefValue
-                        | _ => assert2(false); null
-                      });
+        def ast = JsAstBuilder.Build(expr);
+        def ast = JsAstHelper.FlattenAndRemoveVoids(ast);
+        JsAstHelper.IterateAST(ast)
+                    .Where(a => a is JsAst.DefValue || a is JsAst.Assign)
+                    .Select.[JsAst, JsAst.DefValue](j =>
+                      match(j)
+                      {
+                      | JsAst.DefValue(name, FieldRef(left, prop, false)) => JsAst.DefValue(name, JsAst.FieldRef(left, prop, true))
+                      | JsAst.DefValue(name, Call(MethodRef(Method = "template") as template, [PropertyGet(l1, r1, false), PropertyGet as p2])) => 
+                        JsAst.DefValue(name, JsAst.Call(template, [JsAst.FieldRef(l1, r1, true), p2]))
+                      | JsAst.Assign(JsAst.LocalRef(name, _type), r) => JsAst.DefValue(name, r)
+                      | JsAst.Assign(JsAst.FieldRef(_obj, name, _), r) => JsAst.DefValue(name, r)
+                      | JsAst.DefValue => j :> JsAst.DefValue
+                      | _ => assert2(false); null
+                    });
       }
       
       public BuildJsAst(expr : TExpr, shouldReturn : bool) : JsAst

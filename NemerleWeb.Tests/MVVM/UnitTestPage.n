@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Nemerle.Peg;
+using NemerleWeb.Tests.Macro;
+
 namespace NemerleWeb.Tests
 {
   [Page]
@@ -33,6 +36,16 @@ namespace NemerleWeb.Tests
       public static @:>(i : long) : TestCast
       {
         TestCast(i :> int)
+      }
+    }
+    
+    // TODO: 
+    [Unit, AddSomeMembers]
+    class MembersFromMacro
+    {
+      public this()
+      {
+        this._intVariable = 10;
       }
     }
     
@@ -460,6 +473,7 @@ namespace NemerleWeb.Tests
         a[0] == 1
       });
       
+      // TODO: Fix this
       //test("regexp exec 1", () =>
       //{
       //  def res = re("pattern").exec("pattern");
@@ -496,6 +510,29 @@ namespace NemerleWeb.Tests
         def pat = re("something");
         pat.compile("pattern", "i");
         pat.test("PATTERN")
+      });
+      
+      test("string substring 1", () =>
+      {
+        "abc".Substring(0, 1) == "a"
+      });
+      
+      test("string substring 2", () =>
+      {
+        "abc".Substring(2) == "c"
+      });
+      
+      test("list clear", () =>
+      {
+        def l = List([1, 2, 3]);
+        l.Clear();
+        l.Count == 0
+      });
+      
+      test("members from macro", () =>
+      {
+        def m = MembersFromMacro();
+        m.IntVariable == 10
       });
     }
     
