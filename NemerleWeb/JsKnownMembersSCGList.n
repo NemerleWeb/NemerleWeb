@@ -29,27 +29,28 @@ namespace NemerleWeb
     
     private ObjectHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
-        match (parms)
+      match (parms)
+      {
+      | [] =>
+        match (member.Name)
         {
-        | [] =>
-          match (member.Name)
-          {
-          | "get_Count" => Some(JsAst.FieldRef(left, "length", true))
-          | "GetEnumerator" => Some(left.MethodCall(member.Name, parms))
-          | _ => None()
-          }
-        
-        | [_] =>
-          match (member.Name)
-          {
-          | "get_Item" => Some(JsAst.Call(JsAst.Indexer(left), parms))
-          | "Add" => Some(JsAst.Call(JsAst.MethodRef(TypeHelper.PropertyToField(left, false), "push"), parms))
-          | "Remove" => Some(JsAst.Call(JsAst.MethodRef(TypeHelper.PropertyToField(left, false), "remove"), parms))
-          | _ => None()
-          }
-        
+        | "get_Count" => Some(JsAst.FieldRef(left, "length", true))
+        | "Clear" => Some(JsAst.PropertySet(left, "length", JsAst.Literal(JsLiteral.Integer(0))))
+        | "GetEnumerator" => Some(left.MethodCall(member.Name, parms))
         | _ => None()
         }
+        
+      | [_] =>
+        match (member.Name)
+        {
+        | "get_Item" => Some(JsAst.Call(JsAst.Indexer(left), parms))
+        | "Add" => Some(JsAst.Call(JsAst.MethodRef(TypeHelper.PropertyToField(left, false), "push"), parms))
+        | "Remove" => Some(JsAst.Call(JsAst.MethodRef(TypeHelper.PropertyToField(left, false), "remove"), parms))        
+        | _ => None()
+        }
+        
+      | _ => None()
+      }
     }
      
     private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]

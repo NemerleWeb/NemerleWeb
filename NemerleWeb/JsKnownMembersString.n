@@ -87,9 +87,9 @@ namespace NemerleWeb
         | "PadRight"
         | "Remove"
         | "Split"
-        | "StartsWith"
-        | "Substring"
-        | "ToLower"        
+        | "StartsWith" => None()
+        | "Substring" => Some(left.MethodCall("substr", parms))
+        | "ToLower"
         | "ToUpper"
         | "Trim" => None()        
         | "ToString" => Some(JsToString(left))
@@ -113,8 +113,8 @@ namespace NemerleWeb
         | "Remove"
         | "Replace"
         | "Split"
-        | "StartsWith"
-        | "Substring"
+        | "StartsWith" => None()
+        | "Substring" => Some(left.MethodCall("substr", parms))
         | "ToCharArray"
         | _ => None()
         }
