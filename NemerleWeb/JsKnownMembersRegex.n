@@ -28,9 +28,10 @@ namespace NemerleWeb
     {
       match(member.Name)
       {
-      | "compile" => Some(JsAst.Call(JsAst.MethodRef(left, "compile"), []))
-      | "test"    => Some(JsAst.Call(JsAst.MethodRef(left, "test"), parms))
-      | "exec"    => Some(JsAst.Call(JsAst.MethodRef(left, "exec"), parms))
+      | "compile"
+      | "test"    
+      | "exec"    => Some(left.MethodCall(member.Name, parms))
+      | _ => None()
       }
     }
   }

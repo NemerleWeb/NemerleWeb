@@ -23,13 +23,14 @@ namespace NemerleWeb
     public Equals (lit : JsLiteral) : bool
       implements System.IEquatable[JsLiteral].Equals
     {
-      match ((this, lit)) {
-        | (Null, Null) => true
-        | (String (x1), String (x2)) => x1 == x2
-        | (Bool (x1), Bool (x2)) => x1 == x2
-        | (Integer (val), Integer (val')) => val == val'
-        | (Float (val), Float (val')) => val == val'
-        | _ => false
+      match ((this, lit))
+      {
+      | (Null, Null) => true
+      | (String (x1), String (x2)) => x1 == x2
+      | (Bool (x1), Bool (x2)) => x1 == x2
+      | (Integer (val), Integer (val')) => val == val'
+      | (Float (val), Float (val')) => val == val'      
+      | _ => false      
       }
     }
   }

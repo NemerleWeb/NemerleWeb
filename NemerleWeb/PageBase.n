@@ -71,10 +71,10 @@ namespace NemerleWeb
     public clearInterval(_id : int) : void 
     {}
     
-    public re(pattern : string, modifiers : string) : JsRegexp
+    public re(_pattern : string, _modifiers : string) : JsRegexp
     { JsRegexp() }
     
-    public re(pattern : string) : JsRegexp
+    public re(_pattern : string) : JsRegexp
     { JsRegexp() }
   }
 }
