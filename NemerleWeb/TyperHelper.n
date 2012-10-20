@@ -18,44 +18,55 @@ namespace NemerleWeb
         static mutable _index : int = 0;
         
         public GetSplices(expr : PExpr, typer : Typer) : Dictionary[int, string]
-        {            
-            def method = BuildMethod(expr, typer);
-            def oldBody = method.Header.Body;
-            def defs = JsAstBuilder.BuildJsAstForSplices(GetTypedBody(method, typer, typer.CurrentTypeBuilder, false));
-            method.Header.body = oldBody;
-            def tt = GetTypedBody(method, typer, typer.CurrentTypeBuilder);
-            def defs2 = JsAstBuilder.BuildJsAstForSplices(tt);
+        {
+          def method = BuildMethod(expr, typer);
+          def oldBody = method.Header.body;
+          def defs = JsAstBuilder.BuildJsAstForSplices(GetTypedBody(method, typer, typer.CurrentTypeBuilder, false));
+          method.Header.body = oldBody;
+          def tt = GetTypedBody(method, typer, typer.CurrentTypeBuilder);
+          def defs2 = JsAstBuilder.BuildJsAstForSplices(tt);
             
-            defs.Concat(defs2)
-                .SelectMany(j =>
-                  regexp match(j.Name)
-                  {
-                  | <#^_var(?<index : int>\d+)$#> => [(index, j.Val.Write())]
-                  | _ => []
-                  })
-                .GroupBy((i, _) => i)
-                .ToDictionary(g => g.Key, g => g.FirstOrDefault((_, v) => !string.IsNullOrEmpty(v))[1]);
+          defs.Concat(defs2)
+              .SelectMany(j =>
+                regexp match(j.Name)
+                {
+                | <#^_var(?<index : int>\d+)$#> => [(index, j.Val.Write())]
+                | _ => []
+                })
+              .GroupBy((i, _) => i)
+              .ToDictionary(g => g.Key, g => g.FirstOrDefault((_, v) => !string.IsNullOrEmpty(v))[1]);
         }
         
         public GetMethodJsAst(method : IMethod, typer : Typer, tb : TypeBuilder) : JsAst 
-        {   
-            JsAstBuilder.BuildJsAst(GetTypedBody(method, typer, tb), !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor);            
+        {
+          JsAstBuilder.BuildJsAst(GetTypedBody(method, typer, tb), !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor);            
         }
         
         GetTypedBody(method : IMethod, typer : Typer, tb : TypeBuilder, fullTyping : bool = true) : TExpr
         {
-            match(method.Header.Body)
+          // NOTE: Must not use 'Body' property because it checks for FunBody.Parsed
+          match(method.Header.body)
+          {
+          | FunBody.Typed(typedBody) => typedBody
+          | FunBody.Parsed(parsed) =>
+            match(parsed)
             {
-            | FunBody.Typed(typedBody) => typedBody
-            | FunBody.Parsed(parsed) =>
-              match(parsed) {
-              | <[ {} ]>
-              | <[ { base () } ]> => TExpr.Literal(Literal.Void())
-              | _ => 
-                def oldEmitDebug = typer.Manager.Options.EmitDebug;
-                typer.Manager.Options.EmitDebug = false;
-                def mb = method :> MethodBuilder;
-                def methodTyper = Typer(tb, null, mb, mb.Env);
+            | <[ {} ]>
+            | <[ { base () } ]> => TExpr.Literal(Literal.Void())
+            | _ => 
+              def oldEmitDebug = typer.Manager.Options.EmitDebug;
+              typer.Manager.Options.EmitDebug = false;
+              def mb = method :> MethodBuilder;              
+              def env = mb.Env ?? mb.DeclaringType.GlobalEnv;
+              
+              if (env == null)
+              {
+                Message.Error($"Env is null in $mb");
+                TExpr.Error()
+              }
+              else
+              {
+                def methodTyper = Typer(tb, null, mb, env);
                 
                 if(fullTyping)
                   methodTyper.RunFullTyping();
@@ -68,19 +79,19 @@ namespace NemerleWeb
                 typer.Manager.Options.EmitDebug = oldEmitDebug;
                 GetTypedBody(method, typer, tb);
               }
-            | FunBody.Abstract => TExpr.Literal(Literal.Void())
-            | null =>
-              // External method don't have body
-              def mi = method :> LibraryReference.ExternalMethodInfo;
-              
-              Message.Error($"External methods are not implemented: $(mi.GetName())");
-              TExpr.Error();
-              
-            | _ =>
-              assert2(false);
-              Message.Error("Couldn't type body"); 
-              TExpr.Error();
             }
+          | FunBody.Abstract => TExpr.Literal(Literal.Void())
+          | null =>
+            // External method don't have body
+            def mi = method :> LibraryReference.ExternalMethodInfo;
+              
+            Message.Error($"External methods are not implemented: $(mi.GetName())");
+            TExpr.Error();
+          
+          | _ =>
+            Message.Error("Couldn't type body"); 
+            TExpr.Error();
+          }          
         }
         
         BuildMethod(expr : PExpr, typer : Typer) : MethodBuilder

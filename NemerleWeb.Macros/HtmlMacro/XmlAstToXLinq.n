@@ -126,9 +126,9 @@ namespace NemerleWeb
                 | <[ template(_.$model) ]>             => $<#nweb.utils.getTemplateName(self.$model, "View"): self.$model#>
                 | <[ template(_.$model, _.$view) ]>
                 | <[ template(_.$model, _.$view()) ]>  => $<#nweb.utils.getTemplateName(self.$model, "$view"): self.$model#>
-                | <[ template($model) ]> with view = <[ View ]>
-                | <[ template($model, _.$view) ]>
-                | <[ template($model, _.$view()) ]> => 
+                | <[ template($_model) ]> with view = <[ View ]>
+                | <[ template($_model, _.$view) ]>
+                | <[ template($_model, _.$view()) ]> => 
                   def splice = getSplice();
                   def p = regexp match(splice.Replace(System.Environment.NewLine, ""))
                   {
@@ -145,7 +145,7 @@ namespace NemerleWeb
                   | _ => ""
                   };
                   $<#nweb.utils.getTemplateName(self.$model, $p): self.$model#>
-                | <[ template($model, $_r) ]> => 
+                | <[ template($_model, $_r) ]> => 
                   def splice = getSplice();
                   def (p1, p2) = regexp match(splice)
                   {
@@ -221,7 +221,7 @@ namespace NemerleWeb
                           }
             <[ [L.XElement($nameExpr2, 
                   [..$(cont.NToList())].SelectMany(c => c).CombineAttributes().ToArray())]; ]>;            
-        | TagSplice(t, false)               => 
+        | TagSplice(_t, false)               => 
           <[ [L.XAttribute("nw-text", $(getSplice()))] ]>
         | TagSplice(expr, true)             => <[ [NColl.NToArray($(Parse(ToLocation(xmlAst), expr)))] ]>
         | AttrSplice(expr, SpliceType.Expr) as exprAst => <[ ($(Parse(ToLocation(exprAst), expr))) :> XAttribute ]>;

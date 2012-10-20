@@ -86,39 +86,40 @@ namespace NemerleWeb
           ]>);
           tb.Define(<[ decl: server : ServerProxy { get { ServerProxy() } } ]>);
           
-          foreach(member in serverClass.GetMembers()) {
-              | method is IMethod when !method.IsConstructor && method.DeclaringType.FullName == serverClass.FullName => 
-                  def parameters = method.GetParameters().Map(p => <[ $(p.Name : usesite) : $(p.ty : typed) ]>);              
-                  def fparms = parameters.Map(PParameter);
-                  def methodName = ctb.ParsedName.NewName(method.Name);
+          foreach(method is IMethod
+            when !method.IsConstructor && method.DeclaringType.FullName == serverClass.FullName
+            in serverClass.GetMembers())
+          {              
+            def parameters = method.GetParameters().Map(p => <[ $(p.Name : usesite) : $(p.ty : typed) ]>);              
+            def fparms = parameters.Map(PParameter);
+            def methodName = ctb.ParsedName.NewName(method.Name);
                   
-                  when(method.ReturnType.TryRequire(<[ ttype: void ]>))
-                    Message.FatalError("Server methods cannot return void, please return something");
+            when(method.ReturnType.TryRequire(<[ ttype: void ]>))
+              Message.FatalError("Server methods cannot return void, please return something");
                     
-                  ctb.Define(<[ decl: 
-                    public $(methodName : name) (..$fparms) : System.Web.Mvc.ActionResult
-                    {
-                        def result = _server.$(method.Name : dyn)(..$parameters);
-                        def settings = Newtonsoft.Json.JsonSerializerSettings();
-                        settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
-                        Content(Newtonsoft.Json.JsonConvert.SerializeObject(result, settings));
-                    }
-                  ]>);
+            ctb.Define(<[ decl: 
+              public $(methodName : name) (..$fparms) : System.Web.Mvc.ActionResult
+              {
+                  def result = _server.$(method.Name : dyn)(..$parameters);
+                  def settings = Newtonsoft.Json.JsonSerializerSettings();
+                  settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
+                  Content(Newtonsoft.Json.JsonConvert.SerializeObject(result, settings));
+              }
+            ]>);
                   
-                  if (serverMethods.ContainsKey(method.Name))
-                  {
-                    serverMethods[method.Name] += fparms;
-                  }
-                  else
-                    serverMethods.Add(method.Name, fparms);
+            if (serverMethods.ContainsKey(method.Name))
+            {
+              serverMethods[method.Name] += fparms;
+            }
+            else
+              serverMethods.Add(method.Name, fparms);
                   
-                  def fparms = fparms.Append([<[ parameter: _callback : $(method.ReturnType : typed) -> void ]>]);
+            def fparms = fparms.Append([<[ parameter: _callback : $(method.ReturnType : typed) -> void ]>]);
                   
-                  ptb.Define(<[ decl:                   
-                    public $(methodName : name) (..$(fparms)) : void
-                    {}
-                  ]>);
-              | _ => ()
+            ptb.Define(<[ decl:                   
+              public $(methodName : name) (..$(fparms)) : void
+              {}
+            ]>);
           }
           ctb.Define(<[ decl:
               public __SetSignalRConnectionId(id : string) : System.Web.Mvc.ActionResult
@@ -128,18 +129,20 @@ namespace NemerleWeb
               }]>);
           ptb.Compile();
           ctb.Compile();
-      } else {
-        tb.DefineNestedType(<[ decl: public class Server {} ]>).Compile();
       }
+      else
+        tb.DefineNestedType(<[ decl: public class Server {} ]>).Compile();
     
-      def addParams(parms, expr) : PExpr {
-          match(parms) {
-          | head :: tail => 
+      def addParams(parms, expr) : PExpr
+      {
+        match(parms)
+        {
+        | head :: tail => 
           def newExpr = <[ $expr; __constructorParams.Add($(head : dyn)); ]>;
           addParams(tail, newExpr);                
-          | [] => expr
-          }              
-      }          
+        | [] => expr
+        }              
+      }
       
       JsClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
       JsClass.StringType = <[ ttype : System.String ]>;
@@ -148,6 +151,7 @@ namespace NemerleWeb
       def constructor = cl.Constructor;
       def constructorParams = if(constructor != null) constructor.GetParameters().Map(p => p.Name) else [];
       def ctor = constructor :> MethodBuilder;
+      
       ctor.Body = addParams(constructorParams, <[ $(ctor.Body); "js constructor end"; __constructorParams = List(); ]>);
       tb.Define(<[ decl: __constructorParams : List[object] ]>);
       def result = cl.Write();

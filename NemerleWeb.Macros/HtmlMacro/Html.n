@@ -32,11 +32,10 @@ namespace NemerleWeb
       JsClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
       JsClass.StringType = <[ ttype : System.String ]>;
       
-      def expr = mb.Body;
-      
-      match (expr)
+      match (mb.Header.body)
       {
-      | PExpr.Sequence(PExpr.Literal(Literal where(RawString = rs)) as litExpr :: []) =>
+      | FunBody.Parsed(
+          PExpr.Sequence(PExpr.Literal(Literal where(RawString = rs)) as litExpr :: []) as expr) =>
         if (rs.Length == 0 || rs[0] != '<')
           Message.FatalError(expr.Location, "The literal in 'html' macro must be recursive string.")
         else
@@ -68,8 +67,10 @@ namespace NemerleWeb
             Message.FatalError(parser.ToLocation(pos, pos + 1), msg)
           }
         }
-          
-      | _ => Message.FatalError(expr.Location, "You must pass recursive string with XML literal into 'html' macro.")
+      | FunBody.Abstract => 
+        Message.FatalError("Abstract method is not supported")
+      | _ =>
+        Message.FatalError(mb.Header.Location, "You must pass recursive string with XML literal into 'html' macro.")
       }
     }
   }
