@@ -1,0 +1,23 @@
+using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.IO;
+using System.Reflection;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
+
+using Nemerle.Xml;
+using NemerleWeb;
+using NemerleWeb.PegSample;
+
+public module HtmlHelperExtensions
+{
+  public static FileContents(this _helper : HtmlHelper, [NotNull] filename : string) : string
+  { 
+    Helpers.LoadSourceFor(filename);
+  }  
+}

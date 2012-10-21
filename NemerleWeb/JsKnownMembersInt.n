@@ -13,13 +13,13 @@ using System.Linq;
 namespace NemerleWeb
 {
   /// <summary>
-  /// Description of JsKnownMembersConsole.
+  /// Description of JsKnownMembersInt.
   /// </summary>
-  module JsKnownMembersConsole
+  module JsKnownMembersInt
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(Console), Handler); 
+      JsKnownMembers.RegisterType(typeof(int), Handler); 
     }
     
     private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
@@ -34,7 +34,7 @@ namespace NemerleWeb
       | [_] =>
         match (member.Name)
         {
-        | "WriteLine" => Some(JsAst.Call(JsAst.MethodRef(JsAst.LocalRef("console", None()), "log"), parms))
+        | "Parse" => Some(JsAst.Call(JsAst.LocalRef("parseInt", None()), parms))
         | _ => None()
         }
       | _ => None()
