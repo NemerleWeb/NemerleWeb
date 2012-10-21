@@ -20,6 +20,7 @@ namespace NemerleWeb
         {
         | Array(args, _dims)                => JsAst.Array(args.Map(Build))
         | ArrayIndexer(obj, a :: _)         => JsAst.ArrayIndexer(Build(obj), Build(a))
+        | Assign(s, TExpr.DefaultValue())   => JsAst.Assign(Build(s), Build(TExpr.Literal(Literal.Null())))
         | Assign(s, t)                      => JsAst.Assign(Build(s), Build(t))
         | Base                              => Message.Warning(expr.Location, "Base not implemented"); JsAst.NotImpl("Base")
         | Block(body = body)                => Build(body) 
