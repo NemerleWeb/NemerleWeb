@@ -279,7 +279,6 @@ namespace NemerleWeb.Tests
         "123" == string.Concat(1, 2, 3)
       });
       
-      
       test("using", () =>
       {
         using (s = SomeDisposable())
@@ -534,6 +533,34 @@ namespace NemerleWeb.Tests
         def m = MembersFromMacro();
         m.IntVariable == 10
       });
+      
+      test("int Parse", () =>
+      {
+        int.Parse("1020") == 1020
+      });
+      
+      // TODO: Support option
+      //test("option 1", () =>
+      //{
+      //  def x : option[int] = Some(1);
+      //  match(x)
+      //  {
+      //  | Some(d) when d > 10 => false
+      //  | Some(d) => true
+      //  | None => false
+      //  }
+      //});
+      
+      //test("option 2", () =>
+      //{
+      //  def x : option[int] = None();
+      //  match(x)
+      //  {
+      //  | Some(d) when d > 10 => false
+      //  | Some(d) => false
+      //  | None => true
+      //  }
+      //});
     }
     
     [Html]
