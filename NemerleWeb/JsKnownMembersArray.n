@@ -12,6 +12,11 @@ namespace NemerleWeb
 {
   module JsKnownMembersArray
   {    
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(Array), Handler);
+    }
+  
     public Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
       (if (left is JsAst.StaticRef) StaticHandler else ObjectHandler)(left, member, parms)
@@ -43,11 +48,14 @@ namespace NemerleWeb
     {
       match (parms)
       {
-      | _ =>
+      | [arg1, arg2] =>
         match (member.Name)
         {
+        // TODO: Implement real binary search
+        | "BinarySearch" => Some(arg1.MethodCall("indexOf", [arg2]))
         | _ => None()
         }
+      | _ => None()
       }
     }
   }

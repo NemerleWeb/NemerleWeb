@@ -39,7 +39,6 @@ namespace NemerleWeb.Tests
       }
     }
     
-    // TODO: 
     [Unit, AddSomeMembers]
     class MembersFromMacro
     {
@@ -48,6 +47,14 @@ namespace NemerleWeb.Tests
         this._intVariable = 10;
       }
     }
+    
+    //[Unit]
+    //class ClassWithEmptyConstructor
+    //{
+    //  public this()
+    //  {
+    //  }
+    //}
     
     /*
     [Unit]
