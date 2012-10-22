@@ -4,9 +4,11 @@ using SCG = System.Collections.Generic;
 using Nemerle.Assertions;
 using Nemerle.Extensions;
 using Nemerle.Utility;
+using NemerleWeb;
 
 namespace Nemerle.Peg
 {
+  [Unit]
   public class SourceSnapshot
   {
     [Accessor] originalText : string;
@@ -37,7 +39,7 @@ namespace Nemerle.Peg
       newArray
     }
 
-    [Memoize]
+    //[Memoize]
     internal PositionToLineColumn(pos : int) : int * int
     {
       match(Array.BinarySearch(lineIndexes, pos))

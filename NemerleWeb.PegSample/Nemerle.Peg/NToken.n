@@ -1,10 +1,11 @@
 ﻿using Nemerle.Extensions;
 using Nemerle.Utility;
+using NemerleWeb;
 
 namespace Nemerle.Peg
 {
-  [Record, StructuralEquality, StructuralHashCode]
-  public struct NToken : IToken
+  [Record, StructuralEquality, StructuralHashCode, Unit]
+  public class /*struct*/ NToken : IToken
   {
     [Accessor]  private _startPos : int;
     [Accessor]  private _endPos   : int;

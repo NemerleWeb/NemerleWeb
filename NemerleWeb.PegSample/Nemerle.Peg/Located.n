@@ -4,9 +4,11 @@ using SCG = System.Collections.Generic;
 
 using Nemerle.Assertions;
 using Nemerle.Utility;
+using NemerleWeb;
 
 namespace Nemerle.Peg
 {
+  //[Unit]
   public class Located : IToken
   {
     [Accessor(flags = WantSetter)]
@@ -15,7 +17,8 @@ namespace Nemerle.Peg
     public StartPos : int { get { location.StartPos } }
     public EndPos : int { get { location.EndPos } }
 
-    public this() {}
+    // TODO: Restore !
+    //public this() {}
 
     public this(location : Location)
     {

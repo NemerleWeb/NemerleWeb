@@ -8,7 +8,7 @@ using Nemerle.Utility;
 namespace Nemerle.Peg
 {
   [Record]
-  public struct Location
+  public class /*struct*/ Location
   {
     [Accessor]  private _source : SourceSnapshot;
     [Accessor]  private _startPos : int;
