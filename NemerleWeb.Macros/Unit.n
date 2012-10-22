@@ -29,19 +29,19 @@ namespace NemerleWeb
   }
   
   module UnitImpl
-  {       
+  {
     public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);
       
       def baseType = <[ NemerleWeb.PageBase[$(tb.ParsedTypeName)] ]>;
-      when(tb.Ast is TopDeclaration.Class) {
-        def ast = tb.Ast :> TopDeclaration.Class; 
-        ast.t_extends ::=  baseType;
-      } 
-      when(tb.Ast is TopDeclaration.Variant) {
-        def ast = tb.Ast :> TopDeclaration.Variant; 
-        ast.t_extends ::=  baseType;
+      match (tb.Ast)
+      {
+      | ast is TopDeclaration.Class => ast.t_extends ::= baseType;
+      | ast is TopDeclaration.Variant => ast.t_extends ::=  baseType;
+      | _ =>
+        Message.Error($"This type $(tb.Ast) is not supported");
+        assert2(false);
       } 
     }
     
@@ -133,7 +133,7 @@ namespace NemerleWeb
       tb.GetModifiers().AddCustomAttribute(<[ NemerleWeb.UnitAttribute ]>);
         
       tb.Manager.TypeTreeBuildFinish += _ => {
-          def lambdas = tb.DeclaredNestedTypes
+        def lambdas = tb.DeclaredNestedTypes
                           .Where(t => t.Name.StartsWith("_N__N_"))
                           .Select(t => JsClass(t, "  ", typer).Write());
           def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");          

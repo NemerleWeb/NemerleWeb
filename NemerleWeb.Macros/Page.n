@@ -47,13 +47,11 @@ namespace NemerleWeb
         
       def baseType = <[ NemerleWeb.PageBase[$(tb.ParsedTypeName)] ]>;
       
-      when(tb.Ast is TopDeclaration.Class) {
-        def ast = tb.Ast :> TopDeclaration.Class; 
-        ast.t_extends ::=  baseType;
-      } 
-      when(tb.Ast is TopDeclaration.Variant) {
-        def ast = tb.Ast :> TopDeclaration.Variant; 
-        ast.t_extends ::=  baseType;
+      match (tb.Ast)
+      {
+      | ast is TopDeclaration.Class => ast.t_extends ::= baseType;
+      | ast is TopDeclaration.Variant => ast.t_extends ::= baseType;
+      | _ => ()
       }
     }
     
@@ -89,7 +87,7 @@ namespace NemerleWeb
           foreach(method is IMethod
             when !method.IsConstructor && method.DeclaringType.FullName == serverClass.FullName
             in serverClass.GetMembers())
-          {              
+          {
             def parameters = method.GetParameters().Map(p => <[ $(p.Name : usesite) : $(p.ty : typed) ]>);              
             def fparms = parameters.Map(PParameter);
             def methodName = ctb.ParsedName.NewName(method.Name);
@@ -199,10 +197,8 @@ $$(function() {{
     {
       def env = typer.Manager.CoreEnv;
       def controllerName = "NemerleWebResourceController";
-      match(env.LookupType([controllerName])) 
+      when (env.LookupType([controllerName]) is None())
       {
-      | Some => ()
-      | None => 
         env.Define(<[ decl: 
           public class $(controllerName : usesite) : System.Web.Mvc.Controller
           {
