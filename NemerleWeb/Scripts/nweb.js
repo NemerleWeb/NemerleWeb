@@ -644,8 +644,8 @@ Nemerle_Core_option$T$.prototype.Value = function () {
   if (this.IsSome())
     return this.val;
   if (this.IsNone())
-    throw new "Trying to get Value of None option";
-  throw new "Invalid Value call to option";
+    throw "Trying to get Value of None option";
+  throw "Invalid Value call to option";
 };
 Nemerle_Core_Some$T$.prototype.Value = Nemerle_Core_option$T$.prototype.Value;
 Nemerle_Core_None$T$.prototype.Value = Nemerle_Core_option$T$.prototype.Value;
