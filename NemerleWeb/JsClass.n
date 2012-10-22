@@ -289,17 +289,21 @@ $(indent)}#>);
       
       public static GetProperName(type : TypeInfo) : string 
       {          
-        GetProperName(type.FullName).Replace("[", "$").Replace("]", "$")
+        GetProperName(type.FullName)
       }
         
       public static GetProperName(type : Type) : string 
       {
-        GetProperName(type.FullName).Replace("[", "$").Replace("]", "$")
+        GetProperName(type.FullName)
       }
         
       static GetProperName(fullName : string) : string
       {
-        fullName.Replace(".", "_").Replace("+", "_")
+        fullName.Replace(".", "_")
+                .Replace("+", "_")
+                .Replace("[", "_$")
+                .Replace("]", "$_")
+                .Replace(",", "$$")
       }
         
       public static FilterMethods(methods : IEnumerable[IMethod]) : IEnumerable[IMethod]
