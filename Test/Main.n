@@ -26,8 +26,12 @@ public partial class Test
 {
   public this()
   {
-    def a = array[0];
-    def l = a.Length;
+    def a = Some(1) : option[int];
+    def b = match(a) 
+    {
+    | Some(val) => val
+    | None => 0
+    }
   }
   
   [Html]

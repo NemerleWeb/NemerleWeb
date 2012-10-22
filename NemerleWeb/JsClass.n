@@ -289,12 +289,12 @@ $(indent)}#>);
       
       public static GetProperName(type : TypeInfo) : string 
       {          
-        GetProperName(type.FullName)
+        GetProperName(type.FullName).Replace("[", "$").Replace("]", "$")
       }
         
       public static GetProperName(type : Type) : string 
       {
-        GetProperName(type.FullName)
+        GetProperName(type.FullName).Replace("[", "$").Replace("]", "$")
       }
         
       static GetProperName(fullName : string) : string
