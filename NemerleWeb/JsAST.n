@@ -62,7 +62,7 @@ namespace NemerleWeb
             public override Write(_indent = "" : string) : string {
                 match(this) {
                 | Call(OpCode as op, e1 :: e2 :: []) => $"$(e1.Write()) $(op.Write()) $(e2.Write())"
-                | Call(Constructor(type), parms)     => $<#new $(JsClass.GetProperName(type))(..$(parms; ","; e => e.Write("")))#>
+                | Call(Constructor(type), parms)     => $<#new $(type)(..$(parms; ","; e => e.Write("")))#>
                 | Call(Indexer(obj), parms)          => $<#$(obj.Write())[..$(parms; ","; e => e.Write(""))]#>    
                 | Call(op, parms)                    => $<#$(op.Write())(..$(parms; ","; e => e.Write("")))#>    
                 }
@@ -114,7 +114,7 @@ namespace NemerleWeb
                 $"continue $LoopName"
             }
         }
-        | Constructor    { Type : TypeInfo;
+        | Constructor    { Type : string;
             public override Write(_ = "" : string) : string {
                 "/* TODO: implement constructor writer */"
             }

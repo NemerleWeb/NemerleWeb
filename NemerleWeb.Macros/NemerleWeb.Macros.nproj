@@ -105,6 +105,9 @@
     <Compile Include="Js.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JsApi.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Page.n">
       <SubType>Code</SubType>
     </Compile>

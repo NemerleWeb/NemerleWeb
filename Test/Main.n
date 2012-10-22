@@ -26,6 +26,8 @@ public partial class Test
 {
   public this()
   {
+    def a = array[0];
+    def l = a.Length;
   }
   
   [Html]

@@ -106,6 +106,9 @@
     <Compile Include="IgnoreAttribute.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IKnownMembersRegisterable.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="IPage.n">
       <SubType>Code</SubType>
     </Compile>
@@ -122,6 +125,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JsKnownMembers.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JsKnownMembersArray.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JsKnownMembersBase.n">
@@ -157,9 +163,6 @@
     <Compile Include="JsKnownMembersPage.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersRegex.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="JsKnownMembersSCGList.n">
       <SubType>Code</SubType>
     </Compile>
@@ -182,9 +185,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JsLiteral.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="JsRegexp.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UnitAttribute.n">
