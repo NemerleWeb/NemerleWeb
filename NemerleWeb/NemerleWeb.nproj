@@ -106,7 +106,7 @@
     <Compile Include="IgnoreAttribute.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IKnownMembersRegisterable.n">
+    <Compile Include="JsAstAttribute.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IPage.n">
