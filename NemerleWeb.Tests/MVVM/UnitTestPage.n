@@ -573,32 +573,19 @@ namespace NemerleWeb.Tests
         match(a)
         {
         | Some(val) => val == "a"
-        | _ => false;
+        | _ => false
         }
       });
       
-      // TODO: Support option
-      //test("option 1", () =>
-      //{
-      //  def x : option[int] = Some(1);
-      //  match(x)
-      //  {
-      //  | Some(d) when d > 10 => false
-      //  | Some(d) => true
-      //  | None => false
-      //  }
-      //});
-      
-      //test("option 2", () =>
-      //{
-      //  def x : option[int] = None();
-      //  match(x)
-      //  {
-      //  | Some(d) when d > 10 => false
-      //  | Some(d) => false
-      //  | None => true
-      //  }
-      //});
+      test("option 4 with matching", () =>
+      {
+        def a = None() : option[string];
+        match(a)
+        {
+        | Some(_) => false
+        | _ => true
+        }
+      });  
     }
     
     [Html]
