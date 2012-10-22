@@ -555,6 +555,28 @@ namespace NemerleWeb.Tests
         int.Parse("1020") == 1020
       });
       
+      test("option 1", () =>
+      {
+        def a = Some(1);
+        a.HasValue && a.Value == 1
+      });
+      
+      test("option 2", () =>
+      {
+        def a = None();
+        !a.HasValue && a.IsNone
+      });
+      
+      test("option 3 with matching", () =>
+      {
+        def a = Some("a") : option[string];
+        match(a)
+        {
+        | Some(val) => val == "a"
+        | _ => false;
+        }
+      });
+      
       // TODO: Support option
       //test("option 1", () =>
       //{
