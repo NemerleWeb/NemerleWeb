@@ -1,0 +1,54 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  module JsKnownMembersArray
+  {    
+    public Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      (if (left is JsAst.StaticRef) StaticHandler else ObjectHandler)(left, member, parms)
+    }
+    
+    private ObjectHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    { 
+      match (parms)
+      {
+      | [] =>
+        match (member.Name)
+        {
+        | "get_Length" => Some(JsAst.FieldRef(left, "length", true))
+        | "get_LongLength" => Some(JsAst.FieldRef(left, "length", true))
+        | _ => None()
+        }
+        
+      | [_] =>
+        match (member.Name)
+        {    
+        | _ => None()
+        }
+        
+      | _ => None()
+      }
+    }
+     
+    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      match (parms)
+      {
+      | _ =>
+        match (member.Name)
+        {
+        | _ => None()
+        }
+      }
+    }
+  }
+}

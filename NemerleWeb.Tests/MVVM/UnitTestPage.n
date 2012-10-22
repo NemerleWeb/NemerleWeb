@@ -487,30 +487,46 @@ namespace NemerleWeb.Tests
       
       test("regexp test", () =>
       {
-        re("pattern").test("pattern")
+        RegExp("pattern").test("pattern")
       });
       
       test("regexp compile 1", () =>
       {
-        def pat = re("pattern");
+        def pat = RegExp("pattern");
         pat.compile();
         pat.test("pattern")
       });
       
       test("regexp compile 2", () =>
       {
-        def pat = re("something");
+        def pat = RegExp("something");
         pat.compile("pattern");
         pat.test("pattern")
       });
       
       test("regexp compile 3", () =>
       {
-        def pat = re("something");
+        def pat = RegExp("something");
         pat.compile("pattern", "i");
         pat.test("PATTERN")
       });
       
+      test("regexp exec 1", () =>
+      {
+        def pat = RegExp(".+");        
+        def result = pat.exec("hello world");
+        result.Length == 1 && result[0] == "hello world"
+      });
+      
+      test("regexp exec 2", () =>
+      {
+        def pat = RegExp(".+(el{2}).+");        
+        def result = pat.exec("hello world");
+        result.Length == 2 
+        && result[0] == "hello world"
+        && result[1] == "ell"
+      });
+            
       test("string substring 1", () =>
       {
         "abc".Substring(0, 1) == "a"
@@ -603,5 +619,27 @@ namespace NemerleWeb.Tests
       
       public D : bool = true;
     }
+  }
+  
+  [JsApi]
+  public class RegExp
+  {
+    public this(_pattern : string) 
+    {}
+      
+    public compile() : void
+    {}
+    
+    public compile(_pattern : string) : void
+    {}
+    
+    public compile(_pattern : string, _modifier : string) : void
+    {}
+    
+    public exec(_input : string) : array[string]
+    {[].ToArray()}
+    
+    public test(_input : string) : bool
+    {false}
   }
 }

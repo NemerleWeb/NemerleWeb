@@ -49,7 +49,7 @@ namespace NemerleWeb
     }
   }
   
-  module JsKnownMembers
+  public module JsKnownMembers
   {
     static this()
     {
@@ -72,13 +72,12 @@ namespace NemerleWeb
       JsKnownMembersNemerleNCollectionsExtensions.Register();
       JsKnownMembersEventsDSL.Register();
       JsKnownMembersPage.Register();
-      JsKnownMembersRegex.Register();
       
       JsKnownMembersInt.Register();
     }
     
     public Convert([NotNull] call : TExpr.Call, [NotNull] builder : TExpr -> JsAst) : JsAst
-    {
+    {      
       match (call)
       {
         | Call(MethodRef(obj = Call(MethodRef(meth = serverMeth, obj = obj), _, _), meth = meth), parms, _)
@@ -100,10 +99,12 @@ namespace NemerleWeb
           | _ => Message.FatalError("Invalid GetTemplateName call, use 'name' macro")
           }
         | Call(MethodRef(obj = o, meth = meth), parms, _) =>
-          ConvertMethod(o.Type.TypeInfo, builder(o), meth, parms.Map(p => builder(p.expr)))
+          if(o.Type.TypeInfo != null)
+            ConvertMethod(o.Type.TypeInfo, builder(o), meth, parms.Map(p => builder(p.expr)));
+          else
+            ConvertFixedTypeMethod(o.Type.FixedValue, builder(o), meth, parms.Map(p => builder(p.expr)))
         | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) =>
             ConvertMethod(fromType.TypeInfo, builder(left), meth, parms.Map(p => builder(p.expr)))
-                
         | Call(OpCode as op, parms, _) => JsAst.Call(builder(op), parms.Map(p => builder(p.expr)))
         | Call(Base, _, _)
         | Call(Delayed, _, _) => JsAst.Void()
@@ -159,14 +160,37 @@ namespace NemerleWeb
           when (_convertBaseTypeHandlers.TryGetValue(subType.SystemType.FullName, out typeHandler))
             when (typeHandler(left, member, parms) is Some(ast))
               return ast;
+            
+      when(type != null && type.IsCustomAttributeDefined("NemerleWeb.JsAstAttribute")) {
+        if(member.IsConstructor)
+          return JsAst.Call(JsAst.Constructor(type.Name), parms);
+        else if (left is JsAst.StaticRef)
+          return JsAst.Call(JsAst.StaticRef(type.Name, memberName), parms);        
+        else
+          return JsAst.Call(JsAst.MethodRef(left, memberName), parms);
+      }
               
       // Nothing found, try default dictionary
       when (_convertDefaultMemberHandlers.TryGetValue(memberName, out memberHandler))
         when (memberHandler(type, left, parms) is Some(ast))
           return ast;
-      
+          
       // Process low level naming
       DefaultConvertMethod(type, left, member, parms)
+    }
+    
+    private ConvertFixedTypeMethod(type : FixedType, left : JsAst, member : IMember, parms : list[JsAst]) : JsAst
+    {
+      match(type)
+      {
+      | FixedType.Array => 
+        match(JsKnownMembersArray.Handler(left, member, parms))
+        {
+        | Some(ast) => ast
+        | None => JsAst.NotImpl(member.Name)
+        }        
+      | _ => JsAst.Call(JsAst.MethodRef(left, member.Name), parms)
+      }
     }
     
     private DefaultConvertMethod(type : TypeInfo, left : JsAst, member : IMember, parms : list[JsAst]) : JsAst
