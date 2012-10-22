@@ -124,6 +124,9 @@
     <Compile Include="JsKnownMembers.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JsKnownMembersArray.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JsKnownMembersBase.n">
       <SubType>Code</SubType>
     </Compile>
