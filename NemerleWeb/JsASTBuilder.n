@@ -47,7 +47,8 @@ namespace NemerleWeb
         | ImplicitValueTypeCtor             => Message.Warning(expr.Location, "ImplicitValueTypeCtor not implemented"); JsAst.NotImpl("ImplicintValueTypeCtor")
         | Label(id, body)                   => JsAst.Label(id, Build(body))
         | Literal(val)                      => 
-            match(val) {                
+            match(val)
+            {
             | Null          => JsAst.Literal(JsLiteral.Null())
             | String (val)  => JsAst.Literal(JsLiteral.String(val))
             | Float (val)   => JsAst.Literal(JsLiteral.Float(val))
@@ -56,11 +57,20 @@ namespace NemerleWeb
             | Char (val)    => JsAst.Literal(JsLiteral.String(val.ToString()))
             | Bool (val)    => JsAst.Literal(JsLiteral.Bool(val))
             | Integer (val, isneg, _) => JsAst.Literal(JsLiteral.Integer((val :> int) * (if(isneg) -1 else 1)))
-            | Enum => 
-                Message.Error("Enums currently not supported");
+            | Enum (val, _, _) => 
+              if (val.val < int.MaxValue :> ulong)
+              {
+                JsAst.Literal(JsLiteral.Integer(val.val :> int))
+              }  
+              else
+              {
+                Message.Error("Enums 64bit are not supported");
                 JsAst.NotImpl();
-            | Void          => JsAst.Void()
-            | _ => Message.Error("Unmatched literal"); JsAst.NotImpl();
+              }
+            | Void => JsAst.Void()
+            | _ =>
+              Message.Error($"Unmatched literal $expr");
+              JsAst.NotImpl();
             }
         | LocalFunRef                       => Message.Warning(expr.Location, "LocalFunRef not implemented"); JsAst.NotImpl("LocalFunRef")
         | LocalRef(decl)                    => JsAst.LocalRef(decl.Name, if(decl.Type.TypeInfo != null) Some(decl.Type) else None())

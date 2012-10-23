@@ -107,6 +107,19 @@ namespace NemerleWeb.Tests
       }
     }
     */
+    
+    enum SampleEnum
+    {
+    | A = 1
+    | B = 2
+    }
+    
+    enum SampleEnumWithType : byte
+    {
+    | A = 1
+    | B = 2
+    }
+    
     public this()
     {
       def test(description, res)
@@ -658,6 +671,18 @@ namespace NemerleWeb.Tests
       test("math 2", () =>
       {
         Math.Max(1, 2) == 2
+      });
+      
+      test("enum 1", () =>
+      {
+        def x = SampleEnum.B;
+        x == SampleEnum.B
+      });
+      
+      test("enum 2", () =>
+      {
+        def x = SampleEnumWithType.A;
+        x == SampleEnumWithType.A
       });
     }
     
