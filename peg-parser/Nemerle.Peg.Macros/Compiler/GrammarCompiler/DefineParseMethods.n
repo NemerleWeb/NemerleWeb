@@ -38,41 +38,44 @@ namespace Nemerle.Peg
         }
       ]>);
 
-       PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
-        public TryParse(text : string) : int * $tyParam
-        {
-          TryParse(Nemerle.Peg.SourceSnapshot(text))
-        }
-      ]>);
+      // TODO: Restore
+      // PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
+      //  public TryParse(text : string) : int * $tyParam
+      //  {
+      //    // TODO: Restore
+      //    //TryParse(Nemerle.Peg.SourceSnapshot(text))
+      //    TryParse(Nemerle.Peg.SourceSnapshot(text, text, 0, "", Nemerle.Peg.SourceSnapshot.MakeLineIndexes(text)))
+      //  }
+      //]>);
 
-      if (_typer.Manager.IsIntelliSenseMode)
-      {
-        PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
-          public TryParse(/*[Nemerle.Assertions.NotNull]*/ source : Nemerle.Peg.SourceSnapshot) : int * $tyParam
-          {
-            _parsingSource = source;
-            mutable result;
-            result;
-          }
-        ]>);
-      }
-      else
-      {
-           PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
-          public TryParse(/*[Nemerle.Assertions.NotNull]*/ source : Nemerle.Peg.SourceSnapshot) : int * $tyParam
-          {
-            ResetMemoization();
-            ResetMaxRollbackPos();
+      //if (_typer.Manager.IsIntelliSenseMode)
+      //{
+      //  PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
+      //    public TryParse(/*[Nemerle.Assertions.NotNull]*/ source : Nemerle.Peg.SourceSnapshot) : int * $tyParam
+      //    {
+      //      _parsingSource = source;
+      //      mutable result;
+      //      result;
+      //    }
+      //  ]>);
+      //}
+      //else
+      //{
+      //     PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
+      //    public TryParse(/*[Nemerle.Assertions.NotNull]*/ source : Nemerle.Peg.SourceSnapshot) : int * $tyParam
+      //    {
+      //      ResetMemoization();
+      //      ResetMaxRollbackPos();
 
-            _parsingSource = source;
+      //      _parsingSource = source;
 
-            mutable result;
-            def pos = $(DecorateRuleName(TypedGrammar.StartRuleName.Id) : dyn)(0, _parsingSource.Text, ref result);
+      //      mutable result;
+      //      def pos = $(DecorateRuleName(TypedGrammar.StartRuleName.Id) : dyn)(0, _parsingSource.Text, ref result);
 
-            (pos, result)
-          }
-        ]>);
-      }
+      //      (pos, result)
+      //    }
+      //  ]>);
+      //}
     }
   }
 }
