@@ -4,6 +4,7 @@ using SCG = System.Collections.Generic;
 
 using Nemerle.Assertions;
 using Nemerle.Utility;
+using Nemerle.Imperative;
 using NemerleWeb;
 
 namespace Nemerle.Peg
@@ -25,19 +26,34 @@ namespace Nemerle.Peg
       this.location = location;
     }
     
-    static _posAndLenRx : Regex = Regex(@"\[(\d+):(\d+)]", RegexOptions.Compiled);
+    // TODO: Restore
+    //static _posAndLenRx : Regex = Regex(@"\[(\d+):(\d+)]", RegexOptions.Compiled);
     
     public static ExtractPosAndLen(msg : string) : int * int
     {
-      def m = _posAndLenRx.Match(msg);
-      
-      if (m.Success)
-      {
-        def errorPos = int.Parse(m.Groups[1].Value);
-        def errorLen = int.Parse(m.Groups[2].Value);
+      // Hand parsing
+      if (msg.Length >= 5 &&
+        msg[0] == '[' && msg[msg.Length - 1] == ']' &&
+        msg.Contains(":"))
+       {   
+        def errorPos = int.Parse(msg.Substring(1));
+        def errorLen = int.Parse(msg.Substring(msg.IndexOf(':') + 1));
+        
         (errorPos, errorLen)
       }
-      else (-1, -1)
+      else
+        (-1, -1)
+      
+      // TODO: Restore
+      //def m = _posAndLenRx.Match(msg);
+      
+      //if (m.Success)
+      //{
+      //  def errorPos = int.Parse(m.Groups[1].Value);
+      //  def errorLen = int.Parse(m.Groups[2].Value);
+      //  (errorPos, errorLen)
+      //}
+      //else (-1, -1)
     }
     
     protected BuildMessage(msg : string) : string

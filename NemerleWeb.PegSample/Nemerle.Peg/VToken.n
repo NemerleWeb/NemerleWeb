@@ -1,16 +1,36 @@
 ﻿using Nemerle.Extensions;
 using Nemerle.Utility;
 using NemerleWeb;
+using Nemerle.DesignPatterns;
 
 namespace Nemerle.Peg
 {
   public type VList[TValue] = VToken[list[TValue]];
 
-  [Record]
-  // TODO: #33 [Unit]
-  public class VToken[TValue] : Located
+  //[Record]
+  // TODO: #33 
+  [Unit]
+  public class VToken[TValue] :  /*Located*/ IToken
   {
     [Accessor] value : TValue;
+    
+    [ProxyPublicMembers(Exclude =
+      [
+        template,
+        GetTemplateName,
+        setTimeout,
+        clearTimeout,
+        setInterval,
+        clearInterval
+      ])]
+    _located : Located;
+    
+    // TODO: Remove
+    public this(location : Location, value : TValue)
+    {
+      _located = Located(location);
+      this.value = value;
+    }
 
     public static @:(x : VToken[TValue]) : TValue
     {

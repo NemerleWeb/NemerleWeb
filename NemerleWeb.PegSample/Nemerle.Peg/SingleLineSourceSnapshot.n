@@ -5,16 +5,34 @@ using Nemerle.Assertions;
 using Nemerle.Collections;
 using Nemerle.Utility;
 using NemerleWeb;
+using Nemerle.DesignPatterns;
 
 namespace Nemerle.Peg
 {
   // TODO: #33
-  // [Unit]
-  public class SingleLineSourceSnapshot : SourceSnapshot
+  [Unit]
+  public class SingleLineSourceSnapshot : /*SourceSnapshot*/ ISourceSnapshot
   {
+    [ProxyPublicMembers(Exclude =
+      [
+        ToString,
+        template,
+        GetTemplateName,
+        setTimeout,
+        clearTimeout,
+        setInterval,
+        clearInterval
+      ])]
+    _sourceSnapshot : SourceSnapshot;
+    
     public this([NotNull] text : string, fileIndex : int = 0, fileName : string = "")
     {
-      base(text, text, fileIndex, fileName, array[ text.Length ]);
+      _sourceSnapshot = SourceSnapshot(text, text, fileIndex, fileName, array[ text.Length ]);
+    }
+    
+    public override ToString() : string
+    {
+      _sourceSnapshot.ToString();
     }
   }
 }
