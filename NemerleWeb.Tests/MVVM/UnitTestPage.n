@@ -49,11 +49,11 @@ namespace NemerleWeb.Tests
     }
     
     // TODO: #34
-    [Unit]
-    class SimpleGenericClass[T]
-    {
-      public F() : bool { true }
-    }
+    //[Unit]
+    //class SimpleGenericClass[T]
+    //{
+    //  public F() : bool { true }
+    //}
     
     // TODO: #38
     //[Unit]
