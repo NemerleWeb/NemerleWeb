@@ -1,0 +1,63 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  module JsKnownMembersMath
+  {    
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(Math), Handler);
+    }
+  
+    public Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      (if (left is JsAst.StaticRef) StaticHandler else ObjectHandler)(left, member, parms)
+    }
+    
+    private ObjectHandler(_left : JsAst, _member : IMember, _parms : list[JsAst]) : option[JsAst]
+    { 
+      None()
+    }
+     
+    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      match (parms)
+      {
+      | [_] =>
+        match (member.Name)
+        {
+        | "Abs"
+        | "Acos"
+        | "Asin"
+        | "Atan" => Some("Math".StaticCall(member.Name, parms))
+        | "Ceiling" => Some("Math".StaticCall("ceil", parms))
+        | "Cos"
+        | "Exp"
+        | "Log"
+        | "Round"
+        | "Sin"
+        | "Sqrt"
+        | "Tan" => Some("Math".StaticCall(member.Name, parms))
+        | _ => None()
+        }
+      | [_, _] =>
+        match (member.Name)
+        {
+        | "Max"
+        | "Min"
+        | "Pow" => Some("Math".StaticCall(member.Name, parms))
+        | _ => None()
+        }
+      | _ => None()
+      }
+    }
+  }
+}
