@@ -4,10 +4,11 @@ using SCG = System.Collections.Generic;
 using Nemerle.Assertions;
 using Nemerle.Extensions;
 using Nemerle.Utility;
+using NemerleWeb;
 
 namespace Nemerle.Peg
 {
-  [Record]
+  [Record, Unit]
   public class /*struct*/ Location
   {
     [Accessor]  private _source : SourceSnapshot;
