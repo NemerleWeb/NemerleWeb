@@ -4,6 +4,7 @@ using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
 using Nemerle.Text;
 using Nemerle.Utility;
+using Nemerle.Assertions;
 
 using System;
 using System.Web;
@@ -34,19 +35,21 @@ namespace NemerleWeb
     PageImpl.DoTransform(tb, Macros.ImplicitCTX())
   }
   
-  module PageImpl
+  public module PageImpl
   {    
     public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);
+      
+      AddPageBaseMethods(tb, typer);
+      
       def vmInterface = <[ ttype: NemerleWeb.IPage ]>;
       def superTypes = tb.GetDirectSuperTypes();
       
       unless (superTypes != null && superTypes.Exists(t => t.Equals(vmInterface)))
         tb.AddImplementedInterface(<[ NemerleWeb.IPage ]>);
-        
-      def baseType = <[ NemerleWeb.PageBase[$(tb.ParsedTypeName)] ]>;
-      
+             
+      def baseType = <[ NemerleWeb.Page ]>;      
       match (tb.Ast)
       {
       | ast is TopDeclaration.Class => ast.t_extends ::= baseType;
@@ -158,15 +161,25 @@ namespace NemerleWeb
 $$(function() {{ 
   nweb.go(new $(JsClass.GetProperName(tb))({0}));
 }});#>;
+      def signalRStuff = 
+        if(serverClass != null)
+          <[ 
+            def signalRScript = match(typeof(Server).GetMethod("GetSignalRScript")) {
+            | x when x != null => x.Invoke(null, array[]).ToString()
+            | _ => ""
+            };
+            _ = sb.AppendLine(($result).Replace("{{{SignalR}}}", signalRScript));
+          ]>;
+        else
+         <[
+          sb.AppendLine(($result).Replace("{{{SignalR}}}", ""))
+         ]>;
+      
       _ = tb.DefineWithSource(<[ decl:
         public GetPageScript() : string
-        {
-          def signalRScript = match(typeof(Server).GetMethod("GetSignalRScript")) {
-          | x when x != null => x.Invoke(null, array[]).ToString()
-          | _ => ""
-          };
+        {          
           def sb = System.Text.StringBuilder();
-          _ = sb.AppendLine(($result).Replace("{{{SignalR}}}", signalRScript));
+          $(signalRStuff);
           def paramList = __constructorParams.Map(obj => "nweb.utils.toTypedObject(" + Utils.ToJson(obj) + ")");
           _ = sb.AppendLine(string.Format($applyBindings, $"..$(paramList)"));
           sb.ToString()
@@ -222,6 +235,33 @@ $$(function() {{
           }
         ]>).Compile();  
       }      
+    }
+    
+    public AddPageBaseMethods(tb : TypeBuilder, typer : Typer) : void
+    {                
+      Macros.DefineCTX(typer);
+      def T = 
+        if(tb.ParsedDeclaration.DeclaredTypeParametersCount == 0)
+          <[ $(tb.ParsedName : name) ]>
+        else 
+        {
+          def tparms = tb.ParsedDeclaration.DeclaredTypeParameters;
+          def tparms = tparms.tyvars.Map(t => <[ $(tb.ParsedName.NewName(t.ToString()) : name) ]>);
+          <[ $(tb.ParsedName : name).[..$tparms] ]>;
+        }
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : Func[$(T), TM]) : string { "" }]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : $(T) -> TM, _view : string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : $(T) -> TM, _view : TM -> void -> string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : $(T) -> TM, _view : TM -> string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM, _view : string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM, _view : TM -> string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM, _view : TM -> void -> string) : string { "" }]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public GetTemplateName([NotNull] _modelName : string, [NotNull] _viewName : string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public setTimeout(_callback : void -> void, _timeoutMilliseconds : int) : int { 0 } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public clearTimeout(_id : int) : void {} ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public setInterval(_callback : void -> void, _timeoutMilliseconds : int) : int { 0 } ]> );
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public clearInterval(_id : int) : void {} ]>);
     }
   }
 }

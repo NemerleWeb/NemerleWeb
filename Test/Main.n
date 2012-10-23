@@ -15,23 +15,17 @@ module Program
 {
   Main() : void
   {
-      def result = Utils.MakePageHtml(Test());      
-      Console.WriteLine(result);
+      def result = Utils.MakePageHtml(Test.[string]());      
+      Console.WriteLine(result);    
       _ = Console.ReadKey();
   }
 }
 
 [Page]
-public partial class Test
+public class Test[T]
 {
   public this()
   {
-    def a = Some(1) : option[int];
-    def b = match(a) 
-    {
-    | Some(val) => val
-    | None => 0
-    }
   }
   
   [Html]
@@ -40,5 +34,10 @@ public partial class Test
     <#
       <div></div>
     #>
+  }
+  
+  [Unit]
+  public class Test2[TB]
+  {
   }
 }

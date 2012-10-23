@@ -50,9 +50,8 @@ namespace NemerleWeb
         def modelLambdas = string.Join(Environment.NewLine, models.Select(t => GetModelLambdas(t)));
         def modelScripts = string.Join(Environment.NewLine, models.Select(t => GetModelScript(t)));
         
-        def viewHTml = GetHtml(page.__View());
-        
-      
+        def viewHTml = GetHtml(InvokeStaticMethod("__View", page.GetType()) :> list[XElement]);
+              
         def script = $<#
 $modelTemplates
 <script type='text/javascript'>
@@ -67,27 +66,27 @@ $modelTemplates
     }
     
     GetModelScript(type : Type) : string
-    {
-      type.GetMethod("GetModelScript", BindingFlags.Static | BindingFlags.Public).Invoke(null, array[]) :> string;        
+    { 
+      InvokeStaticMethod("GetModelScript", type) :> string
     }
     
     GetModelTemplates(type : Type) : string
     {
       if(!type.IsAbstract)
-      {
-        def model = FormatterServices.GetUninitializedObject(type);
+      {        
         string.Join(Environment.NewLine, 
-                    type.GetMethods()
+                    type.GetMethods(BindingFlags.Static | BindingFlags.Public)
                         .Where(m => m.Name.StartsWith("__"))
-                        .Select(m => CreateTemplate(GetHtml(m.Invoke(model, array[]) :> list[XElement]), JsClass.GetProperName(m.DeclaringType) + m.Name)))
+                        .Select(m => CreateTemplate(GetHtml(InvokeStaticMethod(m.Name, type) :> list[XElement]), 
+                                                    JsClass.GetProperName(m.DeclaringType) + m.Name)))
       }
       else
         ""
     }
     
     GetModelLambdas(type : Type) : string
-    {
-        type.GetMethod("GetLambdaScript", BindingFlags.Static | BindingFlags.Public).Invoke(null, array[]) :> string;        
+    {      
+      InvokeStaticMethod("GetLambdaScript", type) :> string;
     }
     
     CreateTemplate(html : string, name : string) : string
@@ -109,6 +108,16 @@ $modelTemplates
         xs.Iter(x => x.WriteTo(writer));
         HttpUtility.HtmlDecode(str.ToString());
       }
+    }
+    
+    InvokeStaticMethod(method : string, type : Type) : object
+    {
+      def type' = if(type.ContainsGenericParameters) {
+        type.MakeGenericType(type.GetGenericArguments().MapToArray(_ => typeof(object)))
+      } else {
+        type
+      }      
+      type'.GetMethod(method, BindingFlags.Static | BindingFlags.Public).Invoke(null, array[]);        
     }
   }
 }

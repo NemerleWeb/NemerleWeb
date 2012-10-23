@@ -17,7 +17,7 @@ namespace NemerleWeb
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterBaseType(typeof(NemerleWeb.PageBase[_]), Handler);      
+      //JsKnownMembers.RegisterBaseType(typeof(NemerleWeb.PageBase[_]), Handler);      
     }
     
     private Handler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
