@@ -48,7 +48,6 @@ namespace NemerleWeb.Tests
       }
     }
     
-    // TODO: #34
     [Unit]
     class SimpleGenericClass[T]
     {
@@ -633,12 +632,11 @@ namespace NemerleWeb.Tests
         }
       });
       
-      // TODO: #34
-      //test("simple generic class", () =>
-      //{
-      //  def x = SimpleGenericClass.[int]();
-      //  x.F();
-      //});
+      test("simple generic class", () =>
+      {
+        def x = SimpleGenericClass.[int]();
+        x.F();
+      });
       
       // TODO: #38
       //test("generic class", () =>
