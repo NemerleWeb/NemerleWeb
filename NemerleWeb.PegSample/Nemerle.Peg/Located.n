@@ -8,7 +8,7 @@ using NemerleWeb;
 
 namespace Nemerle.Peg
 {
-  //[Unit]
+  [Unit]
   public class Located : IToken
   {
     [Accessor(flags = WantSetter)]
@@ -17,7 +17,7 @@ namespace Nemerle.Peg
     public StartPos : int { get { location.StartPos } }
     public EndPos : int { get { location.EndPos } }
 
-    // TODO: Restore !
+    // TODO: #37 Restore !
     //public this() {}
 
     public this(location : Location)
