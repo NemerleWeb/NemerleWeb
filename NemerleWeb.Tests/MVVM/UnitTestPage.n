@@ -48,13 +48,52 @@ namespace NemerleWeb.Tests
       }
     }
     
+    // TODO: #34
+    [Unit]
+    class SimpleGenericClass[T]
+    {
+      public F() : bool { true }
+    }
+    
+    // TODO: #38
     //[Unit]
-    //class ClassWithEmptyConstructor
+    //class GenericClass
     //{
-    //  public this()
-    //  {
-    //  }
+    //  public F() : bool { true }
+      
+    //  public G[U]() : bool { true }
     //}
+    
+    //[Unit]
+    //class GenericClass[T] 
+    //{
+    //  public F() : bool { true }
+      
+    //  public G[U]() : bool { true }
+    //}
+    
+    //[Unit]
+    //class GenericClass[T1, T2] 
+    //{
+    //  public F() : bool { true }
+      
+    //  public G[U]() : bool { true }
+    //}
+    
+    [Unit]
+    class BaseClass {}
+    
+    // TODO: #33
+    //[Unit]
+    class DerivedClass : BaseClass {}
+    
+    [Unit]
+    class ClassWithConstructors
+    {
+      public this() { }
+      // TODO: #37  
+      //public this(_ : int) { }
+    }
     
     /*
     [Unit]
@@ -592,7 +631,26 @@ namespace NemerleWeb.Tests
         | Some(_) => false
         | _ => true
         }
-      });  
+      });
+      
+      // TODO: #34
+      //test("simple generic class", () =>
+      //{
+      //  def x = SimpleGenericClass.[int]();
+      //  x.F();
+      //});
+      
+      // TODO: #38
+      //test("generic class", () =>
+      //{
+      //  def g1 = GenericClass();
+      //  def g2 = GenericClass.[int]();
+      //  def g3 = GenericClass.[int, double]();
+        
+      //  g1.F() && g1.G.[int]() &&
+      //  g2.F() && g2.G.[int]() &&
+      //  g3.F() && g3.G.[int]();
+      //});
     }
     
     [Html]
