@@ -75,6 +75,8 @@ namespace NemerleWeb
       
       JsKnownMembersInt.Register();
       JsKnownMembersArray.Register();
+      
+      JsKnownMembersMath.Register();
     }
     
     public Convert([NotNull] call : TExpr.Call, [NotNull] builder : TExpr -> JsAst) : JsAst
