@@ -211,7 +211,7 @@ namespace NemerleWeb
       | [h] when member.Name.StartsWith("set_") =>
         JsAst.PropertySet(left, propertyName, h)
       | _ => 
-        when(type?.BaseType?.FullName != "NemerleWeb.PageBase" &&
+        when(!(type == null || type.SystemType == null || type.SystemType.IsAssignableFrom(typeof(IPage))) &&
              !(type == null && member.Name == "apply"))
           Message.Error(
             member.Location,

@@ -596,56 +596,56 @@ if (!Array.prototype.indexOf) {
 }
 
 // TODO: Maybe move
-var Nemerle_Utility_Identity = {
+var Nemerle_Utility_Identity_$A$$B$_ = {
     Instance: function (x) {
         return x;
     }
 };
 
 
-function Nemerle_Core_Some_$T$_(val) {
+function Nemerle_Core_Some_$T$__$T$_(val) {
   this.val = val;
   this._N_GetVariantCode = function () {
     return 1;
   };
 }
 
-function Nemerle_Core_None_$T$_() {
+function Nemerle_Core_None_$T$__$T$_() {
   this._N_GetVariantCode = function () {
     return 0;
   };
 }
 
-Nemerle_Core_None_$T$_._N_constant_object = new Nemerle_Core_None_$T$_();
+Nemerle_Core_None_$T$__$T$_._N_constant_object = new Nemerle_Core_None_$T$__$T$_();
 
-function Nemerle_Core_option_$T$_(val) {
+function Nemerle_Core_option_$T$__$T$_(val) {
   this.val = val;
 }
 
-Nemerle_Core_option_$T$_.prototype.HasValue = function() {
-  return this.constructor == Nemerle_Core_Some_$T$_;
+Nemerle_Core_option_$T$__$T$_.prototype.HasValue = function () {
+  return this.constructor == Nemerle_Core_Some_$T$__$T$_;
 };
-Nemerle_Core_Some_$T$_.prototype.HasValue = Nemerle_Core_option_$T$_.prototype.HasValue;
-Nemerle_Core_None_$T$_.prototype.HasValue = Nemerle_Core_option_$T$_.prototype.HasValue;
+Nemerle_Core_Some_$T$__$T$_.prototype.HasValue = Nemerle_Core_option_$T$__$T$_.prototype.HasValue;
+Nemerle_Core_None_$T$__$T$_.prototype.HasValue = Nemerle_Core_option_$T$__$T$_.prototype.HasValue;
 
-Nemerle_Core_option_$T$_.prototype.IsSome = function () {
-  return this.constructor == Nemerle_Core_Some_$T$_;
+Nemerle_Core_option_$T$__$T$_.prototype.IsSome = function () {
+  return this.constructor == Nemerle_Core_Some_$T$__$T$_;
 };
-Nemerle_Core_Some_$T$_.prototype.IsSome = Nemerle_Core_option_$T$_.prototype.IsSome;
-Nemerle_Core_None_$T$_.prototype.IsSome = Nemerle_Core_option_$T$_.prototype.IsSome;
+Nemerle_Core_Some_$T$__$T$_.prototype.IsSome = Nemerle_Core_option_$T$__$T$_.prototype.IsSome;
+Nemerle_Core_None_$T$__$T$_.prototype.IsSome = Nemerle_Core_option_$T$__$T$_.prototype.IsSome;
 
-Nemerle_Core_option_$T$_.prototype.IsNone = function () {
-  return this == Nemerle_Core_None_$T$_._N_constant_object;
+Nemerle_Core_option_$T$__$T$_.prototype.IsNone = function () {
+  return this == Nemerle_Core_None_$T$__$T$_._N_constant_object;
 };
-Nemerle_Core_Some_$T$_.prototype.IsNone = Nemerle_Core_option_$T$_.prototype.IsNone;
-Nemerle_Core_None_$T$_.prototype.IsNone = Nemerle_Core_option_$T$_.prototype.IsNone;
+Nemerle_Core_Some_$T$__$T$_.prototype.IsNone = Nemerle_Core_option_$T$__$T$_.prototype.IsNone;
+Nemerle_Core_None_$T$__$T$_.prototype.IsNone = Nemerle_Core_option_$T$__$T$_.prototype.IsNone;
 
-Nemerle_Core_option_$T$_.prototype.Value = function () {
+Nemerle_Core_option_$T$__$T$_.prototype.Value = function () {
   if (this.IsSome())
     return this.val;
   if (this.IsNone())
     throw "Trying to get Value of None option";
   throw "Invalid Value call to option";
 };
-Nemerle_Core_Some_$T$_.prototype.Value = Nemerle_Core_option_$T$_.prototype.Value;
-Nemerle_Core_None_$T$_.prototype.Value = Nemerle_Core_option_$T$_.prototype.Value;
+Nemerle_Core_Some_$T$__$T$_.prototype.Value = Nemerle_Core_option_$T$__$T$_.prototype.Value;
+Nemerle_Core_None_$T$__$T$_.prototype.Value = Nemerle_Core_option_$T$__$T$_.prototype.Value;

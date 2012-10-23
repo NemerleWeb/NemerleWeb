@@ -34,7 +34,9 @@ namespace NemerleWeb
     {
       Macros.DefineCTX(typer);
       
-      def baseType = <[ NemerleWeb.PageBase[$(tb.ParsedTypeName)] ]>;
+      PageImpl.AddPageBaseMethods(tb, typer);
+      
+      def baseType = <[ NemerleWeb.Page ]>;
       match (tb.Ast)
       {
       | ast is TopDeclaration.Class => ast.t_extends ::= baseType;
@@ -46,7 +48,7 @@ namespace NemerleWeb
     }
     
     public DoTransform(tb : TypeBuilder, typer : Typer) : void
-    {            
+    { 
       Macros.DefineCTX(typer);
       
       def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");
@@ -115,14 +117,25 @@ namespace NemerleWeb
       def cl = JsClass(tb, "  ", typer);
       def result = cl.Write();
       
+      def signalRStuff = 
+        if(serverClass != null)
+          <[ 
+            def signalRScript = match(typeof(Server).GetMethod("GetSignalRScript")) {
+            | x when x != null => x.Invoke(null, array[]).ToString()
+            | _ => ""
+            };
+            _ = sb.AppendLine(($result).Replace("{{{SignalR}}}", signalRScript));
+          ]>;
+        else
+         <[
+          sb.AppendLine(($result).Replace("{{{SignalR}}}", ""))
+         ]>;
       _ = tb.DefineWithSource(<[ decl:
         public static GetModelScript() : string
-        {
-          def signalRScript = match(typeof(Server).GetMethod("GetSignalRScript")) {
-          | x when x != null => x.Invoke(null, array[]).ToString()
-          | _ => ""
-          };
-          ($result).Replace("{{{SignalR}}}", signalRScript)
+        {          
+          def sb = System.Text.StringBuilder();
+          $(signalRStuff);
+          sb.ToString()
         }
         ]>);
         

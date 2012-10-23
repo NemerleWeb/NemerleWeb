@@ -289,7 +289,9 @@ $(indent)}#>);
       
       public static GetProperName(type : TypeInfo) : string 
       {          
-        GetProperName(type.FullName)
+        def typeParams = if(type.Typarms.IsEmpty) "";
+                         else $"[..$(type.Typarms.MapToArray(t => t.ToString()))]";
+        GetProperName(type.FullName + typeParams)
       }
         
       public static GetProperName(type : Type) : string 
@@ -298,8 +300,9 @@ $(indent)}#>);
       }
         
       static GetProperName(fullName : string) : string
-      {
-        fullName.Replace(".", "_")
+      {          
+        fullName.Replace(" ", "")
+                .Replace(".", "_")
                 .Replace("+", "_")
                 .Replace("[", "_$")
                 .Replace("]", "$_")

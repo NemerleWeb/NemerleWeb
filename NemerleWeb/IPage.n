@@ -13,6 +13,6 @@ namespace NemerleWeb
   {
     GetLambdaScript() : string;
     GetPageScript() : string;
-    __View() : list[XElement];
+    //__View() : list[XElement];
   }
 }
