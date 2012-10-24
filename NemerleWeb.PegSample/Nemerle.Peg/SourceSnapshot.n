@@ -81,7 +81,8 @@ namespace Nemerle.Peg
     }
 
     // TODO: Restore
-    /*protected*/ public static MakeLineIndexes(text : string) : array[int]
+    // TODO: #41
+    /*protected*/ public /*static*/ MakeLineIndexes(text : string) : array[int]
     {
       def line_indexes_buffer = SCG.List(text.Length / 25);
       line_indexes_buffer.Add(0);
@@ -95,9 +96,9 @@ namespace Nemerle.Peg
             when(pos < text.Length && text[pos] == '\n')
               ++pos;
             line_indexes_buffer.Add(pos);
-          | '\n'
-          | '\u2028'    /*  line separator       */
-          | '\u2029' => /*  paragraph separator  */
+          | '\n' =>
+          //| '\u2028'    /*  line separator       */
+          //| '\u2029' => /*  paragraph separator  */
             ++pos;
             line_indexes_buffer.Add(pos);
           | _ =>

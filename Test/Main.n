@@ -15,14 +15,14 @@ module Program
 {
   Main() : void
   {
-      def result = Utils.MakePageHtml(Test.[string]());      
+      def result = Utils.MakePageHtml(Test());      
       Console.WriteLine(result);    
       _ = Console.ReadKey();
   }
 }
 
 [Page]
-public class Test[T]
+public class Test
 {
   public this()
   {

@@ -128,7 +128,7 @@ namespace NemerleWeb
           ]>;
         else
          <[
-          sb.AppendLine(($result).Replace("{{{SignalR}}}", ""))
+          _ = sb.AppendLine(($result).Replace("{{{SignalR}}}", ""))
          ]>;
       _ = tb.DefineWithSource(<[ decl:
         public static GetModelScript() : string

@@ -50,7 +50,7 @@ namespace NemerleWeb
           | Some(result) => 
             def transformer = XmlAstToXLinq(typer, parser);
             def res = transformer.Transform(result);
-            def methodName = $"__$(mb.Name)";
+            def methodName = $"____$(mb.Name)____";
             mb.DeclaringType.Define(<[decl: public static $(methodName : dyn)() : list[System.Xml.Linq.XElement] { $res; } ]>);
             mb.DeclaringType.Compile();
           | _ =>
