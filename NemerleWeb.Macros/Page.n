@@ -172,7 +172,7 @@ $$(function() {{
           ]>;
         else
          <[
-          sb.AppendLine(($result).Replace("{{{SignalR}}}", ""))
+          _ = sb.AppendLine(($result).Replace("{{{SignalR}}}", ""))
          ]>;
       
       _ = tb.DefineWithSource(<[ decl:

@@ -50,7 +50,7 @@ namespace NemerleWeb
         def modelLambdas = string.Join(Environment.NewLine, models.Select(t => GetModelLambdas(t)));
         def modelScripts = string.Join(Environment.NewLine, models.Select(t => GetModelScript(t)));
         
-        def viewHTml = GetHtml(InvokeStaticMethod("__View", page.GetType()) :> list[XElement]);
+        def viewHTml = GetHtml(InvokeStaticMethod("____View____", page.GetType()) :> list[XElement]);
               
         def script = $<#
 $modelTemplates
@@ -76,7 +76,7 @@ $modelTemplates
       {        
         string.Join(Environment.NewLine, 
                     type.GetMethods(BindingFlags.Static | BindingFlags.Public)
-                        .Where(m => m.Name.StartsWith("__"))
+                        .Where(m => m.Name.StartsWith("____") && m.Name.EndsWith("____"))
                         .Select(m => CreateTemplate(GetHtml(InvokeStaticMethod(m.Name, type) :> list[XElement]), 
                                                     JsClass.GetProperName(m.DeclaringType) + m.Name)))
       }
