@@ -135,7 +135,7 @@ $<#function(..$(Parameters; ";"; p => p.Write(""))) { $(Body.Write("  ")) }#>
           Parameters : list[JsAst];
           Body : JsAst;
           
-          public override Write(indent = "" : string) : string
+          public override Write(_indent = "" : string) : string
           {
 $<#function $Name(..$(Parameters; ";"; p => p.Write(""))) { $(Body.Write("  ")) }#>
           }
