@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace NemerleWeb.SC2Score
 {  
-  [Page]
+  [Unit]
   public class MainPage
   {
     public Chat : Chat;

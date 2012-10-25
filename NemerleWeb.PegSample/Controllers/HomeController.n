@@ -13,7 +13,7 @@ namespace NemerleWeb.PegSample.Controllers
   {
     public Index() : ActionResult
     {
-      View(Utils.MakePageHtml(PegSamplePage()) : object);
+      View((nweb PegSamplePage()) : object);
     }
   }
 }

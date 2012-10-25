@@ -18,10 +18,7 @@ namespace NemerleWeb.SC2Score
     {
       get 
       {
-        if(re(<#\s{20}#>, "g").test(Source))
-          "true"
-        else
-          "false"
+        "false"
       }
     }
     

@@ -133,7 +133,7 @@ namespace Calculator
 
 namespace NemerleWeb.PegSample
 {
-  [Page]
+  [Unit]
   public class PegSamplePage
   {
     _calc : Calculator.CalcParser = Calculator.CalcParser();

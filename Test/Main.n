@@ -15,16 +15,19 @@ module Program
 {
   Main() : void
   {
-      def result = Utils.MakePageHtml(Test.[string]());      
-      Console.WriteLine(result);    
+      def result = nweb Test("ionoy", A());
+      WriteLine(result);
       _ = Console.ReadKey();
   }
 }
 
+public class A
+{}
+
 [Page]
 public class Test[T]
 {
-  public this()
+  public this(param1 : string, param2 : A)
   {
   }
   
@@ -34,10 +37,5 @@ public class Test[T]
     <#
       <div></div>
     #>
-  }
-  
-  [Unit]
-  public class Test2[TB]
-  {
   }
 }

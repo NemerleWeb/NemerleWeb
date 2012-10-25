@@ -128,9 +128,9 @@ $<#
 $nestedClassesString
 $(Indent)function $(GetProperName(ClassType))(..$constructorParams) {
 $(bodyIndent)var self = this;
-$constructorBody
-{{{SignalR}}}
-$returning
+$(bodyIndent)$constructorBody
+$(bodyIndent){{{SignalR}}}
+$(bodyIndent)$returning
 $(Indent)}
 $properties
 ..$(commonProps; Environment.NewLine)
@@ -222,7 +222,6 @@ $computedBody
         
       GetConstructorBody(indent : string) : string
       {
-          //assert2(false);
           def ctor = Constructor;
           if(ctor != null)
           {
@@ -299,7 +298,7 @@ $(indent)}#>);
         GetProperName(type.FullName)
       }
         
-      static GetProperName(fullName : string) : string
+      public static GetProperName(fullName : string) : string
       {          
         fullName.Replace(" ", "")
                 .Replace(".", "_")
