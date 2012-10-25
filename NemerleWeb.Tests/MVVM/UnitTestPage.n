@@ -684,6 +684,18 @@ namespace NemerleWeb.Tests
         def x = SampleEnumWithType.A;
         x == SampleEnumWithType.A
       });
+      
+      test("complex goto 1", () =>
+      {
+        def a = 1;
+        match(a) 
+        {
+        | 1
+        | 2
+        | 3 => true
+        | _ => false
+        }
+      });
     }
     
     [Html]

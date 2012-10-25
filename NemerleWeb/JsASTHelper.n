@@ -52,16 +52,25 @@ namespace NemerleWeb
     
     public LabelsToNamedWhile(ast : JsAst) : JsAst 
     {
-      // TODO: Restore .ToDictionary()
-        def gotos = IterateAST(ast).OfType.[JsAst.Goto]().ToDictionary(k => k.LabelId);
+        def gotos = IterateAST(ast).OfType.[JsAst.Goto]()
+                                   .Select(k => k.LabelId)
+                                   .Distinct()
+                                   .ToDictionary(k => k);
       
         def r = JsAst.Recurse(ast, a : JsAst => 
           match(a)
           {
           | Label(id, body) when gotos.ContainsKey(id) =>
-            JsAst.WhileNamed(JsAst.Literal(JsLiteral.Bool(true)), JsAst.Seq([body, JsAst.Break()]), "l" + id.ToString()); //ConvertLabelToSwitch(l)
+            def functionName = "_nweb_lbl_l" + id.ToString();
+            JsAst.Seq([
+              JsAst.DeclFunction(functionName, [], body),
+              JsAst.Call(JsAst.LocalRef(functionName, None()), [])
+            ]);
+            //JsAst.WhileNamed(JsAst.Literal(JsLiteral.Bool(true)), JsAst.Seq([body, JsAst.Break()]), "l" + id.ToString()); //ConvertLabelToSwitch(l)
           | Label(_, body)  => body
-          | Goto(id)        => JsAst.Continue("l" + id.ToString())
+          | Goto(id)        => 
+            def functionName = "_nweb_lbl_l" + id.ToString();
+            JsAst.Call(JsAst.LocalRef(functionName, None()), [])
           | _ => a
           });        
         r

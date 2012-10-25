@@ -100,7 +100,7 @@ namespace NemerleWeb
                 JsAst.MethodRef(Build(obj), meth.Name.Substring(4))
             else
                 JsAst.MethodRef(Build(obj), meth.Name)
-        | MultipleAssign(assigns)           => JsAst.Seq(assigns.Map((l, e) => JsAst.DefValue(l.Name, Build(e))))
+        | MultipleAssign(assigns)           => JsAst.Seq(assigns.Map((l, e) => JsAst.Assign(JsAst.LocalRef(l.Name, None()), Build(e))))
         | OpCode(name)                      => ConvertToJsOpCode(name)
         | PropertyMember(obj, prop)         => JsAst.PropertyGet(Build(obj), prop.Name, JsClass.HasGetterNoSetter(prop))
         | SelfTailCall                      => Message.Warning(expr.Location, "SelfTailCall not implemented"); JsAst.NotImpl("SelfTailCall")
