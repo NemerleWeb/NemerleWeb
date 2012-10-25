@@ -36,7 +36,7 @@ namespace NemerleWeb
       {
       | [] =>
         match (member.Name)
-        {
+        {        
         | "get_Length" => Some(JsAst.FieldRef(left, "length", true))
         | "Clone" => Some(left)        
         | "GetEnumerator"
@@ -60,6 +60,7 @@ namespace NemerleWeb
       | [arg1] =>
         match (member.Name)
         {
+        | "get_Chars" => Some(JsAst.Call(JsAst.Indexer(left), parms))
         | "Compare"
         | "CompareOrdinal"
         | "CompareTo" => None()
