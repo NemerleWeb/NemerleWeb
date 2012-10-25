@@ -1,0 +1,158 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Web;
+using System.Globalization;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using BF = System.Reflection.BindingFlags;
+using TExpr = Nemerle.Compiler.Typedtree.TExpr;
+
+namespace NemerleWeb
+{    
+  [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Class)]
+  macro Unit(tb : TypeBuilder) 
+  {
+    UnitImpl.DoTransform(tb, Macros.ImplicitCTX())
+  }
+  
+  [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
+  macro Unit(tb : TypeBuilder)
+  {
+    UnitImpl.DoTransformBeforeInheritance(tb, Macros.ImplicitCTX())
+  }
+  
+  module UnitImpl
+  {
+    public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
+    {
+      Macros.DefineCTX(typer);
+      
+      PageImpl.AddPageBaseMethods(tb, typer);
+      
+      def baseType = <[ NemerleWeb.Page ]>;
+      match (tb.Ast)
+      {
+      | ast is TopDeclaration.Class => ast.t_extends ::= baseType;
+      | ast is TopDeclaration.Variant => ast.t_extends ::=  baseType;
+      | _ =>
+        Message.Error($"This type $(tb.Ast) is not supported");
+        assert2(false);
+      } 
+    }
+    
+    public DoTransform(tb : TypeBuilder, typer : Typer) : void
+    { 
+      Macros.DefineCTX(typer);
+      
+      def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");
+      def serverMethods = Dictionary();
+      if(serverClass != null)
+      {          
+          def env = typer.Manager.CoreEnv;
+          def env = env.EnterIntoNamespace(tb.NamespaceNode);
+          def controllerName = tb.Name + "Controller";
+          def field = <[ decl: _server : $(serverClass.Name : usesite) = $(serverClass.Name : usesite)() ]>;          
+          def ctb = env.Define(<[ decl: 
+            public class $(controllerName : usesite) : System.Web.Mvc.Controller
+            {}
+          ]>);
+          ctb.Define(field);
+                 
+          def ptb = tb.DefineNestedType(<[ decl:
+              class ServerProxy
+              {}
+          ]>);
+          tb.Define(<[ decl: server : ServerProxy { get { ServerProxy() } } ]>);
+          
+          foreach(member in serverClass.GetMembers()) {
+              | method is IMethod when !method.IsConstructor && method.DeclaringType.FullName == serverClass.FullName => 
+                  def parameters = method.GetParameters().Map(p => <[ $(p.Name : usesite) : $(p.ty : typed) ]>);              
+                  def fparms = parameters.Map(PParameter);
+                  def methodName = ctb.ParsedName.NewName(method.Name);
+                                    
+                  when(method.ReturnType.TryRequire(<[ ttype: void ]>))
+                    Message.FatalError("Server methods cannot return void, please return something");
+                  
+                  ctb.Define(<[ decl: 
+                    public $(methodName : name) (..$fparms) : System.Web.Mvc.ActionResult
+                    {
+                        def result = _server.$(method.Name : dyn)(..$parameters);
+                        def settings = Newtonsoft.Json.JsonSerializerSettings();
+                        settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
+                        Content(Newtonsoft.Json.JsonConvert.SerializeObject(result, settings));
+                    }
+                  ]>);
+                  
+                  serverMethods.Add(method.Name, fparms);
+                  
+                  def fparms = fparms.Append([<[ parameter: _callback : $(method.ReturnType : typed) -> void ]>]);
+                  
+                  ptb.Define(<[ decl:                   
+                    public $(methodName : name) (..$(fparms)) : void
+                    {}
+                  ]>);
+              | _ => ()              
+          }
+          ctb.Define(<[ decl:
+              public __SetSignalRConnectionId(id : string) : System.Web.Mvc.ActionResult
+              {                
+                HttpContext.Current.Session["SignalRConnectionId"] = id;
+                Content("");
+              }]>);
+          ptb.Compile();
+          ctb.Compile();
+      } else {
+        tb.DefineNestedType(<[ decl: public class Server {} ]>).Compile();
+      }
+    
+      JsClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
+      JsClass.StringType = <[ ttype : System.String ]>;
+      def cl = JsClass(tb, "  ", typer);
+      def result = cl.Write();
+      
+      def signalRStuff = 
+        if(serverClass != null)
+          <[ 
+            def signalRScript = match(typeof(Server).GetMethod("GetSignalRScript")) {
+            | x when x != null => x.Invoke(null, array[]).ToString()
+            | _ => ""
+            };
+            _ = sb.AppendLine(($result).Replace("{{{SignalR}}}", signalRScript));
+          ]>;
+        else
+         <[
+          _ = sb.AppendLine(($result).Replace("{{{SignalR}}}", ""))
+         ]>;
+      _ = tb.DefineWithSource(<[ decl:
+        public static GetModelScript() : string
+        {          
+          def sb = System.Text.StringBuilder();
+          $(signalRStuff);
+          sb.ToString()
+        }
+        ]>);
+        
+      def lambdaMeth = tb.DefineAndReturn(<[ decl: 
+        public static GetLambdaScript() : string
+        { "" } ]>) :> MethodBuilder;          
+      
+      tb.GetModifiers().AddCustomAttribute(<[ NemerleWeb.UnitAttribute ]>);
+        
+      tb.Manager.TypeTreeBuildFinish += _ => {
+        def lambdas = tb.DeclaredNestedTypes
+                          .Where(t => t.Name.StartsWith("_N__N_"))
+                          .Select(t => JsClass(t, "  ", typer).Write());
+          def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");          
+          lambdaMeth.Body = <[ $lambdas ]>;          
+          tb.Compile();
+      };
+    }   
+  }
+}

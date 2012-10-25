@@ -68,7 +68,7 @@ namespace Nemerle.Peg
             }
           ]>
         }
-
+        
         PegGrammarOptions.GetDefineMethod(_tb)(method);                                    
       }
     }
