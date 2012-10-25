@@ -192,9 +192,24 @@ $(ElseBody.Write("  "))
             }
             public override Transform() : JsAst {
                 match(this) {
-                | If(If(c, t, e), tt, ee)    => JsAst.If(JsAst.Ternary(c, t, e), tt, ee)
-                | If(Call(func, [something, If(c, t, e)]), then, els) => JsAst.If(JsAst.Call(func, [something, JsAst.Ternary(c, t, e)]), then, els).Transform()
-                | If(Call(func, [If(c, t, e), something]), then, els) => JsAst.If(JsAst.Call(func, [JsAst.Ternary(c, t, e), something]), then, els).Transform()
+                | If(If(c, t, e), tt, ee)    => 
+                  def varName = JsAstHelper.GetTemporaryVariableName();
+                  JsAst.Seq([
+                    JsAst.DefValue(varName, JsAst.If(c, t, e)).Transform(),
+                    JsAst.If(JsAst.LocalRef(varName, None()), tt, ee)
+                  ]).Transform();
+                | If(Call(func, [something, If(c, t, e)]), then, els) => 
+                  def varName = JsAstHelper.GetTemporaryVariableName();
+                  JsAst.Seq([
+                    JsAst.DefValue(varName, JsAst.If(c, t, e)).Transform(),
+                    JsAst.If(JsAst.Call(func, [something, JsAst.LocalRef(varName, None())]), then, els)
+                  ]).Transform();
+                | If(Call(func, [If(c, t, e), something]), then, els) => 
+                  def varName = JsAstHelper.GetTemporaryVariableName();
+                  JsAst.Seq([
+                    JsAst.DefValue(varName, JsAst.If(c, t, e)).Transform(),
+                    JsAst.If(JsAst.Call(func, [JsAst.LocalRef(varName, None()), something]), then, els)
+                  ]).Transform();
                 | If(Call(OpCode as op, [Seq as seq, rest]), then, els) =>
                     def varName = JsAstHelper.GetTemporaryVariableName();
                     JsAst.Seq([JsAst.DefValue(varName, JsAst.Void()), JsAstHelper.DelayAssignment(seq, JsAst.LocalRef(varName, None())), JsAst.If(JsAst.Call(op, [JsAst.LocalRef(varName, None()), rest]), then, els)]).Transform();                           
@@ -230,8 +245,18 @@ $(Body.Write("  "))
             }
             public override Transform() : JsAst {
                 match(this) {
-                | JustIf(Call(func, [something, If(c, t, e)]), then) => JsAst.JustIf(JsAst.Call(func, [something, JsAst.Ternary(c, t, e)]), then).Transform()
-                | JustIf(Call(func, [If(c, t, e), something]), then) => JsAst.JustIf(JsAst.Call(func, [JsAst.Ternary(c, t, e), something]), then).Transform()
+                | JustIf(Call(func, [something, If(c, t, e)]), then) => 
+                  def varName = JsAstHelper.GetTemporaryVariableName();
+                  JsAst.Seq([
+                    JsAst.DefValue(varName, JsAst.If(c, t, e)).Transform(),
+                    JsAst.JustIf(JsAst.Call(func, [something, JsAst.LocalRef(varName, None())]), then)
+                  ]).Transform();
+                | JustIf(Call(func, [If(c, t, e), something]), then) => 
+                  def varName = JsAstHelper.GetTemporaryVariableName();
+                  JsAst.Seq([
+                    JsAst.DefValue(varName, JsAst.If(c, t, e)).Transform(),
+                    JsAst.JustIf(JsAst.Call(func, [JsAst.LocalRef(varName, None()), something]), then)
+                  ]).Transform();
                 | JustIf(Call(OpCode as op, Seq as seq :: rest), then) =>
                     def varName = JsAstHelper.GetTemporaryVariableName();
                     JsAst.Seq([JsAst.DefValue(varName, JsAst.Void()), JsAstHelper.DelayAssignment(seq, JsAst.LocalRef(varName, None())), JsAst.JustIf(JsAst.Call(op, JsAst.LocalRef(varName, None()) :: rest), then)]).Transform();                           
