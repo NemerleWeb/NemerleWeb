@@ -9,7 +9,7 @@ using NemerleWeb.Tests.Macro;
 
 namespace NemerleWeb.Tests
 {
-  [Page]
+  [Unit]
   public class UnitTestPage
   {
     Results : List[(string * bool)] { get; set; }

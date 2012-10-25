@@ -13,10 +13,10 @@ namespace NemerleWeb.Samples
     public Name : string { get; set; }
     public SourceFiles : list[string] { get; set; }
     public Source : string { get; set; }
-    public Instance : Page { get; set; }
+    public Instance : object { get; set; }
   }
   
-  [Page]
+  [Unit]
   class SamplesPage
   {      
     SelectedSample : Sample { get; set; }

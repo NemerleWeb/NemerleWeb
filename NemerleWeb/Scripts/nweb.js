@@ -509,7 +509,7 @@ nweb.utils = {
         if (!model)
             throw "Model passed in template() cannot be null or undefined. Make sure, you initialized members that are used in templating.";
 
-        return nweb.utils.getConstructorName(model) + "__" + viewName;
+        return nweb.utils.getConstructorName(model) + "_" + viewName;
     },
     getConstructorName: function(model) {
         var funcNameRegex = /function (.{1,})\(/;

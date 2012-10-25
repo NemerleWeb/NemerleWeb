@@ -23,7 +23,7 @@ using Newtonsoft.Json;
 
 namespace NemerleWeb
 {
-  public module Utils
+  public module NWebUtils
   {
     public ToJson(value : string) : string
     {
@@ -40,65 +40,7 @@ namespace NemerleWeb
         JsonConvert.SerializeObject(value, JsonSerializerSettings() <- TypeNameHandling = TypeNameHandling.Objects);
     }
         
-    public MakePageHtml[Page]([NotNull] page : IPage) : string
-    {
-        def models = page.GetType()
-                         .Assembly
-                         .GetTypes()
-                         .Where(t => t.GetCustomAttributes(typeof(UnitAttribute), false).Any());
-        def modelTemplates = string.Join(Environment.NewLine, models.Select(t => GetModelTemplates(t)));
-        def modelLambdas = string.Join(Environment.NewLine, models.Select(t => GetModelLambdas(t)));
-        def modelScripts = string.Join(Environment.NewLine, models.Select(t => GetModelScript(t)));
-        
-        def viewHTml = GetHtml(InvokeStaticMethod("__View", page.GetType()) :> list[XElement]);
-              
-        def script = $<#
-$modelTemplates
-<script type='text/javascript'>
-  $modelLambdas
-  $modelScripts
-  $(page.GetLambdaScript())
-  $(page.GetPageScript())
-</script>
-      #>;
-      
-      viewHTml + script;
-    }
-    
-    GetModelScript(type : Type) : string
-    { 
-      InvokeStaticMethod("GetModelScript", type) :> string
-    }
-    
-    GetModelTemplates(type : Type) : string
-    {
-      if(!type.IsAbstract)
-      {        
-        string.Join(Environment.NewLine, 
-                    type.GetMethods(BindingFlags.Static | BindingFlags.Public)
-                        .Where(m => m.Name.StartsWith("__"))
-                        .Select(m => CreateTemplate(GetHtml(InvokeStaticMethod(m.Name, type) :> list[XElement]), 
-                                                    JsClass.GetProperName(m.DeclaringType) + m.Name)))
-      }
-      else
-        ""
-    }
-    
-    GetModelLambdas(type : Type) : string
-    {      
-      InvokeStaticMethod("GetLambdaScript", type) :> string;
-    }
-    
-    CreateTemplate(html : string, name : string) : string
-    {
-        $<# 
-<script type="text/html" id="$name">
-  $html
-</script>
-        #>
-    }
-    
-    GetHtml(xs : list[XElement]) : string
+    public GetHtml(xs : list[XElement]) : string
     {
       using(str = StringWriter())
       using(writer = XmlTextWriter(str))
@@ -108,16 +50,6 @@ $modelTemplates
         xs.Iter(x => x.WriteTo(writer));
         HttpUtility.HtmlDecode(str.ToString());
       }
-    }
-    
-    InvokeStaticMethod(method : string, type : Type) : object
-    {
-      def type' = if(type.ContainsGenericParameters) {
-        type.MakeGenericType(type.GetGenericArguments().MapToArray(_ => typeof(object)))
-      } else {
-        type
-      }      
-      type'.GetMethod(method, BindingFlags.Static | BindingFlags.Public).Invoke(null, array[]);        
-    }
+    }    
   }
 }

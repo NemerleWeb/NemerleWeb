@@ -11,7 +11,7 @@ using NemerleWeb;
 
 namespace NemerleWeb.Samples
 {
-  [Page]
+  [Unit]
   public class TestPagePage
   {
     items : List[string] { get; set; }

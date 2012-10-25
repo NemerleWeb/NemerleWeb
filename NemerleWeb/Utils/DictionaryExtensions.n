@@ -1,0 +1,27 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+
+  public module DictionaryExtensions
+  {    
+    public GetOrAdd[TK, TV](this instance : Dictionary[TK, TV], key : TK, newVal : void -> TV) : TV
+    {
+      mutable val : TV;
+      if(instance.TryGetValue(key, out val))
+        val
+      else {
+        val = newVal();
+        instance.Add(key, val);
+        val;
+      }          
+    }
+  }
+}

@@ -1,0 +1,83 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  macro nweb_macro(expr) 
+  syntax("nweb", expr)
+  {
+    def ctx = Macros.ImplicitCTX();
+    NwebImpl.TransformNweb(expr, ctx);
+  }
+    
+  public module NwebImpl
+  {
+    public TransformNweb(expr : PExpr, typer : Typer) : PExpr 
+    {    
+      match(expr)
+      {
+      | <[ $unitName() ]> with parms = []
+      | <[ $unitName(..$parms) ]> => 
+        def properName = JsClass.GetProperName(typer.TypeExpr(expr).Type.TypeInfo);        
+        def serverParams = parms.Map(p => <[ paramList.Add("nweb.utils.toTypedObject(" + NWebUtils.ToJson($p) + ")") ]>);
+        
+        def res = <[
+def allScripts = NemerleWeb.NWebData.Units.Map(kvp => {
+  def u = kvp.Value;
+  def lambdaDefinitions = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "LambdaDefinitions", () => "");
+  def classDefinition = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "ClassDefinition", () => "");
+  def signalR = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "SignalRScript", () => "");  
+  lambdaDefinitions + classDefinition.Replace("{{{SignalR}}}", signalR);
+});
+
+def allViews = NemerleWeb.NWebData.Units
+                                  .SelectMany(kvp => kvp.Value)
+                                  .Where(v => v.Key.StartsWith("View_")).ToList();
+def allTemplates = allViews.Map(kvp => {
+  def templateName = kvp.Key.Substring("View_".Length);
+  $<#
+  <script type="text/html" id="$templateName">
+  $(kvp.Value)
+  </script>
+  #>
+});
+
+def allScripts = string.Join("", allScripts);
+def allTemplates = string.Join("", allTemplates);
+def unitName = $(properName : string);
+def defaultViewName = unitName + "_View";
+
+when(!allViews.Any(v => v.Key == "View_" + defaultViewName))
+  throw InvalidOperationException("Please define View on " + unitName);
+
+def currentView = allViews.FirstOrDefault(v => v.Key == "View_" + defaultViewName);
+def paramList = List();
+{..$serverParams}
+def parms = string.Join(",", paramList);
+
+$<#
+$(currentView.Value)
+$allTemplates
+<script>
+$allScripts
+
+$$(function() { 
+  nweb.go(new $unitName($parms));
+});
+</script>
+#>
+      ]>;
+      res
+      | _ => <[]>
+      }      
+    }
+  }
+}
