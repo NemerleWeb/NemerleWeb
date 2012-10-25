@@ -15,7 +15,7 @@ module Program
 {
   Main() : void
   {
-      def result = nweb Test("ionoy", A());
+      def result = nweb Test();
       WriteLine(result);
       _ = Console.ReadKey();
   }
@@ -24,18 +24,24 @@ module Program
 public class A
 {}
 
-[Page]
+[Unit]
 public class Test[T]
 {
-  public this(param1 : string, param2 : A)
+  public this()
   {
+    def l = [1, 2, 3].ToList();
+        
+    mutable count = 0;
+    foreach (e in l with i)
+      when (e == i + 1)
+        count++;
+        
+    count == l.Count;
   }
   
   [Html]
-  public View() : string 
+  public View() : string
   {
-    <#
-      <div></div>
-    #>
+    <# <div></div> #>
   }
 }

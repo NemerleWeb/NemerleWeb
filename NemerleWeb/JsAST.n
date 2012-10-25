@@ -130,6 +130,16 @@ namespace NemerleWeb
 $<#function(..$(Parameters; ";"; p => p.Write(""))) { $(Body.Write("  ")) }#>
             }
         }
+        | DeclFunction {
+          Name : string;
+          Parameters : list[JsAst];
+          Body : JsAst;
+          
+          public override Write(indent = "" : string) : string
+          {
+$<#function $Name(..$(Parameters; ";"; p => p.Write(""))) { $(Body.Write("  ")) }#>
+          }
+        }
         | DefValue       { Name : string; Val : JsAst;
             public override Write(_indent = "" : string) : string {
                 match(this) {
@@ -517,6 +527,7 @@ $(Body.Write("  "))
             | Constructor(type)           => JsAst.Constructor(type)
             | Continue(loopname)          => JsAst.Continue(loopname)
             | DefFunction(obj, ps, bdy)   => JsAst.DefFunction(recurse(obj), ps.Map(recurse), recurse(bdy))
+            | DeclFunction(name, ps, bdy) => JsAst.DeclFunction(name, ps.Map(recurse), recurse(bdy))
             | DefValue(name, val)         => JsAst.DefValue(name, recurse(val))
             | FieldRef(obj, parm, ext)    => JsAst.FieldRef(recurse(obj), parm, ext)
             | For(it, coll, body)         => JsAst.For(it, recurse(coll), recurse(body))
