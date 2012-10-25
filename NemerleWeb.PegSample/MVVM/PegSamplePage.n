@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using NemerleWeb;
 using Nemerle.Extensions;
 using System;
@@ -168,3 +169,175 @@ namespace NemerleWeb.PegSample
     }    
   }
 }
+=======
+﻿using NemerleWeb;
+using Nemerle.Extensions;
+using System;
+using System.Collections.Generic;
+using SCG = System.Collections.Generic;
+using System.Linq;
+
+using Nemerle.Peg;
+
+namespace Calculator
+{  
+  [PegGrammar(Options = EmitDebugSources, implicitMul,
+  grammar
+  {
+    letters               = ['a'..'z', 'A'..'Z'];
+    limit_arg    : string = (letter / operator / limit)+;
+    letter       : string = letters;
+    operator     : string = "#sin()" letter+;
+    limit        : string = "#lim()##low(" implicitMul "#to()" implicitMul ")" limit_arg;
+    implicitMul  : string = (letter / operator / limit)+;
+  })]
+  [Unit]
+  class P
+  {
+    limit_arg(_ : List[string]) : string
+    {
+      ""
+    }
+    letter(_ : NToken) : string
+    {
+      ""
+    }
+    operator(_ : NToken, _ : List[string]) : string
+    {
+      ""
+    }
+    limit(_ : NToken, _ : string, _ : NToken, _ : string, _ : NToken, _ : string) : string
+    {
+      ""
+    }
+    implicitMul(_ : List[string]) : string
+    {
+      ""
+    }
+  }
+
+  [PegGrammar(Options = EmitDebugSources,
+    rule1,
+    grammar
+    {
+      rule1 : SCG.List[int] = rule11+ / rule12;
+      rule11 : int = any;
+      rule12 : SCG.List[int] = any;
+      any = ['\u0000'..'\uFFFF'];
+    }
+  )]
+  [Unit]
+  class Parser
+  {
+    rule1(@list : SCG.List[int]) : SCG.List[int]
+    {
+      @list;
+    }
+    
+    rule11(_ : NToken) : int
+    {
+      1;
+    }
+    
+    rule12(_ : NToken) : SCG.List[int]
+    {
+      SCG.List();
+    } 
+  }
+  
+  type LoopTokens = NToken * int;
+  
+  [Record] public class ParserFatalError : Exception
+  {
+    public Pos     : int;
+  }
+  
+  public class FakeGrammar { }
+  
+  /// <summary>
+  /// Description of CalcParser.
+  /// </summary>  
+  [PegGrammar( Options = EmitDebugSources, start, 
+  grammar
+  {
+    s : void              = ' '*;
+
+    [Extensible(a)]
+    expr                  : int;
+
+    num                   is expr = ['0'..'9']+ s;
+
+    unaryMinus            is expr = '-'s expr : 30;
+
+    parenthesesExpr       is expr = '('s expr ')'s;
+
+    sum                   is expr = expr : 10 '+' expr : 10;
+    sub                   is expr = expr : 10 '-' expr : 10;
+    mul                   is expr = expr : 20 '*' expr : 20;
+    div                   is expr = expr : 20 '/' expr : 20;
+
+    start                 : int = s expr ![Any];
+  })]
+  [Unit]
+  public class CalcParser
+  {
+    private num(digits : NToken) : int
+    {
+      int.Parse(GetText(digits))
+    }
+
+    private unaryMinus(_ : NToken, se : int) : int
+    {
+      -se
+    }
+
+    private parenthesesExpr(_ : NToken, se : int, _ : NToken) : int
+    {
+      se
+    }
+
+    private sum(x : int, _ : NToken, y : int) : int { x + y }
+    private sub(x : int, _ : NToken, y : int) : int { x - y }
+    private mul(x : int, _ : NToken, y : int) : int { x * y }
+    private div(x : int, _ : NToken, y : int) : int { x / y }
+  }
+}
+
+namespace NemerleWeb.PegSample
+{
+  [Page]
+  public class PegSamplePage
+  {
+    _calc : Calculator.CalcParser = Calculator.CalcParser();
+     
+    CalcInput : string { get; set; }
+    CalcOutput : string { get; set; }
+     
+    public Calculate() : void
+    {
+      CalcOutput = if (_calc.Parse(CalcInput) is Some(res)) res.ToString() else "Incorrect input";
+    }
+     
+    public $CalcKeypress(e : EventData) : void
+    {
+      when(e.which == 13) Calculate();
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+        <div>
+          <div class="output">
+            <span class="output-text">$CalcOutput</span> 
+          </div>
+          <div class="calc-input">
+            <input value="$CalcInput" event-keypress="$CalcKeypress" />
+            <button click="$Calculate" disable="$(string.IsNullOrEmpty(CalcInput))" class="btn btn-info">Calculate</button>
+          </div>
+        </div>
+      #>
+    }    
+  }
+}
+>>>>>>> 795a26304bb14a0a0f79f748d0c929711a342ec0

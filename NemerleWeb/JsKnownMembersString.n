@@ -65,18 +65,16 @@ namespace NemerleWeb
         | "CompareTo" => None()
         | "Contains" =>
           Some(JsAst.Call(
-            JsAst.OpCode("!="),
+            JsAst.OpCode("!=="),
             [
-              JsAst.Call(
-                JsAst.MethodRef(left, "indexOf"),
-                [arg1]),
+              left.MethodCall("indexOf", parms),
               JsAst.Literal(JsLiteral.Integer(-1))
             ]))
             
-        | "EndsWith"        
-        | "Equals"
-        | "Format"
-        | "IndexOf"
+        | "EndsWith" => None()       
+        | "Equals" => Some(JsAst.Call(JsAst.OpCode("==="), [left, arg1]))
+        | "Format" => None()
+        | "IndexOf" => Some(left.MethodCall("indexOf", parms))
         | "IndexOfAny"
         | "IsNormalized"        
         | "LastIndexOf"

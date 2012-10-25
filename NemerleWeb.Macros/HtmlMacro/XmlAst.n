@@ -19,10 +19,10 @@ namespace NemerleWeb
   [Record]
   class PegLocated { public StartPos : int; public EndPos : int; }
  
-  [Record] class TagOpen  : PegLocated { public ident : Splicable; public attrs : list[XmlAst] }
-  [Record] class TagClose : PegLocated { public ident : Splicable; }
+  [Record(NotNull = ".*")] class TagOpen  : PegLocated { public ident : Splicable; public attrs : list[XmlAst] }
+  [Record(NotNull = ".*")] class TagClose : PegLocated { public ident : Splicable; }
   
-  [Record]
+  [Record(NotNull = ".*")]
   variant Splicable : PegLocated
   {
     | Value       { value : string; }
@@ -69,7 +69,7 @@ namespace NemerleWeb
     #endregion
   }
   
-  [Record]
+  [Record(NotNull = ".*")]
   variant XmlAst : PegLocated
   {
     | Attr        { name : Splicable; value  : Splicable; }

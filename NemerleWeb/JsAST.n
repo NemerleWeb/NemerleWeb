@@ -55,7 +55,7 @@ namespace NemerleWeb
         }
         | Break          {
             public override Write(_indent = "" : string) : string {
-                "break"
+                "break;"
             }
         }
         | Call           { Fun : JsAst; Parameters : list[JsAst];
@@ -111,7 +111,7 @@ namespace NemerleWeb
         }
         | Continue       { LoopName : string;
             public override Write(_indent = "" : string) : string {
-                $"continue $LoopName"
+                $"continue $LoopName;"
             }
         }
         | Constructor    { Type : string;
@@ -119,8 +119,14 @@ namespace NemerleWeb
                 "/* TODO: implement constructor writer */"
             }
         }
-        | DefFunction    { Obj : JsAst; Parameters : list[JsAst]; Body : JsAst;
-            public override Write(_indent = "" : string) : string {
+        | DefFunction
+          {
+            Obj : JsAst;
+            Parameters : list[JsAst];
+            Body : JsAst;
+            
+            public override Write(_indent = "" : string) : string
+            {
 $<#function(..$(Parameters; ";"; p => p.Write(""))) { $(Body.Write("  ")) }#>
             }
         }
@@ -249,15 +255,38 @@ $(Body.Write())
             }
         }
         | Literal        { Value : JsLiteral;
-            public override Write(_ = "" : string) : string {
-                match(this) {
-                | Literal(Null)         => "null"
-                | Literal(Integer(val)) => $"$val"
-                | Literal(Float(val))   => $"$val"
-                | Literal(String(val))  => $<#"$val"#>
-                | Literal(Bool(val))    => $"$(val.ToString().ToLower())"
-                | Literal(Regexp(pat, mod)) => $<#new RegExp($(pat.Write()), $(mod.Write()))#>
+            public override Write(_ = "" : string) : string
+            {
+              match(this)
+              {
+              | Literal(Null)         => "null"
+              | Literal(Integer(val)) => $"$val"
+              | Literal(Float(val))   => $"$val"
+              | Literal(String(val))  =>
+                def escapeCharacter(c)
+                {
+                | '\'' => "\\\'"
+                | '\"' => "\\\""
+                | '\\' => "\\\\"
+                | '\r' => "\\r"
+                | '\n' => "\\n"
+                | '\t' => "\\t"
+                | '\b' => "\\b"
+                | '\f' => "\\f"                
+                // line separator
+                | '\u2028' => "\\u2028"
+                // paragraph separator
+                | '\u2029' => "\\u2029"
+                | '\0' => Message.Error("\\0 is not supported in JS"); ""
+                | '\a' => Message.Error("\\a is not supported in JS"); ""
+                | '\v' => Message.Error("\\v is not supported in JS"); ""
+                | _ => c.ToString()
                 }
+                
+                $<#"..$(val; ""; escapeCharacter)"#>;
+              | Literal(Bool(val))    => $"$(val.ToString().ToLower())"
+              | Literal(Regexp(pat, mod)) => $<#new RegExp($(pat.Write()), $(mod.Write()))#>
+              }
             }
         }
         | LocalRef       { Name : string; Type : option[TypeVar];

@@ -31,24 +31,28 @@ namespace Nemerle.Peg
         }
       ]>);
        PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
-        public Parse(source : Nemerle.Peg.SourceSnapshot) : option[$tyParam]
+        public Parsex(source : Nemerle.Peg.SourceSnapshot) : option[$tyParam]
         {
-          def (pos, res) = TryParse(source);
+          def (pos, res) = TryParsex(source);
           if (pos < 0) None() else Some(res)
         }
       ]>);
 
-       PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
+      // TODO: #40 Restore
+      PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
         public TryParse(text : string) : int * $tyParam
         {
-          TryParse(Nemerle.Peg.SourceSnapshot(text))
+          // TODO: Restore
+          //TryParsex(Nemerle.Peg.SourceSnapshot(text))
+          // TODO: #41
+          TryParsex(Nemerle.Peg.SourceSnapshot(text, text, 0, "", Nemerle.Peg.SourceSnapshot("", "", 0, "", null).MakeLineIndexes(text)))
         }
       ]>);
 
       if (_typer.Manager.IsIntelliSenseMode)
       {
         PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
-          public TryParse(/*[Nemerle.Assertions.NotNull]*/ source : Nemerle.Peg.SourceSnapshot) : int * $tyParam
+          public TryParsex(/*[Nemerle.Assertions.NotNull]*/ source : Nemerle.Peg.SourceSnapshot) : int * $tyParam
           {
             _parsingSource = source;
             mutable result;
@@ -58,8 +62,8 @@ namespace Nemerle.Peg
       }
       else
       {
-           PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
-          public TryParse(/*[Nemerle.Assertions.NotNull]*/ source : Nemerle.Peg.SourceSnapshot) : int * $tyParam
+        PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
+          public TryParsex(/*[Nemerle.Assertions.NotNull]*/ source : Nemerle.Peg.SourceSnapshot) : int * $tyParam
           {
             ResetMemoization();
             ResetMaxRollbackPos();

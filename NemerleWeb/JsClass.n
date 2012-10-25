@@ -1,4 +1,5 @@
 ﻿using Nemerle;
+using Nemerle.Assertions;
 using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
@@ -11,12 +12,12 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  [Record]
+  [Record(NotNull = [".*"])]
   public class JsClass
   {
-      public ClassType : TypeBuilder { get; set; }
-      public Indent : string    { get; set; }      
-      public Typer : Typer { get; set; }
+      public ClassType : TypeBuilder { get; }
+      public Indent : string    { get; }      
+      public Typer : Typer { get; }
       
       public static StringType : TypeVar { get; set; }
       public static IEnumerableType : TypeVar { get; set; }  
@@ -164,7 +165,7 @@ $staticConstructorBody#>
           if(ctor != null) ctor.GetParameters().Map(p => p.Name) else [];            
       }
         
-      GetProperties(indent : string, parentPtr : string) : string 
+      GetProperties([NotNull] indent : string, [NotNull] parentPtr : string) : string 
       {                                                   
           def propVal(prop : IProperty)
           {
@@ -181,7 +182,7 @@ $staticConstructorBody#>
           $<#..$(propStrings; ";\n")#>;
       }
         
-      GetComputedProperties(indent : string, parentPtr : string, hasSelf : bool) : string 
+      GetComputedProperties([NotNull] indent : string, [NotNull] parentPtr : string, hasSelf : bool) : string 
       {                              
         def self = if(hasSelf) "" else "var self = this;";
         def propVal(prop : IProperty)
@@ -196,21 +197,28 @@ $computedBody
         $<#..$(propStrings; ";\n")#>;
       }
         
-      GetFields(indent : string, parentPtr : string) : string 
+      GetFields([NotNull] indent : string, [NotNull] parentPtr : string) : string 
       {
-          def fields = Fields;
-          def fldVal(fld : IField) {
+          def fldVal(fld : IField)
+          {
             def type = fld.GetMemType();
+            
             def isArray = TypeIsArray(type);
             if(isArray) 
               "[]" 
-            else if(type.TypeInfo.FullName == "System.String") <#""#> else "null";
+            else
+            if(type.TypeInfo?.FullName == "System.String")
+              <#""#>
+            else
+              "null"
           }
+          
+          def fields = Fields;
           def fieldStrings = fields.Select(f => indent + $<#$parentPtr.$(f.Name) = $(fldVal(f))#>);
           $<#..$(fieldStrings; ";\n")#>;
       }
         
-      GetStaticFields(indent : string) : string 
+      GetStaticFields([NotNull] indent : string) : string 
       {
           def fields = ClassType.GetFields().Where(f => f.IsStatic);
           def fldVal(_fld : IField) {
@@ -220,7 +228,7 @@ $computedBody
           $<#..$(fieldStrings; ";\n")#>;
       }
         
-      GetConstructorBody(indent : string) : string
+      GetConstructorBody([NotNull] indent : string) : string
       {
           def ctor = Constructor;
           if(ctor != null)
@@ -233,7 +241,7 @@ $computedBody
               ""
       }
         
-      GetStaticConstructorBody(indent : string) : string 
+      GetStaticConstructorBody([NotNull] indent : string) : string 
       {
           def ctors = ClassType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic);            
           def ctor = ctors.FirstOrDefault();
@@ -243,7 +251,7 @@ $computedBody
               ""
       }
         
-      GetMethods(indent : string, parentPtr : string, hasSelf : bool) : string 
+      GetMethods([NotNull] indent : string, [NotNull] parentPtr : string, hasSelf : bool) : string 
       {
         def self = if(hasSelf) "" else "var self = this;";
         def methodParms(method) {
@@ -275,30 +283,30 @@ $(indent)}#>);
                    .Iter(t => t.Ast.AddCustomAttribute(<[ NemerleWeb.GeneratedClass ]>));
       }
                 
-      public TranslateMethodBody(meth : IMethod, indent = "" : string) : string
+      public TranslateMethodBody([NotNull] meth : IMethod, [NotNull] indent = "" : string) : string
       { 
         def ast = TyperHelper.GetMethodJsAst(meth, Typer, ClassType);
         ast.Write(indent);
       }
       
-      public static TypeIsArray(type : TypeVar) : bool 
+      public static TypeIsArray([NotNull] type : TypeVar) : bool 
       {
         type.TryRequire(IEnumerableType) && !type.TryRequire(StringType);
       }
       
-      public static GetProperName(type : TypeInfo) : string 
+      public static GetProperName([NotNull] type : TypeInfo) : string 
       {          
         def typeParams = if(type.Typarms.IsEmpty) "";
                          else $"[..$(type.Typarms.MapToArray(t => t.ToString()))]";
         GetProperName(type.FullName + typeParams)
       }
         
-      public static GetProperName(type : Type) : string 
+      public static GetProperName([NotNull] type : Type) : string 
       {
         GetProperName(type.FullName)
       }
         
-      public static GetProperName(fullName : string) : string
+      public static GetProperName([NotNull] fullName : string) : string
       {          
         fullName.Replace(" ", "")
                 .Replace(".", "_")
@@ -308,7 +316,7 @@ $(indent)}#>);
                 .Replace(",", "$$")
       }
         
-      public static FilterMethods(methods : IEnumerable[IMethod]) : IEnumerable[IMethod]
+      public static FilterMethods([NotNull] methods : IEnumerable[IMethod]) : IEnumerable[IMethod]
       {
         def pageMethods = typeof(IPage).GetMethods().Select(m => m.Name);
         methods.Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
@@ -316,7 +324,7 @@ $(indent)}#>);
                .Where(m => !m.IsConstructor)
                .Where(m => !pageMethods.Any(vm => vm == m.Name))
                .Where(m => m.Name != "View")
-               .Where(m => !m.Name.StartsWith("__"))
+               .Where(m => !(m.Name.StartsWith("____") && m.Name.EndsWith("____")))
       }
   }
 }

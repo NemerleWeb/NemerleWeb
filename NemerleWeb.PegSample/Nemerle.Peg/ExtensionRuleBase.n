@@ -1,5 +1,8 @@
-﻿namespace Nemerle.Peg
+﻿using NemerleWeb;
+
+namespace Nemerle.Peg
 {
+  [Unit]
   public abstract class ExtensionRuleBase[ReturnType]
   {
     public abstract Parse(pos : int, test : string) : int;
