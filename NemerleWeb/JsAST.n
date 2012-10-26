@@ -533,7 +533,8 @@ $(Body.Write("  "))
           typeof(JsAst.TupleIndexer), typeof(JsAst.FieldRef),
           typeof(JsAst.PropertyGet),
           typeof(JsAst.ArrayIndexer),
-          typeof(JsAst.Label)
+          typeof(JsAst.Label),
+          typeof(JsAst.Goto),
         ];
                                          
         public static Recurse(ast : JsAst, selector : JsAst -> JsAst, topdown : bool = true) : JsAst 
