@@ -22,11 +22,11 @@ namespace Nemerle.Peg
           <[
             def rep(pos : int)
             {
-              def newPos = $ruleCode;
-              if (newPos >= 0)
+              def newPosCompileRuleRepeatMin0 = $ruleCode;
+              if (newPosCompileRuleRepeatMin0 >= 0)
               {
                 $addTokensToList;
-                rep(newPos)
+                rep(newPosCompileRuleRepeatMin0)
               }
               else
                 pos
@@ -38,11 +38,11 @@ namespace Nemerle.Peg
           <[
             def rep(count, pos)
             {
-              def newPos = $ruleCode;
-              if (newPos >= 0)
+              def newPosCompileRuleRepeatMin = $ruleCode;
+              if (newPosCompileRuleRepeatMin >= 0)
               {
                 $addTokensToList;
-                rep(count + 1, newPos)
+                rep(count + 1, newPosCompileRuleRepeatMin)
               }
               else if (count >= $(minCount : int))
                 pos

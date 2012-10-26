@@ -38,11 +38,11 @@ namespace Nemerle.Peg
                               varRef                 => <[ $varRef = None(); ]>);
           }
           PrepandExprs(initialising, <[
-            def newPos = $ruleCode;
-            if (newPos >= 0)
+            def newPosCompileRuleRepeatMinMax01 = $ruleCode;
+            if (newPosCompileRuleRepeatMinMax01 >= 0)
             {
               $setExpr;
-              newPos
+              newPosCompileRuleRepeatMinMax01
             }
             else
             {
@@ -60,11 +60,11 @@ namespace Nemerle.Peg
                 pos
               else
               {
-                def newPos = $ruleCode;
-                if (newPos >= 0)
+                def newPosCompileRuleRepeatMinMax = $ruleCode;
+                if (newPosCompileRuleRepeatMinMax >= 0)
                 {
                   $addTokensToList;
-                  rep(count + 1, newPos)
+                  rep(count + 1, newPosCompileRuleRepeatMinMax)
                 }
                 else if (count >= $(minCount : int))
                   pos

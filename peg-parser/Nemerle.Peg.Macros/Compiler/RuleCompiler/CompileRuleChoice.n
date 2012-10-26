@@ -21,8 +21,8 @@ namespace Nemerle.Peg
         | [rule]        => [rule];
         | rule :: rules =>
           <[
-            def newPos = $rule;
-            when (newPos >= 0) res(newPos);
+            def newPosCompileRuleChoice = $rule;
+            when (newPosCompileRuleChoice >= 0) res(newPosCompileRuleChoice);
           ]> :: generate(rules)
       }
       def rules = generate(rule.rules.Map(CompileRule(_, results)));

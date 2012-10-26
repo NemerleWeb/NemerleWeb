@@ -26,18 +26,18 @@ namespace Nemerle.Peg
         {
           | Some(true) =>
             <[
-              def newPos = $subRuesCode;
-              if ($(endName : dyn)(newPos >= 0))
-                newPos
+              def newPosCompileRuleScopeTrue = $subRuesCode;
+              if ($(endName : dyn)(newPosCompileRuleScopeTrue >= 0))
+                newPosCompileRuleScopeTrue
               else
                 -1
             ]>
 
           | Some(false) =>
             <[
-              def newPos = $subRuesCode;
-              $(endName : dyn)(newPos >= 0);
-              newPos
+              def newPosCompileRuleScopeFalse = $subRuesCode;
+              $(endName : dyn)(newPosCompileRuleScopeFalse >= 0);
+              newPosCompileRuleScopeFalse
             ]>
 
           | None => subRuesCode
