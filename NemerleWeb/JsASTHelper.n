@@ -103,9 +103,10 @@ namespace NemerleWeb
             | something => JsAst.Assign(left, delayAssignment(something))
             }
             JsAst.WhileNamed(c, newBody, n)
+        | Label(id, body) => JsAst.Label(id, delayAssignment(body))
+        | Void => JsAst.Void()
         | e when JsAst.AllowedForAssignment.Any(al => al == e.GetType()) => JsAst.Assign(left, e)
         | Undefined
-        | Void => JsAst.Void()
         | _ => expr
         }
     }
