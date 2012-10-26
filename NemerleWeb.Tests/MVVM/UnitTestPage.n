@@ -697,7 +697,6 @@ namespace NemerleWeb.Tests
         }
       });
       
-      // TODO: #45
       test("initialization with local function in block", () =>
       {
         def var1 = 
