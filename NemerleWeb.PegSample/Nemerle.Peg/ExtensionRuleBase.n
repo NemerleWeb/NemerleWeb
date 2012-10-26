@@ -6,7 +6,8 @@ namespace Nemerle.Peg
   public abstract class ExtensionRuleBase[ReturnType]
   {
     public abstract Parse(pos : int, test : string) : int;
-    public abstract Parse(pos : int, test : string, result : ref ReturnType) : int;
+    // TODO: Restore
+    public abstract Parsex(pos : int, test : string/*, result : ref ReturnType*/) : int * ReturnType;
 
     public abstract PrecedenceLesserThan  : array[ExtensionRuleBase[ReturnType]] { get; }
     public abstract PrecedenceEqualsTo    : array[ExtensionRuleBase[ReturnType]] { get; }

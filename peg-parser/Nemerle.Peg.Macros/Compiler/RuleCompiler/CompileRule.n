@@ -67,8 +67,8 @@ namespace Nemerle.Peg
                   {
                     mutable c : char;
                     _ = c; // eliminate warning "a local value c was never used"
-                    def newPos = $(CompileRule(rule, ["result"]));
-                    if (newPos < 0)
+                    def newPosCompileRule = $(CompileRule(rule, ["result"]));
+                    if (newPosCompileRule < 0)
                     {
                       def skipPos = $skipRule;
                       if (skipPos > pos)
@@ -81,7 +81,7 @@ namespace Nemerle.Peg
                         -1
                     }
                     else
-                      newPos;
+                      newPosCompileRule;
                   }
                 ]>
 
