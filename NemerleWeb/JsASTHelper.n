@@ -63,7 +63,7 @@ namespace NemerleWeb
           | Label(id, body) when gotos.ContainsKey(id) =>
             def functionName = "_nweb_lbl_l" + id.ToString();
             JsAst.Seq([
-              JsAst.DeclFunction(functionName, [], body),
+              JsAst.DeclFunction(functionName, [], MakeReturn(body)),
               JsAst.Call(JsAst.LocalRef(functionName, None()), [])
             ]);
             //JsAst.WhileNamed(JsAst.Literal(JsLiteral.Bool(true)), JsAst.Seq([body, JsAst.Break()]), "l" + id.ToString()); //ConvertLabelToSwitch(l)

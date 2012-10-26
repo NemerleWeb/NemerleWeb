@@ -29,14 +29,22 @@ public class Test[T]
 {
   public this()
   {
-    def l = [1, 2, 3].ToList();
-        
-    mutable count = 0;
-    foreach (e in l with i)
-      when (e == i + 1)
-        count++;
-        
-    count == l.Count;
+    def var1 = 
+    {
+      (res : 
+      {
+        def rep(p)
+        {
+          if (p >= 5)
+          {
+            rep(p - 1)
+          }
+          else
+            if (p < 0) -1 else 1
+        }
+        rep(5)
+      })
+    };  
   }
   
   [Html]
