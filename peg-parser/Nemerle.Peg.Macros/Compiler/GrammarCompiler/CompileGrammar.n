@@ -40,8 +40,8 @@ namespace Nemerle.Peg
             | ex =>
               Message.Error(name.Location, ex.Message);
               PExpr.Error(ex);
-          }
-
+          };
+          
         def method = if (useResult)
         {
           def ty = match (TypedGrammar.GetRuleType(name))
@@ -51,9 +51,16 @@ namespace Nemerle.Peg
               Message.Error(name.Location, "PEG implementation error.");
               PExpr.Error("PEG implementation error.");
           };
-
+          
+        // TODO: Remove
+        _ = _tb.Define(
           <[decl:
-            private $(DecorateRuleName(name.Id) : dyn)(pos : int, text : string, result : ref $ty) : int
+            private result : $ty { get; set; }
+            ]>);
+                    
+          // TODO: Restore
+          <[decl:
+            private $(DecorateRuleName(name.Id + "x") : dyn)(pos : int, text : string/*, result : ref $ty*/) : int
             {
               $body;
             }

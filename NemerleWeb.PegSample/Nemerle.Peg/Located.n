@@ -31,19 +31,16 @@ namespace Nemerle.Peg
     
     public static ExtractPosAndLen(msg : string) : int * int
     {
-      // Hand parsing
-      if (msg.Length >= 5 &&
-        msg[0] == '[' && msg[msg.Length - 1] == ']' &&
-        msg.Contains(":"))
-       {   
-        def errorPos = int.Parse(msg.Substring(1));
-        def errorLen = int.Parse(msg.Substring(msg.IndexOf(':') + 1));
-        
+      def result = RegExp(@"\[(\d+):(\d+)]").exec(msg);
+      if (result != null && result.Length == 2)
+      {
+        def errorPos = int.Parse(result[1]);
+        def errorLen = int.Parse(result[2]);
         (errorPos, errorLen)
       }
       else
         (-1, -1)
-      
+        
       // TODO: Restore
       //def m = _posAndLenRx.Match(msg);
       
@@ -62,5 +59,28 @@ namespace Nemerle.Peg
       def len = Location.EndPos - Location.StartPos;
       $"$(Location.Source.FileName)$(Location.StartLineColumn.ToString()):[$pos:$len]: $msg"
     }
+  
+    // TODO: Remove
+      [JsApi]
+  public class RegExp
+  {
+    public this(_pattern : string) 
+    {}
+      
+    public compile() : void
+    {}
+    
+    public compile(_pattern : string) : void
+    {}
+    
+    public compile(_pattern : string, _modifier : string) : void
+    {}
+    
+    public exec(_input : string) : array[string]
+    {array(0)}
+    
+    public test(_input : string) : bool
+    {false}
+  }
   }
 }
