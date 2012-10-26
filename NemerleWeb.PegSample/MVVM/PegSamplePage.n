@@ -7,127 +7,145 @@ using System.Linq;
 
 using Nemerle.Peg;
 
+//namespace Calculator
+//{
+//  [Unit]
+//  [PegGrammar(Options = EmitDebugSources, implicitMul,
+//  grammar
+//  {
+//    letters               = ['a'..'z', 'A'..'Z'];
+//    limit_arg    : string = (letter / operator / limit)+;
+//    letter       : string = letters;
+//    operator     : string = "#sin()" letter+;
+//    limit        : string = "#lim()##low(" implicitMul "#to()" implicitMul ")" limit_arg;
+//    implicitMul  : string = (letter / operator / limit)+;
+//  })]
+//  class P
+//  {
+//    limit_arg(_ : List[string]) : string
+//    {
+//      ""
+//    }
+//    letter(_ : NToken) : string
+//    {
+//      ""
+//    }
+//    operator(_ : NToken, _ : List[string]) : string
+//    {
+//      ""
+//    }
+//    limit(_ : NToken, _ : string, _ : NToken, _ : string, _ : NToken, _ : string) : string
+//    {
+//      ""
+//    }
+//    implicitMul(_ : List[string]) : string
+//    {
+//      ""
+//    }
+//  }
+
+//  [Unit]
+//  [PegGrammar(Options = EmitDebugSources,
+//    rule1,
+//    grammar
+//    {
+//      rule1 : SCG.List[int] = rule11+ / rule12;
+//      rule11 : int = any;
+//      rule12 : SCG.List[int] = any;
+//      any = ['\u0000'..'\uFFFF'];
+//    }
+//  )]
+//  class Parser
+//  {
+//    rule1(@list : SCG.List[int]) : SCG.List[int]
+//    {
+//      @list;
+//    }
+    
+//    rule11(_ : NToken) : int
+//    {
+//      1;
+//    }
+    
+//    rule12(_ : NToken) : SCG.List[int]
+//    {
+//      SCG.List();
+//    }
+//  }
+  
+//  type LoopTokens = NToken * int;
+  
+//  [Record] public class ParserFatalError : Exception
+//  {
+//    public Pos     : int;
+//  }
+  
+//  public class FakeGrammar { }
+  
+//  /// <summary>
+//  /// Description of CalcParser.
+//  /// </summary>  
+//  [Unit]
+//  [PegGrammar( Options = EmitDebugSources, start, 
+//  grammar
+//  {
+//    s : void              = ' '*;
+
+//    [Extensible(a)]
+//    expr                  : int;
+
+//    num                   is expr = ['0'..'9']+ s;
+
+//    unaryMinus            is expr = '-'s expr : 30;
+
+//    parenthesesExpr       is expr = '('s expr ')'s;
+
+//    sum                   is expr = expr : 10 '+' expr : 10;
+//    sub                   is expr = expr : 10 '-' expr : 10;
+//    mul                   is expr = expr : 20 '*' expr : 20;
+//    div                   is expr = expr : 20 '/' expr : 20;
+
+//    start                 : int = s expr ![Any];
+//  })]
+//  public class CalcParser
+//  {
+//    private num(digits : NToken) : int
+//    {
+//      int.Parse(GetText(digits))
+//    }
+
+//    private unaryMinus(_ : NToken, se : int) : int
+//    {
+//      -se
+//    }
+
+//    private parenthesesExpr(_ : NToken, se : int, _ : NToken) : int
+//    {
+//      se
+//    }
+
+//    private sum(x : int, _ : NToken, y : int) : int { x + y }
+//    private sub(x : int, _ : NToken, y : int) : int { x - y }
+//    private mul(x : int, _ : NToken, y : int) : int { x * y }
+//    private div(x : int, _ : NToken, y : int) : int { x / y }
+//  }
+//}
+
 namespace Calculator
 {
   [Unit]
-  [PegGrammar(Options = EmitDebugSources, implicitMul,
+  [PegGrammar(Options = EmitDebugSources, start,
   grammar
   {
-    letters               = ['a'..'z', 'A'..'Z'];
-    limit_arg    : string = (letter / operator / limit)+;
-    letter       : string = letters;
-    operator     : string = "#sin()" letter+;
-    limit        : string = "#lim()##low(" implicitMul "#to()" implicitMul ")" limit_arg;
-    implicitMul  : string = (letter / operator / limit)+;
+    num = ['0'..'9'];
+    start : int = num+
   })]
-  class P
+  class CalcParser
   {
-    limit_arg(_ : List[string]) : string
-    {
-      ""
-    }
-    letter(_ : NToken) : string
-    {
-      ""
-    }
-    operator(_ : NToken, _ : List[string]) : string
-    {
-      ""
-    }
-    limit(_ : NToken, _ : string, _ : NToken, _ : string, _ : NToken, _ : string) : string
-    {
-      ""
-    }
-    implicitMul(_ : List[string]) : string
-    {
-      ""
-    }
-  }
-
-  [Unit]
-  [PegGrammar(Options = EmitDebugSources,
-    rule1,
-    grammar
-    {
-      rule1 : SCG.List[int] = rule11+ / rule12;
-      rule11 : int = any;
-      rule12 : SCG.List[int] = any;
-      any = ['\u0000'..'\uFFFF'];
-    }
-  )]
-  class Parser
-  {
-    rule1(@list : SCG.List[int]) : SCG.List[int]
-    {
-      @list;
-    }
-    
-    rule11(_ : NToken) : int
-    {
-      1;
-    }
-    
-    rule12(_ : NToken) : SCG.List[int]
-    {
-      SCG.List();
-    }
-  }
-  
-  type LoopTokens = NToken * int;
-  
-  [Record] public class ParserFatalError : Exception
-  {
-    public Pos     : int;
-  }
-  
-  public class FakeGrammar { }
-  
-  /// <summary>
-  /// Description of CalcParser.
-  /// </summary>  
-  [Unit]
-  [PegGrammar( Options = EmitDebugSources, start, 
-  grammar
-  {
-    s : void              = ' '*;
-
-    [Extensible(a)]
-    expr                  : int;
-
-    num                   is expr = ['0'..'9']+ s;
-
-    unaryMinus            is expr = '-'s expr : 30;
-
-    parenthesesExpr       is expr = '('s expr ')'s;
-
-    sum                   is expr = expr : 10 '+' expr : 10;
-    sub                   is expr = expr : 10 '-' expr : 10;
-    mul                   is expr = expr : 20 '*' expr : 20;
-    div                   is expr = expr : 20 '/' expr : 20;
-
-    start                 : int = s expr ![Any];
-  })]
-  public class CalcParser
-  {
-    private num(digits : NToken) : int
+    start(digits : Nemerle.Peg.NToken) : int
     {
       int.Parse(GetText(digits))
     }
-
-    private unaryMinus(_ : NToken, se : int) : int
-    {
-      -se
-    }
-
-    private parenthesesExpr(_ : NToken, se : int, _ : NToken) : int
-    {
-      se
-    }
-
-    private sum(x : int, _ : NToken, y : int) : int { x + y }
-    private sub(x : int, _ : NToken, y : int) : int { x - y }
-    private mul(x : int, _ : NToken, y : int) : int { x * y }
-    private div(x : int, _ : NToken, y : int) : int { x / y }
   }
 }
 
