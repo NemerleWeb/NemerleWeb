@@ -134,18 +134,225 @@ using Nemerle.Peg;
 namespace Calculator
 {
   [Unit]
-  [PegGrammar(Options = EmitDebugSources, start,
+  /*[PegGrammar(Options = EmitDebugSources, start,
   grammar
   {
     num = ['0'..'9'];
     start : int = num+
-  })]
+  })]*/
   class CalcParser
   {
     start(digits : Nemerle.Peg.NToken) : int
     {
       int.Parse(GetText(digits))
     }
+    
+    
+    #region Generated
+    // Calculator.CalcParser
+private mutable __GENERATED_PEG__Memeoize_Pos__start__ : int = -1;
+
+// Calculator.CalcParser
+private mutable __GENERATED_PEG__Memeoize_End__start__ : int = -1;
+
+// Calculator.CalcParser
+private mutable __GENERATED_PEG__Memeoize_Res__start__ : int = -1;
+
+// Calculator.CalcParser
+private mutable __GENERATED_PEG__MaxRollback___start__ : int = -1;
+
+private mutable result : int;
+
+// Calculator.CalcParser
+private __GENERATED_PEG__RULE__startx__(pos : int, text : string) : int
+{
+  unchecked 
+  {
+    mutable (c : char);
+    _  = c;
+    
+    {
+      _  = "CaptureH[start](CaptureA[Chars](num+))";
+      
+      {
+        mutable token_1;
+        if (__GENERATED_PEG__Memeoize_Pos__start__ == pos) 
+        {
+          when (__GENERATED_PEG__Memeoize_End__start__ >= 0) result = __GENERATED_PEG__Memeoize_Res__start__;
+          __GENERATED_PEG__Memeoize_End__start__
+        }; else 
+        {
+          def newPosCompileRuleCaptureHandler = 
+          {
+            def newPosCompileRuleCaptureChars = 
+            {
+              _  = "num+";
+              (res : 
+              {
+                _  = "num+";
+                
+                {
+                  def rep (count, pos)  
+                  {
+                    def newPosCompileRuleRepeatMin = 
+                    {
+                      _  = "num";
+                      __GENERATED_PEG__RULE__num__(pos, text)
+                    };
+                    if (newPosCompileRuleRepeatMin >= 0) 
+                    {
+                      ();
+                      rep(count + 1, newPosCompileRuleRepeatMin)
+                    }; else if (count >= 1) pos; else -1
+                  };
+                  rep(0, pos)
+                }
+              })
+            };
+            when (newPosCompileRuleCaptureChars >= 0) token_1 = Nemerle.Peg.NToken(pos, newPosCompileRuleCaptureChars);
+            newPosCompileRuleCaptureChars
+          };
+          __GENERATED_PEG__Memeoize_Pos__start__ = pos;
+          __GENERATED_PEG__Memeoize_End__start__ = newPosCompileRuleCaptureHandler;
+          if (newPosCompileRuleCaptureHandler >= 0) 
+          {
+            result = start(token_1);
+            ();
+            __GENERATED_PEG__Memeoize_Res__start__ = result
+          }; else when (__GENERATED_PEG__MaxRollback___start__ < pos) __GENERATED_PEG__MaxRollback___start__ = pos;
+          newPosCompileRuleCaptureHandler
+        }
+      }
+    }
+  }
+}
+
+// Calculator.CalcParser
+private __GENERATED_PEG__RULE__num__(pos : int, text : string) : int
+{
+  unchecked 
+  {
+    mutable (c : char);
+    _  = c;
+    
+    {
+      _  = "['0'..'9']";
+      (res : 
+      {
+        _  = "['0'..'9']";
+        
+        {
+          _  = "['0'..'9']";
+          if (pos < text.Length) 
+          {
+            c = text[pos];
+            if ('0' <= c && c <= '9') pos + 1; else -1
+          }; else -1
+        }
+      })
+    }
+  }
+}
+
+// Calculator.CalcParser
+public GetMaxRollbackPosAndIds() : int * System.Collections.Generic.List[int]
+{
+  def ids = System.Collections.Generic.List(42);
+  mutable max = -1;
+  
+  {
+    
+    {
+      when (max < __GENERATED_PEG__MaxRollback___start__) 
+      {
+        max = __GENERATED_PEG__MaxRollback___start__;
+        ids.Clear()
+      };
+      when (__GENERATED_PEG__MaxRollback___start__ > 0 && max == __GENERATED_PEG__MaxRollback___start__) ids.Add(1)
+    }
+  };
+  (max, ids)
+}
+
+// Calculator.CalcParser
+public GetMaxRollbackPosAndNames() : int * System.Collections.Generic.List[string]
+{
+  def (max, ids) = GetMaxRollbackPosAndIds();
+  def names = System.Collections.Generic.List(ids.Count);
+  foreach (id in ids) names.Add(GetRuleName(id));
+  (max, names)
+}
+
+// Calculator.CalcParser
+public GetRuleName(id : int) : string
+{
+  match (id)
+    {
+    | 0 => 
+      "num"
+    | 1 => 
+      "start"
+    | _  => 
+      "Unknown rule id."
+  }
+}
+
+// Calculator.CalcParser
+private ResetMaxRollbackPos() : void 
+{
+  __GENERATED_PEG__MaxRollback___start__ = -1
+}
+
+// Calculator.CalcParser
+private ResetMemoization() : void 
+{
+  __GENERATED_PEG__Memeoize_Pos__start__ = -1;
+  __GENERATED_PEG__Memeoize_End__start__ = -1;
+  __GENERATED_PEG__Memeoize_Res__start__ = -1;
+}
+
+// Calculator.CalcParser
+public Parse(text : string) : option[int]
+{
+  def pos = TryParse(text);
+  if (pos < 0) None(); else Some(result)
+}
+
+// Calculator.CalcParser
+public Parsex(source : Nemerle.Peg.SourceSnapshot) : option[int]
+{
+  def pos = TryParsex(source);
+  if (pos < 0) None(); else Some(result)
+}
+
+// Calculator.CalcParser
+public TryParse(text : string) : int
+{
+  TryParsex(Nemerle.Peg.SourceSnapshot(text, text, 0, "", Nemerle.Peg.SourceSnapshot("", "", 0, "", null).MakeLineIndexes(text)))
+}
+
+mutable _parsingSource : SourceSnapshot;
+// Calculator.CalcParser
+public TryParsex(source : Nemerle.Peg.SourceSnapshot) : int
+{
+  ResetMemoization();
+  ResetMaxRollbackPos();
+  _parsingSource = source;
+  __GENERATED_PEG__RULE__startx__(0, _parsingSource.Text)
+}
+
+// Calculator.CalcParser
+protected GetText(tok : Nemerle.Peg.NToken) : string
+{
+  _parsingSource.OriginalText.Substring(tok.StartPos, tok.EndPos - tok.StartPos)
+}
+
+// Calculator.CalcParser
+protected GetLocation(tok : Nemerle.Peg.NToken) : Nemerle.Peg.Location
+{
+  Nemerle.Peg.Location(_parsingSource, tok.StartPos, tok.EndPos)
+}
+    #endregion
   }
 }
 
