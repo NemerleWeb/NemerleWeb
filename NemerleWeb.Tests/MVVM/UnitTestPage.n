@@ -705,7 +705,7 @@ namespace NemerleWeb.Tests
           {
             def rep(p)
             {
-              if (p >= 5)
+              if (p >= 10)
               {
                 rep(p - 1)
               }
@@ -717,6 +717,68 @@ namespace NemerleWeb.Tests
         };
         
         var1 == 1
+      });
+      
+      test("complex local function with block", () =>
+      {
+        mutable posStart = -1;
+        mutable posEnd = -1;
+        mutable __GENERATED_PEG__Memeoize_Res__start__= -1;
+        mutable __GENERATED_PEG__MaxRollback___start__= -1;
+        mutable result = -1;
+        mutable pos = 0;
+        def text = "123";
+        
+        mutable token_1;
+        def f()
+        {
+          if (posStart == pos) 
+          {
+            when (posEnd >= 0) result = __GENERATED_PEG__Memeoize_Res__start__;
+            posEnd
+          }; else 
+          {
+            def newPosCompileRuleCaptureHandler = 
+            {
+              def newPosCompileRuleCaptureChars = 
+              {
+                (res : 
+                {
+                  {
+                    def rep (count, pos)  
+                    {
+                      def newPosCompileRuleRepeatMin = 
+                      {
+                        _  = "num";
+                        //__GENERATED_PEG__RULE__num__(pos, text)
+                        2 - count
+                      };
+                      if (newPosCompileRuleRepeatMin >= 0) 
+                      {
+                        ();
+                        rep(count + 1, newPosCompileRuleRepeatMin)
+                      }; else if (count >= 1) pos + 1; else -1
+                    };
+                    rep(0, pos)
+                  }
+                })
+              };
+              when (newPosCompileRuleCaptureChars >= 0) token_1 = (pos, newPosCompileRuleCaptureChars);
+              newPosCompileRuleCaptureChars
+            };
+            posStart = pos;
+            posEnd = newPosCompileRuleCaptureHandler;
+            if (newPosCompileRuleCaptureHandler >= 0) 
+            {
+              result = 1; //start(token_1);
+              ();
+              __GENERATED_PEG__Memeoize_Res__start__ = result
+            }; else when (__GENERATED_PEG__MaxRollback___start__ < pos) __GENERATED_PEG__MaxRollback___start__ = pos;
+            newPosCompileRuleCaptureHandler
+          }
+        }
+        
+        f() == 1
       });
     }
     

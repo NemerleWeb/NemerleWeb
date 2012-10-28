@@ -47,17 +47,17 @@ namespace Nemerle.Peg
             else
             {
               $setNoneExpr;
-              pos
+              internalPos
             }
           ]>)
 
         | RepeatMinMax(minCount, maxCount, subrule)    =>
           def (initialising, addTokensToList, ruleCode) = MakeListCode(results, subrule);
           PrepandExprs(initialising, <[
-            def rep(count, pos)
+            def rep(count, internalPos)
             {
               if (count == $(maxCount : int))
-                pos
+                internalPos
               else
               {
                 def newPosCompileRuleRepeatMinMax = $ruleCode;
@@ -67,7 +67,7 @@ namespace Nemerle.Peg
                   rep(count + 1, newPosCompileRuleRepeatMinMax)
                 }
                 else if (count >= $(minCount : int))
-                  pos
+                  internalPos
                 else
                   -1
                }
