@@ -32,8 +32,8 @@ namespace Nemerle.Peg
                     def ruleCode = CompileRule(rule, [result]);
                     <[
                       {
-                        def internalPos = $ruleCode;
-                        if (internalPos >= 0) $(generate(rules, results)) else -1
+                        def pos = $ruleCode;
+                        if (pos >= 0) $(generate(rules, results)) else -1
                       }
                     ]>
                   | _ => PExpr.Error("Empty result list")
@@ -43,15 +43,15 @@ namespace Nemerle.Peg
                 def ruleCode = CompileRule(rule, []);
                 <[
                   {
-                    def internalPos = $ruleCode;
-                    if (internalPos >= 0) $(generate(rules, results)) else -1
+                    def pos = $ruleCode;
+                    if (pos >= 0) $(generate(rules, results)) else -1
                   }
                 ]>
             }
 
           | [] =>
             assert(results.Length == 0);
-            <[ { internalPos } ]>;
+            <[ { pos } ]>;
         }
       }
 
@@ -59,12 +59,12 @@ namespace Nemerle.Peg
       {
         match (rules)
         {
-          | []            => <[ { internalPos } ]>
+          | []            => <[ { pos } ]>
           | [rule]        => CompileRule(rule, [])
           | rule :: rules =>
             <[
-              def internalPos = $(CompileRule(rule, []));
-              if (internalPos >= 0) $(generateNoResult(rules)) else -1
+              def pos = $(CompileRule(rule, []));
+              if (pos >= 0) $(generateNoResult(rules)) else -1
             ]>
         }
       }

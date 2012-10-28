@@ -27,16 +27,16 @@ namespace Nemerle.Peg
        PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
         public Parse(text : string) : option[$tyParam]
         {
-          def (pos/*, res*/) = TryParse(text);
-          if (pos < 0) None() else Some(result/*res*/)
+          def (position/*, res*/) = TryParse(text);
+          if (position < 0) None() else Some(result/*res*/)
         }
       ]>);
       // TODO: Restore
        PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
         public Parsex(source : Nemerle.Peg.SourceSnapshot) : option[$tyParam]
         {
-          def (pos/*, res*/) = TryParsex(source);
-          if (pos < 0) None() else Some(result/*res*/)
+          def (position/*, res*/) = TryParsex(source);
+          if (position < 0) None() else Some(result/*res*/)
         }
       ]>);
 
@@ -73,10 +73,10 @@ namespace Nemerle.Peg
             _parsingSource = source;
 
             //mutable result;
-            //def pos = 
+            //def position = 
             $(DecorateRuleName(TypedGrammar.StartRuleName.Id + "x") : dyn)(0, _parsingSource.Text/*, ref result*/);
 
-            //(pos, result)
+            //(position, result)
           }
         ]>);
       }

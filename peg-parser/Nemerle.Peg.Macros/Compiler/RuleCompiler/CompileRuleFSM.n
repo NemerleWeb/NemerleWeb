@@ -34,7 +34,7 @@ namespace Nemerle.Peg
         });
       def statements = SCG.List();
       statements.Add(<[ mutable okPos = -1 ]>);
-      statements.Add(<[ mutable curPos = pos ]>);
+      statements.Add(<[ mutable curPos = position ]>);
       when (fsm.StartState != 0)
         statements.Add(goto(fsm.StartState));
       for (mutable state = 0; state < fsm.StateCount; ++state)

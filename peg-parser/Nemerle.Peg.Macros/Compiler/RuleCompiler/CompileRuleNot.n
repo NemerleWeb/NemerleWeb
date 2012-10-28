@@ -16,12 +16,12 @@ namespace Nemerle.Peg
     public CompileRuleNot(rule : Rule.Not) : PExpr
     {
       | Not(Chars([RangeSet where (Ranges = [range])])) when range.from == char.MinValue && range.to == char.MaxValue => // !any
-        <[ if (pos >= text.Length) pos else -1 ]>
+        <[ if (position >= text.Length) position else -1 ]>
 
       | Not(rule) =>
         <[
           def newPosCompileRuleNot = $(CompileRule(rule, []));
-          if (newPosCompileRuleNot < 0) pos else -1
+          if (newPosCompileRuleNot < 0) position else -1
         ]>
     }
   }
