@@ -17,7 +17,7 @@ namespace Nemerle.Peg
     {
       <[
         def newPosCompileRuleAnd = $(CompileRule(rule.rule, []));
-        if (newPosCompileRuleAnd >= 0) pos else -1
+        if (newPosCompileRuleAnd >= 0) position else -1
       ]>
     }
   }

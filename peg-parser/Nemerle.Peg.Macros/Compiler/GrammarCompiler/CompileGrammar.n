@@ -60,7 +60,7 @@ namespace Nemerle.Peg
                     
           // TODO: Restore
           <[decl:
-            private $(DecorateRuleName(name.Id + "x") : dyn)(pos : int, text : string/*, result : ref $ty*/) : int
+            private $(DecorateRuleName(name.Id + "x") : dyn)(position : int, text : string/*, result : ref $ty*/) : int
             {
               $body;
             }
@@ -69,7 +69,7 @@ namespace Nemerle.Peg
         else
         {
           <[decl:
-            private $(DecorateRuleName(name.Id) : dyn)(pos : int, text : string) : int
+            private $(DecorateRuleName(name.Id) : dyn)(position : int, text : string) : int
             {
               $body;
             }

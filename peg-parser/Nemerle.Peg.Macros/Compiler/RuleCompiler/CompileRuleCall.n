@@ -19,11 +19,11 @@ namespace Nemerle.Peg
       {
         | [] =>
           _grammarCompiller.CallRule(rule.name, false);
-          <[ $(_grammarCompiller.DecorateRuleName(rule.name.Id) : dyn)(internalPos, text) ]>
+          <[ $(_grammarCompiller.DecorateRuleName(rule.name.Id) : dyn)(pos, text) ]>
 
         | [result] =>
           _grammarCompiller.CallRule(rule.name, true);
-          <[ $(_grammarCompiller.DecorateRuleName(rule.name.Id) : dyn)(internalPos, text, ref $(result : dyn)) ]>
+          <[ $(_grammarCompiller.DecorateRuleName(rule.name.Id) : dyn)(pos, text, ref $(result : dyn)) ]>
 
         | _ => PExpr.Error("Implementation error: Multiple results in Rule.Call")
       }

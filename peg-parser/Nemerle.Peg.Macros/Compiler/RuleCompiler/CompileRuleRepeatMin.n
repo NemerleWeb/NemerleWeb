@@ -20,7 +20,7 @@ namespace Nemerle.Peg
       {
         | RepeatMin(0, _) =>
           <[
-            def rep(internalPos : int)
+            def rep(pos : int)
             {
               def newPosCompileRuleRepeatMin0 = $ruleCode;
               if (newPosCompileRuleRepeatMin0 >= 0)
@@ -29,14 +29,14 @@ namespace Nemerle.Peg
                 rep(newPosCompileRuleRepeatMin0)
               }
               else
-                internalPos
+                pos
             }
-            rep(pos)
+            rep(position)
           ]>
 
         | RepeatMin(minCount, _) =>
           <[
-            def rep(count, internalPos)
+            def rep(count, pos)
             {
               def newPosCompileRuleRepeatMin = $ruleCode;
               if (newPosCompileRuleRepeatMin >= 0)
@@ -45,11 +45,11 @@ namespace Nemerle.Peg
                 rep(count + 1, newPosCompileRuleRepeatMin)
               }
               else if (count >= $(minCount : int))
-                internalPos
+                pos
               else
                 -1
             }
-            rep(0, pos)
+            rep(0, position)
           ]>
       }
       PrepandExprs(initialising, code);
