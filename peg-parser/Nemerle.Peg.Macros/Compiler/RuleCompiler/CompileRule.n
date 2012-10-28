@@ -73,7 +73,7 @@ namespace Nemerle.Peg
                       def skipPos = $skipRule;
                       if (skipPos > pos)
                       {
-                        $("result" : dyn) = $(recovery.handlerName.Id : usesite)(pos, skipPos, $(_ruleToCompile.Id : int));
+                        $("result" : dyn) = $(recovery.handlerName.Id : usesite)(newPosCompileRule, skipPos, $(_ruleToCompile.Id : int));
                         ResetMaxRollbackPos();
                         skipPos
                       }
