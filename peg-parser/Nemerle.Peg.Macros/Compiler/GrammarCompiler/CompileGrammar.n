@@ -52,17 +52,13 @@ namespace Nemerle.Peg
               PExpr.Error("PEG implementation error.");
           };
           
-        // TODO: Remove
-        _ = _tb.Define(
-          <[decl:
-            private result : $ty { get; set; }
-            ]>);
-                    
           // TODO: Restore
           <[decl:
-            private $(DecorateRuleName(name.Id + "x") : dyn)(position : int, text : string/*, result : ref $ty*/) : int
+            private $(DecorateRuleName(name.Id + "x") : dyn)(position : int, text : string/*, result : ref $ty*/) : int * $ty
             {
-              $body;
+              mutable result;
+              def p = $body;
+              (p, result)
             }
           ]>
         }
