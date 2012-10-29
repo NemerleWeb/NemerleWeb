@@ -23,7 +23,12 @@ namespace Nemerle.Peg
 
         | [result] =>
           _grammarCompiller.CallRule(rule.name, true);
-          <[ $(_grammarCompiller.DecorateRuleName(rule.name.Id) : dyn)(pos, text, ref $(result : dyn)) ]>
+          // TODO: #42 Restore 
+          <[ 
+            def (ret, res) = $(_grammarCompiller.DecorateRuleName(rule.name.Id + "x") : dyn)(pos, text/*, ref $(result : dyn)*/);
+            $(result : dyn) = res;
+            ret
+            ]>
 
         | _ => PExpr.Error("Implementation error: Multiple results in Rule.Call")
       }
