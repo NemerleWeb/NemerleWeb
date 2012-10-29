@@ -26,7 +26,8 @@ namespace Nemerle.Peg
     {
       _typer    = typer;
       _tb       = tb;
-      _isDebug  = _typer.Manager.Options.IsConstantDefined("DEBUG");
+      // TODO: Restore, always use debug because we don't support TExpr.Goto.
+      _isDebug  = true;//_typer.Manager.Options.IsConstantDefined("DEBUG");
 
       def untypedGrammar = GrammarTyper.RemoveAllCaptures(typedGrammar);
       _typedGrammar   = if(_isDebug) typedGrammar   else Optimizer.OptimizeGrammar(typedGrammar);
