@@ -16,7 +16,7 @@ namespace Nemerle.Peg
     public CompileRuleAnd(rule : Rule.And) : PExpr
     {
       <[
-        def newPosCompileRuleAnd = $(CompileRule(rule.rule, []));
+        def newPosCompileRuleAnd = $(CompileRule(rule.rule, [], false));
         if (newPosCompileRuleAnd >= 0) position else -1
       ]>
     }

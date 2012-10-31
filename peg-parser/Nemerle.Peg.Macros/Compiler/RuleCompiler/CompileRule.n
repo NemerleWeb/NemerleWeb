@@ -13,20 +13,20 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    private CompileRule(currentRule : Rule, results : list[string]) : PExpr
+    private CompileRule(currentRule : Rule, results : list[string], global : bool) : PExpr
     {
       def code = match (currentRule)
       {
         | And          as rule => assert(results.IsEmpty()); CompileRuleAnd         (rule)
         | Not          as rule => assert(results.IsEmpty()); CompileRuleNot         (rule)
         | Fsm          as rule => assert(results.IsEmpty()); CompileRuleFsm         (rule)
-        | Chars        as rule => assert(results.IsEmpty()); CompileRuleChars       (rule)
-        | Call         as rule =>                            CompileRuleCall        (rule, results)
+        | Chars        as rule => assert(results.IsEmpty()); CompileRuleChars       (rule, global)
+        | Call         as rule =>                            CompileRuleCall        (rule, results, global)
         | Sequence     as rule =>                            CompileRuleSequence    (rule, results)
         | Choice       as rule =>                            CompileRuleChoice      (rule, results)
         | RepeatMin    as rule =>                            CompileRuleRepeatMin   (rule, results)
         | RepeatMinMax as rule =>                            CompileRuleRepeatMinMax(rule, results)
-        | Capture      as rule =>                            CompileRuleCapture     (rule, results)
+        | Capture      as rule =>                            CompileRuleCapture     (rule, results, global)
         | Scope        as rule =>                            CompileRuleScope       (rule, results)
         | Cut          as rule =>                            CompileRuleCut         (rule, results)
       }
@@ -56,18 +56,18 @@ namespace Nemerle.Peg
                   {
                     mutable c : char;
                     _ = c; // eliminate warning "a local value c was never used"
-                    $(CompileRule(rule, ["result"]))
+                    $(CompileRule(rule, ["result"], false))
                   }
                 ]>
 
               | [recovery is RuleAttribute.Recovery] =>
-                def skipRule = CompileRule(Rule.RepeatMin(0, Rule.Sequence([Rule.Not(recovery.stop), recovery.skip])), []);
+                def skipRule = CompileRule(Rule.RepeatMin(0, Rule.Sequence([Rule.Not(recovery.stop), recovery.skip])), [], false);
                 <[
                   unchecked
                   {
                     mutable c : char;
                     _ = c; // eliminate warning "a local value c was never used"
-                    def newPosCompileRule = $(CompileRule(rule, ["result"]));
+                    def newPosCompileRule = $(CompileRule(rule, ["result"], false));
                     if (newPosCompileRule < 0)
                     {
                       def skipPos = $skipRule;
@@ -96,7 +96,7 @@ namespace Nemerle.Peg
               {
                 mutable c : char;
                 _ = c; // eliminate warning "a local value c was never used"
-                $(CompileRule(rule, []))
+                $(CompileRule(rule, [], false))
               }
             ]>
         | _ =>

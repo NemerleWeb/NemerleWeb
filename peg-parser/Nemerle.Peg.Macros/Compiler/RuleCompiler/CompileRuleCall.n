@@ -13,22 +13,24 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleCall(rule : Rule.Call, results : list[string]) : PExpr
+    public CompileRuleCall(rule : Rule.Call, results : list[string], global : bool) : PExpr
     {
+      def pos = if (global) <[ position ]> else <[ pos ]>;
+      
       match (results)
       {
         | [] =>
           _grammarCompiller.CallRule(rule.name, false);
-          <[ $(_grammarCompiller.DecorateRuleName(rule.name.Id) : dyn)(pos, text) ]>
+          <[ $(_grammarCompiller.DecorateRuleName(rule.name.Id) : dyn)($pos, text) ]>
 
         | [result] =>
           _grammarCompiller.CallRule(rule.name, true);
-          // TODO: #42 Restore 
+          // TODO: #42 Restore
           <[ 
-            def (ret, res) = $(_grammarCompiller.DecorateRuleName(rule.name.Id + "x") : dyn)(pos, text/*, ref $(result : dyn)*/);
+            def (ret, res) = $(_grammarCompiller.DecorateRuleName(rule.name.Id + "x") : dyn)($pos, text/*, ref $(result : dyn)*/);
             $(result : dyn) = res;
             ret
-            ]>
+          ]>
 
         | _ => PExpr.Error("Implementation error: Multiple results in Rule.Call")
       }

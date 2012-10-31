@@ -25,7 +25,7 @@ namespace Nemerle.Peg
             when (newPosCompileRuleChoice >= 0) res(newPosCompileRuleChoice);
           ]> :: generate(rules)
       }
-      def rules = generate(rule.rules.Map(CompileRule(_, results)));
+      def rules = generate(rule.rules.Map(CompileRule(_, results, true)));
       def rules = rules.Map(fun(_)
       {
         | PExpr.Sequence(rules) => rules

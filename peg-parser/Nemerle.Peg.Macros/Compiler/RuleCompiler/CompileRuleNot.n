@@ -20,7 +20,7 @@ namespace Nemerle.Peg
 
       | Not(rule) =>
         <[
-          def newPosCompileRuleNot = $(CompileRule(rule, []));
+          def newPosCompileRuleNot = $(CompileRule(rule, [], false));
           if (newPosCompileRuleNot < 0) position else -1
         ]>
     }

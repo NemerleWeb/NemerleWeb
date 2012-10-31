@@ -10,102 +10,23 @@ using Nemerle.Peg;
 namespace Calculator
 {
   [Unit]
-  [PegGrammar(Options = EmitDebugSources, implicitMul,
-  grammar
-  {
-    letters               = ['a'..'z', 'A'..'Z'];
-    limit_arg    : string = (letter / operator / limit)+;
-    letter       : string = letters;
-    operator     : string = "#sin()" letter+;
-    limit        : string = "#lim()##low(" implicitMul "#to()" implicitMul ")" limit_arg;
-    implicitMul  : string = (letter / operator / limit)+;
-  })]
-  class P
-  {
-    limit_arg(_ : List[string]) : string
-    {
-      ""
-    }
-    letter(_ : NToken) : string
-    {
-      ""
-    }
-    operator(_ : NToken, _ : List[string]) : string
-    {
-      ""
-    }
-    limit(_ : NToken, _ : string, _ : NToken, _ : string, _ : NToken, _ : string) : string
-    {
-      ""
-    }
-    implicitMul(_ : List[string]) : string
-    {
-      ""
-    }
-  }
-
-  [Unit]
-  [PegGrammar(Options = EmitDebugSources,
-    rule1,
-    grammar
-    {
-      rule1 : SCG.List[int] = rule11+ / rule12;
-      rule11 : int = any;
-      rule12 : SCG.List[int] = any;
-      any = ['\u0000'..'\uFFFF'];
-    }
-  )]
-  class Parser
-  {
-    rule1(@list : SCG.List[int]) : SCG.List[int]
-    {
-      @list;
-    }
-    
-    rule11(_ : NToken) : int
-    {
-      1;
-    }
-    
-    rule12(_ : NToken) : SCG.List[int]
-    {
-      SCG.List();
-    }
-  }
-  
-  type LoopTokens = NToken * int;
-  
-  [Record] public class ParserFatalError : Exception
-  {
-    public Pos     : int;
-  }
-  
-  public class FakeGrammar { }
-  
-  /// <summary>
-  /// Description of CalcParser.
-  /// </summary>  
-  [Unit]
   [PegGrammar( Options = EmitDebugSources, start, 
   grammar
   {
     s : void              = ' '*;
 
-    [Extensible(a)]
-    expr                  : int;
+    any                   = ['\u0000'..'\uFFFF'];
+    digit                 = ['0'..'9']+;
+  
+    num                   : int = s digit s;
+    unaryMinus            : int = '-' s num;
 
-    num                   is expr = ['0'..'9']+ s;
+    sum                   : int  = num : 10 '+' num : 10;
+    sub                   : int  = num : 10 '-' num : 10;
+    mul                   : int  = num : 20 '*' num : 20;
+    div                   : int  = num : 20 '/' num : 20;
 
-    unaryMinus            is expr = '-'s expr : 30;
-
-    parenthesesExpr       is expr = '('s expr ')'s;
-
-    sum                   is expr = expr : 10 '+' expr : 10;
-    sub                   is expr = expr : 10 '-' expr : 10;
-    mul                   is expr = expr : 20 '*' expr : 20;
-    div                   is expr = expr : 20 '/' expr : 20;
-
-    start                 : int = s expr ![Any];
+    start                 : int = num/s (sum/sub/mul/div) ![Any];
   })]
   public class CalcParser
   {
