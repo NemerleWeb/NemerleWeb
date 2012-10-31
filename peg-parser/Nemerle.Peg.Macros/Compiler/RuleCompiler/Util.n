@@ -63,12 +63,12 @@ namespace Nemerle.Peg
       match (results)
       {
         | [] =>
-          ([], <[ () ]>, <[ () ]>, CompileRule(subrule, []))
+          ([], <[ () ]>, <[ () ]>, CompileRule(subrule, [], false))
 
         | [result] =>
           def result          = <[ $(result : dyn) ]>;
           def variables       = MakeVariablesForRule(subrule);
-          def ruleCode        = CompileRule(subrule, variables);
+          def ruleCode        = CompileRule(subrule, variables, false);
           def initList        = makeInitExpr(result);
           def setExpr         = makeSetExpr(result, variables.Map(var => <[ $(var : dyn) ]>));
           def setNoneExpr     = makeSetNoneExpr(result);

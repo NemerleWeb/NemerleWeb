@@ -13,33 +13,35 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleCapture(rule : Rule.Capture, results : list[string]) : PExpr
+    public CompileRuleCapture(rule : Rule.Capture, results : list[string], global : bool) : PExpr
     {
       match (rule)
       {
         | Capture(Argument(Chars), subrule) =>
-          def code = CompileRule(subrule, []);
+          def code = CompileRule(subrule, [], global);
           match (results)
           {
             | []       => code;
             | [result] =>
+              def pos = if(global) <[ position ]> else <[ pos ]>;
+            
               <[
                 def newPosCompileRuleCaptureChars = $code;
                 when (newPosCompileRuleCaptureChars >= 0)
-                  $(result : dyn) = Nemerle.Peg.NToken(position, newPosCompileRuleCaptureChars);
+                  $(result : dyn) = Nemerle.Peg.NToken($pos, newPosCompileRuleCaptureChars);
                 newPosCompileRuleCaptureChars
               ]>
             | _ => assert(false);
           }
 
-        | Capture(Argument, subrule) => CompileRule(subrule, results);
+        | Capture(Argument, subrule) => CompileRule(subrule, results, global);
         | Capture(Handler(name, _, retType), subrule) =>
           match (results)
           {
-            | []       => CompileRule(subrule, [])
+            | []       => CompileRule(subrule, [], global)
             | [result] =>
               def varNames     = MakeVariablesForRule(subrule);
-              def subRulesCode = CompileRule(subrule, varNames);
+              def subRulesCode = CompileRule(subrule, varNames, global);
 
               def ty = match(retType : RuleType)
               {

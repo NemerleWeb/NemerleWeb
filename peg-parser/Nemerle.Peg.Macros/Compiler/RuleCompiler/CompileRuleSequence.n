@@ -15,11 +15,11 @@ namespace Nemerle.Peg
   {
     public CompileRuleSequence(rule : Rule.Sequence, results : list[string]) : PExpr
     {
-      def generate(rules : list[Rule], results : list[string]) : PExpr
+      def generate(rules : list[Rule], results : list[string], global : bool) : PExpr
       {
         match (rules)
         {
-          | [rule]        => CompileRule(rule, results);
+          | [rule]        => CompileRule(rule, results, global);
           | rule :: rules =>
             match (rule)
             {
@@ -29,22 +29,22 @@ namespace Nemerle.Peg
                 match (results)
                 {
                   | result :: results =>
-                    def ruleCode = CompileRule(rule, [result]);
+                    def ruleCode = CompileRule(rule, [result], global);
                     <[
                       {
                         def pos = $ruleCode;
-                        if (pos >= 0) $(generate(rules, results)) else -1
+                        if (pos >= 0) $(generate(rules, results, false)) else -1
                       }
                     ]>
                   | _ => PExpr.Error("Empty result list")
                 }
 
               | _ =>
-                def ruleCode = CompileRule(rule, []);
+                def ruleCode = CompileRule(rule, [], global);
                 <[
                   {
                     def pos = $ruleCode;
-                    if (pos >= 0) $(generate(rules, results)) else -1
+                    if (pos >= 0) $(generate(rules, results, false)) else -1
                   }
                 ]>
             }
@@ -55,24 +55,24 @@ namespace Nemerle.Peg
         }
       }
 
-      def generateNoResult(rules : list[Rule]) : PExpr
+      def generateNoResult(rules : list[Rule], global : bool) : PExpr
       {
         match (rules)
         {
           | []            => <[ { pos } ]>
-          | [rule]        => CompileRule(rule, [])
+          | [rule]        => CompileRule(rule, [], global)
           | rule :: rules =>
             <[
-              def pos = $(CompileRule(rule, []));
-              if (pos >= 0) $(generateNoResult(rules)) else -1
+              def pos = $(CompileRule(rule, [], global));
+              if (pos >= 0) $(generateNoResult(rules, false)) else -1
             ]>
         }
       }
 
       match (results)
       {
-        | [] => generateNoResult(rule.rules);
-        | _  => generate(rule.rules, results);
+        | [] => generateNoResult(rule.rules, true);
+        | _  => generate(rule.rules, results, true);
       }
     }
   }
