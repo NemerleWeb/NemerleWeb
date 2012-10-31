@@ -439,11 +439,10 @@
     <YourSourceDirectory>$(ProjectDir)MVVM</YourSourceDirectory>
   </PropertyGroup>
   <Target Name="BeforeBuild"></Target>
-  <Target Name="AfterBuild">    
+  <Target Name="AfterBuild">
     <CreateItem Include="$(YourSourceDirectory)\**\*.*">
       <Output TaskParameter="Include" ItemName="YourFilesToCopy" />
     </CreateItem>
-
     <Copy SourceFiles="@(YourFilesToCopy)"
           DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(YourFilesToCopy)"
