@@ -8,11 +8,8 @@ using NemerleWeb;
 
 namespace Nemerle.Peg
 {
-  // TODO: Remove
-  public interface ISourceSnapshot {}
-  
   [Unit]
-  public class SourceSnapshot : ISourceSnapshot
+  public class SourceSnapshot
   {
     [Accessor] originalText : string;
     [Accessor] text : string;
