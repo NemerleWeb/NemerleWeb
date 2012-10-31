@@ -15,7 +15,7 @@ namespace NemerleWeb
 {
   using XmlAst;
   
-  [PegGrammar(Options = EmitDebugSources, start,
+  [PegGrammar(Options = null /*EmitDebugSources*/, start,
   grammar
   {
     digit                      = ['0'..'9'];

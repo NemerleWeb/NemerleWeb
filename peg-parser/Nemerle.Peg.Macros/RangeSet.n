@@ -7,10 +7,10 @@ using Nemerle.Utility;
 
 namespace Nemerle.Peg
 {
-  [StructuralHashCode, StructuralEquality]
+  [StructuralHashCode, StructuralEquality(EmitDebugSources = false)]
   public class RangeSet
   {//TODO:Optimize
-    [Record, StructuralHashCode, StructuralEquality]
+    [Record, StructuralHashCode, StructuralEquality(EmitDebugSources = false)]
     public struct Range
     {
       public from : char;
