@@ -32,9 +32,9 @@
 
 </member>
     <member name="T:Nemerle.Diff.Diff" />
-    <member name="M:Nemerle.Diff.Diff._N_optimizeDiffData_4565``1(Nemerle.Diff.DiffData{``0})" />
-    <member name="M:Nemerle.Diff.Diff._N_computeLcs_4525``1(Nemerle.Diff.Diff._N_closureOf_Diff_4425{``0},Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,System.Int32[],System.Int32[])" />
-    <member name="M:Nemerle.Diff.Diff._N_computeSms_4436``1(Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,System.Int32[],System.Int32[])" />
+    <member name="M:Nemerle.Diff.Diff._N_optimizeDiffData_4569``1(Nemerle.Diff.DiffData{``0})" />
+    <member name="M:Nemerle.Diff.Diff._N_computeLcs_4529``1(Nemerle.Diff.Diff._N_closureOf_Diff_4429{``0},Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,System.Int32[],System.Int32[])" />
+    <member name="M:Nemerle.Diff.Diff._N_computeSms_4440``1(Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,System.Int32[],System.Int32[])" />
     <member name="M:Nemerle.Diff.Diff.Diff``1(``0[],``0[])">
       <summary>
         <para>This method implements the Difference Algorithm published in

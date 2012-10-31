@@ -94,7 +94,7 @@
     <member name="T:Nemerle.Peg.SingleLineSourceSnapshot" />
     <member name="M:Nemerle.Peg.SingleLineSourceSnapshot.#ctor(System.String,System.Int32,System.String)" />
     <member name="T:Nemerle.Peg.SourceSnapshot" />
-    <member name="F:Nemerle.Peg.SourceSnapshot._N_cache_3868" />
+    <member name="F:Nemerle.Peg.SourceSnapshot._N_cache_3872" />
     <member name="F:Nemerle.Peg.SourceSnapshot.originalText" />
     <member name="F:Nemerle.Peg.SourceSnapshot.text" />
     <member name="F:Nemerle.Peg.SourceSnapshot.fileIndex" />
