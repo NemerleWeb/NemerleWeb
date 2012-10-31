@@ -9,7 +9,7 @@ using Nemerle.Peg;
 namespace Calculator
 {
   [Unit]
-  [PegGrammar( Options = EmitDebugSources, start, 
+  [PegGrammar( Options = null /*EmitDebugSources*/,  start, 
   grammar
   {
     s : void              = ' '*;
