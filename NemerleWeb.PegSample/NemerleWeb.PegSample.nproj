@@ -167,37 +167,49 @@
     <Compile Include="MVVM\PegSamplePage.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Nemerle.Peg\ExtensionRuleBase.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Nemerle.Peg\IGrammar.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Nemerle.Peg\IToken.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Nemerle.Peg\Located.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Nemerle.Peg\Location.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Nemerle.Peg\NToken.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Nemerle.Peg\PegParser.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Nemerle.Peg\SingleLineSourceSnapshot.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Nemerle.Peg\SourceSnapshot.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Nemerle.Peg\VToken.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\peg-parser\Nemerle.Peg\ExtensionRuleBase.n">
+      <Link>Nemerle.Peg\ExtensionRuleBase.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\IGrammar.n">
+      <Link>Nemerle.Peg\IGrammar.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\IToken.n">
+      <Link>Nemerle.Peg\IToken.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\Located.n">
+      <Link>Nemerle.Peg\Located.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\Location.n">
+      <Link>Nemerle.Peg\Location.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\NToken.n">
+      <Link>Nemerle.Peg\NToken.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\PegParser.n">
+      <Link>Nemerle.Peg\PegParser.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\SingleLineSourceSnapshot.n">
+      <Link>Nemerle.Peg\SingleLineSourceSnapshot.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\SourceSnapshot.n">
+      <Link>Nemerle.Peg\SourceSnapshot.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\VToken.n">
+      <Link>Nemerle.Peg\VToken.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\images\bg.jpg">
@@ -380,7 +392,7 @@
     <Folder Include="Models\" />
     <Folder Include="MVVM" />
     <Folder Include="Infrastructure" />
-    <Folder Include="Nemerle.Peg" />
+    <Folder Include="Nemerle.Peg\" />
     <Folder Include="Properties\" />
     <Folder Include="Scripts\" />
     <Folder Include="Views\" />
