@@ -13,8 +13,9 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleRepeatMinMax(rule : Rule.RepeatMinMax, results : list[string]) : PExpr
+    public CompileRuleRepeatMinMax(rule : Rule.RepeatMinMax, results : list[string], global : bool) : PExpr
     {
+      def pos = if (global) <[ position ]> else <[ pos ]>;
       match (rule)
       {
         | RepeatMinMax(0, 1, subrule)    =>
@@ -72,7 +73,7 @@ namespace Nemerle.Peg
                   -1
                }
             }
-            rep(0, position)
+            rep(0, $pos)
           ]>)
       }
     }
