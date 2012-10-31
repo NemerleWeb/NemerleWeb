@@ -1,0 +1,97 @@
+using NemerleWeb;
+using Nemerle.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Nemerle.Peg;
+
+namespace Calculator
+{
+  [Unit]
+  [PegGrammar( Options = EmitDebugSources, start, 
+  grammar
+  {
+    s : void              = ' '*;
+
+    any                   = ['\u0000'..'\uFFFF'];
+    digit                 = ['0'..'9']+;
+  
+    num                   : int = s digit s;
+    unaryMinus            : int = '-' s num;
+
+    sum                   : int  = num : 10 '+' num : 10;
+    sub                   : int  = num : 10 '-' num : 10;
+    mul                   : int  = num : 20 '*' num : 20;
+    div                   : int  = num : 20 '/' num : 20;
+
+    start                 : int = (sum/*/sub/mul/div*/) /*/num*/ ![Any];
+  })]
+  class CalcParser
+  {
+    private num(digits : NToken) : int
+    {
+      int.Parse(GetText(digits))
+    }
+
+    private unaryMinus(_ : NToken, se : int) : int
+    {
+      -se
+    }
+
+    private parenthesesExpr(_ : NToken, se : int, _ : NToken) : int
+    {
+      se
+    }
+
+    private sum(x : int, _ : NToken, y : int) : int { x + y }
+    private sub(x : int, _ : NToken, y : int) : int { x - y }
+    private mul(x : int, _ : NToken, y : int) : int { x * y }
+    private div(x : int, _ : NToken, y : int) : int { x / y }
+  }
+}
+
+namespace NemerleWeb.PegSample
+{
+  [Unit]
+  internal class CalculatorPage
+  {
+    _calc : Calculator.CalcParser { get; set; }
+    public this()
+    {
+      _calc = Calculator.CalcParser();
+    }
+         
+    CalcOutput : string
+    {
+      get
+      {
+        if (!string.IsNullOrEmpty(CalcInput))
+          if (_calc.Parse(CalcInput) is Some(res))
+            res.ToString()
+          else
+            "Incorrect input"
+        else
+          "";
+      }
+    }
+     
+    public CalcInput : string { get; set; }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+        <div>
+          <span>Write an expression:</span>
+          <div class="output">
+            <span class="output-text">$CalcOutput</span> 
+          </div>
+          <div class="calc-input">
+            <input value="$CalcInput"/>
+          </div>
+        </div>
+      #>
+    }    
+  }
+}

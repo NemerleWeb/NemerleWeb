@@ -164,6 +164,9 @@
     <Compile Include="Infrastructure\HtmlHelperExtensions.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MVVM\CalculatorPage.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\PegSamplePage.n">
       <SubType>Code</SubType>
     </Compile>
@@ -432,11 +435,21 @@
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
+       Other similar extension points exist, see Microsoft.Common.targets. -->
+  <PropertyGroup>
+    <YourDestinationDirectory>$(TargetDir)MVVM</YourDestinationDirectory>
+    <YourDestinationDirectory2>$(TargetDir)_PublishedWebsites\NemerleWeb.Samples\bin\MVVM</YourDestinationDirectory2>
+    <YourSourceDirectory>$(ProjectDir)MVVM</YourSourceDirectory>
+  </PropertyGroup>
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
-  </Target> -->
+    <CreateItem Include="$(YourSourceDirectory)\**\*.*">
+      <Output TaskParameter="Include" ItemName="YourFilesToCopy" />
+    </CreateItem>
+    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory2)\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
   </Target>
@@ -446,7 +459,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>63019</DevelopmentServerPort>
+          <DevelopmentServerPort>53517</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

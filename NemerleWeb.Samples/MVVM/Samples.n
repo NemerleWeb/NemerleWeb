@@ -92,7 +92,7 @@ namespace NemerleWeb.Samples
     }
     
     LoadSample(samples : List[Sample], index : int) : void
-    {      
+    {
       server.LoadSourceForList(samples[index].SourceFiles, source =>
       {          
         samples[index].Source = source;
