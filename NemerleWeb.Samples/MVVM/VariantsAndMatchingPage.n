@@ -72,10 +72,10 @@ namespace NemerleWeb.Samples
           <select value="$CurrentColorId">
             <option $foreach(color in AvailableColors) value="$(color[0])" text="$(color[1])" />
           </select>
-          <span $when(OtherColor != null)> 
-            <input class="color-input" value="$(OtherColor.R)" />
-            <input class="color-input" value="$(OtherColor.G)" />
-            <input class="color-input" value="$(OtherColor.B)" />
+          <span $when(CurrentColor is Color.Other)> 
+            <span>$(OtherColor.R)</span>
+            <span>$(OtherColor.G)</span>
+            <span>$(OtherColor.B)</span>
           </span>
         </div>
       #>
