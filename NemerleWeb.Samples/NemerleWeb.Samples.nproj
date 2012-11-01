@@ -179,6 +179,9 @@
     <Compile Include="MVVM\Knockout\Tutorial_5_LoadingAndSaving.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MVVM\Peg\CalculatorPage.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\NameListPage.n">
       <SubType>Code</SubType>
     </Compile>
@@ -195,6 +198,48 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\peg-parser\Nemerle.Peg\ExtensionRuleBase.n">
+      <Link>Nemerle.Peg\ExtensionRuleBase.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\IGrammar.n">
+      <Link>Nemerle.Peg\IGrammar.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\IToken.n">
+      <Link>Nemerle.Peg\IToken.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\Located.n">
+      <Link>Nemerle.Peg\Located.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\Location.n">
+      <Link>Nemerle.Peg\Location.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\NToken.n">
+      <Link>Nemerle.Peg\NToken.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\PegParser.n">
+      <Link>Nemerle.Peg\PegParser.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\SingleLineSourceSnapshot.n">
+      <Link>Nemerle.Peg\SingleLineSourceSnapshot.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\SourceSnapshot.n">
+      <Link>Nemerle.Peg\SourceSnapshot.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\peg-parser\Nemerle.Peg\VToken.n">
+      <Link>Nemerle.Peg\VToken.n</Link>
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\images\bg.jpg">
@@ -399,6 +444,8 @@
     <Folder Include="MVVM" />
     <Folder Include="Infrastructure" />
     <Folder Include="MVVM\Knockout" />
+    <Folder Include="MVVM\Peg\" />
+    <Folder Include="Nemerle.Peg\" />
     <Folder Include="Properties\" />
     <Folder Include="Scripts\" />
     <Folder Include="Scripts\NWebJs.Tests\" />
@@ -428,6 +475,11 @@
       <HintPath>$(Nemerle)\Nemerle.ComputationExpressions.Macros.dll</HintPath>
       <Private>False</Private>
     </MacroReference>
+    <MacroProjectReference Include="..\peg-parser\Nemerle.Peg.Macros\Nemerle.Peg.Macros-VS_2012.nproj">
+      <Name>Nemerle.Peg.Macros-VS_2012</Name>
+      <Project>{388424bd-c3a5-4c01-b84b-6c1bb9a9cc8e}</Project>
+      <Private>False</Private>
+    </MacroProjectReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets" />
@@ -438,15 +490,14 @@
     <YourDestinationDirectory2>$(TargetDir)_PublishedWebsites\NemerleWeb.Samples\bin\MVVM</YourDestinationDirectory2>
     <YourSourceDirectory>$(ProjectDir)MVVM</YourSourceDirectory>
   </PropertyGroup>
-  <Target Name="BeforeBuild"></Target>
+  <Target Name="BeforeBuild">
+  </Target>
   <Target Name="AfterBuild">
     <CreateItem Include="$(YourSourceDirectory)\**\*.*">
       <Output TaskParameter="Include" ItemName="YourFilesToCopy" />
     </CreateItem>
-    <Copy SourceFiles="@(YourFilesToCopy)"
-          DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(YourFilesToCopy)"
-          DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory2)\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory2)\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />

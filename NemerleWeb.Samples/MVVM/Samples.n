@@ -23,11 +23,12 @@ namespace NemerleWeb.Samples
     
     Samples : List[Sample] { get; set; }
     KnockoutSamples : List[Sample] { get; set; }
+    PegSamples : List[Sample] { get; set; }
     AllSamples : array[Sample] 
     {
       get
       {
-        Samples.Concat(KnockoutSamples).ToArray()
+        Samples.Concat(KnockoutSamples).Concat(PegSamples).ToArray()
       }
     }
     
@@ -40,6 +41,8 @@ namespace NemerleWeb.Samples
     ListsAndCollections : ListsAndCollectionsPage { get; set; }
     LoadingAndSaving : LoadingAndSavingPage { get; set; }
     SinglePageApps : SPAPage { get; set; }
+    
+    Calculator : CalculatorPage { get; set; }
     
     Sources : List[string * string] { get; set; }
     ThisPageSource : string { get; set; }
@@ -55,6 +58,7 @@ namespace NemerleWeb.Samples
       ListsAndCollections = ListsAndCollectionsPage();
       LoadingAndSaving = LoadingAndSavingPage();
       SinglePageApps = SPAPage();
+      Calculator = CalculatorPage();
             
       Samples = 
       [
@@ -69,14 +73,20 @@ namespace NemerleWeb.Samples
       [
         Sample("Introduction", ["MVVM/Knockout/Tutorial_1_Introduction.n"], "", Introduction), 
         Sample("Lists and collections", ["MVVM/Knockout/Tutorial_2_ListsAndCollections.n"], "", ListsAndCollections), 
-        Sample ("Single page applications", ["MVVM/Knockout/Tutorial_3_SinglePageApps.n"], "", SinglePageApps), 
+        Sample("Single page applications", ["MVVM/Knockout/Tutorial_3_SinglePageApps.n"], "", SinglePageApps), 
         Sample("Loading and saving", ["MVVM/Knockout/Tutorial_5_LoadingAndSaving.n"], "", LoadingAndSaving)
+      ].ToList();
+      
+      PegSamples =
+      [
+        Sample("Calculator", ["MVVM/Peg/CalculatorPage.n"], "", Calculator),
       ].ToList();
                  
       SelectedSample = Samples[2];
             
       LoadSamples(Samples);
       LoadSamples(KnockoutSamples);
+      LoadSamples(PegSamples);
             
       server.LoadSourceFor("MVVM/Samples.n", source =>
       {
@@ -132,6 +142,9 @@ namespace NemerleWeb.Samples
             <li class="split"></li>
             <li class="header">KnockoutJs tutorials</li>
             <li $foreach(s in KnockoutSamples) css-selected="$(SelectedSample.Name == s.Name)"><span click="$SelectSample">$(s.Name)</span></li>
+            <li class="split"></li>
+            <li class="header">Peg Samples</li>
+            <li $foreach(s in PegSamples) css-selected="$(SelectedSample.Name == s.Name)"><span click="$SelectSample">$(s.Name)</span></li>
           </ul>
           <div $foreach(s in AllSamples)>
             <div $when(SelectedSample.Name == s.Name) class="current-sample">

@@ -51,7 +51,7 @@ namespace Calculator
   }
 }
 
-namespace NemerleWeb.PegSample
+namespace NemerleWeb.Samples
 {
   [Unit]
   internal class CalculatorPage
@@ -83,7 +83,8 @@ namespace NemerleWeb.PegSample
     {
       <#
         <div>
-          <span>Write an expression:</span>
+          <span>Write an expression.</span>
+          <span>For example: 1 + 2 - 3 *  4</span>
           <div class="output">
             <span class="output-text">$CalcOutput</span> 
           </div>
