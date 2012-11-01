@@ -17,7 +17,8 @@ namespace NemerleWeb.Samples
     | Red
     | Green
     | Blue
-    | Other {
+    | Other
+    {
       R : int;
       G : int;
       B : int;      
@@ -46,9 +47,12 @@ namespace NemerleWeb.Samples
     CurrentColorId : int { get; set; }
     OtherColor : Color.Other;
         
-    public CurrentColor : Color {
-      get {
-        match(CurrentColorId) {
+    public CurrentColor : Color
+    {
+      get
+      {
+        match(CurrentColorId)
+        {
         | 0 => Color.Red()
         | 1 => Color.Green()
         | 2 => Color.Blue()
