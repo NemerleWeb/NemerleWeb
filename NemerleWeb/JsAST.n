@@ -67,6 +67,9 @@ namespace NemerleWeb
                 | Call(op, parms)                    => $<#$(op.Write())(..$(parms; ","; e => e.Write("")))#>    
                 }
             }
+            
+            static private Literal_Int1 : JsAst.Literal = JsAst.Literal(JsLiteral.Integer(1));
+            
             public override Transform() : JsAst {
                 match(this) {
                 | Call(OpCode("==="), something :: Literal(Bool(true)) :: []) 
@@ -99,7 +102,17 @@ namespace NemerleWeb
                     def paramInits = JsAst.Seq(newParms.Filter((i, _)=> !(i is JsAst.Void)).Map((i, _) => i));
                     def newParms = newParms.Map((_, p) => p);
                     JsAst.Seq([paramInits, JsAst.Call(func, newParms)])                    
-                | Call(OpCode("++"), [FieldRef as field]) => Call(OpCode("+"), [field, JsAst.Literal(JsLiteral.Integer(1))])
+                
+                | Call(OpCode("++" as opcode), [FieldRef as field])
+                | Call(OpCode("--" as opcode), [FieldRef as field]) =>
+                  Call(OpCode(opcode.Substring(1)), [field, Literal_Int1])
+                
+                | Call(OpCode("++" as opcode), [PropertyGet as property])
+                | Call(OpCode("++" as opcode), [Call(MethodRef, _) as property])
+                | Call(OpCode("--" as opcode), [PropertyGet as property ])
+                | Call(OpCode("--" as opcode), [Call(MethodRef, _) as property]) =>
+                  Call(OpCode(opcode.Substring(1)), [property, Literal_Int1])
+                  
                 | _ => this
                 }
             }
@@ -346,24 +359,32 @@ $(Body.Write())
                 $"$(Obj.Write()).$Parameter"
             }
         }
-        | PropertySet    { Obj : JsAst; PropertyName : string; Value : JsAst;
-            public override Write(_ = "" : string) : string {
-                $"$(Obj.Write()).$PropertyName = $(Value.Write())"
+        | PropertySet    
+          {
+            Obj : JsAst;
+            PropertyName : string;
+            Value : JsAst;
+            
+            public override Write(_ = "" : string) : string 
+            {
+              $"$(Obj.Write()).set_$PropertyName($(Value.Write()))"
             }
-            public override Transform() : JsAst {
-              match(Value) {
-              | _ => JsAst.Assign(JsAst.FieldRef(Obj, PropertyName, false), Value).Transform()
-              }
+            
+            public override Transform() : JsAst 
+            {
+              JsAst.Call(JsAst.MethodRef(Obj, "set_" + PropertyName), [Value]).Transform()
             }
-        }
-        | PropertyGet    { Obj : JsAst; PropertyName : string; IsGetOnly : bool;
-            public override Write(_ = "" : string) : string {
-                if(!IsGetOnly) 
-                  $"$(Obj.Write()).$PropertyName"
-                else
-                  $"$(Obj.Write()).$PropertyName()"
+          }
+        | PropertyGet   
+          {
+            Obj : JsAst;
+            PropertyName : string;
+            
+            public override Write(_ = "" : string) : string 
+            {
+              $"$(Obj.Write()).get_$PropertyName()"
             }
-        }
+          }
         | OpCode         { Name : string;
             public override Write(_ = "" : string) : string {
                 $"$Name"
@@ -571,7 +592,7 @@ $(Body.Write("  "))
             | OpCode                      => ast'
             | Object(fields)              => JsAst.Object(fields.Map((name, body) => (name, recurse(body))))
             | PropertySet(obj, prop, val) => JsAst.PropertySet(recurse(obj), prop, recurse(val))
-            | PropertyGet(obj, prop, igt) => JsAst.PropertyGet(recurse(obj), prop, igt)
+            | PropertyGet(obj, prop)      => JsAst.PropertyGet(recurse(obj), prop)
             | Return(expr)                => JsAst.Return(recurse(expr))
             | Seq(items)                  => JsAst.Seq(items.Map(recurse))
             | ServerCall(meth, ty, parms, callback) => JsAst.ServerCall(meth, ty, parms.Map(p => (p[0], recurse(p[1]))), recurse(callback))

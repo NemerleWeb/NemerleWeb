@@ -54,7 +54,7 @@ namespace NemerleWeb
             ]
           ),
           left.MethodCall("dispose", parms),
-          JsAst.Call(JsAst.MethodRef(left, "Dispose"), parms)
+          left.ExternalMethodCall("Dispose", parms)
         ))
       
       | _ => None()

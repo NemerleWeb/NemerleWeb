@@ -9,6 +9,7 @@ using Nemerle.Compiler.Typedtree;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace NemerleWeb
 {
@@ -20,20 +21,23 @@ namespace NemerleWeb
       public Typer : Typer { get; }
       
       public static StringType : TypeVar { get; set; }
-      public static IEnumerableType : TypeVar { get; set; }  
-      public static HasGetterNoSetter(p : IProperty) : bool
-      {
-        p.GetGetter() != null && p.GetSetter() == null
-      }
+      public static IEnumerableType : TypeVar { get; set; }        
         
       public Fields : IEnumerable[IField]
       {
-        get 
+        get
         {
-          ClassType.GetFields()
-                    .Where(f => !f.IsStatic)
-                    .Where(f => !f.Name.StartsWith("_N_") || !IsPage)
-                    .Where(f => f.Name != "server" && f.Name != "__constructorParams")
+          ClassType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                   .Where(f => f.Name != "server" && f.Name != "__constructorParams")
+        }
+      }
+      
+      public StaticFields : IEnumerable[IField]
+      {
+        get
+        {
+          ClassType.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                   .Where(f => f.Name != "server" && f.Name != "__constructorParams")
         }
       }
         
@@ -41,23 +45,21 @@ namespace NemerleWeb
       {
         get
         {
-          ClassType.GetProperties()
+          ClassType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                     .Where(_ is PropertyBuilder)
                     .Where(p => p.Name != "server")
-                    .Where(p => !HasGetterNoSetter(p))
         }
       }
-        
-      public ComputedProperties : IEnumerable[IProperty] 
+      
+      public StaticProperties : IEnumerable[IProperty] 
       {
         get
         {
-          ClassType.GetProperties()
+          ClassType.GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
                     .Where(_ is PropertyBuilder)
                     .Where(p => p.Name != "server")
-                    .Where(p => HasGetterNoSetter(p));
         }
-      }
+      }      
         
       public Methods : IEnumerable[IMethod] 
       {
@@ -66,7 +68,16 @@ namespace NemerleWeb
           def methods = ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
           FilterMethods(methods);
         }
-      }        
+      }
+      
+      public StaticMethods : IEnumerable[IMethod] 
+      {
+        get
+        {            
+          def methods = ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Static| BindingFlags.Public | BindingFlags.NonPublic);
+          FilterMethods(methods);
+        }
+      }
         
       IsPage : bool { get { !ClassType.Name.StartsWith("_N_") } }
         
@@ -87,11 +98,13 @@ namespace NemerleWeb
         def bodyIndent = Indent + "  ";
         def constructorParams = GetConstructorParams();
         def properties = GetProperties(bodyIndent, parentPtr);
-        def computedProperties = GetComputedProperties(bodyIndent, parentPtr, !isAbstract);
+        def staticProperties = GetStaticProperties(bodyIndent);
         def fields = GetFields(bodyIndent, parentPtr);
+        def staticFields = GetStaticFields(bodyIndent);
         def constructorBody = GetConstructorBody(bodyIndent);
         def staticConstructorBody = GetStaticConstructorBody(Indent);
         def methods = GetMethods(bodyIndent, parentPtr, !isAbstract);
+        def staticMethods = GetStaticMethods(bodyIndent);        
         def (nestedClassesString, nestedClasses) = GetNestedClasses();
           
         def returning = match(ClassType.BaseType?.Name) {
@@ -108,15 +121,12 @@ return self.apply_void.apply(self, arguments);
             | _ => ""
         };
           
-        if(isAbstract) {
+        if(isAbstract)
+        {
           def commonProps = 
             nestedClasses.Select(c => 
               string.Join(Environment.NewLine, 
                           Properties.Select(p => $"$(GetProperName(c.ClassType)).prototype.$(p.Name) = $properTypeName.prototype.$(p.Name);")));
-          def commonCompProps = 
-            nestedClasses.Select(c => 
-              string.Join(Environment.NewLine, 
-                          ComputedProperties.Select(p => $"$(GetProperName(c.ClassType)).prototype.$(p.Name) = $properTypeName.prototype.$(p.Name);")));
           def commonFields = 
             nestedClasses.Select(c => 
               string.Join(Environment.NewLine, 
@@ -139,10 +149,14 @@ $fields
 ..$(commonFields; Environment.NewLine)
 $methods
 ..$(commonMethods; Environment.NewLine)
-$computedProperties
-..$(commonCompProps; Environment.NewLine)
-$staticConstructorBody#>
-        } else {
+$staticConstructorBody
+$staticMethods
+$staticProperties
+$staticFields
+#>
+        }
+        else
+        {
 $<#
 $nestedClassesString
 $(Indent)function $(GetProperName(ClassType))(..$constructorParams) {
@@ -151,11 +165,14 @@ $properties
 $fields
 $methods
 $constructorBody
-$computedProperties
 {{{SignalR}}}
 $returning
 $(Indent)}
-$staticConstructorBody#>
+$staticConstructorBody
+$staticMethods
+$staticProperties
+$staticFields
+#>
         }
       }
         
@@ -164,71 +181,110 @@ $staticConstructorBody#>
           def ctor = Constructor;
           if(ctor != null) ctor.GetParameters().Map(p => p.Name) else [];            
       }
-        
-      GetProperties([NotNull] indent : string, [NotNull] parentPtr : string) : string 
-      {                                                   
-          def propVal(prop : IProperty)
-          {
-            def type = prop.GetGetter().ReturnType;
-            def isArray = TypeIsArray(type);
-            if(isArray) 
-              "[]" 
-            else 
-              if(type.TypeInfo.FullName == "System.String") <#""#> 
-              else if(type.TypeInfo.FullName == "System.Boolean") "false"
-              else if(type.TypeInfo.FullName == "System.Int32") "0" else "null";
-          }
-          def propStrings = Properties.Select(p => indent + $<#$parentPtr.$(p.Name) = $(propVal(p))#>);
-          $<#..$(propStrings; ";\n")#>;
+      
+      static PropVal(prop : IProperty) : string
+      {
+        def type = prop.GetGetter().ReturnType;
+        def isArray = TypeIsArray(type);
+        if(isArray) 
+          "[]" 
+        else 
+          if(type.TypeInfo.FullName == "System.String") <#""#> 
+          else if(type.TypeInfo.FullName == "System.Boolean") "false"
+          else if(type.TypeInfo.FullName == "System.Int32") "0" else "null";
       }
-        
-      GetComputedProperties([NotNull] indent : string, [NotNull] parentPtr : string, hasSelf : bool) : string 
-      {                              
-        def self = if(hasSelf) "" else "var self = this;";
-        def propVal(prop : IProperty)
-        {
-            def computedBody = TranslateMethodBody(prop.GetGetter(), indent);
-$<#function() {
-$self
-$computedBody
-}#>
-        }
-        def propStrings = ComputedProperties.Select(p => indent + $<#$parentPtr.$(p.Name) = $(propVal(p))#>);
+      
+      GenerateProperties(indent : string, parentPtr : string, properties : IEnumerable[IProperty]) : string 
+      {
+        def propStrings = properties.Select(p =>
+          {
+            when (p.IsIndexer)
+              Message.Error(p.Location, $"Indexed properties are not supported, $p");
+            
+            def sb = StringBuilder();
+            
+            when (p.GetGetter() != null)
+            {
+              def getterBody = TranslateMethodBody(p.GetGetter());
+              _ = sb.AppendLine($<#$indent$parentPtr.get_$(p.Name) = function() {
+$getterBody
+};#>);
+            }
+          
+            when (p.GetSetter() != null)
+            {
+              def setterBody = TranslateMethodBody(p.GetSetter());
+              _ = sb.AppendLine($<#$indent$parentPtr.set_$(p.Name) = function(value) {
+$setterBody
+};#>);
+            }
+            
+            sb.ToString()
+          });
+          
         $<#..$(propStrings; ";\n")#>;
       }
-        
-      GetFields([NotNull] indent : string, [NotNull] parentPtr : string) : string 
+      
+      GetProperties(indent : string, parentPtr : string) : string
       {
-          def fldVal(fld : IField)
+        GenerateProperties(indent, parentPtr, Properties)
+      }
+      
+      GetStaticProperties(indent : string) : string 
+      {
+        GenerateProperties(indent, GetProperName(ClassType), StaticProperties)
+      }
+      
+      FieldValue(field : IField) : string
+      {
+        def type = field.GetMemType();
+        def isArray = TypeIsArray(type);
+        if(isArray) 
+          "[]" 
+        else
+        {
+          match(type.TypeInfo?.FullName)
           {
-            def type = fld.GetMemType();
-            
-            def isArray = TypeIsArray(type);
-            if(isArray) 
-              "[]" 
-            else
-            if(type.TypeInfo?.FullName == "System.String")
-              <#""#>
-            else
-              "null"
+          | "System.String" => <#""#>
+          | "System.Int16"
+          | "System.UInt16"
+          | "System.Int32"
+          | "System.UInt32"
+          | "System.Int64"
+          | "System.UInt64" => "0"
+          | _ => "null"
           }
-          
-          def fields = Fields;
-          def fieldStrings = fields.Select(f => indent + $<#$parentPtr.$(f.Name) = $(fldVal(f))#>);
-          $<#..$(fieldStrings; ";\n")#>;
+        }
       }
-        
-      GetStaticFields([NotNull] indent : string) : string 
+      
+      GenerateFields(indent : string, parentPtr : string, fields: IEnumerable[IField]) : string
       {
-          def fields = ClassType.GetFields().Where(f => f.IsStatic);
-          def fldVal(_fld : IField) {
-              "null";
-          }
-          def fieldStrings = fields.Select(f => indent + $<#$(ClassType.Name).$(f.Name) = $(fldVal(f))#>);
-          $<#..$(fieldStrings; ";\n")#>;
+        def fieldStrings = fields.Select(f => $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>);
+        
+        $<#..$(fieldStrings; ";\n")#>;
       }
         
-      GetConstructorBody([NotNull] indent : string) : string
+      GetFields(indent : string, parentPtr : string) : string 
+      {
+        GenerateFields(indent, parentPtr, Fields)
+      }
+        
+      GetStaticFields(indent : string) : string 
+      {
+        def parentPtr = GetProperName(ClassType);
+        def fieldStrings = StaticFields.Select(f => 
+          {
+            // HACK: Hack for Instance initializers of lambda
+            if (ClassType.Name.Contains("_N__N_lambda__") && f.Name == "Instance")
+              $<#$indent$parentPtr.$(f.Name) = new $parentPtr();#>
+            else
+              $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>
+          });
+        
+        $<#..$(fieldStrings; ";\n")#>;
+      }
+        
+      GetConstructorBody(indent : string) : string
       {
           def ctor = Constructor;
           if(ctor != null)
@@ -241,31 +297,39 @@ $computedBody
               ""
       }
         
-      GetStaticConstructorBody([NotNull] indent : string) : string 
+      GetStaticConstructorBody(indent : string) : string 
       {
-          def ctors = ClassType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic);            
+          def ctors = ClassType.GetConstructors(BindingFlags.Static);
           def ctor = ctors.FirstOrDefault();
           if(ctor != null)
-              TranslateMethodBody(ctor,indent)
+            TranslateMethodBody(ctor, indent)
           else
-              ""
+            ""
       }
-        
-      GetMethods([NotNull] indent : string, [NotNull] parentPtr : string, hasSelf : bool) : string 
+      
+      GenerateMethods(indent : string, parentPtr : string, hasSelf : bool, methods : IEnumerable[IMethod]) : string 
       {
         def self = if(hasSelf) "" else "var self = this;";
-        def methodParms(method) {
-            method.GetParameters().Select(p => p.Name);
-        }
-        def methods = Methods.Select(m => 
+        def methodParms(method) { method.GetParameters().Select(p => p.Name); }
+        def m = methods.Select(m => 
 $<#$(indent)$parentPtr.$(m.Name) = function(..$(methodParms(m))) { 
 $self
 $(TranslateMethodBody(m, indent + "  "))
 $(indent)}#>);
 
-          $<#..$(methods; "\n")#>
+          $<#..$(m; "\n")#>
       }
         
+      GetMethods(indent : string, parentPtr : string, hasSelf : bool) : string 
+      {
+        GenerateMethods(indent, parentPtr, hasSelf, Methods)
+      }
+      
+      GetStaticMethods(indent : string) : string 
+      {
+        GenerateMethods(indent, GetProperName(ClassType), false, StaticMethods)
+      }
+      
       GetNestedClasses() : (string * IEnumerable[JsClass])
       {            
           def nested = ClassType.DeclaredNestedTypes

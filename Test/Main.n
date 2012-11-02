@@ -15,19 +15,15 @@ module Program
 {
   Main() : void
   {
-      def result = nweb Test();
-      WriteLine(result);
-      _ = Console.ReadKey();
+    def result = nweb Test();
+    WriteLine(result);
+    _ = Console.ReadKey();
   }
 }
 
 [Unit]
 public class Test
 {
-  public this()
-  {   
-  }
-  
   [Html]
   public View() : string
   {

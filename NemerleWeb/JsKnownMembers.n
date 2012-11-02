@@ -11,18 +11,6 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  internal module TypeHelper
-  {   
-    public PropertyToField([NotNull] prop : JsAst, isObservable : bool) : JsAst
-    {   
-      match(prop)
-      {
-      | PropertyGet(obj, name, false) => JsAst.FieldRef(obj, name, !isObservable)
-      | _ => prop
-      }
-    }
-  }
-
   internal module StringExtensions
   {
     public static FirstCharacterToLower([NotNull] this str : string) : string 
@@ -40,6 +28,11 @@ namespace NemerleWeb
     public static MethodCall(this self : JsAst, [NotNull] method : string, [NotNull] parms : list[JsAst]) : JsAst
     {
       JsAst.Call(JsAst.MethodRef(self, method.FirstCharacterToLower()), parms)
+    }
+    
+    public static ExternalMethodCall(this self : JsAst, [NotNull] method : string, [NotNull] parms : list[JsAst]) : JsAst
+    {
+      JsAst.Call(JsAst.MethodRef(self, method), parms)
     }
     
     public static StaticCall(this type : string, [NotNull] method : string, [NotNull] parms : list[JsAst]) : JsAst
@@ -76,6 +69,7 @@ namespace NemerleWeb
       JsKnownMembersArray.Register();
       
       JsKnownMembersMath.Register();
+      JsKnownMembersOption.Register();
     }
     
     public Convert([NotNull] call : TExpr.Call, [NotNull] builder : TExpr -> JsAst) : JsAst
@@ -196,30 +190,14 @@ namespace NemerleWeb
     }
     
     private DefaultConvertMethod(type : TypeInfo, left : JsAst, member : IMember, parms : list[JsAst]) : JsAst
-    {     
-      def propertyName = RemoveGetSet(member.Name);
-      
-      match (parms)
-      {
-      | _ when member.Name.StartsWith("get_") =>
-        def prop = member.DeclaringType
-                          .GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                          .FirstOrDefault(m => m.Name == propertyName) :> IProperty;
-        if(prop != null)
-          JsAst.PropertyGet(left, propertyName, JsClass.HasGetterNoSetter(prop))
-        else
-          JsAst.PropertyGet(left, propertyName, false)        
-      | [h] when member.Name.StartsWith("set_") =>
-        JsAst.PropertySet(left, propertyName, h)
-      | _ => 
-        when(!(type == null || type.SystemType == null || type.SystemType.IsAssignableFrom(typeof(IPage))) &&
-             !(type == null && member.Name == "apply"))
-          Message.Error(
-            member.Location,
-            $"Invalid $(member.Name) with $(TypeName(type)) type, params: ..$parms not implemented in JS");
+    {
+      when(!(type == null || type.SystemType == null || type.SystemType.IsAssignableFrom(typeof(IPage))) &&
+            !(type == null && member.Name == "apply"))
+        Message.Error(
+          member.Location,
+          $"Invalid $(member.Name) with $(TypeName(type)) type, params: ..$parms not implemented in JS");
           
-        JsAst.Call(JsAst.MethodRef(left, propertyName), parms)
-      }
+      JsAst.Call(JsAst.MethodRef(left, member.Name), parms)
     }
     
     public RegisterType([NotNull] type : Type, [NotNull] handler : ConvertTypeHandler) : void
@@ -280,16 +258,6 @@ namespace NemerleWeb
     private TypeName(type : TypeInfo) : string
     {
       if (type != null) InternalTypeName(type) else "";
-    }
-                  
-    private RemoveGetSet([NotNull] methodName : string) : string
-    {
-      if (IsGetSet(methodName)) methodName.Substring(4) else methodName
-    }
-      
-    private IsGetSet(methodName : string) : bool
-    {
-      methodName.StartsWith("get_") || methodName.StartsWith("set_")
     }
     
     #endregion

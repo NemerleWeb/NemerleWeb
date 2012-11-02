@@ -67,13 +67,14 @@ namespace NemerleWeb
       {
         JsKnownMembers.RegisterMember(
           opcodeName,
-          (_, _, parms) =>
+          (_typeInfo, left, parms) =>
+          {
             match (parms)
             {
-            | [h] => Some(h)
-            | h :: t => Some(JsAst.Seq(h :: t))
+            | [_] => Some(JsAst.Call(left, []))
             | _ => None()
-            });
+            }
+          });
       }
       
       registerCastOpcode("op_Implicit");

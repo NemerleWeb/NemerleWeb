@@ -24,7 +24,7 @@ namespace NemerleWeb
     {    
       match(expr)
       {
-      | <[ $unitName() ]> with parms = []
+      | <[ $_unitName() ]> with parms = []
       | <[ $unitName(..$parms) ]> => 
         def properName = JsClass.GetProperName(typer.TypeExpr(expr).Type.TypeInfo);        
         def serverParams = parms.Map(p => <[ paramList.Add("nweb.utils.toTypedObject(" + NWebUtils.ToJson($p) + ")") ]>);

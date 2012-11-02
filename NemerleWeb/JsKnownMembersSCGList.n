@@ -34,7 +34,8 @@ namespace NemerleWeb
         match (member.Name)
         {
         | "get_Count" => Some(JsAst.FieldRef(left, "length", true))
-        | "Clear" => Some(JsAst.PropertySet(left, "length", JsAst.Literal(JsLiteral.Integer(0))))
+        | "Clear" =>
+          Some(JsAst.Assign(JsAst.FieldRef(left, "length", false), JsAst.Literal(JsLiteral.Integer(0))))
         | "GetEnumerator" => Some(left.MethodCall(member.Name, parms))
         | "ToArray" => Some(left)
         | _ => None()
@@ -44,8 +45,8 @@ namespace NemerleWeb
         match (member.Name)
         {
         | "get_Item" => Some(JsAst.Call(JsAst.Indexer(left), parms))
-        | "Add" => Some(JsAst.Call(JsAst.MethodRef(TypeHelper.PropertyToField(left, false), "push"), parms))
-        | "Remove" => Some(JsAst.Call(JsAst.MethodRef(TypeHelper.PropertyToField(left, false), "remove"), parms))        
+        | "Add" => Some(left.MethodCall("push", parms))
+        | "Remove" => Some(left.MethodCall("remove", parms))
         | _ => None()
         }
         
