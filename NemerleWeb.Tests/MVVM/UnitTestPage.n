@@ -888,6 +888,12 @@ namespace NemerleWeb.Tests
         
         f() == 1
       });
+      
+      test("decimal", () =>
+      {
+        def a = 1m;
+        a == 1 && a :> int == 1
+      });
     }
     
     [Html]
