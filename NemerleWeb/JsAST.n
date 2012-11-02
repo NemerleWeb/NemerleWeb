@@ -348,7 +348,12 @@ $(Body.Write())
               def delimiter = if (Obj is Literal(JsLiteral.Integer)) " " else "";
               $"$(Obj.Write())$(delimiter).$Method"
             }
-        }        
+        }    
+        | StaticMethodRef      { Type : string; Method : string;
+            public override Write(_ = "" : string) : string {
+                $"$Type.$Method"
+            }
+        }
         | StaticRef      { Type : string; Member : string;
             public override Write(_ = "" : string) : string {
                 $"$Type.$Member"
@@ -596,7 +601,8 @@ $(Body.Write("  "))
             | Return(expr)                => JsAst.Return(recurse(expr))
             | Seq(items)                  => JsAst.Seq(items.Map(recurse))
             | ServerCall(meth, ty, parms, callback) => JsAst.ServerCall(meth, ty, parms.Map(p => (p[0], recurse(p[1]))), recurse(callback))
-            | StaticRef(type, member)     => JsAst.StaticRef(type, member);
+            | StaticRef as s              => s
+            | StaticMethodRef as s        => s
             | Switch(expr, cases, deflt)  => JsAst.Switch(recurse(expr), cases.Select(recurse).Cast.[JsAst.SwitchCase]().NToList(), recurse(deflt))
             | SwitchCase(id, case)        => JsAst.SwitchCase(id, recurse(case))
             | Ternary(cond, then, els)    => JsAst.Ternary(recurse(cond), recurse(then), recurse(els))

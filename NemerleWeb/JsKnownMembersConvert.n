@@ -23,7 +23,7 @@ namespace NemerleWeb
     
     private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
-      if (left is JsAst.StaticRef) StaticHandler(left, member, parms) else None()
+      if (left is JsAst.StaticMethodRef) StaticHandler(left, member, parms) else None()
     }
     
     private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]

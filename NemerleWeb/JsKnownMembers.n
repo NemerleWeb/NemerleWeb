@@ -150,7 +150,7 @@ namespace NemerleWeb
           when (typeHandler(left, member, parms) is Some(ast))
             return ast;
             
-      //Try looking for base types
+      // Try looking for base types
       foreach(subType in GetSubTypeList(type))
         when (subType != null && subType.SystemType != null)
           when (_convertBaseTypeHandlers.TryGetValue(subType.SystemType.FullName, out typeHandler))
@@ -160,8 +160,8 @@ namespace NemerleWeb
       when(type != null && type.IsCustomAttributeDefined("NemerleWeb.JsAstAttribute")) {
         if(member.IsConstructor)
           return JsAst.Call(JsAst.Constructor(type.Name), parms);
-        else if (left is JsAst.StaticRef)
-          return JsAst.Call(JsAst.StaticRef(type.Name, memberName), parms);        
+        else if (left is JsAst.StaticMethodRef)
+          return JsAst.Call(JsAst.StaticMethodRef(type.Name, memberName), parms);        
         else
           return JsAst.Call(JsAst.MethodRef(left, memberName), parms);
       }
@@ -191,13 +191,18 @@ namespace NemerleWeb
     
     private DefaultConvertMethod(type : TypeInfo, left : JsAst, member : IMember, parms : list[JsAst]) : JsAst
     {
-      when(!(type == null || type.SystemType == null || type.SystemType.IsAssignableFrom(typeof(IPage))) &&
-            !(type == null && member.Name == "apply"))
-        Message.Error(
-          member.Location,
-          $"Invalid $(member.Name) with $(TypeName(type)) type, params: ..$parms not implemented in JS");
+      if (left is StaticMethodRef())
+        JsAst.Call(left, parms)
+      else
+      {
+        when(!(type == null || type.SystemType == null || type.SystemType.IsAssignableFrom(typeof(IPage))) &&
+             !(type == null && member.Name == "apply"))
+          Message.Error(
+            member.Location,
+            $"Invalid $(member.Name) with $(TypeName(type)) type, params: ..$parms not implemented in JS");
           
-      JsAst.Call(JsAst.MethodRef(left, member.Name), parms)
+        JsAst.Call(JsAst.MethodRef(left, member.Name), parms)
+      }
     }
     
     public RegisterType([NotNull] type : Type, [NotNull] handler : ConvertTypeHandler) : void
@@ -258,6 +263,16 @@ namespace NemerleWeb
     private TypeName(type : TypeInfo) : string
     {
       if (type != null) InternalTypeName(type) else "";
+    }
+                  
+    private RemoveGetSet([NotNull] methodName : string) : string
+    {
+      if (IsGetSet(methodName)) methodName.Substring(4) else methodName
+    }
+      
+    private IsGetSet(methodName : string) : bool
+    {
+      methodName.StartsWith("get_") || methodName.StartsWith("set_")
     }
     
     #endregion

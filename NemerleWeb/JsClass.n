@@ -83,7 +83,7 @@ namespace NemerleWeb
         
       public Constructor : IMethod { 
           get {
-              def constructors = ClassType.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
+              def constructors = ClassType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
               when(constructors.Length > 1)
                     Message.Error(ClassType.Location, "Multiple constructors are not supported");  
               constructors.FirstOrDefault()
@@ -98,13 +98,13 @@ namespace NemerleWeb
         def bodyIndent = Indent + "  ";
         def constructorParams = GetConstructorParams();
         def properties = GetProperties(bodyIndent, parentPtr);
-        def staticProperties = GetStaticProperties(bodyIndent);
+        def staticProperties = GetStaticProperties(Indent);
         def fields = GetFields(bodyIndent, parentPtr);
-        def staticFields = GetStaticFields(bodyIndent);
+        def staticFields = GetStaticFields(Indent);
         def constructorBody = GetConstructorBody(bodyIndent);
         def staticConstructorBody = GetStaticConstructorBody(Indent);
         def methods = GetMethods(bodyIndent, parentPtr, !isAbstract);
-        def staticMethods = GetStaticMethods(bodyIndent);        
+        def staticMethods = GetStaticMethods(Indent);        
         def (nestedClassesString, nestedClasses) = GetNestedClasses();
           
         def returning = match(ClassType.BaseType?.Name) {
@@ -149,10 +149,10 @@ $fields
 ..$(commonFields; Environment.NewLine)
 $methods
 ..$(commonMethods; Environment.NewLine)
+$staticFields
 $staticConstructorBody
 $staticMethods
 $staticProperties
-$staticFields
 #>
         }
         else
@@ -168,10 +168,10 @@ $constructorBody
 {{{SignalR}}}
 $returning
 $(Indent)}
+$staticFields
 $staticConstructorBody
 $staticMethods
 $staticProperties
-$staticFields
 #>
         }
       }
@@ -245,13 +245,18 @@ $setterBody
         {
           match(type.TypeInfo?.FullName)
           {
-          | "System.String" => <#""#>
+          | "System.Byte"
+          | "System.SByte"
+          | "System.Char"
           | "System.Int16"
           | "System.UInt16"
           | "System.Int32"
           | "System.UInt32"
           | "System.Int64"
-          | "System.UInt64" => "0"
+          | "System.UInt64"
+          | "System.Single"
+          | "System.Double"
+          | "System.Decimal"=> "0"
           | _ => "null"
           }
         }
@@ -276,7 +281,7 @@ $setterBody
           {
             // HACK: Hack for Instance initializers of lambda
             if (ClassType.Name.Contains("_N__N_lambda__") && f.Name == "Instance")
-              $<#$indent$parentPtr.$(f.Name) = new $parentPtr();#>
+              $<#$indent$parentPtr.$(f.Name) = new $parentPtr()#>
             else
               $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>
           });
@@ -299,7 +304,7 @@ $setterBody
         
       GetStaticConstructorBody(indent : string) : string 
       {
-          def ctors = ClassType.GetConstructors(BindingFlags.Static);
+          def ctors = ClassType.GetConstructors(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
           def ctor = ctors.FirstOrDefault();
           if(ctor != null)
             TranslateMethodBody(ctor, indent)
