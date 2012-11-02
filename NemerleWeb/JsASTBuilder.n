@@ -22,29 +22,29 @@ namespace NemerleWeb
         | ArrayIndexer(obj, a :: _)         => JsAst.ArrayIndexer(Build(obj), Build(a))
         | Assign(s, TExpr.DefaultValue())   => JsAst.Assign(Build(s), Build(TExpr.Literal(Literal.Null())))
         | Assign(s, t)                      => JsAst.Assign(Build(s), Build(t))
-        | Base                              => Message.Warning(expr.Location, "Base not implemented"); JsAst.NotImpl("Base")
+        | Base                              => Message.Error(expr.Location, "Base not implemented"); JsAst.NotImpl("Base")
         | Block(body = body)                => Build(body) 
-        | Cache                             => Message.Warning(expr.Location, "Cache not implemented"); JsAst.NotImpl("Cache")
-        | CacheRef                          => Message.Warning(expr.Location, "CacheRef not implemented"); JsAst.NotImpl("CacheRef")
+        | Cache                             => Message.Error(expr.Location, "Cache not implemented"); JsAst.NotImpl("Cache")
+        | CacheRef                          => Message.Error(expr.Location, "CacheRef not implemented"); JsAst.NotImpl("CacheRef")
         | Call as call                      => JsKnownMembers.Convert(call, Build)
-        | ClosureFieldOf                    => Message.Warning(expr.Location, "ClosureFieldOf not implemented"); JsAst.NotImpl("ClosureFieldOf")
-        | ClosureObjectOf                   => Message.Warning(expr.Location, "ClosureObjectOf not implemented"); JsAst.NotImpl("ClosureObjectOf")
-        | ConstantObjectRef                 => Message.Warning(expr.Location, "ConstantObjectRef not implemented"); JsAst.NotImpl("ConstantObjectRef") 
-        | CtorOf                            => Message.Warning(expr.Location, "CtorOf not implemented"); JsAst.NotImpl("CtorOf")
+        | ClosureFieldOf                    => Message.Error(expr.Location, "ClosureFieldOf not implemented"); JsAst.NotImpl("ClosureFieldOf")
+        | ClosureObjectOf                   => Message.Error(expr.Location, "ClosureObjectOf not implemented"); JsAst.NotImpl("ClosureObjectOf")
+        | ConstantObjectRef                 => Message.Error(expr.Location, "ConstantObjectRef not implemented"); JsAst.NotImpl("ConstantObjectRef") 
+        | CtorOf                            => Message.Error(expr.Location, "CtorOf not implemented"); JsAst.NotImpl("CtorOf")
         | DebugInfo(expr = expr)            => Build(expr)
-        | Def                               => Message.Warning(expr.Location, "Def not implemented"); JsAst.NotImpl("Def")
+        | Def                               => Message.Error(expr.Location, "Def not implemented"); JsAst.NotImpl("Def")
         | DefaultValue                      => JsAst.Void()
-        | DefFunctionsIn                    => Message.Warning(expr.Location, "DefFunctionsIn not implemented"); JsAst.NotImpl("DefFunctionsIn")
+        | DefFunctionsIn                    => Message.Error(expr.Location, "DefFunctionsIn not implemented"); JsAst.NotImpl("DefFunctionsIn")
         | DefValIn(name, val, body)         => JsAst.Seq([JsAst.DefValue(name.Name, Build(val)), Build(body)])
         | Delayed                           => JsAst.NotImpl("Delayed")
-        | Error                             => Message.Warning(expr.Location, "Error not implemented"); JsAst.NotImpl("Error")
-        | EventMember                       => Message.Warning(expr.Location, "EventMember not implemented"); JsAst.NotImpl("EventMember")
+        | Error                             => Message.Error(expr.Location, "Error not implemented"); JsAst.NotImpl("Error")
+        | EventMember                       => Message.Error(expr.Location, "EventMember not implemented"); JsAst.NotImpl("EventMember")
         | FieldMember(obj, fld)             => JsKnownMembers.ConvertField(obj, fld, Build)
-        | FieldOf                           => Message.Warning(expr.Location, "FieldOf not implemented"); JsAst.NotImpl("FieldOf")
+        | FieldOf                           => Message.Error(expr.Location, "FieldOf not implemented"); JsAst.NotImpl("FieldOf")
         | Goto(target, _)                   => JsAst.Goto(target)
         | HasType(expr, type)               => JsAst.HasType(Build(expr), JsClass.GetProperName(type.TypeInfo))
         | If(cond, then, els, _, _)         => JsAst.If(Build(cond), Build(then), Build(els))
-        | ImplicitValueTypeCtor             => Message.Warning(expr.Location, "ImplicitValueTypeCtor not implemented"); JsAst.NotImpl("ImplicintValueTypeCtor")
+        | ImplicitValueTypeCtor             => Message.Error(expr.Location, "ImplicitValueTypeCtor not implemented"); JsAst.NotImpl("ImplicintValueTypeCtor")
         | Label(id, body)                   => JsAst.Label(id, Build(body))
         | Literal(val)                      => 
             match(val)
@@ -72,7 +72,7 @@ namespace NemerleWeb
               Message.Error($"Unmatched literal $expr");
               JsAst.NotImpl();
             }
-        | LocalFunRef                       => Message.Warning(expr.Location, "LocalFunRef not implemented"); JsAst.NotImpl("LocalFunRef")
+        | LocalFunRef                       => Message.Error(expr.Location, "LocalFunRef not implemented"); JsAst.NotImpl("LocalFunRef")
         | LocalRef(decl)                    => JsAst.LocalRef(decl.Name, if(decl.Type.TypeInfo != null) Some(decl.Type) else None())
         | MacroEnvelope(expanded = ex, original = org, the_macro = _) => 
             match(org) { 
@@ -94,7 +94,7 @@ namespace NemerleWeb
             }                
         | Match(_, _)                       => JsAst.NotImpl("Match")
         | MethodAddress                     => JsAst.Literal(JsLiteral.String(""))
-        | MethodOf                          => Message.Warning(expr.Location, "MethodOf not implemented"); JsAst.NotImpl("MethodOf")
+        | MethodOf                          => Message.Error(expr.Location, "MethodOf not implemented"); JsAst.NotImpl("MethodOf")
         | MethodRef(obj, meth, _, _)        => 
             if(meth.Name.StartsWith("get_") || meth.Name.StartsWith("set_"))
                 JsAst.MethodRef(Build(obj), meth.Name.Substring(4))
@@ -102,18 +102,22 @@ namespace NemerleWeb
                 JsAst.MethodRef(Build(obj), meth.Name)
         | MultipleAssign(assigns)           => JsAst.Seq(assigns.Map((l, e) => JsAst.Assign(JsAst.LocalRef(l.Name, None()), Build(e))))
         | OpCode(name)                      => ConvertToJsOpCode(name)
-        | PropertyMember(obj, prop)         => JsAst.PropertyGet(Build(obj), prop.Name, JsClass.HasGetterNoSetter(prop))
-        | SelfTailCall                      => Message.Warning(expr.Location, "SelfTailCall not implemented"); JsAst.NotImpl("SelfTailCall")
+        | PropertyMember(obj, prop)         => JsAst.PropertyGet(Build(obj), prop.Name)
+        | SelfTailCall                      => Message.Error(expr.Location, "SelfTailCall not implemented"); JsAst.NotImpl("SelfTailCall")
         | Sequence(e1, e2)                  => JsAst.Seq([Build(e1), Build(e2)])
-        | StaticEventRef                    => Message.Warning(expr.Location, "StaticEventRef not implemented"); JsAst.NotImpl("StaticEventRef")
-        | StaticPropertyRef                 => Message.Warning(expr.Location, "StaticPropertyRef not implemented"); JsAst.NotImpl("StaticPropertyRef")
+        | StaticEventRef                    => Message.Error(expr.Location, "StaticEventRef not implemented"); JsAst.NotImpl("StaticEventRef")
+        | StaticPropertyRef(from, prop)     => JsAst.PropertyGet(JsAst.LocalRef(from.tycon.Name, None()), prop.Name)
         | StaticRef(from, mem, _)           => 
           def typeName = if(from.tycon.SystemType != null) from.tycon.SystemType.FullName else from.tycon.FrameworkTypeName;              
           match(typeName) {
           | _ when typeName == typeof(Nemerle.Core.list[_].Nil).FullName => JsAst.Array([])
           | _ => JsAst.StaticRef(JsClass.GetProperName(from.TypeInfo), mem.Name);
           }
-        | Switch(expr, defCase, cases)      => JsAst.Switch(Build(expr), cases.Map((id, ex) => JsAst.SwitchCase(id, Build(ex))), if(defCase.IsSome) Build(defCase.Value) else JsAst.Void())
+        | Switch(expr, defCase, cases)      =>
+          JsAst.Switch(
+            Build(expr),
+            cases.Map((id, ex) => JsAst.SwitchCase(id, Build(ex))),
+            if(defCase.IsSome) Build(defCase.Value) else JsAst.Void())
         | This                              => JsAst.This()
         | Throw(expr)                       => JsAst.Throw(Build(expr))
         | Try(_, _)                         => Message.Warning("Try is not implmemented"); JsAst.NotImpl("Try");
@@ -121,8 +125,8 @@ namespace NemerleWeb
         | Tuple(args)                       => JsAst.Tuple(args.Map(a => Build(a)))
         | TupleIndexer(obj, pos, _len)      => JsAst.TupleIndexer(Build(obj), pos)
         | TypeConversion(e, _, _, _)        => Build(e)
-        | TypeOf                            => JsAst.NotImpl("TypeOf")
-        | Use                               => JsAst.NotImpl("Use")
+        | TypeOf                            => Message.Error("TypeOf is not implemented"); JsAst.NotImpl("TypeOf")
+        | Use                               => Message.Error("Use is not implemented"); JsAst.NotImpl("Use")
         | _ => Message.Error("Unmatched TExpr $expr"); JsAst.NotImpl("unmatched");
         }
       } 
@@ -209,7 +213,7 @@ namespace NemerleWeb
                       match(j)
                       {
                       | JsAst.DefValue(name, FieldRef(left, prop, false)) => JsAst.DefValue(name, JsAst.FieldRef(left, prop, true))
-                      | JsAst.DefValue(name, Call(MethodRef(Method = "template") as template, [PropertyGet(l1, r1, false), PropertyGet as p2])) => 
+                      | JsAst.DefValue(name, Call(MethodRef(Method = "template") as template, [PropertyGet(l1, r1), PropertyGet as p2])) => 
                         JsAst.DefValue(name, JsAst.Call(template, [JsAst.FieldRef(l1, r1, true), p2]))
                       | JsAst.Assign(JsAst.LocalRef(name, _type), r) => JsAst.DefValue(name, r)
                       | JsAst.Assign(JsAst.FieldRef(_obj, name, _), r) => JsAst.DefValue(name, r)

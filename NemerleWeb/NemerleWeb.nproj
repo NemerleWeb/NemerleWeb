@@ -163,6 +163,9 @@
     <Compile Include="JsKnownMembersEnumerator.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JsKnownMembersOption.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JsKnownMembersPage.n">
       <SubType>Code</SubType>
     </Compile>

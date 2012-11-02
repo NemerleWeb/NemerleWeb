@@ -110,14 +110,14 @@ namespace NemerleWeb.Tests
     
     enum SampleEnum
     {
-    | A = 1
+    | _A = 1
     | B = 2
     }
     
     enum SampleEnumWithType : byte
     {
     | A = 1
-    | B = 2
+    | _B = 2
     }
     
     public this()
@@ -625,6 +625,18 @@ namespace NemerleWeb.Tests
         !a.HasValue && a.IsNone
       });
       
+      test("option 3", () =>
+      {
+        def a : option[int] = Some(1);
+        a.HasValue && a.Value == 1
+      });
+      
+      test("option 4", () =>
+      {
+        def a : option[string] = None();
+        !a.HasValue && a.IsNone
+      });
+      
       test("option 3 with matching", () =>
       {
         def a = Some("a") : option[string];
@@ -727,7 +739,6 @@ namespace NemerleWeb.Tests
         mutable __GENERATED_PEG__MaxRollback___start__= -1;
         mutable result = -1;
         mutable pos = 0;
-        def text = "123";
         
         mutable token_1;
         def f()

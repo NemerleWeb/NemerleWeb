@@ -1,0 +1,75 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  module JsKnownMembersOption
+  {    
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(option[_]), Handler);
+      JsKnownMembers.RegisterType(typeof(option[_].Some), Handler);
+      JsKnownMembers.RegisterType(typeof(option[_].None), Handler);
+    }
+  
+    public Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      (if (left is JsAst.StaticRef) StaticHandler else ObjectHandler)(left, member, parms)
+    }
+    
+    private ObjectHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      def isSome()
+      {
+        JsAst.HasType(left, "Nemerle_Core_Some_$T$__$T$_")
+      }
+      
+      def isNone()
+      {
+        JsAst.Call(
+          JsAst.OpCode("=="),
+          [
+            left,
+            JsAst.Code("Nemerle_Core_None_$T$__$T$_._N_constant_object")
+          ])
+      }
+    
+      match (parms)
+      {
+      | [] =>
+        match (member.Name)
+        {
+        | "get_HasValue"
+        | "get_IsSome" => Some(isSome())
+        | "get_IsNone" => Some(isNone())
+        | "get_Value" => 
+          Some(
+            JsAst.Seq(
+            [
+              JsAst.JustIf(
+                isSome(),
+                JsAst.Return(JsAst.FieldRef(left, "val", false))),
+              JsAst.JustIf(
+                isNone(),
+                JsAst.Throw(JsAst.Literal(JsLiteral.String("Trying to get Value of None option")))),
+              JsAst.Throw(JsAst.Literal(JsLiteral.String("Invalid Value call to option"))),
+            ]))
+        | _ => None()
+        }        
+      | _ => None()
+      }
+    }
+     
+    private StaticHandler(_left : JsAst, _member : IMember, _parms : list[JsAst]) : option[JsAst]
+    {
+      None()
+    }
+  }
+}
