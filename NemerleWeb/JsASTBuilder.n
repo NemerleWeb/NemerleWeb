@@ -95,11 +95,7 @@ namespace NemerleWeb
         | Match(_, _)                       => JsAst.NotImpl("Match")
         | MethodAddress                     => JsAst.Literal(JsLiteral.String(""))
         | MethodOf                          => Message.Error(expr.Location, "MethodOf not implemented"); JsAst.NotImpl("MethodOf")
-        | MethodRef(obj, meth, _, _)        => 
-            if(meth.Name.StartsWith("get_") || meth.Name.StartsWith("set_"))
-                JsAst.MethodRef(Build(obj), meth.Name.Substring(4))
-            else
-                JsAst.MethodRef(Build(obj), meth.Name)
+        | MethodRef(obj, meth, _, _)        => JsAst.MethodRef(Build(obj), meth.Name)
         | MultipleAssign(assigns)           => JsAst.Seq(assigns.Map((l, e) => JsAst.Assign(JsAst.LocalRef(l.Name, None()), Build(e))))
         | OpCode(name)                      => ConvertToJsOpCode(name)
         | PropertyMember(obj, prop)         => JsAst.PropertyGet(Build(obj), prop.Name)
@@ -107,9 +103,17 @@ namespace NemerleWeb
         | Sequence(e1, e2)                  => JsAst.Seq([Build(e1), Build(e2)])
         | StaticEventRef                    => Message.Error(expr.Location, "StaticEventRef not implemented"); JsAst.NotImpl("StaticEventRef")
         | StaticPropertyRef(from, prop)     => JsAst.PropertyGet(JsAst.LocalRef(from.tycon.Name, None()), prop.Name)
-        | StaticRef(from, mem, _)           => 
+        | StaticRef(from, mem is IMethod, _) =>          
           def typeName = if(from.tycon.SystemType != null) from.tycon.SystemType.FullName else from.tycon.FrameworkTypeName;              
-          match(typeName) {
+          match(typeName)
+          {
+          | _ when typeName == typeof(Nemerle.Core.list[_].Nil).FullName => JsAst.Array([])
+          | _ => JsAst.StaticMethodRef(JsClass.GetProperName(from.TypeInfo), mem.Name);
+          }
+        | StaticRef(from, mem, _)           =>
+          def typeName = if(from.tycon.SystemType != null) from.tycon.SystemType.FullName else from.tycon.FrameworkTypeName;              
+          match(typeName)
+          {
           | _ when typeName == typeof(Nemerle.Core.list[_].Nil).FullName => JsAst.Array([])
           | _ => JsAst.StaticRef(JsClass.GetProperName(from.TypeInfo), mem.Name);
           }
@@ -218,7 +222,7 @@ namespace NemerleWeb
                       | JsAst.Assign(JsAst.LocalRef(name, _type), r) => JsAst.DefValue(name, r)
                       | JsAst.Assign(JsAst.FieldRef(_obj, name, _), r) => JsAst.DefValue(name, r)
                       | JsAst.DefValue => j :> JsAst.DefValue
-                      | _ => assert2(false); null
+                      | _ => Message.Error("Must not get here"); null
                     });
       }
       

@@ -120,6 +120,57 @@ namespace NemerleWeb.Tests
     | _B = 2
     }
     
+    class Dummy
+    {
+      public InstancePropGetSet : int { get; set; }      
+      private mutable fieldInstancePropGetSetBody : int;
+      public InstancePropGetSetBody : int { get { fieldInstancePropGetSetBody } set { fieldInstancePropGetSetBody = value + 1 } }
+      public mutable InstanceField : string;
+      public mutable InstanceFieldWithInit : string = "Passed"; 
+      public InstancePropGet : string
+      {
+        get
+        {
+          if(true)
+            "Passed"
+          else 
+            "Failed"
+        }
+      }
+      public InstancePropGetOnly : string { get; }
+      
+      public static StaticPropGetSet : int { get; set; }
+      private static mutable fieldStaticPropGetSetBody : int;
+      public static StaticPropGetSetBody : int { get { fieldStaticPropGetSetBody } set { fieldStaticPropGetSetBody = value + 1 } }
+      public static mutable StaticField : string;
+      public static mutable StaticFieldWithInit : string = "Passed"; 
+      public static StaticPropGet : string
+      {
+        get
+        {
+          if(true)
+            "Passed"
+          else 
+            "Failed"
+        }
+      }
+      
+      public this()
+      {
+        InstancePropGetOnly = "Instance";
+      }
+    }
+    
+    [Unit]
+    variant DummyVariant
+    {
+      | Case1 { A : string }
+      | Case2 { B : int }
+      | Case3 { C : bool }
+      
+      public D : bool = true;
+    }
+    
     public this()
     {
       def test(description, res)
@@ -166,13 +217,13 @@ namespace NemerleWeb.Tests
       
       test("ctor().field", () =>
       {
-        _ = Dummy().DummyField;
+        _ = Dummy().InstanceField;
         true
       });
       
       test("ctor().prop with if/else inside", () =>
       {
-        _ = Dummy().DummyProp;
+        _ = Dummy().InstancePropGet;
         true
       });
       
@@ -183,12 +234,58 @@ namespace NemerleWeb.Tests
         b;
       });
       
-      test("dummy.prop++", () =>
+      test("property++", () =>
       {
         def d = Dummy();
-        d.DummyInt++;
+        d.InstancePropGetSet++;
         
-        d.DummyInt == 1
+        d.InstancePropGetSet == 1
+      });
+      
+      test("field without initialization", () =>
+      {
+        def d = Dummy();
+        d.InstanceField == null && Dummy.StaticField == null
+      });
+      
+      test("field with initialization", () =>
+      {
+        def d = Dummy();
+        d.InstanceFieldWithInit == "Passed" && Dummy.StaticFieldWithInit == "Passed"
+      });
+      
+      test("property get/set", () =>
+      {
+        def d = Dummy();
+        def f()
+        {
+          d.InstancePropGetSet = 1;
+          Dummy.StaticPropGetSet = 2;
+          
+          d.InstancePropGetSet -1 == 0 && Dummy.StaticPropGetSet - 2 == 0
+        }
+        
+        d.InstancePropGetSet == 0 && Dummy.StaticPropGetSet == 0 && f()
+      });
+      
+      test("property get/set body", () =>
+      {
+        def d = Dummy();
+        def f()
+        {
+          d.InstancePropGetSetBody = 1;
+          Dummy.StaticPropGetSetBody = 2;
+          
+          d.InstancePropGetSetBody - 2 == 0 && Dummy.StaticPropGetSetBody - 3 == 0
+        }
+        
+        d.InstancePropGetSetBody == 0 && Dummy.StaticPropGetSetBody == 0 && f()
+      });
+      
+      test("property get only", () =>
+      {
+        def d = Dummy();
+        d.InstancePropGetOnly == "Instance"
       });
       
       test("when", () =>
@@ -806,32 +903,6 @@ namespace NemerleWeb.Tests
           </tbody>
         </table>
       #>
-    }
-    
-    class Dummy 
-    {
-      public DummyInt : int { get; set; }
-      public mutable DummyField : string = "Passed"; 
-      public DummyProp : string
-      {
-        get
-        {
-          if(true)
-            "Passed"
-          else 
-            "Failed"
-        }
-      }
-    }
-    
-    [Unit]
-    variant DummyVariant
-    {
-      | Case1 { A : string }
-      | Case2 { B : int }
-      | Case3 { C : bool }
-      
-      public D : bool = true;
     }
   }
   
