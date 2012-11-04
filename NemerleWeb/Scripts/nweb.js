@@ -482,6 +482,7 @@ nweb.utils = {
             try {
                 obj = JSON.parse(obj);
             } catch(e) {
+            
             }
         }
 

@@ -10,8 +10,8 @@ namespace NemerleWeb.Samples
     [Record]
     public class SeatReservation 
     {
-        public Name : string { get; set; }
-        public Meal : Meal { get; set; }        
+        mutable public Name : string;// { get; set; }
+        mutable public Meal : Meal;// { get; set; }        
         public FormattedPrice : string 
         { 
             get { if(Meal != null) Meal.Price.ToString() else "None" } 
@@ -21,12 +21,12 @@ namespace NemerleWeb.Samples
     [Record]
     public class Meal 
     {
-        public MealName : string { get; set; }
-        public Price : decimal { get; set; }
+        mutable public MealName : string;// { get; set; }
+        mutable public Price : decimal;// { get; set; }
     }
     
-    public AvailableMeals : List[Meal] { get; set; }
-    public Seats          : List[SeatReservation] { get; set; }
+    mutable public AvailableMeals : List[Meal];// { get; set; }
+    mutable public Seats          : List[SeatReservation];// { get; set; }
     public SeatCount      : int;
     public TotalSurcharge : decimal 
     { 
