@@ -10,20 +10,20 @@ namespace NemerleWeb.Samples
   [Unit, Record]  
   class Sample
   {
-    public Name : string { get; set; }
-    public SourceFiles : list[string] { get; set; }
-    public Source : string { get; set; }
-    public Instance : object { get; set; }
+    mutable public Name : string;// { get; set; }
+    mutable public SourceFiles : list[string];// { get; set; }
+    mutable public Source : string;// { get; set; }
+    mutable public Instance : object;// { get; set; }
   }
   
   [Unit]
   class SamplesPage
   {      
-    SelectedSample : Sample { get; set; }
+    mutable SelectedSample : Sample;// { get; set; }
     
-    Samples : List[Sample] { get; set; }
-    KnockoutSamples : List[Sample] { get; set; }
-    PegSamples : List[Sample] { get; set; }
+    mutable Samples : List[Sample];// { get; set; }
+    mutable KnockoutSamples : List[Sample];// { get; set; }
+    mutable PegSamples : List[Sample];// { get; set; }
     AllSamples : array[Sample] 
     {
       get
@@ -32,20 +32,20 @@ namespace NemerleWeb.Samples
       }
     }
     
-    NameList : NameListPage { get; set; }
-    NameListCSharp : NameListCSharpPage { get; set; }
-    CompList : CompListPage { get; set; }
-    Signal : SignalPage { get; set; }
-    Variants : VariantsAndMatchingPage { get; set; }    
-    Introduction : IntroductionPage { get; set; }
-    ListsAndCollections : ListsAndCollectionsPage { get; set; }
-    LoadingAndSaving : LoadingAndSavingPage { get; set; }
-    SinglePageApps : SPAPage { get; set; }
+    mutable NameList : NameListPage;// { get; set; }
+    mutable NameListCSharp : NameListCSharpPage;// { get; set; }
+    mutable CompList : CompListPage;// { get; set; }
+    mutable Signal : SignalPage;// { get; set; }
+    mutable Variants : VariantsAndMatchingPage;// { get; set; }    
+    mutable Introduction : IntroductionPage;// { get; set; }
+    mutable ListsAndCollections : ListsAndCollectionsPage;// { get; set; }
+    mutable LoadingAndSaving : LoadingAndSavingPage;// { get; set; }
+    mutable SinglePageApps : SPAPage;// { get; set; }
     
-    Calculator : CalculatorPage { get; set; }
+    mutable Calculator : CalculatorPage;// { get; set; }
     
-    Sources : List[string * string] { get; set; }
-    ThisPageSource : string { get; set; }
+    mutable Sources : List[string * string];// { get; set; }
+    mutable ThisPageSource : string;// { get; set; }
         
     public this()
     {
