@@ -56,7 +56,7 @@ namespace Nemerle.Peg
                   {
                     mutable c : char;
                     _ = c; // eliminate warning "a local value c was never used"
-                    $(CompileRule(rule, ["result"], false))
+                    $(CompileRule(rule, ["result"], true))
                   }
                 ]>
 
@@ -96,7 +96,7 @@ namespace Nemerle.Peg
               {
                 mutable c : char;
                 _ = c; // eliminate warning "a local value c was never used"
-                $(CompileRule(rule, [], false))
+                $(CompileRule(rule, [], true))
               }
             ]>
         | _ =>
