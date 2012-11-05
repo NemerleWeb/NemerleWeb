@@ -24,6 +24,23 @@ module Program
 [Unit]
 public class Test
 {
+  public this()
+  {
+    def a = 1;
+    def r = match(a) 
+            {
+            | 1
+            | 2
+            | 3 => 
+              match(a * 2) 
+              {
+              | 1 
+              | 2
+              | 3 => a * 4;
+              }
+            }
+  }
+  
   [Html]
   public View() : string
   {
