@@ -4,6 +4,7 @@ using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
 using Nemerle.Text;
 using Nemerle.Utility;
+using Nemerle.Assertions;
 
 using System;
 using System.Web;
@@ -15,40 +16,47 @@ using BF = System.Reflection.BindingFlags;
 using TExpr = Nemerle.Compiler.Typedtree.TExpr;
 
 namespace NemerleWeb
-{    
-  [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Class)]
-  macro Unit(tb : TypeBuilder) 
-  {
-    UnitImpl.DoTransform(tb, Macros.ImplicitCTX())
-  }
-  
+{
   [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
   macro Unit(tb : TypeBuilder)
   {
     UnitImpl.DoTransformBeforeInheritance(tb, Macros.ImplicitCTX())
   }
   
-  module UnitImpl
+  [MacroUsage(MacroPhase.BeforeTypedMembers, MacroTargets.Class)]
+  macro Unit(tb : TypeBuilder) 
   {
+    UnitImpl.DoTransformBeforeTypedMembers(tb, Macros.ImplicitCTX())
+  }
+  
+  [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Class)]
+  macro Unit(tb : TypeBuilder) 
+  {
+    UnitImpl.DoTransform(tb, Macros.ImplicitCTX())
+  }
+  
+  public module UnitImpl
+  {    
     public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);
       
-      PageImpl.AddPageBaseMethods(tb, typer);
+      AddPageBaseMethods(tb, typer);
       
-      def baseType = <[ NemerleWeb.Page ]>;
-      match (tb.Ast)
-      {
-      | ast is TopDeclaration.Class => ast.t_extends ::= baseType;
-      | ast is TopDeclaration.Variant => ast.t_extends ::=  baseType;
-      | _ =>
-        Message.Error($"This type $(tb.Ast) is not supported");
-        assert2(false);
-      } 
+      def vmInterface = <[ ttype: NemerleWeb.IPage ]>;
+      def superTypes = tb.GetDirectSuperTypes();
+      
+      unless (superTypes != null && superTypes.Exists(t => t.Equals(vmInterface)))
+        tb.AddImplementedInterface(<[ NemerleWeb.IPage ]>);
+    }
+    
+    public DoTransformBeforeTypedMembers(tb : TypeBuilder, typer : Typer) : void
+    {
+      CreateResourceController(tb, typer);
     }
     
     public DoTransform(tb : TypeBuilder, typer : Typer) : void
-    { 
+    {            
       Macros.DefineCTX(typer);
       
       def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");
@@ -71,34 +79,40 @@ namespace NemerleWeb
           ]>);
           tb.Define(<[ decl: server : ServerProxy { get { ServerProxy() } } ]>);
           
-          foreach(member in serverClass.GetMembers()) {
-              | method is IMethod when !method.IsConstructor && method.DeclaringType.FullName == serverClass.FullName => 
-                  def parameters = method.GetParameters().Map(p => <[ $(p.Name : usesite) : $(p.ty : typed) ]>);              
-                  def fparms = parameters.Map(PParameter);
-                  def methodName = ctb.ParsedName.NewName(method.Name);
-                                    
-                  when(method.ReturnType.TryRequire(<[ ttype: void ]>))
-                    Message.FatalError("Server methods cannot return void, please return something");
+          foreach(method is IMethod
+            when !method.IsConstructor && method.DeclaringType.FullName == serverClass.FullName
+            in serverClass.GetMembers())
+          {
+            def parameters = method.GetParameters().Map(p => <[ $(p.Name : usesite) : $(p.ty : typed) ]>);              
+            def fparms = parameters.Map(PParameter);
+            def methodName = ctb.ParsedName.NewName(method.Name);
                   
-                  ctb.Define(<[ decl: 
-                    public $(methodName : name) (..$fparms) : System.Web.Mvc.ActionResult
-                    {
-                        def result = _server.$(method.Name : dyn)(..$parameters);
-                        def settings = Newtonsoft.Json.JsonSerializerSettings();
-                        settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
-                        Content(Newtonsoft.Json.JsonConvert.SerializeObject(result, settings));
-                    }
-                  ]>);
+            when(method.ReturnType.TryRequire(<[ ttype: void ]>))
+              Message.FatalError("Server methods cannot return void, please return something");
+                    
+            ctb.Define(<[ decl: 
+              public $(methodName : name) (..$fparms) : System.Web.Mvc.ActionResult
+              {
+                  def result = _server.$(method.Name : dyn)(..$parameters);
+                  def settings = Newtonsoft.Json.JsonSerializerSettings();
+                  settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
+                  Content(Newtonsoft.Json.JsonConvert.SerializeObject(result, settings));
+              }
+            ]>);
                   
-                  serverMethods.Add(method.Name, fparms);
+            if (serverMethods.ContainsKey(method.Name))
+            {
+              serverMethods[method.Name] += fparms;
+            }
+            else
+              serverMethods.Add(method.Name, fparms);
                   
-                  def fparms = fparms.Append([<[ parameter: _callback : $(method.ReturnType : typed) -> void ]>]);
+            def fparms = fparms.Append([<[ parameter: _callback : $(method.ReturnType : typed) -> void ]>]);
                   
-                  ptb.Define(<[ decl:                   
-                    public $(methodName : name) (..$(fparms)) : void
-                    {}
-                  ]>);
-              | _ => ()              
+            ptb.Define(<[ decl:                   
+              public $(methodName : name) (..$(fparms)) : void
+              {}
+            ]>);
           }
           ctb.Define(<[ decl:
               public __SetSignalRConnectionId(id : string) : System.Web.Mvc.ActionResult
@@ -108,51 +122,121 @@ namespace NemerleWeb
               }]>);
           ptb.Compile();
           ctb.Compile();
-      } else {
-        tb.DefineNestedType(<[ decl: public class Server {} ]>).Compile();
       }
-    
+      else
+        tb.DefineNestedType(<[ decl: public class Server {} ]>).Compile();
+          
       JsClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
       JsClass.StringType = <[ ttype : System.String ]>;
-      def cl = JsClass(tb, "  ", typer);
-      def result = cl.Write();
       
-      def signalRStuff = 
-        if(serverClass != null)
-          <[ 
-            def signalRScript = match(typeof(Server).GetMethod("GetSignalRScript")) {
-            | x when x != null => x.Invoke(null, array[]).ToString()
-            | _ => ""
-            };
-            _ = sb.AppendLine(($result).Replace("{{{SignalR}}}", signalRScript));
-          ]>;
-        else
-         <[
-          _ = sb.AppendLine(($result).Replace("{{{SignalR}}}", ""))
-         ]>;
-      _ = tb.DefineWithSource(<[ decl:
-        public static GetModelScript() : string
-        {          
-          def sb = System.Text.StringBuilder();
-          $(signalRStuff);
-          sb.ToString()
-        }
-        ]>);
-        
-      def lambdaMeth = tb.DefineAndReturn(<[ decl: 
-        public static GetLambdaScript() : string
-        { "" } ]>) :> MethodBuilder;          
-      
-      tb.GetModifiers().AddCustomAttribute(<[ NemerleWeb.UnitAttribute ]>);
-        
+      def result = JsClass(tb, "  ", typer).Write();
+      AddUnitData(tb, "ClassDefinition", result);
+                  
       tb.Manager.TypeTreeBuildFinish += _ => {
-        def lambdas = tb.DeclaredNestedTypes
+          def lambdas = tb.DeclaredNestedTypes
                           .Where(t => t.Name.StartsWith("_N__N_"))
                           .Select(t => JsClass(t, "  ", typer).Write());
-          def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");          
-          lambdaMeth.Body = <[ $lambdas ]>;          
-          tb.Compile();
+          def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");
+          AddUnitData(tb, "LambdaDefinitions", lambdas);
       };
-    }   
+    }
+    
+    public AddUnitData(tb : TypeBuilder, dataName : string, data : string) : void
+    {
+      def ctor = GetNWebDataConstructor(tb);
+      
+      ctor.Body = <[ 
+        $(ctor.Body);
+        _ = Units.GetOrAdd($(tb.Name : string), () => Dictionary.[string, string]()).GetOrAdd($dataName, () => $data);
+      ]>;
+    }
+    
+    public AddUnitData(tb : TypeBuilder, dataName : string, dataExpr : PExpr) : void
+    {
+      def ctor = GetNWebDataConstructor(tb);
+      
+      ctor.Body = <[ 
+        $(ctor.Body);
+        _ = Units.GetOrAdd($(tb.Name : string), () => Dictionary.[string, string]()).GetOrAdd($dataName, () => NWebUtils.GetHtml($dataExpr));
+      ]>;
+    }
+    
+    GetNWebDataConstructor(tb : TypeBuilder) : MethodBuilder
+    {
+      def env = tb.Manager.CoreEnv.EnterIntoNamespace(["NemerleWeb"]);
+      match(env.LookupType(["NWebData"])) 
+      {
+      | Some(type) => 
+        type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Static).First() :> MethodBuilder
+      | None => 
+        def t = env.Define(<[ decl:
+          public module NWebData
+          {
+            public Units : Dictionary[string, Dictionary[string, string]] = Dictionary.[string, Dictionary[string, string]]();
+            this() {}
+          }          
+        ]>);
+        t.Compile();
+        t.GetConstructors().First() :> MethodBuilder;
+      }
+    }
+    
+    CreateResourceController(_tb : TypeBuilder, typer : Typer) : void
+    {
+      def env = typer.Manager.CoreEnv;
+      def controllerName = "NemerleWebResourceController";
+      when (env.LookupType([controllerName]) is None())
+      {
+        env.Define(<[ decl: 
+          public class $(controllerName : usesite) : System.Web.Mvc.Controller
+          {
+            public NemerleWebJs() : System.Web.Mvc.ActionResult
+            {
+              def scripts =
+              [
+                "NemerleWeb.Scripts.jquery-1.8.0.js",
+                "NemerleWeb.Scripts.jquery.signalR-0.5.3.js",
+                "NemerleWeb.Scripts.linq.js",
+                "NemerleWeb.Scripts.nweb.js"
+              ];
+              
+              def sb = System.Text.StringBuilder();
+              foreach(file in scripts)
+                using(stream = typeof(NemerleWeb.JsAst).Assembly.GetManifestResourceStream(file))
+                using(reader = System.IO.StreamReader(stream))
+                  _ = sb.Append(reader.ReadToEnd());
+              Content(sb.ToString(), "text/javascript");
+            }
+          }
+        ]>).Compile();  
+      }      
+    }
+    
+    public AddPageBaseMethods(tb : TypeBuilder, typer : Typer) : void
+    {                
+      Macros.DefineCTX(typer);
+      def T = 
+        if(tb.ParsedDeclaration.DeclaredTypeParametersCount == 0)
+          <[ $(tb.ParsedName : name) ]>
+        else 
+        {
+          def tparms = tb.ParsedDeclaration.DeclaredTypeParameters;
+          def tparms = tparms.tyvars.Map(t => <[ $(tb.ParsedName.NewName(t.ToString()) : name) ]>);
+          <[ $(tb.ParsedName : name).[..$tparms] ]>;
+        }
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : Func[$(T), TM]) : string { "" }]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : $(T) -> TM, _view : string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : $(T) -> TM, _view : TM -> void -> string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : $(T) -> TM, _view : TM -> string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM, _view : string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM, _view : TM -> string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM, _view : TM -> void -> string) : string { "" }]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public GetTemplateName([NotNull] _modelName : string, [NotNull] _viewName : string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public setTimeout(_callback : void -> void, _timeoutMilliseconds : int) : int { 0 } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public clearTimeout(_id : int) : void {} ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public setInterval(_callback : void -> void, _timeoutMilliseconds : int) : int { 0 } ]> );
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public clearInterval(_id : int) : void {} ]>);
+    }
   }
 }
