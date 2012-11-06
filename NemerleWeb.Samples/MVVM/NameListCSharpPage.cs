@@ -7,8 +7,8 @@ namespace NemerleWeb.Samples
   [Unit]
   partial class NameListCSharpPage
   {
-    List<string> Names;// { get; set; }
-    string SearchPattern;// { get; set; }    
+    List<string> Names { get; set; }
+    string SearchPattern { get; set; }    
     List<string> FilteredNames
     {
       get

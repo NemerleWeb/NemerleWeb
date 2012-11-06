@@ -44,7 +44,7 @@ namespace NemerleWeb.Samples
   public class VariantsAndMatchingPage
   { 
     AvailableColors : list[(int * string)] { get { [(0, "Red"), (1, "Green"), (2, "Blue"), (3, "Other")] }  }
-    mutable CurrentColorId : int;// { get; set; }
+    CurrentColorId : int { get; set; }
     OtherColor : Color.Other;
         
     public CurrentColor : Color

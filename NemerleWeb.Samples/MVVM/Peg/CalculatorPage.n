@@ -141,7 +141,7 @@ namespace NemerleWeb.Samples
   [Unit]
   internal class CalculatorPage
   {
-    mutable _calc : Calculator.CalcParser;// { get; set; }
+    _calc : Calculator.CalcParser;
     public this()
     {
       _calc = Calculator.CalcParser();
@@ -161,7 +161,7 @@ namespace NemerleWeb.Samples
       }
     }
      
-    public CalcInput : string;// { get; set; }
+    public CalcInput : string { get; set; }
     
     [Html]
     public View() : string
