@@ -20,9 +20,9 @@ namespace NemerleWeb.Samples
       public Timestamp : string;
     }
     
-    mutable Messages : List[Message];// { get; set; }
-    mutable Name : string;// { get; set; }
-    mutable CurrentMessage : string;// { get; set; }
+    Messages : List[Message] { get; set; }
+    Name : string { get; set; }
+    CurrentMessage : string { get; set; }
     
     public this()
     {

@@ -181,14 +181,14 @@ var nweb = {
     if($el.is(":text")) {
       $el.on("keyup", function() {
         nweb.execute(function() {
-          eval(expr + " = $el.val();");
+            eval(nweb.utils.makeAssignExpression(expr, "$el.val()"));
         });
       });
     } else {
       $(el).change(function() {
         nweb.execute(function() {
           var newVal = nweb.getValue(el);
-          eval(expr + " = newVal;");
+          eval(nweb.utils.makeAssignExpression(expr, "newVal"));
         });
       });
     };
@@ -208,7 +208,7 @@ var nweb = {
 
     $(el).change(function() {
       nweb.execute(function() {
-        eval(expr + " = $el.prop('checked');");
+          eval(nweb.utils.makeAssignExpression(expr, "$el.prop('checked')"));
       });
     });
 
@@ -239,7 +239,7 @@ var nweb = {
       getValue: function() {
           var ret = nweb.getParsedValue(model, expr, loopStack);
 
-          if (ret.toArray)
+          if (ret != undefined && ret != null && ret.toArray)
               return ret.toArray();
           else
               return ret;
@@ -540,7 +540,16 @@ nweb.utils = {
     replaceWith: function($el, $newEl) {
         $el.replaceWith($newEl);
         return $newEl;
-    }
+    },
+    makeAssignExpression : function(expr, value) {
+        var m = /(get_([^\.]+))\(\)$/;;
+        var setExpr = expr.replace(m, "set_$2");
+
+        if (expr == setExpr)
+            return expr + " = " + value + ";";
+        else
+            return setExpr + "(" + value + ");";
+    },
 };
 
 Array.prototype.getEnumerator = function() {

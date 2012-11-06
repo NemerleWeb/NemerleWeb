@@ -11,26 +11,26 @@ namespace NemerleWeb.Samples
         [Record, Unit]
         public class Mail
         {   
-            mutable public Id : int;// { get; set; }
-            mutable public From : string;// { get; set; }
-            mutable public To : string;// { get; set; }
-            mutable public Date : string;// { get; set; }
-            mutable public Subject : string;// { get; set; }
-            mutable public MessageContent : string;// { get; set; }
-            mutable public Folder : string;// { get; set; }
+            public Id : int { get; set; }
+            public From : string { get; set; }
+            public To : string { get; set; }
+            public Date : string { get; set; }
+            public Subject : string { get; set; }
+            public MessageContent : string { get; set; }
+            public Folder : string { get; set; }
         }
         
         [Record, Unit]
         public class FolderData
         {
-            mutable public Id : string;// { get; set; }
-            mutable public Mails : IEnumerable[Mail];// { get; set; }
+            public Id : string { get; set; }
+            public Mails : IEnumerable[Mail] { get; set; }
         }
         
-        mutable public Folders : List[string];// { get; set; }
-        mutable public ChosenFolderId : string;// { get; set; }
-        mutable public ChosenFolderData : FolderData;// { get; set; }
-        mutable public ChosenMailData : Mail;// { get; set; }
+        public Folders : List[string] { get; set; }
+        public ChosenFolderId : string { get; set; }
+        public ChosenFolderData : FolderData { get; set; }
+        public ChosenMailData : Mail { get; set; }
         
         public this() 
         {
@@ -38,19 +38,19 @@ namespace NemerleWeb.Samples
             js <#
                 Sammy(function() {
                     this.get("#:folder", function() {
-                        self.ChosenFolderId = this.params.folder;
-                        self.ChosenMailData = null;
+                        self.set_ChosenFolderId(this.params.folder);
+                        self.set_ChosenMailData(null);
                         $.get("/SPAPage/Folder", { folder: this.params.folder }, function(result) { 
-                            self.ChosenFolderData = nweb.utils.toTypedObject(result);
+                            self.set_ChosenFolderData(nweb.utils.toTypedObject(result));
                             nweb.invalidate();
                         });
                     });
                     
                     this.get("#:folder/:mailId", function() {
-                        self.ChosenFolderId = this.params.folder;
-                        self.ChosenMailData = null;
+                        self.set_ChosenFolderId(this.params.folder);
+                        self.set_ChosenMailData(null);
                         $.get("/SPAPage/Mail", { mailId: this.params.mailId }, function(result) { 
-                            self.ChosenMailData = nweb.utils.toTypedObject(result);
+                            self.set_ChosenMailData(nweb.utils.toTypedObject(result));
                             nweb.invalidate();
                         });
                     });

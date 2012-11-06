@@ -10,13 +10,13 @@ namespace NemerleWeb.Samples
   {        
     public class Task
     {
-      mutable public Title : string;// { get; set; }
-      mutable public IsDone : bool;// { get; set; }
-      mutable public IsDestroyed : bool;// { get; set; }
+      public Title : string { get; set; }
+      public IsDone : bool { get; set; }
+      public IsDestroyed : bool { get; set; }
     }
 
-    mutable public Tasks : List[Task];// { get; set; }
-    mutable public NewTaskText : string;// { get; set; }
+    public Tasks : List[Task] { get; set; }
+    public NewTaskText : string { get; set; }
     public IncompleteTasks : IEnumerable[Task]
     {
       get
