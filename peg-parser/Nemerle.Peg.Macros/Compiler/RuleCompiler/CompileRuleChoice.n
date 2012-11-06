@@ -13,7 +13,7 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleChoice(rule : Rule.Choice, results : list[string]) : PExpr
+    public CompileRuleChoice(rule : Rule.Choice, results : list[string], global : bool) : PExpr
     {
       def generate(_)
       {
@@ -25,7 +25,7 @@ namespace Nemerle.Peg
             when (newPosCompileRuleChoice >= 0) res(newPosCompileRuleChoice);
           ]> :: generate(rules)
       }
-      def rules = generate(rule.rules.Map(CompileRule(_, results, true)));
+      def rules = generate(rule.rules.Map(CompileRule(_, results, global)));
       def rules = rules.Map(fun(_)
       {
         | PExpr.Sequence(rules) => rules

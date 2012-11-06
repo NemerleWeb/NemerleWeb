@@ -36,7 +36,7 @@ namespace Calculator
     inputError : int = any;
     mulOrDiv : int = simplExpr (('*' / '/') spaces simplExpr)*;
     sumOrSub : int = mulOrDiv (('+' / '-') spaces mulOrDiv )*;
-    mainRule : int = sumOrSub inputError?;
+    mainRule : int = (sumOrSub / num) inputError?;
     start : int = spaces mainRule !any;
   })]
   public class CalcParser
