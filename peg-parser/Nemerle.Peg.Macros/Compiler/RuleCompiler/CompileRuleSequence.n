@@ -13,7 +13,7 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleSequence(rule : Rule.Sequence, results : list[string]) : PExpr
+    public CompileRuleSequence(rule : Rule.Sequence, results : list[string], global : bool) : PExpr
     {
       def generate(rules : list[Rule], results : list[string], global : bool) : PExpr
       {
@@ -71,8 +71,8 @@ namespace Nemerle.Peg
 
       match (results)
       {
-        | [] => generateNoResult(rule.rules, true);
-        | _  => generate(rule.rules, results, true);
+        | [] => generateNoResult(rule.rules, global);
+        | _  => generate(rule.rules, results, global);
       }
     }
   }
