@@ -58,6 +58,11 @@ namespace NemerleWeb
                 "break;"
             }
         }
+        | BreakNamed     { Id : string;
+            public override Write(_indent = "" : string) : string {
+                $"break $Id;"
+            }
+        }
         | Call           { Fun : JsAst; Parameters : list[JsAst];
             public override Write(_indent = "" : string) : string {
                 match(this) {
@@ -176,7 +181,7 @@ $(Body.Write("  "))
 }#> 
             }
         }
-        | Goto           { LabelId : int;
+        | Goto           { LabelId : string;
             public override Write(_ = "" : string) : string {
                 "/* No goto writer implementation */"
             }
@@ -424,9 +429,9 @@ default:
 }#>
             }
         }
-        | SwitchCase     { Id : int; Body : JsAst;
+        | SwitchCase     { Id : string; Body : JsAst;
             public override Write(_indent = "" : string) : string {
-$<#case $Id:
+$<#case "$Id":
 $(Body.Write("  "))
 break;#>
             }
@@ -561,13 +566,13 @@ $(Body.Write("  "))
           typeof(JsAst.PropertyGet),
           typeof(JsAst.ArrayIndexer),
           typeof(JsAst.Label),
-          typeof(JsAst.Goto),
+          //typeof(JsAst.Goto),
         ];
-                                         
-        public static Recurse(ast : JsAst, selector : JsAst -> JsAst, topdown : bool = true) : JsAst 
+        
+        public static Recurse(ast : JsAst, selector : (JsAst * int) -> JsAst, currentDepth = 0 : int, topdown : bool = true) : JsAst 
         {
-            def recurse = Recurse(_, selector, topdown);
-            def ast' = if(topdown) selector(ast) else ast;
+            def recurse = Recurse(_, selector, currentDepth + 1, topdown);
+            def ast' = if(topdown) selector(ast, currentDepth) else ast;
             
             def result = match(ast') {
             | Assign(l, r)                => JsAst.Assign(recurse(l), recurse(r))
@@ -575,6 +580,7 @@ $(Body.Write("  "))
             | ArrayIndexer(o, v)          => JsAst.ArrayIndexer(recurse(o), recurse(v))
             | BinaryOperator(o, l, r)     => JsAst.BinaryOperator(o, recurse(l), recurse(r))
             | Break                       => ast'
+            | BreakNamed                  => ast'
             | Call(func, parms)           => JsAst.Call(recurse(func), parms.Map(recurse))
             | Code(code)                  => JsAst.Code(code)
             | Constructor(type)           => JsAst.Constructor(type)
@@ -600,7 +606,7 @@ $(Body.Write("  "))
             | PropertySet(obj, prop, val) => JsAst.PropertySet(recurse(obj), prop, recurse(val))
             | PropertyGet(obj, prop)      => JsAst.PropertyGet(recurse(obj), prop)
             | Return(expr)                => JsAst.Return(recurse(expr))
-            | Seq(items)                  => JsAst.Seq(items.Map(recurse))
+            | Seq(items)                  => JsAst.Seq(items.Map(ast => Recurse(ast, selector, currentDepth, topdown)))
             | ServerCall(meth, ty, parms, callback) => JsAst.ServerCall(meth, ty, parms.Map(p => (p[0], recurse(p[1]))), recurse(callback))
             | StaticRef as s              => s
             | StaticMethodRef as s        => s
@@ -621,7 +627,7 @@ $(Body.Write("  "))
             | WhileNamed(cnd, bdy, nme)   => JsAst.WhileNamed(recurse(cnd), recurse(bdy), nme)            
             }
             
-            if(topdown) result else selector(result)
+            if(topdown) result else selector(result, currentDepth)
         }        
     }
 }

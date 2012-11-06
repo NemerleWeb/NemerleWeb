@@ -806,6 +806,25 @@ namespace NemerleWeb.Tests
         }
       });
       
+      test("complex goto 2", () =>
+      {
+        def a = 1;
+        match(a) 
+        {
+        | 3 => false
+        | 2
+        | 1 => 
+          match(a + 1)
+          {
+          | 1 => false
+          | 3
+          | 2 => true
+          | _ => false
+          }
+        | _ => false
+        }
+      });
+      
       test("initialization with local function in block", () =>
       {
         def var1 = 

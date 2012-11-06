@@ -15,7 +15,7 @@ namespace NemerleWeb
   public module JsAstBuilder
   {
       Build(expr : TExpr) : JsAst
-      {
+      {        
         match(expr) 
         {
         | Array(args, _dims)                => JsAst.Array(args.Map(Build))
@@ -41,7 +41,7 @@ namespace NemerleWeb
         | EventMember                       => Message.Error(expr.Location, "EventMember not implemented"); JsAst.NotImpl("EventMember")
         | FieldMember(obj, fld)             => JsKnownMembers.ConvertField(obj, fld, Build)
         | FieldOf                           => Message.Error(expr.Location, "FieldOf not implemented"); JsAst.NotImpl("FieldOf")
-        | Goto(target, _)                   => JsAst.Goto(target)
+        | Goto(target, _)                   => JsAst.Goto(target.ToString())
         | HasType(expr, type)               => JsAst.HasType(Build(expr), JsClass.GetProperName(type.TypeInfo))
         | If(cond, then, els, _, _)         => JsAst.If(Build(cond), Build(then), Build(els))
         | ImplicitValueTypeCtor             => Message.Error(expr.Location, "ImplicitValueTypeCtor not implemented"); JsAst.NotImpl("ImplicintValueTypeCtor")
@@ -120,7 +120,7 @@ namespace NemerleWeb
         | Switch(expr, defCase, cases)      =>
           JsAst.Switch(
             Build(expr),
-            cases.Map((id, ex) => JsAst.SwitchCase(id, Build(ex))),
+            cases.Map((id, ex) => JsAst.SwitchCase(id.ToString(), Build(ex))),
             if(defCase.IsSome) Build(defCase.Value) else JsAst.Void())
         | This                              => JsAst.This()
         | Throw(expr)                       => JsAst.Throw(Build(expr))
@@ -229,15 +229,18 @@ namespace NemerleWeb
       public BuildJsAst(expr : TExpr, shouldReturn : bool) : JsAst
       {
         mutable ast = JsAstBuilder.Build(expr);
-        
-        ast = JsAstHelper.LabelsToNamedWhile(ast);
+                
+        //ast = JsAstHelper.LabelsToNamedWhile(ast);
         ast = JsAstHelper.TransformBottomUp(ast);
         ast = JsAstHelper.FlattenAndRemoveVoids(ast);
         ast = JsAstHelper.RemoveEmptyBranches(ast);
         
         when(shouldReturn)
           ast = JsAstHelper.MakeReturn(ast);
-        
+          
+        ast = JsAstHelper.FlattenAndRemoveVoids(ast);        
+        ast = JsAstHelper.GotosToSwitch(ast);
+          
         match(ast)
         {
         | Seq => ast
