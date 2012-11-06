@@ -542,12 +542,13 @@ nweb.utils = {
         return $newEl;
     },
     makeAssignExpression : function(expr, value) {
-        var m = /(.*\.)get_(.*)\(\)/.exec(expr);
+        var m = /(get_([^\.]+))\(\)$/;;
+        var setExpr = expr.replace(m, "set_$2");
 
-        if (m == null)
+        if (expr == setExpr)
             return expr + " = " + value + ";";
         else
-            return m[1] + "set_" + m[2] + "(" + value + ");";
+            setExpr + "(" + value + ");";
     },
 };
 
