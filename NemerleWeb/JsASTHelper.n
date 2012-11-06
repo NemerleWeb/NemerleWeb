@@ -173,9 +173,6 @@ namespace NemerleWeb
           | _ => ast
           }
         );
-        foreach(e in Enumerable.Reverse(exprList)) {
-          Message.Hint($"$(e.label): $(e.expr.Write()) $(e.next)")
-        }
         
         resultAst'
       }
