@@ -31,11 +31,11 @@ namespace Calculator
     unaryMinus : int = '-' spaces simplExpr;
     parenthesesExpr : int = '(' spaces sumOrSub ')' spaces;
     parenthesesExprError : int = '(' spaces sumOrSub (&any / !any);
-    simplExpr : int = num /*/ parenthesesExpr / unaryMinus / parenthesesExprError / simplExprError*/;
+    simplExpr : int = num / parenthesesExpr / unaryMinus / parenthesesExprError / simplExprError;
     simplExprError : int = any;
     inputError : int = any;
-    mulOrDiv : int = simplExpr (('*' /* / '/'*/) spaces simplExpr)*;
-    sumOrSub : int = num spaces '+' spaces num spaces; //mulOrDiv (('+' /* / '-'*/) spaces mulOrDiv )*;
+    mulOrDiv : int = simplExpr (('*' / '/') spaces simplExpr)*;
+    sumOrSub : int = mulOrDiv (('+' / '-') spaces mulOrDiv )*;
     mainRule : int = sumOrSub inputError?;
     start : int = spaces mainRule !any;
   })]
@@ -98,17 +98,10 @@ namespace Calculator
       DoOpHelper(se, lst)
     }
         
-    // TODO: Remove
-    sumOrSub(l : int, _ : NToken, r : int) : int
+    private sumOrSub(se : int, lst : List[LoopTokens]) : int
     {
-      l + r
+      DoOpHelper(se, lst)
     }
-    
-    // TODO: Uncomment
-    //private sumOrSub(se : int, lst : List[LoopTokens]) : int
-    //{
-    //  DoOpHelper(se, lst)
-    //}
      
 //End requred for parser --------------------------------------------------------------------------------------------
 
