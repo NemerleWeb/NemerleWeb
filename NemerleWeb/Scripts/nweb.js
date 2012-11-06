@@ -548,7 +548,7 @@ nweb.utils = {
         if (expr == setExpr)
             return expr + " = " + value + ";";
         else
-            setExpr + "(" + value + ");";
+            return setExpr + "(" + value + ");";
     },
 };
 
