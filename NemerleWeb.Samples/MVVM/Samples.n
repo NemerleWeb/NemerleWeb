@@ -98,7 +98,7 @@ namespace NemerleWeb.Samples
     LoadSamples(samples : List[Sample]) : void
     {
       for(mutable i = 0; i < samples.Count; i++)      
-        LoadSample(samples, i)      
+        LoadSample(samples, i)
     }
     
     LoadSample(samples : List[Sample], index : int) : void

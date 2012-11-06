@@ -24,24 +24,19 @@ module Program
 [Unit]
 public class Test
 {  
-  public ReturnInt() : bool
+  public this()
   {
-    def a = 1;
-    match(a) 
-    {
-    | 3 => false
-    | 2
-    | 1 => 
-      match(a + 1)
-      {
-      | 1 => false
-      | 3
-      | 2 => true
-      | _ => false
-      }
-    | _ => false
-    }
+    LoadSamples([1, 2, 3].ToList());
   }
+  
+  public LoadSamples(samples : List[int]) : void
+  {
+    for(mutable i = 0; i < samples.Count; i++)
+        LoadSample(samples, i)
+  }
+  
+  public LoadSample(samples : List[int], i : int) : void
+  {}
   
   [Html]
   public View() : string

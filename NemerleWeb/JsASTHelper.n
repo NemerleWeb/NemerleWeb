@@ -104,14 +104,17 @@ namespace NemerleWeb
           {
           | Label(id, Seq as seq)
           | Seq as seq with id = -1 =>
-            def seqList = seq.Items.ToList();
-            def reversed = Enumerable.Reverse(seqList);
-            mutable currentNext = if(next.HasValue) next.Value else "";
-            foreach(s in reversed)
-                currentNext = f(s, Some(currentNext));
-            when(!labelMap.ContainsKey(id.ToString()))
-              labelMap.Add(id.ToString(), currentNext);
-            currentNext;
+            if(seq.Items.Any()) 
+            {
+              def seqList = seq.Items.ToList();
+              def reversed = Enumerable.Reverse(seqList);
+              mutable currentNext = next;
+              foreach(s in reversed)
+                  currentNext = Some(f(s, currentNext));
+              when(!labelMap.ContainsKey(id.ToString()))
+                labelMap.Add(id.ToString(), currentNext.Value);
+              currentNext.Value;
+            } else ""
           | Label(id, body) =>
             def label = f(body, next);
             when(!labelMap.ContainsKey(id.ToString()))
