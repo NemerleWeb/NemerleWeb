@@ -239,7 +239,7 @@ var nweb = {
       getValue: function() {
           var ret = nweb.getParsedValue(model, expr, loopStack);
 
-          if (ret.toArray)
+          if (ret != undefined && ret != null && ret.toArray)
               return ret.toArray();
           else
               return ret;
