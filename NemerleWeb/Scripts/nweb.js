@@ -208,7 +208,7 @@ var nweb = {
 
     $(el).change(function() {
       nweb.execute(function() {
-          eval(nweb.utils.makeAssignExpression(expr, "$el.prop('checked');"));
+          eval(nweb.utils.makeAssignExpression(expr, "$el.prop('checked')"));
       });
     });
 
@@ -545,9 +545,9 @@ nweb.utils = {
         var m = /(.*\.)get_(.*)\(\)/.exec(expr);
 
         if (m == null)
-            return expr + " = " + value;
+            return expr + " = " + value + ";";
         else
-            return m[1] + "set_" + m[2] + "(" + value + ")";
+            return m[1] + "set_" + m[2] + "(" + value + ");";
     },
 };
 
