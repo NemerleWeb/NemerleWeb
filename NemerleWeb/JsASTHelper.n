@@ -1,7 +1,9 @@
 ﻿using Nemerle;
 using Nemerle.Collections;
+using Nemerle.Compiler;
 using Nemerle.Text;
 using Nemerle.Utility;
+using Nemerle.Extensions;
 
 using System;
 using System.Collections.Generic;
@@ -16,12 +18,12 @@ namespace NemerleWeb
     
     public TransformBottomUp(ast : JsAst) : JsAst
     {   
-        JsAst.Recurse(ast, a => a.Transform(), false)
+        JsAst.Recurse(ast, (a, _depth) => a.Transform(), 0, false)
     }
     
     public RemoveEmptyBranches(ast : JsAst) : JsAst
     {
-        JsAst.Recurse(ast, a : JsAst =>
+        JsAst.Recurse(ast, (a : JsAst, depth) =>
         match(a) { 
         | While(_, Void) 
         | While(_, Undefined) => JsAst.Void()
@@ -30,12 +32,12 @@ namespace NemerleWeb
         | JustIf(_, Void) 
         | JustIf(_, Undefined) => JsAst.Void()        
         | _ => a
-        }, false);
+        }, 0, false);
     }
     
     public FlattenAndRemoveVoids(ast : JsAst) : JsAst    
     {
-        JsAst.Recurse(ast, a : JsAst => {
+        JsAst.Recurse(ast, (a : JsAst, _depth) => {
             def flatten(a' : JsAst) : JsAst {
             | Seq(s0) when s0.Any(e => e is JsAst.Seq)  => 
                 def r = s0.Flatten(e => 
@@ -57,10 +59,10 @@ namespace NemerleWeb
                                    .Distinct()
                                    .ToDictionary(k => k);
       
-        def r = JsAst.Recurse(ast, a : JsAst => 
+        def r = JsAst.Recurse(ast, (a : JsAst, _depth) => 
           match(a)
           {
-          | Label(id, body) when gotos.ContainsKey(id) =>
+          | Label(id, body) when gotos.ContainsKey(id.ToString()) =>
             def functionName = "_nweb_lbl_l" + id.ToString();
             JsAst.Seq([
               JsAst.DeclFunction(functionName, [], MakeReturn(body)),
@@ -74,6 +76,111 @@ namespace NemerleWeb
           | _ => a
           });        
         r
+    }
+    
+    public GotosToSwitch(ast : JsAst) : JsAst
+    {
+      def anyGotos = IterateAST(ast).OfType.[JsAst.Goto]().Any();
+      if(anyGotos) 
+      {
+        def exprList = List();
+        def labelMap = Dictionary();
+        def currentLabelVar = GetTemporaryVariableName();
+        def loopName = "__gotoSwitchLoop";
+        mutable labelCounter = 0;
+        def getNewLabel() {
+          ++labelCounter;
+          $"__lbl__$labelCounter"
+        }
+        def getGotoToLabel(label) {
+          JsAst.Seq([
+            JsAst.Assign(JsAst.LocalRef(currentLabelVar, None()), JsAst.Literal(JsLiteral.String("__CHECK_LABEL__" + label))),
+            JsAst.Continue(loopName)
+          ]);
+        }
+        def f(current : JsAst, next : option[string]) : string
+        {
+          match(current)
+          {
+          | Label(id, Seq as seq)
+          | Seq as seq with id = -1 =>
+            def seqList = seq.Items.ToList();
+            def reversed = Enumerable.Reverse(seqList);
+            mutable currentNext = if(next.HasValue) next.Value else "";
+            foreach(s in reversed)
+                currentNext = f(s, Some(currentNext));
+            when(!labelMap.ContainsKey(id.ToString()))
+              labelMap.Add(id.ToString(), currentNext);
+            currentNext;
+          | Label(id, body) =>
+            def label = f(body, next);
+            when(!labelMap.ContainsKey(id.ToString()))
+              labelMap.Add(id.ToString(), label);
+            label;
+          | If(cond, bdy, els) =>
+            def bdyLabel = f(bdy, next);
+            def elsLabel = f(els, next);
+            def newExpr = JsAst.If(cond, getGotoToLabel(bdyLabel), getGotoToLabel(elsLabel));
+            def newLabel = getNewLabel();
+            exprList.Add(new (label = newLabel, expr = newExpr, next = next));
+            newLabel;
+          | Goto(id) =>
+            def newLabel = getNewLabel();            
+            exprList.Add(new (label = newLabel, expr = getGotoToLabel(id), next = next));
+            newLabel;            
+          | TryFinally(body, _handler) => 
+            f(body, next);            
+          | _ =>
+            def newLabel = getNewLabel();
+            exprList.Add(new (label = newLabel, expr = current, next = next));
+            newLabel;
+          }
+        }
+        
+        _ = f(ast, None());
+        def reversedExprs = Enumerable.Reverse(exprList).ToList();
+        def createSwitchCase(e) {
+          match(e.next)
+          {
+          | Some(next) => JsAst.Seq([
+              e.expr,            
+              getGotoToLabel(next)
+            ]);
+          | None() => 
+            JsAst.Seq([
+              e.expr,
+              JsAst.BreakNamed(loopName)
+            ]);
+          }
+        }        
+        def firstLabel = if(reversedExprs.Count > 0) reversedExprs[0].label else "";
+        def resultAst = JsAst.Seq([
+          JsAst.DefValue(currentLabelVar, JsAst.Literal(JsLiteral.String(firstLabel))),
+          JsAst.WhileNamed(JsAst.Literal(JsLiteral.Bool(true)), 
+            JsAst.Switch(
+              JsAst.LocalRef(currentLabelVar, None()),               
+              reversedExprs.Select(e => JsAst.SwitchCase(e.label, createSwitchCase(e))).NToList(),
+              JsAst.Void()),
+            loopName)
+        ]);
+        def resultAst' = JsAst.Recurse(resultAst, (ast : JsAst, _) => 
+          match(ast) {
+          | Assign(l, Literal(JsLiteral.String(label))) 
+            when label.StartsWith("__CHECK_LABEL__") => 
+            def label = label.Replace("__CHECK_LABEL__", "");
+            def label = if(labelMap.ContainsKey(label)) labelMap[label] else label;
+            JsAst.Assign(l, JsAst.Literal(JsLiteral.String(label)))
+          | _ => ast
+          }
+        );
+        foreach(e in Enumerable.Reverse(exprList)) {
+          Message.Hint($"$(e.label): $(e.expr.Write()) $(e.next)")
+        }
+        
+        resultAst'
+      }
+      else 
+        ast
     }
     
     public DelayAssignment(expr : JsAst, left : JsAst) : JsAst
@@ -140,7 +247,7 @@ namespace NemerleWeb
     public IterateAST(ast : JsAst) : List[JsAst] 
     {
         def lst = List();
-        _ = JsAst.Recurse(ast, a => {
+        _ = JsAst.Recurse(ast, (a, _depth) => {
             lst.Add(a);
             a
         });

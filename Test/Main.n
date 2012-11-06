@@ -23,22 +23,24 @@ module Program
 
 [Unit]
 public class Test
-{
-  public this()
+{  
+  public ReturnInt() : bool
   {
     def a = 1;
-    def r = match(a) 
-            {
-            | 1
-            | 2
-            | 3 => 
-              match(a * 2) 
-              {
-              | 1 
-              | 2
-              | 3 => a * 4;
-              }
-            }
+    match(a) 
+    {
+    | 3 => false
+    | 2
+    | 1 => 
+      match(a + 1)
+      {
+      | 1 => false
+      | 3
+      | 2 => true
+      | _ => false
+      }
+    | _ => false
+    }
   }
   
   [Html]
