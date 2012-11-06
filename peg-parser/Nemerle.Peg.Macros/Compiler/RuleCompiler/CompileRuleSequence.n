@@ -13,13 +13,14 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleSequence(rule : Rule.Sequence, results : list[string], global : bool) : PExpr
+    public CompileRuleSequence(rule : Rule.Sequence, results : list[string], global : bool, counter : int) : PExpr
     {
-      def generate(rules : list[Rule], results : list[string], global : bool) : PExpr
+      def generate(rules : list[Rule], results : list[string], global : bool, counter : int) : PExpr
       {
+        def pos = <[ $(("pos" + counter) : usesite) ]>;
         match (rules)
         {
-          | [rule]        => CompileRule(rule, results, global);
+          | [rule]        => CompileRule(rule, results, global, counter);
           | rule :: rules =>
             match (rule)
             {
@@ -29,50 +30,51 @@ namespace Nemerle.Peg
                 match (results)
                 {
                   | result :: results =>
-                    def ruleCode = CompileRule(rule, [result], global);
+                    def ruleCode = CompileRule(rule, [result], global, counter);
                     <[
                       {
-                        def pos = $ruleCode;
-                        if (pos >= 0) $(generate(rules, results, false)) else -1
+                        def $pos = $ruleCode;
+                        if ($pos >= 0) $(generate(rules, results, false, counter)) else -1
                       }
                     ]>
                   | _ => PExpr.Error("Empty result list")
                 }
 
               | _ =>
-                def ruleCode = CompileRule(rule, [], global);
+                def ruleCode = CompileRule(rule, [], global, counter);
                 <[
                   {
-                    def pos = $ruleCode;
-                    if (pos >= 0) $(generate(rules, results, false)) else -1
+                    def $pos = $ruleCode;
+                    if ($pos >= 0) $(generate(rules, results, false, counter)) else -1
                   }
                 ]>
             }
 
           | [] =>
             assert(results.Length == 0);
-            <[ { pos } ]>;
+            <[ { $pos } ]>;
         }
       }
 
-      def generateNoResult(rules : list[Rule], global : bool) : PExpr
+      def generateNoResult(rules : list[Rule], global : bool, counter : int) : PExpr
       {
+        def pos = <[ $(("pos" + counter) : usesite) ]>;
         match (rules)
         {
-          | []            => <[ { pos } ]>
-          | [rule]        => CompileRule(rule, [], global)
+          | []            => <[ { $pos } ]>
+          | [rule]        => CompileRule(rule, [], global, counter)
           | rule :: rules =>
             <[
-              def pos = $(CompileRule(rule, [], global));
-              if (pos >= 0) $(generateNoResult(rules, false)) else -1
+              def $pos = $(CompileRule(rule, [], global, counter));
+              if ($pos >= 0) $(generateNoResult(rules, false, counter)) else -1
             ]>
         }
       }
 
       match (results)
       {
-        | [] => generateNoResult(rule.rules, global);
-        | _  => generate(rule.rules, results, global);
+        | [] => generateNoResult(rule.rules, global, counter);
+        | _  => generate(rule.rules, results, global, counter);
       }
     }
   }

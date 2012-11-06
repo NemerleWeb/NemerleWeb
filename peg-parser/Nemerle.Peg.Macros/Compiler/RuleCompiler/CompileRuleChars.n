@@ -13,10 +13,10 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleChars(rule : Rule.Chars, global : bool) : PExpr
+    public CompileRuleChars(rule : Rule.Chars, global : bool, counter : int) : PExpr
     {
       def chars = rule.chars;
-      def pos = if (global) <[ position ]> else <[ pos ]>;
+      def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
       def generate(_)
       {
         | [ch] =>

@@ -13,9 +13,9 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleNot(rule : Rule.Not, global : bool) : PExpr
+    public CompileRuleNot(rule : Rule.Not, global : bool, counter : int) : PExpr
     {
-      def pos = if (global) <[ position ]> else <[ pos ]>;
+      def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
       match (rule)
       {
         | Not(Chars([RangeSet where (Ranges = [range])])) when range.from == char.MinValue && range.to == char.MaxValue => // !any
@@ -23,7 +23,7 @@ namespace Nemerle.Peg
 
         | Not(rule) =>
           <[
-            def newPosCompileRuleNot = $(CompileRule(rule, [], false));
+            def newPosCompileRuleNot = $(CompileRule(rule, [], false, counter));
             if (newPosCompileRuleNot < 0) $pos else -1
           ]>
       }

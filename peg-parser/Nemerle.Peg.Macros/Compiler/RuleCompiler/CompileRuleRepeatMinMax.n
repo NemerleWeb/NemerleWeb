@@ -13,9 +13,11 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleRepeatMinMax(rule : Rule.RepeatMinMax, results : list[string], global : bool) : PExpr
+    public CompileRuleRepeatMinMax(rule : Rule.RepeatMinMax, results : list[string], global : bool, counter : int) : PExpr
     {
-      def pos = if (global) <[ position ]> else <[ pos ]>;
+      def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
+      def newPos = <[ $(("pos" + (counter + 1)) : usesite) ]>;
+      def rep = <[ $(("rep" + counter) : usesite) ]>;
       match (rule)
       {
         | RepeatMinMax(0, 1, subrule)    =>
@@ -30,13 +32,15 @@ namespace Nemerle.Peg
                                                           | [variableRef] => <[ $varRef = $variableRef; ]>
                                                           | _ => assert(false);
                                                         },
-                              _                      => <[ () ]>);
+                              _                      => <[ () ]>,
+                              counter);
 
             | _ =>
               MakeSubruleCode(results, subrule,
                               _                      => <[ () ]>,
                               (varRef, variableRefs) => <[ $varRef = Some(..$variableRefs); ]>,
-                              varRef                 => <[ $varRef = None(); ]>);
+                              varRef                 => <[ $varRef = None(); ]>,
+                              counter);
           }
           PrepandExprs(initialising, <[
             def newPosCompileRuleRepeatMinMax01 = $ruleCode;
@@ -48,14 +52,16 @@ namespace Nemerle.Peg
             else
             {
               $setNoneExpr;
-              pos
+              $pos
             }
           ]>)
 
         | RepeatMinMax(minCount, maxCount, subrule)    =>
-          def (initialising, addTokensToList, ruleCode) = MakeListCode(results, subrule);
+          def (initialising, addTokensToList, ruleCode) = MakeListCode(results, subrule, counter);
           PrepandExprs(initialising, <[
-            def rep(count, pos)
+            //def rep(count, pos)
+            mutable rep = null;
+            $rep = (count, $newPos) =>
             {
               if (count == $(maxCount : int))
                 pos
@@ -65,15 +71,15 @@ namespace Nemerle.Peg
                 if (newPosCompileRuleRepeatMinMax >= 0)
                 {
                   $addTokensToList;
-                  rep(count + 1, newPosCompileRuleRepeatMinMax)
+                  $rep(count + 1, newPosCompileRuleRepeatMinMax)
                 }
                 else if (count >= $(minCount : int))
-                  pos
+                  newPos
                 else
                   -1
                }
             }
-            rep(0, $pos)
+            $rep(0, $pos)
           ]>)
       }
     }

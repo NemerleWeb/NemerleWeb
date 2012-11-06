@@ -13,44 +13,59 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleRepeatMin(rule : Rule.RepeatMin, results : list[string], global : bool) : PExpr
+    public CompileRuleRepeatMin(rule : Rule.RepeatMin, results : list[string], global : bool, counter : int) : PExpr
     {
-      def pos = if (global) <[ position ]> else <[ pos ]>;
-      def (initialising, addTokensToList, ruleCode) = MakeListCode(results, rule.rule);
+      /*def y = <[ $(x : usesite) ]>;
+      def x = <[ parameter: x : int ]>;
+      def xx = [x];
+      def q = <[
+        def f(..$xx)
+        {
+          f($y);
+        }
+      ]>;*/
+      
+      
+      def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
+      def newPos = <[ $(("pos" + (counter + 1)) : usesite) ]>;
+      def rep = <[ $(("rep" + counter) : usesite) ]>;
+      def (initialising, addTokensToList, ruleCode) = MakeListCode(results, rule.rule, counter + 1);
       def code = match (rule)
       {
         | RepeatMin(0, _) =>
           <[
-            def rep(pos : int)
+            mutable $rep = null;
+            $rep = ($newPos) =>
             {
               def newPosCompileRuleRepeatMin0 = $ruleCode;
               if (newPosCompileRuleRepeatMin0 >= 0)
               {
                 $addTokensToList;
-                rep(newPosCompileRuleRepeatMin0)
+                $rep(newPosCompileRuleRepeatMin0)
               }
               else
-                pos
-            }
-            rep($pos)
+                $newPos
+            };
+            $rep($pos)
           ]>
 
         | RepeatMin(minCount, _) =>
           <[
-            def rep(count, pos)
+            mutable $rep = null;
+            $rep = (count, $newPos : int) =>
             {
               def newPosCompileRuleRepeatMin = $ruleCode;
               if (newPosCompileRuleRepeatMin >= 0)
               {
                 $addTokensToList;
-                rep(count + 1, newPosCompileRuleRepeatMin)
+                $rep(count + 1, newPosCompileRuleRepeatMin)
               }
               else if (count >= $(minCount : int))
-                pos
+                $newPos
               else
                 -1
             }
-            rep(0, $pos)
+            $rep(0, $pos)
           ]>
       }
       PrepandExprs(initialising, code);
