@@ -181,14 +181,14 @@ var nweb = {
     if($el.is(":text")) {
       $el.on("keyup", function() {
         nweb.execute(function() {
-          eval(expr + " = $el.val();");
+            eval(nweb.utils.makeAssignExpression(expr, "$el.val()"));
         });
       });
     } else {
       $(el).change(function() {
         nweb.execute(function() {
           var newVal = nweb.getValue(el);
-          eval(expr + " = newVal;");
+          eval(nweb.utils.makeAssignExpression(expr, "newVal"));
         });
       });
     };
@@ -208,7 +208,7 @@ var nweb = {
 
     $(el).change(function() {
       nweb.execute(function() {
-        eval(expr + " = $el.prop('checked');");
+          eval(nweb.utils.makeAssignExpression(expr, "$el.prop('checked');"));
       });
     });
 
@@ -540,7 +540,15 @@ nweb.utils = {
     replaceWith: function($el, $newEl) {
         $el.replaceWith($newEl);
         return $newEl;
-    }
+    },
+    makeAssignExpression : function(expr, value) {
+        var m = /(.*\.)get_(.*)\(\)/.exec(expr);
+
+        if (m == null)
+            return expr + " = " + value;
+        else
+            return m[1] + "set_" + m[2] + "(" + value + ")";
+    },
 };
 
 Array.prototype.getEnumerator = function() {
