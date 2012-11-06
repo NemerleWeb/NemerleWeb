@@ -8,9 +8,9 @@ namespace NemerleWeb.Samples
   [Unit]
   class CompListPage
   {
-    mutable Alphabet : array[string];// { get; set; }
-    mutable OddLettersOnly : bool;// { get; set; }
-    mutable LetterCount : int;// { get; set; }
+    Alphabet : array[string] { get; set; }
+    OddLettersOnly : bool { get; set; }
+    LetterCount : int { get; set; }
     Letters : list[string]
     {
       get
