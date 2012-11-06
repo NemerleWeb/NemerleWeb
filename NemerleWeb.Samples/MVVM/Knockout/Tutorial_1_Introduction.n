@@ -5,8 +5,8 @@ namespace NemerleWeb.Samples
   [Record, Unit]
   public class IntroductionPage
   {
-    mutable public FirstName     : string;// { get; set; }
-    mutable public LastName      : string;// { get; set; }
+    public FirstName     : string { get; set; }
+    public LastName      : string { get; set; }
     public FullName      : string { get { FirstName + " " + LastName } }
         
     CapitalizeLastName() : void

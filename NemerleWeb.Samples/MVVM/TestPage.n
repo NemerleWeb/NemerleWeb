@@ -14,8 +14,8 @@ namespace NemerleWeb.Samples
   [Unit]
   public class TestPagePage
   {
-    mutable items : List[string];// { get; set; }
-    mutable selected : string;// { get; set; }
+    items : List[string] { get; set; }
+    selected : string { get; set; }
     
     public this()
     {
