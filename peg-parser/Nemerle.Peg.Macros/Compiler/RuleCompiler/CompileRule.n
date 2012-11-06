@@ -13,21 +13,21 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    private CompileRule(currentRule : Rule, results : list[string], global : bool) : PExpr
+    private CompileRule(currentRule : Rule, results : list[string], global : bool, counter : int) : PExpr
     {
       def code = match (currentRule)
       {
-        | And          as rule => assert(results.IsEmpty()); CompileRuleAnd         (rule)
-        | Not          as rule => assert(results.IsEmpty()); CompileRuleNot         (rule, global)
+        | And          as rule => assert(results.IsEmpty()); CompileRuleAnd         (rule, global, counter)
+        | Not          as rule => assert(results.IsEmpty()); CompileRuleNot         (rule, global, counter)
         | Fsm          as rule => assert(results.IsEmpty()); CompileRuleFsm         (rule)
-        | Chars        as rule => assert(results.IsEmpty()); CompileRuleChars       (rule, global)
-        | Call         as rule =>                            CompileRuleCall        (rule, results, global)
-        | Sequence     as rule =>                            CompileRuleSequence    (rule, results, global)
-        | Choice       as rule =>                            CompileRuleChoice      (rule, results, global)
-        | RepeatMin    as rule =>                            CompileRuleRepeatMin   (rule, results, global)
-        | RepeatMinMax as rule =>                            CompileRuleRepeatMinMax(rule, results, global)
-        | Capture      as rule =>                            CompileRuleCapture     (rule, results, global)
-        | Scope        as rule =>                            CompileRuleScope       (rule, results)
+        | Chars        as rule => assert(results.IsEmpty()); CompileRuleChars       (rule, global, counter)
+        | Call         as rule =>                            CompileRuleCall        (rule, results, global, counter)
+        | Sequence     as rule =>                            CompileRuleSequence    (rule, results, global, counter)
+        | Choice       as rule =>                            CompileRuleChoice      (rule, results, global, counter)
+        | RepeatMin    as rule =>                            CompileRuleRepeatMin   (rule, results, global, counter)
+        | RepeatMinMax as rule =>                            CompileRuleRepeatMinMax(rule, results, global, counter)
+        | Capture      as rule =>                            CompileRuleCapture     (rule, results, global, counter)
+        | Scope        as rule =>                            CompileRuleScope       (rule, results, counter)
         | Cut          as rule =>                            CompileRuleCut         (rule, results)
       }
 
@@ -56,18 +56,18 @@ namespace Nemerle.Peg
                   {
                     mutable c : char;
                     _ = c; // eliminate warning "a local value c was never used"
-                    $(CompileRule(rule, ["result"], true))
+                    $(CompileRule(rule, ["result"], true, 0))
                   }
                 ]>
 
               | [recovery is RuleAttribute.Recovery] =>
-                def skipRule = CompileRule(Rule.RepeatMin(0, Rule.Sequence([Rule.Not(recovery.stop), recovery.skip])), [], false);
+                def skipRule = CompileRule(Rule.RepeatMin(0, Rule.Sequence([Rule.Not(recovery.stop), recovery.skip])), [], true, 0);
                 <[
                   unchecked
                   {
                     mutable c : char;
                     _ = c; // eliminate warning "a local value c was never used"
-                    def newPosCompileRule = $(CompileRule(rule, ["result"], false));
+                    def newPosCompileRule = $(CompileRule(rule, ["result"], true, 0));
                     if (newPosCompileRule < 0)
                     {
                       def skipPos = $skipRule;
@@ -96,7 +96,7 @@ namespace Nemerle.Peg
               {
                 mutable c : char;
                 _ = c; // eliminate warning "a local value c was never used"
-                $(CompileRule(rule, [], true))
+                $(CompileRule(rule, [], true, 0))
               }
             ]>
         | _ =>

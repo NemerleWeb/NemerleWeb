@@ -13,9 +13,9 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleCall(rule : Rule.Call, results : list[string], global : bool) : PExpr
+    public CompileRuleCall(rule : Rule.Call, results : list[string], global : bool, counter : int) : PExpr
     {
-      def pos = if (global) <[ position ]> else <[ pos ]>;
+      def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
       
       match (results)
       {

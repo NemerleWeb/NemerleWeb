@@ -13,17 +13,17 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleCapture(rule : Rule.Capture, results : list[string], global : bool) : PExpr
+    public CompileRuleCapture(rule : Rule.Capture, results : list[string], global : bool, counter : int) : PExpr
     {
       match (rule)
       {
         | Capture(Argument(Chars), subrule) =>
-          def code = CompileRule(subrule, [], global);
+          def code = CompileRule(subrule, [], global, counter);
           match (results)
           {
             | []       => code;
             | [result] =>
-              def pos = if(global) <[ position ]> else <[ pos ]>;
+              def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
             
               <[
                 def newPosCompileRuleCaptureChars = $code;
@@ -34,14 +34,14 @@ namespace Nemerle.Peg
             | _ => assert(false);
           }
 
-        | Capture(Argument, subrule) => CompileRule(subrule, results, global);
+        | Capture(Argument, subrule) => CompileRule(subrule, results, global, counter);
         | Capture(Handler(name, _, retType), subrule) =>
           match (results)
           {
-            | []       => CompileRule(subrule, [], global)
+            | []       => CompileRule(subrule, [], global, counter)
             | [result] =>
               def varNames     = MakeVariablesForRule(subrule);
-              def subRulesCode = CompileRule(subrule, varNames, global);
+              def subRulesCode = CompileRule(subrule, varNames, global, counter);
 
               def ty = match(retType : RuleType)
               {
