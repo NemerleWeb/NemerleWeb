@@ -330,9 +330,9 @@ $(Body.Write())
                 | '\u2028' => "\\u2028"
                 // paragraph separator
                 | '\u2029' => "\\u2029"
-                | '\0' => Message.Error("\\0 is not supported in JS"); ""
-                | '\a' => Message.Error("\\a is not supported in JS"); ""
-                | '\v' => Message.Error("\\v is not supported in JS"); ""
+                | '\0' => "\\0"
+                | '\a' => "\\x07"
+                | '\v' => "\\x0B"
                 | _ => c.ToString()
                 }
                 

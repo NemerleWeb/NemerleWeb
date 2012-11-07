@@ -3,6 +3,7 @@ using Nemerle.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 using Nemerle.Peg;
 using NemerleWeb.Tests.Macro;
@@ -913,6 +914,35 @@ namespace NemerleWeb.Tests
         def a = 1m;
         a == 1 && a :> int == 1
       });
+      
+      test("StringBuilder Append", () =>
+      {
+        def sb = StringBuilder();
+        _ = sb.Append("a");
+        _ = sb.Append(1);
+        _ = sb.Append('x');
+        
+        sb.ToString() == "a1x";
+      });
+      
+      test("StringBuilder set_Length decrease", () =>
+      {
+        def sb = StringBuilder();
+        
+        _ = sb.Append("ab");
+        sb.Length--;        
+
+        sb.Length == 1;
+      });
+      
+      // TODO: Increasing length
+      //test("StringBuilder set_Length increase", () =>
+      //{
+      //  def sb = StringBuilder();
+      //  sb.Length = 10;
+
+      //  sb.Length == 10;
+      //});        
     }
     
     [Html]
