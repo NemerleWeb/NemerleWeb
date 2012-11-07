@@ -240,7 +240,7 @@ namespace NemerleWeb
           
         ast = JsAstHelper.FlattenAndRemoveVoids(ast);        
         ast = JsAstHelper.GotosToSwitch(ast);
-          
+                
         match(ast)
         {
         | Seq => ast
