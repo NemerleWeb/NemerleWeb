@@ -39,7 +39,13 @@ namespace NemerleWeb
         
         public GetMethodJsAst(method : IMethod, typer : Typer, tb : TypeBuilder) : JsAst 
         {
-          JsAstBuilder.BuildJsAst(GetTypedBody(method, typer, tb), !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor);            
+          def texpr = GetTypedBody(method, typer, tb);
+          def jsast = JsAstBuilder.BuildJsAst(texpr, !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor);
+          /*def tempFileName = System.IO.Path.GetTempFileName();
+          System.IO.File.WriteAllText(tempFileName, texpr.ToString());
+          System.IO.File.AppendAllText(tempFileName, jsast.Write());
+          Message.Hint(method.Name + ": " + tempFileName);*/
+          jsast;
         }
         
         GetTypedBody(method : IMethod, typer : Typer, tb : TypeBuilder, fullTyping : bool = true) : TExpr
