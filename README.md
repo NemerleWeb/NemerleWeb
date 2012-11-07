@@ -18,3 +18,4 @@ There is no binary builds yet, but you are free to download source of [NemerleWe
 ##License
 
 NemerleWeb is licensed under MIT license [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php).
+Nemerle.Peg is licensed under Nemerle license: [Nemerle project](http://github.com/rsdn/nemerle).

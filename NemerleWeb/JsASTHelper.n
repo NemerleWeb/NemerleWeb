@@ -23,7 +23,7 @@ namespace NemerleWeb
     
     public RemoveEmptyBranches(ast : JsAst) : JsAst
     {
-        JsAst.Recurse(ast, (a : JsAst, depth) =>
+        JsAst.Recurse(ast, (a : JsAst, _depth) =>
         match(a) { 
         | While(_, Void) 
         | While(_, Undefined) => JsAst.Void()
