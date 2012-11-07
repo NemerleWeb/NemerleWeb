@@ -65,7 +65,7 @@ namespace NemerleWeb.Samples
         }
         
         public GoToMail(_mail : Mail) : void {
-            js location.hash = _mail.Folder + '/' + _mail.Id;
+            js location.hash = _mail.get_Folder() + '/' + _mail.get_Id();
         }
         
         public class Server
