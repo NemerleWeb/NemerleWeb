@@ -43,8 +43,8 @@ namespace NemerleWeb.Samples
   [Unit]
   public class VariantsAndMatchingPage
   { 
-    AvailableColors : list[(int * string)] { get { [(0, "Red"), (1, "Green"), (2, "Blue"), (3, "Other")] }  }
-    CurrentColorId : int { get; set; }
+    AvailableColors : list[(string * string)] { get { [("0", "Red"), ("1", "Green"), ("2", "Blue"), ("3", "Other")] }  }
+    CurrentColorId : string { get; set; }
     OtherColor : Color.Other;
         
     public CurrentColor : Color
@@ -53,10 +53,10 @@ namespace NemerleWeb.Samples
       {
         match(CurrentColorId)
         {
-        | 0 => Color.Red()
-        | 1 => Color.Green()
-        | 2 => Color.Blue()
-        | 3 => OtherColor
+        | "0" => Color.Red()
+        | "1" => Color.Green()
+        | "2" => Color.Blue()
+        | "3" => OtherColor
         | _ => Color.Red();
         }
       }
@@ -77,9 +77,9 @@ namespace NemerleWeb.Samples
             <option $foreach(color in AvailableColors) value="$(color[0])" text="$(color[1])" />
           </select>
           <span $when(CurrentColor is Color.Other)> 
-            <span>$(OtherColor.R)</span>
-            <span>$(OtherColor.G)</span>
-            <span>$(OtherColor.B)</span>
+            <input value="$(OtherColor.R)"></input>
+            <input value="$(OtherColor.G)"></input>
+            <input value="$(OtherColor.B)"></input>
           </span>
         </div>
       #>

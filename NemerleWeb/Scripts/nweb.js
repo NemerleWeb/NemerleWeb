@@ -490,12 +490,13 @@ nweb.utils = {
             var typename = obj.$type.replace(/\./g, "_").replace(/\+/g, "_").replace(/(.+),.+/g, "$1");
             var newObj = eval('new ' + typename + '()');
             for (var p in obj) {
-                if (obj.hasOwnProperty(p) && newObj.hasOwnProperty(p)) {
-                    if (typeof newObj[p] === "function")
-                        newObj[p](nweb.utils.toTypedObject(obj[p]));
-                    else
-                        newObj[p] = nweb.utils.toTypedObject(obj[p]);
-                }
+              var propSetter = "set_" + p;
+              if (obj.hasOwnProperty(p)) {
+                if (newObj.hasOwnProperty(propSetter) && typeof newObj[propSetter] === "function")
+                  newObj[propSetter](nweb.utils.toTypedObject(obj[p]));
+                else if (newObj.hasOwnProperty(p))
+                  newObj[p] = nweb.utils.toTypedObject(obj[p]);
+              }
             }
             return newObj;
         }
