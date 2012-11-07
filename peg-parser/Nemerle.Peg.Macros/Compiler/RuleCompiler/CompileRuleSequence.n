@@ -17,7 +17,7 @@ namespace Nemerle.Peg
     {
       def generate(rules : list[Rule], results : list[string], global : bool, counter : int) : PExpr
       {
-        def pos = <[ $(("pos" + counter) : usesite) ]>;
+        def pos = <[ $(("pos" + (counter + 1)) : usesite) ]>;
         match (rules)
         {
           | [rule]        => CompileRule(rule, results, global, counter);
@@ -34,7 +34,7 @@ namespace Nemerle.Peg
                     <[
                       {
                         def $pos = $ruleCode;
-                        if ($pos >= 0) $(generate(rules, results, false, counter)) else -1
+                        if ($pos >= 0) $(generate(rules, results, false, counter + 1)) else -1
                       }
                     ]>
                   | _ => PExpr.Error("Empty result list")
@@ -45,7 +45,7 @@ namespace Nemerle.Peg
                 <[
                   {
                     def $pos = $ruleCode;
-                    if ($pos >= 0) $(generate(rules, results, false, counter)) else -1
+                    if ($pos >= 0) $(generate(rules, results, false, counter + 1)) else -1
                   }
                 ]>
             }
@@ -66,7 +66,7 @@ namespace Nemerle.Peg
           | rule :: rules =>
             <[
               def $pos = $(CompileRule(rule, [], global, counter));
-              if ($pos >= 0) $(generateNoResult(rules, false, counter)) else -1
+              if ($pos >= 0) $(generateNoResult(rules, false, counter + 1)) else -1
             ]>
         }
       }

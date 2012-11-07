@@ -15,27 +15,18 @@ namespace Nemerle.Peg
   {
     public CompileRuleRepeatMin(rule : Rule.RepeatMin, results : list[string], global : bool, counter : int) : PExpr
     {
-      /*def y = <[ $(x : usesite) ]>;
-      def x = <[ parameter: x : int ]>;
-      def xx = [x];
-      def q = <[
-        def f(..$xx)
-        {
-          f($y);
-        }
-      ]>;*/
-      
-      
       def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
-      def newPos = <[ $(("pos" + (counter + 1)) : usesite) ]>;
+      def newPosName = "pos" + (counter + 1);
+      def newPos = <[ $(newPosName : usesite) ]>;
+      def newPosParam = <[ parameter: $(newPosName : usesite) ]>;
       def rep = <[ $(("rep" + counter) : usesite) ]>;
       def (initialising, addTokensToList, ruleCode) = MakeListCode(results, rule.rule, counter + 1);
       def code = match (rule)
-      {
+      {        
         | RepeatMin(0, _) =>
+          def repParams = [ newPosParam ];
           <[
-            mutable $rep = null;
-            $rep = ($newPos) =>
+            def $(rep : name)(..$repParams)
             {
               def newPosCompileRuleRepeatMin0 = $ruleCode;
               if (newPosCompileRuleRepeatMin0 >= 0)
@@ -45,14 +36,14 @@ namespace Nemerle.Peg
               }
               else
                 $newPos
-            };
+            }
             $rep($pos)
           ]>
 
         | RepeatMin(minCount, _) =>
+          def repParams = [ <[ parameter: count ]>, newPosParam ];
           <[
-            mutable $rep = null;
-            $rep = (count, $newPos : int) =>
+            def $(rep : name)(..$repParams)
             {
               def newPosCompileRuleRepeatMin = $ruleCode;
               if (newPosCompileRuleRepeatMin >= 0)

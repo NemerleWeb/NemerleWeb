@@ -16,7 +16,9 @@ namespace Nemerle.Peg
     public CompileRuleRepeatMinMax(rule : Rule.RepeatMinMax, results : list[string], global : bool, counter : int) : PExpr
     {
       def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
-      def newPos = <[ $(("pos" + (counter + 1)) : usesite) ]>;
+      def newPosName = "pos" + (counter + 1);
+      def newPos = <[ $(newPosName : usesite) ]>;
+      def newPosParam = <[ parameter: $(newPosName : usesite) ]>;
       def rep = <[ $(("rep" + counter) : usesite) ]>;
       match (rule)
       {
@@ -57,14 +59,13 @@ namespace Nemerle.Peg
           ]>)
 
         | RepeatMinMax(minCount, maxCount, subrule)    =>
-          def (initialising, addTokensToList, ruleCode) = MakeListCode(results, subrule, counter);
+          def repParams = [ <[ parameter: count ]>, newPosParam ];
+          def (initialising, addTokensToList, ruleCode) = MakeListCode(results, subrule, counter + 1);
           PrepandExprs(initialising, <[
-            //def rep(count, pos)
-            mutable rep = null;
-            $rep = (count, $newPos) =>
+            def $(rep : name)(..$repParams)
             {
               if (count == $(maxCount : int))
-                pos
+                $newPos
               else
               {
                 def newPosCompileRuleRepeatMinMax = $ruleCode;
@@ -74,7 +75,7 @@ namespace Nemerle.Peg
                   $rep(count + 1, newPosCompileRuleRepeatMinMax)
                 }
                 else if (count >= $(minCount : int))
-                  newPos
+                  $newPos
                 else
                   -1
                }
