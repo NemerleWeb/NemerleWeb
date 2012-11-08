@@ -556,6 +556,9 @@ nweb.utils = {
 Array.prototype.getEnumerator = function() {
     this.__enumeratorIndex = -1;
     this.Current = null;
+    this.get_Current = function () {
+        return this.Current;
+    }
     return this;
 };
 
@@ -605,6 +608,29 @@ if (!Array.prototype.indexOf) {
         return -1;
     };
 }
+
+String.prototype.getEnumerator = function () {
+    this.__enumeratorIndex = -1;
+    this.Current = null;
+    this.get_Current = function () {
+        return this.Current;
+    }
+    return this;
+};
+
+String.prototype.dispose = String.prototype.getEnumerator;
+
+String.prototype.moveNext = function () {
+    if (typeof this.__enumeratorIndex === 'undefined')
+        this.__enumeratorIndex = -1;
+    this.__enumeratorIndex++;
+    this.Current = this[this.__enumeratorIndex];
+    return this.__enumeratorIndex < this.length;
+};
+
+String.prototype.current = function () {
+    return this[this.__enumeratorIndex];
+};
 
 // TODO: Maybe move
 var Nemerle_Utility_Identity_$A$$B$_ = {

@@ -7,20 +7,21 @@ using System.Linq;
 namespace NemerleWeb.Samples
 {
   [Unit]
-  internal class CalculatorPage
+  internal class JsonPage
   {
-    _calc : Calculator.CalcParser;
+    _parser : Nemerle.Json.JsonParser;
+    
     public this()
     {
-      _calc = Calculator.CalcParser();
+      _parser = Nemerle.Json.JsonParser();
     }
          
-    CalcOutput : string
+    ParserOutput : string
     {
       get
       {
-        if (!string.IsNullOrEmpty(CalcInput))
-          if (_calc.Parse(CalcInput) is Some(res))
+        if (!string.IsNullOrEmpty(ParserInput))
+          if (_parser.Parse(ParserInput) is Some(res))
             res.ToString()
           else
             "Incorrect input"
@@ -29,20 +30,19 @@ namespace NemerleWeb.Samples
       }
     }
      
-    public CalcInput : string { get; set; }
+    public ParserInput : string { get; set; }
     
     [Html]
     public View() : string
     {
       <#
         <div>
-          <span>Write an expression.</span>
-          <span>For example: 1 + 2 - 3 *  4</span>
+          <span>Write a JSON:</span>
           <div class="output">
-            <span class="output-text">$CalcOutput</span> 
+            <span class="output-text">$ParserOutput</span> 
           </div>
-          <div class="calc-input">
-            <input value="$CalcInput"/>
+          <div class="parser-input">
+            <input value="$ParserInput"/>
           </div>
         </div>
       #>

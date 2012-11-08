@@ -983,6 +983,18 @@ namespace NemerleWeb.Tests
         _ = CultureInfo.CreateSpecificCulture("").NumberFormat;
         true
       });
+      
+      test("String Enumerator", () =>
+      {
+        def a = "a";
+        def e = a.GetEnumerator();
+        while (e.MoveNext())
+        {
+          _ = e.Current;
+        }
+        
+        true
+      });
     }
     
     [Html]

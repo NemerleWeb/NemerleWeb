@@ -185,6 +185,30 @@
     <Compile Include="MVVM\NameListPage.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MVVM\Peg\JsonAst.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\Peg\JsonParser.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\Peg\JsonUtils.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\Peg\CalculatorParser.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\Peg\JsonPage.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\Peg\JSPage.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\Peg\JSParser.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\Peg\JSParserAst.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\Samples.n">
       <SubType>Code</SubType>
     </Compile>

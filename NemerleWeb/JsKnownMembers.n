@@ -72,6 +72,7 @@ namespace NemerleWeb
       JsKnownMembersNemerleOption.Register();
       JsKnownMembersTextStringBuilder.Register();
       JsKnownMembersGlobalizationCutlureInfo.Register();
+      JsKnownMembersCharEnumerator.Register();
     }
     
     public Convert([NotNull] call : TExpr.Call, [NotNull] builder : TExpr -> JsAst) : JsAst

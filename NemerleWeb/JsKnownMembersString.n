@@ -15,7 +15,7 @@ namespace NemerleWeb
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(string), Handler); 
+      JsKnownMembers.RegisterType(typeof(string), Handler);
     }
     
     private JsToString(arg : JsAst) : JsAst
@@ -39,7 +39,7 @@ namespace NemerleWeb
         {        
         | "get_Length" => Some(JsAst.FieldRef(left, "length", true))
         | "Clone" => Some(left)        
-        | "GetEnumerator"
+        | "GetEnumerator" => Some(left.MethodCall(member.Name, parms))
         | "GetHashCode"
         | "GetType"
         | "GetTypeCode"        
