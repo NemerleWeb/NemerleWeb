@@ -133,6 +133,9 @@
     <Compile Include="JsKnownMembersBase.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JsKnownMembersCharEnumerator.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JsKnownMembersDelegate.n">
       <SubType>Code</SubType>
     </Compile>

@@ -1,0 +1,130 @@
+﻿using NemerleWeb;
+using Nemerle.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Nemerle.Peg;
+
+namespace Calculator
+{
+  type LoopTokens = NToken * int;
+  
+  [Record]
+  public class ParserFatalError : Exception
+  {
+    public Pos : int;
+  }
+  
+  /// <summary>
+  /// Description of CalcParser.
+  /// </summary>
+  [Unit]
+  [PegGrammar(Options = EmitDebugSources, start,
+  grammar
+  {
+    any = ['\u0000'..'\uFFFF'];
+    digit = ['0'..'9']+;
+    spaces : void = ' '*;
+    
+    num : int = digit spaces;
+    unaryMinus : int = '-' spaces simplExpr;
+    parenthesesExpr : int = '(' spaces sumOrSub ')' spaces;
+    parenthesesExprError : int = '(' spaces sumOrSub (&any / !any);
+    simplExpr : int = num / parenthesesExpr / unaryMinus / parenthesesExprError / simplExprError;
+    simplExprError : int = any;
+    inputError : int = any;
+    mulOrDiv : int = simplExpr (('*' / '/') spaces simplExpr)*;
+    sumOrSub : int = mulOrDiv (('+' / '-') spaces mulOrDiv )*;
+    mainRule : int = sumOrSub inputError?;
+    start : int = spaces mainRule !any;
+  })]
+  public class CalcParser
+  {
+//Requred for parser --------------------------------------------------------------------------------------------
+    
+    private num(digit : NToken) : int
+    {
+      int.Parse(GetText(digit))
+    }
+    
+    private unaryMinus(_ : NToken, se : int) : int
+    {
+      -se
+    }
+    
+    private parenthesesExpr(_ : NToken, se : int, _ : NToken) : int
+    {
+      se
+    }
+    
+    private parenthesesExprError(_ : NToken, _ : int) : int
+    {
+      js <# throw "Need closing parentheses or '+', '-', '*', '/' with following number of expression"; #>;
+      -1
+    }
+    
+    private inputError(_tok : NToken) : int
+    {
+      js <# throw "Need '+', '-', '*', '/' with following number or expression"; #>;
+      -1
+    }
+    
+    private simplExprError(_tok : NToken) : int
+    {
+      js <# throw "Need number or expression in parentheses"; #>;
+      -1
+    }
+    
+    private mainRule(se : int, _ : option[int]) : int
+    {
+      se
+    }
+
+    // TODO: autogenerate this block
+    private simplExpr(se : int) : int
+    {
+      se
+    }
+    // TODO: end todo
+    
+    private start(se : int) : int
+    {
+      se
+    }
+    
+    private mulOrDiv(se : int, lst : List[LoopTokens]) : int
+    {
+      DoOpHelper(se, lst)
+    }
+        
+    private sumOrSub(se : int, lst : List[LoopTokens]) : int
+    {
+      DoOpHelper(se, lst)
+    }
+     
+//End requred for parser --------------------------------------------------------------------------------------------
+
+    private DoOpHelper(se : int, lst : List[LoopTokens]) : int
+    {
+      def doOp(x : int, y : int, op : string) : int
+      {
+        match (op)
+        {
+          | "*" => x * y
+          | "/" => x / y
+          | "+" => x + y
+          | "-" => x - y
+          | _ => assert(false);
+        }
+      }
+           
+      mutable r = se;
+      
+      foreach ((opTok, secondTok) in lst)
+        r = doOp(r, secondTok, GetText(opTok));
+    
+      r
+    }
+  }
+}

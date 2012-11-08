@@ -1,0 +1,438 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Utility;
+
+using Nemerle.Peg;
+using NemerleWeb;
+
+namespace JSEngine {
+
+    type Statements     = list[Statement];
+    type Expressions    = list[Expression];
+    type Strings        = list[string];
+
+    [Unit]
+    [PegGrammar(Options = EmitDebugSources,
+        start,
+        grammar {
+            newLine                     = "\r\n" / '\n' / '\r' / '\u2028' / '\u2029' / '\u0085';
+            singleLineComment           = "//" (!('\n' / '\r') [Any])* newLine?;
+            delimitedComment            = "/*" (!"*/" [Any])* "*/";
+            comment                     = singleLineComment / delimitedComment;
+            spaces : Void               = (' ' / '\t' / '\u000B' / '\u000C' / newLine / comment)*;
+            letter                      = ([Lu, Ll, Lt, Lm, Lo, Nl] / '_' / '$');
+            decimal_digit               = ['0'..'9'];
+            hex_digit                   = ['0'..'9', 'A'..'F', 'a'..'f'];
+            octal_digit                 = ['0'..'7'];
+
+            SEMICOLON                   = ';' spaces;
+            COLON                       = ':' spaces;
+            DOT                         = '.' spaces;
+            COMMA                       = ',' spaces;
+            LPAREN                      = '(' spaces;
+            RPAREN                      = ')' spaces;
+            LBRACE                      = '[' spaces;
+            RBRACE                      = ']' spaces;
+            LFBRACE                     = '{' spaces;
+            RFBRACE                     = '}' spaces;
+            EQ                          = '=' spaces;
+            QUEST                       = '?' spaces;
+
+            VAR                         = "var" spaces;
+            TRUE                        = "true" spaces;
+            FALSE                       = "false" spaces;
+            NULL                        = "null" spaces;
+            FUNCTION                    = "function" spaces;
+            THIS                        = "this" spaces;
+            RETURN                      = "return" spaces;
+
+            identifierValue             = letter (letter / decimal_digit)*;
+            identifier      : string    = identifierValue spaces;
+            identifiers     : Strings   = identifier (COMMA identifiers)?;
+
+            decimalLiteral  : IntegerLiteral = decimal_digit+ spaces;
+            hexLiteral      : IntegerLiteral = "0x" hex_digit+ spaces;
+            octalLiteral    : IntegerLiteral = '0' octal_digit+ spaces;
+            integerLiteral  : Literal   = hexLiteral / octalLiteral / decimalLiteral;
+
+            trueLiteral     : BooleanLiteral = TRUE;
+            falseLiteral    : BooleanLiteral = FALSE;
+            boolLiteral     : Literal   = trueLiteral / falseLiteral;
+
+            singleQuoteLiteral : StringLiteral = "'" (!"'" [Any])* "'" spaces;
+            doubleQuoteLiteral : StringLiteral = "\"" (!"\"" [Any])* "\"" spaces;
+            stringLiteral   : Literal   = singleQuoteLiteral / doubleQuoteLiteral;
+
+            nullLiteral     : Literal   = NULL;
+
+            literal : Literal           = integerLiteral / boolLiteral / stringLiteral / nullLiteral;
+
+            literalExpression       : Expression = literal;
+            thisExpression          : Expression = THIS;
+            functionExpression      : Expression = FUNCTION LPAREN identifiers? RPAREN blockStatement;
+            identifierExpression    : Expression = identifier;
+            parenExpression         : Expression = LPAREN expression RPAREN;
+            otherExpression         : Expression = literalExpression / thisExpression / functionExpression / identifierExpression / parenExpression;
+
+            indexerExpression  : Expression = otherExpression (LBRACE expressions? RBRACE)*;
+            callExpression     : Expression = indexerExpression (LPAREN expressions? RPAREN)*;
+            memberExpression   : Expression = callExpression (DOT memberExpression)?;
+
+            postfixExpression  : Expression = memberExpression (("++" / "--") spaces)*;
+            prefixExpression   : Expression = (("++" / "--" / '~' / '!' / '+' / '-') spaces)* postfixExpression;  // right assoc
+
+            multiplicativeExpression    : Expression = prefixExpression (('*' / '/' / '%') spaces           prefixExpression)*;
+            additiveExpression          : Expression = multiplicativeExpression (('+' / '-' ) spaces        multiplicativeExpression)*;
+            shiftExpression             : Expression = additiveExpression ((">>>" / ">>" / "<<") spaces     additiveExpression)*;
+            relationalExpression        : Expression = shiftExpression (("<=" / ">=" / '<' / '>') spaces    shiftExpression)*;
+            equalityExpression          : Expression = relationalExpression (("===" / "==" / "!=") spaces   relationalExpression)*;
+            andExpression               : Expression = equalityExpression ('&' spaces                       equalityExpression)*;
+            exclusiveOrExpression       : Expression = andExpression ('^' spaces                            andExpression)*;
+            inclusiveOrExpression       : Expression = exclusiveOrExpression ('|' spaces                    exclusiveOrExpression)*;
+            conditionalAndExpression    : Expression = inclusiveOrExpression ("&&" spaces                   inclusiveOrExpression)*;
+            conditionalOrExpression     : Expression = conditionalAndExpression ("||" spaces                conditionalAndExpression)*;
+            conditionalExpression       : Expression = conditionalOrExpression (QUEST expression COLON conditionalExpression)?; //right assoc
+            assignExpression            : Expression = conditionalExpression (EQ assignExpression)?;  // right assoc 
+
+            expression              : Expression = assignExpression;
+            expressions             : Expressions = expression (COMMA expressions)?;
+
+            emptyStatement      : Statement = SEMICOLON;
+            blockStatement      : Statement = LFBRACE statements RFBRACE;
+            varDeclStatement    : Statement = VAR identifier (EQ expression) ? SEMICOLON;
+            funDeclStatement    : Statement = FUNCTION identifier LPAREN identifiers? RPAREN blockStatement;
+            expressionStatement : Statement = expression SEMICOLON;
+            returnStatement     : Statement = RETURN expression? SEMICOLON;
+
+            statements          : Statements = (emptyStatement / blockStatement / varDeclStatement / funDeclStatement / expressionStatement /  returnStatement)*;
+
+            start : Statements          = spaces statements ![Any];
+        }
+    )]
+    public class JSParser {
+
+        identifier(idValue : NToken) : string {
+            GetText(idValue)
+        }
+
+        identifiers(id : string, tail : option[NToken * list[string]]) : list[string] {
+            match(tail) {
+                | Some((_, tail)) => id :: tail
+                | _ => [id]
+            }
+        }
+
+        #region Literals
+
+        #region integer literals
+
+        decimalLiteral(lst : NToken) : IntegerLiteral {
+            IntegerLiteral.Decimal(GetText(lst))
+        }
+
+        hexLiteral(head : NToken, tail : NToken) : IntegerLiteral {
+            IntegerLiteral.Hex(GetText(head) + GetText(tail))
+        }
+
+        octalLiteral(head : NToken, tail : NToken) : IntegerLiteral {
+            IntegerLiteral.Octal(GetText(head) + GetText(tail))
+        }
+
+        integerLiteral(x : IntegerLiteral) : Literal {
+            Literal.Integer(x)
+        }
+
+        #endregion
+        
+        #region bool literals
+
+        trueLiteral(_ : NToken) : BooleanLiteral {
+            BooleanLiteral.True()
+        }
+
+        falseLiteral(_ : NToken) : BooleanLiteral {
+            BooleanLiteral.False()
+        }
+
+        boolLiteral(value : BooleanLiteral) : Literal {
+            Literal.Boolean(value)
+        }
+
+        #endregion
+
+        #region string literals
+
+        //singleQuoteLiteral : StringLiteral = "'" (!"'" [Any])* "'" spaces;
+        singleQuoteLiteral(_ : NToken, chars : NToken, _ : NToken) : StringLiteral {
+            StringLiteral.SingleQuote(GetText(chars));
+        }
+
+        doubleQuoteLiteral(_ : NToken, chars : NToken, _ : NToken) : StringLiteral {
+            StringLiteral.DoubleQuote(GetText(chars));
+        }
+
+        stringLiteral(x : StringLiteral) : Literal {
+            Literal.String(x)
+        }
+
+        #endregion
+
+        #region null literal
+
+        nullLiteral(_ : NToken) : Literal {
+            Literal.Null()
+        }
+
+        #endregion
+
+        literal(x : Literal) : Literal {
+            x
+        }
+
+        #endregion
+
+        #region Expressions
+
+        #region Other expressions
+
+        literalExpression(x : Literal) : Expression {
+            Expression.Literal(x)
+        }
+
+        identifierExpression(x : string) : Expression {
+            Expression.Identifier(x)
+        }
+
+        functionExpression(_ : NToken, _ : NToken, args : option[list[string]], _ : NToken, stmts : Statement) : Expression {
+            def stmts = stmts :> Statement.Block;
+            match(args) {
+                | Some(args) => Expression.Function(args, stmts)
+                | _ => Expression.Function([], stmts)
+            }
+        }
+
+        thisExpression(_ : NToken) : Expression {
+            Expression.This()
+        }
+
+        parenExpression(_ : NToken, e : Expression, _ : NToken) : Expression {
+            e
+        }
+
+        otherExpression(e : Expression) : Expression {
+            e
+        }
+
+        #endregion
+
+        #region Accessors and calls
+
+        memberExpression(e : Expression, member : option[NToken * Expression]) : Expression {
+            match(member) {
+                | Some((_, member)) => Expression.Member(e, member)
+                | _ => e
+            }
+        }
+
+        indexerExpression(x : Expression, tail : SCG.List[NToken * option[list[Expression]] * NToken]) : Expression {
+            if(tail.Count > 0) {
+                mutable result = x;
+                foreach((_, args, _) in tail)
+                    result =
+                        match(args) {
+                            | Some(args) => Expression.Indexer(result, args);
+                            | _ => Expression.Indexer(result, []);
+                        }
+                result
+            } else
+                x
+        }
+
+        callExpression(x : Expression, tail : SCG.List[NToken * option[list[Expression]] * NToken]) : Expression {
+            if(tail.Count > 0) {
+                mutable result = x;
+                foreach((_, args, _) in tail)
+                    result =
+                        match(args) {
+                            | Some(args) => Expression.Call(result, args);
+                            | _ => Expression.Call(result, []);
+                        }
+                result
+            } else
+                x
+        }
+
+        #endregion
+
+        #region Unary expressions
+
+        postfixExpression(x : Expression, ops : SCG.List[NToken]) : Expression {
+            if(ops.Count > 0) {
+                mutable result = x;
+                foreach(op in ops)
+                    result = Expression.Call(Expression.Operator(GetText(op), OperatorKind.Postfix), [result]);
+                result
+            } else
+                x
+        }
+
+        prefixExpression(ops : SCG.List[NToken], x : Expression) : Expression {
+            if(ops.Count > 0) {
+                mutable result = x;
+                foreach(op in ops.ToListRev())
+                    result = Expression.Call(Expression.Operator(GetText(op), OperatorKind.Prefix), [result]);
+                result
+            } else
+                x
+        }
+
+        #endregion
+
+        #region Binary expressions
+
+        // not rule
+        infixExpression(a : Expression, other : SCG.List[NToken * Expression]) : Expression {
+            mutable result = a;
+            foreach((op, b) in other)
+                result = Expression.Call(Expression.Operator(GetText(op), OperatorKind.Infix), [result, b]);
+            result
+        }
+
+        //conditionalOrExpression     : Expression = conditionalAndExpression ("||" spaces                conditionalAndExpression)?;
+        conditionalOrExpression(a : Expression, other : SCG.List[NToken * Expression]) : Expression {
+            infixExpression(a, other)
+        }
+
+
+        //conditionalAndExpression    : Expression = inclusiveOrExpression ("&&" spaces                   inclusiveOrExpression)?;
+        conditionalAndExpression(a : Expression, other : SCG.List[NToken * Expression]) : Expression {
+            infixExpression(a, other)
+        }
+
+        //inclusiveOrExpression       : Expression = exclusiveOrExpression ('|' spaces                    exclusiveOrExpression)?;
+        inclusiveOrExpression(a : Expression, other : SCG.List[NToken * Expression]) : Expression {
+            infixExpression(a, other)
+        }
+
+        //exclusiveOrExpression       : Expression = andExpression ('^' spaces                            andExpression)?;
+        exclusiveOrExpression(a : Expression, other : SCG.List[NToken * Expression]) : Expression {
+            infixExpression(a, other)
+        }
+
+        //andExpression               : Expression = equalityExpression ('&' spaces                       equalityExpression)?;
+        andExpression(a : Expression, other : SCG.List[NToken * Expression]) : Expression {
+            infixExpression(a, other)
+        }
+
+        //equalityExpression          : Expression = relationalExpression (("===" / "==" / "!=") spaces   relationalExpression)?;
+        equalityExpression(a : Expression, other : SCG.List[NToken * Expression]) : Expression {
+            infixExpression(a, other)
+        }
+
+        //relationalExpression        : Expression = shiftExpression (("<=" / ">=" / '<' / '>') spaces    shiftExpression)?;
+        relationalExpression(a : Expression, other : SCG.List[NToken * Expression]) : Expression {
+            infixExpression(a, other)
+        }
+
+        //shiftExpression             : Expression = additiveExpression ((">>>" / ">>" / "<<") spaces     additiveExpression)?;
+        shiftExpression(a : Expression, other : SCG.List[NToken * Expression]) : Expression {
+            infixExpression(a, other)
+        }
+
+        //additiveExpression          : Expression = multiplicativeExpression (('+' / '-' ) spaces        multiplicativeExpression)?;
+        additiveExpression(a : Expression, other : SCG.List[NToken * Expression]) : Expression {
+            infixExpression(a, other)
+        }
+
+        //multiplicativeExpression    : Expression = prefixExpression (('*' / '/' / '%') spaces           prefixExpression)?;
+        multiplicativeExpression(a : Expression, other : SCG.List[NToken * Expression]) : Expression {
+            infixExpression(a, other)
+        }
+
+        assignExpression(x : Expression, from : option[NToken * Expression]) : Expression {
+            match(from) {
+                | Some((_, from)) => Expression.Assign(x, from)
+                | _ => x
+            }
+        }
+
+        #endregion
+
+        #region Ternary expression
+
+        //conditionalExpression       : Expression = conditionalOrExpression (QUEST expression COLON conditionalExpression)?; //right assoc
+        conditionalExpression(x : Expression, other : option[NToken * Expression * NToken * Expression]) : Expression {
+            match(other) {
+                | Some((_, t, _, f)) =>
+                    Expression.Call(Expression.Operator("?:", OperatorKind.Ternary), [x, t, f]);
+                | _ => x 
+            }
+        }
+
+        #endregion
+
+        expression(x : Expression) : Expression {
+            x
+        }
+
+        expressions(head : Expression, tail : option[NToken * list[Expression]]) : list[Expression] {
+            match(tail) {
+                | Some((_, tail)) => head :: tail
+                | _ => [head]
+            }
+        }
+
+        #endregion
+
+        #region Statements
+
+        emptyStatement(_ : NToken) : Statement {
+            Statement.Empty()
+        }
+
+        blockStatement(_ : NToken, stmts : list[Statement], _ : NToken) : Statement {
+            Statement.Block(stmts)
+        }
+
+        varDeclStatement(_ : NToken, name : string, init : option[NToken * Expression], _ : NToken) : Statement {
+            match(init) {
+                | Some((_, expr)) => Statement.VarDecl(name, expr)
+                | _ => Statement.VarDecl(name, null)
+            }
+        }
+
+        funDeclStatement(_ : NToken, name : string, _ : NToken, args : option[list[string]], _ : NToken, stmts : Statement) : Statement {
+            def stmts = stmts :> Statement.Block;
+            match(args) {
+                | Some(args) => Statement.FunDecl(name, args, stmts)
+                | _ => Statement.FunDecl(name, [], stmts)
+            }
+        }
+
+        expressionStatement(e : Expression, _ : NToken) : Statement {
+            Statement.Expression(e)
+        }
+
+        returnStatement(_ : NToken, value : option[Expression], _ : NToken) : Statement {
+            match(value) {
+                | Some(value) => Statement.Return(value)
+                | _ => Statement.Return(null)
+            }
+        }
+
+        statements(stmts : SCG.List[Statement]) : list[Statement] {
+            NList.ToList(stmts)
+        }
+
+        #endregion
+
+        start(x : list[Statement]) : list[Statement] {
+            x
+        }
+
+    }
+
+}
