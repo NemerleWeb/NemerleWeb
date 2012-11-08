@@ -986,14 +986,15 @@ namespace NemerleWeb.Tests
       
       test("String Enumerator", () =>
       {
-        def a = "a";
+        def a = "aba";
         def e = a.GetEnumerator();
+        mutable count = 0;
         while (e.MoveNext())
         {
-          _ = e.Current;
+          when (e.Current == 'a') count++;
         }
         
-        true
+        count == 2
       });
     }
     
