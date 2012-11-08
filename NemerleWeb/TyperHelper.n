@@ -110,7 +110,7 @@ namespace NemerleWeb
         BuildMethod(expr : PExpr, typer : Typer) : MethodBuilder
         {
             def tb = typer.CurrentType;
-            def methodName = $"____TyperHelperMethod$(_index)____";
+            def methodName = $"_N__TyperHelperMethod$(_index)____";
             _index++;
             def meth = tb.DefineAndReturn(<[ decl: $(methodName : dyn)() : void { $expr } ]>) :> MethodBuilder;
             tb.Compile();

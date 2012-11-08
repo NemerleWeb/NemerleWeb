@@ -16,23 +16,24 @@ namespace Nemerle.Peg
     public CompileRuleRepeatMin(rule : Rule.RepeatMin, results : list[string], global : bool, counter : int) : PExpr
     {
       def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
-      def newPosName = "pos" + (counter + 1);
+      def newPosName = "pos" + (counter);
       def newPos = <[ $(newPosName : usesite) ]>;
       def newPosParam = <[ parameter: $(newPosName : usesite) ]>;
       def rep = <[ $(("rep" + counter) : usesite) ]>;
-      def (initialising, addTokensToList, ruleCode) = MakeListCode(results, rule.rule, counter + 1);
+      def (initialising, addTokensToList, ruleCode) = MakeListCode(results, rule.rule, counter);
       def code = match (rule)
       {        
         | RepeatMin(0, _) =>
+          def newPosCompileRuleRepeatMin0 = <[ $(("newPosCompileRuleRepeatMin0" + counter) : usesite) ]>;
           def repParams = [ newPosParam ];
           <[
             def $(rep : name)(..$repParams)
             {
-              def newPosCompileRuleRepeatMin0 = $ruleCode;
-              if (newPosCompileRuleRepeatMin0 >= 0)
+              def $newPosCompileRuleRepeatMin0 = $ruleCode;
+              if ($newPosCompileRuleRepeatMin0 >= 0)
               {
                 $addTokensToList;
-                $rep(newPosCompileRuleRepeatMin0)
+                $rep($newPosCompileRuleRepeatMin0)
               }
               else
                 $newPos
@@ -41,15 +42,16 @@ namespace Nemerle.Peg
           ]>
 
         | RepeatMin(minCount, _) =>
+          def newPosCompileRuleRepeatMin = <[ $(("newPosCompileRuleRepeatMin" + counter) : usesite) ]>;
           def repParams = [ <[ parameter: count ]>, newPosParam ];
           <[
             def $(rep : name)(..$repParams)
             {
-              def newPosCompileRuleRepeatMin = $ruleCode;
-              if (newPosCompileRuleRepeatMin >= 0)
+              def $newPosCompileRuleRepeatMin = $ruleCode;
+              if ($newPosCompileRuleRepeatMin >= 0)
               {
                 $addTokensToList;
-                $rep(count + 1, newPosCompileRuleRepeatMin)
+                $rep(count + 1, $newPosCompileRuleRepeatMin)
               }
               else if (count >= $(minCount : int))
                 $newPos
