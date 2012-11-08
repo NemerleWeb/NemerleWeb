@@ -25,11 +25,12 @@ namespace Nemerle.Peg
             | [result] =>
               def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
             
+              def newPosCompileRuleCaptureChars = <[ $(("newPosCompileRuleCaptureChars" + counter) : usesite) ]>;
               <[
-                def newPosCompileRuleCaptureChars = $code;
-                when (newPosCompileRuleCaptureChars >= 0)
-                  $(result : dyn) = Nemerle.Peg.NToken($pos, newPosCompileRuleCaptureChars);
-                newPosCompileRuleCaptureChars
+                def $newPosCompileRuleCaptureChars = $code;
+                when ($newPosCompileRuleCaptureChars >= 0)
+                  $(result : dyn) = Nemerle.Peg.NToken($pos, $newPosCompileRuleCaptureChars);
+                $newPosCompileRuleCaptureChars
               ]>
             | _ => assert(false);
           }
@@ -73,6 +74,9 @@ namespace Nemerle.Peg
                   <[ $(result : dyn) = $(varNames.Head : dyn) ]>
                 else
                   PExpr.Error("Too many variables.");
+                  
+              // TODO: Restore
+              def newPosCompileRuleCaptureHandler = <[ $(("newPosCompileRuleCaptureHandler" + counter) : usesite) ]>;
 
               DefVars(varNames, <[
                 {
@@ -84,12 +88,12 @@ namespace Nemerle.Peg
                   }
                   else
                   {
-                    def newPosCompileRuleCaptureHandler = $subRulesCode;
+                    def $newPosCompileRuleCaptureHandler = $subRulesCode;
 
                     $(names.MemPos : dyn) = position;
-                    $(names.MemNewPos : dyn) = newPosCompileRuleCaptureHandler;
+                    $(names.MemNewPos : dyn) = $newPosCompileRuleCaptureHandler;
 
-                    if (newPosCompileRuleCaptureHandler >= 0)
+                    if ($newPosCompileRuleCaptureHandler >= 0)
                     {
                       $setResult;
                       $setResultLocation;
@@ -99,7 +103,7 @@ namespace Nemerle.Peg
                       when ($(names.MaxRollbackPos : dyn) < position)
                         $(names.MaxRollbackPos : dyn) = position;
 
-                    newPosCompileRuleCaptureHandler
+                    $newPosCompileRuleCaptureHandler
                   }
                 }
               ]>)

@@ -20,9 +20,10 @@ namespace Nemerle.Peg
         | []            => [PExpr.Error("Internal PEG macro error: Empty choice.")];
         | [rule]        => [rule];
         | rule :: rules =>
+          def newPosCompileRuleChoice = <[ $(("newPosCompileRuleChoice" + counter) : usesite) ]>;
           <[
-            def newPosCompileRuleChoice = $rule;
-            when (newPosCompileRuleChoice >= 0) res(newPosCompileRuleChoice);
+            def $newPosCompileRuleChoice = $rule;
+            when ($newPosCompileRuleChoice >= 0) res($newPosCompileRuleChoice);
           ]> :: generate(rules)
       }
       def rules = generate(rule.rules.Map(CompileRule(_, results, global, counter)));

@@ -393,7 +393,7 @@ $(indent)}#>);
                .Where(m => !m.IsConstructor)
                .Where(m => !pageMethods.Any(vm => vm == m.Name))
                .Where(m => m.Name != "View")
-               .Where(m => !(m.Name.StartsWith("____") && m.Name.EndsWith("____")))
+               .Where(m => !(m.Name.StartsWith("_N__") && m.Name.EndsWith("____")))
       }
   }
 }
