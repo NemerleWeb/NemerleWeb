@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  module JsKnownMembersOption
+  module JsKnownMembersNemerleOption
   {    
     public Register() : void
     {
@@ -40,11 +40,11 @@ namespace NemerleWeb
             JsAst.Code("Nemerle_Core_None_$T$__$T$_._N_constant_object")
           ])
       }
-    
-      match (parms)
+      
+      match(parms)
       {
       | [] =>
-        match (member.Name)
+        match(member.Name)
         {
         | "get_HasValue"
         | "get_IsSome" => Some(isSome())
@@ -62,7 +62,14 @@ namespace NemerleWeb
               JsAst.Throw(JsAst.Literal(JsLiteral.String("Invalid Value call to option"))),
             ]))
         | _ => None()
-        }        
+        }
+      | [arg] =>
+        match(member.Name)
+        {
+        | "WithDefault" =>
+          Some(JsAst.Ternary(isSome(), JsAst.FieldRef(left, "val", false), arg))
+        | _ => None()
+        }
       | _ => None()
       }
     }

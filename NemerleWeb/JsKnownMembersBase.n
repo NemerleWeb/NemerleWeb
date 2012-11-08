@@ -26,7 +26,8 @@ namespace NemerleWeb
         (_, left, parms) =>
           match (parms)
           {
-          | [] => Some(left.MethodCall("toString", parms))
+          | [] => Some(left.MethodCall("toString", []))
+          | [_] => Some(left.MethodCall("toString", []))
           | _ => None()
           });
     }

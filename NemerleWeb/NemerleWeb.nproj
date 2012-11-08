@@ -145,6 +145,9 @@
     <Compile Include="JsKnownMembersEventsDSL.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JsKnownMembersGlobalizationCultureInfo.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JsKnownMembersIDisposable.n">
       <SubType>Code</SubType>
     </Compile>
@@ -163,7 +166,7 @@
     <Compile Include="JsKnownMembersEnumerator.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersOption.n">
+    <Compile Include="JsKnownMembersNemerleOption.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JsKnownMembersPage.n">

@@ -1,0 +1,54 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Globalization;
+
+namespace NemerleWeb
+{
+  module JsKnownMembersGlobalizationCutlureInfo
+  {    
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(CultureInfo), Handler);
+    }
+  
+    public Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      (if (left is JsAst.StaticMethodRef) StaticHandler else ObjectHandler)(left, member, parms)
+    }
+    
+    private ObjectHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      match(parms)
+      {
+      | [] =>
+        match(member.Name)
+        {
+        | "get_NumberFormat" => Some(JsAst.Literal(JsLiteral.Null()))
+        | _ => None()
+        }
+      | _ => None()
+      }
+    }
+     
+    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      match(parms)
+      {
+      | [_] =>
+        match(member.Name)
+        {
+        | "CreateSpecificCulture" => Some(JsAst.Literal(JsLiteral.String("")))
+        | _ => None()
+        }
+      | _ => None()
+      }
+    }
+  }
+}

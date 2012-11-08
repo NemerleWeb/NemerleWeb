@@ -8,6 +8,7 @@ using Nemerle.Compiler.Typedtree;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 
 namespace NemerleWeb
 {
@@ -313,8 +314,8 @@ $(Body.Write())
               match(this)
               {
               | Literal(Null)         => "null"
-              | Literal(Integer(val)) => $"$val"
-              | Literal(Float(val))   => $"$val"
+              | Literal(Integer(val)) => $"$(val.ToString(CultureInfo.InvariantCulture))"
+              | Literal(Float(val))   => $"$(val.ToString(CultureInfo.InvariantCulture))"
               | Literal(String(val))  =>
                 def escapeCharacter(c)
                 {
@@ -333,11 +334,11 @@ $(Body.Write())
                 | '\0' => "\\0"
                 | '\a' => "\\x07"
                 | '\v' => "\\x0B"
-                | _ => c.ToString()
+                | _ => c.ToString(CultureInfo.InvariantCulture)
                 }
                 
                 $<#"..$(val; ""; escapeCharacter)"#>;
-              | Literal(Bool(val))    => $"$(val.ToString().ToLower())"
+              | Literal(Bool(val))    => $"$(val.ToString(CultureInfo.InvariantCulture).ToLower())"
               | Literal(Regexp(pat, mod)) => $<#new RegExp($(pat.Write()), $(mod.Write()))#>
               }
             }
