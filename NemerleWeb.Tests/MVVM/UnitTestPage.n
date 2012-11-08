@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Globalization;
+using Nemerle;
 
 using Nemerle.Peg;
 using NemerleWeb.Tests.Macro;
@@ -755,6 +757,22 @@ namespace NemerleWeb.Tests
         }
       });
       
+       test("option some withdefault", () =>
+       {
+         def a : option[string] = Some("a");
+         def a2 = Some("a");
+         
+         a.WithDefault("b") == "a" && a2.WithDefault("b") == "a"
+       });
+       
+       test("option none withdefault", () =>
+       {
+         def a : option[string] = None();
+         def a2 = None();
+         
+         a.WithDefault("b") == "b" && a2.WithDefault("b") == "b"
+       });
+      
       test("simple generic class", () =>
       {
         def x = SimpleGenericClass.[int]();
@@ -942,7 +960,29 @@ namespace NemerleWeb.Tests
       //  sb.Length = 10;
 
       //  sb.Length == 10;
-      //});        
+      //});
+      
+      test("ToString", () =>
+      {
+        1.ToString() == "1" &&
+        'a'.ToString() == "a" &&
+        "a".ToString() == "a" &&
+        1.1.ToString() == "1.1"
+      });
+      
+      test("ToString with culture", () =>
+      {
+        1.ToString(CultureInfo.CreateSpecificCulture("en-US")) == "1" &&
+        'a'.ToString(CultureInfo.CreateSpecificCulture("en-US")) == "a" &&
+        "a".ToString(CultureInfo.CreateSpecificCulture("en-US")) == "a" &&
+        1.1.ToString(CultureInfo.CreateSpecificCulture("en-US")) == "1.1"
+      });
+      
+      test("CultureInfo", () =>
+      {
+        _ = CultureInfo.CreateSpecificCulture("").NumberFormat;
+        true
+      });
     }
     
     [Html]
