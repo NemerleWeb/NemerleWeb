@@ -79,9 +79,20 @@ namespace NemerleWeb
                 else
                 {
                   def methodTyper = Typer(tb, null, mb, env);
-                
+                                  
                   if(fullTyping)
-                    methodTyper.RunFullTyping();
+                  {
+                    try
+                    {
+                      methodTyper.RunFullTyping();
+                    }
+                    catch
+                    {
+                    | _ =>
+                      Message.Error($"Failed typing $method, $typer, $tb");
+                      throw;
+                    }
+                  }
                   else
                   {
                     def runTyper = methodTyper.GetType().GetMethod("RunTyper", BindingFlags.NonPublic | BindingFlags.Instance);
