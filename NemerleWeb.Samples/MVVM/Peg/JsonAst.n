@@ -27,7 +27,11 @@ namespace Nemerle.Json
       {
         | String(value) => sb.Append('"').Escape(value).Append('"');
         | Number(value) => sb.Append(value.ToString(CultureInfo.CreateSpecificCulture("en-US")));
-        | Bool(value) => sb.Append(if (value) "true" else "false");
+        | Bool(value) => 
+          // TODO: Restore, workaround
+          mutable v;
+          if (value) v = "true" else v = "false";
+          sb.Append(v);
         | Null => sb.Append("null");
       }
     }

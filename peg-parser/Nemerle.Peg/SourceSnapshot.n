@@ -93,9 +93,9 @@ namespace Nemerle.Peg
             when(pos < text.Length && text[pos] == '\n')
               ++pos;
             line_indexes_buffer.Add(pos);
-          | '\n' =>
-          //| '\u2028'    /*  line separator       */
-          //| '\u2029' => /*  paragraph separator  */
+          | '\n'
+          | '\u2028'    /*  line separator       */
+          | '\u2029' => /*  paragraph separator  */
             ++pos;
             line_indexes_buffer.Add(pos);
           | _ =>

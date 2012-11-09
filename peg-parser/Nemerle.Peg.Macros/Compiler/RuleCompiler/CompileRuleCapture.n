@@ -25,6 +25,7 @@ namespace Nemerle.Peg
             | [result] =>
               def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
             
+	      // TODO: Restore
               def newPosCompileRuleCaptureChars = <[ $(("newPosCompileRuleCaptureChars" + counter) : usesite) ]>;
               <[
                 def $newPosCompileRuleCaptureChars = $code;
