@@ -983,6 +983,20 @@ namespace NemerleWeb.Tests
         _ = CultureInfo.CreateSpecificCulture("").NumberFormat;
         true
       });
+      
+      test("Call with non assignable parameter 1", () =>
+      {
+        def sb = StringBuilder();        
+        _ = sb.Append(if(true) "" else "");
+        
+        true
+      });
+      
+      test("Call with non assignable parameter 2", () =>
+      {
+        _ = string.Concat(if(true) "" else "", if(false) "" else "");
+        true
+      });
     }
     
     [Html]
