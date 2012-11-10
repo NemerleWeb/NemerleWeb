@@ -26,18 +26,9 @@ public class Test
 {  
   public this()
   {
-    LoadSamples([1, 2, 3].ToList());
+    string.Concat(if(true) "" else "", if(false) "" else "");
   }
-  
-  public LoadSamples(samples : List[int]) : void
-  {
-    for(mutable i = 0; i < samples.Count; i++)
-        LoadSample(samples, i)
-  }
-  
-  public LoadSample(samples : List[int], i : int) : void
-  {}
-  
+    
   [Html]
   public View() : string
   {
