@@ -238,7 +238,7 @@ namespace NemerleWeb
         when(shouldReturn)
           ast = JsAstHelper.MakeReturn(ast);
           
-        ast = JsAstHelper.FlattenAndRemoveVoids(ast);        
+        ast = JsAstHelper.FlattenAndRemoveVoids(ast);
         ast = JsAstHelper.GotosToSwitch(ast);
                 
         match(ast)

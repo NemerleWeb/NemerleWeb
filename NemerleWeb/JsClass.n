@@ -205,24 +205,26 @@ $staticProperties
             
             when (p.GetGetter() != null)
             {
-              def getterBody = TranslateMethodBody(p.GetGetter());
-              _ = sb.AppendLine($<#$indent$parentPtr.get_$(p.Name) = function() {
+              def getterBody = TranslateMethodBody(p.GetGetter(), indent + "  ");
+              _ = sb.AppendLine(
+$<#$indent$parentPtr.get_$(p.Name) = function() {
 $getterBody
-};#>);
+$indent};#>);
             }
           
             when (p.GetSetter() != null)
             {
-              def setterBody = TranslateMethodBody(p.GetSetter());
-              _ = sb.AppendLine($<#$indent$parentPtr.set_$(p.Name) = function(value) {
+              def setterBody = TranslateMethodBody(p.GetSetter(), indent + "  ");
+              _ = sb.AppendLine(
+$<#$indent$parentPtr.set_$(p.Name) = function(value) {
 $setterBody
-};#>);
+$indent};#>);
             }
             
             sb.ToString()
           });
           
-        $<#..$(propStrings; ";\n")#>;
+        $<#..$(propStrings; "\n")#>;
       }
       
       GetProperties(indent : string, parentPtr : string) : string
@@ -318,7 +320,7 @@ $setterBody
         def methodParms(method) { method.GetParameters().Select(p => p.Name); }
         def m = methods.Select(m => 
 $<#$(indent)$parentPtr.$(m.Name) = function(..$(methodParms(m))) { 
-$self
+$(indent)  $self
 $(TranslateMethodBody(m, indent + "  "))
 $(indent)}#>);
 
