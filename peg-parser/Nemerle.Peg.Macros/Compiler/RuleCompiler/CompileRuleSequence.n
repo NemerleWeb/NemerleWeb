@@ -17,10 +17,10 @@ namespace Nemerle.Peg
     {
       def generate(rules : list[Rule], results : list[string], global : bool, counter : int) : PExpr
       {
-        def pos = <[ $(("pos" + (counter + 1)) : usesite) ]>;
+        def pos = <[ $(("pos" + counter) : usesite) ]>;
         match (rules)
         {
-          | [rule]        => CompileRule(rule, results, global, counter);
+          | [rule]        => CompileRule(rule, results, global, counter + 1);
           | rule :: rules =>
             match (rule)
             {
@@ -30,7 +30,7 @@ namespace Nemerle.Peg
                 match (results)
                 {
                   | result :: results =>
-                    def ruleCode = CompileRule(rule, [result], global, counter);
+                    def ruleCode = CompileRule(rule, [result], global, counter + 1);
                     <[
                       {
                         def $pos = $ruleCode;
@@ -41,7 +41,7 @@ namespace Nemerle.Peg
                 }
 
               | _ =>
-                def ruleCode = CompileRule(rule, [], global, counter);
+                def ruleCode = CompileRule(rule, [], global, counter + 1);
                 <[
                   {
                     def $pos = $ruleCode;
@@ -62,11 +62,11 @@ namespace Nemerle.Peg
         match (rules)
         {
           | []            => <[ { $pos } ]>
-          | [rule]        => CompileRule(rule, [], global, counter)
+          | [rule]        => CompileRule(rule, [], global, counter + 1)
           | rule :: rules =>
             <[
-              def $pos = $(CompileRule(rule, [], global, counter));
-              if ($pos >= 0) $(generateNoResult(rules, false, counter)) else -1
+              def $pos = $(CompileRule(rule, [], global, counter + 1));
+              if ($pos >= 0) $(generateNoResult(rules, false, counter + 1)) else -1
             ]>
         }
       }
