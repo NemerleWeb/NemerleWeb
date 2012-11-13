@@ -76,39 +76,79 @@ namespace NemerleWeb
     }
     
     public Convert([NotNull] call : TExpr.Call, [NotNull] builder : TExpr -> JsAst) : JsAst
-    {      
-      match (call)
+    {
+      def isRefOut(p)
       {
-        | Call(MethodRef(obj = Call(MethodRef(meth = serverMeth, obj = obj), _, _), meth = meth), parms, _)
-          when serverMeth.Name == "get_server" && obj is TExpr.This =>
-            def parameters =
-              if (parms.Length > 0) parms.Zip(meth.GetParameters()).Take(parms.Length - 1).Map((cp, mp) => (mp.name, builder(cp.expr)))
-              else [];
-            def callback = if(parms.Length > 0) builder(parms.Last().expr) else JsAst.Void();
-            match(callback)
-            {
-              | Seq(DefValue as dv :: cb :: []) => JsAst.Seq([dv, JsAst.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, cb)])
-              | _ => JsAst.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, callback)
-            }
-        | Call(MethodRef(_, meth, _, _), [modelParm, viewParm], _) when meth.Name == "GetTemplateName" =>             
-          match(modelParm, viewParm)
-          {
-          | (Parm(expr = TExpr.Literal(Literal.String(model))), Parm(expr = TExpr.Literal(Literal.String(view)))) =>
-            JsAst.Code($"nweb.utils.getTemplateName(this.$model, '$view')")
-          | _ => Message.FatalError("Invalid GetTemplateName call, use 'name' macro")
-          }
-        | Call(MethodRef(obj = o, meth = meth), parms, _) =>
-          if(o.Type.TypeInfo != null)
-            ConvertMethod(o.Type.TypeInfo, builder(o), meth, parms.Map(p => builder(p.expr)));
-          else
-            ConvertFixedTypeMethod(o.Type.FixedValue, builder(o), meth, parms.Map(p => builder(p.expr)))
-        | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) =>
-            ConvertMethod(fromType.TypeInfo, builder(left), meth, parms.Map(p => builder(p.expr)))
-        | Call(OpCode as op, parms, _) => JsAst.Call(builder(op), parms.Map(p => builder(p.expr)))
-        | Call(Base, _, _)
-        | Call(Delayed, _, _) => JsAst.Void()
-        | Call(s, _, _) => Message.Warning($"Unsupported call to $s"); JsAst.Void()          
+        match (p.kind)
+        {
+        | ParmKind.Ref | ParmKind.Out => true
+        | _ => false
+        }
       }
+      
+      // Pack ref/out
+      // x = { value: x };
+      def packRefOut = call.parms
+        .Where(isRefOut)
+        .Select(p =>
+          {
+            def expr = builder(p.expr);
+            if (expr is ParamRef())
+              JsAst.Void()
+            else
+              JsAst.Assign(expr, JsAst.Object([("value", expr)]))
+          }
+        );
+      
+      def callAst =
+        match (call)
+        {
+          | Call(MethodRef(obj = Call(MethodRef(meth = serverMeth, obj = obj), _, _), meth = meth), parms, _)
+            when serverMeth.Name == "get_server" && obj is TExpr.This =>
+              def parameters =
+                if (parms.Length > 0) parms.Zip(meth.GetParameters()).Take(parms.Length - 1).Map((cp, mp) => (mp.name, builder(cp.expr)))
+                else [];
+              def callback = if(parms.Length > 0) builder(parms.Last().expr) else JsAst.Void();
+              match(callback)
+              {
+                | Seq(DefValue as dv :: cb :: []) => JsAst.Seq([dv, JsAst.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, cb)])
+                | _ => JsAst.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, callback)
+              }
+          | Call(MethodRef(_, meth, _, _), [modelParm, viewParm], _) when meth.Name == "GetTemplateName" =>             
+            match(modelParm, viewParm)
+            {
+            | (Parm(expr = TExpr.Literal(Literal.String(model))), Parm(expr = TExpr.Literal(Literal.String(view)))) =>
+              JsAst.Code($"nweb.utils.getTemplateName(this.$model, '$view')")
+            | _ => Message.FatalError("Invalid GetTemplateName call, use 'name' macro")
+            }
+          | Call(MethodRef(obj = o, meth = meth), parms, _) =>
+            if(o.Type.TypeInfo != null)
+              ConvertMethod(o.Type.TypeInfo, builder(o), meth, parms.Map(p => builder(p.expr)));
+            else
+              ConvertFixedTypeMethod(o.Type.FixedValue, builder(o), meth, parms.Map(p => builder(p.expr)))
+          | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) =>
+              ConvertMethod(fromType.TypeInfo, builder(left), meth, parms.Map(p => builder(p.expr)))
+          | Call(OpCode as op, parms, _) => JsAst.Call(builder(op), parms.Map(p => builder(p.expr)))
+          | Call(Base, _, _)
+          | Call(Delayed, _, _) => JsAst.Void()
+          | Call(s, _, _) => Message.Warning($"Unsupported call to $s"); JsAst.Void()          
+        }
+      
+      // Unpack ref/out
+      // x = x.value
+      def unpackRefOut = call.parms
+        .Where(isRefOut)
+        .Select(p =>
+          {
+            def expr = builder(p.expr);
+            if (expr is ParamRef())
+              JsAst.Void()
+            else
+              JsAst.Assign(expr, JsAst.FieldRef(expr, "value", false))
+          }
+        );
+          
+      JsAst.Seq(packRefOut.Concat([callAst]).Concat(unpackRefOut).NToList())
     }
     
     #region ConvertMethod

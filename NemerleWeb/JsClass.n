@@ -346,7 +346,7 @@ $(indent)}#>);
                                 .ToList();
           ($"..$(nested; Environment.NewLine; _.Write())", nested)
       }
-        
+      
       ApplyAttributesToGeneratedClasses() : void
       {
           ClassType.DeclaredNestedTypes
@@ -355,7 +355,7 @@ $(indent)}#>);
       }
                 
       public TranslateMethodBody([NotNull] meth : IMethod, [NotNull] indent = "" : string) : string
-      { 
+      {
         def ast = TyperHelper.GetMethodJsAst(meth, Typer, ClassType);
         ast.Write(indent);
       }
@@ -393,7 +393,7 @@ $(indent)}#>);
         methods.Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
                .Where(m => !m.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
                .Where(m => !m.IsConstructor)
-               .Where(m => !pageMethods.Any(vm => vm == m.Name))
+               .Where(m => !pageMethods.Contains(m.Name))
                .Where(m => m.Name != "View")
                .Where(m => !(m.Name.StartsWith("_N__") && m.Name.EndsWith("____")))
       }

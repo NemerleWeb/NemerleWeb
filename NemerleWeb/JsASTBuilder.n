@@ -15,7 +15,7 @@ namespace NemerleWeb
   public module JsAstBuilder
   {
       Build(expr : TExpr) : JsAst
-      {        
+      {
         match(expr) 
         {
         | Array(args, _dims)                => JsAst.Array(args.Map(Build))
@@ -73,7 +73,16 @@ namespace NemerleWeb
               JsAst.NotImpl();
             }
         | LocalFunRef                       => Message.Error(expr.Location, "LocalFunRef not implemented"); JsAst.NotImpl("LocalFunRef")
-        | LocalRef(decl)                    => JsAst.LocalRef(decl.Name, if(decl.Type.TypeInfo != null) Some(decl.Type) else None())
+        | LocalRef(decl)                    => 
+          def name = decl.Name;
+          def type = if(decl.Type.TypeInfo != null) Some(decl.Type) else None();
+          
+          match (decl.ValueKind)
+          {
+          | LocalValue.Kind.FunParm(kind) when kind ==  ParmKind.Ref || kind == ParmKind.Out =>
+            JsAst.ParamRef(name, type)
+          | _ => JsAst.LocalRef(name, type)
+          }
         | MacroEnvelope(expanded = ex, original = org, the_macro = _) => 
             match(org) { 
             /*| <[ foreach($it in $coll) $body  ]> => 
