@@ -18,9 +18,12 @@ namespace NemerleWeb
             public override Write(indent = "" : string) : string {
                 indent + $"$(Left.Write()) = $(Right.Write())"
             }
-            public override Transform() : JsAst {
-              match(this) {
-              | Assign(l, r) when !AllowedForAssignment.Any(al => al == r.GetType()) => JsAstHelper.DelayAssignment(r, l);
+            public override Transform() : JsAst
+            {
+              match(this)
+              {
+              | Assign(l, r) when !AllowedForAssignment.Contains(l.GetType()) =>
+                JsAstHelper.DelayAssignment(r, l);
               | _ => this
               }
             }
@@ -64,13 +67,22 @@ namespace NemerleWeb
                 indent + $"break $Id;"
             }
         }
-        | Call           { Fun : JsAst; Parameters : list[JsAst];
-            public override Write(indent = "" : string) : string {
-                indent + match(this) {
-                | Call(OpCode as op, e1 :: e2 :: []) => $<#$(e1.Write("")) $(op.Write("")) $(e2.Write(""))#>
-                | Call(Constructor(type), parms)     => $<#new $(type)(..$(parms; ","; e => e.Write("")))#>
-                | Call(Indexer(obj), parms)          => $<#$(obj.Write())[..$(parms; ","; e => e.Write(""))]#>    
-                | Call(op, parms)                    => $<#$(op.Write())(..$(parms; ","; e => e.Write("")))#>    
+        | Call
+          {
+            Fun : JsAst;
+            Parameters : list[JsAst];
+            
+            public override Write(indent = "" : string) : string
+            {
+              def writeParam(p) { p.Write("") }
+              
+              indent +
+                match(this)
+                {
+                | Call(OpCode as op, [e1, e2])       => $<#$(e1.Write("")) $(op.Write("")) $(e2.Write(""))#>
+                | Call(Constructor(type), parms)     => $<#new $(type)(..$(parms; ","; writeParam))#>
+                | Call(Indexer(obj), parms)          => $<#$(obj.Write())[..$(parms; ","; writeParam)]#>    
+                | Call(op, parms)                    => $<#$(op.Write())(..$(parms; ","; writeParam))#>    
                 }
             }
             
@@ -151,7 +163,7 @@ namespace NemerleWeb
               | _ => this
               }
             }
-        }
+          }
         | Code           { CodeString : string;
             public override Write(indent = "" : string) : string {
                 indent + $"$CodeString"
@@ -379,6 +391,11 @@ $(Body.Write(indent + "  "))
                 $<#$(Name.Replace(".", "_"))#>
             }
         }
+        | ParamRef       { Name : string; Type : option[TypeVar];
+            public override Write(_ = "" : string) : string {
+                $<#$(Name.Replace(".", "_")).value#>
+            }
+        }
         | MethodRef      { Obj : JsAst; Method : string;
             public override Write(_ = "" : string) : string
             {
@@ -592,6 +609,7 @@ $(indent)}
           typeof(JsAst.Call),
           typeof(JsAst.MethodRef),
           typeof(JsAst.LocalRef),            
+          typeof(JsAst.ParamRef),
           typeof(JsAst.Literal), 
           typeof(JsAst.Code),
           typeof(JsAst.Void), 
@@ -639,11 +657,12 @@ $(indent)}
             | Label(id, body)             => JsAst.Label(id, recurse(body))
             | Lambda(name, parms, body)   => JsAst.Lambda(name, parms, recurse(body))
             | Literal                     => ast'
-            | LocalRef                    => ast'
+            | LocalRef                    => ast'            
             | MethodRef(obj, meth)        => JsAst.MethodRef(recurse(obj), meth)
             | NotImpl                     => ast'
             | OpCode                      => ast'
             | Object(fields)              => JsAst.Object(fields.Map((name, body) => (name, recurse(body))))
+            | ParamRef                    => ast'
             | PropertySet(obj, prop, val) => JsAst.PropertySet(recurse(obj), prop, recurse(val))
             | PropertyGet(obj, prop)      => JsAst.PropertyGet(recurse(obj), prop)
             | Return(expr)                => JsAst.Return(recurse(expr))
@@ -673,7 +692,7 @@ $(indent)}
         
         private IsAllowedForAssignment(ast : JsAst) : bool
         {
-          AllowedForAssignment.Any(al => al == ast.GetType())
+          AllowedForAssignment.Contains(ast.GetType())
         }
     }
 }

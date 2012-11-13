@@ -302,7 +302,7 @@ namespace NemerleWeb
                                                             | SyntaxElement.Expression(body) => SyntaxElement.Expression(CleanupCallRefs(body))                                                            
                                                             | _ => p
                                                             }).NToList())
-    | Define(p, Ref(name)) when _methodNames.Any(m => m == name.Id) => PExpr.Define(p, PExpr.Literal(Literal.String("self." + name.Id)))
+    | Define(p, Ref(name)) when _methodNames.Contains(name.Id) => PExpr.Define(p, PExpr.Literal(Literal.String("self." + name.Id)))
     | _ => expr
     }
     
