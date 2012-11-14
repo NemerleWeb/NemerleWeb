@@ -177,24 +177,46 @@ namespace NemerleWeb.Tests
     [Unit]
     class TestRefOut
     {
-      public Ref(s : ref string) : string
+      public InstanceRef(s : ref string) : string
       {
-        DoRef(ref s);
+        InstanceDoRef(ref s);
         s + "b"
       }
       
-      private DoRef(s : ref string) : void
+      private InstanceDoRef(s : ref string) : void
       {
         s = "a";
       }
       
-      public Out(x : out int) : int
+      public InstanceOut(x : out int) : int
       {
-        DoOut(out x);
+        InstanceDoOut(out x);
         x + 1
       }
       
-      private DoOut(x : out int) : void
+      private InstanceDoOut(x : out int) : void
+      {
+        x = 1;
+      }
+  
+      public static StaticRef(s : ref string) : string
+      {
+        StaticDoRef(ref s);
+        s + "b"
+      }
+      
+      private static StaticDoRef(s : ref string) : void
+      {
+        s = "a";
+      }
+      
+      public static StaticOut(x : out int) : int
+      {
+        StaticDoOut(out x);
+        x + 1
+      }
+      
+      private static StaticDoOut(x : out int) : void
       {
         x = 1;
       }
@@ -1061,17 +1083,25 @@ namespace NemerleWeb.Tests
       test("out", () =>
       {
         mutable x;
-        def outRes = TestRefOut().Out(out x);
+        def outRes = TestRefOut().InstanceOut(out x);
         
-        x == 1 && outRes == 2
+        mutable x2;
+        def outRes2 = TestRefOut.StaticOut(out x2);
+        
+        x == 1 && outRes == 2 &&
+        x2 == 1 && outRes2 == 2
       });
       
       test("ref", () =>
       {
         mutable s = "x";
-        def refRes = TestRefOut().Ref(ref s);
+        def refRes = TestRefOut().InstanceRef(ref s);
         
-        s == "a" && refRes == "ab"
+        mutable s2 = "x";
+        def refRes2 = TestRefOut.StaticRef(ref s2);
+        
+        s == "a" && refRes == "ab" &&
+        s2 == "a" && refRes2 == "ab"
       });
     }
     
