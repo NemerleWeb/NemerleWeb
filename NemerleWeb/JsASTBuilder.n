@@ -28,9 +28,7 @@ namespace NemerleWeb
                         currentScopeDefs.First((org, _) => org == localVal.Name)[1];                        
           } else localVal.Name;
         }
-        
-        Message.Hint($"..$(currentScopeDefs)");
-        
+                
         match(expr) 
         {
         | Array(args, _dims)                => JsAst.Array(args.Map(build))

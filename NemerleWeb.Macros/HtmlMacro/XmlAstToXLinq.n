@@ -173,10 +173,13 @@ namespace NemerleWeb
             def header = Parse(ToLocation(c), expr);
             match(header) {
             | <[ $x in $_xs ]> => 
-                def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, 
-                                         CreateAttribute("nw-repeat", x.ToString() + " in " + getSplice()) :: content);
-                def tagExpr = TransformImpl(tag, splices, loopStack.Append([x.ToString()]));
-                <[ $tagExpr ]>;
+              def loopSplice = getSplice();
+              _transformCounter++;
+              def iterSplice = getSplice();
+              def tag     = XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, 
+                                        CreateAttribute("nw-repeat", iterSplice + " in " + loopSplice) :: content);
+              def tagExpr = TransformImpl(tag, splices, loopStack.Append([x.ToString()]));
+              <[ $tagExpr ]>;
             | _ => TransformImpl(XmlAst.Tag(xmlAst.StartPos, xmlAst.EndPos, name, content), splices);
             }
         | Tag(name, XmlAst.AttrSplice(_, SpliceType.When)   :: content) =>            
@@ -239,7 +242,7 @@ namespace NemerleWeb
     {        
         _spliceCounter++;
         Debug.WriteLine(_spliceCounter + ": " + xmlAst.ToString());
-        def varName = "_var" + _spliceCounter.ToString();
+        def varName = "_var" + _spliceCounter;
         match (xmlAst)
         {
         | Attr(_, Splicable.Expr(str) as expr) => <[ def $(varName : dyn) = $(Parse(ToLocation(expr), str)) ]>
@@ -248,11 +251,20 @@ namespace NemerleWeb
                                      xmlAst.EndPos, 
                                      name, 
                                      CreateAttribute("dummy", "") :: content);
-            def tagExpr = GetMethodWithSplicesOnly(tag);
             def header = Parse(ToLocation(c), expr);
+            def loopName = varName;
+            _spliceCounter++;
+            def iterName = "_var" + _spliceCounter;
+            
+            def tagExpr = GetMethodWithSplicesOnly(tag);
             match(header) 
             {
-            | <[ $x in $xs ]> => <[ foreach($x in { def $(varName : dyn) = $xs; $xs }) { $tagExpr } ]>
+            | <[ $x in $xs ]> => 
+              <[ foreach($x in { def $(loopName : dyn) = $xs; $xs }) 
+              { 
+                def $(iterName : dyn) = $x;
+                $tagExpr 
+              } ]>
             | _ => <[ ]>
             }
         | Tag(name, XmlAst.AttrSplice(expr, SpliceType.When)   as c :: content) with isWhen = true
