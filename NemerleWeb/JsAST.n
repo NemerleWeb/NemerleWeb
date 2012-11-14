@@ -118,8 +118,7 @@ namespace NemerleWeb
                   }).NToList();
                   def paramInits = JsAst.Seq(newParms.Filter((i, _)=> !(i is JsAst.Void)).Map((i, _) => i));
                   def newParms = newParms.Map((_, p) => p);
-                  JsAst.Seq([paramInits, JsAst.Call(func, newParms).Transform()])                    
-                
+                  JsAst.Seq([paramInits, JsAst.Call(func, newParms).Transform()])
               | Call(OpCode("++" as opcode), [FieldRef as field])
               | Call(OpCode("--" as opcode), [FieldRef as field]) =>
                 Call(OpCode(opcode.Substring(1)), [field, Literal_Int1])
@@ -480,6 +479,12 @@ $(Body.Write(indent + "  "))
                 def ss = Items.Where(i => !(i is JsAst.Void))
                               .Select(i => i.Write(indent));                
                 $<#..$(ss; ";" + Environment.NewLine)#>
+            }
+            public override Transform() : JsAst {
+                match(Items) {
+                | x :: [] => x
+                | _ => this
+                }
             }
         }
         | Switch         { Expr : JsAst; Cases : list[JsAst.SwitchCase]; DefaultExpr : JsAst;
