@@ -118,7 +118,7 @@ namespace NemerleWeb
                   }).NToList();
                   def paramInits = JsAst.Seq(newParms.Filter((i, _)=> !(i is JsAst.Void)).Map((i, _) => i));
                   def newParms = newParms.Map((_, p) => p);
-                  JsAst.Seq([paramInits, JsAst.Call(func, newParms)])                    
+                  JsAst.Seq([paramInits, JsAst.Call(func, newParms).Transform()])                    
                 
               | Call(OpCode("++" as opcode), [FieldRef as field])
               | Call(OpCode("--" as opcode), [FieldRef as field]) =>
@@ -161,7 +161,7 @@ namespace NemerleWeb
                  .Append([JsAst.Call(func, varParams).Transform()]))
               | Call(MethodRef(obj, meth), parms) when !IsAllowedForAssignment(obj) =>
                 def varName = JsAstHelper.GetTemporaryVariableName(); 
-                JsAst.Seq([                  
+                JsAst.Seq([
                   JsAst.DefValue(varName, JsAst.Void()),
                   JsAstHelper.DelayAssignment(obj, JsAst.LocalRef(varName, None())),
                   JsAst.Call(JsAst.MethodRef(JsAst.LocalRef(varName, None()), meth), parms).Transform()
@@ -221,9 +221,10 @@ $<#function $Name(..$(Parameters; ";"; p => p.Write(""))) { $(Body.Write("  ")) 
             match(this)
             {
             | DefValue(l, r) when !IsAllowedForAssignment(r) =>
-              JsAst.Seq([
+              def res = JsAst.Seq([
                 JsAst.DefValue(l, JsAst.Void()),
                 JsAstHelper.DelayAssignment(r, JsAst.LocalRef(l, None()))]);
+              res;
             | _ => this                
             }
           }            
