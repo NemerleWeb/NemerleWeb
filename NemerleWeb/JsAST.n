@@ -14,13 +14,14 @@ namespace NemerleWeb
 {
     public variant JsAst
     {
-        | Assign         { Left : JsAst; Right : JsAst;
+        | Assign
+          {
+            Left : JsAst;
+            Right : JsAst;
+            
             public override Write(indent = "" : string) : string
             {
-              def res = indent + $"$(Left.Write()) = $(Right.Write())";
-              when(res.Contains("count = count_N_158 + 1"))
-                assert2(false);
-              res;
+              indent + $"$(Left.Write()) = $(Right.Write())";
             }
             public override Transform() : JsAst
             {

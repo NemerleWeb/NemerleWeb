@@ -15,7 +15,7 @@ module Program
 {
   Main() : void
   {
-    def result = nweb Test(1);
+    def result = nweb Test();
     WriteLine(result);
     _ = Console.ReadKey();
   }
@@ -25,28 +25,57 @@ module Program
 [Unit]
 public class Test
 {  
-  public this(pos : int)
-  {    
-    def pos =
-    {
-      def pos = 
-      {
-        def f(pos)
-        {
-          def g(pos)
-          {
-            pos + 2
-          }
-          
-          //_ = g(0);
-          g(pos + 3)          
-        }  
-        //_ = f(0);
-        f(pos)
-      }
-
-      pos + 1
-    }    
+  public InstanceRef(s : ref string) : string
+  {
+    InstanceDoRef(ref s);
+    s + "b"
+  }
+      
+  private InstanceDoRef(s : ref string) : void
+  {
+    s = "a";
+  }
+      
+  //public InstanceOut(x : out int) : int
+  //{
+  //  InstanceDoOut(out x);
+  //  x + 1
+  //}
+      
+  //private InstanceDoOut(x : out int) : void
+  //{
+  //  x = 1;
+  //}
+  
+  //public static StaticRef(s : ref string) : string
+  //{
+  //  StaticDoRef(ref s);
+  //  s + "b"
+  //}
+      
+  //private static StaticDoRef(s : ref string) : void
+  //{
+  //  s = "a";
+  //}
+      
+  //public static StaticOut(x : out int) : int
+  //{
+  //  StaticDoOut(out x);
+  //  x + 1
+  //}
+      
+  //private static StaticDoOut(x : out int) : void
+  //{
+  //  x = 1;
+  //}
+      
+  public this()
+  {
+    mutable s;
+    InstanceRef(ref s);
+    
+    //mutable s2;
+    //Test.StaticRef(ref s2);
   }
     
   [Html]

@@ -13,37 +13,33 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleCapture(rule : Rule.Capture, results : list[string], global : bool, counter : int) : PExpr
+    public CompileRuleCapture(rule : Rule.Capture, results : list[string]) : PExpr
     {
       match (rule)
       {
         | Capture(Argument(Chars), subrule) =>
-          def code = CompileRule(subrule, [], global, counter);
+          def code = CompileRule(subrule, []);
           match (results)
           {
             | []       => code;
             | [result] =>
-              def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
-            
-              // TODO: Restore
-              def newPosCompileRuleCaptureChars = <[ $(("newPosCompileRuleCaptureChars" + counter) : usesite) ]>;
               <[
-                def $newPosCompileRuleCaptureChars = $code;
-                when ($newPosCompileRuleCaptureChars >= 0)
-                  $(result : dyn) = Nemerle.Peg.NToken($pos, $newPosCompileRuleCaptureChars);
-                $newPosCompileRuleCaptureChars
+                def newPos = $code;
+                when (newPos >= 0)
+                  $(result : dyn) = Nemerle.Peg.NToken(pos, newPos);
+                newPos
               ]>
             | _ => assert(false);
           }
 
-        | Capture(Argument, subrule) => CompileRule(subrule, results, global, counter);
+        | Capture(Argument, subrule) => CompileRule(subrule, results);
         | Capture(Handler(name, _, retType), subrule) =>
           match (results)
           {
-            | []       => CompileRule(subrule, [], global, counter)
+            | []       => CompileRule(subrule, [])
             | [result] =>
               def varNames     = MakeVariablesForRule(subrule);
-              def subRulesCode = CompileRule(subrule, varNames, global, counter);
+              def subRulesCode = CompileRule(subrule, varNames);
 
               def ty = match(retType : RuleType)
               {
@@ -56,10 +52,10 @@ namespace Nemerle.Peg
                 if (!omitLocation && ty.TryRequire(_pegLocatedType))
                   match(varNames)
                   {
-                    | []  with (start = <[ position ]>,
-                                end   = <[ newPosCompileRuleCaptureHandler ]>)
-                    | _   with (start = <[ Nemerle.Peg.Internal.EvalLocationStart($(varNames.Head : dyn), position) ]>,
-                                end   = <[ Nemerle.Peg.Internal.EvalLocationEnd($(varNames.Last() : dyn), newPosCompileRuleCaptureHandler) ]>)
+                    | []  with (start = <[ pos ]>,
+                                end   = <[ newPos ]>)
+                    | _   with (start = <[ Nemerle.Peg.Internal.EvalLocationStart($(varNames.Head : dyn), pos) ]>,
+                                end   = <[ Nemerle.Peg.Internal.EvalLocationEnd($(varNames.Last() : dyn), newPos) ]>)
                       =>
                       <[ $(result : dyn).Location = Nemerle.Peg.Location(_parsingSource, $start, $end); ]>
                   }
@@ -75,13 +71,10 @@ namespace Nemerle.Peg
                   <[ $(result : dyn) = $(varNames.Head : dyn) ]>
                 else
                   PExpr.Error("Too many variables.");
-                  
-              // TODO: Restore
-              def newPosCompileRuleCaptureHandler = <[ $(("newPosCompileRuleCaptureHandler" + counter) : usesite) ]>;
 
               DefVars(varNames, <[
                 {
-                  if ($(names.MemPos : dyn) == position)
+                  if ($(names.MemPos : dyn) == pos)
                   {
                     when ($(names.MemNewPos : dyn) >= 0)
                       $(result : dyn) = $(names.MemResult : dyn);
@@ -89,22 +82,22 @@ namespace Nemerle.Peg
                   }
                   else
                   {
-                    def $newPosCompileRuleCaptureHandler = $subRulesCode;
+                    def newPos = $subRulesCode;
 
-                    $(names.MemPos : dyn) = position;
-                    $(names.MemNewPos : dyn) = $newPosCompileRuleCaptureHandler;
+                    $(names.MemPos : dyn) = pos;
+                    $(names.MemNewPos : dyn) = newPos;
 
-                    if ($newPosCompileRuleCaptureHandler >= 0)
+                    if (newPos >= 0)
                     {
                       $setResult;
                       $setResultLocation;
                       $(names.MemResult : dyn) = $(result : dyn);
                     }
                     else
-                      when ($(names.MaxRollbackPos : dyn) < position)
-                        $(names.MaxRollbackPos : dyn) = position;
+                      when ($(names.MaxRollbackPos : dyn) < pos)
+                        $(names.MaxRollbackPos : dyn) = pos;
 
-                    $newPosCompileRuleCaptureHandler
+                    newPos
                   }
                 }
               ]>)

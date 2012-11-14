@@ -13,10 +13,10 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleScope(rule : Rule.Scope, results : list[string], counter : int) : PExpr
+    public CompileRuleScope(rule : Rule.Scope, results : list[string]) : PExpr
     {
       def (beginName, beginRes, endName, endRes) = _grammarCompiller.GetScopeMethods(rule.name.Id);
-      def subRuesCode = CompileRule(rule.rule, results, false, counter);
+      def subRuesCode = CompileRule(rule.rule, results);
 
       when (endRes.IsNone && beginRes.IsNone)
         Message.Error(rule.name.Location, $"You must specify at least one scope handler for scope $(rule.name). Scope handlers must have signatures: '$beginName() : bool/void', '$endName(isOk : bool) : bool/void'.");
@@ -26,18 +26,18 @@ namespace Nemerle.Peg
         {
           | Some(true) =>
             <[
-              def newPosCompileRuleScopeTrue = $subRuesCode;
-              if ($(endName : dyn)(newPosCompileRuleScopeTrue >= 0))
-                newPosCompileRuleScopeTrue
+              def newPos = $subRuesCode;
+              if ($(endName : dyn)(newPos >= 0))
+                newPos
               else
                 -1
             ]>
 
           | Some(false) =>
             <[
-              def newPosCompileRuleScopeFalse = $subRuesCode;
-              $(endName : dyn)(newPosCompileRuleScopeFalse >= 0);
-              newPosCompileRuleScopeFalse
+              def newPos = $subRuesCode;
+              $(endName : dyn)(newPos >= 0);
+              newPos
             ]>
 
           | None => subRuesCode

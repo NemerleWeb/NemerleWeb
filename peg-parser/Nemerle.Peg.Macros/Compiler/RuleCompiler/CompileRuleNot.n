@@ -13,20 +13,16 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleNot(rule : Rule.Not, global : bool, counter : int) : PExpr
+    public CompileRuleNot(rule : Rule.Not) : PExpr
     {
-      def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
-      match (rule)
-      {
-        | Not(Chars([RangeSet where (Ranges = [range])])) when range.from == char.MinValue && range.to == char.MaxValue => // !any
-          <[ if ($pos >= text.Length) $pos else -1 ]>
+      | Not(Chars([RangeSet where (Ranges = [range])])) when range.from == char.MinValue && range.to == char.MaxValue => // !any
+        <[ if (pos >= text.Length) pos else -1 ]>
 
-        | Not(rule) =>
-          <[
-            def newPosCompileRuleNot = $(CompileRule(rule, [], global, counter));
-            if (newPosCompileRuleNot < 0) $pos else -1
-          ]>
-      }
+      | Not(rule) =>
+        <[
+          def newPos = $(CompileRule(rule, []));
+          if (newPos < 0) pos else -1
+        ]>
     }
   }
 }
