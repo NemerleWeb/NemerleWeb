@@ -147,7 +147,7 @@ namespace NemerleWeb
           match(e.next)
           {
           | Some(next) => JsAst.Seq([
-              e.expr,            
+              e.expr,
               getGotoToLabel(next)
             ]);
           | None() => 

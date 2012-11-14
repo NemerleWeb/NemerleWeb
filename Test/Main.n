@@ -15,7 +15,7 @@ module Program
 {
   Main() : void
   {
-    def result = nweb Test();
+    def result = nweb Test(1);
     WriteLine(result);
     _ = Console.ReadKey();
   }
@@ -24,9 +24,28 @@ module Program
 [Unit]
 public class Test
 {  
-  public this()
-  {
-    _ = List([]).FirstOrDefault() == null && List([]).LastOrDefault() == null;
+  public this(pos : int)
+  {    
+    def pos =
+    {
+      def pos = 
+      {
+        def f(pos)
+        {
+          def g(pos)
+          {
+            pos + 2
+          }
+          
+          //_ = g(0);
+          g(pos + 3)          
+        }  
+        //_ = f(0);
+        f(pos)
+      }
+
+      pos + 1
+    }    
   }
     
   [Html]
