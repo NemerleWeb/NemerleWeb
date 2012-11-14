@@ -25,6 +25,14 @@ namespace NemerleWeb
 {
   public module NWebUtils
   {
+    private mutable _uniqueId : int;
+    
+    public GetUniqueId() : int
+    {
+      _uniqueId++;
+      _uniqueId;
+    }
+    
     public ToJson(value : string) : string
     {
       def sb = Text.StringBuilder(value.Length + 2);
