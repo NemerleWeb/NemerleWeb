@@ -90,13 +90,16 @@ namespace NemerleWeb
       // x = { value: x };
       def packRefOut = call.parms
         .Where(isRefOut)
-        .Select(p =>
+        .SelectMany(p =>
           {
             def expr = builder(p.expr);
-            if (expr is ParamRef())
-              JsAst.Void()
-            else
-              JsAst.Assign(expr, JsAst.Object([("value", expr)]))
+            
+            def varName = JsAstHelper.GetTemporaryVariableName();
+            
+            [
+              JsAst.DefValue(varName, JsAst.Object([("value", expr)])),
+              JsAstHelper.DelayAssignment(expr, JsAst.LocalRef(varName, None())),
+            ];
           }
         );
       
@@ -138,16 +141,18 @@ namespace NemerleWeb
       // x = x.value
       def unpackRefOut = call.parms
         .Where(isRefOut)
-        .Select(p =>
+        .SelectMany(p =>
           {
             def expr = builder(p.expr);
-            if (expr is ParamRef())
-              JsAst.Void()
-            else
-              JsAst.Assign(expr, JsAst.FieldRef(expr, "value", false))
+            def varName = JsAstHelper.GetTemporaryVariableName();
+            
+            [
+              JsAst.DefValue(varName, JsAst.FieldRef(expr, "value", false)),
+              JsAstHelper.DelayAssignment(expr, JsAst.LocalRef(varName, None())),
+            ]
           }
         );
-          
+      
       JsAst.Seq(packRefOut.Concat([callAst]).Concat(unpackRefOut).NToList())
     }
     

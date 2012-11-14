@@ -21,12 +21,8 @@ namespace NemerleWeb
             }
             public override Transform() : JsAst
             {
-              match(this)
-              {
-              | Assign(l, r) when !IsAllowedForAssignment(r) =>
-                JsAstHelper.DelayAssignment(r, l);
-              | _ => this
-              }
+              if (!IsAllowedForAssignment(Right)) JsAstHelper.DelayAssignment(Right, Left)
+              else                                this
             }
         }
         | Array          { Values : list[JsAst];
@@ -90,7 +86,8 @@ namespace NemerleWeb
             static private Literal_Int1 : JsAst.Literal = JsAst.Literal(JsLiteral.Integer(1));
             
             public override Transform() : JsAst {
-              def paramsNotAllowedForAssignment = Parameters.Any(p => !IsAllowedForAssignment(p));
+              // Compiler bug workaround
+              def parametersNotAllowedForAssignment = Parameters.Any(p => !IsAllowedForAssignment(p));
               match(this) {
               | Call(OpCode("==="), something :: Literal(Bool(true)) :: []) 
               | Call(OpCode("==="), Literal(Bool(true)) :: something :: []) => something.Transform()
@@ -111,7 +108,7 @@ namespace NemerleWeb
                               [JsAst.Call(JsAst.OpCode("!=="), [something, JsAst.Literal(JsLiteral.Null())]), 
                               JsAst.Call(JsAst.OpCode("!=="), [JsAst.TypeOf(something), JsAst.Literal(JsLiteral.String("undefined"))])]).Transform()                 
                 
-                              | Call(func, parms) when parms.OfType.[JsAst.Seq]().Any() =>
+              | Call(func, parms) when parms.OfType.[JsAst.Seq]().Any() =>
                   def newParms = parms.Select(p : JsAst => {
                       def varName = JsAstHelper.GetTemporaryVariableName();
                       match(p) {
@@ -132,8 +129,8 @@ namespace NemerleWeb
               | Call(OpCode("--" as opcode), [PropertyGet as property ])
               | Call(OpCode("--" as opcode), [Call(MethodRef, _) as property]) =>
                 Call(OpCode(opcode.Substring(1)), [property, Literal_Int1])
-              /* TODO: _ when (() => false)() crashes compiler */
-              | Call(func, parms) when paramsNotAllowedForAssignment =>
+              /* TODO: _ when (() => false)() crashes compiler */              
+              | Call(func, parms) when parametersNotAllowedForAssignment =>
                 def varInitializations = 
                   parms.Map(p =>
                     if(!IsAllowedForAssignment(p))
@@ -704,7 +701,7 @@ $(indent)}
             }
             
             if(topdown) result else selector(result, currentDepth)
-        }        
+        }
         
         private IsAllowedForAssignment(ast : JsAst) : bool
         {
