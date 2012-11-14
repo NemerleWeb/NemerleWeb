@@ -142,8 +142,7 @@ namespace NemerleWeb
           }
         );
       
-      //JsAst.Seq(packRefOut.Concat([callAst]).Concat(unpackRefOut).NToList())
-        JsAst.Seq([callAst])
+      JsAst.Seq(packRefOut.Concat([callAst]).Concat(unpackRefOut).NToList())
     }
     
     #region ConvertMethod
