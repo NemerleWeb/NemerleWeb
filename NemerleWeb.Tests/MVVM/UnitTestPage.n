@@ -969,6 +969,27 @@ namespace NemerleWeb.Tests
         sb.ToString() == "a1x";
       });
       
+      test("StringBuilder Append2", () =>
+      {
+        def sb = StringBuilder();
+        sb.Append("a").Append(1).Append('x').ToString() == "a1x"
+      });
+      
+      test("StringBuilder AppendLine", () =>
+      {
+        def sb = StringBuilder();
+        _ = sb.AppendLine("a");
+        _ = sb.AppendLine();
+        
+        sb.ToString() == "a\n";
+      });
+      
+      test("StringBuilder AppendLine2", () =>
+      {
+        def sb = StringBuilder();
+        sb.AppendLine("a").AppendLine().ToString() == "a\n";
+      });
+      
       test("StringBuilder set_Length decrease", () =>
       {
         def sb = StringBuilder();
