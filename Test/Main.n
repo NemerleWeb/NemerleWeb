@@ -26,7 +26,7 @@ public class Test
 {  
   public this()
   {
-    string.Concat(if(true) "" else "", if(false) "" else "");
+    _ = string.Concat(if(true) "" else "", if(false) "" else "");
   }
     
   [Html]
