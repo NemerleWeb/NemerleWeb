@@ -27,7 +27,7 @@ public class Test
 {  
   public this()
   {
-    _ = string.Concat(if(true) "" else "", if(false) "" else "");
+    _ = List([]).FirstOrDefault() == null && List([]).LastOrDefault() == null;
   }
     
   [Html]
