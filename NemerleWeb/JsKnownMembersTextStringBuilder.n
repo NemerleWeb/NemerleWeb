@@ -33,7 +33,8 @@ namespace NemerleWeb
         match (member.Name)
         {        
         | "get_Length" => Some(JsAst.FieldRef(left, "length", false))
-        | "AppendLine" => Some(JsAst.Call(JsAst.OpCode("+="), [left, NewLine]))
+        | "AppendLine" => 
+          Some(JsAst.Assign(left, JsAst.Call(JsAst.OpCode("+"), [left, NewLine])))
         | "ToString" => Some(left)        
         | _ => None()
         }
@@ -46,8 +47,14 @@ namespace NemerleWeb
             left.MethodCall("substring", [JsAst.Literal(JsLiteral.Integer(0)), arg])))
         | "Append" => Some(JsAst.Assign(left, JsAst.Call(JsAst.OpCode("+"), [left, arg])))
         | "AppendLine" =>
-          Some(
-            JsAst.Call(JsAst.OpCode("+="), [left, JsAst.Call(JsAst.OpCode("+"), parms + [NewLine])]))
+          Some(JsAst.Assign(
+            left,
+            JsAst.Call(
+              JsAst.OpCode("+"),
+              [
+                left,
+                JsAst.Call(JsAst.OpCode("+"), [arg, NewLine])
+              ])))
         | _ => None()
         }        
       | _ => None()
