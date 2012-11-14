@@ -1,51 +1,51 @@
-﻿//using NemerleWeb;
-//using Nemerle.Extensions;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
+﻿using NemerleWeb;
+using Nemerle.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-//namespace NemerleWeb.Samples
-//{
-//  [Unit]
-//  internal class JSPage
-//  {
-//    _parser : JSEngine.JSParser;
+namespace NemerleWeb.Samples
+{
+  [Unit]
+  internal class JSPage
+  {
+    _parser : JSEngine.JSParser;
     
-//    public this()
-//    {
-//      _parser = JSEngine.JSParser();
-//    }
+    public this()
+    {
+      _parser = JSEngine.JSParser();
+    }
          
-//    ParserOutput : string
-//    {
-//      get
-//      {
-//        if (!string.IsNullOrEmpty(ParserInput))
-//          if (_parser.Parse(ParserInput) is Some(res))
-//            res.ToString()
-//          else
-//            "Incorrect input"
-//        else
-//          "";
-//      }
-//    }
+    ParserOutput : string
+    {
+      get
+      {
+        if (!string.IsNullOrEmpty(ParserInput))
+          if (_parser.Parse(ParserInput) is Some(res))
+            res.ToString()
+          else
+            "Incorrect input"
+        else
+          "";
+      }
+    }
      
-//    public ParserInput : string { get; set; }
+    public ParserInput : string { get; set; }
     
-//    [Html]
-//    public View() : string
-//    {
-//      <#
-//        <div>
-//          <span>Write a JavaScript code:</span>
-//          <div class="output">
-//            <span class="output-text">$ParserOutput</span> 
-//          </div>
-//          <div class="parser-input">
-//            <input value="$ParserInput"/>
-//          </div>
-//        </div>
-//      #>
-//    }    
-//  }
-//}
+    [Html]
+    public View() : string
+    {
+      <#
+        <div>
+          <span>Write a JavaScript code:</span>
+          <div class="output">
+            <span class="output-text">$ParserOutput</span> 
+          </div>
+          <div class="parser-input">
+            <input value="$ParserInput"/>
+          </div>
+        </div>
+      #>
+    }    
+  }
+}

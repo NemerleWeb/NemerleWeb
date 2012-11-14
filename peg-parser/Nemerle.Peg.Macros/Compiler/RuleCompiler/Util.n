@@ -57,19 +57,18 @@ namespace Nemerle.Peg
                             subrule         : Rule,
                             makeInitExpr    : PExpr               -> PExpr,
                             makeSetExpr     : PExpr * list[PExpr] -> PExpr,
-                            makeSetNoneExpr : PExpr               -> PExpr,
-                            counter         : int)
+                            makeSetNoneExpr : PExpr               -> PExpr)
       : list[PExpr] * PExpr * PExpr * PExpr
     {
       match (results)
       {
         | [] =>
-          ([], <[ () ]>, <[ () ]>, CompileRule(subrule, [], false, counter))
+          ([], <[ () ]>, <[ () ]>, CompileRule(subrule, []))
 
         | [result] =>
           def result          = <[ $(result : dyn) ]>;
           def variables       = MakeVariablesForRule(subrule);
-          def ruleCode        = CompileRule(subrule, variables, false, counter);
+          def ruleCode        = CompileRule(subrule, variables);
           def initList        = makeInitExpr(result);
           def setExpr         = makeSetExpr(result, variables.Map(var => <[ $(var : dyn) ]>));
           def setNoneExpr     = makeSetNoneExpr(result);
@@ -81,16 +80,14 @@ namespace Nemerle.Peg
     }
 
     private MakeListCode(results      : list[string],
-                         subrule      : Rule,
-                         counter      : int)
+                         subrule      : Rule)
       : list[PExpr] * PExpr * PExpr
     {
       def (initialising, setExpr, _setNoneExpr, rule) =
         MakeSubruleCode(results, subrule,
                       varRef                 => <[ $varRef = SCG.List(); ]>, 
                       (varRef, variableRefs) => <[ $varRef.Add(..$variableRefs); ]>,
-                      _                      => <[ () ]>,
-                      counter);
+                      _                      => <[ () ]>);
       (initialising, setExpr, rule)
     }
   }

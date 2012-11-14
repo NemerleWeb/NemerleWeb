@@ -13,12 +13,11 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleAnd(rule : Rule.And, global : bool, counter : int) : PExpr
+    public CompileRuleAnd(rule : Rule.And) : PExpr
     {
-      def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
       <[
-        def newPosCompileRuleAnd = $(CompileRule(rule.rule, [], false, counter));
-        if (newPosCompileRuleAnd >= 0) $pos else -1
+        def newPos = $(CompileRule(rule.rule, []));
+        if (newPos >= 0) pos else -1
       ]>
     }
   }

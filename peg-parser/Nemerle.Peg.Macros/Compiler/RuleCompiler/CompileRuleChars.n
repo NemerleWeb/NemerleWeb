@@ -13,21 +13,20 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleChars(rule : Rule.Chars, global : bool, counter : int) : PExpr
+    public CompileRuleChars(rule : Rule.Chars) : PExpr
     {
       def chars = rule.chars;
-      def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
       def generate(_)
       {
         | [ch] =>
           match (ch.Ranges)
           {
             | [range] when range.from == char.MinValue && range.to == char.MaxValue =>
-              <[ $pos + 1 ]>
+              <[ pos + 1 ]>
             | _ =>
               <[
-                c = text[$pos];
-                if ($(TestCharConditionCode(ch))) $pos + 1 else -1;
+                c = text[pos];
+                if ($(TestCharConditionCode(ch))) pos + 1 else -1;
               ]>
           }
 
@@ -36,16 +35,16 @@ namespace Nemerle.Peg
           {
             | [range] when range.from == char.MinValue && range.to == char.MaxValue =>
               <[
-                def $pos = $pos + 1;
+                def pos = pos + 1;
                 $(generate(chars));
               ]>
 
             | _ =>
               <[
-                c = text[$pos];
+                c = text[pos];
                 if ($(TestCharConditionCode(ch)))
                 {
-                  def $pos = $pos + 1;
+                  def pos = pos + 1;
                   $(generate(chars));
                 }
                 else
@@ -56,20 +55,20 @@ namespace Nemerle.Peg
         | [] => assert(false);
       }
       def len = chars.Length;
-      def check = if (len > 1) <[$pos + $((len - 1) : int)]> else <[$pos]>;
+      def check = if (len > 1) <[pos + $((len - 1) : int)]> else <[pos]>;
 
       if (len > 1 && chars.ForAll(_.IsSinglChar))
       {
         def makeCharCheckCode(ch, i : int) : PExpr
         {
-          def index = if (i <= 0) <[ $pos ]> else <[ $pos + $(i : int) ]>;
+          def index = if (i <= 0) <[ pos ]> else <[ pos + $(i : int) ]>;
           
           <[ text[$index] == $(ch.Ranges.Head.from : char) ]>
         }
         def exprs = chars.Select(makeCharCheckCode);
         def condExpr = exprs.Aggregate((e1, e2) => <[ $e1 && $e2 ]>);
 
-        <[ if ($check < text.Length && $condExpr) $pos + $(len : int) else -1 ]>
+        <[ if ($check < text.Length && $condExpr) pos + $(len : int) else -1 ]>
       }
       else
         <[ if ($check < text.Length) $(generate(chars)) else -1 ]>

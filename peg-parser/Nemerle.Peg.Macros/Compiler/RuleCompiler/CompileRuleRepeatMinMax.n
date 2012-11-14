@@ -13,13 +13,8 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleRepeatMinMax(rule : Rule.RepeatMinMax, results : list[string], global : bool, counter : int) : PExpr
+    public CompileRuleRepeatMinMax(rule : Rule.RepeatMinMax, results : list[string]) : PExpr
     {
-      def pos = if (global) <[ position ]> else <[ $(("pos" + counter) : usesite) ]>;
-      def newPosName = "pos" + (counter + 1);
-      def newPos = <[ $(newPosName : usesite) ]>;
-      def newPosParam = <[ parameter: $(newPosName : usesite) ]>;
-      def rep = <[ $(("rep" + counter) : usesite) ]>;
       match (rule)
       {
         | RepeatMinMax(0, 1, subrule)    =>
@@ -34,57 +29,50 @@ namespace Nemerle.Peg
                                                           | [variableRef] => <[ $varRef = $variableRef; ]>
                                                           | _ => assert(false);
                                                         },
-                              _                      => <[ () ]>,
-                              counter);
+                              _                      => <[ () ]>);
 
             | _ =>
               MakeSubruleCode(results, subrule,
                               _                      => <[ () ]>,
                               (varRef, variableRefs) => <[ $varRef = Some(..$variableRefs); ]>,
-                              varRef                 => <[ $varRef = None(); ]>,
-                              counter);
+                              varRef                 => <[ $varRef = None(); ]>);
           }
-          // TODO: Restore
-          def newPosCompileRuleRepeatMinMax01 = <[ $(("newPosCompileRuleRepeatMinMax01" + counter) : usesite) ]>;
           PrepandExprs(initialising, <[
-            def $newPosCompileRuleRepeatMinMax01 = $ruleCode;
-            if ($newPosCompileRuleRepeatMinMax01 >= 0)
+            def newPos = $ruleCode;
+            if (newPos >= 0)
             {
               $setExpr;
-              $newPosCompileRuleRepeatMinMax01
+              newPos
             }
             else
             {
               $setNoneExpr;
-              $pos
+              pos
             }
           ]>)
 
         | RepeatMinMax(minCount, maxCount, subrule)    =>
-          def repParams = [ <[ parameter: count ]>, newPosParam ];
-          def (initialising, addTokensToList, ruleCode) = MakeListCode(results, subrule, counter + 1);
-          // TODO: Restore
-          def newPosCompileRuleRepeatMinMax = <[ $(("newPosCompileRuleRepeatMinMax" + counter) : usesite) ]>;
+          def (initialising, addTokensToList, ruleCode) = MakeListCode(results, subrule);
           PrepandExprs(initialising, <[
-            def $(rep : name)(..$repParams)
+            def rep(count, pos)
             {
               if (count == $(maxCount : int))
-                $newPos
+                pos
               else
               {
-                def $newPosCompileRuleRepeatMinMax = $ruleCode;
-                if ($newPosCompileRuleRepeatMinMax >= 0)
+                def newPos = $ruleCode;
+                if (newPos >= 0)
                 {
                   $addTokensToList;
-                  $rep(count + 1, $newPosCompileRuleRepeatMinMax)
+                  rep(count + 1, newPos)
                 }
                 else if (count >= $(minCount : int))
-                  $newPos
+                  pos
                 else
                   -1
                }
             }
-            $rep(0, $pos)
+            rep(0, pos)
           ]>)
       }
     }

@@ -13,20 +13,19 @@ namespace Nemerle.Peg
 {
   partial internal class RuleCompiler
   {
-    public CompileRuleChoice(rule : Rule.Choice, results : list[string], global : bool, counter : int) : PExpr
+    public CompileRuleChoice(rule : Rule.Choice, results : list[string]) : PExpr
     {
       def generate(_)
       {
         | []            => [PExpr.Error("Internal PEG macro error: Empty choice.")];
         | [rule]        => [rule];
         | rule :: rules =>
-          def newPosCompileRuleChoice = <[ $(("newPosCompileRuleChoice" + counter) : usesite) ]>;
           <[
-            def $newPosCompileRuleChoice = $rule;
-            when ($newPosCompileRuleChoice >= 0) res($newPosCompileRuleChoice);
+            def newPos = $rule;
+            when (newPos >= 0) res(newPos);
           ]> :: generate(rules)
       }
-      def rules = generate(rule.rules.Map(CompileRule(_, results, global, counter)));
+      def rules = generate(rule.rules.Map(CompileRule(_, results)));
       def rules = rules.Map(fun(_)
       {
         | PExpr.Sequence(rules) => rules

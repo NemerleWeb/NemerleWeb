@@ -26,15 +26,15 @@ namespace Nemerle.Peg
        PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
         public Parse(text : string) : option[$tyParam]
         {
-          def (position, res) = TryParse(text);
-          if (position < 0) None() else Some(res)
+          def (pos, res) = TryParse(text);
+          if (pos < 0) None() else Some(res)
         }
       ]>);
        PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
-        public Parsex(source : Nemerle.Peg.SourceSnapshot) : option[$tyParam]
+        public ParseSource(source : Nemerle.Peg.SourceSnapshot) : option[$tyParam]
         {
-          def (position, res) = TryParsex(source);
-          if (position < 0) None() else Some(res)
+          def (pos, res) = TryParseSource(source);
+          if (pos < 0) None() else Some(res)
         }
       ]>);
 
@@ -44,14 +44,14 @@ namespace Nemerle.Peg
           // TODO: Restore
           //TryParsex(Nemerle.Peg.SourceSnapshot(text))
           // TODO: #41
-          TryParsex(Nemerle.Peg.SourceSnapshot(text, text, 0, "", Nemerle.Peg.SourceSnapshot("", "", 0, "", null).MakeLineIndexes(text)))
+          TryParseSource(Nemerle.Peg.SourceSnapshot(text, text, 0, "", Nemerle.Peg.SourceSnapshot("", "", 0, "", null).MakeLineIndexes(text)))
         }
       ]>);
 
       if (_typer.Manager.IsIntelliSenseMode)
       {
         PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
-          public TryParsex(/*[Nemerle.Assertions.NotNull]*/ source : Nemerle.Peg.SourceSnapshot) : int * $tyParam
+          public TryParseSource(/*[Nemerle.Assertions.NotNull]*/ source : Nemerle.Peg.SourceSnapshot) : int * $tyParam
           {
             _parsingSource = source;
             mutable result;
@@ -62,17 +62,17 @@ namespace Nemerle.Peg
       else
       {
         PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
-          public TryParsex(/*[Nemerle.Assertions.NotNull]*/ source : Nemerle.Peg.SourceSnapshot) : int * $tyParam
+          public TryParseSource(/*[Nemerle.Assertions.NotNull]*/ source : Nemerle.Peg.SourceSnapshot) : int * $tyParam
           {
             ResetMemoization();
             ResetMaxRollbackPos();
 
             _parsingSource = source;
 
-            // mutable result;
-            $(DecorateRuleName(TypedGrammar.StartRuleName.Id + "x") : dyn)(0, _parsingSource.Text/*, ref result*/);
+            mutable result;
+            def pos = $(DecorateRuleName(TypedGrammar.StartRuleName.Id) : dyn)(0, _parsingSource.Text, ref result);
 
-            // (pos, result)
+            (pos, result)
           }
         ]>);
       }
