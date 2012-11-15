@@ -163,6 +163,9 @@
     <Compile Include="JsKnownMembersMath.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JsKnownMembersNemerleCollectionsNList.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JsKnownMembersNemerleNCollectionsExtensions.n">
       <SubType>Code</SubType>
     </Compile>
