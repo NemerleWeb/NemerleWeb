@@ -133,7 +133,7 @@ namespace JSEngine {
             body : Statement.Block;
         }
 
-        public ToString(sb : System.Text.StringBuilder, tab : string, current_tab : string) : void {
+        public ToString2(sb : System.Text.StringBuilder, tab : string, current_tab : string) : void {
             match(this) {
                 | Literal(value) =>
                     _ = sb.Append(value);
@@ -196,7 +196,7 @@ namespace JSEngine {
 
         public override ToString() : string {
             def sb = System.Text.StringBuilder();
-            ToString(sb, "    ", "");
+            ToString2(sb, "    ", "");
             sb.ToString()
         }
     }
@@ -231,7 +231,7 @@ namespace JSEngine {
             body : Statement.Block;
         }
 
-        public ToString(sb : System.Text.StringBuilder, tab : string, current_tab : string) : void {
+        public ToString2(sb : System.Text.StringBuilder, tab : string, current_tab : string) : void {
             match(this) {
                 | Empty() =>
                     _ = sb.Append(";");
@@ -282,7 +282,7 @@ namespace JSEngine {
 
         public override ToString() : string {
             def sb = System.Text.StringBuilder();
-            ToString(sb, "    ", "");
+            ToString2(sb, "    ", "");
             sb.ToString()
         }
     }
