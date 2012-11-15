@@ -229,6 +229,46 @@ namespace NemerleWeb.Tests
       }
     }
     
+    module BlockTest
+    {
+      public G(pos : int, result : ref int) : int
+      {
+        result = pos;
+        -1
+      }
+      
+      public H(pos : int, result : ref int) : int
+      {
+        result = pos + 1;
+        1
+      }
+        
+      public F(pos : int, result : ref int) : int
+      {
+        def newPos =
+        {
+          (res:
+          {
+            def newPos = G(pos, ref result);
+            when(newPos >= 0) res(newPos);
+              
+            def newPos = H(pos, ref result);
+            when(newPos >= 0) res(newPos);
+              
+            G(pos, ref result);
+          })
+        };
+        
+        if (newPos >= 0)
+          result = 10
+        else
+        when (newPos >= 10)
+          result = 2;
+        
+        newPos
+      }
+    }
+    
     public this()
     {
       def test(description, res)
@@ -1190,6 +1230,14 @@ namespace NemerleWeb.Tests
         }
         
         f(1) == 7
+      });
+      
+      test("mutliple variables same name 3", () =>
+      {
+        mutable result;
+        def pos = BlockTest.F(0, ref result);
+        
+        result == 10 && pos == 1
       });
     }    
     
