@@ -25,62 +25,7 @@ module Program
 
 [Unit]
 public class Test
-{  
-  [Unit]
-  class TestRefOut
-  {
-    public InstanceRef(s : ref string) : string
-    {
-      InstanceDoRef(ref s);
-      s + "b"
-    }
-      
-    public InstanceRef2(s : ref string, s2 : ref string) : string
-    {
-      InstanceDoRef(ref s);
-      InstanceDoRef(ref s2);
-      s + "b"
-    }
-      
-    private InstanceDoRef(s : ref string) : void
-    {
-      s = "a";
-    }
-      
-    public InstanceOut(x : out int) : int
-    {
-      InstanceDoOut(out x);
-      x + 1
-    }
-      
-    private InstanceDoOut(x : out int) : void
-    {
-      x = 1;
-    }
-  
-    public static StaticRef(s : ref string) : string
-    {
-      StaticDoRef(ref s);
-      s + "b"
-    }
-      
-    private static StaticDoRef(s : ref string) : void
-    {
-      s = "a";
-    }
-      
-    public static StaticOut(x : out int) : int
-    {
-      StaticDoOut(out x);
-      x + 1
-    }
-      
-    private static StaticDoOut(x : out int) : void
-    {
-      x = 1;
-    }
-  }
-  
+{    
   public this()
   {    
     
@@ -88,14 +33,8 @@ public class Test
   
   public T() : bool
   {
-    mutable x;
-    def outRes = TestRefOut().InstanceOut(out x);
-        
-    mutable x2;
-    def outRes2 = TestRefOut.StaticOut(out x2);
-        
-    x == 1 && outRes == 2 &&
-    x2 == 1 && outRes2 == 2
+    def a = Some(1);
+    a.HasValue && a.Value == 1
   }
 
   [Html]
