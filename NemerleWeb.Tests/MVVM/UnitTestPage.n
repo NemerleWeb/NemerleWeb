@@ -1119,7 +1119,7 @@ namespace NemerleWeb.Tests
         
         s1 == "a" && 
         s2 == "a" &&
-        refRes == "ab"        
+        refRes == "ab"
       });
       
       test("StringBuilder chain", () =>
