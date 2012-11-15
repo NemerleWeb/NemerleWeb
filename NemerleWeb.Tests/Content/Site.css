@@ -131,14 +131,15 @@ h1.logo span {
 }
 
 .jsast-tests tr td {
-    background-color: greenyellow;
+    background-color: red;
     padding: 2px 5px;
     text-align: center;
+    color: #fff;
 }
 
-.jsast-tests tr.failed td {
-    background-color: red;
-    color: #fff;
+.jsast-tests tr.succeeded td {    
+    background-color: greenyellow;
+    color: #000;
 }
 
 footer {
