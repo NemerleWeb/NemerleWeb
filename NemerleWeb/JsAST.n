@@ -25,8 +25,16 @@ namespace NemerleWeb
             }
             public override Transform() : JsAst
             {
-              if (!IsAllowedForAssignment(Right)) JsAstHelper.DelayAssignment(Right, Left)
-              else                                this
+              match(this) {
+              | Assign(_, right) when !IsAllowedForAssignment(right) => 
+                def varName = JsAstHelper.GetTemporaryVariableName();
+                def delayed = JsAstHelper.DelayAssignment(Right, JsAst.LocalRef(varName, None()));
+                JsAst.Seq([
+                  delayed,
+                  JsAst.Assign(Left, LocalRef(varName, None()))
+                ]);
+              | _ => this
+              }
             }
         }
         | Array          { Values : list[JsAst];
@@ -80,7 +88,7 @@ namespace NemerleWeb
               indent +
                 match(this)
                 {
-                | Call(OpCode as op, [e1, e2])       => $<#$(e1.Write("")) $(op.Write("")) $(e2.Write(""))#>
+                | Call(OpCode as op, [e1, e2])       => $<#($(e1.Write("")) $(op.Write("")) $(e2.Write("")))#>
                 | Call(Constructor(type), parms)     => $<#new $(type)(..$(parms; ","; writeParam))#>
                 | Call(Indexer(obj), parms)          => $<#$(obj.Write())[..$(parms; ","; writeParam)]#>    
                 | Call(op, parms)                    => $<#$(op.Write())(..$(parms; ","; writeParam))#>    
@@ -169,6 +177,8 @@ namespace NemerleWeb
                   JsAstHelper.DelayAssignment(obj, JsAst.LocalRef(varName, None())),
                   JsAst.Call(JsAst.MethodRef(JsAst.LocalRef(varName, None()), meth), parms).Transform()
                 ])
+              | Call(OpCode("+="), [Call(OpCode("+="), [l1, r1]), r2]) =>                                
+                  JsAst.Call(OpCode("+="), [l1, JsAst.Call(JsAst.OpCode("+"), [r1, r2])])
               | _ => this
               }
             }
@@ -486,7 +496,8 @@ $(Body.Write(indent + "  "))
             }
             public override Transform() : JsAst {
                 match(Items) {
-                | x :: [] => x
+                | x :: [] => x.Transform()
+                | xs => JsAst.Seq(xs.Map(x => x.Transform()))
                 | _ => this
                 }
             }
