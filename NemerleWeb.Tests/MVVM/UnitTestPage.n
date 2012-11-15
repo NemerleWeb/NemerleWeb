@@ -183,6 +183,13 @@ namespace NemerleWeb.Tests
         s + "b"
       }
       
+      public InstanceRef2(s : ref string, s2 : ref string) : string
+      {
+        InstanceDoRef(ref s);
+        InstanceDoRef(ref s2);
+        s + "b"
+      }
+      
       private InstanceDoRef(s : ref string) : void
       {
         s = "a";
@@ -1102,6 +1109,17 @@ namespace NemerleWeb.Tests
         
         s == "a" && refRes == "ab" &&
         s2 == "a" && refRes2 == "ab"
+      });
+      
+      test("ref 2 params", () =>
+      {
+        mutable s1 = "x";
+        mutable s2 = "y";
+        def refRes = TestRefOut().InstanceRef2(ref s1, ref s2);
+        
+        s1 == "a" && 
+        s2 == "a" &&
+        refRes == "ab"        
       });
       
       test("StringBuilder chain", () =>
