@@ -98,7 +98,7 @@ namespace NemerleWeb
         .Where(isRefOut)
         .Select(p => builder'(p.expr))
         .Where(expr => !(expr is JsAst.ParamRef()))
-        .Select(expr => JsAst.Assign(expr, JsAst.Object([("value", expr)])));
+        .Select(expr => JsAst.Pack(expr));
       
       def callAst =
         match (call)
@@ -140,8 +140,8 @@ namespace NemerleWeb
         .Where(isRefOut)
         .Select(p => builder'(p.expr))
         .Where(expr => !(expr is JsAst.ParamRef()))
-        .Select(expr => JsAst.Assign(expr, JsAst.FieldRef(expr, "value", false)));
-      
+        .Select(expr => JsAst.Unpack(expr));
+            
       JsAst.Seq(packRefOut.Concat([callAst]).Concat(unpackRefOut).NToList())
     }
     

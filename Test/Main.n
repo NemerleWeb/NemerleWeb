@@ -26,71 +26,63 @@ module Program
 [Unit]
 public class Test
 {  
-  /*public InstanceRef(s : ref string) : string
+  [Unit]
+  class TestRefOut
   {
-    InstanceDoRef(ref s);
-    s + "b"
-  }
+    public InstanceRef(s : ref string) : string
+    {
+      InstanceDoRef(ref s);
+      s + "b"
+    }
       
-  private InstanceDoRef(s : ref string) : void
-  {
-    s = "a";
-  }*/
+    private InstanceDoRef(s : ref string) : void
+    {
+      s = "a";
+    }
       
-  //public InstanceOut(x : out int) : int
-  //{
-  //  InstanceDoOut(out x);
-  //  x + 1
-  //}
+    /*public InstanceOut(x : out int) : int
+    {
+      InstanceDoOut(out x);
+      x + 1
+    }
       
-  //private InstanceDoOut(x : out int) : void
-  //{
-  //  x = 1;
-  //}
+    private InstanceDoOut(x : out int) : void
+    {
+      x = 1;
+    }
   
-  //public static StaticRef(s : ref string) : string
-  //{
-  //  StaticDoRef(ref s);
-  //  s + "b"
-  //}
+    public static StaticRef(s : ref string) : string
+    {
+      StaticDoRef(ref s);
+      s + "b"
+    }
       
-  //private static StaticDoRef(s : ref string) : void
-  //{
-  //  s = "a";
-  //}
+    private static StaticDoRef(s : ref string) : void
+    {
+      s = "a";
+    }
       
-  //public static StaticOut(x : out int) : int
-  //{
-  //  StaticDoOut(out x);
-  //  x + 1
-  //}
+    public static StaticOut(x : out int) : int
+    {
+      StaticDoOut(out x);
+      x + 1
+    }
       
-  //private static StaticDoOut(x : out int) : void
-  //{
-  //  x = 1;
-  //}
+    private static StaticDoOut(x : out int) : void
+    {
+      x = 1;
+    }*/
+  }
       
   public this()
   {    
-    def g(pos, x) { pos - x }
-    def h(pos, x) { pos + x }
+    mutable s = "x";
+    def refRes = TestRefOut().InstanceRef(ref s);
         
-    def f(pos : int)
-    {
-      def pos = g(pos, 1);
-      if (pos >= 0)
-      {
-        def pos = h(pos, 2);
-        if (pos >= 0)
-          pos
-        else
-          -1
-      }
-      else
-        -1
-    }
+    //mutable s2 = "x";
+    //def refRes2 = TestRefOut.StaticRef(ref s2);
         
-    f(2) == 3
+    s == "a" && refRes == "ab"
   }
     
   [Html]
