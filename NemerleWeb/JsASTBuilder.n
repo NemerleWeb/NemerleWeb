@@ -66,7 +66,9 @@ namespace NemerleWeb
         match(Build(val, currentScopeDefs, methodHeader)) 
         {
         | Seq([Seq(Pack :: _) as pack, smth, Seq(Unpack :: _) as unpack]) => 
-          JsAst.Seq(pack.Items.Append([JsAst.DefValue(newName, smth)]).Append(unpack.Items));
+          JsAst.Seq(pack.Items.Append([JsAst.DefValue(newName, smth)])
+                              .Append(unpack.Items)
+                              .Append([Build(body, (name.Name, newName) :: currentScopeDefs, methodHeader)]));
         | value => 
           JsAst.Seq([JsAst.DefValue(newName, value), 
                      Build(body, (name.Name, newName) :: currentScopeDefs, methodHeader)
