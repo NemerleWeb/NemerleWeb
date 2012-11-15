@@ -378,13 +378,13 @@ $(Body.Write(indent + "  "))
             }
         }
         | Literal        { Value : JsLiteral;
-            public override Write(_ = "" : string) : string
+            public override Write(indent = "" : string) : string
             {
               match(this)
               {
-              | Literal(Null)         => "null"
-              | Literal(Integer(val)) => $"$(val.ToString(CultureInfo.InvariantCulture))"
-              | Literal(Float(val))   => $"$(val.ToString(CultureInfo.InvariantCulture))"
+              | Literal(Null)         => indent + "null"
+              | Literal(Integer(val)) => indent + $"$(val.ToString(CultureInfo.InvariantCulture))"
+              | Literal(Float(val))   => indent + $"$(val.ToString(CultureInfo.InvariantCulture))"
               | Literal(String(val))  =>
                 def escapeCharacter(c)
                 {
@@ -406,9 +406,9 @@ $(Body.Write(indent + "  "))
                 | _ => c.ToString(CultureInfo.InvariantCulture)
                 }
                 
-                $<#"..$(val; ""; escapeCharacter)"#>;
-              | Literal(Bool(val))    => $"$(val.ToString(CultureInfo.InvariantCulture).ToLower())"
-              | Literal(Regexp(pat, mod)) => $<#new RegExp($(pat.Write()), $(mod.Write()))#>
+                indent + $<#"..$(val; ""; escapeCharacter)"#>;
+              | Literal(Bool(val))    => indent + $"$(val.ToString(CultureInfo.InvariantCulture).ToLower())"
+              | Literal(Regexp(pat, mod)) => indent + $<#new RegExp($(pat.Write()), $(mod.Write()))#>
               }
             }
         }
@@ -496,8 +496,8 @@ $(Body.Write(indent + "  "))
             }
             public override Transform() : JsAst {
                 match(Items) {
-                | x :: [] => x.Transform()
-                | xs => JsAst.Seq(xs.Map(x => x.Transform()))
+                | x :: [] => x
+                //| xs => JsAst.Seq(xs.Map(x => x.Transform()))
                 | _ => this
                 }
             }
@@ -625,6 +625,16 @@ $(indent)}
 #>  
             }
         }
+        | Pack     { Expr : JsAst; 
+          public override Write(indent = "" : string) : string {
+            JsAst.Assign(Expr, JsAst.Object([("value", Expr)])).Write(indent)
+          }
+        }
+        | Unpack     { Expr : JsAst; 
+          public override Write(indent = "" : string) : string {
+            JsAst.Assign(Expr, JsAst.FieldRef(Expr, "value", false)).Write(indent)
+          }
+        }
         | NotImpl { 
             Val : string;
             public this() {
@@ -718,7 +728,9 @@ $(indent)}
             | UnaryOperator(op, obj)      => JsAst.UnaryOperator(op, recurse(obj))
             | Void                        => ast'        
             | While(cond, body)           => JsAst.While(recurse(cond), recurse(body))
-            | WhileNamed(cnd, bdy, nme)   => JsAst.WhileNamed(recurse(cnd), recurse(bdy), nme)            
+            | WhileNamed(cnd, bdy, nme)   => JsAst.WhileNamed(recurse(cnd), recurse(bdy), nme)
+            | Pack                        => ast'
+            | Unpack                      => ast'
             }
             
             if(topdown) result else selector(result, currentDepth)
