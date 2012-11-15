@@ -62,13 +62,15 @@ namespace NemerleWeb
       | DefFunctionsIn                    => Message.Error(expr.Location, "DefFunctionsIn not implemented"); JsAst.NotImpl("DefFunctionsIn")
       | DefValIn(name, val, body)         => 
         def newName = name.Name + "_N_" + NWebUtils.GetUniqueId();
-        def value = Build(val, currentScopeDefs, methodHeader);
-        match(value) {
-        | Seq([Pack as pack, smth, Unpack as unpack]) => 
-            JsAst.Seq([pack, JsAst.DefValue(newName, smth), unpack]);
-        | _ => JsAst.Seq([JsAst.DefValue(newName, 
-                  Build(val, currentScopeDefs, methodHeader)), 
-                  Build(body, (name.Name, newName) :: currentScopeDefs, methodHeader)])
+        
+        match(Build(val, currentScopeDefs, methodHeader)) 
+        {
+        | Seq([Seq(Pack :: _) as pack, smth, Seq(Unpack :: _) as unpack]) => 
+          JsAst.Seq(pack.Items.Append([JsAst.DefValue(newName, smth)]).Append(unpack.Items));
+        | value => 
+          JsAst.Seq([JsAst.DefValue(newName, value), 
+                     Build(body, (name.Name, newName) :: currentScopeDefs, methodHeader)
+                    ])
         }
       | Delayed                           => JsAst.NotImpl("Delayed")
       | Error                             => Message.Error(expr.Location, "Error not implemented"); JsAst.NotImpl("Error")

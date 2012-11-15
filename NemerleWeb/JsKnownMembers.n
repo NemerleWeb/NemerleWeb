@@ -98,7 +98,7 @@ namespace NemerleWeb
         .Where(isRefOut)
         .Select(p => builder'(p.expr))
         .Where(expr => !(expr is JsAst.ParamRef()))
-        .Select(expr => JsAst.Pack(expr));
+        .Map(expr => JsAst.Pack(expr));
       
       def callAst =
         match (call)
@@ -140,9 +140,12 @@ namespace NemerleWeb
         .Where(isRefOut)
         .Select(p => builder'(p.expr))
         .Where(expr => !(expr is JsAst.ParamRef()))
-        .Select(expr => JsAst.Unpack(expr));
-            
-      JsAst.Seq(packRefOut.Concat([callAst]).Concat(unpackRefOut).NToList())
+        .Map(expr => JsAst.Unpack(expr));
+      
+      if(packRefOut.Any())
+        JsAst.Seq([JsAst.Seq(packRefOut), callAst, JsAst.Seq(unpackRefOut)])
+      else
+        callAst
     }
     
     #region ConvertMethod
