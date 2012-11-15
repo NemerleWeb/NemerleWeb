@@ -1173,7 +1173,7 @@ namespace NemerleWeb.Tests
         
         f(1) == 7
       });
-    }
+    }    
     
     [Html]
     public View() : string
