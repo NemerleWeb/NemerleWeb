@@ -273,7 +273,7 @@ namespace NemerleWeb
     public BuildJsAst(expr : TExpr, shouldReturn : bool, methodHeader : TFunHeader) : JsAst
     {
       mutable ast = JsAstBuilder.Build(expr, [], methodHeader);
-                
+      //assert2(false);
       //ast = JsAstHelper.LabelsToNamedWhile(ast);
       ast = JsAstHelper.TransformBottomUp(ast);
       ast = JsAstHelper.FlattenAndRemoveVoids(ast);

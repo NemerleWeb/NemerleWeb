@@ -981,13 +981,13 @@ namespace NemerleWeb.Tests
         _ = sb.AppendLine("a");
         _ = sb.AppendLine();
         
-        sb.ToString() == "a\n";
+        sb.ToString() == "a\n\n";
       });
       
       test("StringBuilder AppendLine2", () =>
       {
         def sb = StringBuilder();
-        sb.AppendLine("a").AppendLine().ToString() == "a\n";
+        sb.AppendLine("a").AppendLine().ToString() == "a\n\n";
       });
       
       test("StringBuilder set_Length decrease", () =>
@@ -1072,6 +1072,13 @@ namespace NemerleWeb.Tests
         def refRes = TestRefOut().Ref(ref s);
         
         s == "a" && refRes == "ab"
+      });
+      
+      test("StringBuilder chain", () =>
+      {
+        def sb = StringBuilder();
+        _ = sb.Append("A").Append("B").Append("C");
+        sb.ToString() == "ABC";
       });
     }
     
