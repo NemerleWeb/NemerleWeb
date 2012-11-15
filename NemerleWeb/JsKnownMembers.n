@@ -73,6 +73,7 @@ namespace NemerleWeb
       JsKnownMembersTextStringBuilder.Register();
       JsKnownMembersGlobalizationCutlureInfo.Register();
       JsKnownMembersCharEnumerator.Register();
+      JsKnownMembersNemerleCollectionsNList.Register();
     }
     
     public Convert(

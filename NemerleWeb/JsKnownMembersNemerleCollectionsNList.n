@@ -1,0 +1,40 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  module JsKnownMembersNemerleCollectionsNList
+  {
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(NList), Handler);
+    }
+    
+    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      if (left is JsAst.StaticMethodRef) StaticHandler(left, member, parms) else None()
+    }
+    
+    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      match (parms)
+      {
+      | [obj] =>
+        match (member.Name)
+        {
+          | "ToList" => Some(obj)
+          | _ => None()
+        }
+      | _ => None()
+      }
+    }
+  }
+}
