@@ -49,18 +49,7 @@ namespace NemerleWeb
         | "get_HasValue"
         | "get_IsSome" => Some(isSome())
         | "get_IsNone" => Some(isNone())
-        | "get_Value" => 
-          Some(
-            JsAst.Seq(
-            [
-              JsAst.JustIf(
-                isSome(),
-                JsAst.Return(JsAst.FieldRef(left, "val", false))),
-              JsAst.JustIf(
-                isNone(),
-                JsAst.Throw(JsAst.Literal(JsLiteral.String("Trying to get Value of None option")))),
-              JsAst.Throw(JsAst.Literal(JsLiteral.String("Invalid Value call to option"))),
-            ]))
+        | "get_Value" => Some(JsAst.FieldRef(left, "val", false))
         | _ => None()
         }
       | [arg] =>
