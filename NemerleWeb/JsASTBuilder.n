@@ -63,7 +63,7 @@ namespace NemerleWeb
       | DefValIn(name, val, body)         => 
         def newName = name.Name + "_N_" + NWebUtils.GetUniqueId();
         JsAst.Seq([JsAst.DefValue(newName, 
-                  Build(val, (name.Name, newName) :: currentScopeDefs, methodHeader)), 
+                  Build(val, currentScopeDefs, methodHeader)), 
                   Build(body, (name.Name, newName) :: currentScopeDefs, methodHeader)])
       | Delayed                           => JsAst.NotImpl("Delayed")
       | Error                             => Message.Error(expr.Location, "Error not implemented"); JsAst.NotImpl("Error")
