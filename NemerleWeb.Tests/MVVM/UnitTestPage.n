@@ -231,41 +231,71 @@ namespace NemerleWeb.Tests
     
     module BlockTest
     {
-      public G(pos : int, result : ref int) : int
+      public G(pos : int, token : ref int) : int
       {
-        result = pos;
+        token = pos;
         -1
       }
       
-      public H(pos : int, result : ref int) : int
+      public H(pos : int, token : ref int) : int
       {
-        result = pos + 1;
+        token = pos + 1;
         1
       }
+      
+      public I(token : int) : int
+      {
+        token
+      }
+      
+      mutable a : int;
+      mutable b : int;
         
       public F(pos : int, result : ref int) : int
       {
-        def newPos =
+        unchecked
         {
-          (res:
           {
-            def newPos = G(pos, ref result);
-            when(newPos >= 0) res(newPos);
+            {
+              mutable token;
+              if (pos < 0)
+              {
+                result = 10;
+                pos
+              }
+              else
+              {
+                def newPos =
+                {
+                  (res:
+                  {
+                    def newPos = G(pos, ref token);
+                    when(newPos >= 0) res(newPos);
               
-            def newPos = H(pos, ref result);
-            when(newPos >= 0) res(newPos);
+                    def newPos = H(pos, ref token);
+                    when(newPos >= 0) res(newPos);
               
-            G(pos, ref result);
-          })
-        };
+                    G(pos, ref token);
+                  })
+                };
+              
+                a = pos;
+                b = pos;
         
-        if (newPos >= 0)
-          result = 10
-        else
-        when (newPos >= 10)
-          result = 2;
+                if (newPos >= 0)
+                {
+                  result = I(token);
+                  a = result;
+                }
+                else
+                when (newPos >= 10)
+                  a = pos;
         
-        newPos
+                newPos
+              }
+            }
+          }
+        }
       }
     }
     
@@ -1237,7 +1267,7 @@ namespace NemerleWeb.Tests
         mutable result;
         def pos = BlockTest.F(0, ref result);
         
-        result == 10 && pos == 1
+        result == 1 && pos == 1
       });
     }    
     
