@@ -71,15 +71,26 @@ public class Test
   //}
       
   public this()
-  {
-    def sb = StringBuilder();
-    _ = sb.Append("A").Append("B").Append("C");
-    sb.ToString() == "ABC";
-    //mutable s;
-    //InstanceRef(ref s);
-    
-    //mutable s2;
-    //Test.StaticRef(ref s2);
+  {    
+    def g(pos, x) { pos - x }
+    def h(pos, x) { pos + x }
+        
+    def f(pos : int)
+    {
+      def pos = g(pos, 1);
+      if (pos >= 0)
+      {
+        def pos = h(pos, 2);
+        if (pos >= 0)
+          pos
+        else
+          -1
+      }
+      else
+        -1
+    }
+        
+    f(2) == 3
   }
     
   [Html]
