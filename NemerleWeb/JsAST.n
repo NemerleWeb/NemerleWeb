@@ -27,10 +27,10 @@ namespace NemerleWeb
             {
               match(this) {
               | Assign(_, right) when !IsAllowedForAssignment(right) => 
-                def varName = JsAstHelper.GetTemporaryVariableName();
-                def delayed = JsAstHelper.DelayAssignment(Right, JsAst.LocalRef(varName, None()));
+                def varName = JsAstHelper.GetTemporaryVariableName();                
                 JsAst.Seq([
-                  delayed,
+                  JsAst.DefValue(varName, JsAst.Void()),
+                  JsAstHelper.DelayAssignment(Right, JsAst.LocalRef(varName, None())),
                   JsAst.Assign(Left, LocalRef(varName, None()))
                 ]);
               | _ => this
@@ -669,6 +669,7 @@ $(indent)}
             typeof(JsAst.ArrayIndexer),
             typeof(JsAst.Label),
             typeof(JsAst.Object),
+            typeof(JsAst.Unpack)
             //typeof(JsAst.Goto),
           ]);
         
