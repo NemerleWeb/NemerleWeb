@@ -28,8 +28,8 @@ public class Test
 {      
   public this()
   {    
-    mutable c;
-    c = c + 1;
+    mutable s;
+    s += "";
   }  
 
   [Html]
