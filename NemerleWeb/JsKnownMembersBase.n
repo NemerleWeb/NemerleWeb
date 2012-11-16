@@ -21,15 +21,28 @@ namespace NemerleWeb
       JsKnownMembers.RegisterDefaultMember(
         ".ctor",
         (type, _, parms) => Some(JsAst.Call(JsAst.Constructor(JsClass.GetProperName(type)), parms)));
+        
+      def toString(type, left, parms)
+      {
+        // If type has method ToString, use it
+        if (type != null && type.SystemType == null)
+        {
+          def members = type.GetMembers(
+            BindingFlags.Instance |
+            BindingFlags.Public |
+            BindingFlags.NonPublic |
+            BindingFlags.DeclaredOnly);
+          if (members.Any(m => m.Name == "ToString"))
+            Some(left.ExternalMethodCall("ToString", parms))
+          else
+            Some(left.MethodCall("toString", []))
+        }
+        else
+          Some(left.MethodCall("toString", []))
+      }
       
-      JsKnownMembers.RegisterDefaultMember("ToString",
-        (_, left, parms) =>
-          match (parms)
-          {
-          | [] => Some(left.MethodCall("toString", []))
-          | [_] => Some(left.MethodCall("toString", []))
-          | _ => None()
-          });
+      JsKnownMembers.RegisterDefaultMember("ToString", toString);
+        
     }
   }
 }

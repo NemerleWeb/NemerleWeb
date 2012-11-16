@@ -11,7 +11,6 @@ using System.Globalization;
 
 using NemerleWeb;
 
-// TODO: Restore NToString => ToString
 // TODO: Restore ToString2 => ToString
 
 namespace Nemerle.Json
@@ -35,7 +34,7 @@ namespace Nemerle.Json
       }
     }
 
-    public NToString() : string
+    public override ToString() : string
     {
       ToString2(StringBuilder()).ToString()
     }
@@ -109,7 +108,7 @@ namespace Nemerle.Json
       }
     }
 
-    public NToString() : string
+    public override ToString() : string
     {
       ToString2(StringBuilder()).ToString()
     }

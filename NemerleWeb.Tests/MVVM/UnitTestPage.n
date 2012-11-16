@@ -228,6 +228,15 @@ namespace NemerleWeb.Tests
         x = 1;
       }
     }
+
+    [Unit]
+    class TestToString
+    {
+      public override ToString() : string
+      {
+        "X"
+      }
+    }
     
     public this()
     {
@@ -1223,6 +1232,12 @@ namespace NemerleWeb.Tests
       test("String Join", () =>
       {
         string.Join(" ", [1, 2, 3]) == "1 2 3"        
+      });
+      
+      test("Member ToString", () =>
+      {
+        def t = TestToString();
+        t.ToString() == "X"
       });
     }    
     
