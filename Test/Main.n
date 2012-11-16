@@ -25,43 +25,12 @@ module Program
 
 [Unit]
 public class Test
-{    
-  [Unit]
-  variant VariantWithListTuple
-  {
-    | A { X : list[B * string]; }
-    | B { Y : int; }
-  }
-  
+{      
   public this()
   {    
-    match([1, 2])
-    {
-    | x :: xs => x
-    | _ => -1
-    }
-  }
-  
-  public T() : bool
-  {
-    true
-/*
-    def f(a)
-    {
-      match (a)
-      {
-      | VariantWithListTuple.A(l) =>
-        mutable count;        
-        foreach (i in l)
-          count += f(i[0]);
-        count
-      | VariantWithListTuple.B => 1
-      }
-    }
-        
-    def a = VariantWithListTuple.A([(VariantWithListTuple.B(1), "A"), (VariantWithListTuple.B(2), "B")]);
-    f(a) == 2*/
-  }
+    mutable c;
+    c = c + 1;
+  }  
 
   [Html]
   public View() : string
