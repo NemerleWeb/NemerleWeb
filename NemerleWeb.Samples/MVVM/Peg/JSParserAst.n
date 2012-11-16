@@ -7,6 +7,8 @@ using Nemerle.Utility;
 using Nemerle.Peg;
 using NemerleWeb;
 
+// TODO: Restore NToString => ToString
+
 namespace JSEngine {
 
     [Record]
@@ -24,7 +26,7 @@ namespace JSEngine {
         }
         | Null
 
-        public override ToString() : string {
+        public NToString() : string {
             match(this) {
                 | Integer(value)    => value.ToString()
                 | Boolean(value)    => value.ToString()
@@ -52,7 +54,7 @@ namespace JSEngine {
             }
         }
 
-        public override ToString() : string {
+        public NToString() : string {
             token
         }
     }
@@ -70,7 +72,7 @@ namespace JSEngine {
             }
         }
 
-        public override ToString() : string {
+        public NToString() : string {
             match(this) {
                 | True()  => "true"
                 | False() => "false"
@@ -90,7 +92,7 @@ namespace JSEngine {
             token
         }
 
-        public override ToString() : string {
+        public NToString() : string {
             match(this) {
                 | SingleQuote() => "'" + token + "'"
                 | DoubleQuote() => "\"" + token + "\""
@@ -154,33 +156,33 @@ namespace JSEngine {
                 | Indexer(expr, args) =>
                     expr.ToString2(sb, tab, current_tab);
                     _ = sb.Append($"[..$args]");
+                    
+                // TODO: Restor, Failed typing method ?!
+                | Call(Operator(op, kind), [a, b]) when kind == OperatorKind.Infix=>
+                    _ = sb.Append("(");
+                    a.ToString2(sb, tab, current_tab);
+                    _ = sb.Append(" ").Append(op).Append(" ");
+                    b.ToString2(sb, tab, current_tab);
+                    _ = sb.Append(")");
 
-                // TODO: Uncomment, Failed typing method
-                //| Call(Operator(op, OperatorKind.Infix), [a, b]) =>
-                //    _ = sb.Append("(");
-                //    a.ToString2(sb, tab, current_tab);
-                //    _ = sb.Append(" ").Append(op).Append(" ");
-                //    b.ToString2(sb, tab, current_tab);
-                //    _ = sb.Append(")");
+                | Call(Operator(op, kind), [a]) when kind == OperatorKind.Prefix =>
+                    _ = sb.Append("(").Append(op);
+                    a.ToString2(sb, tab, current_tab);
+                    _ = sb.Append(")");
 
-                //| Call(Operator(op, OperatorKind.Prefix), [a]) =>
-                //    _ = sb.Append("(").Append(op);
-                //    a.ToString2(sb, tab, current_tab);
-                //    _ = sb.Append(")");
+                | Call(Operator(op, kind), [a]) when kind == OperatorKind.Postfix =>
+                    _ = sb.Append("(");
+                    a.ToString2(sb, tab, current_tab);
+                    _ = sb.Append(op).Append(")");
 
-                //| Call(Operator(op, OperatorKind.Postfix), [a]) =>
-                //    _ = sb.Append("(");
-                //    a.ToString2(sb, tab, current_tab);
-                //    _ = sb.Append(op).Append(")");
-
-                //| Call(Operator("?:", OperatorKind.Ternary), [q, t, f]) =>
-                //    _ = sb.Append("(");
-                //    q.ToString2(sb, tab, current_tab);
-                //    _ = sb.Append(" ? ");
-                //    t.ToString2(sb, tab, current_tab);
-                //    _ = sb.Append(" : ");
-                //    f.ToString2(sb, tab, current_tab);
-                //    _ = sb.Append(")");
+                | Call(Operator("?:", kind), [q, t, f]) when kind == OperatorKind.Ternary =>
+                    _ = sb.Append("(");
+                    q.ToString2(sb, tab, current_tab);
+                    _ = sb.Append(" ? ");
+                    t.ToString2(sb, tab, current_tab);
+                    _ = sb.Append(" : ");
+                    f.ToString2(sb, tab, current_tab);
+                    _ = sb.Append(")");
 
                 | Call(expr, args) =>
                     expr.ToString2(sb, tab, current_tab);
@@ -195,7 +197,7 @@ namespace JSEngine {
             }
         }
 
-        public override ToString() : string {
+        public NToString() : string {
             def sb = System.Text.StringBuilder();
             ToString2(sb, "    ", "");
             sb.ToString()
@@ -281,7 +283,7 @@ namespace JSEngine {
             }
         }
 
-        public override ToString() : string {
+        public NToString() : string {
             def sb = System.Text.StringBuilder();
             ToString2(sb, "    ", "");
             sb.ToString()

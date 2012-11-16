@@ -30,8 +30,8 @@ namespace NemerleWeb
       | [obj] =>
         match (member.Name)
         {
-          | "ToList" => Some(obj)
-          | _ => None()
+        | "ToList" => Some(obj)
+        | _ => None()
         }
       | _ => None()
       }
