@@ -229,76 +229,6 @@ namespace NemerleWeb.Tests
       }
     }
     
-    module BlockTest
-    {
-      public G(pos : int, token : ref int) : int
-      {
-        token = pos;
-        -1
-      }
-      
-      public H(pos : int, token : ref int) : int
-      {
-        token = pos + 1;
-        1
-      }
-      
-      public I(token : int) : int
-      {
-        token
-      }
-      
-      mutable a : int;
-      mutable b : int;
-        
-      public F(pos : int, result : ref int) : int
-      {
-        unchecked
-        {
-          {
-            {
-              mutable token;
-              if (pos < 0)
-              {
-                result = 10;
-                pos
-              }
-              else
-              {
-                def newPos =
-                {
-                  (res:
-                  {
-                    def newPos = G(pos, ref token);
-                    when(newPos >= 0) res(newPos);
-              
-                    def newPos = H(pos, ref token);
-                    when(newPos >= 0) res(newPos);
-              
-                    G(pos, ref token);
-                  })
-                };
-              
-                a = pos;
-                b = pos;
-        
-                if (newPos >= 0)
-                {
-                  result = I(token);
-                  a = result;
-                }
-                else
-                when (newPos >= 10)
-                  a = pos;
-        
-                newPos
-              }
-            }
-          }
-        }
-      }
-    }
-    
     public this()
     {
       def test(description, res)
@@ -1192,6 +1122,18 @@ namespace NemerleWeb.Tests
         refRes == "ab"
       });
       
+      test("ref with return", () =>
+      {
+        mutable a;
+        def t(p)
+        {
+          if (p > 0) TestRefOut.StaticOut(out a);
+          else -1
+        }
+        
+        t(1) == 2 && a == 1
+      });
+      
       test("StringBuilder chain", () =>
       {
         def sb = StringBuilder();
@@ -1260,15 +1202,7 @@ namespace NemerleWeb.Tests
         }
         
         f(1) == 7
-      });
-      
-      test("mutliple variables same name 3", () =>
-      {
-        mutable result;
-        def pos = BlockTest.F(0, ref result);
-        
-        result == 1 && pos == 1
-      });
+      });          
     }    
     
     [Html]
