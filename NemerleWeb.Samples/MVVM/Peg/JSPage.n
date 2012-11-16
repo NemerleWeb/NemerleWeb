@@ -22,7 +22,7 @@ namespace NemerleWeb.Samples
       {
         if (!string.IsNullOrEmpty(ParserInput))
           if (_parser.Parse(ParserInput) is Some(res))
-            res.ToString()
+            $<#..$(res; "\n"; _.NToString())#>
           else
             "Incorrect input"
         else

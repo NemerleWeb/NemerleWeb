@@ -20,7 +20,22 @@ namespace NemerleWeb
     
     private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
-      if (left is JsAst.StaticMethodRef) StaticHandler(left, member, parms) else None()
+      (if (left is JsAst.StaticMethodRef) StaticHandler else ObjectHandler)(left, member, parms)
+    }
+    
+    private ObjectHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+     {
+      match (parms)
+      {
+      | [arg1] =>
+        match (member.Name)
+        {
+        | "MapToArray" => 
+          Some(left.AsEnumerable().MethodCall("select", [arg1]).MethodCall("toArray", []))
+        | _ => None()
+        }
+      | _ => None()
+      }
     }
     
     private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]

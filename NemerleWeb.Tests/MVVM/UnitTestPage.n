@@ -1202,7 +1202,28 @@ namespace NemerleWeb.Tests
         }
         
         f(1) == 7
-      });          
+      });
+      
+      test("list MapToArray", () =>
+      {
+        def x = [1, 2, 3];
+        def arr = x.MapToArray(p => p * 2);
+        
+        arr[0] == 2 && arr[1] == 4 && arr[2] == 6
+      });
+      
+      test("NemerleNCollectionsExtensions MapToArray", () =>
+      {
+        def x = [1, 2, 3];
+        def arr = Nemerle.Collections.NCollectionsExtensions.MapToArray(x, p => p * 2);
+        
+        arr[0] == 2 && arr[1] == 4 && arr[2] == 6
+      });
+      
+      test("String Join", () =>
+      {
+        string.Join(" ", [1, 2, 3]) == "1 2 3"        
+      });
     }    
     
     [Html]

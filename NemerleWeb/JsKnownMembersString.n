@@ -196,8 +196,8 @@ namespace NemerleWeb
         match (member.Name)
         {
         | "Concat" => Some(JsToString(arg1).MethodCall("concat", [arg2]))
-        | "Equals"
-        | "Join"
+        | "Equals" => None()
+        | "Join" => Some(arg2.MethodCall("join", [arg1]))
         | _ => None()
         }
       | [arg1, arg2, arg3] =>

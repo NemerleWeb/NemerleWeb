@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  module JsLinqExtensions
+  internal module JsLinqExtensions
   {
     public static AsEnumerable(this seq : JsAst) : JsAst
     {

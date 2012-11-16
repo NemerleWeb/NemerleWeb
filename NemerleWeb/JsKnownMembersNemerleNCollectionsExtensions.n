@@ -30,8 +30,15 @@ namespace NemerleWeb
       | [obj] =>
         match (member.Name)
         {
-          | "NToList" => Some(obj)
-          | _ => None()
+        | "NToList" => Some(obj)
+        | _ => None()
+        }
+      | [arg1, arg2] =>
+        match (member.Name)
+        {
+        | "MapToArray" =>
+          Some(arg1.AsEnumerable().MethodCall("select", [arg2]).MethodCall("toArray", []))
+        | _ => None()
         }
       | _ => None()
       }
