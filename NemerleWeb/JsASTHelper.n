@@ -187,12 +187,16 @@ namespace NemerleWeb
     public DelayAssignment(expr : JsAst, left : JsAst) : JsAst
     {
         def delayAssignment = DelayAssignment(_, left);
-        match(expr) {
+        match(expr)
+        {
         | Seq(exprs) => 
-            def newExprs = match(exprs.Rev()) {
-            | last :: allButLast => delayAssignment(last) :: allButLast
-            | r => r
-            }
+            def newExprs =
+              match(exprs.Rev())
+              {
+              | (JsAst.Unpack as u) :: (JsAst.Call as c) :: rest => u :: delayAssignment(c) :: rest
+              | last :: allButLast => delayAssignment(last) :: allButLast
+              | r => r
+              };
             JsAst.Seq(newExprs.Rev())
         | TryFinally(body, handler) => JsAst.TryFinally(delayAssignment(body), handler)
         | Assign(l, r)     => JsAst.Assign(l, delayAssignment(r))
@@ -200,20 +204,24 @@ namespace NemerleWeb
         | ServerCall(m, t, ps, c) => JsAst.ServerCall(m, t, ps.Map(p => (p[0], delayAssignment(p[1]))), delayAssignment(c))
         | Switch(e, cases, deflt) => JsAst.Switch(e, cases.Map(c => JsAst.SwitchCase(c.Id, delayAssignment(c.Body))), delayAssignment(deflt))
         | WhileNamed(c, b, n) => 
-            def newBody = match(b) {
-            | Seq(bodyItems) => 
-                def newItems = match(bodyItems.Rev()) {
-                | Break :: secondToLast :: rest => JsAst.Break() :: delayAssignment(secondToLast) :: rest;
-                | last :: rest => delayAssignment(last) :: rest;
-                | [] => []
-                }
-                JsAst.Seq(newItems.Rev())
-            | something => JsAst.Assign(left, delayAssignment(something))
-            }
+            def newBody =
+              match(b)
+              {
+              | Seq(bodyItems) => 
+                  def newItems =
+                    match(bodyItems.Rev())
+                    {
+                    | Break :: secondToLast :: rest => JsAst.Break() :: delayAssignment(secondToLast) :: rest;
+                    | last :: rest => delayAssignment(last) :: rest;
+                    | [] => []
+                    };
+                  JsAst.Seq(newItems.Rev())
+              | something => JsAst.Assign(left, delayAssignment(something))
+              };
             JsAst.WhileNamed(c, newBody, n)
         | Label(id, body) => JsAst.Label(id, delayAssignment(body))
         | Void => JsAst.Void()
-        | e when JsAst.AllowedForAssignment.Any(al => al == e.GetType()) => JsAst.Assign(left, e)
+        | e when JsAst.AllowedForAssignment.Contains(e.GetType()) => JsAst.Assign(left, e)
         | Undefined
         | _ => expr
         }
@@ -222,7 +230,12 @@ namespace NemerleWeb
     public MakeReturn(ast : JsAst) : JsAst 
     {
       | Void => ast
-      | _ => JsAst.Seq([JsAst.DefValue("__returnValue", JsAst.Void()), DelayAssignment(ast, JsAst.LocalRef("__returnValue", None())), JsAst.Return(JsAst.LocalRef("__returnValue", None()))])        
+      | _ =>
+        JsAst.Seq([
+          JsAst.DefValue("__returnValue", JsAst.Void()),
+          DelayAssignment(ast, JsAst.LocalRef("__returnValue", None())),
+          JsAst.Return(JsAst.LocalRef("__returnValue", None()))
+        ])
     }
     
     public MakeReturningFunction(ast : JsAst) : JsAst
