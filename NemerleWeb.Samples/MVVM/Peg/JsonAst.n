@@ -64,7 +64,7 @@ namespace Nemerle.Json
 
     // TODO: Restore
     //public static Null : JObject = JObject.Value();
-      public static Null : JObject = JObject.Value(JValue.Null());
+    public static Null : JObject = JObject.Value(JValue.Null());
     public static Convert(jobj : JObject) : JObject {jobj}
     //public static Convert(number : double) : JObject {JObject.Value(number);}
     public static Convert(number : double) : JObject {JObject.Value(JValue.Number(number));}

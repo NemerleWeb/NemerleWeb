@@ -145,6 +145,9 @@
     <Compile Include="JsKnownMembersConvert.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JsKnownMembersDouble.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JsKnownMembersEventsDSL.n">
       <SubType>Code</SubType>
     </Compile>
