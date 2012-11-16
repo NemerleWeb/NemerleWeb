@@ -36,8 +36,9 @@ namespace NemerleWeb.Samples
     {
       <#
         <div>
-          <span>Write an expression.</span>
-          <span>For example: 1 + 2 - 3 *  4</span>
+          <span>This is demonstration of Calculator parser</span><br />
+          <span>Write any valid expression.</span><br />
+          <span>Example: 1 + 2 - 3 *  4</span>
           <div class="output">
             <span class="output-text">$CalcOutput</span> 
           </div>

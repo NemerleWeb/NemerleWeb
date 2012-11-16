@@ -37,7 +37,9 @@ namespace NemerleWeb.Samples
     {
       <#
         <div>
-          <span>Write a JSON:</span>
+          <span>This is demonstration of JSON parser</span><br />
+          <span>When you write JSON, the parser parses it and creates AST.</span><br />
+          <span>Afterwards this AST is converted to human readable string</span>
           <div class="output">
             <span class="output-text">$ParserOutput</span> 
           </div>

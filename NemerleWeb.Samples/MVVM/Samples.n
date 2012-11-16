@@ -84,8 +84,8 @@ namespace NemerleWeb.Samples
       PegSamples =
       [
         Sample("Calculator", ["MVVM/Peg/CalculatorParser.n", "MVVM/Peg/CalculatorPage.n"], "", Calculator),
-        Sample("Json", ["MVVM/Peg/JsonParser.n", "MVVM/Peg/JsonPage.n"], "", Json),
-        Sample("JavaScript", ["MVVM/Peg/JSParser.n", "MVVM/Peg/JSPage.n"], "", JS),
+        Sample("Json", ["MVVM/Peg/JsonParser.n", "MVVM/Peg/JsonPage.n", "MVVM/Peg/JsonAst.n", "MVVM/Peg/JsonUtils.n"], "", Json),
+        Sample("JavaScript", ["MVVM/Peg/JSParser.n", "MVVM/Peg/JSPage.n", "MVVM/Peg/JSParserAst.n"], "", JS),
       ].ToList();
                  
       SelectedSample = Samples[2];

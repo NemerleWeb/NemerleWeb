@@ -37,7 +37,9 @@ namespace NemerleWeb.Samples
     {
       <#
         <div>
-          <span>Write a JavaScript code:</span>
+          <span>This is demonstration of JavaScript parser</span><br />
+          <span>When you write JavaScript code, the parser parses it and creates AST.</span><br />
+          <span>Afterwards this AST is converted to human readable string</span>
           <div class="output">
             <span class="output-text">$ParserOutput</span> 
           </div>
