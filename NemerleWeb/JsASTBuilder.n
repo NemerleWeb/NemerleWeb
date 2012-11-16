@@ -283,7 +283,7 @@ namespace NemerleWeb
     {
       //when(methodHeader.Name == "__GENERATED_PEG__RULE__simplExpr__")
       //  assert2(false);
-      
+      //assert2(false);
       mutable ast = JsAstBuilder.Build(expr, [], methodHeader);
       
       ast = JsAstHelper.TransformBottomUp(ast);
