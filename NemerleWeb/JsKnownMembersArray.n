@@ -29,8 +29,8 @@ namespace NemerleWeb
       | [] =>
         match (member.Name)
         {
-        | "get_Length" => Some(JsAst.FieldRef(left, "length", true))
-        | "get_LongLength" => Some(JsAst.FieldRef(left, "length", true))
+        | "get_Length" => Some(JsAst.FieldRef(left, "length"))
+        | "get_LongLength" => Some(JsAst.FieldRef(left, "length"))
         | _ => None()
         }
         

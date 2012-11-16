@@ -264,7 +264,7 @@ $(Body.Write("  "))
             match(this) {
             | HasType(l, "Nemerle_Core_Cons[T]") => 
               JsAst.Call(JsAst.OpCode(">"),
-                        [JsAst.FieldRef(l, "length", true), JsAst.Literal(JsLiteral.Integer(0))]);
+                        [JsAst.FieldRef(l, "length"), JsAst.Literal(JsLiteral.Integer(0))]);
             | _ => this                
             }
           }   
@@ -439,7 +439,7 @@ $(Body.Write(indent + "  "))
                 $"$Type.$Member"
             }
         }
-        | FieldRef       { Obj : JsAst; Parameter : string; IsExternal : bool;
+        | FieldRef       { Obj : JsAst; Parameter : string;
             public override Write(_ = "" : string) : string {
                 $"$(Obj.Write()).$Parameter"
             }
@@ -632,7 +632,7 @@ $(indent)}
         }
         | Unpack     { Expr : JsAst; 
           public override Write(indent = "" : string) : string {
-            JsAst.Assign(Expr, JsAst.FieldRef(Expr, "value", false)).Write(indent)
+            JsAst.Assign(Expr, JsAst.FieldRef(Expr, "value")).Write(indent)
           }
         }
         | NotImpl { 
@@ -692,7 +692,7 @@ $(indent)}
             | DefFunction(obj, ps, bdy)   => JsAst.DefFunction(recurse(obj), ps.Map(recurse), recurse(bdy))
             | DeclFunction(name, ps, bdy) => JsAst.DeclFunction(name, ps.Map(recurse), recurse(bdy))
             | DefValue(name, val)         => JsAst.DefValue(name, recurse(val))
-            | FieldRef(obj, parm, ext)    => JsAst.FieldRef(recurse(obj), parm, ext)
+            | FieldRef(obj, parm)         => JsAst.FieldRef(recurse(obj), parm)
             | For(it, coll, body)         => JsAst.For(it, recurse(coll), recurse(body))
             | Goto                        => ast'        
             | HasType(obj, type)          => JsAst.HasType(recurse(obj), type)

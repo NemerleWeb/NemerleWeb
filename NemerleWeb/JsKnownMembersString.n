@@ -37,7 +37,7 @@ namespace NemerleWeb
       | [] =>
         match (member.Name)
         {        
-        | "get_Length" => Some(JsAst.FieldRef(left, "length", true))
+        | "get_Length" => Some(JsAst.FieldRef(left, "length"))
         | "Clone" => Some(left)        
         | "GetEnumerator" => Some(left.MethodCall(member.Name, parms))
         | "GetHashCode"
