@@ -24,7 +24,7 @@ namespace NemerleWeb
     }
     
     private ObjectHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
-     {
+    {
       match (parms)
       {
       | [arg1] =>

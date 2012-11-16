@@ -25,17 +25,12 @@ module Program
 
 [Unit]
 public class Test
-{    
+{      
   public this()
   {    
-    
-  }
-  
-  public T() : bool
-  {
-    def a = Some(1);
-    a.HasValue && a.Value == 1
-  }
+    mutable s;
+    s += "";
+  }  
 
   [Html]
   public View() : string
