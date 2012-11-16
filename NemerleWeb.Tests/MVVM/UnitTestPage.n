@@ -1265,6 +1265,20 @@ namespace NemerleWeb.Tests
         def a = VariantWithListTuple.A([(VariantWithListTuple.B(1), "A"), (VariantWithListTuple.B(2), "B")]);
         f(a) == 2
       });
+      
+      test("default values", () =>
+      {
+        mutable i;
+        i = i + 1;
+        mutable d;
+        d = 0.0f;
+        mutable s;
+        s += "";
+        mutable b;
+        b = b && false;
+        
+        i == 1 && d == 0.0f && s == "" && b == false
+      });
     }    
     
     [Html]
