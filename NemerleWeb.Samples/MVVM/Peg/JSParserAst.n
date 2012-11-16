@@ -7,8 +7,6 @@ using Nemerle.Utility;
 using Nemerle.Peg;
 using NemerleWeb;
 
-// TODO: Restore NToString => ToString
-
 namespace JSEngine {
 
     [Record]
@@ -26,7 +24,7 @@ namespace JSEngine {
         }
         | Null
 
-        public NToString() : string {
+        public override ToString() : string {
             match(this) {
                 | Integer(value)    => value.ToString()
                 | Boolean(value)    => value.ToString()
@@ -54,7 +52,7 @@ namespace JSEngine {
             }
         }
 
-        public NToString() : string {
+        public override ToString() : string {
             token
         }
     }
@@ -72,7 +70,7 @@ namespace JSEngine {
             }
         }
 
-        public NToString() : string {
+        public override ToString() : string {
             match(this) {
                 | True()  => "true"
                 | False() => "false"
@@ -92,7 +90,7 @@ namespace JSEngine {
             token
         }
 
-        public NToString() : string {
+        public override ToString() : string {
             match(this) {
                 | SingleQuote() => "'" + token + "'"
                 | DoubleQuote() => "\"" + token + "\""
@@ -197,7 +195,7 @@ namespace JSEngine {
             }
         }
 
-        public NToString() : string {
+        public override ToString() : string {
             def sb = System.Text.StringBuilder();
             ToString2(sb, "    ", "");
             sb.ToString()
@@ -283,7 +281,7 @@ namespace JSEngine {
             }
         }
 
-        public NToString() : string {
+        public override ToString() : string {
             def sb = System.Text.StringBuilder();
             ToString2(sb, "    ", "");
             sb.ToString()
