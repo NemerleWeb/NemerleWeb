@@ -35,7 +35,7 @@ namespace NemerleWeb
         {
         | "ToString" => Some(arg1.MethodCall("toString", []))
         | "ToDouble"
-        | "ToSingle" => Some(JsAst.Call(JsAst.LocalRef("parseFloat", None()), parms))
+        | "ToSingle" => Some(JsAst.Call(JsAst.GlobalRef("parseFloat"), parms))
         | "ToByte"
         | "ToInt16"
         | "ToInt32"
@@ -43,7 +43,7 @@ namespace NemerleWeb
         | "ToSByte"
         | "ToUInt16"
         | "ToUInt32"
-        | "ToUInt64" => Some(JsAst.Call(JsAst.LocalRef("parseInt", None()), parms))
+        | "ToUInt64" => Some(JsAst.Call(JsAst.GlobalRef("parseInt"), parms))
         
         | _ => None()
         }

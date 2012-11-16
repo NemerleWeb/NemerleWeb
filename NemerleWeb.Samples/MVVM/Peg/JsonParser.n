@@ -173,12 +173,13 @@ namespace Nemerle.Json
     }
     #endregion
 
-    trueValue(_ : NToken)   : JObject { JObject.Convert(true) }
-    falseValue(_ : NToken)  : JObject { JObject.Convert(false) }
+    // TODO: Restore
+    trueValue(_ : NToken)   : JObject { JObject.FromBool(true) }
+    falseValue(_ : NToken)  : JObject { JObject.FromBool(false) }
     nullValue(_ : NToken)   : JObject { JObject.Null }
-
-    jstring(str : string) : JObject { JObject.Convert(str) }
-    jnumber(str : string) : JObject { JObject.Convert(Double.Parse(str, CultureInfo.CreateSpecificCulture("en-US").NumberFormat)) }
+    
+    jstring(str : string) : JObject { JObject.FromString(str) }
+    jnumber(str : string) : JObject { JObject.FromNumber(Double.Parse(str, CultureInfo.CreateSpecificCulture("en-US").NumberFormat)) }
 
     jvalue(o : JObject) : JObject {o}
 

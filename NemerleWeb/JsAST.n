@@ -251,6 +251,15 @@ $(Body.Write("  "))
 }#> 
             }
         }
+        | GlobalRef
+          {
+            Member : string;
+          
+            public override Write(_ = "" : string) : string
+            {
+                Member
+            }
+          }
         | Goto           { LabelId : string;
             public override Write(_ = "" : string) : string {
                 "/* No goto writer implementation */"
@@ -670,7 +679,8 @@ $(indent)}
             typeof(JsAst.ArrayIndexer),
             typeof(JsAst.Label),
             typeof(JsAst.Object),
-            typeof(JsAst.Unpack)
+            typeof(JsAst.Unpack),
+            typeof(JsAst.GlobalRef),
             //typeof(JsAst.Goto),
           ]);
         
@@ -695,7 +705,8 @@ $(indent)}
             | DefValue(name, val)         => JsAst.DefValue(name, recurse(val))
             | FieldRef(obj, parm)         => JsAst.FieldRef(recurse(obj), parm)
             | For(it, coll, body)         => JsAst.For(it, recurse(coll), recurse(body))
-            | Goto                        => ast'        
+            | GlobalRef                   => ast'
+            | Goto                        => ast'
             | HasType(obj, type)          => JsAst.HasType(recurse(obj), type)
             | If(cond, then, els)         => JsAst.If(recurse(cond), recurse(then), recurse(els))
             | Indexer(obj)                => JsAst.Indexer(recurse(obj))

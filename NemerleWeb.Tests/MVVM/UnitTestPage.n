@@ -1303,6 +1303,22 @@ namespace NemerleWeb.Tests
         
         i == 1 && d == 0.0f && s == "" && b == false
       });
+      
+      test("list append", () =>
+      {
+        mutable lst = 2 :: 1 :: [];
+        lst ::= 3;
+        lst ::= 4;
+        
+        lst.Equals([4, 3, 2, 1])
+      });
+      
+      test("tuple indexer", () =>
+      {
+        def tpl = (1, "a", 2.0);
+        
+        tpl[0] == 1 && tpl[1] == "a" && tpl[2] == 2.0
+      });
     }    
     
     [Html]

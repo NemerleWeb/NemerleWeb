@@ -33,13 +33,13 @@ namespace NemerleWeb
       | [_] =>
         match (member.Name)
         {
-        | "Parse" => Some(JsAst.Call(JsAst.LocalRef("parseInt", None()), parms))
+        | "Parse" => Some(JsAst.Call(JsAst.GlobalRef("parseInt"), parms))
         | _ => None()
         }
       | [arg1, _] =>
         match (member.Name)
         {
-        | "Parse" => Some(JsAst.Call(JsAst.LocalRef("parseInt", None()), [arg1]))
+        | "Parse" => Some(JsAst.Call(JsAst.GlobalRef("parseInt"), [arg1]))
         | _ => None()
         }
       | _ => None()
