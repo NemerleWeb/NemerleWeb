@@ -286,9 +286,9 @@ namespace NemerleWeb
     public ConvertField([NotNull] obj : TExpr, [NotNull] field : IField, [NotNull] builder : TExpr -> JsAst) : JsAst
     {
       match(field)
-      {
-      //| _ when field.Name == "hd" && field.DeclaringType.FullName == "Nemerle.Core.Cons[T]" => JsAst.Call(JsAst.Indexer(builder(obj)), [JsAst.Literal(JsLiteral.Integer(0))])
-      //| _ when field.Name == "tl" && field.DeclaringType.FullName == "Nemerle.Core.Cons[T]" => JsAst.Call(JsAst.MethodRef(builder(obj), "splice"), [JsAst.Literal(JsLiteral.Integer(1))])        
+      {      
+      | _ when field.Name == "hd" && field.DeclaringType.FrameworkTypeName == "Nemerle.Core.list+Cons" => JsAst.Call(JsAst.MethodRef(builder(obj), "hd"), [])
+      | _ when field.Name == "tl" && field.DeclaringType.FrameworkTypeName == "Nemerle.Core.list+Cons" => JsAst.Call(JsAst.MethodRef(builder(obj), "tl"), [])        
       | _ => JsAst.FieldRef(builder(obj), field.Name, false) 
       }
     }
