@@ -1263,24 +1263,38 @@ namespace NemerleWeb.Tests
         t.ToString() == "X"
       });
       
-      //test("Variant with list tuple", () =>
-      //{
-      //  def f(a)
-      //  {
-      //    match (a)
-      //    {
-      //    | VariantWithListTuple.A(l) =>
-      //      mutable count;
-      //      foreach (i in l)
-      //        count += f(i[0]);
-      //      count
-      //    | VariantWithListTuple.B => 1
-      //    }
-      //  }
+      test("Variant with list tuple", () =>
+      {
+        def f(a)
+        {
+          match (a)
+          {
+          | VariantWithListTuple.A(l) =>
+            mutable count;
+            foreach (i in l)
+              count += f(i[0]);
+            count
+          | VariantWithListTuple.B => 1
+          }
+        }
         
-      //  def a = VariantWithListTuple.A([(VariantWithListTuple.B(1), "A"), (VariantWithListTuple.B(2), "B")]);
-      //  f(a) == 2
-      //});
+        def a = VariantWithListTuple.A([(VariantWithListTuple.B(1), "A"), (VariantWithListTuple.B(2), "B")]);
+        f(a) == 2
+      });
+      
+      test("default values", () =>
+      {
+        mutable i;
+        i = i + 1;
+        mutable d;
+        d = 0.0f;
+        mutable s;
+        s += "";
+        mutable b;
+        b = b && false;
+        
+        i == 1 && d == 0.0f && s == "" && b == false
+      });
     }    
     
     [Html]

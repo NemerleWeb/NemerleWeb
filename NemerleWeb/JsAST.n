@@ -262,7 +262,8 @@ $(Body.Write("  "))
           }
           public override Transform() : JsAst {
             match(this) {
-            | HasType(l, "Nemerle_Core_Cons[T]") => 
+            | HasType(l, "Nemerle_Core_Cons_$T$__$T$_")
+            | HasType(l, "Nemerle_Core_Cons_$T$_") => 
               JsAst.Call(JsAst.OpCode(">"),
                         [JsAst.FieldRef(l, "length"), JsAst.Literal(JsLiteral.Integer(0))]);
             | _ => this                
