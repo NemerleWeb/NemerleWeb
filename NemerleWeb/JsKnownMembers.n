@@ -294,7 +294,7 @@ namespace NemerleWeb
       {      
       | _ when field.Name == "hd" && field.DeclaringType.FrameworkTypeName == "Nemerle.Core.list+Cons" => JsAst.Call(JsAst.MethodRef(builder(obj), "hd"), [])
       | _ when field.Name == "tl" && field.DeclaringType.FrameworkTypeName == "Nemerle.Core.list+Cons" => JsAst.Call(JsAst.MethodRef(builder(obj), "tl"), [])        
-      | _ => JsAst.FieldRef(builder(obj), field.Name, false) 
+      | _ => JsAst.FieldRef(builder(obj), field.Name) 
       }
     }
     
