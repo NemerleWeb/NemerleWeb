@@ -58,12 +58,20 @@ namespace NemerleWeb
     {
       match (parms)
       {
-      | _ =>
+      | [] =>
         match (member.Name)
         {
-        | ".ctor" => Some(JsAst.Array(parms.Where(p => !(p is JsAst.NotImpl())).NToList()))
+        | ".ctor" => Some(JsAst.Array([]))
         | _ => None()
         }
+      | [arg] =>
+        match (member.Name)
+        {
+        | ".ctor" =>
+          Some(JsAst.Call(JsAst.GlobalRef("System_Collections_Generic_List"), [arg]))
+        | _ => None()
+        }
+      | _ => None()
       }
     }
   }

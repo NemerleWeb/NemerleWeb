@@ -174,7 +174,7 @@ namespace NemerleWeb
       | [arg1] =>
         match (member.Name)
         {
-        | ".ctor" => Some(JsAst.Call(JsAst.LocalRef("System_String", None()), parms))
+        | ".ctor" => Some(JsAst.Call(JsAst.GlobalRef("System_String"), parms))
         | "Concat" =>
           match (arg1)
           {

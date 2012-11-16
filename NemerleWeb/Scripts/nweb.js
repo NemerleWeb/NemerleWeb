@@ -698,3 +698,24 @@ function System_String() {
     else
         return arguments[0];
 }
+
+// This is not constructor, call directly without 'new'.
+function System_Collections_Generic_List(arg) {
+    if (typeof arg === typeof 0)
+        return [];
+    else
+        return Enumerable.from(arg).toArray();
+}
+
+nweb.collection = {
+    areArrayEqual : function(arr1, arr2) {
+        if (arr1.length != arr2.length)
+            return false;
+
+        for (var i = 0; i < arr1.length; i++)
+            if (arr1[i] != arr2[i])
+                return false;
+
+        return true;
+    }
+};
