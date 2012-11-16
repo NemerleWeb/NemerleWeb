@@ -658,3 +658,7 @@ Nemerle_Core_None_$T$__$T$_._N_constant_object = new Nemerle_Core_None_$T$__$T$_
 function Nemerle_Core_option_$T$__$T$_(val) {
   this.val = val;
 }
+
+function System_Text_StringBuilder() {
+    this.string = "";
+}

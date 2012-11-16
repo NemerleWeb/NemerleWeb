@@ -39,6 +39,11 @@ namespace NemerleWeb
     {
       JsAst.Call(JsAst.StaticRef(type, method.FirstCharacterToLower()), parms)
     }
+    
+    public static Field(this self : JsAst, [NotNull] field : string) : JsAst
+    {
+      JsAst.FieldRef(self, field)
+    }
   }
   
   public module JsKnownMembers
@@ -289,7 +294,7 @@ namespace NemerleWeb
       {
       //| _ when field.Name == "hd" && field.DeclaringType.FullName == "Nemerle.Core.Cons[T]" => JsAst.Call(JsAst.Indexer(builder(obj)), [JsAst.Literal(JsLiteral.Integer(0))])
       //| _ when field.Name == "tl" && field.DeclaringType.FullName == "Nemerle.Core.Cons[T]" => JsAst.Call(JsAst.MethodRef(builder(obj), "splice"), [JsAst.Literal(JsLiteral.Integer(1))])        
-      | _ => JsAst.FieldRef(builder(obj), field.Name, false) 
+      | _ => JsAst.FieldRef(builder(obj), field.Name) 
       }
     }
     

@@ -245,6 +245,14 @@ namespace NemerleWeb.Tests
       | B { Y : int; }
     }
     
+    module StringBuilderTest
+    {
+      public F(sb : StringBuilder) : void
+      {
+        _ = sb.Append("abc");
+      }
+    }
+    
     public this()
     {
       def test(description, res)
@@ -1054,6 +1062,14 @@ namespace NemerleWeb.Tests
       //  sb.Length == 10;
       //});
       
+      test("StringBuilder function param", () =>
+      {
+        def sb = StringBuilder();
+        StringBuilderTest.F(sb);
+        
+        sb.ToString() == "abc"
+      });
+      
       test("ToString", () =>
       {
         1.ToString() == "1" &&
@@ -1247,24 +1263,24 @@ namespace NemerleWeb.Tests
         t.ToString() == "X"
       });
       
-      test("Variant with list tuple", () =>
-      {
-        def f(a)
-        {
-          match (a)
-          {
-          | VariantWithListTuple.A(l) =>
-            mutable count;
-            foreach (i in l)
-              count += f(i[0]);
-            count
-          | VariantWithListTuple.B => 1
-          }
-        }
+      //test("Variant with list tuple", () =>
+      //{
+      //  def f(a)
+      //  {
+      //    match (a)
+      //    {
+      //    | VariantWithListTuple.A(l) =>
+      //      mutable count;
+      //      foreach (i in l)
+      //        count += f(i[0]);
+      //      count
+      //    | VariantWithListTuple.B => 1
+      //    }
+      //  }
         
-        def a = VariantWithListTuple.A([(VariantWithListTuple.B(1), "A"), (VariantWithListTuple.B(2), "B")]);
-        f(a) == 2
-      });
+      //  def a = VariantWithListTuple.A([(VariantWithListTuple.B(1), "A"), (VariantWithListTuple.B(2), "B")]);
+      //  f(a) == 2
+      //});
     }    
     
     [Html]

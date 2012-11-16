@@ -33,9 +33,9 @@ namespace NemerleWeb
       | [] =>
         match (member.Name)
         {
-        | "get_Count" => Some(JsAst.FieldRef(left, "length", true))
+        | "get_Count" => Some(JsAst.FieldRef(left, "length"))
         | "Clear" =>
-          Some(JsAst.Assign(JsAst.FieldRef(left, "length", false), JsAst.Literal(JsLiteral.Integer(0))))
+          Some(JsAst.Assign(JsAst.FieldRef(left, "length"), JsAst.Literal(JsLiteral.Integer(0))))
         | "GetEnumerator" => Some(left.MethodCall(member.Name, parms))
         | "ToArray" => Some(left)
         | _ => None()

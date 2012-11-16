@@ -42,12 +42,12 @@ namespace NemerleWeb
           (
             JsAst.OpCode("&&"),
             [
-              JsAst.FieldRef(left, "dispose", false),              
+              JsAst.FieldRef(left, "dispose"),              
               JsAst.Call
               (
                 JsAst.OpCode("==="),
                 [
-                  JsAst.TypeOf(JsAst.FieldRef(left, "dispose", false)),
+                  JsAst.TypeOf(JsAst.FieldRef(left, "dispose")),
                   JsAst.Literal(JsLiteral.String("function"))
                 ]
               )

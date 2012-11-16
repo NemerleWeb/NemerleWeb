@@ -49,14 +49,14 @@ namespace NemerleWeb
         | "get_HasValue"
         | "get_IsSome" => Some(isSome())
         | "get_IsNone" => Some(isNone())
-        | "get_Value" => Some(JsAst.FieldRef(left, "val", false))
+        | "get_Value" => Some(JsAst.FieldRef(left, "val"))
         | _ => None()
         }
       | [arg] =>
         match(member.Name)
         {
         | "WithDefault" =>
-          Some(JsAst.Ternary(isSome(), JsAst.FieldRef(left, "val", false), arg))
+          Some(JsAst.Ternary(isSome(), JsAst.FieldRef(left, "val"), arg))
         | _ => None()
         }
       | _ => None()

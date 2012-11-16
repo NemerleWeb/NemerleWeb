@@ -32,10 +32,10 @@ namespace NemerleWeb
       | [] =>
         match (member.Name)
         {        
-        | "get_Length" => Some(JsAst.FieldRef(left, "length", false))
+        | "get_Length" => Some(left.Field("string").Field("length"))
         | "AppendLine" =>           
-          Some(JsAst.Call(JsAst.OpCode("+="), [left, NewLine]))
-        | "ToString" => Some(left)        
+          Some(JsAst.Call(JsAst.OpCode("+="), [left.Field("string"), NewLine]))
+        | "ToString" => Some(left.Field("string"))        
         | _ => None()
         }
       | [arg] =>
@@ -43,31 +43,21 @@ namespace NemerleWeb
         {
         | "set_Length" =>
           Some(JsAst.Assign(
-            left,
-            left.MethodCall("substring", [JsAst.Literal(JsLiteral.Integer(0)), arg])))
+            left.Field("string"),
+            left.Field("string").MethodCall("substring", [JsAst.Literal(JsLiteral.Integer(0)), arg])))
         | "Append" => 
-          Some(JsAst.Call(JsAst.OpCode("+="), [left, arg]))
+          Some(JsAst.Call(JsAst.OpCode("+="), [left.Field("string"), arg]))
         | "AppendLine" =>
-          Some(JsAst.Call(JsAst.OpCode("+="), [left, JsAst.Call(JsAst.OpCode("+"), [arg, NewLine])]))
-          
+          Some(JsAst.Call(JsAst.OpCode("+="), [left.Field("string"), JsAst.Call(JsAst.OpCode("+"), [arg, NewLine])]))
         | _ => None()
         }        
       | _ => None()
       }
     }
      
-    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private StaticHandler(_left : JsAst, _member : IMember, _parms : list[JsAst]) : option[JsAst]
     {
-      match (parms)
-      {
-      | [] =>
-        match (member.Name)
-        {
-        | ".ctor" => Some(JsAst.Literal(JsLiteral.String("")))
-        | _ => None()
-        }
-      | _ => None()
-      }
+      None()
     }
   }
 }
