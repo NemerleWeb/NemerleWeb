@@ -19,10 +19,10 @@ namespace NemerleWeb
   
     public Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
-      (if (left is JsAst.StaticMethodRef) StaticHandler else ObjectHandler)(left, member, parms)
+      (if (left is JsAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
     }
     
-    private ObjectHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private InstanceHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     { 
       match (parms)
       {
