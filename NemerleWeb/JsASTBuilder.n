@@ -64,7 +64,7 @@ namespace NemerleWeb
         | "System.Int32" => JsAst.Literal(JsLiteral.Integer(0))
         | "System.Double" => JsAst.Literal(JsLiteral.Float(0f)); 
         | "System.Boolean" => JsAst.Literal(JsLiteral.Bool(false));         
-        | "System.String" => JsAst.Literal(JsLiteral.Null())
+        | "System.String" => JsAst.Literal(JsLiteral.String(""))
         | _ => JsAst.Void()
         }
       | DefFunctionsIn                    => Message.Error(expr.Location, "DefFunctionsIn not implemented"); JsAst.NotImpl("DefFunctionsIn")
@@ -291,7 +291,7 @@ namespace NemerleWeb
     {
       //when(methodHeader.Name == "__GENERATED_PEG__RULE__simplExpr__")
       //  assert2(false);
-
+      
       mutable ast = JsAstBuilder.Build(expr, [], methodHeader);
       
       ast = JsAstHelper.TransformBottomUp(ast);
