@@ -40,6 +40,7 @@ namespace NemerleWeb
         {
         | "AsEnumerable" => Some(seq.AsEnumerable())        
         | "All"
+        | "Any"
         | "Average"
         | "Cast"
         | "Count"
@@ -60,12 +61,13 @@ namespace NemerleWeb
         | "LastOrDefault" =>  Some(seq.AsEnumerable().MethodCall(member.Name, [JsAst.Literal(JsLiteral.Null())]))
         | _ => None()
         }
-          
+       
       | [seq, arg1] =>
         match (member.Name)
         {        
         | "Aggregate"
         | "All"
+        | "Any"
         | "Average"
         | "Concat"
         | "Contains"

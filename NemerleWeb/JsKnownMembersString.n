@@ -27,10 +27,10 @@ namespace NemerleWeb
     
     private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
-      (if (left is JsAst.StaticMethodRef) StaticHandler else ObjectHandler)(left, member, parms)
+      (if (left is JsAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
     }
     
-    private ObjectHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private InstanceHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
       match (parms)
       {
@@ -159,13 +159,22 @@ namespace NemerleWeb
       }
     }
     
+    EmptyString : JsAst.Literal = JsAst.Literal(JsLiteral.String(""));
+    
     private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
       match (parms)
       {
+      | [] =>
+        match (member.Name)
+        {
+        | ".ctor" => Some(EmptyString)
+        | _ => None()
+        }
       | [arg1] =>
         match (member.Name)
         {
+        | ".ctor" => Some(JsAst.Call(JsAst.LocalRef("System_String", None()), parms))
         | "Concat" =>
           match (arg1)
           {

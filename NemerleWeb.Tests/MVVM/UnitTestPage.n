@@ -1257,6 +1257,14 @@ namespace NemerleWeb.Tests
         string.Join(" ", [1, 2, 3]) == "1 2 3"        
       });
       
+      test("String from array", () =>
+      {
+        def a = array['a', 'b' ,'c'];
+        def b = String(a);
+        
+        b == "abc"
+      });
+      
       test("Member ToString", () =>
       {
         def t = TestToString();

@@ -661,4 +661,40 @@ function Nemerle_Core_option_$T$__$T$_(val) {
 
 function System_Text_StringBuilder() {
     this.string = "";
+
+    this.get_Length = function (newLength) {
+        return this.string.length;
+    };
+
+    this.set_Length = function (newLength) {
+        if (newLength < 0) throw "Length must be positive";
+
+        if (this.string.length > newLength)
+            this.string = this.string.substring(0, newLength);        
+    };
+
+    this.Append = function (s) {
+        this.string += s;
+        return this;
+    };
+
+    this.AppendLine = function (s) {
+        switch (arguments.length) {
+            case 0: return this.Append("\n");
+            case 1: return this.Append(s + "\n");
+            default: throw "Invalid number of parameters";
+        }
+    }
+
+    this.ToString = function () {
+        return this.string;
+    }
+}
+
+// This is not constructor, call directly without 'new'.
+function System_String() {
+    if (nweb.utils.isArray(arguments[0]))
+        return arguments[0].join("");
+    else
+        return arguments[0];
 }

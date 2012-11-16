@@ -20,39 +20,14 @@ namespace NemerleWeb
   
     public Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
-      (if (left is JsAst.StaticMethodRef) StaticHandler else ObjectHandler)(left, member, parms)
+      (if (left is JsAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
     }
     
     static NewLine : JsAst.Literal = JsAst.Literal(JsLiteral.String("\n"));
     
-    private ObjectHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private InstanceHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
-      match (parms)
-      {
-      | [] =>
-        match (member.Name)
-        {        
-        | "get_Length" => Some(left.Field("string").Field("length"))
-        | "AppendLine" =>           
-          Some(JsAst.Call(JsAst.OpCode("+="), [left.Field("string"), NewLine]))
-        | "ToString" => Some(left.Field("string"))        
-        | _ => None()
-        }
-      | [arg] =>
-        match (member.Name)
-        {
-        | "set_Length" =>
-          Some(JsAst.Assign(
-            left.Field("string"),
-            left.Field("string").MethodCall("substring", [JsAst.Literal(JsLiteral.Integer(0)), arg])))
-        | "Append" => 
-          Some(JsAst.Call(JsAst.OpCode("+="), [left.Field("string"), arg]))
-        | "AppendLine" =>
-          Some(JsAst.Call(JsAst.OpCode("+="), [left.Field("string"), JsAst.Call(JsAst.OpCode("+"), [arg, NewLine])]))
-        | _ => None()
-        }        
-      | _ => None()
-      }
+      Some(left.ExternalMethodCall(member.Name, parms))
     }
      
     private StaticHandler(_left : JsAst, _member : IMember, _parms : list[JsAst]) : option[JsAst]
