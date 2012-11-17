@@ -197,7 +197,7 @@ var nweb = {
       getValue: function() {
         return nweb.getParsedValue(model, expr, loopStack);
       },
-      apply: function(value) {
+      apply: function (value) {
         nweb.setValue($el[0], value);        
       }
     };
@@ -460,7 +460,9 @@ var nweb = {
     } else if(el.tagName == "OPTION") {
       el[nweb.dataKey] = val;
     } else {
-      $(el).val(val);
+      var $el = $(el);
+      if($el.val() != val)
+        $el.val(val);
     }
   },
   dataKey: "__nw_value_data",
