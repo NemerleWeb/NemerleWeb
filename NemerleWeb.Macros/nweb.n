@@ -32,10 +32,23 @@ namespace NemerleWeb
         def res = <[
 def allScripts = NemerleWeb.NWebData.Units.Map(kvp => {
   def u = kvp.Value;
-  def lambdaDefinitions = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "LambdaDefinitions", () => "");
+  def filename = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "filename", () => "");
+  def lambdasFilename = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "lambdasFilename", () => "");
+  def signalrFilename = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "signalrFilename", () => "");  
+  
+  def mainScript = $<# <script src="$filename"></script> #>;
+  def lambdaScript = if(lambdasFilename != "") $<# <script src="$lambdasFilename"></script> #> else "";
+  def signalrScript = if(signalrFilename != "") $<# <script src="$signalrFilename"></script> #> else "";
+  $<#
+    $mainScript
+    $lambdaScript
+    $signalrScript
+  #>
+  /*def lambdaDefinitions = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "LambdaDefinitions", () => "");
   def classDefinition = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "ClassDefinition", () => "");
   def signalR = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "SignalRScript", () => "");  
-  lambdaDefinitions + classDefinition.Replace("{{{SignalR}}}", signalR);
+  lambdaDefinitions + classDefinition.Replace("{{{SignalR}}}", signalR);*/
+  
 });
 
 def allViews = NemerleWeb.NWebData.Units
@@ -66,9 +79,8 @@ def parms = string.Join(",", paramList);
 $<#
 $(currentView.Value)
 $allTemplates
-<script>
 $allScripts
-
+<script>
 $$(function() { 
   nweb.go(new $unitName($parms));
 });

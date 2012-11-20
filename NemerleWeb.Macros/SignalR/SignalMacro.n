@@ -37,7 +37,7 @@ namespace NemerleWeb
   {
     public TransformSignal(expr : PExpr, typer : Typer) : PExpr 
     {
-      CreateSignalIfNeeded(typer.CurrentTypeBuilder);      
+      CreateSignalIfNeeded(typer.CurrentTypeBuilder, typer);      
       def hubName = typer.CurrentTypeBuilder.DeclaringType.Name + "Hub";
       match(expr) {
       | <[ $_.$method(..$parms) ]> => 
@@ -50,7 +50,7 @@ namespace NemerleWeb
     
     public TransformBroadcast(expr : PExpr, typer : Typer) : PExpr 
     {
-      CreateSignalIfNeeded(typer.CurrentTypeBuilder);
+      CreateSignalIfNeeded(typer.CurrentTypeBuilder, typer);
       def hubName = typer.CurrentTypeBuilder.DeclaringType.Name + "Hub";
       match(expr) {
       | <[ $_.$method(..$parms) ]> => 
@@ -60,7 +60,7 @@ namespace NemerleWeb
       }     
     }
     
-    public CreateSignalIfNeeded(tb : TypeBuilder) : void 
+    public CreateSignalIfNeeded(tb : TypeBuilder, typer : Typer) : void 
     {
       def declaringType = tb.DeclaringType :> TypeBuilder;
       def hubName = declaringType.Name + "Hub";
@@ -86,7 +86,9 @@ $$.connection.hub.start({}, function() {
   $$.get('$(declaringType.Name)/__SetSignalRConnectionId', {id: this.id});
 });
 }, 1000);#>;
-
+      
+      def pathToScript = UnitImpl.SaveUnitDataToFile(typer, JsClass.GetProperName(declaringType) + "_signalr_", script);
+      UnitImpl.AddUnitData(declaringType, "signalrFilename", pathToScript);
       UnitImpl.AddUnitData(declaringType, "SignalRScript", script);
         
       tb.Define(<[ decl: client : $(declaringType.ParsedTypeName) = $(declaringType.ParsedTypeName)() ]>);        
