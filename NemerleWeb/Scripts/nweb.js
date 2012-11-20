@@ -44,6 +44,10 @@ var nweb = {
 
     for(var i = 0; i < attrs.length; i++) {
       var attrName = attrs[i].nodeName;
+        
+      if (attrName == "nw-text" && el.tagName.toUpperCase() == "TEXTAREA")
+          attrName = "nw-value";
+        
       if(attrName.indexOf("nw-") == 0) {
         var binder = nweb.binds(attrName);
         
@@ -182,6 +186,13 @@ var nweb = {
       $el.on("keyup", function() {
         nweb.execute(function() {
             eval(nweb.utils.makeAssignExpression(expr, "$el.val()"));
+        });
+      });
+    } else if(el.tagName.toUpperCase() == "TEXTAREA") {
+      $(el).keyup(function () {
+        var val = this.value;
+        nweb.execute(function () {
+          eval(nweb.utils.makeAssignExpression(expr, "val"));
         });
       });
     } else {
