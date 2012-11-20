@@ -7,6 +7,9 @@ using Nemerle.Utility;
 using Nemerle.Assertions;
 
 using System;
+using System.Security.Cryptography;
+using System.Text;
+using System.IO;
 using System.Web;
 using System.Globalization;
 using System.Collections.Generic;
@@ -58,7 +61,7 @@ namespace NemerleWeb
     public DoTransform(tb : TypeBuilder, typer : Typer) : void
     {            
       Macros.DefineCTX(typer);
-      //assert2(false);
+      
       def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");
       def serverMethods = Dictionary();
       if(serverClass != null)
@@ -131,14 +134,42 @@ namespace NemerleWeb
       
       def result = JsClass(tb, "  ", typer).Write();
       AddUnitData(tb, "ClassDefinition", result);
-                  
+      
+      def pathToScript = SaveUnitDataToFile(typer, JsClass.GetProperName(tb.Name), result);
+      AddUnitData(tb, "filename", pathToScript);
+      
       tb.Manager.TypeTreeBuildFinish += _ => {
           def lambdas = tb.DeclaredNestedTypes
                           .Where(t => t.Name.StartsWith("_N__N_"))
                           .Select(t => JsClass(t, "  ", typer).Write());
           def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");
+          
+          when(!string.IsNullOrWhiteSpace(lambdas)) {
+            def pathToLambdasScript = SaveUnitDataToFile(typer, JsClass.GetProperName(tb.Name) + "_lambdas_", lambdas);
+            AddUnitData(tb, "lambdasFilename", pathToLambdasScript);
+          }
+            
           AddUnitData(tb, "LambdaDefinitions", lambdas);
       };
+    }
+    
+    public SaveUnitDataToFile(typer : Typer, filename : string, data : string) : string
+    {
+      def dir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
+      def bytes = Encoding.Unicode.GetBytes(data);
+      using(sha = SHA1CryptoServiceProvider()) 
+      {
+        def hash = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "");
+        def relativeScriptPath = Path.Combine("Scripts/NemerleWeb", filename + hash + ".js");
+        def scriptsDir = Path.Combine(dir, "Scripts/NemerleWeb");
+        
+        when(!Directory.Exists(scriptsDir))
+          _ = Directory.CreateDirectory(scriptsDir);
+          
+        def filename = Path.Combine(dir, relativeScriptPath);
+        File.WriteAllText(filename, data);
+        relativeScriptPath
+      }    
     }
     
     public AddUnitData(tb : TypeBuilder, dataName : string, data : string) : void

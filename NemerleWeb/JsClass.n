@@ -140,7 +140,7 @@ $nestedClassesString
 $(Indent)function $(GetProperName(ClassType))(..$constructorParams) {
 $(bodyIndent)var self = this;
 $(bodyIndent)$constructorBody
-$(bodyIndent){{{SignalR}}}
+$(bodyIndent) //{{{SignalR}}} //TODO
 $(bodyIndent)$returning
 $(Indent)}
 $properties
@@ -165,7 +165,7 @@ $properties
 $fields
 $methods
 $constructorBody
-{{{SignalR}}}
+//{{{SignalR}}} //TODO
 $returning
 $(Indent)}
 $staticFields
