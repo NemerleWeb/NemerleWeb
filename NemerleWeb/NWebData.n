@@ -5,61 +5,61 @@ using Nemerle.Utility;
 using NemerleWeb;
 
 using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace NemerleWeb
 {
   public module NWebData
   {
-    _unitDefinitions : Dictionary[string, string] = Dictionary.[string, string]();
-    _signalDefinitions : Dictionary[string, string] = Dictionary();
-    _unitTemplates : Dictionary[string, Dictionary[string, string]] = Dictionary.[string, Dictionary[string, string]]();
-    _unitLambdas : Dictionary[string, string] = Dictionary.[string, string]();
+    public UnitDefinitions : Dictionary[string, string] = Dictionary.[string, string]();
+    public SignalDefinitions : Dictionary[string, string] = Dictionary();
+    public UnitTemplates : Dictionary[string, Dictionary[string, string]] = Dictionary.[string, Dictionary[string, string]]();
+    public UnitLambdas : Dictionary[string, string] = Dictionary.[string, string]();
     
-    public AddUnitMainDefinition(unitName : string, definition : string) : void
+    this() 
     {
-      _unitDefinitions.Add(unitName, definition);
-    }
-    
-    public AddUnitLambdas(unitName : string, lambdas : string) : void
-    {
-      _unitLambdas.Add(unitName, lambdas);
-    }
-    
-    public AddUnitTemplate(unitName : string, templateName : string, template : string) : void
-    {
-      mutable templateDict;
-      when(!_unitTemplates.TryGetValue(unitName, out templateDict)) {
-        templateDict = Dictionary.[string, string]();
-        _unitTemplates.Add(unitName, templateDict);
+      def datas = AppDomain.CurrentDomain
+                           .GetAssemblies()
+                           .SelectMany(a => a.GetTypes()
+                                             .Where(t => t.Name.EndsWith("NWebDataPerAssembly")));
+      foreach(dataType in datas) {
+        def instance = Activator.CreateInstance(dataType, array[], array[]) :> NWebDataInstance;
+        
+        foreach(u in instance.UnitDefinitions)
+          UnitDefinitions.Add(u.Key, u.Value);
+          
+        foreach(s in instance.SignalDefinitions)
+          SignalDefinitions.Add(s.Key, s.Value);
+          
+        foreach(u in instance.UnitTemplates)
+           UnitTemplates.Add(u.Key, u.Value);
+
+        foreach(u in instance.UnitLambdas)
+          UnitLambdas.Add(u.Key, u.Value);
       }
-      templateDict.Add(templateName, template);
-    }
-    
-    public AddUnitSignalRDefinition(unitName : string, signalr : string) : void
-    {
-      _signalDefinitions.Add(unitName, signalr);      
-    }
+    }         
     
     public GetAllScriptNames() : IEnumerable[string]
     {
-      _unitDefinitions.Keys
+      UnitDefinitions.Keys
     }
     
     public GetScript(unitName : string) : string
     {
       mutable unitDef;
-      when(!_unitDefinitions.TryGetValue(unitName, out unitDef))
+      when(UnitDefinitions.TryGetValue(unitName, out unitDef))
         throw InvalidOperationException($"Unit $unitName wasn't defined");
               
-      unitDef.Replace("{{{SignalR}}}", _signalDefinitions.GetOrAdd(unitName, () => ""));
+      unitDef.Replace("{{{SignalR}}}", SignalDefinitions.GetOrAdd(unitName, () => ""));
     }
     
     public GetLambdasScript(unitName : string) : string
     {
       mutable unitDef;
-      when(!_unitLambdas.TryGetValue(unitName, out unitDef))
+      when(!UnitLambdas.TryGetValue(unitName, out unitDef))
         throw InvalidOperationException($"Lambdas for $unitName weren't defined");
       unitDef
     }
@@ -67,7 +67,7 @@ namespace NemerleWeb
     public GetTemplatesScripts(unitName : string) : string
     {
       mutable templates;
-      if(!_unitTemplates.TryGetValue(unitName, out templates)) {
+      if(!UnitTemplates.TryGetValue(unitName, out templates)) {
         def templateScripts = templates.Map(templateKvp => {
             $<#
             <script type="text/html" id="$(templateKvp.Key)">
@@ -79,6 +79,39 @@ namespace NemerleWeb
       } else {
         ""
       }      
+    }
+  }
+  
+  public class NWebDataInstance
+  {
+    public UnitDefinitions : Dictionary[string, string] = Dictionary.[string, string]();
+    public SignalDefinitions : Dictionary[string, string] = Dictionary();
+    public UnitTemplates : Dictionary[string, Dictionary[string, string]] = Dictionary.[string, Dictionary[string, string]]();
+    public UnitLambdas : Dictionary[string, string] = Dictionary.[string, string]();
+             
+    public AddUnitMainDefinition(unitName : string, definition : string) : void
+    {
+      UnitDefinitions.Add(unitName, definition);
+    }
+    
+    public AddUnitLambdas(unitName : string, lambdas : string) : void
+    {
+      UnitLambdas.Add(unitName, lambdas);
+    }
+    
+    public AddUnitTemplate(unitName : string, templateName : string, template : string) : void
+    {
+      mutable templateDict;
+      when(!UnitTemplates.TryGetValue(unitName, out templateDict)) {
+        templateDict = Dictionary.[string, string]();
+        UnitTemplates.Add(unitName, templateDict);
+      }
+      templateDict.Add(templateName, template);
+    }
+    
+    public AddUnitSignalRDefinition(unitName : string, signalr : string) : void
+    {
+      SignalDefinitions.Add(unitName, signalr);      
     }
   }
 }

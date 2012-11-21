@@ -165,41 +165,41 @@ namespace NemerleWeb
     
     public AddMainData(tb : TypeBuilder, data : string) : void
     {
-      def ctor = GetStaticConstructor(tb);
+      def ctor = GetNWebDataConstructor(tb);
       
       ctor.Body = <[ 
         $(ctor.Body);
-        NemerleWeb.NWebData.AddUnitMainDefinition($(tb.Name : string), $(data : string));
+        AddUnitMainDefinition($(tb.Name : string), $(data : string));
       ]>;
     }
     
     public AddLambdasData(tb : TypeBuilder, data : string) : void
     {
-      def ctor = GetStaticConstructor(tb);
+      def ctor = GetNWebDataConstructor(tb);
       
       ctor.Body = <[ 
         $(ctor.Body);
-        NemerleWeb.NWebData.AddUnitLambdas($(tb.Name : string), $(data : string));
+        AddUnitLambdas($(tb.Name : string), $(data : string));
       ]>;
     }
     
     public AddSignalrData(tb : TypeBuilder, data : string) : void
     {
-      def ctor = GetStaticConstructor(tb);
+      def ctor = GetNWebDataConstructor(tb);
       
       ctor.Body = <[ 
         $(ctor.Body);
-        NemerleWeb.NWebData.AddUnitSignalRDefinition($(tb.Name : string), $(data : string));
+        AddUnitSignalRDefinition($(tb.Name : string), $(data : string));
       ]>;
     }
     
     public AddTemplateData(tb : TypeBuilder, template : string, data : PExpr) : void
     {      
-      def ctor = GetStaticConstructor(tb);
+      def ctor = GetNWebDataConstructor(tb);
       
       ctor.Body = <[ 
         $(ctor.Body);
-        NemerleWeb.NWebData.AddUnitTemplate($(tb.Name : string), $(template : string), NWebUtils.GetHtml($data));
+        AddUnitTemplate($(tb.Name : string), $(template : string), NWebUtils.GetHtml($data));
       ]>;
     }
     
@@ -210,6 +210,26 @@ namespace NemerleWeb
       {
       | null => tb.DefineAndReturn(<[ decl: static this() {} ]>) :> MethodBuilder;        
       | x => x :> MethodBuilder
+      }
+    }
+    
+    GetNWebDataConstructor(tb : TypeBuilder) : MethodBuilder
+    {
+      def assemblyName = Path.GetFileNameWithoutExtension(tb.Manager.Options.OutputFileName);
+      def env = tb.Manager.CoreEnv.EnterIntoNamespace([assemblyName]);
+      match(env.LookupType(["NWebDataPerAssembly"])) 
+      {
+      | Some(type) => 
+        type.GetConstructors(BindingFlags.Public | BindingFlags.Instance).First() :> MethodBuilder
+      | None => 
+        def t = env.Define(<[ decl:
+          public class NWebDataPerAssembly : NemerleWeb.NWebDataInstance
+          {
+            public this() {}
+          }
+        ]>);
+        t.Compile();
+        t.GetConstructors().First() :> MethodBuilder;
       }
     }
     
