@@ -9,7 +9,6 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-
   public module DictionaryExtensions
   {    
     public GetOrAdd[TK, TV](this instance : Dictionary[TK, TV], key : TK, newVal : void -> TV) : TV

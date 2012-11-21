@@ -208,6 +208,9 @@
     <Compile Include="JsLiteral.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="NWebData.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="UnitAttribute.n">
       <SubType>Code</SubType>
     </Compile>

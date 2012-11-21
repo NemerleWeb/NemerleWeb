@@ -102,7 +102,7 @@ namespace NemerleWeb
         def fields = GetFields(bodyIndent, parentPtr);
         def staticFields = GetStaticFields(Indent);
         def constructorBody = GetConstructorBody(bodyIndent);
-        def staticConstructorBody = GetStaticConstructorBody(Indent);
+        //def staticConstructorBody = GetStaticConstructorBody(Indent);
         def methods = GetMethods(bodyIndent, parentPtr, !isAbstract);
         def staticMethods = GetStaticMethods(Indent);        
         def (nestedClassesString, nestedClasses) = GetNestedClasses();
@@ -140,7 +140,7 @@ $nestedClassesString
 $(Indent)function $(GetProperName(ClassType))(..$constructorParams) {
 $(bodyIndent)var self = this;
 $(bodyIndent)$constructorBody
-$(bodyIndent) //{{{SignalR}}} //TODO
+$(bodyIndent) {{{SignalR}}}
 $(bodyIndent)$returning
 $(Indent)}
 $properties
@@ -150,7 +150,6 @@ $fields
 $methods
 ..$(commonMethods; Environment.NewLine)
 $staticFields
-$staticConstructorBody
 $staticMethods
 $staticProperties
 #>
@@ -165,11 +164,10 @@ $properties
 $fields
 $methods
 $constructorBody
-//{{{SignalR}}} //TODO
+{{{SignalR}}}
 $returning
 $(Indent)}
 $staticFields
-$staticConstructorBody
 $staticMethods
 $staticProperties
 #>

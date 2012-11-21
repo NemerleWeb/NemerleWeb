@@ -13,6 +13,7 @@ namespace NemerleWeb.Samples.Controllers
   {
     public Index() : ActionResult 
     {
+      def a = NWebData.GetAllScriptNames();
       View((nweb SamplesPage()) : object);
     }
     

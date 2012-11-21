@@ -1,0 +1,84 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using NemerleWeb;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  public module NWebData
+  {
+    _unitDefinitions : Dictionary[string, string] = Dictionary.[string, string]();
+    _signalDefinitions : Dictionary[string, string] = Dictionary();
+    _unitTemplates : Dictionary[string, Dictionary[string, string]] = Dictionary.[string, Dictionary[string, string]]();
+    _unitLambdas : Dictionary[string, string] = Dictionary.[string, string]();
+    
+    public AddUnitMainDefinition(unitName : string, definition : string) : void
+    {
+      _unitDefinitions.Add(unitName, definition);
+    }
+    
+    public AddUnitLambdas(unitName : string, lambdas : string) : void
+    {
+      _unitLambdas.Add(unitName, lambdas);
+    }
+    
+    public AddUnitTemplate(unitName : string, templateName : string, template : string) : void
+    {
+      mutable templateDict;
+      when(!_unitTemplates.TryGetValue(unitName, out templateDict)) {
+        templateDict = Dictionary.[string, string]();
+        _unitTemplates.Add(unitName, templateDict);
+      }
+      templateDict.Add(templateName, template);
+    }
+    
+    public AddUnitSignalRDefinition(unitName : string, signalr : string) : void
+    {
+      _signalDefinitions.Add(unitName, signalr);      
+    }
+    
+    public GetAllScriptNames() : IEnumerable[string]
+    {
+      _unitDefinitions.Keys
+    }
+    
+    public GetScript(unitName : string) : string
+    {
+      mutable unitDef;
+      when(!_unitDefinitions.TryGetValue(unitName, out unitDef))
+        throw InvalidOperationException($"Unit $unitName wasn't defined");
+              
+      unitDef.Replace("{{{SignalR}}}", _signalDefinitions.GetOrAdd(unitName, () => ""));
+    }
+    
+    public GetLambdasScript(unitName : string) : string
+    {
+      mutable unitDef;
+      when(!_unitLambdas.TryGetValue(unitName, out unitDef))
+        throw InvalidOperationException($"Lambdas for $unitName weren't defined");
+      unitDef
+    }
+    
+    public GetTemplatesScripts(unitName : string) : string
+    {
+      mutable templates;
+      if(!_unitTemplates.TryGetValue(unitName, out templates)) {
+        def templateScripts = templates.Map(templateKvp => {
+            $<#
+            <script type="text/html" id="$(templateKvp.Key)">
+            $(templateKvp.Value)
+            </script>
+            #>
+        });      
+        $"..$templateScripts"
+      } else {
+        ""
+      }      
+    }
+  }
+}
