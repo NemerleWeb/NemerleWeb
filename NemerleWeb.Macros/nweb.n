@@ -30,58 +30,27 @@ namespace NemerleWeb
         def serverParams = parms.Map(p => <[ paramList.Add("nweb.utils.toTypedObject(" + NWebUtils.ToJson($p) + ")") ]>);
         
         def res = <[
-def allScripts = NemerleWeb.NWebData.Units.Map(kvp => {
-  def u = kvp.Value;
-  def filename = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "filename", () => "");
-  def lambdasFilename = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "lambdasFilename", () => "");
-  def signalrFilename = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "signalrFilename", () => "");  
+def allScripts = NemerleWeb.NWebData.GetAllScriptNames().Map(script => {
+  def mainScript = $<# <script src="NemerleWebResource/Unit/$script.js"></script> #>;
+  def lambdasScript = $<# <script src="NemerleWebResource/Lambdas/$script.js"></script> #>;
+  def templatesScript = $<# <script src="NemerleWebResource/Templates/$script.js"></script> #>;
   
-  def mainScript = $<# <script src="$filename"></script> #>;
-  def lambdaScript = if(lambdasFilename != "") $<# <script src="$lambdasFilename"></script> #> else "";
-  def signalrScript = if(signalrFilename != "") $<# <script src="$signalrFilename"></script> #> else "";
-  $<#
-    $mainScript
-    $lambdaScript
-    $signalrScript
-  #>
-  /*def lambdaDefinitions = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "LambdaDefinitions", () => "");
-  def classDefinition = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "ClassDefinition", () => "");
-  def signalR = NemerleWeb.DictionaryExtensions.GetOrAdd(u, "SignalRScript", () => "");  
-  lambdaDefinitions + classDefinition.Replace("{{{SignalR}}}", signalR);*/
-  
-});
-
-def allViews = NemerleWeb.NWebData.Units
-                                  .SelectMany(kvp => kvp.Value)
-                                  .Where(v => v.Key.StartsWith("View_")).ToList();
-def allTemplates = allViews.Map(kvp => {
-  def templateName = kvp.Key.Substring("View_".Length);
-  $<#
-  <script type="text/html" id="$templateName">
-  $(kvp.Value)
-  </script>
-  #>
+$<#$mainScript
+$lambdasScript
+$templatesScript#>  
 });
 
 def allScripts = string.Join("", allScripts);
-def allTemplates = string.Join("", allTemplates);
 def unitName = $(properName : string);
-def defaultViewName = unitName + "_View";
-
-when(!allViews.Any(v => v.Key == "View_" + defaultViewName))
-  throw InvalidOperationException("Please define View on " + unitName);
-
-def currentView = allViews.FirstOrDefault(v => v.Key == "View_" + defaultViewName);
 def paramList = List();
 {..$serverParams}
 def parms = string.Join(",", paramList);
 
 $<#
-$(currentView.Value)
-$allTemplates
+<div id="nweb-start"></div>
 $allScripts
 <script>
-$$(function() { 
+$$(function() {
   nweb.go(new $unitName($parms));
 });
 </script>

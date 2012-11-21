@@ -36,8 +36,7 @@ namespace NemerleWeb
   public module SignalImpl
   {
     public TransformSignal(expr : PExpr, typer : Typer) : PExpr 
-    {
-      CreateSignalIfNeeded(typer.CurrentTypeBuilder, typer);      
+    {   
       def hubName = typer.CurrentTypeBuilder.DeclaringType.Name + "Hub";
       match(expr) {
       | <[ $_.$method(..$parms) ]> => 
@@ -49,8 +48,7 @@ namespace NemerleWeb
     }
     
     public TransformBroadcast(expr : PExpr, typer : Typer) : PExpr 
-    {
-      CreateSignalIfNeeded(typer.CurrentTypeBuilder, typer);
+    {      
       def hubName = typer.CurrentTypeBuilder.DeclaringType.Name + "Hub";
       match(expr) {
       | <[ $_.$method(..$parms) ]> => 
@@ -59,43 +57,5 @@ namespace NemerleWeb
       | _ => Message.FatalError(expr.Location, "Invalid 'broadcast' macro call. Syntax: broadcast client.MethodName(parameters)");
       }     
     }
-    
-    public CreateSignalIfNeeded(tb : TypeBuilder, typer : Typer) : void 
-    {
-      def declaringType = tb.DeclaringType :> TypeBuilder;
-      def hubName = declaringType.Name + "Hub";
-      def jsHubName = char.ToLowerInvariant(hubName[0]) + hubName.Substring(1);
-      def methods = tb.DeclaringType
-                      .GetMembers(BF.Instance | BF.DeclaredOnly | BF.Public | BF.NonPublic)
-                      .OfType.[IMethod]();
-      def methods = JsClass.FilterMethods(methods)
-                            .Select(m => (m.Name, $"..$(m.GetParameters().Select(p => p.Name))"))
-                            .Select(((name, parms), _) => 
-$<#
-$jsHubName.$name = function($parms) {
-self.$name($parms);
-nweb.invalidate();
-};#>);
-  
-      def methods = $<#..$(methods; "")#>;
-      def script = $<#
-var $jsHubName = $$.connection.$jsHubName;
-$methods
-setTimeout(function() {
-$$.connection.hub.start({}, function() {
-  $$.get('$(declaringType.Name)/__SetSignalRConnectionId', {id: this.id});
-});
-}, 1000);#>;
-      
-      def pathToScript = UnitImpl.SaveUnitDataToFile(typer, JsClass.GetProperName(declaringType) + "_signalr_", script);
-      UnitImpl.AddUnitData(declaringType, "signalrFilename", pathToScript);
-      UnitImpl.AddUnitData(declaringType, "SignalRScript", script);
-        
-      tb.Define(<[ decl: client : $(declaringType.ParsedTypeName) = $(declaringType.ParsedTypeName)() ]>);        
-      tb.DefineNestedType(<[ decl: public class $(hubName : dyn) : HubBase {} ]>).Compile();
-    }
   }
 }
-
-
-
