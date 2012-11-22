@@ -31,15 +31,15 @@ namespace NemerleWeb
         
         def res = <[
 def allScripts = NemerleWeb.NWebData.GetAllScriptNames().Map(script => {
-  def mainScript = $<# <script src="NemerleWebResource/Unit/$script.js"></script> #>;
-  def lambdasScript = $<# <script src="NemerleWebResource/Lambdas/$script.js"></script> #>;
-  def templatesScript = $<# <script src="NemerleWebResource/Templates/$script.js"></script> #>;
-  
+  def mainScript = $<# <script type="text/javascript" src="NemerleWebResource/Unit/$script.js"></script> #>;
+  def lambdasScript = if(!string.IsNullOrEmpty(NemerleWeb.NWebData.GetLambdasScript(script)))
+                        $<# <script type="text/javascript" src="NemerleWebResource/Lambdas/$script.js"></script> #>;
+                      else "";  
 $<#$mainScript
-$lambdasScript
-$templatesScript#>  
+$lambdasScript#>  
 });
 
+def templates = NemerleWeb.NWebData.GetAllScriptNames().Map(script => NemerleWeb.NWebData.GetTemplatesScripts(script));
 def allScripts = string.Join("", allScripts);
 def unitName = $(properName : string);
 def paramList = List();
@@ -49,8 +49,9 @@ def parms = string.Join(",", paramList);
 $<#
 <div id="nweb-start"></div>
 $allScripts
+..$(templates; "\n")
 <script>
-$$(function() {
+$$(function() {  
   nweb.go(new $unitName($parms));
 });
 </script>

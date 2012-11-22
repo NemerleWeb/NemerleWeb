@@ -169,7 +169,7 @@ namespace NemerleWeb
       
       ctor.Body = <[ 
         $(ctor.Body);
-        AddUnitMainDefinition($(tb.Name : string), $(data : string));
+        AddUnitMainDefinition($(JsClass.GetProperName(tb) : string), $(data : string));
       ]>;
     }
     
@@ -179,7 +179,7 @@ namespace NemerleWeb
       
       ctor.Body = <[ 
         $(ctor.Body);
-        AddUnitLambdas($(tb.Name : string), $(data : string));
+        AddUnitLambdas($(JsClass.GetProperName(tb) : string), $(data : string));
       ]>;
     }
     
@@ -189,7 +189,7 @@ namespace NemerleWeb
       
       ctor.Body = <[ 
         $(ctor.Body);
-        AddUnitSignalRDefinition($(tb.Name : string), $(data : string));
+        AddUnitSignalRDefinition($(JsClass.GetProperName(tb) : string), $(data : string));
       ]>;
     }
     
@@ -199,7 +199,7 @@ namespace NemerleWeb
       
       ctor.Body = <[ 
         $(ctor.Body);
-        AddUnitTemplate($(tb.Name : string), $(template : string), NWebUtils.GetHtml($data));
+        AddUnitTemplate($(JsClass.GetProperName(tb) : string), $(template : string), NWebUtils.GetHtml($data));
       ]>;
     }
     

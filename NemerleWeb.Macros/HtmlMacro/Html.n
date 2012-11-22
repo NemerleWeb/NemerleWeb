@@ -50,7 +50,7 @@ namespace NemerleWeb
           | Some(result) => 
             def transformer = XmlAstToXLinq(typer, parser);
             def res = transformer.Transform(result);
-            UnitImpl.AddTemplateData(mb.DeclaringType, "View_" + JsClass.GetProperName(mb.DeclaringType) + "_" + mb.Name, res);
+            UnitImpl.AddTemplateData(mb.DeclaringType, JsClass.GetProperName(mb.DeclaringType) + "_" + mb.Name, res);
           | _ =>
             def (pos, expected) = parser.GetMaxRollbackPosAndNames();
             def expected = expected.NToList();
