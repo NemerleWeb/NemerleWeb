@@ -7,7 +7,7 @@ namespace NemerleWeb.Samples
   [Unit]
   public class ListsAndCollectionsPage
   {
-    [Record]
+    [Record][Unit]
     public class SeatReservation 
     {
         public Name : string { get; set; }
@@ -18,7 +18,7 @@ namespace NemerleWeb.Samples
         }
     }
     
-    [Record]
+    [Record][Unit]
     public class Meal 
     {
         public MealName : string { get; set; }

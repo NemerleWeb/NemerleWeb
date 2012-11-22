@@ -22,6 +22,7 @@ namespace NemerleWeb
       
       public static StringType : TypeVar { get; set; }
       public static IEnumerableType : TypeVar { get; set; }        
+      public static IPageType : TypeVar { get; set; }        
         
       public Fields : IEnumerable[IField]
       {

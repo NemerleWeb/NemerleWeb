@@ -241,8 +241,10 @@ namespace NemerleWeb
         JsAst.Call(left, parms)
       else
       {
-        when(!(type == null || type.SystemType == null || type.SystemType.IsAssignableFrom(typeof(IPage))) &&
-             !(type == null && member.Name == "apply"))
+        when (type != null &&
+          !(type.IsInterface ||
+            type.GetSuperTypes().Any(t => t.TryRequire(JsClass.IPageType)) ||
+            member.Name == "apply"))
           Message.Error(
             member.Location,
             $"Invalid $(member.Name) with $(TypeName(type)) type, params: ..$parms not implemented in JS");
