@@ -31,6 +31,7 @@ namespace NemerleWeb
        
       JsClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
       JsClass.StringType = <[ ttype : System.String ]>;
+      JsClass.IPageType = <[ ttype: IPage ]>;
       
       match (mb.Header.body)
       {

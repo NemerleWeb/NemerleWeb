@@ -7,7 +7,8 @@ namespace NemerleWeb.Samples
 {
   [Unit]
   public class LoadingAndSavingPage
-  {        
+  {
+    [Unit]
     public class Task
     {
       public Title : string { get; set; }

@@ -185,28 +185,10 @@
     <Compile Include="MVVM\NameListPage.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MVVM\Peg\JsonAst.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MVVM\Peg\JsonParser.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MVVM\Peg\JsonUtils.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MVVM\Peg\CalculatorParser.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MVVM\Peg\JsonPage.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MVVM\Peg\JSPage.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MVVM\Peg\JSParser.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MVVM\Peg\JSParserAst.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MVVM\Samples.n">
@@ -222,48 +204,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\peg-parser\Nemerle.Peg\ExtensionRuleBase.n">
-      <Link>Nemerle.Peg\ExtensionRuleBase.n</Link>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="..\peg-parser\Nemerle.Peg\IGrammar.n">
-      <Link>Nemerle.Peg\IGrammar.n</Link>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="..\peg-parser\Nemerle.Peg\IToken.n">
-      <Link>Nemerle.Peg\IToken.n</Link>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="..\peg-parser\Nemerle.Peg\Located.n">
-      <Link>Nemerle.Peg\Located.n</Link>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="..\peg-parser\Nemerle.Peg\Location.n">
-      <Link>Nemerle.Peg\Location.n</Link>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="..\peg-parser\Nemerle.Peg\NToken.n">
-      <Link>Nemerle.Peg\NToken.n</Link>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="..\peg-parser\Nemerle.Peg\PegParser.n">
-      <Link>Nemerle.Peg\PegParser.n</Link>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="..\peg-parser\Nemerle.Peg\SingleLineSourceSnapshot.n">
-      <Link>Nemerle.Peg\SingleLineSourceSnapshot.n</Link>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="..\peg-parser\Nemerle.Peg\SourceSnapshot.n">
-      <Link>Nemerle.Peg\SourceSnapshot.n</Link>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="..\peg-parser\Nemerle.Peg\VToken.n">
-      <Link>Nemerle.Peg\VToken.n</Link>
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\images\bg.jpg">
@@ -469,7 +409,6 @@
     <Folder Include="Infrastructure" />
     <Folder Include="MVVM\Knockout" />
     <Folder Include="MVVM\Peg\" />
-    <Folder Include="Nemerle.Peg\" />
     <Folder Include="Properties\" />
     <Folder Include="Scripts\" />
     <Folder Include="Scripts\NWebJs.Tests\" />
@@ -504,6 +443,26 @@
       <Project>{388424bd-c3a5-4c01-b84b-6c1bb9a9cc8e}</Project>
       <Private>False</Private>
     </MacroProjectReference>
+    <ProjectReference Include="..\peg-parser\Calculator\Calculator-VS_2012.nproj">
+      <Name>Calculator-VS_2012</Name>
+      <Project>{dbabc305-af6e-40d6-8e79-1e3f36fbd879}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\peg-parser\Json\Nemerle.Json\Nemerle.Json-VS_2012.nproj">
+      <Name>Nemerle.Json-VS_2012</Name>
+      <Project>{5f0fee19-6857-47d6-b669-ee0a03e5d047}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\peg-parser\JSParser\JSParser-VS_2012.nproj">
+      <Name>JSParser-VS_2012</Name>
+      <Project>{f440f161-d644-4004-b4f0-a9dfa001039e}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\peg-parser\Nemerle.Peg\Nemerle.Peg-VS_2012.nproj">
+      <Name>Nemerle.Peg-VS_2012</Name>
+      <Project>{76db8b13-a01a-47bd-98be-f2d3755770fe}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets" />
