@@ -1,8 +1,9 @@
 "use strict";
 
 var nweb = {
-  go: function(model) {    
-    nweb.applyBindings(model, document.body, nweb.bindings, []);
+  go: function (model) {
+    var body = $("#nweb-start").html($("#" + nweb.utils.getTemplateName(model, "View")).html())[0];
+    nweb.applyBindings(model, body, nweb.bindings, []);
     nweb.invalidate(nweb.bindings);
   },
   binds: function(name) {
@@ -555,7 +556,7 @@ nweb.utils = {
         $el.replaceWith($newEl);
         return $newEl;
     },
-    makeAssignExpression : function(expr, value) {
+    makeAssignExpression: function(expr, value) {
         var m = /(get_([^\.]+))\(\)$/;;
         var setExpr = expr.replace(m, "set_$2");
 
@@ -564,6 +565,9 @@ nweb.utils = {
         else
             return setExpr + "(" + value + ");";
     },
+    loadTemplate: function(modelName) {
+      
+    }
 };
 
 Array.prototype.getEnumerator = function() {
@@ -625,9 +629,9 @@ if (!Array.prototype.indexOf) {
 String.prototype.getEnumerator = function () {
     this.__enumeratorIndex = -1;
     this.Current = null;
-    this.get_Current = function () {
-        return this.Current;
-    }
+    this.get_Current = function() {
+      return this.Current;
+    };
     return this;
 };
 
@@ -691,17 +695,20 @@ function System_Text_StringBuilder() {
         return this;
     };
 
-    this.AppendLine = function (s) {
-        switch (arguments.length) {
-            case 0: return this.Append("\n");
-            case 1: return this.Append(s + "\n");
-            default: throw "Invalid number of parameters";
-        }
-    }
+    this.AppendLine = function(s) {
+      switch (arguments.length) {
+      case 0:
+        return this.Append("\n");
+      case 1:
+        return this.Append(s + "\n");
+      default:
+        throw "Invalid number of parameters";
+      }
+    };
 
-    this.ToString = function () {
-        return this.string;
-    }
+    this.ToString = function() {
+      return this.string;
+    };
 }
 
 // This is not constructor, call directly without 'new'.
@@ -732,3 +739,5 @@ nweb.collection = {
         return true;
     }
 };
+
+nweb.templateCollection = { };

@@ -50,7 +50,7 @@ namespace NemerleWeb
     public GetScript(unitName : string) : string
     {
       mutable unitDef;
-      when(UnitDefinitions.TryGetValue(unitName, out unitDef))
+      when(!UnitDefinitions.TryGetValue(unitName, out unitDef))
         throw InvalidOperationException($"Unit $unitName wasn't defined");
               
       unitDef.Replace("{{{SignalR}}}", SignalDefinitions.GetOrAdd(unitName, () => ""));
@@ -67,7 +67,7 @@ namespace NemerleWeb
     public GetTemplatesScripts(unitName : string) : string
     {
       mutable templates;
-      if(!UnitTemplates.TryGetValue(unitName, out templates)) {
+      if(UnitTemplates.TryGetValue(unitName, out templates)) {
         def templateScripts = templates.Map(templateKvp => {
             $<#
             <script type="text/html" id="$(templateKvp.Key)">
