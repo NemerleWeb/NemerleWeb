@@ -145,7 +145,7 @@
     <Compile Include="JsKnownMembersConvert.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersDouble.n">
+    <Compile Include="JsKnownMembersFloats.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JsKnownMembersEventsDSL.n">
@@ -160,7 +160,7 @@
     <Compile Include="JsKnownMembersIEnumerable.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersInt.n">
+    <Compile Include="JsKnownMembersIntegers.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JsKnownMembersMath.n">
