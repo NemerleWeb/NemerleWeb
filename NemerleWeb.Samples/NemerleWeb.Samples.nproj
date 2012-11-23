@@ -298,9 +298,6 @@
     <Compile Include="MVVM\NameListCSharpPage.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MVVM\NameListCSharpPage.View.n">
-      <DependentUpon>MVVM\NameListCSharpPage.cs</DependentUpon>
-    </Compile>
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
@@ -481,21 +478,18 @@
     </CreateItem>
     <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory2)\%(RecursiveDir)%(Filename)%(Extension)')" />
-    
     <ItemGroup>
-        <CalculatorParser Include="$(ProjectDir)..\peg-parser\Calculator\*.n"/>
+      <CalculatorParser Include="$(ProjectDir)..\peg-parser\Calculator\*.n" />
     </ItemGroup>
-    <Copy SourceFiles="@(CalculatorParser)"  DestinationFolder="$(YourDestinationDirectory)\Peg\CalculatorParser" />
-
+    <Copy SourceFiles="@(CalculatorParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\CalculatorParser" />
     <ItemGroup>
-        <JsonParser Include="$(ProjectDir)..\peg-parser\Json\Nemerle.Json\*.n"/>
+      <JsonParser Include="$(ProjectDir)..\peg-parser\Json\Nemerle.Json\*.n" />
     </ItemGroup>
-    <Copy SourceFiles="@(JsonParser)"  DestinationFolder="$(YourDestinationDirectory)\Peg\JsonParser" />
-
+    <Copy SourceFiles="@(JsonParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\JsonParser" />
     <ItemGroup>
-        <JSParser Include="$(ProjectDir)..\peg-parser\JSParser\*.n"/>
+      <JSParser Include="$(ProjectDir)..\peg-parser\JSParser\*.n" />
     </ItemGroup>
-    <Copy SourceFiles="@(JSParser)"  DestinationFolder="$(YourDestinationDirectory)\Peg\JSParser" />
+    <Copy SourceFiles="@(JSParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\JSParser" />
   </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />

@@ -11,7 +11,7 @@ using System.Linq;
 namespace NemerleWeb
 {
   [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Method)]
-  macro SignalR(tb : TypeBuilder, mb : MethodBuilder) 
+  macro SignalR(tb : TypeBuilder, _mb : MethodBuilder) 
   {
     SignalRImpl.DoTransform(tb, Macros.ImplicitCTX())
   }
@@ -23,7 +23,7 @@ namespace NemerleWeb
       CreateSignalIfNeeded(tb, typer);
     }
     
-    public CreateSignalIfNeeded(tb : TypeBuilder, typer : Typer) : void 
+    public CreateSignalIfNeeded(tb : TypeBuilder, _typer : Typer) : void 
     {
       def declaringType = tb.DeclaringType :> TypeBuilder;
       def hubName = declaringType.Name + "Hub";

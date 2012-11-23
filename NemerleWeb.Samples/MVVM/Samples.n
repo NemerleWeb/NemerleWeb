@@ -67,7 +67,7 @@ namespace NemerleWeb.Samples
       Samples = 
       [
         Sample("List of names", ["MVVM/NameListPage.n"], "", NameList),  // in tname template(_.NameList) second parameter is View by default
-        Sample("List of names C#", ["MVVM/NameListCSharpPage.cs", "MVVM/NameListCSharpPage.View.n"], "", NameListCSharp), 
+        Sample("List of names C#", ["MVVM/NameListCSharpPage.cs"], "", NameListCSharp), 
         Sample("Computation Expressions", ["MVVM/CompListPage.n"], "", CompList), 
         Sample("Chat using SignalR", ["MVVM/SignalPage.n"], "", Signal),
         Sample("Variants and Pattern Matching", ["MVVM/VariantsAndMatchingPage.n"], "", Variants)
