@@ -44,7 +44,6 @@ namespace NemerleWeb
         | "ToUInt16"
         | "ToUInt32"
         | "ToUInt64" => Some(JsAst.Call(JsAst.GlobalRef("parseInt"), parms))
-        
         | _ => None()
         }
       | _ => None()

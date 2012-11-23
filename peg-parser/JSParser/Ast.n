@@ -34,26 +34,34 @@ namespace JSEngine {
             }
         }
     }
-
+    
     [Record]
     [Unit]
     public variant IntegerLiteral /*: Located*/ {
+        // TODO: Restore and remove token in each case
         | Decimal
+        { token : string; }
         | Hex
+        { token : string; }
         | Octal
+        { token : string; }
 
-        [Accessor] token : string;
+        //[Accessor] token : string;
 
         public GetValue() : ulong {
             match(this) {
-                | Decimal() => ulong.Parse(token)
-                | Hex()     => Convert.ToUInt64(token, 16)
-                | Octal()   => Convert.ToUInt64(token, 8)
+                | Decimal(token) => ulong.Parse(token)
+                | Hex(token)     => Convert.ToUInt64(token, 16)
+                | Octal(token)   => Convert.ToUInt64(token, 8)
             }
         }
 
         public override ToString() : string {
-            token
+            //token
+           match (this)
+           {
+           | Decimal(token) | Hex(token) | Octal(token) => token
+           }
         }
     }
 
@@ -81,19 +89,26 @@ namespace JSEngine {
     [Record]
     [Unit]
     public variant StringLiteral /*: Located*/ {
+        // TODO: Restore and remove token in each case
         | SingleQuote
+        { token : string; }
         | DoubleQuote
+        { token : string; }
 
-        [Accessor] token : string;
-
+        //[Accessor] token : string;
+        
         public GetValue() : string {
-            token
+            // token
+          match(this)
+          {
+          | SingleQuote(token) | DoubleQuote(token) => token
+          }
         }
 
         public override ToString() : string {
             match(this) {
-                | SingleQuote() => "'" + token + "'"
-                | DoubleQuote() => "\"" + token + "\""
+                | SingleQuote(token) => "'" + token + "'"
+                | DoubleQuote(token) => "\"" + token + "\""
             }
         }
     }

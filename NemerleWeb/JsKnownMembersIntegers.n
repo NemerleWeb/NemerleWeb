@@ -11,11 +11,21 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  module JsKnownMembersDouble
+  /// <summary>
+  /// Description of JsKnownMembersInt.
+  /// </summary>
+  module JsKnownMembersIntegers
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(double), Handler); 
+      JsKnownMembers.RegisterType(typeof(byte), Handler);
+      JsKnownMembers.RegisterType(typeof(sbyte), Handler);
+      JsKnownMembers.RegisterType(typeof(short), Handler);
+      JsKnownMembers.RegisterType(typeof(ushort), Handler);
+      JsKnownMembers.RegisterType(typeof(int), Handler);
+      JsKnownMembers.RegisterType(typeof(uint), Handler);
+      JsKnownMembers.RegisterType(typeof(long), Handler);
+      JsKnownMembers.RegisterType(typeof(ulong), Handler);
     }
     
     private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
@@ -30,13 +40,13 @@ namespace NemerleWeb
       | [_] =>
         match (member.Name)
         {
-        | "Parse" => Some(JsAst.Call(JsAst.GlobalRef("parseFloat"), parms))
+        | "Parse" => Some(JsAst.Call(JsAst.GlobalRef("parseInt"), parms))
         | _ => None()
         }
       | [arg1, _] =>
         match (member.Name)
         {
-        | "Parse" => Some(JsAst.Call(JsAst.GlobalRef("parseFloat"), [arg1]))
+        | "Parse" => Some(JsAst.Call(JsAst.GlobalRef("parseInt"), [arg1]))
         | _ => None()
         }
       | _ => None()

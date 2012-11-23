@@ -39,18 +39,15 @@ namespace NemerleWeb
       def toString(typeInfo, left, parms)
       {
         // If type has method ToString, use it
-        if (typeInfo != null && !isFrameworkAssembly(typeInfo))
-        {
-          def members = typeInfo.GetMembers(
-            BindingFlags.Instance |
-            BindingFlags.Public |
-            BindingFlags.NonPublic |
-            BindingFlags.DeclaredOnly);
-          if (members.Any(m => m.Name == "ToString"))
-            Some(left.ExternalMethodCall("ToString", parms))
-          else
-            Some(left.MethodCall("toString", []))
-        }
+        if (typeInfo != null && !isFrameworkAssembly(typeInfo) &&
+          { 
+            def members = typeInfo.GetMembers(
+              BindingFlags.Instance |
+              BindingFlags.Public |
+              BindingFlags.NonPublic |
+              BindingFlags.DeclaredOnly);
+            members.Any(m => m.Name == "ToString") })
+          Some(left.ExternalMethodCall("ToString", parms))
         else
           Some(left.MethodCall("toString", []))
       }

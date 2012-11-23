@@ -70,8 +70,8 @@ namespace NemerleWeb
       JsKnownMembersEventsDSL.Register();
       JsKnownMembersPage.Register();
       
-      JsKnownMembersInt.Register();
-      JsKnownMembersDouble.Register();
+      JsKnownMembersIntegers.Register();
+      JsKnownMembersFloats.Register();
       JsKnownMembersArray.Register();
       
       JsKnownMembersMath.Register();

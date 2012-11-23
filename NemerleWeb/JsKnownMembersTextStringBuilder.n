@@ -27,7 +27,14 @@ namespace NemerleWeb
     
     private InstanceHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
-      Some(left.ExternalMethodCall(member.Name, parms))
+      match(parms)
+      {
+      | [arg1]
+        when member.Name == "Append" &&
+             (member :> IMethod).GetParameters().Nth(0).Type.Equals(JsClass.ObjectType) =>
+        Some(left.ExternalMethodCall(member.Name, [arg1.ExternalMethodCall("ToString", [])]))
+      | _ => Some(left.ExternalMethodCall(member.Name, parms))
+      }
     }
      
     private StaticHandler(_left : JsAst, _member : IMember, _parms : list[JsAst]) : option[JsAst]
