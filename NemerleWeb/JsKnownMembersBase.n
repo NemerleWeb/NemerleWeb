@@ -22,12 +22,26 @@ namespace NemerleWeb
         ".ctor",
         (type, _, parms) => Some(JsAst.Call(JsAst.Constructor(JsClass.GetProperName(type)), parms)));
         
-      def toString(type, left, parms)
+          
+      def isFrameworkAssembly(typeInfo)
+      {
+        if (typeInfo.SystemType == null) false
+        else
+        {
+          def token = typeInfo.SystemType.Assembly.GetName().GetPublicKeyToken();
+        
+          def msClrToken = array[0xb7 : byte, 0x7a, 0x5c, 0x56, 0x19, 0x34, 0xe0, 0x89];
+          def msFxToken = array[0xb0 : byte, 0x3f, 0x5f, 0x7f, 0x11, 0xd5, 0x0a, 0x3a];
+       
+          token.SequenceEqual(msClrToken) || token.SequenceEqual(msFxToken);
+        }
+      }      
+      def toString(typeInfo, left, parms)
       {
         // If type has method ToString, use it
-        if (type != null && type.SystemType == null)
+        if (typeInfo != null && !isFrameworkAssembly(typeInfo))
         {
-          def members = type.GetMembers(
+          def members = typeInfo.GetMembers(
             BindingFlags.Instance |
             BindingFlags.Public |
             BindingFlags.NonPublic |
