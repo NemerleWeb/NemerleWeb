@@ -3,7 +3,9 @@ using Nemerle.Collections;
 using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
 using Nemerle.IO;
+
 using System;
+using System.Linq;
 using System.Xml;
 using System.Collections.Generic;
 
@@ -35,15 +37,25 @@ namespace NemerleWeb
       
       match (mb.Header.body)
       {
-      | FunBody.Parsed(
-          PExpr.Sequence(PExpr.Literal(Literal where(RawString = rs)) as litExpr :: []) as expr) =>
-        if (rs.Length == 0 || rs[0] != '<')
-          Message.FatalError(expr.Location, "The literal in 'html' macro must be recursive string.")
+      | FunBody.Parsed(PExpr.Sequence([PExpr.Literal(Literal.String(str)) as lit]))
+      | FunBody.Parsed(PExpr.Literal(Literal.String(str)) as lit) =>
+      
+        if (str.IsEmpty())
+        {
+          Message.FatalError(
+            mb.Location,
+            "You must write html string.");
+        }
         else
         {
-          def str = rs.Substring(2, rs.Length - 4);
-          def loc = litExpr.Location;
-          def loc = Location(loc.FileIndex, loc.Line, loc.Column + 2, loc.EndLine, loc.EndColumn - 2);            
+          def litLoc = lit.Location;
+          def loc = Location(
+            litLoc.FileIndex,
+            litLoc.Line,
+            litLoc.Column + 2,
+            litLoc.EndLine,
+            litLoc.EndColumn - 2);
+        
           def parser = XmlQuotParser(loc, str);
                         
           match (parser.Parse(str))
@@ -54,22 +66,24 @@ namespace NemerleWeb
             UnitImpl.AddTemplateData(mb.DeclaringType, JsClass.GetProperName(mb.DeclaringType) + "_" + mb.Name, res);
           | _ =>
             def (pos, expected) = parser.GetMaxRollbackPosAndNames();
-            def expected = expected.NToList();
-                
-            def msg = if (expected.IsEmpty) "Unexpected character."
-                      else
-                        match (expected.DivideLast())
-                        {
-                        | ([], last)        => $"Expected $last."
-                        | (expected,  last) => $"Expected ..$expected or $last."
-                        };
+          
+            def msg = 
+              if (expected.IsEmpty()) "Unexpected character."
+              else
+              if (expected.Count == 1) $"Expected $(expected.Last())";
+              else
+              {
+                $"Expected ..$(expected.Take(expected.Count -1)) $(expected.Last())";
+              }
+          
             Message.FatalError(parser.ToLocation(pos, pos + 1), msg)
           }
         }
-      | FunBody.Abstract => 
+      | FunBody.Abstract =>
         Message.FatalError("Abstract method is not supported")
       | _ =>
-        Message.FatalError(mb.Header.Location, "You must pass recursive string with XML literal into 'html' macro.")
+      assert2(false);
+        Message.FatalError(mb.Header.Location, "You must return XML literal string.")
       }
     }
   }

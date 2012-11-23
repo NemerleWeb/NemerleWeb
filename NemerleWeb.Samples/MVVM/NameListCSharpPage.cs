@@ -38,5 +38,21 @@ namespace NemerleWeb.Samples
         return Helpers.GetNames().ToList();
       }
     }
+
+    [Html]
+    public string View()
+    {
+        return @"
+        <div>
+          <h3>List of names</h3>
+          Filter: <input value=""$SearchPattern"" />
+          <div class=""name-list"">
+            <span $foreach(n in FilteredNames)>
+              $(n + "", "")
+            </span>
+          </div>
+        </div>
+      ";
+    }
   }
 }
