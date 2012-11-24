@@ -73,8 +73,13 @@ namespace NemerleWeb
             match (parms)
             {
             // HACK: Is there anything better ?
-            | [arg] when typeInfo.FullName == "System.Decimal" => Some(arg)
-            | [_] => Some(JsAst.Call(left, []))
+            | [arg] =>
+              match(typeInfo.FullName)
+              {
+              | "System.Decimal" => Some(arg)
+              | "System.String" => Some(JsAstHelper.ExternalToString(typeInfo, left, parms))
+              | _ => Some(JsAst.Call(left, []))
+              }
             | _ => None()
             }
           });

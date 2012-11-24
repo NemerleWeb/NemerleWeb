@@ -1,4 +1,5 @@
 ﻿using Nemerle;
+using Nemerle.Assertions;
 using Nemerle.Collections;
 using Nemerle.Compiler;
 using Nemerle.Text;
@@ -250,6 +251,45 @@ namespace NemerleWeb
       | Seq(xs) => JsAst.Seq(xs.Append([toAppend]))
       | _ => JsAst.Seq([ast, toAppend])
       }
+    }
+    
+    // Call toString JS method with some optimization for strings.
+    public JsToString(arg : JsAst) : JsAst
+    {
+      | JsAst.Literal(JsLiteral.String) => arg        
+      | JsAst.LocalRef(_, Some(type)) when type.TryRequire(JsClass.StringType) => arg
+      | _ => arg.MethodCall("toString", [])
+    }
+    
+    /// Call user ToString if exist
+    public ExternalToString(typeInfo : TypeInfo, [NotNull] left : JsAst, [NotNull] parms : list[JsAst]) : JsAst
+    {       
+      def isFrameworkAssembly(typeInfo)
+      {
+        if (typeInfo.SystemType == null) false
+        else
+        {
+          def token = typeInfo.SystemType.Assembly.GetName().GetPublicKeyToken();
+        
+          def msClrToken = array[0xb7 : byte, 0x7a, 0x5c, 0x56, 0x19, 0x34, 0xe0, 0x89];
+          def msFxToken = array[0xb0 : byte, 0x3f, 0x5f, 0x7f, 0x11, 0xd5, 0x0a, 0x3a];
+       
+          token.SequenceEqual(msClrToken) || token.SequenceEqual(msFxToken);
+        }
+      }      
+      
+      // If type has method ToString, use it
+      if (typeInfo != null && !isFrameworkAssembly(typeInfo) &&
+        { 
+          def members = typeInfo.GetMembers(
+            BindingFlags.Instance |
+            BindingFlags.Public |
+            BindingFlags.NonPublic |
+            BindingFlags.DeclaredOnly);
+          members.Any(m => m.Name == "ToString") })
+        left.ExternalMethodCall("ToString", parms)
+      else
+        JsAstHelper.JsToString(left)
     }
     
     public GetTemporaryVariableName() : string 

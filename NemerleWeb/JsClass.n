@@ -360,16 +360,16 @@ $(indent)}#>);
         ast.Write(indent);
       }
       
-      public static TypeIsArray([NotNull] type : TypeVar) : bool 
+      public static TypeIsArray([NotNull] typeVar : TypeVar) : bool 
       {
-        type.TryRequire(IEnumerableType) && !type.TryRequire(StringType);
+        typeVar.TryRequire(IEnumerableType) && !typeVar.TryRequire(StringType);
       }
       
-      public static GetProperName([NotNull] type : TypeInfo) : string 
+      public static GetProperName([NotNull] typeInfo : TypeInfo) : string 
       {          
-        def typeParams = if(type.Typarms.IsEmpty) "";
-                         else $"[..$(type.Typarms.MapToArray(t => t.ToString()))]";
-        GetProperName(type.FullName + typeParams)
+        def typeParams = if(typeInfo.Typarms.IsEmpty) "";
+                         else $"[..$(typeInfo.Typarms.MapToArray(t => t.ToString()))]";
+        GetProperName(typeInfo.FullName + typeParams)
       }
         
       public static GetProperName([NotNull] type : Type) : string 
