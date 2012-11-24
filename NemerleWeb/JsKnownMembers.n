@@ -174,51 +174,55 @@ namespace NemerleWeb
     /// Convert method.
     /// Note: type can be null.
     /// </summary>
-    public ConvertMethod(type : TypeInfo, [NotNull] left : JsAst, [NotNull] member : IMember, [NotNull] parms : list[JsAst]) : JsAst
+    public ConvertMethod(
+      typeInfo : TypeInfo,
+      [NotNull] left : JsAst,
+      [NotNull] member : IMember,
+      [NotNull] parms : list[JsAst]) : JsAst
     {
       // First try convert member by name
       def memberName = member.Name;
       mutable memberHandler;
       when (_convertMemberHandlers.TryGetValue(memberName, out memberHandler))
-        when (memberHandler(type, left, parms) is Some(ast))
+        when (memberHandler(typeInfo, left, parms) is Some(ast))
           return ast;
       
       // If no member handler found, try method handler
-      def typeName = TypeName(type);
+      def typeName = TypeName(typeInfo);
       mutable typeHandler;
       when (_convertTypeHandlers.TryGetValue(typeName, out typeHandler))
         when (typeHandler(left, member, parms) is Some(ast))
           return ast;
           
       // Try using just FullName if SystemType
-      when (type != null && type.SystemType != null)
-        when (_convertTypeHandlers.TryGetValue(type.FullName, out typeHandler))
+      when (typeInfo != null && typeInfo.SystemType != null)
+        when (_convertTypeHandlers.TryGetValue(typeInfo.FullName, out typeHandler))
           when (typeHandler(left, member, parms) is Some(ast))
             return ast;
             
       // Try looking for base types
-      foreach(subType in GetSubTypeList(type))
+      foreach(subType in GetSubTypeList(typeInfo))
         when (subType != null && subType.SystemType != null)
           when (_convertBaseTypeHandlers.TryGetValue(subType.SystemType.FullName, out typeHandler))
             when (typeHandler(left, member, parms) is Some(ast))
               return ast;
             
-      when(type != null && type.IsCustomAttributeDefined("NemerleWeb.JsAstAttribute")) {
+      when(typeInfo != null && typeInfo.IsCustomAttributeDefined("NemerleWeb.JsAstAttribute")) {
         if(member.IsConstructor)
-          return JsAst.Call(JsAst.Constructor(type.Name), parms);
+          return JsAst.Call(JsAst.Constructor(typeInfo.Name), parms);
         else if (left is JsAst.StaticMethodRef)
-          return JsAst.Call(JsAst.StaticMethodRef(type.Name, memberName), parms);        
+          return JsAst.Call(JsAst.StaticMethodRef(typeInfo.Name, memberName), parms);        
         else
           return JsAst.Call(JsAst.MethodRef(left, memberName), parms);
       }
               
       // Nothing found, try default dictionary
       when (_convertDefaultMemberHandlers.TryGetValue(memberName, out memberHandler))
-        when (memberHandler(type, left, parms) is Some(ast))
+        when (memberHandler(typeInfo, left, parms) is Some(ast))
           return ast;
           
       // Process low level naming
-      DefaultConvertMethod(type, left, member, parms)
+      DefaultConvertMethod(typeInfo, left, member, parms)
     }
     
     private ConvertFixedTypeMethod(type : FixedType, left : JsAst, member : IMember, parms : list[JsAst]) : JsAst
@@ -235,19 +239,19 @@ namespace NemerleWeb
       }
     }
     
-    private DefaultConvertMethod(type : TypeInfo, left : JsAst, member : IMember, parms : list[JsAst]) : JsAst
+    private DefaultConvertMethod(typeInfo : TypeInfo, left : JsAst, member : IMember, parms : list[JsAst]) : JsAst
     {
       if (left is StaticMethodRef())
         JsAst.Call(left, parms)
       else
       {
-        when (type != null &&
-          !(type.IsInterface ||
-            type.GetSuperTypes().Any(t => t.TryRequire(JsClass.IPageType)) ||
+        when (typeInfo != null &&
+          !(typeInfo.IsInterface ||
+            typeInfo.GetSuperTypes().Any(t => t.TryRequire(JsClass.IPageType)) ||
             member.Name == "apply"))
           Message.Error(
             member.Location,
-            $"Invalid $(member.Name) with $(TypeName(type)) type, params: ..$parms not implemented in JS");
+            $"Invalid $(member.Name) with $(TypeName(typeInfo)) type, params: ..$parms not implemented in JS");
           
         JsAst.Call(JsAst.MethodRef(left, member.Name), parms)
       }

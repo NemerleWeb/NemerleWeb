@@ -17,14 +17,7 @@ namespace NemerleWeb
     {
       JsKnownMembers.RegisterType(typeof(string), Handler);
     }
-    
-    private JsToString(arg : JsAst) : JsAst
-    {
-    | JsAst.Literal(JsLiteral.String) => arg        
-    | JsAst.LocalRef(_, Some(type)) when type.TryRequire(JsClass.StringType) => arg
-    | _ => arg.MethodCall("toString", [])
-    }
-    
+        
     private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
       (if (left is JsAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
@@ -48,7 +41,7 @@ namespace NemerleWeb
         | "ToCharArray" => None()
         | "ToLower" => Some(left.MethodCall("toLowerCase", []))
         | "ToLowerInvariant" => None()
-        | "ToString" => Some(JsToString(left))
+        | "ToString" => Some(JsAstHelper.JsToString(left))
         | "ToUpper" => Some(left.MethodCall("toUpperCase", []))
         | "ToUpperInvariant"
         | "Trim"
@@ -90,7 +83,7 @@ namespace NemerleWeb
         | "ToLower"
         | "ToUpper"
         | "Trim" => None()        
-        | "ToString" => Some(JsToString(left))
+        | "ToString" => Some(JsAstHelper.JsToString(left))
         | _ => None()
         }
           
@@ -182,11 +175,12 @@ namespace NemerleWeb
             match (values)
             {
             | [] => None()
-            | [v] => Some(JsToString(v))
-            | _ => Some(JsToString(values.Head).MethodCall("concat", values.Tail))
+            | [v] => Some(JsAstHelper.JsToString(v))
+            | _ => Some(JsAstHelper.JsToString(values.Head).MethodCall("concat", values.Tail))
             }
-          | LocalRef(_, Some(type)) when JsClass.TypeIsArray(type) => Some(arg1.MethodCall("join", [JsAst.Literal(JsLiteral.String(""))]))
-          | _ => Some(JsToString(arg1))
+          | LocalRef(_, Some(type)) when JsClass.TypeIsArray(type) =>
+            Some(arg1.MethodCall("join", [JsAst.Literal(JsLiteral.String(""))]))
+          | _ => Some(JsAstHelper.JsToString(arg1))
           }
         | "Copy"
         | "Intern"
@@ -204,7 +198,7 @@ namespace NemerleWeb
       | [arg1, arg2] =>
         match (member.Name)
         {
-        | "Concat" => Some(JsToString(arg1).MethodCall("concat", [arg2]))
+        | "Concat" => Some(JsAstHelper.JsToString(arg1).MethodCall("concat", [arg2]))
         | "Equals" => None()
         | "Join" => Some(arg2.MethodCall("join", [arg1]))
         | _ => None()
@@ -212,14 +206,14 @@ namespace NemerleWeb
       | [arg1, arg2, arg3] =>
         match (member.Name)
         {
-        | "Concat" => Some(JsToString(arg1).MethodCall("concat", [arg2, arg3]))
+        | "Concat" => Some(JsAstHelper.JsToString(arg1).MethodCall("concat", [arg2, arg3]))
         | "Equals"
         | _ => None()
         }
       | [arg1, arg2, arg3, arg4] =>
         match (member.Name)
         {
-        | "Concat" => Some(JsToString(arg1).MethodCall("concat", [arg2, arg3, arg4]))
+        | "Concat" => Some(JsAstHelper.JsToString(arg1).MethodCall("concat", [arg2, arg3, arg4]))
         | "Equals"
         | "Join"
         | _ => None()

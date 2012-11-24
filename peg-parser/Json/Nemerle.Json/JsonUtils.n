@@ -35,17 +35,21 @@ namespace Nemerle.Json
       
       sb
     }
-
-    escapingChars : array[char]
+    
+    static this()
     {
-      // TODO: Implement lazy1                  
-      //_escapingChars : LazyValue[array[char]] = lazy(makeEscapingChars());
-      get 
-      {
-        //_escapingChars.Value;
-        makeEscapingChars()
-      }
+      escapingChars = makeEscapingChars();
     }
+
+    escapingChars : array[char];
+    // TODO: Implement lazy
+    //{      
+      //_escapingChars : LazyValue[array[char]] = lazy(makeEscapingChars());
+      //get 
+      //{
+        //_escapingChars.Value;
+      //}
+    //}
     
     makeEscapingChars() : array[char]
     {
