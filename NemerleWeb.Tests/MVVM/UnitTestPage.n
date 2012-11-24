@@ -85,8 +85,7 @@ namespace NemerleWeb.Tests
     [Unit]
     class BaseClass {}
     
-    // TODO: #33
-    //[Unit]
+    [Unit]
     class DerivedClass : BaseClass {}
     
     [Unit]
@@ -123,6 +122,7 @@ namespace NemerleWeb.Tests
     | _B = 2
     }
     
+    [Unit]
     class Dummy
     {
       public InstancePropGetSet : int { get; set; }      
