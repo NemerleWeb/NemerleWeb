@@ -26,11 +26,19 @@ namespace Nemerle.Json
     {
       foreach (c in src)
       {
-        | c when (c : int) < escapingChars.Length && escapingChars[(c : int)] > 0 =>
+        // TODO: Restore
+        //| c when (c : int) < escapingChars.Length && escapingChars[(c : int)] > 0 =>
+        //  _ = sb.Append('\\');
+        //  _ = sb.Append(escapingChars[c : int])
+        //| x =>
+        //  _ = sb.Append(x)
+        if (c : int < escapingChars.Length && escapingChars[c : int] > 0)
+        {
           _ = sb.Append('\\');
           _ = sb.Append(escapingChars[c : int])
-        | x =>
-          _ = sb.Append(x)
+        }
+        else
+          _ = sb.Append(c);
       }
       
       sb
