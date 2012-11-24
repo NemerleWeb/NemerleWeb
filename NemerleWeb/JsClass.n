@@ -320,13 +320,13 @@ $indent};#>);
       {
         def self = if(hasSelf) "" else "var self = this;";
         def methodParms(method) { method.GetParameters().Select(p => p.Name); }
-        def m = methods.Select(m => 
+        def genMethods = methods.Select(m => 
 $<#$(indent)$parentPtr.$(m.Name) = function(..$(methodParms(m))) { 
 $(indent)  $self
 $(TranslateMethodBody(m, indent + "  "))
 $(indent)}#>);
 
-          $<#..$(m; "\n")#>
+          $<#..$(genMethods; "\n")#>
       }
         
       GetMethods(indent : string, parentPtr : string, hasSelf : bool) : string 

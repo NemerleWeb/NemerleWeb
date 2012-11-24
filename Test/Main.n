@@ -17,6 +17,10 @@ module Program
   Main() : void
   {
     def result = nweb Test();
+    
+    foreach (s in NWebData.GetAllScriptNames())
+      WriteLine(NWebData.GetScript(s));
+    
     WriteLine(result);
     _ = Console.ReadKey();
   }
@@ -26,10 +30,15 @@ module Program
 [Unit]
 public class Test
 {      
-  public this()
-  {    
-    mutable s;
-    s += "";
+   public static Escape() : void
+    {
+      def c = 1;
+      
+      match(c)
+      {
+      | c when c > 0 => ()
+      | _ => ()
+      }
   }  
 
   [Html]
