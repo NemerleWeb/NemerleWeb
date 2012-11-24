@@ -152,9 +152,9 @@ $fields
 $methods
 ..$(commonMethods; Environment.NewLine)
 $staticFields
-$staticConstructorBody
 $staticMethods
 $staticProperties
+$staticConstructorBody
 #>
         }
         else
@@ -171,9 +171,9 @@ $constructorBody
 $returning
 $(Indent)}
 $staticFields
-$staticConstructorBody
 $staticMethods
 $staticProperties
+$staticConstructorBody
 #>
         }
       }
