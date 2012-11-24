@@ -104,7 +104,7 @@ namespace NemerleWeb
         def fields = GetFields(bodyIndent, parentPtr);
         def staticFields = GetStaticFields(Indent);
         def constructorBody = GetConstructorBody(bodyIndent);
-        //def staticConstructorBody = GetStaticConstructorBody(Indent);
+        def staticConstructorBody = GetStaticConstructorBody(Indent);
         def methods = GetMethods(bodyIndent, parentPtr, !isAbstract);
         def staticMethods = GetStaticMethods(Indent);        
         def (nestedClassesString, nestedClasses) = GetNestedClasses();
@@ -152,6 +152,7 @@ $fields
 $methods
 ..$(commonMethods; Environment.NewLine)
 $staticFields
+$staticConstructorBody
 $staticMethods
 $staticProperties
 #>
@@ -170,6 +171,7 @@ $constructorBody
 $returning
 $(Indent)}
 $staticFields
+$staticConstructorBody
 $staticMethods
 $staticProperties
 #>
