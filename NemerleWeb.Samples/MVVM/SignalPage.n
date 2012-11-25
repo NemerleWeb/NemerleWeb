@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
 using SignalR.Hubs;
-using Nemerle.Late;
 
 namespace NemerleWeb.Samples
 {
