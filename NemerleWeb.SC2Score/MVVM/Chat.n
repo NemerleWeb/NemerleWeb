@@ -12,7 +12,7 @@ namespace NemerleWeb.SC2Score
   [Unit]
   public class Chat
   {
-    [Record]
+    [Record][Unit]
     public class Message 
     {
       public Author : string { get; set; }
