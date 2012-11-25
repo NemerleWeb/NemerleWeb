@@ -14,18 +14,20 @@ namespace NemerleWeb
 {
   public module NWebData
   {
-    public UnitDefinitions : Dictionary[string, string] = Dictionary.[string, string]();
+    public UnitDefinitions : Dictionary[string, string] = Dictionary();
     public SignalDefinitions : Dictionary[string, string] = Dictionary();
-    public UnitTemplates : Dictionary[string, Dictionary[string, string]] = Dictionary.[string, Dictionary[string, string]]();
-    public UnitLambdas : Dictionary[string, string] = Dictionary.[string, string]();
+    public UnitTemplates : Dictionary[string, Dictionary[string, string]] = Dictionary();
+    public UnitLambdas : Dictionary[string, string] = Dictionary();
     
     this() 
     {
       def datas = AppDomain.CurrentDomain
                            .GetAssemblies()
                            .SelectMany(a => a.GetTypes()
-                                             .Where(t => t.Name.EndsWith("NWebDataPerAssembly")));
-      foreach(dataType in datas) {
+                           .Where(t => t.Name.EndsWith("NWebDataPerAssembly")));
+                           
+      foreach(dataType in datas)
+      {
         def instance = Activator.CreateInstance(dataType, array[], array[]) :> NWebDataInstance;
         
         foreach(u in instance.UnitDefinitions)
@@ -67,8 +69,9 @@ namespace NemerleWeb
     public GetTemplatesScripts(unitName : string) : string
     {
       mutable templates;
-      if(UnitTemplates.TryGetValue(unitName, out templates)) {
-        def templateScripts = templates.Map(templateKvp => {
+      if(UnitTemplates.TryGetValue(unitName, out templates))
+      {
+        def templateScripts = templates.Select(templateKvp => {
             $<#
             <script type="text/html" id="$(templateKvp.Key)">
             $(templateKvp.Value)
@@ -76,9 +79,9 @@ namespace NemerleWeb
             #>
         });      
         $"..$templateScripts"
-      } else {
-        ""
-      }      
+      }
+      else
+        ""   
     }
   }
   
@@ -102,8 +105,10 @@ namespace NemerleWeb
     public AddUnitTemplate(unitName : string, templateName : string, template : string) : void
     {
       mutable templateDict;
-      when(!UnitTemplates.TryGetValue(unitName, out templateDict)) {
-        templateDict = Dictionary.[string, string]();
+      
+      when(!UnitTemplates.TryGetValue(unitName, out templateDict))
+      {
+        templateDict = Dictionary();
         UnitTemplates.Add(unitName, templateDict);
       }
       templateDict.Add(templateName, template);
