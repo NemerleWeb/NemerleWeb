@@ -467,29 +467,34 @@
        Other similar extension points exist, see Microsoft.Common.targets. -->
   <PropertyGroup>
     <YourDestinationDirectory>$(TargetDir)MVVM</YourDestinationDirectory>
+    <!-- AppHarbor hack to preview source -->
     <YourDestinationDirectory2>$(TargetDir)_PublishedWebsites\NemerleWeb.Samples\bin\MVVM</YourDestinationDirectory2>
     <YourSourceDirectory>$(ProjectDir)MVVM</YourSourceDirectory>
   </PropertyGroup>
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
-    <CreateItem Include="$(YourSourceDirectory)\**\*.*">
-      <Output TaskParameter="Include" ItemName="YourFilesToCopy" />
-    </CreateItem>
-    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory2)\%(RecursiveDir)%(Filename)%(Extension)')" />
     <ItemGroup>
       <CalculatorParser Include="$(ProjectDir)..\peg-parser\Calculator\*.n" />
     </ItemGroup>
     <Copy SourceFiles="@(CalculatorParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\CalculatorParser" />
+    <Copy SourceFiles="@(CalculatorParser)" DestinationFolder="$(YourDestinationDirectory2)\Peg\CalculatorParser" />
     <ItemGroup>
       <JsonParser Include="$(ProjectDir)..\peg-parser\Json\Nemerle.Json\*.n" />
     </ItemGroup>
     <Copy SourceFiles="@(JsonParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\JsonParser" />
+    <Copy SourceFiles="@(JsonParser)" DestinationFolder="$(YourDestinationDirectory2)\Peg\JsonParser" />
     <ItemGroup>
       <JSParser Include="$(ProjectDir)..\peg-parser\JSParser\*.n" />
     </ItemGroup>
     <Copy SourceFiles="@(JSParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\JSParser" />
+    <Copy SourceFiles="@(JSParser)" DestinationFolder="$(YourDestinationDirectory2)\Peg\JSParser" />
+  
+    <CreateItem Include="$(YourSourceDirectory)\**\*.*">
+      <Output TaskParameter="Include" ItemName="YourFilesToCopy" />
+    </CreateItem>
+    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory2)\%(RecursiveDir)%(Filename)%(Extension)')" />    
   </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
