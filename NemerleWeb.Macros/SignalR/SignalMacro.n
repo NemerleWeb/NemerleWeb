@@ -58,7 +58,7 @@ namespace NemerleWeb
     }
     
     public TransformSignal(expr : PExpr, typer : Typer) : PExpr 
-    {   
+    {
       def res = Transform(
         expr,
         typer, 
@@ -70,7 +70,7 @@ namespace NemerleWeb
       {
       | Some(p) => p
       | _ => Message.FatalError(expr.Location, "Invalid 'signal' macro call. Syntax: signal client.MethodName(parameters)");
-      }      
+      }
     }
     
     public TransformBroadcast(expr : PExpr, typer : Typer) : PExpr 
@@ -80,7 +80,7 @@ namespace NemerleWeb
       {
       | Some(p) => p
       | _ => Message.FatalError(expr.Location, "Invalid 'broadcast' macro call. Syntax: broadcast client.MethodName(parameters)");
-      }     
+      }
     }
   }
 }

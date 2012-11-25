@@ -78,7 +78,7 @@
     <Reference Include="Newtonsoft.Json">
       <Name>Newtonsoft.Json</Name>
       <AssemblyName>Newtonsoft.Json.dll</AssemblyName>
-      <HintPath>..\packages\Newtonsoft.Json.4.5.8\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="SignalR">
