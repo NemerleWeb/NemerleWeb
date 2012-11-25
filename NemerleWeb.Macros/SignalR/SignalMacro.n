@@ -4,7 +4,6 @@ using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
 using Nemerle.Text;
 using Nemerle.Utility;
-using Nemerle.Late;
 
 using System;
 using System.Web;
@@ -35,25 +34,51 @@ namespace NemerleWeb
   
   public module SignalImpl
   {
+    private Transform(expr : PExpr, typer : Typer, objExpr : PExpr) : option[PExpr]
+    {
+      match(expr)
+      {
+      | <[ $_.$method(..$parms) ]> =>
+        def hubName = typer.CurrentTypeBuilder.DeclaringType.Name + "Hub";
+      
+        Some(<[
+          def signalClients =
+            SignalR.GlobalHost.ConnectionManager.GetHubContext.[$(hubName : dyn)]().Clients;
+        
+          $objExpr;
+          
+          def invokeMethod = obj.GetType().GetMethod(
+            "Invoke",
+            BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+          
+          _ = invokeMethod.Invoke(obj, array[$(method.ToString() : string) : object, array[..$parms]]);
+        ]>)   
+      | _ => None()
+      }
+    }
+    
     public TransformSignal(expr : PExpr, typer : Typer) : PExpr 
     {   
-      def hubName = typer.CurrentTypeBuilder.DeclaringType.Name + "Hub";
-      match(expr) {
-      | <[ $_.$method(..$parms) ]> => 
-              <[  def __signalClients = SignalR.GlobalHost.ConnectionManager.GetHubContext.[$(hubName : dyn)]().Clients; 
-                  def __signalConnectionId = HttpContext.Current.Session["SignalRConnectionId"];
-                  def _ = late __signalClients[__signalConnectionId].Invoke($(method.ToString() : string), array[..$parms]) ]>
+      def res = Transform(
+        expr,
+        typer, 
+        <[
+            def signalConnectionId = HttpContext.Current.Session["SignalRConnectionId"];
+            def obj = signalClients[signalConnectionId];
+        ]>);
+      match (res)
+      {
+      | Some(p) => p
       | _ => Message.FatalError(expr.Location, "Invalid 'signal' macro call. Syntax: signal client.MethodName(parameters)");
       }      
     }
     
     public TransformBroadcast(expr : PExpr, typer : Typer) : PExpr 
-    {      
-      def hubName = typer.CurrentTypeBuilder.DeclaringType.Name + "Hub";
-      match(expr) {
-      | <[ $_.$method(..$parms) ]> => 
-              <[  def __signalClients = SignalR.GlobalHost.ConnectionManager.GetHubContext.[$(hubName : dyn)]().Clients; 
-                  def _ = late __signalClients.Invoke($(method.ToString() : string), array[..$parms]) ]>
+    {
+      def res = Transform(expr, typer, <[ def obj = signalClients; ]>);
+      match(res)
+      {
+      | Some(p) => p
       | _ => Message.FatalError(expr.Location, "Invalid 'broadcast' macro call. Syntax: broadcast client.MethodName(parameters)");
       }     
     }
