@@ -5,9 +5,9 @@
   </assembly>
   <members>
     <member name="T:Nemerle.Statechart.FsmParser" />
-    <member name="M:Nemerle.Statechart.FsmParser._N_get_decls_61656(Nemerle.Core.list{Nemerle.Statechart.StateNode})" />
-    <member name="M:Nemerle.Statechart.FsmParser._N_check_tran_61644(Nemerle.Statechart.StateNode.State,Nemerle.Statechart.StateNode.Transition)" />
-    <member name="M:Nemerle.Statechart.FsmParser._N_get_target_60559(Nemerle.Statechart.FsmParser._N_closureOf_simple_target_60551,Nemerle.Statechart.StateNode.State,System.String)" />
+    <member name="M:Nemerle.Statechart.FsmParser._N_get_decls_61658(Nemerle.Core.list{Nemerle.Statechart.StateNode})" />
+    <member name="M:Nemerle.Statechart.FsmParser._N_check_tran_61646(Nemerle.Statechart.StateNode.State,Nemerle.Statechart.StateNode.Transition)" />
+    <member name="M:Nemerle.Statechart.FsmParser._N_get_target_60561(Nemerle.Statechart.FsmParser._N_closureOf_simple_target_60553,Nemerle.Statechart.StateNode.State,System.String)" />
     <member name="M:Nemerle.Statechart.FsmParser.GetLocation(Nemerle.Peg.NToken)" />
     <member name="M:Nemerle.Statechart.FsmParser.GetText(Nemerle.Peg.NToken)" />
     <member name="P:Nemerle.Statechart.FsmParser.ParsingSource" />

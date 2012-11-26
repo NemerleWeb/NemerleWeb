@@ -49,13 +49,13 @@
     <member name="M:Nemerle.Test.Framework.Runner.Run(System.Collections.Generic.IEnumerable{Nemerle.Test.Framework.Test})" />
     <member name="F:Nemerle.Test.Framework.Runner._executionListener" />
     <member name="T:Nemerle.Test.Framework.Statistics" />
-    <member name="F:Nemerle.Test.Framework.Statistics._N_Elapsed_3654" />
+    <member name="F:Nemerle.Test.Framework.Statistics._N_Elapsed_3656" />
     <member name="M:Nemerle.Test.Framework.Statistics.get_Elapsed" />
     <member name="P:Nemerle.Test.Framework.Statistics.Elapsed" />
-    <member name="F:Nemerle.Test.Framework.Statistics._N_ElapsedMilliseconds_3662" />
+    <member name="F:Nemerle.Test.Framework.Statistics._N_ElapsedMilliseconds_3664" />
     <member name="M:Nemerle.Test.Framework.Statistics.get_ElapsedMilliseconds" />
     <member name="P:Nemerle.Test.Framework.Statistics.ElapsedMilliseconds" />
-    <member name="F:Nemerle.Test.Framework.Statistics._N_ElapsedTicks_3667" />
+    <member name="F:Nemerle.Test.Framework.Statistics._N_ElapsedTicks_3669" />
     <member name="M:Nemerle.Test.Framework.Statistics.get_ElapsedTicks" />
     <member name="P:Nemerle.Test.Framework.Statistics.ElapsedTicks" />
     <member name="M:Nemerle.Test.Framework.Statistics.#ctor(System.TimeSpan,System.Int64,System.Int64)" />
