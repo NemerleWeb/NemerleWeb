@@ -148,8 +148,8 @@
     <member name="M:Nemerle.Xml.XmlAstToXLinq.Transform(Nemerle.Xml.XmlAst,Nemerle.Collections.Set{System.String},System.String)" />
     <member name="M:Nemerle.Xml.XmlAstToXLinq.TransformImpl(Nemerle.Xml.XmlAst,Nemerle.Collections.Set{System.String},System.String)" />
     <member name="T:Nemerle.Xml.XmlQuotParser" />
-    <member name="M:Nemerle.Xml.XmlQuotParser._N_testSpaces_14976(Nemerle.Xml.XmlQuotParser._N_closureOf_prefixedName_14968,Nemerle.Peg.NToken)" />
-    <member name="M:Nemerle.Xml.XmlQuotParser._N_getTextPoint_14923(Nemerle.Xml.XmlQuotParser._N_closureOf_ToLocation_14915,System.Int32)" />
+    <member name="M:Nemerle.Xml.XmlQuotParser._N_testSpaces_14978(Nemerle.Xml.XmlQuotParser._N_closureOf_prefixedName_14970,Nemerle.Peg.NToken)" />
+    <member name="M:Nemerle.Xml.XmlQuotParser._N_getTextPoint_14925(Nemerle.Xml.XmlQuotParser._N_closureOf_ToLocation_14917,System.Int32)" />
     <member name="M:Nemerle.Xml.XmlQuotParser.GetLocation(Nemerle.Peg.NToken)" />
     <member name="M:Nemerle.Xml.XmlQuotParser.GetText(Nemerle.Peg.NToken)" />
     <member name="P:Nemerle.Xml.XmlQuotParser.ParsingSource" />

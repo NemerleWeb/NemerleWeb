@@ -53,10 +53,10 @@
     <member name="M:Nemerle.WPF.DependencyProperty_method_postscanMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.WPF.DependencyProperty_method_postscanMacro.SyntaxExtension" />
     <member name="T:Nemerle.WPF.DependencyPropertyImpl" />
-    <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_checkAccessorAttributes_11041(Nemerle.Compiler.Parsetree.ClassMember.Function)" />
-    <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_accessor_11032(Nemerle.WPF.DependencyPropertyImpl._N_closureOf_Implement_11021,Nemerle.Core.option{Nemerle.Compiler.Parsetree.ClassMember.Function})" />
-    <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_define_10342(Nemerle.WPF.DependencyPropertyImpl._N_closureOf_DeclareFields_10325,Nemerle.Compiler.Parsetree.ClassMember.Field)" />
-    <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_check_9325(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_checkAccessorAttributes_11043(Nemerle.Compiler.Parsetree.ClassMember.Function)" />
+    <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_accessor_11034(Nemerle.WPF.DependencyPropertyImpl._N_closureOf_Implement_11023,Nemerle.Core.option{Nemerle.Compiler.Parsetree.ClassMember.Function})" />
+    <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_define_10344(Nemerle.WPF.DependencyPropertyImpl._N_closureOf_DeclareFields_10327,Nemerle.Compiler.Parsetree.ClassMember.Field)" />
+    <member name="M:Nemerle.WPF.DependencyPropertyImpl._N_check_9327(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.WPF.DependencyPropertyImpl.PropertyFieldName(System.String)" />
     <member name="M:Nemerle.WPF.DependencyPropertyImpl.PropertyKeyFieldName(System.String)" />
     <member name="M:Nemerle.WPF.DependencyPropertyImpl.PropertyFieldName(System.String,System.Boolean)" />
