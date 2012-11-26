@@ -25,12 +25,12 @@ namespace NemerleWeb
           method.Header.body = oldBody;
           def tt = GetTypedBody(method, typer, typer.CurrentTypeBuilder);
           def defs2 = JsAstBuilder.BuildJsAstForSplices(tt, method.Header);
-            
+          
           defs.Concat(defs2)
               .SelectMany(j =>
                 regexp match(j.Name)
                 {
-                | <#^_var(?<index : int>\d+)_N_\d+$#> => [(index, j.Val.Write())]
+                | <#^_var(?<index : int>\d+)_\d+$#> => [(index, j.Val.Write())]
                 | _ => []
                 })
               .GroupBy((i, _) => i)

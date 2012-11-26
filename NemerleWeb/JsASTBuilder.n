@@ -30,15 +30,9 @@ namespace NemerleWeb
       paramKind : option[ParmKind]) : JsAst
     {
       def build = Build(_, currentScopeDefs, methodHeader);
-      def getLocalValueName(localVal : LocalValue) {
-        def isFromMainMethodParams = 
-          methodHeader.ToString() == localVal.DefinedIn.ToString() &&
-          methodHeader.Parameters.Any(p => localVal.Name == p.Name && localVal.Type.Equals(p.Type)) &&
-          localVal.ValueKind is LocalValue.Kind.FunParm;
-            
-        if(!isFromMainMethodParams && currentScopeDefs.Any((org, _) => org == localVal.Name)) {
-                      currentScopeDefs.First((org, _) => org == localVal.Name)[1];                        
-        } else localVal.Name;
+      def getLocalValueName(localVal : LocalValue) {        
+        def isFromMainMethodParams = methodHeader.Parameters.Any(p => p.decl.Id == localVal.Id);
+        if(isFromMainMethodParams) localVal.Name else localVal.Name + "_" + localVal.Id
       }
         
       match(expr) 
@@ -69,7 +63,7 @@ namespace NemerleWeb
         }
       | DefFunctionsIn                    => Message.Error(expr.Location, "DefFunctionsIn not implemented"); JsAst.NotImpl("DefFunctionsIn")
       | DefValIn(name, val, body)         => 
-        def newName = name.Name + "_N_" + NWebUtils.GetUniqueId();
+        def newName = name.Name + "_" + name.Id;
         
         match(Build(val, currentScopeDefs, methodHeader)) 
         {
