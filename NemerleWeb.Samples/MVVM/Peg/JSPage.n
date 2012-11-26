@@ -7,7 +7,7 @@ using System.Linq;
 namespace NemerleWeb.Samples
 {
   [Unit]
-  internal class JSPage
+  public class JSPage
   {
     _parser : JSEngine.JSParser;
     
