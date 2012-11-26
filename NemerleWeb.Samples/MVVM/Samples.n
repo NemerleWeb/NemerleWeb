@@ -119,7 +119,7 @@ namespace NemerleWeb.Samples
     SelectSample(sample : Sample) : void 
     {
       SelectedSample = sample;
-      js prettyPrint();
+      js <# nweb.invalidate(); prettyPrint(); #>
     }
     
     public class Server
