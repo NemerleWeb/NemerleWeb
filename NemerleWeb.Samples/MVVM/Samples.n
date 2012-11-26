@@ -119,7 +119,12 @@ namespace NemerleWeb.Samples
     SelectSample(sample : Sample) : void 
     {
       SelectedSample = sample;
-      js <# nweb.invalidate(); prettyPrint(); #>
+    }
+    
+    PrettifiedSource(sample : Sample) : string
+    {
+      js prettyPrint();
+      sample.Source
     }
     
     public class Server
@@ -156,7 +161,7 @@ namespace NemerleWeb.Samples
             <div $when(SelectedSample.Name == s.Name) class="current-sample">
               <div template="$(template(s.Instance))"></div>
               <h2>Source</h2>
-              <pre class="prettyprint lang-n prettyprinted">$(s.Source)</pre>
+              <pre class="prettyprint lang-n prettyprinted">$(PrettifiedSource(s))</pre>
             </div>
           </div>
           <h2>Main page source</h2>
