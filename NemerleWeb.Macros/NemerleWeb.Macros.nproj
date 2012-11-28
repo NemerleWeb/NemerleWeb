@@ -62,22 +62,22 @@
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="SignalR">
-      <Name>SignalR</Name>
-      <AssemblyName>SignalR.dll</AssemblyName>
-      <HintPath>..\packages\SignalR.Server.0.5.3\lib\net40\SignalR.dll</HintPath>
+    <Reference Include="Microsoft.AspNet.SignalR.Core">
+      <Name>Microsoft.AspNet.SignalR.Core</Name>
+      <AssemblyName>Microsoft.AspNet.SignalR.Core.dll</AssemblyName>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.1.0.0-alpha2\lib\net40\Microsoft.AspNet.SignalR.Core.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="SignalR.Hosting.AspNet">
-      <Name>SignalR.Hosting.AspNet</Name>
-      <AssemblyName>SignalR.Hosting.AspNet.dll</AssemblyName>
-      <HintPath>..\packages\SignalR.Hosting.AspNet.0.5.3\lib\net40\SignalR.Hosting.AspNet.dll</HintPath>
+    <Reference Include="Microsoft.AspNet.SignalR.Hosting.AspNet">
+      <Name>Microsoft.AspNet.SignalR.Hosting.AspNet</Name>
+      <AssemblyName>Microsoft.AspNet.SignalR.Hosting.AspNet.dll</AssemblyName>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Hosting.AspNet.1.0.0-alpha2\lib\net45\Microsoft.AspNet.SignalR.Hosting.AspNet.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="SignalR.Hosting.Common">
-      <Name>SignalR.Hosting.Common</Name>
-      <AssemblyName>SignalR.Hosting.Common.dll</AssemblyName>
-      <HintPath>..\packages\SignalR.Hosting.Common.0.5.3\lib\net40\SignalR.Hosting.Common.dll</HintPath>
+    <Reference Include="Microsoft.AspNet.SignalR.Hosting.Common">
+      <Name>Microsoft.AspNet.SignalR.Hosting.Common</Name>
+      <AssemblyName>Microsoft.AspNet.SignalR.Hosting.Common.dll</AssemblyName>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Hosting.Common.1.0.0-alpha2\lib\net40\Microsoft.AspNet.SignalR.Hosting.Common.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="Nemerle.Peg">

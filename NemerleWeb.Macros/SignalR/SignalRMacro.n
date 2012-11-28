@@ -35,7 +35,7 @@ namespace NemerleWeb
                             .Select(m => (m.Name, $"..$(m.GetParameters().Select(p => p.Name))"))
                             .Select(((name, parms), _) => 
 $<#
-$jsHubName.$name = function($parms) {
+$jsHubName.client.$name = function($parms) {
 self.$name($parms);
 nweb.invalidate();
 };#>);

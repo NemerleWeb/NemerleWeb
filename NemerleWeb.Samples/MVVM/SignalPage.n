@@ -4,7 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
-using SignalR.Hubs;
+using Nemerle.Late;
+
+using Microsoft.AspNet.SignalR.Hubs;
+using Microsoft.AspNet.SignalR;
 
 namespace NemerleWeb.Samples
 {
