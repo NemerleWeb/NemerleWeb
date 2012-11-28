@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>c:\Projects\prv\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.Statechart.Analyser.xml</name>
+    <name>c:\dev\open-source\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.Statechart.Analyser.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.Statechart.FsmAnalyser" />
