@@ -30,11 +30,13 @@ namespace NemerleWeb
       paramKind : option[ParmKind]) : JsAst
     {
       def build = Build(_, currentScopeDefs, methodHeader);
-      def getLocalValueName(localVal : LocalValue) {        
+      def getLocalValueName(localVal : LocalValue)
+      {        
         def isFromMainMethodParams = methodHeader.Parameters.Any(p => p.decl.Id == localVal.Id);
         if(isFromMainMethodParams) localVal.Name else localVal.Name + "_" + localVal.Id
       }
-        
+      
+      
       match(expr) 
       {
       | Array(args, _dims)                => JsAst.Array(args.Map(build))
@@ -150,7 +152,7 @@ namespace NemerleWeb
       | Match(_, _)                       => JsAst.NotImpl("Match")
       | MethodAddress                     => JsAst.Literal(JsLiteral.String(""))
       | MethodOf                          => Message.Error(expr.Location, "MethodOf not implemented"); JsAst.NotImpl("MethodOf")
-      | MethodRef(obj, meth, _, _)        => JsAst.MethodRef(build(obj), meth.Name)
+      | MethodRef(obj, meth, _, _)        => JsAst.MethodRef(build(obj), meth.Name, JsAstHelper.MethodParameters(meth))
       | MultipleAssign(assigns)           => JsAst.Seq(assigns.Map((l, e) => JsAst.Assign(JsAst.LocalRef(getLocalValueName(l), None()), build(e))))
       | OpCode(name)                      => ConvertToJsOpCode(name)
       | PropertyMember(obj, prop)         => JsAst.PropertyGet(build(obj), prop.Name)
@@ -158,20 +160,21 @@ namespace NemerleWeb
       | Sequence(e1, e2)                  => JsAst.Seq([build(e1), build(e2)])
       | StaticEventRef                    => Message.Error(expr.Location, "StaticEventRef not implemented"); JsAst.NotImpl("StaticEventRef")
       | StaticPropertyRef(from, prop)     => JsAst.PropertyGet(JsAst.LocalRef(from.tycon.Name, None()), prop.Name)
-      | StaticRef(from, mem is IMethod, _) =>          
-        def typeName = if(from.tycon.SystemType != null) from.tycon.SystemType.FullName else from.tycon.FrameworkTypeName;              
-        match(typeName)
-        {
-        | _ when typeName == typeof(Nemerle.Core.list[_].Nil).FullName => JsAst.Array([])
-        | _ => JsAst.StaticMethodRef(JsClass.GetProperName(from.TypeInfo), mem.Name);
-        }
       | StaticRef(from, mem, _)           =>
-        def typeName = if(from.tycon.SystemType != null) from.tycon.SystemType.FullName else from.tycon.FrameworkTypeName;              
-        match(typeName)
-        {
-        | _ when typeName == typeof(Nemerle.Core.list[_].Nil).FullName => JsAst.Array([])
-        | _ => JsAst.StaticRef(JsClass.GetProperName(from.TypeInfo), mem.Name);
-        }
+        def typeName =
+          if(from.tycon.SystemType != null) from.tycon.SystemType.FullName
+          else                              from.tycon.FrameworkTypeName;              
+        
+        if (typeName == typeof(Nemerle.Core.list[_].Nil).FullName)
+          JsAst.Array([])
+        else
+          match (mem)
+          {
+          | m is IMethod =>
+            JsAst.StaticMethodRef(JsClass.GetProperName(from.TypeInfo), mem.Name, JsAstHelper.MethodParameters(m))
+          | _ =>
+            JsAst.StaticRef(JsClass.GetProperName(from.TypeInfo), mem.Name);
+          }
       | Switch(expr, defCase, cases)      =>
         JsAst.Switch(
           build(expr),

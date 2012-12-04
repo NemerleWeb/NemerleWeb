@@ -33,7 +33,7 @@ namespace NemerleWeb
       | [arg1] =>
         match(member.Name)
         {
-        | "ToString" => Some(arg1.MethodCall("toString", []))
+        | "ToString" => Some(arg1.JsMethodCall("toString", []))
         | "ToDouble"
         | "ToSingle" => Some(JsAst.Call(JsAst.GlobalRef("parseFloat"), parms))
         | "ToByte"

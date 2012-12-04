@@ -44,38 +44,39 @@ namespace NemerleWeb
     Parse(loc : Location, code : string) : PExpr
     {
       _typer.Manager.MacroColors.PushUseSiteColor();
-      def pExpr = try     { MainParser.ParseExpr(_typer.Env, code, loc, false); }
-                  finally { _typer.Manager.MacroColors.PopColor(); };
+      def pExpr = try     MainParser.ParseExpr(_typer.Env, code, loc, false)
+                  finally _typer.Manager.MacroColors.PopColor();
       pExpr
     }
 
     SplicablePExprName(value : X.Splicable, defaultns : string = "") : PExpr
     {
       Util.locate(ToLocation(value),
-      match (value)
-      {
-        | Splicable.Value(value)          =>
-            if(defaultns.IsEmpty())    
-                <[ L.XName.Get($(value : string)) ]>
-            else            
-                <[ L.XNamespace.Get($(defaultns : string)).GetName($(value : string))]>
-        | Splicable.Expr(expr)            => Parse(ToLocation(value), expr)
-        | Splicable.ListExpr              => Message.FatalError(<#The "..$" not supportend in name context.#>);
-        | Splicable.ControlExpr           => assert(false)
-      })
+        match (value)
+        {
+          | Splicable.Value(value)          =>
+              if(defaultns.IsEmpty())    
+                  <[ L.XName.Get($(value : string)) ]>
+              else            
+                  <[ L.XNamespace.Get($(defaultns : string)).GetName($(value : string))]>
+          | Splicable.Expr(expr)            => Parse(ToLocation(value), expr)
+          | Splicable.ListExpr              => Message.FatalError(<#The "..$" not supportend in name context.#>);
+          | Splicable.ControlExpr           => assert(false)
+        })
     }
     
     SplicablePExprStr(value : X.Splicable) : PExpr
     {
       Util.locate(ToLocation(value),
-      match (value)
-      {
-        | Splicable.Value(value)    => <[ $(value : string) ]>
-        | Splicable.Expr(expr)      => Parse(ToLocation(value), expr)          
-        | Splicable.ListExpr(_expr) => Message.FatalError(<#The "..$" not supportend in name context.#>);
-        | Splicable.ControlExpr     => assert(false)
-      })
+        match (value)
+        {
+          | Splicable.Value(value)    => <[ $(value : string) ]>
+          | Splicable.Expr(expr)      => Parse(ToLocation(value), expr)          
+          | Splicable.ListExpr(_expr) => Message.FatalError(<#The "..$" not supportend in name context.#>);
+          | Splicable.ControlExpr     => assert(false)
+        })
     }
+    
     public Transform([NotNull] xmlAsts : XmlAst.Seq) : PExpr
     {          
       def splicedMethod = CleanupCallRefs(<[ $(GetMethodWithSplicesOnly(xmlAsts)) ]>);
@@ -91,19 +92,21 @@ namespace NemerleWeb
         Debug.WriteLine(_transformCounter + ": " + xmlAst.ToString());
         def loopStack = if(loopStack == null) [] else loopStack;
         
-        def transformJsExpr(expr) {
+        def transformJsExpr(expr)
+        {
           def res = if(expr.StartsWith("\"") && expr.EndsWith("\"")) expr.Trim('\"') else expr;
           //def res = Regex.Replace(res, <#(^(?<b>)_self\W|(?<b>\W)_self\W)#>, "${b}");
-          def res = if(res.EndsWith(";")) res.Substring(0, res.Length - 1) else res;          
+          def res = if(res.EndsWith(";")) res.Substring(0, res.Length - 1) else res;
           res
         }
                 
-        def getSplice() {
+        def getSplice()
+        {
           mutable splice;
           if(splices.TryGetValue(_transformCounter, out splice))
-              transformJsExpr(splice ?? "");
+            transformJsExpr(splice ?? "");
           else 
-              ""
+            ""
         }
         
         match (xmlAst) {
@@ -120,7 +123,7 @@ namespace NemerleWeb
             | (Splicable.Value(v), _) when v == "checked"  => <[ [L.XAttribute("nw-checked", $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "events"  => <[ [L.XAttribute("nw-events", $(getSplice()))] ]>
             | (Splicable.Value(v), _) when v == "template" =>
-              def pexpr = SplicablePExprStr(value);
+              def pexpr = SplicablePExprStr(value);              
               def binding = match(pexpr)
               {
                 | <[ template(_.$model) ]>             => $<#nweb.utils.getTemplateName(self.$model, "View"): self.$model#>
@@ -132,25 +135,25 @@ namespace NemerleWeb
                   def splice = getSplice();
                   def p = regexp match(splice.Replace(System.Environment.NewLine, ""))
                   {
-                  | <#self.template\((?<p>.+),.+#> => p
-                  | <#self.template\((?<p>.+).+#> => p
-                  | _ => ""
+                  | <#self.template(\[.*\])?\((?<p>.+),.+#> => p
+                  | <#self.template(\[.*\])?\((?<p>.+).+#> => p
+                  | _ => Message.Error(pexpr.Location, $"Incorrect xml: $xmlAst"); ""
                   };
                   $<#nweb.utils.getTemplateName($p, "$view"): $p#>
                 | <[ template(_.$model, $_r) ]> =>
                   def splice = getSplice();
                   def p = regexp match(splice.Replace(System.Environment.NewLine, ""))
                   {
-                  | <#self.template\((.+),(?<p>.+)\)#> => p
-                  | _ => ""
+                  | <#self.template(\[.*\])?\((.+),(?<p>.+)\)#> => p
+                  | _ => Message.Error(pexpr.Location, $"Incorrect xml: $xmlAst"); ""
                   };
                   $<#nweb.utils.getTemplateName(self.$model, $p): self.$model#>
                 | <[ template($_model, $_r) ]> => 
                   def splice = getSplice();
                   def (p1, p2) = regexp match(splice)
                   {
-                  | <#self.template\((?<p1>.+),(?<p2>.+)\)#> => (p1, p2)
-                  | _ => ("", "")
+                  | <#self.template(\[.*\])?\((?<p1>.+),(?<p2>.+)\)#> => (p1, p2)
+                  | _ => Message.Error(pexpr.Location, $"Incorrect xml: $xmlAst"); ("", "")
                   };
                   $<#nweb.utils.getTemplateName($p1, $p2): $p1#>
                 | _ => Message.FatalError($"Invalid patter expression: $pexpr")
@@ -294,9 +297,12 @@ namespace NemerleWeb
             def pexpr = Parse(ToLocation(xmlAst), expr);
             <[ def $(varName : dyn) = $pexpr;
                _ = $(varName : dyn); ]>
-        | TagSplice(expr, true)             => <[ def $(varName : dyn) = NColl.NToArray($(Parse(ToLocation(xmlAst), expr))) ]>
-        | AttrSplice(expr, SpliceType.Expr) => <[ def $(varName : dyn) = $(Parse(ToLocation(xmlAst), expr)) : L.XAttribute ]>
-        | AttrSplice(expr, SpliceType.List) => <[ def $(varName : dyn) = NColl.NToArray.[L.XAttribute]($(Parse(ToLocation(xmlAst), expr)) : IEnumerable[L.XAttribute]) ]>         
+        | TagSplice(expr, true)             =>
+          <[ def $(varName : dyn) = NColl.NToArray($(Parse(ToLocation(xmlAst), expr))) ]>
+        | AttrSplice(expr, SpliceType.Expr) =>
+          <[ def $(varName : dyn) = $(Parse(ToLocation(xmlAst), expr)) : L.XAttribute ]>
+        | AttrSplice(expr, SpliceType.List) =>
+          <[ def $(varName : dyn) = NColl.NToArray.[L.XAttribute]($(Parse(ToLocation(xmlAst), expr)) : IEnumerable[L.XAttribute]) ]>         
         | AttrSplice(_, SpliceType.Foreach)
         | AttrSplice(_, SpliceType.When)
         | AttrSplice(_, SpliceType.Unless)  => Message.FatalError("Control instructions must be placed before attributes in Tag definition.");        
@@ -307,15 +313,20 @@ namespace NemerleWeb
         }
     }
     
-    CleanupCallRefs(expr : PExpr) : PExpr {
-    | Sequence(items) => PExpr.Sequence(items.Select(i => CleanupCallRefs(i)).Where(c => !(c is PExpr.Sequence([]))).NToList())
-    | MacroCall(name, ns, parms) => PExpr.MacroCall(name, ns, parms.Select(p => 
-                                                            match(p) {
-                                                            | SyntaxElement.Expression(body) => SyntaxElement.Expression(CleanupCallRefs(body))                                                            
-                                                            | _ => p
-                                                            }).NToList())
-    | Define(p, Ref(name)) when _methodNames.Contains(name.Id) => PExpr.Define(p, PExpr.Literal(Literal.String("self." + name.Id)))
-    | _ => expr
+    CleanupCallRefs(expr : PExpr) : PExpr
+    {
+      | Sequence(items) =>
+        PExpr.Sequence(items.Select(i => CleanupCallRefs(i)).Where(c => !(c is PExpr.Sequence([]))).NToList())
+      | MacroCall(name, ns, parms) =>
+        PExpr.MacroCall(name, ns, parms.Select(p => 
+          match(p)
+          {
+          | SyntaxElement.Expression(body) => SyntaxElement.Expression(CleanupCallRefs(body))
+          | _ => p
+          }).NToList())
+      | Define(p, Ref(name)) when _methodNames.Contains(name.Id) =>
+        PExpr.Define(p, PExpr.Literal(Literal.String("self." + name.Id + <#[""]#>)))
+      | _ => expr
     }
     
     CreateAttribute(name : string, val : string) : XmlAst

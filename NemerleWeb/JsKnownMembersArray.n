@@ -52,7 +52,7 @@ namespace NemerleWeb
         match (member.Name)
         {
         // TODO: Implement real binary search
-        | "BinarySearch" => Some(arg1.MethodCall("indexOf", [arg2]))
+        | "BinarySearch" => Some(arg1.JsMethodCall("indexOf", [arg2]))
         | _ => None()
         }
       | _ => None()

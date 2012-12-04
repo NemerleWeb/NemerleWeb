@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace NemerleWeb
-{
+{ 
   internal module StringExtensions
   {
     public static FirstCharacterToLower([NotNull] this str : string) : string 
@@ -25,19 +25,44 @@ namespace NemerleWeb
   // Mini lifting
   internal module JsAstExtensions
   {
-    public static MethodCall(this self : JsAst, [NotNull] method : string, [NotNull] parms : list[JsAst]) : JsAst
+    public static JsMethodCall(this self : JsAst, [NotNull] method : string, [NotNull] parms : list[JsAst]) : JsAst
     {
-      JsAst.Call(JsAst.MethodRef(self, method.FirstCharacterToLower()), parms)
+      JsAst.Call(JsAst.MethodRef(self, method.FirstCharacterToLower(), None()), parms)
+    }
+    
+    public static MethodCall(this self : JsAst, [NotNull] method : IMember, [NotNull] parms : list[JsAst]) : JsAst
+    {
+      JsAst.Call(
+        JsAst.MethodRef(
+          self,
+          method.Name,
+          JsAstHelper.MethodParameters(method :> IMethod)),
+       parms)
     }
     
     public static ExternalMethodCall(this self : JsAst, [NotNull] method : string, [NotNull] parms : list[JsAst]) : JsAst
     {
-      JsAst.Call(JsAst.MethodRef(self, method), parms)
+      JsAst.Call(JsAst.MethodRef(self, method, None()), parms)
     }
     
-    public static StaticCall(this type : string, [NotNull] method : string, [NotNull] parms : list[JsAst]) : JsAst
+    public static JsStaticCall(this type : string, [NotNull] method : IMember, [NotNull] parms : list[JsAst]) : JsAst
     {
-      JsAst.Call(JsAst.StaticRef(type, method.FirstCharacterToLower()), parms)
+      JsAst.Call(JsAst.StaticMethodRef(type, method.Name.FirstCharacterToLower(), None()), parms)
+    }
+    
+    public static JsStaticCall(this type : string, [NotNull] methodName : string, [NotNull] parms : list[JsAst]) : JsAst
+    {
+      JsAst.Call(JsAst.StaticMethodRef(type, methodName, None()), parms)
+    }
+    
+    public static StaticCall(this type : string, [NotNull] method : IMember, [NotNull] parms : list[JsAst]) : JsAst
+    {
+      JsAst.Call(
+        JsAst.StaticMethodRef(
+          type,
+          method.Name,
+          JsAstHelper.MethodParameters(method :> IMethod)),
+        parms)
     }
     
     public static Field(this self : JsAst, [NotNull] field : string) : JsAst
@@ -104,7 +129,7 @@ namespace NemerleWeb
         .Where(isRefOut)
         .Select(p => builder'(p.expr))
         .Where(expr => !(expr is JsAst.ParamRef()))
-        .Map(expr => JsAst.Pack(expr));
+        .Select(expr => JsAst.Pack(expr));
       
       def callAst =
         match (call)
@@ -117,13 +142,15 @@ namespace NemerleWeb
               def callback = if(parms.Length > 0) builder'(parms.Last().expr) else JsAst.Void();
               match(callback)
               {
-                | Seq(DefValue as dv :: cb :: []) => JsAst.Seq([dv, JsAst.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, cb)])
+                | Seq(DefValue as dv :: cb :: []) =>
+                  JsAst.Seq([dv, JsAst.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, cb)])
                 | _ => JsAst.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, callback)
               }
           | Call(MethodRef(_, meth, _, _), [modelParm, viewParm], _) when meth.Name == "GetTemplateName" =>             
             match(modelParm, viewParm)
             {
-            | (Parm(expr = TExpr.Literal(Literal.String(model))), Parm(expr = TExpr.Literal(Literal.String(view)))) =>
+            | (Parm(expr = TExpr.Literal(Literal.String(model))),
+               Parm(expr = TExpr.Literal(Literal.String(view)))) =>
               JsAst.Code($"nweb.utils.getTemplateName(this.$model, '$view')")
             | _ => Message.FatalError("Invalid GetTemplateName call, use 'name' macro")
             }
@@ -146,10 +173,10 @@ namespace NemerleWeb
         .Where(isRefOut)
         .Select(p => builder'(p.expr))
         .Where(expr => !(expr is JsAst.ParamRef()))
-        .Map(expr => JsAst.Unpack(expr));
+        .Select(expr => JsAst.Unpack(expr));
       
       if(packRefOut.Any())
-        JsAst.Seq([JsAst.Seq(packRefOut), callAst, JsAst.Seq(unpackRefOut)])
+        JsAst.Seq([JsAst.Seq(packRefOut.NToList()), callAst, JsAst.Seq(unpackRefOut.NToList())])
       else
         callAst
     }
@@ -162,13 +189,13 @@ namespace NemerleWeb
     private static _convertTypeHandlers : Dictionary[string, ConvertTypeHandler] = Dictionary();    
     private static _convertBaseTypeHandlers : Dictionary[string, ConvertTypeHandler] = Dictionary();
     
-    internal type ConvertMemberHandler = TypeInfo * JsAst * list[JsAst] -> option[JsAst];
+    internal type ConvertMethodHandler = TypeInfo * JsAst * IMember * list[JsAst] -> option[JsAst];
     
     // memberName -> Handler
-    private static _convertMemberHandlers : Dictionary[string, ConvertMemberHandler] = Dictionary();
+    private static _convertMethodHandlers : Dictionary[string, ConvertMethodHandler] = Dictionary();
     
     // Default memberName -> Handler
-    private static _convertDefaultMemberHandlers : Dictionary[string, ConvertMemberHandler] = Dictionary();
+    private static _convertDefaultMemberHandlers : Dictionary[string, ConvertMethodHandler] = Dictionary();
 
     /// <summary>
     /// Convert method.
@@ -183,8 +210,8 @@ namespace NemerleWeb
       // First try convert member by name
       def memberName = member.Name;
       mutable memberHandler;
-      when (_convertMemberHandlers.TryGetValue(memberName, out memberHandler))
-        when (memberHandler(typeInfo, left, parms) is Some(ast))
+      when (_convertMethodHandlers.TryGetValue(memberName, out memberHandler))
+        when (memberHandler(typeInfo, left, member, parms) is Some(ast))
           return ast;
       
       // If no member handler found, try method handler
@@ -195,30 +222,32 @@ namespace NemerleWeb
           return ast;
           
       // Try using just FullName if SystemType
-      when (typeInfo != null && typeInfo.SystemType != null)
+      when (typeInfo?.SystemType != null)
         when (_convertTypeHandlers.TryGetValue(typeInfo.FullName, out typeHandler))
           when (typeHandler(left, member, parms) is Some(ast))
             return ast;
             
       // Try looking for base types
       foreach(subType in GetSubTypeList(typeInfo))
-        when (subType != null && subType.SystemType != null)
+        when (subType?.SystemType != null)
           when (_convertBaseTypeHandlers.TryGetValue(subType.SystemType.FullName, out typeHandler))
             when (typeHandler(left, member, parms) is Some(ast))
               return ast;
             
-      when(typeInfo != null && typeInfo.IsCustomAttributeDefined("NemerleWeb.JsAstAttribute")) {
+      when(typeInfo?.IsCustomAttributeDefined("NemerleWeb.JsAstAttribute"))
+      {
         if(member.IsConstructor)
           return JsAst.Call(JsAst.Constructor(typeInfo.Name), parms);
         else if (left is JsAst.StaticMethodRef)
-          return JsAst.Call(JsAst.StaticMethodRef(typeInfo.Name, memberName), parms);        
+          return typeInfo.Name.StaticCall(member, parms);
         else
-          return JsAst.Call(JsAst.MethodRef(left, memberName), parms);
+          return left.MethodCall(member, parms);
       }
               
       // Nothing found, try default dictionary
-      when (_convertDefaultMemberHandlers.TryGetValue(memberName, out memberHandler))
-        when (memberHandler(typeInfo, left, parms) is Some(ast))
+      mutable defaultMemberHandler;
+      when (_convertDefaultMemberHandlers.TryGetValue(memberName, out defaultMemberHandler))
+        when (defaultMemberHandler(typeInfo, left, member, parms) is Some(ast))
           return ast;
           
       // Process low level naming
@@ -235,7 +264,7 @@ namespace NemerleWeb
         | Some(ast) => ast
         | None => JsAst.NotImpl(member.Name)
         }        
-      | _ => JsAst.Call(JsAst.MethodRef(left, member.Name), parms)
+      | _ => left.MethodCall(member, parms)
       }
     }
     
@@ -253,7 +282,7 @@ namespace NemerleWeb
             member.Location,
             $"Invalid $(member.Name) with $(TypeName(typeInfo)) type, params: ..$parms not implemented in JS");
           
-        JsAst.Call(JsAst.MethodRef(left, member.Name), parms)
+        left.MethodCall(member, parms)
       }
     }
     
@@ -272,21 +301,20 @@ namespace NemerleWeb
       _convertBaseTypeHandlers.Add(type.FullName, handler);
     }
     
-    public RegisterMember([NotNull] memberName : string, [NotNull] handler : ConvertMemberHandler) : void
+    public RegisterMember([NotNull] memberName : string, [NotNull] handler : ConvertMethodHandler) : void
     {
-      _convertMemberHandlers.Add(memberName, handler);
+      _convertMethodHandlers.Add(memberName, handler);
     }
     
-    public RegisterDefaultMember([NotNull] memberName : string, [NotNull] handler : ConvertMemberHandler) : void
+    public RegisterDefaultMember([NotNull] memberName : string, [NotNull] handler : ConvertMethodHandler) : void
     {
       _convertDefaultMemberHandlers.Add(memberName, handler);
     }
     
     public GetSubTypeList(type : TypeInfo) : list[TypeInfo]
-    {   
-    | null => []
-    | _ =>
-      match(type.BaseType) {        
+    {
+      match(type?.BaseType)
+      {        
       | null => []
       | baseType => baseType :: GetSubTypeList(baseType)
       }
@@ -296,35 +324,24 @@ namespace NemerleWeb
       
     public ConvertField([NotNull] obj : TExpr, [NotNull] field : IField, [NotNull] builder : TExpr -> JsAst) : JsAst
     {
-      match(field)
-      {      
-      | _ when field.Name == "hd" && field.DeclaringType.FrameworkTypeName == "Nemerle.Core.list+Cons" => JsAst.Call(JsAst.MethodRef(builder(obj), "hd"), [])
-      | _ when field.Name == "tl" && field.DeclaringType.FrameworkTypeName == "Nemerle.Core.list+Cons" => JsAst.Call(JsAst.MethodRef(builder(obj), "tl"), [])        
-      | _ => JsAst.FieldRef(builder(obj), field.Name) 
-      }
+      if ((field.Name == "hd" || field.Name == "tl") &&
+        field.DeclaringType.FrameworkTypeName == "Nemerle.Core.list+Cons")
+        JsAst.Call(JsAst.MethodRef(builder(obj), field.Name, None()), [])        
+      else
+        JsAst.FieldRef(builder(obj), field.Name) 
     }
     
     #region Helper methods
-    
-    [Memoize]
+        
     private InternalTypeName(type : TypeInfo) : string
     {
       if (type.SystemType != null) type.SystemType.FullName else type.FrameworkTypeName;
     }
     
+    [Memoize]
     private TypeName(type : TypeInfo) : string
     {
       if (type != null) InternalTypeName(type) else "";
-    }
-                  
-    private RemoveGetSet([NotNull] methodName : string) : string
-    {
-      if (IsGetSet(methodName)) methodName.Substring(4) else methodName
-    }
-      
-    private IsGetSet(methodName : string) : bool
-    {
-      methodName.StartsWith("get_") || methodName.StartsWith("set_")
     }
     
     #endregion

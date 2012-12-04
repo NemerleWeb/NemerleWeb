@@ -31,7 +31,7 @@ namespace NemerleWeb
         match(member.Name)
         {
         | "get_Current"
-        | "MoveNext" => Some(left.MethodCall(member.Name, parms))
+        | "MoveNext" => Some(left.JsMethodCall(member.Name, parms))
         | _ => None()
         }
       | _ => None()

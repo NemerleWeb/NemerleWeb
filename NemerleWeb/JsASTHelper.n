@@ -5,6 +5,7 @@ using Nemerle.Compiler;
 using Nemerle.Text;
 using Nemerle.Utility;
 using Nemerle.Extensions;
+using Nemerle.Compiler.Typedtree;
 
 using System;
 using System.Collections.Generic;
@@ -258,36 +259,42 @@ namespace NemerleWeb
     {
       | JsAst.Literal(JsLiteral.String) => arg        
       | JsAst.LocalRef(_, Some(type)) when type.TryRequire(JsClass.StringType) => arg
-      | _ => arg.MethodCall("toString", [])
+      | _ => arg.JsMethodCall("toString", [])
+    }
+    
+    public IsFrameworkAssembly([NotNull] typeInfo : TypeInfo) : bool
+    {
+      if (typeInfo.SystemType == null) false
+      else
+      {
+        def token = typeInfo.SystemType.Assembly.GetName().GetPublicKeyToken();
+        
+        def checkTokens =
+          [
+            // CLR Token
+            array[0xb7 : byte, 0x7a, 0x5c, 0x56, 0x19, 0x34, 0xe0, 0x89],
+              
+            // Framework Token
+            array[0xb0 : byte, 0x3f, 0x5f, 0x7f, 0x11, 0xd5, 0x0a, 0x3a],
+              
+            // Presentation Token
+            array[0x31 : byte, 0xbf, 0x38, 0x56, 0xad, 0x36, 0x4e, 0x35],
+          ];
+       
+        checkTokens.Any(t => t.SequenceEqual(token))
+      }
     }
     
     /// Call user ToString if exist
-    public ExternalToString(typeInfo : TypeInfo, [NotNull] left : JsAst, [NotNull] parms : list[JsAst]) : JsAst
-    {       
-      def isFrameworkAssembly(typeInfo)
-      {
-        if (typeInfo.SystemType == null) false
-        else
-        {
-          def token = typeInfo.SystemType.Assembly.GetName().GetPublicKeyToken();
-        
-          def msClrToken = array[0xb7 : byte, 0x7a, 0x5c, 0x56, 0x19, 0x34, 0xe0, 0x89];
-          def msFxToken = array[0xb0 : byte, 0x3f, 0x5f, 0x7f, 0x11, 0xd5, 0x0a, 0x3a];
-       
-          token.SequenceEqual(msClrToken) || token.SequenceEqual(msFxToken);
-        }
-      }      
-      
+    public CallToString(
+      typeInfo : TypeInfo,
+      [NotNull] left : JsAst,
+      [NotNull] method : IMember,
+      [NotNull] parms : list[JsAst]) : JsAst
+    {
       // If type has method ToString, use it
-      if (typeInfo != null && !isFrameworkAssembly(typeInfo) &&
-        { 
-          def members = typeInfo.GetMembers(
-            BindingFlags.Instance |
-            BindingFlags.Public |
-            BindingFlags.NonPublic |
-            BindingFlags.DeclaredOnly);
-          members.Any(m => m.Name == "ToString") })
-        left.ExternalMethodCall("ToString", parms)
+      if (typeInfo != null && !IsFrameworkAssembly(typeInfo))
+        left.MethodCall(method, parms);
       else
         JsAstHelper.JsToString(left)
     }
@@ -306,6 +313,39 @@ namespace NemerleWeb
             a
         });
         lst
+    }
+    
+    /// If parameters has value, use it and access method via dictionary
+    public Method(method : string, parameters : option[list[TParameter]]) : string
+    {
+      // Handle properties
+      // TODO: Add better check for properties
+      if (method.StartsWith("set_") || method.StartsWith("get_") || method == "apply" || method == "apply_void")
+        method
+      else
+        match(parameters)
+        {
+        | Some([]) => $<#$method[""]#>
+        | Some(parms) =>
+          def typeOrTypeInfo(p)
+          {
+            (p.Type.TypeInfo : object ?? p.Type).ToString()
+          }
+      
+          def functionSignature = $<#..$(parms; ", "; typeOrTypeInfo)#>;
+          $<#$method["$functionSignature"]#>
+        | _ => method
+        }
+    }
+    
+    public MethodParameters(m : IMethod) : option[list[TParameter]]
+    {
+      if (m.DeclaringType is LibraryReference.ExternalTypeInfo ||
+        m.DeclaringType.GetModifiers().CustomAttributes.Any(
+          a => a.ToString() == "NemerleWeb.JsAstAttribute"))
+        None()
+      else
+        Some(m.Header.Parameters)
     }
   }
 }

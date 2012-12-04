@@ -35,27 +35,27 @@ namespace NemerleWeb
       // if (left.dispose && typeof left.dispose == "function") left.dispose();
       // else left.Dispose();
       
-      Some(
-        JsAst.If
-        (
-          JsAst.Call
+        Some(
+          JsAst.If
           (
-            JsAst.OpCode("&&"),
-            [
-              JsAst.FieldRef(left, "dispose"),              
-              JsAst.Call
-              (
-                JsAst.OpCode("==="),
-                [
-                  JsAst.TypeOf(JsAst.FieldRef(left, "dispose")),
-                  JsAst.Literal(JsLiteral.String("function"))
-                ]
-              )
-            ]
-          ),
-          left.MethodCall("dispose", parms),
-          left.ExternalMethodCall("Dispose", parms)
-        ))
+            JsAst.Call
+            (
+              JsAst.OpCode("&&"),
+              [
+                JsAst.FieldRef(left, "dispose"),              
+                JsAst.Call
+                (
+                  JsAst.OpCode("==="),
+                  [
+                    JsAst.TypeOf(JsAst.FieldRef(left, "dispose")),
+                    JsAst.Literal(JsLiteral.String("function"))
+                  ]
+                )
+              ]
+            ),
+            left.JsMethodCall("dispose", parms),
+            left.ExternalMethodCall(<#Dispose[""]#>, parms)
+          ))
       
       | _ => None()
       }

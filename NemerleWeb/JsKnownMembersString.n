@@ -32,17 +32,17 @@ namespace NemerleWeb
         {        
         | "get_Length" => Some(JsAst.FieldRef(left, "length"))
         | "Clone" => Some(left)        
-        | "GetEnumerator" => Some(left.MethodCall(member.Name, parms))
+        | "GetEnumerator" => Some(left.JsMethodCall(member.Name, parms))
         | "GetHashCode"
         | "GetType"
         | "GetTypeCode"        
         | "IsNormalized"
         | "Normalize"
         | "ToCharArray" => None()
-        | "ToLower" => Some(left.MethodCall("toLowerCase", []))
+        | "ToLower" => Some(left.JsMethodCall("toLowerCase", []))
         | "ToLowerInvariant" => None()
         | "ToString" => Some(JsAstHelper.JsToString(left))
-        | "ToUpper" => Some(left.MethodCall("toUpperCase", []))
+        | "ToUpper" => Some(left.JsMethodCall("toUpperCase", []))
         | "ToUpperInvariant"
         | "Trim"
         | "TrimEnd"
@@ -61,14 +61,14 @@ namespace NemerleWeb
           Some(JsAst.Call(
             JsAst.OpCode("!=="),
             [
-              left.MethodCall("indexOf", parms),
+              left.JsMethodCall("indexOf", parms),
               JsAst.Literal(JsLiteral.Integer(-1))
             ]))
             
         | "EndsWith" => None()       
         | "Equals" => Some(JsAst.Call(JsAst.OpCode("==="), [left, arg1]))
         | "Format" => None()
-        | "IndexOf" => Some(left.MethodCall("indexOf", parms))
+        | "IndexOf" => Some(left.JsMethodCall("indexOf", parms))
         | "IndexOfAny"
         | "IsNormalized"        
         | "LastIndexOf"
@@ -79,7 +79,7 @@ namespace NemerleWeb
         | "Remove"
         | "Split"
         | "StartsWith" => None()
-        | "Substring" => Some(left.MethodCall("substr", parms))
+        | "Substring" => Some(left.JsMethodCall("substr", parms))
         | "ToLower"
         | "ToUpper"
         | "Trim" => None()        
@@ -105,7 +105,7 @@ namespace NemerleWeb
         | "Replace"
         | "Split"
         | "StartsWith" => None()
-        | "Substring" => Some(left.MethodCall("substr", parms))
+        | "Substring" => Some(left.JsMethodCall("substr", parms))
         | "ToCharArray"
         | _ => None()
         }
@@ -176,10 +176,10 @@ namespace NemerleWeb
             {
             | [] => None()
             | [v] => Some(JsAstHelper.JsToString(v))
-            | _ => Some(JsAstHelper.JsToString(values.Head).MethodCall("concat", values.Tail))
+            | _ => Some(JsAstHelper.JsToString(values.Head).JsMethodCall("concat", values.Tail))
             }
           | LocalRef(_, Some(type)) when JsClass.TypeIsArray(type) =>
-            Some(arg1.MethodCall("join", [JsAst.Literal(JsLiteral.String(""))]))
+            Some(arg1.JsMethodCall("join", [JsAst.Literal(JsLiteral.String(""))]))
           | _ => Some(JsAstHelper.JsToString(arg1))
           }
         | "Copy"
@@ -198,22 +198,22 @@ namespace NemerleWeb
       | [arg1, arg2] =>
         match (member.Name)
         {
-        | "Concat" => Some(JsAstHelper.JsToString(arg1).MethodCall("concat", [arg2]))
+        | "Concat" => Some(JsAstHelper.JsToString(arg1).JsMethodCall("concat", [arg2]))
         | "Equals" => None()
-        | "Join" => Some(arg2.MethodCall("join", [arg1]))
+        | "Join" => Some(arg2.JsMethodCall("join", [arg1]))
         | _ => None()
         }
       | [arg1, arg2, arg3] =>
         match (member.Name)
         {
-        | "Concat" => Some(JsAstHelper.JsToString(arg1).MethodCall("concat", [arg2, arg3]))
+        | "Concat" => Some(JsAstHelper.JsToString(arg1).JsMethodCall("concat", [arg2, arg3]))
         | "Equals"
         | _ => None()
         }
       | [arg1, arg2, arg3, arg4] =>
         match (member.Name)
         {
-        | "Concat" => Some(JsAstHelper.JsToString(arg1).MethodCall("concat", [arg2, arg3, arg4]))
+        | "Concat" => Some(JsAstHelper.JsToString(arg1).JsMethodCall("concat", [arg2, arg3, arg4]))
         | "Equals"
         | "Join"
         | _ => None()
