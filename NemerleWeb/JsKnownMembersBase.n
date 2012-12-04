@@ -20,9 +20,9 @@ namespace NemerleWeb
       // Constructor case
       JsKnownMembers.RegisterDefaultMember(
         ".ctor",
-        (typeInfo, _, parms) => Some(JsAst.Call(JsAst.Constructor(JsClass.GetProperName(typeInfo)), parms)));
+        (typeInfo, _, _, parms) => Some(JsAst.Call(JsAst.Constructor(JsClass.GetProperName(typeInfo)), parms)));
       
-      def toString(t, l, p) { Some(JsAstHelper.ExternalToString(t, l, p)) }
+      def toString(t, l, m, p) { Some(JsAstHelper.CallToString(t, l, m, p)) }
         
       JsKnownMembers.RegisterDefaultMember("ToString", toString);
     }

@@ -37,8 +37,8 @@ namespace NemerleWeb
       | [] =>
         match (member.Name)
         {
-        | "MoveNext" => Some(JsAst.Call(JsAst.MethodRef(left, "moveNext"), []))
-        | "get_Current" => Some(left.MethodCall("current", parms))
+        | "MoveNext" => Some(JsAst.Call(JsAst.MethodRef(left, "moveNext", None()), []))
+        | "get_Current" => Some(left.JsMethodCall("current", parms))
         | _ => None()
         }
       | _ => None()

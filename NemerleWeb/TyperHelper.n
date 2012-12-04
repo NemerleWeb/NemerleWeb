@@ -21,7 +21,8 @@ namespace NemerleWeb
         {
           def method = BuildMethod(expr, typer);
           def oldBody = method.Header.body;
-          def defs = JsAstBuilder.BuildJsAstForSplices(GetTypedBody(method, typer, typer.CurrentTypeBuilder, false), method.Header);
+          def typedBody = GetTypedBody(method, typer, typer.CurrentTypeBuilder, false);
+          def defs = JsAstBuilder.BuildJsAstForSplices(typedBody, method.Header);
           method.Header.body = oldBody;
           def tt = GetTypedBody(method, typer, typer.CurrentTypeBuilder);
           def defs2 = JsAstBuilder.BuildJsAstForSplices(tt, method.Header);

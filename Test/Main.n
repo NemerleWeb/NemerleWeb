@@ -26,20 +26,47 @@ module Program
   }
 }
 
+[Unit]
+class P
+{
+  public static F() : int { 1 }
+  public static F(_ : int) : int { 2 }
+  public static F(_ : int, _ : int) : int { 3 }
+  
+  public new ToString(_ : int) : string { "" }
+  
+  public X : int -> string;
+  public this(){
+     X = this.ToString;
+  }
+  
+  public static Y : int -> int = F;
+}
 
 [Unit]
 public class Test
 {      
-   public static Escape() : void
-    {
-      def c = 1;
-      
-      match(c)
-      {
-      | c when c > 0 => ()
-      | _ => ()
-      }
-  }  
+  X() : void { _ = P.F(); }
+  
+  Y() : void { _ = P.F(1); }
+  
+  Z() : void { _ = P.F(1, 2); }
+  
+  U() : void
+  {
+    def f = P.F;
+    _ = f(1, 2);
+  }
+  
+  V() :void
+  {
+    def p = P();
+    _ = p.X(1);
+    _ = P.Y(1);
+    
+    _ = (p : object).ToString();
+    _ = p.ToString(3);
+  }
 
   [Html]
   public View() : string

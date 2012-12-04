@@ -80,11 +80,8 @@ namespace NemerleWeb
             Message.FatalError(parser.ToLocation(pos, pos + 1), msg)
           }
         }
-      | FunBody.Abstract =>
-        Message.FatalError("Abstract method is not supported")
-      | _ =>
-      assert2(false);
-        Message.FatalError(mb.Header.Location, "You must return XML literal string.")
+      | FunBody.Abstract => Message.FatalError("Abstract method is not supported")
+      | _ => Message.FatalError(mb.Header.Location, "You must return XML literal string.")
       }
     }
   }

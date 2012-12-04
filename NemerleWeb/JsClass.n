@@ -320,13 +320,30 @@ $indent};#>);
       {
         def self = if(hasSelf) "" else "var self = this;";
         def methodParms(method) { method.GetParameters().Select(p => p.Name); }
-        def genMethods = methods.Select(m => 
-$<#$(indent)$parentPtr.$(m.Name) = function(..$(methodParms(m))) { 
+        
+        def generatedMethods = HashSet();
+        
+        def methodsCode = methods.Select(m =>
+        { 
+          // Add method variable in first time
+          def methodVariable =
+            if (generatedMethods.Contains(m.Name)) ""
+            else
+            {
+              _ = generatedMethods.Add(m.Name);
+              $<#$(indent)$parentPtr.$(m.Name) = {};#>;
+            };
+            
+          def methodWithSignature = JsAstHelper.Method(m.Name, Some(m.Header.Parameters));
+
+$<#$methodVariable
+$(indent)$parentPtr.$methodWithSignature = function(..$(methodParms(m))) {
 $(indent)  $self
 $(TranslateMethodBody(m, indent + "  "))
-$(indent)}#>);
+$(indent)}#>
+        });
 
-          $<#..$(genMethods; "\n")#>
+        $<#..$(methodsCode; "\n")#>
       }
         
       GetMethods(indent : string, parentPtr : string, hasSelf : bool) : string 

@@ -35,7 +35,7 @@ namespace NemerleWeb
       | [] =>
         match (member.Name)
         {
-        | "GetEnumerator" => Some(left.MethodCall(member.Name, parms))
+        | "GetEnumerator" => Some(left.JsMethodCall(member.Name, parms))
         | _ => None()
         }
       | _ => None()

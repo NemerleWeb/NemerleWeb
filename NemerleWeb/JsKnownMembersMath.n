@@ -37,15 +37,15 @@ namespace NemerleWeb
         | "Abs"
         | "Acos"
         | "Asin"
-        | "Atan" => Some("Math".StaticCall(member.Name, parms))
-        | "Ceiling" => Some("Math".StaticCall("ceil", parms))
+        | "Atan" => Some("Math".JsStaticCall(member, parms))
+        | "Ceiling" => Some("Math".JsStaticCall("ceil", parms))
         | "Cos"
         | "Exp"
         | "Log"
         | "Round"
         | "Sin"
         | "Sqrt"
-        | "Tan" => Some("Math".StaticCall(member.Name, parms))
+        | "Tan" => Some("Math".JsStaticCall(member, parms))
         | _ => None()
         }
       | [_, _] =>
@@ -53,7 +53,7 @@ namespace NemerleWeb
         {
         | "Max"
         | "Min"
-        | "Pow" => Some("Math".StaticCall(member.Name, parms))
+        | "Pow" => Some("Math".JsStaticCall(member, parms))
         | _ => None()
         }
       | _ => None()

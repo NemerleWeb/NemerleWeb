@@ -245,12 +245,25 @@ namespace NemerleWeb.Tests
       | B { Y : int; }
     }
     
+    [Unit]
     module StringBuilderTest
     {
       public F(sb : StringBuilder) : void
       {
         _ = sb.Append("abc");
       }
+    }
+    
+    [Unit]
+    class MethodOverloadTest
+    {
+      public F() : int { 0 }
+      public F(_ : int) : int { 1 }
+      public F(_ : int, _ : string) : int { 2 }
+      
+      public static G() : int { 0 }
+      public static G(_ : string) : int { 1 }
+      public static G(_ : string, _ : double) : int { 2 }
     }
     
     public this()
@@ -1319,6 +1332,16 @@ namespace NemerleWeb.Tests
         
         tpl[0] == 1 && tpl[1] == "a" && tpl[2] == 2.0
       });
+      
+      test("method overload", () =>
+      {
+        MethodOverloadTest().F() == 0 &&
+        MethodOverloadTest().F(1) == 1 &&
+        MethodOverloadTest().F(2, "") == 2 &&        
+        MethodOverloadTest.G() == 0 &&
+        MethodOverloadTest.G("") == 1 &&
+        MethodOverloadTest.G("", 0) == 2
+      })
     }    
     
     [Html]

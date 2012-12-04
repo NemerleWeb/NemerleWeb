@@ -20,7 +20,7 @@ namespace NemerleWeb
       def opcodeAst(opcode, parms) { JsAst.Call(JsAst.OpCode(opcode), parms) }
       def registerOpcode(opcodeName, opcode)
       {
-        JsKnownMembers.RegisterMember(opcodeName, (_, _, parms) => Some(opcodeAst(opcode, parms)));
+        JsKnownMembers.RegisterMember(opcodeName, (_, _, _, parms) => Some(opcodeAst(opcode, parms)));
       }
       
       registerOpcode("op_Inequality", "!==");
@@ -68,7 +68,7 @@ namespace NemerleWeb
       {
         JsKnownMembers.RegisterMember(
           opcodeName,
-          (typeInfo, left, parms) =>
+          (typeInfo, left, member, parms) =>
           {
             match (parms)
             {
@@ -77,7 +77,7 @@ namespace NemerleWeb
               match(typeInfo.FullName)
               {
               | "System.Decimal" => Some(arg)
-              | "System.String" => Some(JsAstHelper.ExternalToString(typeInfo, left, parms))
+              | "System.String" => Some(JsAstHelper.CallToString(typeInfo, left, member, parms))
               | _ => Some(JsAst.Call(left, []))
               }
             | _ => None()

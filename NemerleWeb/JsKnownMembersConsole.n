@@ -33,7 +33,7 @@ namespace NemerleWeb
       | [_] =>
         match (member.Name)
         {
-        | "WriteLine" => Some(JsAst.Call(JsAst.MethodRef(JsAst.LocalRef("console", None()), "log"), parms))
+        | "WriteLine" => Some(JsAst.Call(JsAst.MethodRef(JsAst.LocalRef("console", None()), "log", None()), parms))
         | _ => None()
         }
       | _ => None()
