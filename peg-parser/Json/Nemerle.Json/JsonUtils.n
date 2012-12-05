@@ -17,11 +17,10 @@ namespace Nemerle.Json
   [Unit]
   module JsonUtils
   {
-    // TODO: No method overload
-    //public Escape(src : string) : string
-    //{
-    //  Escape(StringBuilder(), src).ToString()
-    //}
+    public Escape(src : string) : string
+    {
+      Escape(StringBuilder(), src).ToString()
+    }
     
     public Escape(this sb : StringBuilder, src : string) : StringBuilder
     {

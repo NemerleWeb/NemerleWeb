@@ -256,14 +256,21 @@ namespace NemerleWeb.Tests
     
     [Unit]
     class MethodOverloadTest
-    {
-      public F() : int { 0 }
-      public F(_ : int) : int { 1 }
+    {      
       public F(_ : int, _ : string) : int { 2 }
+      public F() : int { F(1, "") - 2 }
+      public F(_ : int) : int { F(1, "") - 1 }
       
-      public static G() : int { 0 }
       public static G(_ : string) : int { 1 }
-      public static G(_ : string, _ : double) : int { 2 }
+      public static G() : int { G("") - 1 }
+      public static G(_ : string, _ : double) : int { G("") + 1 }
+      
+      public H(_ : int, _ : string) : int { 2 }
+      
+      public static Call(m : MethodOverloadTest) : int
+      {
+        m.F()
+      }
     }
     
     public this()
@@ -1340,7 +1347,9 @@ namespace NemerleWeb.Tests
         MethodOverloadTest().F(2, "") == 2 &&        
         MethodOverloadTest.G() == 0 &&
         MethodOverloadTest.G("") == 1 &&
-        MethodOverloadTest.G("", 0) == 2
+        MethodOverloadTest.G("", 0) == 2 &&
+        MethodOverloadTest().H(1, "") == 2 &&
+        MethodOverloadTest.Call(MethodOverloadTest()) == 0
       })
     }    
     
