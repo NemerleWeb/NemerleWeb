@@ -691,7 +691,10 @@ function System_Text_StringBuilder() {
     };
 
     this.Append = function (s) {
-        this.string += s;
+        if (s.hasOwnProperty("ToString"))
+            this.string += s.ToString[""].call(s);
+        else
+            this.string += s;
         return this;
     };
 

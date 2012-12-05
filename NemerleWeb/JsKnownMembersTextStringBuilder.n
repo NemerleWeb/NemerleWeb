@@ -32,7 +32,7 @@ namespace NemerleWeb
       | [arg1]
         when member.Name == "Append" &&
              (member :> IMethod).GetParameters().Nth(0).Type.Equals(JsClass.ObjectType) =>
-        Some(left.ExternalMethodCall(member.Name, [arg1.ExternalMethodCall("ToString", [])]))
+        Some(left.ExternalMethodCall(member.Name, [arg1]))
       | _ => Some(left.ExternalMethodCall(member.Name, parms))
       }
     }
