@@ -11,8 +11,6 @@ using System.Globalization;
 
 using NemerleWeb;
 
-// TODO: Restore ToString2 => ToString
-
 namespace Nemerle.Json
 {
   [Record, Unit]
@@ -23,7 +21,7 @@ namespace Nemerle.Json
     | Bool {value : bool}
     | Null
 
-    public ToString2(sb : StringBuilder) : StringBuilder
+    public ToString(sb : StringBuilder) : StringBuilder
     {
       match (this)
       {
@@ -36,7 +34,7 @@ namespace Nemerle.Json
 
     public override ToString() : string
     {
-      ToString2(StringBuilder()).ToString()
+      ToString(StringBuilder()).ToString()
     }
   }
 
@@ -73,7 +71,7 @@ namespace Nemerle.Json
     //public static Convert(boolean : bool) : JObject {JObject.Value(boolean);}
     public static FromBool(boolean : bool) : JObject {JObject.Value(JValue.Bool(boolean));}
 
-    public ToString2(sb : StringBuilder) : StringBuilder
+    public ToString(sb : StringBuilder) : StringBuilder
     {
       match (this)
       {
@@ -82,7 +80,7 @@ namespace Nemerle.Json
           foreach ((name, value) in items)
           {
             _ = sb.Append($<#"$name":#>);
-            _ = value.ToString2(sb);
+            _ = value.ToString(sb);
             _ = sb.Append(',');
           }
 
@@ -95,7 +93,7 @@ namespace Nemerle.Json
           _ = sb.Append("[");
           foreach (value in items)
           {
-            _ = value.ToString2(sb);
+            _ = value.ToString(sb);
             _ = sb.Append(',');
           }
 
@@ -104,13 +102,13 @@ namespace Nemerle.Json
 
           sb.Append("]");
         | Value(value) =>
-          value.ToString2(sb);
+          value.ToString(sb);
       }
     }
 
     public override ToString() : string
     {
-      ToString2(StringBuilder()).ToString()
+      ToString(StringBuilder()).ToString()
     }
   }
 }

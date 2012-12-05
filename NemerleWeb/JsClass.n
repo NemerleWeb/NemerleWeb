@@ -321,35 +321,50 @@ $indent};#>);
         def self = if(hasSelf) "" else "var self = this;";
         def methodParms(method) { method.GetParameters().Select(p => p.Name); }
         
-        def generatedMethods = HashSet();
+        // Method name => signature
+        def generatedMethods = Dictionary();
         
         def methodsCode = methods.Select(m =>
         {
           // Add method variable and default signature in first time
-          def (methodVariable, defaultSignatureAssign) =
-            if (generatedMethods.Contains(m.Name)) ("", "")
+          def methodVariable =
+            if (generatedMethods.ContainsKey(m.Name)) ""
             else
-            {
-              // Add to list
-              _ = generatedMethods.Add(m.Name);
-              
-              def defaultSignature =
-                if (m.Header.Parameters is []) ""
-                else $<#$parentPtr.$(m.Name)[""] = #>;
-              
-              ($<#$(indent)$parentPtr.$(m.Name) = {};#>, defaultSignature)
-            };
-            
+              $<#$(indent)$parentPtr.$(m.Name) = {};#>;
+          
           def methodWithSignature = JsAstHelper.Method(m.Name, Some(m.Header.Parameters));
+          
+          if (generatedMethods.ContainsKey(m.Name))
+          {
+            // Do not add default method signature
+            when (m.Header.Parameters is [])
+              generatedMethods[m.Name] = None();
+          }
+          else
+          {
+            if (m.Header.Parameters is [])
+              generatedMethods.Add(m.Name, None())
+            else
+              generatedMethods.Add(m.Name, Some(methodWithSignature))
+          }
 
 $<#$methodVariable
-$(indent)$defaultSignatureAssign$parentPtr.$methodWithSignature = function(..$(methodParms(m))) {
+$(indent)$parentPtr.$methodWithSignature = function(..$(methodParms(m))) {
 $(indent)  $self
 $(TranslateMethodBody(m, indent + "  "))
 $(indent)}#>
         });
+        
+        // Default methods signature for first method if there are no methods without parameters
+        def defaultMethodsCode = generatedMethods
+          .Where(kv => kv.Value.IsSome)
+          .Select(kv =>
+            {
+              $<#$indent$parentPtr.$(kv.Key)[""] = $parentPtr.$(kv.Value.Value)#>
+            });
 
-        $<#..$(methodsCode; "\n")#>
+        $<#..$(methodsCode; "\n")
+..$(defaultMethodsCode; "\n")#>
       }
         
       GetMethods(indent : string, parentPtr : string, hasSelf : bool) : string 
