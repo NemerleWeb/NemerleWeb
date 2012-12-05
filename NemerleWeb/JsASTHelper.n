@@ -315,12 +315,16 @@ namespace NemerleWeb
         lst
     }
     
+    // HACK: Handle properties and labmda according to name
+    public IsSpecialMethod(method : string) : bool
+    {
+      method.StartsWith("set_") || method.StartsWith("get_") || method == "apply" || method == "apply_void"
+    }
+    
     /// If parameters has value, use it and access method via dictionary
     public Method(method : string, parameters : option[list[TParameter]]) : string
     {
-      // HACK: Handle properties according to name
-      // HACK: Handle lambda according to name
-      if (method.StartsWith("set_") || method.StartsWith("get_") || method == "apply" || method == "apply_void")
+      if (IsSpecialMethod(method))
         method
       else
         match(parameters)
@@ -341,8 +345,12 @@ namespace NemerleWeb
     public MethodParameters(m : IMethod) : option[list[TParameter]]
     {
       if (IsFrameworkAssembly(m.DeclaringType) ||
-        m.DeclaringType.GetModifiers().CustomAttributes.Any(
-          a => a.ToString() == "NemerleWeb.JsAstAttribute"))
+        m.GetModifiers()
+         .CustomAttributes
+         .Any(a => a.ToString() == "NemerleWeb.IgnoreAttribute") ||
+        m.DeclaringType.GetModifiers()
+         .CustomAttributes
+         .Any(a => a.ToString() == "NemerleWeb.JsAstAttribute"))
         None()
       else
         Some(m.Header.Parameters)

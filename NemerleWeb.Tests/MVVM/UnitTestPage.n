@@ -1034,12 +1034,17 @@ namespace NemerleWeb.Tests
       
       test("StringBuilder Append", () =>
       {
+        def l : object = 2;
+        def t = TestToString();
+        
         def sb = StringBuilder();
         _ = sb.Append("a");
         _ = sb.Append(1);
         _ = sb.Append('x');
+        _ = sb.Append(l);
+        _ = sb.Append(t);
         
-        sb.ToString() == "a1x";
+        sb.ToString() == "a1x2X";
       });
       
       test("StringBuilder Append2", () =>

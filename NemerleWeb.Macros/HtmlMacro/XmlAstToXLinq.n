@@ -135,8 +135,8 @@ namespace NemerleWeb
                   def splice = getSplice();
                   def p = regexp match(splice.Replace(System.Environment.NewLine, ""))
                   {
-                  | <#self.template(\[.*\])?\((?<p>.+),.+#> => p
-                  | <#self.template(\[.*\])?\((?<p>.+).+#> => p
+                  | <#self.template\((?<p>.+),.+#> => p
+                  | <#self.template\((?<p>.+).+#> => p
                   | _ => Message.Error(pexpr.Location, $"Incorrect xml: $xmlAst"); ""
                   };
                   $<#nweb.utils.getTemplateName($p, "$view"): $p#>
@@ -144,7 +144,7 @@ namespace NemerleWeb
                   def splice = getSplice();
                   def p = regexp match(splice.Replace(System.Environment.NewLine, ""))
                   {
-                  | <#self.template(\[.*\])?\((.+),(?<p>.+)\)#> => p
+                  | <#self.template\((.+),(?<p>.+)\)#> => p
                   | _ => Message.Error(pexpr.Location, $"Incorrect xml: $xmlAst"); ""
                   };
                   $<#nweb.utils.getTemplateName(self.$model, $p): self.$model#>
@@ -152,7 +152,7 @@ namespace NemerleWeb
                   def splice = getSplice();
                   def (p1, p2) = regexp match(splice)
                   {
-                  | <#self.template(\[.*\])?\((?<p1>.+),(?<p2>.+)\)#> => (p1, p2)
+                  | <#self.template\((?<p1>.+),(?<p2>.+)\)#> => (p1, p2)
                   | _ => Message.Error(pexpr.Location, $"Incorrect xml: $xmlAst"); ("", "")
                   };
                   $<#nweb.utils.getTemplateName($p1, $p2): $p1#>

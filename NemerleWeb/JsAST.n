@@ -97,8 +97,11 @@ namespace NemerleWeb
                 {
                 | Call(OpCode as op, [e1, e2])       => $<#($(e1.Write("")) $(op.Write("")) $(e2.Write("")))#>
                 | Call(Constructor(type), parms)     => $<#new $(type)(..$(parms; ","; writeParam))#>
-                | Call(Indexer(obj), parms)          => $<#$(obj.Write())[..$(parms; ","; writeParam)]#>    
-                | Call(op, parms)                    => $<#$(op.Write())(..$(parms; ","; writeParam))#>    
+                | Call(Indexer(obj), parms)          => $<#$(obj.Write())[..$(parms; ","; writeParam)]#>                
+                | Call(MethodRef(obj, method, Some) as f, parms) when
+                  !JsAstHelper.IsSpecialMethod(method) =>
+                  $<#$(f.Write()).call(..$(obj :: parms; ","; writeParam))#>
+                | Call(f, parms)                     => $<#$(f.Write())(..$(parms; ","; writeParam))#>    
                 }
             }
             
