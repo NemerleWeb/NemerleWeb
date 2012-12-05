@@ -39,7 +39,7 @@ namespace NemerleWeb
         }
         
         public GetMethodJsAst(method : IMethod, typer : Typer, tb : TypeBuilder) : JsAst 
-        {
+        {when(method.Name == "get_CalcOutput" ) assert2(false);
           def texpr = GetTypedBody(method, typer, tb);
           def jsast = JsAstBuilder.BuildJsAst(texpr, !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor, method.Header);
           /*def tempFileName = System.IO.Path.GetTempFileName();

@@ -12,8 +12,15 @@ using System.Globalization;
 
 namespace NemerleWeb
 {
+  public module StringLiteral
+  {
+    // HACK: Indicator to not escape string literal
+    // Some string that cannot be found in code
+    public static DoNotEscapeMarker = "\u0001";
+  }
+  
     public variant JsAst
-    {
+    {           
         | Assign
           {
             Left : JsAst;
@@ -452,7 +459,10 @@ $(Body.Write(indent + "  "))
 }#>
             }
         }
-        | Literal        { Value : JsLiteral;
+        | Literal        
+          {
+            Value : JsLiteral;
+            
             public override Write(indent = "" : string) : string
             {
               match(this)
@@ -481,9 +491,14 @@ $(Body.Write(indent + "  "))
                 | _ => c.ToString(CultureInfo.InvariantCulture)
                 }
                 
-                indent + 
-                  if (val.Contains(<#[""]#>)) val
-                  else                        $<#"..$(val; ""; escapeCharacter)"#>;
+                def escaping = val.IndexOf(StringLiteral.DoNotEscapeMarker);
+                def str = 
+                  if(escaping != -1)
+                    val.Substring(0, escaping)
+                  else
+                    $<#"..$(val; ""; escapeCharacter)"#>;
+                    
+                indent + str                
               | Literal(Bool(val))    => indent + $"$(val.ToString(CultureInfo.InvariantCulture).ToLower())"
               | Literal(Regexp(pat, mod)) => indent + $<#new RegExp($(pat.Write()), $(mod.Write()))#>
               }

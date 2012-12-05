@@ -318,8 +318,8 @@ namespace NemerleWeb
     /// If parameters has value, use it and access method via dictionary
     public Method(method : string, parameters : option[list[TParameter]]) : string
     {
-      // Handle properties
-      // TODO: Add better check for properties
+      // HACK: Handle properties according to name
+      // HACK: Handle lambda according to name
       if (method.StartsWith("set_") || method.StartsWith("get_") || method == "apply" || method == "apply_void")
         method
       else
@@ -340,7 +340,7 @@ namespace NemerleWeb
     
     public MethodParameters(m : IMethod) : option[list[TParameter]]
     {
-      if (m.DeclaringType is LibraryReference.ExternalTypeInfo ||
+      if (IsFrameworkAssembly(m.DeclaringType) ||
         m.DeclaringType.GetModifiers().CustomAttributes.Any(
           a => a.ToString() == "NemerleWeb.JsAstAttribute"))
         None()

@@ -325,7 +325,8 @@ namespace NemerleWeb
           | _ => p
           }).NToList())
       | Define(p, Ref(name)) when _methodNames.Contains(name.Id) =>
-        PExpr.Define(p, PExpr.Literal(Literal.String("self." + name.Id + <#[""]#>)))
+        // HACK: We add special string, because we don't know here exact type of the method
+        PExpr.Define(p, PExpr.Literal(Literal.String("self." + name.Id + <#[""]#> + StringLiteral.DoNotEscapeMarker)))
       | _ => expr
     }
     

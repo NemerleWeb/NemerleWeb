@@ -324,20 +324,26 @@ $indent};#>);
         def generatedMethods = HashSet();
         
         def methodsCode = methods.Select(m =>
-        { 
-          // Add method variable in first time
-          def methodVariable =
-            if (generatedMethods.Contains(m.Name)) ""
+        {
+          // Add method variable and default signature in first time
+          def (methodVariable, defaultSignatureAssign) =
+            if (generatedMethods.Contains(m.Name)) ("", "")
             else
             {
+              // Add to list
               _ = generatedMethods.Add(m.Name);
-              $<#$(indent)$parentPtr.$(m.Name) = {};#>;
+              
+              def defaultSignature =
+                if (m.Header.Parameters is []) ""
+                else $<#$parentPtr.$(m.Name)[""] = #>;
+              
+              ($<#$(indent)$parentPtr.$(m.Name) = {};#>, defaultSignature)
             };
             
           def methodWithSignature = JsAstHelper.Method(m.Name, Some(m.Header.Parameters));
 
 $<#$methodVariable
-$(indent)$parentPtr.$methodWithSignature = function(..$(methodParms(m))) {
+$(indent)$defaultSignatureAssign$parentPtr.$methodWithSignature = function(..$(methodParms(m))) {
 $(indent)  $self
 $(TranslateMethodBody(m, indent + "  "))
 $(indent)}#>
