@@ -691,7 +691,8 @@ function System_Text_StringBuilder() {
     };
 
     this.Append = function (s) {
-        if (s.hasOwnProperty("ToString"))
+        if (typeof s == "object" && ("ToString" in s) &&
+            typeof s.ToString == "object" && nweb.utils.isFunction(s.ToString[""]))
             this.string += s.ToString[""].call(s);
         else
             this.string += s;
@@ -703,7 +704,7 @@ function System_Text_StringBuilder() {
       case 0:
         return this.Append("\n");
       case 1:
-        return this.Append(s + "\n");
+        return this.Append(s).Append("\n");
       default:
         throw "Invalid number of parameters";
       }
