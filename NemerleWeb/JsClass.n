@@ -4,10 +4,12 @@ using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
 using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
 using Nemerle.Compiler.Typedtree;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -24,9 +26,10 @@ namespace NemerleWeb
       public static IEnumerableType : TypeVar { get; set; }        
       public static IPageType : TypeVar { get; set; }
       public static ObjectType : TypeVar { get; set; }
-        
+              
       public Fields : IEnumerable[IField]
       {
+        [Memoize]
         get
         {
           ClassType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
@@ -42,9 +45,10 @@ namespace NemerleWeb
                    .Where(f => f.Name != "server" && f.Name != "__constructorParams")
         }
       }
-        
+              
       public Properties : IEnumerable[IProperty] 
       {
+        [Memoize]
         get
         {
           ClassType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
@@ -62,9 +66,10 @@ namespace NemerleWeb
                     .Where(p => p.Name != "server")
         }
       }      
-        
+              
       public Methods : IEnumerable[IMethod] 
       {
+        [Memoize]
         get
         {            
           def methods = ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -80,6 +85,19 @@ namespace NemerleWeb
           FilterMethods(methods);
         }
       }
+      
+      NestedClasses : IEnumerable[JsClass]
+      {            
+        get
+        {
+          def nested = ClassType.DeclaredNestedTypes
+                                .Where(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server
+                                .Where(c => !c.Name.StartsWith("_N__N_")) //Not generated class
+                                .Select(c => JsClass(c, Indent, Typer));
+          nested
+        }
+      }
+      
         
       IsPage : bool { get { !ClassType.Name.StartsWith("_N_") } }
         
@@ -106,8 +124,9 @@ namespace NemerleWeb
         def constructorBody = GetConstructorBody(bodyIndent);
         def staticConstructorBody = GetStaticConstructorBody(Indent);
         def methods = GetMethods(bodyIndent, parentPtr, !isAbstract);
-        def staticMethods = GetStaticMethods(Indent);        
-        def (nestedClassesString, nestedClasses) = GetNestedClasses();
+        def staticMethods = GetStaticMethods(Indent);
+        def nestedClasses = NestedClasses.ToList();
+        def nestedClassesString = GenerateNestedClasses(nestedClasses);
           
         def returning = match(ClassType.BaseType?.Name) {
             | "Function" => bodyIndent + 
@@ -241,27 +260,60 @@ $indent};#>);
       
       FieldValue(field : IField) : string
       {
-        def type = field.GetMemType();
-        def isArray = TypeIsArray(type);
-        if(isArray) 
-          "[]" 
-        else
+        def field = field :> FieldBuilder;
+        if(field.Ast.Initializer != null)
         {
-          match(type.TypeInfo?.FullName)
+          def integer(v)
           {
-          | "System.Byte"
-          | "System.SByte"
-          | "System.Char"
-          | "System.Int16"
-          | "System.UInt16"
-          | "System.Int32"
-          | "System.UInt32"
-          | "System.Int64"
-          | "System.UInt64"
-          | "System.Single"
-          | "System.Double"
-          | "System.Decimal"=> "0"
+            if (v.is_negative)
+              (unchecked(v.val :> long) * -1).ToString(CultureInfo.InvariantCulture)
+            else
+              v.val.ToString(CultureInfo.InvariantCulture)
+          }
+          
+          def makeInitializer(expr)
+          {
+          | PExpr.Literal(Literal.Bool(val)) => val.ToString(CultureInfo.InvariantCulture).ToLower()
+          | PExpr.Literal(Literal.Char(val)) => val.ToString()
+          | PExpr.Literal(Literal.Decimal(val)) => (val :> ulong).ToString()
+          | PExpr.Literal(Literal.Double(val)) => val.ToString(CultureInfo.InvariantCulture)
+          | PExpr.Literal(Literal.Enum(Integer as i, _, _)) => integer(i)
+          | PExpr.Literal(Literal.Float(val)) => val.ToString(CultureInfo.InvariantCulture)
+          | PExpr.Literal(Literal.Integer as i) => integer(i)
+          | PExpr.Literal(Literal.String(val)) => JsAstHelper.EscapeString(val)
+          | PExpr.ListLiteral(elements) => $<#[..$(elements; ", "; makeInitializer)]#>
+          | PExpr.Tuple(elements) => $<#[..$(elements; ", "; makeInitializer)]#>
+          | PExpr.Literal(Literal.Void)          
+          | PExpr.Literal(Literal.Null)          
           | _ => "null"
+          }
+          
+          makeInitializer(field.Ast.Initializer)
+        }
+        else
+        {  
+          def type = field.GetMemType();
+          def isArray = TypeIsArray(type);
+          if(isArray) 
+            "[]" 
+          else
+          {
+            match(type.TypeInfo?.FullName)
+            {
+            | "System.Byte"
+            | "System.SByte"
+            | "System.Char"
+            | "System.Int16"
+            | "System.UInt16"
+            | "System.Int32"
+            | "System.UInt32"
+            | "System.Int64"
+            | "System.UInt64"
+            | "System.Single"
+            | "System.Double"
+            | "System.Decimal"=> "0"
+            | _ => "null"
+            }
           }
         }
       }
@@ -377,13 +429,9 @@ $(indent)}#>
         GenerateMethods(indent, GetProperName(ClassType), false, StaticMethods)
       }
       
-      GetNestedClasses() : (string * IEnumerable[JsClass])
-      {            
-          def nested = ClassType.DeclaredNestedTypes
-                                .Where(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server
-                                .Where(c => !c.Name.StartsWith("_N__N_")) //Not generated class
-                                .Select(c => JsClass(c, Indent, Typer));
-          ($"..$(nested; Environment.NewLine; _.Write())", nested)
+      GenerateNestedClasses(nested : IEnumerable[JsClass]) : string
+      {
+        $"..$(nested; Environment.NewLine; _.Write())"
       }
       
       ApplyAttributesToGeneratedClasses() : void

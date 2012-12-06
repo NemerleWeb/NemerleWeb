@@ -598,7 +598,7 @@ Array.prototype.hd = function() {
 };
 
 Array.prototype.tl = function() {
-    return this.splice(1);
+    return this.slice(1);
 };
 
 Array.prototype.Head = Array.prototype.hd;

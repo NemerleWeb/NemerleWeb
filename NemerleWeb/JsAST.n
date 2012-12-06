@@ -107,10 +107,12 @@ namespace NemerleWeb
             
             static private Literal_Int1 : JsAst.Literal = JsAst.Literal(JsLiteral.Integer(1));
             
-            public override Transform() : JsAst {
+            public override Transform() : JsAst
+            {
               // Compiler bug workaround
               def parametersNotAllowedForAssignment = Parameters.Any(p => !IsAllowedForAssignment(p));
-              match(this) {
+              match(this)
+              {
               | Call(OpCode("==="), something :: Literal(Bool(true)) :: []) 
               | Call(OpCode("==="), Literal(Bool(true)) :: something :: []) => something.Transform()
               | Call(OpCode as op, Call(MethodRef(Seq,  _, _), _) as call :: rest) => 
@@ -144,7 +146,15 @@ namespace NemerleWeb
                           JsAst.Literal(JsLiteral.String("undefined"))
                         ])
                     ]
-                  ).Transform() 
+                  ).Transform()
+                 
+              // Empty list comparison
+              | Call(OpCode("===") as op, [something, JsAst.Array([])])
+              | Call(OpCode("===") as op, [JsAst.Array([]), something])
+              | Call(OpCode("!==") as op, [something, JsAst.Array([])])
+              | Call(OpCode("!==") as op, [JsAst.Array([]), something]) => 
+                JsAst.Call(op, [something.Field("length"), JsAst.Literal(JsLiteral.Integer(0))])
+              
               | Call(OpCode("!=="), something :: Literal(Null) :: []) 
               | Call(OpCode("!=="), [Literal(Null), something]) => 
                   JsAst.Call(
@@ -473,33 +483,13 @@ $(Body.Write(indent + "  "))
               | Literal(Null)         => indent + "null"
               | Literal(Integer(val)) => indent + $"$(val.ToString(CultureInfo.InvariantCulture))"
               | Literal(Float(val))   => indent + $"$(val.ToString(CultureInfo.InvariantCulture))"
-              | Literal(String(val))  =>
-                def escapeCharacter(c)
-                {
-                | '\'' => "\\\'"
-                | '\"' => "\\\""
-                | '\\' => "\\\\"
-                | '\r' => "\\r"
-                | '\n' => "\\n"
-                | '\t' => "\\t"
-                | '\b' => "\\b"
-                | '\f' => "\\f"                
-                // line separator
-                | '\u2028' => "\\u2028"
-                // paragraph separator
-                | '\u2029' => "\\u2029"
-                | '\0' => "\\0"
-                | '\a' => "\\x07"
-                | '\v' => "\\x0B"
-                | _ => c.ToString(CultureInfo.InvariantCulture)
-                }
-                
+              | Literal(String(val))  =>        
                 def escaping = val.IndexOf(StringLiteral.DoNotEscapeMarker);
                 def str = 
                   if(escaping != -1)
                     val.Substring(0, escaping)
                   else
-                    $<#"..$(val; ""; escapeCharacter)"#>;
+                    JsAstHelper.EscapeString(val);
                     
                 indent + str                
               | Literal(Bool(val))    => indent + $"$(val.ToString(CultureInfo.InvariantCulture).ToLower())"

@@ -165,6 +165,17 @@ namespace NemerleWeb.Tests
     }
     
     [Unit]
+    class InitializerTest
+    {
+      public ListInit : list[int] = [1, 2, 3];
+      public TupleInit : int * string * double = (1, "a", 2.0);
+      
+      public IntInit : int = 10;
+      public DoubleInit : double = 20.0;
+      public StringInit : string = "x";
+    }
+    
+    [Unit]
     variant DummyVariant
     {
       | Case1 { A : string }
@@ -566,6 +577,12 @@ namespace NemerleWeb.Tests
         | Case2 => false
         | Case3(val) => val == false
         }
+      });
+      
+      test("variable in variant", () =>
+      {
+        def v = DummyVariant.Case1("");
+        v.D
       });
       
       test("multiple assign", () =>
@@ -1355,7 +1372,16 @@ namespace NemerleWeb.Tests
         MethodOverloadTest.G("", 0) == 2 &&
         MethodOverloadTest().H(1, "") == 2 &&
         MethodOverloadTest.Call(MethodOverloadTest()) == 0
-      })
+      });
+      
+      test("initializers", () =>
+      {
+        InitializerTest().ListInit is [1, 2, 3] && 
+        InitializerTest().TupleInit is (1, "a", 2.0) &&
+        InitializerTest().IntInit == 10 &&
+        InitializerTest().DoubleInit == 20.0 &&
+        InitializerTest().StringInit == "x"
+      });
     }    
     
     [Html]
