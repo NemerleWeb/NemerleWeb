@@ -36,7 +36,6 @@ namespace NemerleWeb
         if(isFromMainMethodParams) localVal.Name else localVal.Name + "_" + localVal.Id
       }
       
-      
       match(expr) 
       {
       | Array(args, _dims)                => JsAst.Array(args.Map(build))

@@ -8,6 +8,7 @@ using Nemerle.Extensions;
 using Nemerle.Compiler.Typedtree;
 
 using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -354,6 +355,31 @@ namespace NemerleWeb
         None()
       else
         Some(m.Header.Parameters)
+    }
+    
+    public EscapeString(val : string) : string
+    {
+      def escapeCharacter(c)
+      {
+      | '\'' => "\\\'"
+      | '\"' => "\\\""
+      | '\\' => "\\\\"
+      | '\r' => "\\r"
+      | '\n' => "\\n"
+      | '\t' => "\\t"
+      | '\b' => "\\b"
+      | '\f' => "\\f"                
+      // line separator
+      | '\u2028' => "\\u2028"
+      // paragraph separator
+      | '\u2029' => "\\u2029"
+      | '\0' => "\\0"
+      | '\a' => "\\x07"
+      | '\v' => "\\x0B"
+      | _ => c.ToString(CultureInfo.InvariantCulture)
+      }
+                
+      $<#"..$(val; ""; escapeCharacter)"#>;
     }
   }
 }
