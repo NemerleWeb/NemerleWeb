@@ -146,8 +146,27 @@ return self.apply_void.apply(self, arguments);
         {
           def commonProps = 
             nestedClasses.Select(c => 
-              string.Join(Environment.NewLine, 
-                          Properties.Select(p => $"$(GetProperName(c.ClassType)).prototype.$(p.Name) = $properTypeName.prototype.$(p.Name);")));
+              string.Join(
+                Environment.NewLine, 
+                Properties.Select(p => 
+                  if(p.IsIndexer) Message.FatalError(p.Location, "Indexed properties are not supported");
+                  else
+                  {
+                    def prop(name)
+                    {
+                      $"$(GetProperName(c.ClassType)).prototype.$name = $properTypeName.prototype.$name;"
+                    }
+                    
+                    def sb = StringBuilder();
+                    when (p.GetGetter() != null)
+                      _ = sb.AppendLine(prop("get_" + p.Name));
+                    when (p.GetSetter() != null)
+                      _ = sb.AppendLine(prop("set_" + p.Name));
+                      
+                    sb.ToString()
+                  })
+                ));
+                
           def commonFields = 
             nestedClasses.Select(c => 
               string.Join(Environment.NewLine, 
