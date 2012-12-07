@@ -300,6 +300,42 @@ namespace NemerleWeb.Tests
       }
     }
     
+    // TODO: #53
+    [Unit]
+    abstract class AbstractBase
+    {
+      public this()
+      {
+        X = F() + G() + I + J;
+      }
+            
+      F() : int { 1 }      
+      static G() : int { 2 }
+      
+      I : int = 10;
+      J : int = 20;
+      
+      public X : int;
+    }
+    
+    [Unit]
+    class NonAbstractDerived : AbstractBase
+    {
+      public this()
+      {
+        base();
+        Y = Q() + W() + U + V;
+      }
+            
+      Q() : int { 2 }      
+      static W() : int { 4 }
+      
+      U : int = 20;
+      V : int = 40;
+      
+      public Y : int;
+    }
+    
     public this()
     {
       def test(description, res)
@@ -1403,6 +1439,13 @@ namespace NemerleWeb.Tests
       {
         def d = DerivedClass("x");
         d.S == "x"
+      });
+      
+      test("Use fields and methods from constructor", () =>
+      {
+        // TODO: #53
+        //NonAbstractDerived().X == 33 && NonAbstractDerived().Y == 66
+        true
       });
     }    
     
