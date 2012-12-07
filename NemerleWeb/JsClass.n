@@ -97,17 +97,16 @@ namespace NemerleWeb
           nested
         }
       }
-      
-        
+              
       IsPage : bool { get { !ClassType.Name.StartsWith("_N_") } }
         
-      public Constructor : IMethod { 
-          get {
-              def constructors = ClassType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-              when(constructors.Length > 1)
-                    Message.Error(ClassType.Location, "Multiple constructors are not supported");  
-              constructors.FirstOrDefault()
-          }
+      public Constructors : IEnumerable[IMethod]
+      {
+        get
+        {
+          def constructors = ClassType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);              
+          constructors
+        }
       }
         
       public Write() : string 
@@ -116,19 +115,20 @@ namespace NemerleWeb
         def properTypeName = GetProperName(ClassType);
         def parentPtr = if(isAbstract) properTypeName + ".prototype" else "this";
         def bodyIndent = Indent + "  ";
-        def constructorParams = GetConstructorParams();
         def properties = GetProperties(bodyIndent, parentPtr);
         def staticProperties = GetStaticProperties(Indent);
         def fields = GetFields(bodyIndent, parentPtr);
         def staticFields = GetStaticFields(Indent);
-        def constructorBody = GetConstructorBody(bodyIndent);
+        def constructorsBody = GetConstructorsBody(Indent, bodyIndent);
+        def callConstrutor = GetCallConstructor(bodyIndent);
         def staticConstructorBody = GetStaticConstructorBody(Indent);
         def methods = GetMethods(bodyIndent, parentPtr, !isAbstract);
         def staticMethods = GetStaticMethods(Indent);
         def nestedClasses = NestedClasses.ToList();
         def nestedClassesString = GenerateNestedClasses(nestedClasses);
           
-        def returning = match(ClassType.BaseType?.Name) {
+        def returning = match(ClassType.BaseType?.Name)
+        {
             | "Function" => bodyIndent + 
 /*<#return function() {
 return self.apply.apply(self, arguments);
@@ -177,9 +177,11 @@ return self.apply_void.apply(self, arguments);
                           Methods.Select(p => $"$(GetProperName(c.ClassType)).prototype.$(p.Name) = $properTypeName.prototype.$(p.Name);")));
 $<#
 $nestedClassesString
-$(Indent)function $(GetProperName(ClassType))(..$constructorParams) {
+$(Indent)var $properTypeName$$ctor = {};
+$constructorsBody
+$(Indent)function $properTypeName() {
 $(bodyIndent)var self = this;
-$(bodyIndent)$constructorBody
+$callConstrutor
 $(bodyIndent) {{{SignalR}}}
 $(bodyIndent)$returning
 $(Indent)}
@@ -199,12 +201,14 @@ $staticConstructorBody
         {
 $<#
 $nestedClassesString
-$(Indent)function $(GetProperName(ClassType))(..$constructorParams) {
+$(Indent)var $properTypeName$$ctor = {};
+$constructorsBody
+$(Indent)function $properTypeName() {
 $(bodyIndent)var self = this;
 $properties
 $fields
 $methods
-$constructorBody
+$callConstrutor
 {{{SignalR}}}
 $returning
 $(Indent)}
@@ -215,25 +219,7 @@ $staticConstructorBody
 #>
         }
       }
-        
-      GetConstructorParams() : list[string] 
-      { 
-          def ctor = Constructor;
-          if(ctor != null) ctor.GetParameters().Map(p => p.Name) else [];            
-      }
-      
-      static PropVal(prop : IProperty) : string
-      {
-        def type = prop.GetGetter().ReturnType;
-        def isArray = TypeIsArray(type);
-        if(isArray) 
-          "[]" 
-        else 
-          if(type.TypeInfo.FullName == "System.String") <#""#> 
-          else if(type.TypeInfo.FullName == "System.Boolean") "false"
-          else if(type.TypeInfo.FullName == "System.Int32") "0" else "null";
-      }
-      
+           
       GenerateProperties(indent : string, parentPtr : string, properties : IEnumerable[IProperty]) : string 
       {
         def propStrings = properties.Select(p =>
@@ -363,18 +349,35 @@ $indent};#>);
         
         $<#..$(fieldStrings; ";\n")#>;
       }
-        
-      GetConstructorBody(indent : string) : string
+
+      GetConstructorsBody(indent : string, bodyIndent : string) : string
       {
-          def ctor = Constructor;
-          if(ctor != null)
-          {
-              def ctorBody = TranslateMethodBody(ctor, indent);
-              def endIndex = ctorBody.IndexOf("js constructor end");
-              if(endIndex != -1) ctorBody.Substring(0, endIndex - 1) else ctorBody
-          }
-          else
-              ""
+          def ctors = Constructors;
+          def properTypeName = GetProperName(ClassType);
+          def ctorObject = properTypeName + "$ctor";
+          
+          def ctorsCode = ctors.Select(
+            ctor => 
+            {
+              def ctorBody = TranslateMethodBody(ctor, bodyIndent);
+              def ctorParameters = ctor.GetParameters().Select(p => p.Name);
+              def signature = JsAstHelper.Method("", Some(ctor.Header.Parameters));
+              
+$<#$indent$ctorObject$signature = function(..$ctorParameters) {
+$(bodyIndent)var self = this;
+$ctorBody
+$indent}#>
+            });
+         
+         $<#..$(ctorsCode; ";\n")#>
+      }
+      
+      GetCallConstructor(indent : string) : string
+      {
+        def properTypeName = GetProperName(ClassType);
+        def ctorObject = properTypeName + "$ctor";
+          
+        $"$indent$ctorObject[arguments[0]].call(this, arguments.slice(1))"
       }
         
       GetStaticConstructorBody(indent : string) : string 
