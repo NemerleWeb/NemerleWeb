@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Globalization;
 using Nemerle;
+using Nemerle.Utility;
 
 using Nemerle.Peg;
 using NemerleWeb.Tests.Macro;
@@ -83,10 +84,25 @@ namespace NemerleWeb.Tests
     //}
     
     [Unit]
-    class BaseClass {}
+    class BaseClass : Exception
+    {
+      public S : string;
+      
+      public this(s : string)
+      {
+        base(""); // This should not be translated to JS
+        this.S = s;
+      }
+    }
     
     [Unit]
-    class DerivedClass : BaseClass {}
+    class DerivedClass : BaseClass 
+    {
+      public this(s : string)
+      {
+        base(s);
+      }
+    }
     
     [Unit]
     class ClassWithConstructors
@@ -1381,6 +1397,12 @@ namespace NemerleWeb.Tests
         InitializerTest().IntInit == 10 &&
         InitializerTest().DoubleInit == 20.0 &&
         InitializerTest().StringInit == "x"
+      });
+      
+      test("call base constructor", () =>
+      {
+        def d = DerivedClass("x");
+        d.S == "x"
       });
     }    
     

@@ -134,37 +134,48 @@ namespace NemerleWeb
       def callAst =
         match (call)
         {
-          | Call(MethodRef(obj = Call(MethodRef(meth = serverMeth, obj = obj), _, _), meth = meth), parms, _)
-            when serverMeth.Name == "get_server" && obj is TExpr.This =>
-              def parameters =
-                if (parms.Length > 0) parms.Zip(meth.GetParameters()).Take(parms.Length - 1).Map((cp, mp) => (mp.name, builder'(cp.expr)))
-                else [];
-              def callback = if(parms.Length > 0) builder'(parms.Last().expr) else JsAst.Void();
-              match(callback)
-              {
-                | Seq(DefValue as dv :: cb :: []) =>
-                  JsAst.Seq([dv, JsAst.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, cb)])
-                | _ => JsAst.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, callback)
-              }
-          | Call(MethodRef(_, meth, _, _), [modelParm, viewParm], _) when meth.Name == "GetTemplateName" =>             
-            match(modelParm, viewParm)
+        | Call(MethodRef(obj = Call(MethodRef(meth = serverMeth, obj = obj), _, _), meth = meth), parms, _)
+          when serverMeth.Name == "get_server" && obj is TExpr.This =>
+            def parameters =
+              if (parms.Length > 0) parms.Zip(meth.GetParameters()).Take(parms.Length - 1).Map((cp, mp) => (mp.name, builder'(cp.expr)))
+              else [];
+            def callback = if(parms.Length > 0) builder'(parms.Last().expr) else JsAst.Void();
+            match(callback)
             {
-            | (Parm(expr = TExpr.Literal(Literal.String(model))),
-               Parm(expr = TExpr.Literal(Literal.String(view)))) =>
-              JsAst.Code($"nweb.utils.getTemplateName(this.$model, '$view')")
-            | _ => Message.FatalError("Invalid GetTemplateName call, use 'name' macro")
+            | Seq(DefValue as dv :: cb :: []) =>
+              JsAst.Seq([dv, JsAst.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, cb)])
+            | _ => JsAst.ServerCall(meth.Name, serverMeth.DeclaringType.Name, parameters, callback)
             }
-          | Call(MethodRef(obj = o, meth = meth), parms, _) =>
-            if(o.Type.TypeInfo != null)
-              ConvertMethod(o.Type.TypeInfo, builder'(o), meth, parms.Map(paramBuilder));
-            else
-              ConvertFixedTypeMethod(o.Type.FixedValue, builder'(o), meth, parms.Map(paramBuilder))
-          | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) =>
-              ConvertMethod(fromType.TypeInfo, builder'(left), meth, parms.Map(paramBuilder))
-          | Call(OpCode as op, parms, _) => JsAst.Call(builder'(op), parms.Map(paramBuilder))
-          | Call(Base, _, _)
-          | Call(Delayed, _, _) => JsAst.Void()
-          | Call(s, _, _) => Message.Warning($"Unsupported call to $s"); JsAst.Void()          
+        | Call(MethodRef(_, meth, _, _), [modelParm, viewParm], _) when meth.Name == "GetTemplateName" =>             
+          match(modelParm, viewParm)
+          {
+          | (Parm(expr = TExpr.Literal(Literal.String(model))),
+              Parm(expr = TExpr.Literal(Literal.String(view)))) =>
+            JsAst.Code($"nweb.utils.getTemplateName(this.$model, '$view')")
+          | _ => Message.FatalError("Invalid GetTemplateName call, use 'name' macro")
+          }
+        | Call(MethodRef(obj = o, meth = meth), parms, _) =>
+          if(o.Type.TypeInfo != null)
+            ConvertMethod(o.Type.TypeInfo, builder'(o), meth, parms.Map(paramBuilder));
+          else
+            ConvertFixedTypeMethod(o.Type.FixedValue, builder'(o), meth, parms.Map(paramBuilder))
+        | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) =>
+            ConvertMethod(fromType.TypeInfo, builder'(left), meth, parms.Map(paramBuilder))
+        | Call(OpCode as op, parms, _) => JsAst.Call(builder'(op), parms.Map(paramBuilder))
+        | Call(Base(baseCtor), parms, _) =>
+          // Call base constructor for Unit bases
+          def declaringType = baseCtor.DeclaringType;
+          if (declaringType is TypeBuilder)
+            JsAst.Call(
+              JsAst.MethodRef(  
+                JsAst.GlobalRef(JsClass.GetProperName(declaringType)),
+                "call",
+                None()),
+              JsAst.This() :: parms.Map(paramBuilder))
+          else
+            JsAst.Void()
+        | Call(Delayed, _, _) => JsAst.Void()
+        | Call(s, _, _) => Message.Error(s.Location, $"Unsupported call to $s"); JsAst.Void()          
         }
       
       // Unpack ref/out
