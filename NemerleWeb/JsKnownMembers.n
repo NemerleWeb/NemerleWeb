@@ -166,12 +166,13 @@ namespace NemerleWeb
           // Call base constructor for Unit bases
           def declaringType = baseCtor.DeclaringType;
           if (declaringType.GetSuperTypes().Any(_.TryRequire(JsClass.IPageType)))
+          {
             JsAst.Call(
-              JsAst.MethodRef(  
-                JsAst.GlobalRef(JsClass.GetProperName(declaringType)),
-                "call",
-                None()),
+              JsAst.ConstructorRef(
+                JsClass.GetProperName(declaringType),
+                Some(baseCtor.Header.Parameters)),
               JsAst.This() :: parms.Map(paramBuilder))
+          }
           else
             JsAst.Void()
         | Call(Delayed, _, _) => JsAst.Void()

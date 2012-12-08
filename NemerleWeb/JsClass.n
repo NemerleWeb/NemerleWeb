@@ -346,14 +346,21 @@ $indent};#>);
           def ctorsCode = ctors.Select(
             ctor => 
             {
-              def ctorBody = TranslateMethodBody(ctor, bodyIndent);
+              def ctorBody = TranslateMethodBody(ctor, bodyIndent);              
               def ctorParameters = ctor.GetParameters().Select(p => p.Name);
               def signature = JsAstHelper.Method("", Some(ctor.Header.Parameters));
               
-$<#$indent$ctorObject$signature = function(..$ctorParameters) {
+              def writeBody =
+                if(ctorBody.Trim().Length == 0) ""
+                else
+                {
+                  $<#
 $(bodyIndent)var self = this;
 $ctorBody
-$indent}#>
+$indent#>
+                };
+              
+              $<#$indent$ctorObject$signature = function(..$ctorParameters) {$writeBody}#>
             });
          
          $<#..$(ctorsCode; ";\n")#>
