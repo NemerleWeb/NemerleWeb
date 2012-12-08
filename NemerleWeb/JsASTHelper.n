@@ -316,31 +316,49 @@ namespace NemerleWeb
         lst
     }
     
-    // HACK: Handle properties and labmda according to name
+    // HACK: Handle properties and lambda according to name
     public IsSpecialMethod(method : string) : bool
     {
-      method.StartsWith("set_") || method.StartsWith("get_") || method == "apply" || method == "apply_void"
+      method.StartsWith("set_") || method.StartsWith("get_")
     }
     
     /// If parameters has value, use it and access method via dictionary
-    public Method(method : string, parameters : option[list[TParameter]]) : string
+    public Method(method : string, parametersType : option[list[TParameter]]) : string
     {
       if (IsSpecialMethod(method))
         method
       else
-        match(parameters)
+        match(parametersType)
         {
-        | Some([]) => $<#$method[""]#>
-        | Some(parms) =>
-          def typeOrTypeInfo(p)
-          {
-            (p.Type.TypeInfo : object ?? p.Type).ToString()
-          }
-      
-          def functionSignature = $<#..$(parms; ", "; typeOrTypeInfo)#>;
-          $<#$method["$functionSignature"]#>
+        | Some(pt) => $"$method[$(MethodSignature(pt))]"
         | _ => method
         }
+    }
+    
+    public MethodSignature(parametersType : list[TParameter]) : string
+    {
+      | [] => <#""#>
+      | _ =>
+        def typeOrTypeInfo(p)
+        {
+          (p.Type.TypeInfo : object ?? p.Type).ToString()
+        }
+      
+        def functionSignature = $<#..$(parametersType; ", "; typeOrTypeInfo)#>;
+        $<#"$functionSignature"#>
+    }
+    
+    public MethodSignature(parametersType : list[TExpr]) : string
+    {
+      | [] => <#""#>
+      | _ =>
+        def typeOrTypeInfo(p)
+        {
+          (p.Type.TypeInfo : object ?? p.Type).ToString()
+        }
+      
+        def functionSignature = $<#..$(parametersType; ", "; typeOrTypeInfo)#>;
+        $<#"$functionSignature"#>
     }
     
     public MethodParameters(m : IMethod) : option[list[TParameter]]

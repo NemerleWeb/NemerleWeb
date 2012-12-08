@@ -248,7 +248,7 @@ namespace NemerleWeb
       when(typeInfo?.IsCustomAttributeDefined("NemerleWeb.JsAstAttribute"))
       {
         if(member.IsConstructor)
-          return JsAst.Call(JsAst.Constructor(typeInfo.Name), parms);
+          return JsAst.Call(JsAst.Constructor(typeInfo.Name, None()), parms);
         else if (left is JsAst.StaticMethodRef)
           return typeInfo.Name.StaticCall(member, parms);
         else

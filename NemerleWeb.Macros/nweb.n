@@ -25,26 +25,34 @@ namespace NemerleWeb
       match(expr)
       {
       | <[ $_unitName() ]> with parms = []
-      | <[ $_unitName(..$parms) ]> => 
+      | <[ $_unitName(..$parms) ]> =>
+        def typedParms = parms.Map(typer.TypeExpr);
+        def signature = JsAstHelper.MethodSignature(typedParms);
+        
         def properName = JsClass.GetProperName(typer.TypeExpr(expr).Type.TypeInfo);        
-        def serverParams = parms.Map(p => <[ paramList.Add("nweb.utils.toTypedObject(" + NWebUtils.ToJson($p) + ")") ]>);
+        def serverParams = parms.Select(p => <[ paramList.Add("nweb.utils.toTypedObject(" + NWebUtils.ToJson($p) + ")") ]>);
         
         def res = <[
-def allScripts = NemerleWeb.NWebData.GetAllScriptNames().Map(script => {
-  def mainScript = $<# <script type="text/javascript" src="NemerleWebResource/Unit/$script.js"></script> #>;
-  def lambdasScript = if(!string.IsNullOrEmpty(NemerleWeb.NWebData.GetLambdasScript(script)))
-                        $<# <script type="text/javascript" src="NemerleWebResource/Lambdas/$script.js"></script> #>;
-                      else "";  
-$<#$mainScript
-$lambdasScript#>  
-});
+          def allScripts = NemerleWeb.NWebData.GetAllScriptNames().Select(script =>
+          {
+            def mainScript = $<# <script type="text/javascript" src="NemerleWebResource/Unit/$script.js"></script> #>;
+            def lambdasScript = 
+              if(!string.IsNullOrEmpty(NWebData.GetLambdasScript(script)))
+                $<# <script type="text/javascript" src="NemerleWebResource/Lambdas/$script.js"></script> #>;
+              else
+                "";  
 
-def templates = NemerleWeb.NWebData.GetAllScriptNames().Map(script => NemerleWeb.NWebData.GetTemplatesScripts(script));
-def allScripts = string.Join("", allScripts);
-def unitName = $(properName : string);
-def paramList = List();
-{..$serverParams}
-def parms = string.Join(",", paramList);
+            $<#$mainScript
+$lambdasScript#>  
+          });
+
+        def templates = NWebData.GetAllScriptNames().Select(script => NWebData.GetTemplatesScripts(script));
+        def allScripts = string.Join("", allScripts);
+        def unitName = $(properName : string);
+        def paramList = List();
+        paramList.Add($signature);
+        {..$(serverParams.NToList())}
+        def callParms = string.Join(",", paramList);
 
 $<#
 <div id="nweb-start"></div>
@@ -52,13 +60,13 @@ $allScripts
 ..$(templates; "\n")
 <script>
 $$(function() {  
-  nweb.go(new $unitName($parms));
+  nweb.go(new $unitName($callParms));
 });
 </script>
 #>
       ]>;
       res
-      | _ => <[]>
+      | _ => Message.Error("Correct usage: nweb ClassName(arguments)"); <[ ]>
       }      
     }
   } 
