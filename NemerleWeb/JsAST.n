@@ -95,17 +95,26 @@ namespace NemerleWeb
               indent +
                 match(this)
                 {
-                | Call(OpCode as op, [e1, e2])       => $<#($(e1.Write("")) $(op.Write("")) $(e2.Write("")))#>
-                | Call(Constructor(type, None), parms) => $<#new $(type)(..$(parms; ","; writeParam))#>
+                | Call(OpCode as op, [e1, e2])         => $<#($(e1.Write("")) $(op.Write("")) $(e2.Write("")))#>
+                
+                | Call(Constructor(type, None), parms) => $<#new $(type)(..$(parms; ", "; writeParam))#>
                 | Call(Constructor(type, Some(paramsType)), parms) => 
                   def methodSignature = JsAstHelper.MethodSignature(paramsType);
-                  def comma = if (paramsType is []) "" else ", ";                  
-                  $<#new $(type)($methodSignature$comma..$(parms; ","; writeParam))#>
-                | Call(Indexer(obj), parms)          => $<#$(obj.Write())[..$(parms; ","; writeParam)]#>                
+                  def comma = if (parms is []) "" else ", ";
+                  $<#new $(type)($methodSignature$comma..$(parms; ", "; writeParam))#>
+                
+                | Call(ConstructorRef(type, None), parms) =>
+                  $<#$(type).call(..$(parms; ", "; writeParam))#>
+                | Call(ConstructorRef(type, Some(paramsType)), parms) =>
+                  def methodSignature = JsAstHelper.MethodSignature(paramsType);
+                  def comma = if (parms is []) "" else ", ";
+                  $<#$(type).call($methodSignature$comma..$(parms; ", "; writeParam))#>
+                
+                | Call(Indexer(obj), parms)          => $<#$(obj.Write())[..$(parms; ", "; writeParam)]#>                
                 | Call(MethodRef(obj, method, Some) as f, parms) when
                   !JsAstHelper.IsSpecialMethod(method) =>
-                  $<#$(f.Write()).call(..$(obj :: parms; ","; writeParam))#>
-                | Call(f, parms)                     => $<#$(f.Write())(..$(parms; ","; writeParam))#>    
+                  $<#$(f.Write()).call(..$(obj :: parms; ", "; writeParam))#>
+                | Call(f, parms)                     => $<#$(f.Write())(..$(parms; ", "; writeParam))#>    
                 }
             }
             
@@ -264,7 +273,16 @@ namespace NemerleWeb
             public override Write(_ = "" : string) : string
             {
               throw NotImplementedException("Not implemented");
-              ""
+            }
+          }
+        | ConstructorRef
+          {
+            Type : string;
+            ParametersType : option[list[TParameter]];
+          
+            public override Write(_ = "" : string) : string
+            {
+              Type
             }
           }
         | DefFunction
@@ -800,6 +818,7 @@ $(indent)}
             | Call(func, parms)           => JsAst.Call(recurse(func), parms.Map(recurse))
             | Code                        => ast'
             | Constructor                 => ast'
+            | ConstructorRef              => ast'
             | Continue(loopname)          => JsAst.Continue(loopname)
             | DefFunction(obj, ps, bdy)   => JsAst.DefFunction(recurse(obj), ps.Map(recurse), recurse(bdy))
             | DeclFunction(name, ps, bdy) => JsAst.DeclFunction(name, ps.Map(recurse), recurse(bdy))
