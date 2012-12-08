@@ -115,9 +115,9 @@ namespace NemerleWeb
         def properTypeName = GetProperName(ClassType);
         def parentPtr = if(isAbstract) properTypeName + ".prototype" else "this";
         def bodyIndent = Indent + "  ";
-        def properties = GetProperties(bodyIndent, parentPtr);
-        def staticProperties = GetStaticProperties(Indent);
-        def fields = GetFields(bodyIndent, parentPtr);
+        def properties = GetProperties(bodyIndent, parentPtr);        
+        def staticProperties = GetStaticProperties(Indent);        
+        def fields = GetFields(bodyIndent, parentPtr);        
         def staticFields = GetStaticFields(Indent);
         def constructorsBody = GetConstructorsBody(Indent, bodyIndent);
         def callConstrutor = GetCallConstructor(bodyIndent);
@@ -126,22 +126,17 @@ namespace NemerleWeb
         def staticMethods = GetStaticMethods(Indent);
         def nestedClasses = NestedClasses.ToList();
         def nestedClassesString = GenerateNestedClasses(nestedClasses);
-          
-        def returning = match(ClassType.BaseType?.Name)
-        {
-            | "Function" => bodyIndent + 
-/*<#return function() {
-return self.apply.apply(self, arguments);
-}#>*/
-<#return self.apply;#>
-            | "FunctionVoid" => bodyIndent + 
-/*<#return function() {
-return self.apply_void.apply(self, arguments);
-}#>*/
-<#return self.apply_void;#>
-            | _ => ""
-        };
-          
+        
+        //Message.Hint($"Properties: $properties");
+        //Message.Hint($"Static properties: $staticProperties");
+        //Message.Hint($"Fields: $fields");
+        //Message.Hint($"Static fields: $staticFields");
+        //Message.Hint($"Constructor body: $constructorsBody");
+        //Message.Hint($"Static constructor body: $staticConstructorBody");
+        //Message.Hint($"Methods: $methods");
+        //Message.Hint($"Static methods: $staticMethods");
+        //Message.Hint($"Nested classes: $nestedClassesString");
+
         if(isAbstract)
         {
           def commonProps = 
@@ -183,7 +178,6 @@ $(Indent)function $properTypeName() {
 $(bodyIndent)var self = this;
 $callConstrutor
 $(bodyIndent) {{{SignalR}}}
-$(bodyIndent)$returning
 $(Indent)}
 $properties
 ..$(commonProps; Environment.NewLine)
@@ -210,7 +204,6 @@ $fields
 $methods
 $callConstrutor
 {{{SignalR}}}
-$returning
 $(Indent)}
 $staticFields
 $staticMethods
@@ -339,13 +332,7 @@ $indent};#>);
       {
         def parentPtr = GetProperName(ClassType);
         def fieldStrings = StaticFields.Select(f => 
-          {
-            // HACK: Hack for Instance initializers of lambda
-            if (ClassType.Name.Contains("_N__N_lambda__") && f.Name == "Instance")
-              $<#$indent$parentPtr.$(f.Name) = new $parentPtr()#>
-            else
-              $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>
-          });
+          $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>);
         
         $<#..$(fieldStrings; ";\n")#>;
       }
@@ -377,7 +364,7 @@ $indent}#>
         def properTypeName = GetProperName(ClassType);
         def ctorObject = properTypeName + "$ctor";
           
-        $"$indent$ctorObject[arguments[0]].call(this, arguments.slice(1))"
+        $"$indent$ctorObject[arguments[0]].call(this, Array.prototype.slice.call(arguments, 1))"
       }
         
       GetStaticConstructorBody(indent : string) : string 
@@ -477,7 +464,7 @@ $(indent)}#>
       public static GetProperName([NotNull] typeInfo : TypeInfo) : string 
       {          
         def typeParams = if(typeInfo.Typarms.IsEmpty) "";
-                         else $"[..$(typeInfo.Typarms.MapToArray(t => t.ToString()))]";
+                         else $"[..$(typeInfo.Typarms.Select(_.ToString()))]";
         GetProperName(typeInfo.FullName + typeParams)
       }
         
