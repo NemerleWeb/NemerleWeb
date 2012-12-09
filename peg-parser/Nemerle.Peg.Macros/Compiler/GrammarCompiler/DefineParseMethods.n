@@ -41,9 +41,7 @@ namespace Nemerle.Peg
        PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
         public TryParse(text : string) : int * $tyParam
         {
-          // TODO: Restore
-          //TryParse(Nemerle.Peg.SourceSnapshot(text))
-          TryParse(Nemerle.Peg.SourceSnapshot(text, text, 0, "", Nemerle.Peg.SourceSnapshot("", "", 0, "", null).MakeLineIndexes(text)))
+          TryParse(Nemerle.Peg.SourceSnapshot(text))
         }
       ]>);
 

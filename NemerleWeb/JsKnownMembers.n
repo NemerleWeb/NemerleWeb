@@ -289,7 +289,8 @@ namespace NemerleWeb
         when (typeInfo != null &&
           !(typeInfo.IsInterface ||
             typeInfo.GetSuperTypes().Any(t => t.TryRequire(JsClass.IPageType)) ||
-            member.Name == "apply"))
+            member.Name == "apply" ||
+            member.Name == "apply_void"))
           Message.Error(
             member.Location,
             $"Invalid $(member.Name) with $(TypeName(typeInfo)) type, params: ..$parms not implemented in JS");

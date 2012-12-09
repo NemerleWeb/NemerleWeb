@@ -15,6 +15,18 @@ using System.Text;
 
 namespace NemerleWeb
 {
+  module JsClassHelper
+  {
+    public HasBase(ti : TypeInfo) : bool 
+    {
+      ti.BaseType != null &&
+      ti.BaseType.FullName != "System.Object" &&
+      ti.BaseType.FullName != "Nemerle.Builtins.Function" &&
+      ti.BaseType.FullName != "Nemerle.Builtins.FunctionVoid" &&
+      !ti.BaseType.IsInterface
+    }
+  }
+  
   [Record(NotNull = [".*"])]
   public class JsClass
   {
@@ -52,8 +64,20 @@ namespace NemerleWeb
         get
         {
           ClassType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                    .Where(_ is PropertyBuilder)
-                    .Where(p => p.Name != "server")
+                   .Where(_ is PropertyBuilder)
+                   .Where(prop =>
+                     {
+                       // Filter out properties not belonging to this class
+                       if (!JsClassHelper.HasBase(ClassType)) true
+                       else
+                       {                          
+                         def declaringType =
+                           prop.GetGetter()?.DeclaringType ?? prop.GetSetter()?.DeclaringType;
+                         
+                         ClassType.FullName == declaringType.FullName
+                       }
+                     })
+                   .Where(p => p.Name != "server")
         }
       }
       
@@ -369,7 +393,19 @@ $indent};#>);
               def signature = JsAstHelper.Method("", Some(ctor.Header.Parameters));
               
               def writeBody =
-                if(ctorBody.Trim().Length == 0) ""
+                if(ctorBody.Trim().Length == 0)
+                {
+                  // Call empty base constructor if exists
+                  if (ctor.Header.Parameters is [] && JsClassHelper.HasBase(ClassType))
+                  {
+                    def baseName = GetProperName(ClassType.BaseType.FullName);
+                    $<#
+$(bodyIndent)$baseName.call(self, "");
+$indent#>
+                  }
+                  else
+                    ""
+                }
                 else
                 {
                   $<#
@@ -402,7 +438,7 @@ $indent#>
             ""
       }
       
-      GenerateMethods(indent : string, parentPtr : string, hasSelf : bool, methods : IEnumerable[IMethod]) : string 
+      GenerateMethods(indent : string, parentPtr : string, hasSelf : bool, methods : IEnumerable[IMethod]) : string
       {
         def self = if(hasSelf) "" else "var self = this;";
         def methodParms(method) { method.GetParameters().Select(p => p.Name); }

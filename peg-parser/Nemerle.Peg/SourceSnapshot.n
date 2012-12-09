@@ -18,8 +18,7 @@ namespace Nemerle.Peg
 
     lineIndexes : array[int];
 
-    // TODO: Restore
-    /*protected*/ public this(originalText : string, text : string, fileIndex : int, fileName : string, lineIndexes : array[int])
+    protected this(originalText : string, text : string, fileIndex : int, fileName : string, lineIndexes : array[int])
     {
       this.originalText = originalText;
       this.text = text;
@@ -28,11 +27,10 @@ namespace Nemerle.Peg
       this.lineIndexes = lineIndexes;
     }
 
-    // TODO: Restore
-    //public this([NotNull] text : string, fileIndex : int = 0, fileName : string = "")
-    //{
-    //  this(text, text, fileIndex, fileName, MakeLineIndexes(text));
-    //}
+    public this([NotNull] text : string, fileIndex : int = 0, fileName : string = "")
+    {
+      this(text, text, fileIndex, fileName, MakeLineIndexes(text));
+    }
     
     public GetLinesRelocationTable() : array[int]
     {
@@ -77,9 +75,7 @@ namespace Nemerle.Peg
       $<#File index: $fileIndex, File name: $fileName#>
     }
 
-    // TODO: Restore
-    // TODO: #41
-    /*protected*/ public /*static*/ MakeLineIndexes(text : string) : array[int]
+    protected static MakeLineIndexes(text : string) : array[int]
     {
       def line_indexes_buffer = SCG.List(text.Length / 25);
       line_indexes_buffer.Add(0);
