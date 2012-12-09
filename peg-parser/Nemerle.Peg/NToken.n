@@ -14,10 +14,7 @@ namespace Nemerle.Peg
 
     public override ToString() : string
     {
-      "Start: " + _startPos.ToString() + " Len: " + (_endPos - _startPos).ToString();
-      
-      // TODO: Restore
-      //$<#"Start: $_startPos Len: $(_endPos - _startPos)"#>;
+      $<#"Start: $_startPos Len: $(_endPos - _startPos)"#>;
     }
   }
 }
