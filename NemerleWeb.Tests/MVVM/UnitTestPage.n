@@ -1519,6 +1519,14 @@ namespace NemerleWeb.Tests
         | _ => false
         }
       });
+      
+      test("Splice string with quotes", () =>
+      {
+        def startPos = 1;
+        def endPos = 2;
+        
+        $<#"Start: $startPos Len: $(endPos - startPos)"#> == "\"Start: 1 Len: 1\""
+      });
     }    
     
     [Html]
