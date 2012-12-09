@@ -491,6 +491,9 @@ nweb.utils = {
     isFunction: function(obj) {
         return obj && { }.toString.call(obj) == '[object Function]';
     },
+    firstProperty: function(obj) {
+        for(v in obj) return v;
+    },
     toTypedObject: function(obj) {
         if (typeof obj === "string") {
             try {
@@ -502,7 +505,16 @@ nweb.utils = {
 
         if (obj != null && !!obj.$type) {
             var typename = obj.$type.replace(/\./g, "_").replace(/\+/g, "_").replace(/(.+),.+/g, "$1");
-            var newObj = eval('new ' + typename + '()');
+            // HACK: Support constructor's signature
+            var typenameCtor = typename + '$ctor';
+            var hasTypenameCtor = eval('typeof ' +  typenameCtor + '!== "undefined"');
+
+            var newObjectExpr =
+                'new ' + typename + '("' +
+                    (hasTypenameCtor ? nweb.utils.firstProperty(eval(typenameCtor)) : '') +
+                '")';
+            var newObj = eval(newObjectExpr);
+
             for (var p in obj) {
               var propSetter = "set_" + p;
               if (obj.hasOwnProperty(p)) {
@@ -729,6 +741,11 @@ function System_Collections_Generic_List(arg) {
         return [];
     else
         return Enumerable.from(arg).toArray();
+}
+
+function System_ArgumentNullException(paramName, message) {
+    this.paramName = paramName;
+    this.message = messages;
 }
 
 nweb.collection = {

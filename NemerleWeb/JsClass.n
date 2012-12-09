@@ -392,6 +392,14 @@ $indent};#>);
               def ctorParameters = ctor.GetParameters().Select(p => p.Name);
               def signature = JsAstHelper.Method("", Some(ctor.Header.Parameters));
               
+              def makeBody(body)
+              {
+                $<#
+$(bodyIndent)var self = this;
+$(bodyIndent)$body
+$indent#>
+              }
+              
               def writeBody =
                 if(ctorBody.Trim().Length == 0)
                 {
@@ -399,20 +407,13 @@ $indent};#>);
                   if (ctor.Header.Parameters is [] && JsClassHelper.HasBase(ClassType))
                   {
                     def baseName = GetProperName(ClassType.BaseType.FullName);
-                    $<#
-$(bodyIndent)$baseName.call(self, "");
-$indent#>
+                    makeBody($<#$baseName.call(self, "");#>)
                   }
                   else
                     ""
                 }
                 else
-                {
-                  $<#
-$(bodyIndent)var self = this;
-$ctorBody
-$indent#>
-                };
+                  makeBody(ctorBody);
               
               $<#$indent$ctorObject$signature = function(..$ctorParameters) {$writeBody}#>
             });
