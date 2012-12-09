@@ -146,7 +146,7 @@ namespace NemerleWeb
         def constructorsBody = GetConstructorsBody(Indent, bodyIndent);
         def callConstrutor = GetCallConstructor(bodyIndent);
         def staticConstructorBody = GetStaticConstructorBody(Indent);
-        def methods = GetMethods(bodyIndent, parentPtr, !isAbstract);
+        def methods = GetMethods(bodyIndent, parentPtr, true);
         def staticMethods = GetStaticMethods(Indent);
         def nestedClasses = NestedClasses.ToList();
         def nestedClassesString = GenerateNestedClasses(nestedClasses);
@@ -269,6 +269,7 @@ $staticConstructorBody
               def getterBody = TranslateMethodBody(p.GetGetter(), indent + "  ");
               _ = sb.AppendLine(
 $<#$indent$parentPtr.get_$(p.Name) = function() {
+$(indent)  var self = this;
 $getterBody
 $indent};#>);
             }
@@ -278,6 +279,7 @@ $indent};#>);
               def setterBody = TranslateMethodBody(p.GetSetter(), indent + "  ");
               _ = sb.AppendLine(
 $<#$indent$parentPtr.set_$(p.Name) = function(value) {
+$(indent)  var self = this;
 $setterBody
 $indent};#>);
             }
