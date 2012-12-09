@@ -16,7 +16,6 @@ namespace NemerleWeb
 {
   public module JsAstHelper
   {     
-    allowedCallTargets : list[Type] = [typeof(JsAst.LocalRef), typeof(JsAst.Literal)];
     mutable temporaryVariableCounter : int = 0;
     
     public TransformBottomUp(ast : JsAst) : JsAst

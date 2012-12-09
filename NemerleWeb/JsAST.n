@@ -104,11 +104,12 @@ namespace NemerleWeb
                   $<#new $(type)($methodSignature$comma..$(parms; ", "; writeParam))#>
                 
                 | Call(ConstructorRef(type, None), parms) =>
-                  $<#$(type).call(..$(parms; ", "; writeParam))#>
+                  $<#$(type).call(..$(JsAst.This() :: parms; ", "; writeParam))#>
                 | Call(ConstructorRef(type, Some(paramsType)), parms) =>
                   def methodSignature = JsAstHelper.MethodSignature(paramsType);
                   def comma = if (parms is []) "" else ", ";
-                  $<#$(type).call($methodSignature$comma..$(parms; ", "; writeParam))#>
+                  def astThis = JsAst.This().Write();
+                  $<#$(type).call($astThis, $methodSignature$comma..$(parms; ", "; writeParam))#>
                 
                 | Call(Indexer(obj), parms)          => $<#$(obj.Write())[..$(parms; ", "; writeParam)]#>                
                 | Call(MethodRef(obj, method, Some) as f, parms) when
