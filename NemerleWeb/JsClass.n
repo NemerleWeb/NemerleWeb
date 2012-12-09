@@ -396,7 +396,7 @@ $indent};#>);
               {
                 $<#
 $(bodyIndent)var self = this;
-$(bodyIndent)$body
+$body
 $indent#>
               }
               
@@ -407,7 +407,7 @@ $indent#>
                   if (ctor.Header.Parameters is [] && JsClassHelper.HasBase(ClassType))
                   {
                     def baseName = GetProperName(ClassType.BaseType.FullName);
-                    makeBody($<#$baseName.call(self, "");#>)
+                    makeBody($<#$bodyIndent$baseName.call(self, "");#>)
                   }
                   else
                     ""

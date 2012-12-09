@@ -364,6 +364,32 @@ namespace NemerleWeb.Tests
       }
     }
     
+    [Unit]
+    class Located
+    {
+      [Accessor] location : int;
+      
+      public this()
+      {
+        this(0)
+      }
+      
+      public this(location : int)
+      {
+        this.location = location;
+      }
+    }
+    
+    [Unit]
+    [Record]
+    variant RecordVariant
+    {
+      | A
+      | B
+      
+      [Accessor] token : string;
+    }
+    
     public this()
     {
       def test(description, res)
@@ -1482,6 +1508,16 @@ namespace NemerleWeb.Tests
         ConstructorsOverload(2).A == "int" && ConstructorsOverload(2).B == 2 &&
         ConstructorsOverload("x").A == "x" && ConstructorsOverload("x").B == 10 &&
         ConstructorsOverload("y", 3).A == "y" && ConstructorsOverload("y", 3).B == 3
+      });
+      
+      test("Record variant", () =>
+      {
+        def m = RecordVariant.A("X") : RecordVariant;
+        match(m)
+        {
+        | r is RecordVariant.A when r.Token == "X" => true
+        | _ => false
+        }
       });
     }    
     
