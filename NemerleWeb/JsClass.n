@@ -127,6 +127,22 @@ namespace NemerleWeb
         def nestedClasses = NestedClasses.ToList();
         def nestedClassesString = GenerateNestedClasses(nestedClasses);
         
+        // This is needed to make labmda object behave as regular function
+        def returning = match(ClassType.BaseType?.Name)
+        {
+        | "Function" => bodyIndent + 
+/*<#return function() {
+return self.apply.apply(self, arguments);
+}#>*/
+<#return self.apply;#>
+        | "FunctionVoid" => bodyIndent + 
+/*<#return function() {
+return self.apply_void.apply(self, arguments);
+}#>*/
+<#return self.apply_void;#>
+        | _ => ""
+        };
+  
         //Message.Hint($"Properties: $properties");
         //Message.Hint($"Static properties: $staticProperties");
         //Message.Hint($"Fields: $fields");
@@ -178,6 +194,7 @@ $(Indent)function $properTypeName() {
 $(bodyIndent)var self = this;
 $callConstrutor
 $(bodyIndent) {{{SignalR}}}
+$(bodyIndent)$returning
 $(Indent)}
 $properties
 ..$(commonProps; Environment.NewLine)
@@ -204,6 +221,7 @@ $fields
 $methods
 $callConstrutor
 {{{SignalR}}}
+$returning
 $(Indent)}
 $staticFields
 $staticMethods
@@ -371,7 +389,7 @@ $indent#>
         def properTypeName = GetProperName(ClassType);
         def ctorObject = properTypeName + "$ctor";
           
-        $"$indent$ctorObject[arguments[0]].call(this, Array.prototype.slice.call(arguments, 1))"
+        $"$indent$ctorObject[arguments[0]].apply(this, Array.prototype.slice.call(arguments, 1))"
       }
         
       GetStaticConstructorBody(indent : string) : string 
