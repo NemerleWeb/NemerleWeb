@@ -38,8 +38,7 @@ namespace Nemerle.Json
     }
   }
 
-  // TODO: Restore
-  //[Record]
+  [Record]
   [Unit]
   public variant JObject
   {
@@ -49,20 +48,17 @@ namespace Nemerle.Json
       {
         value : JValue;
 
-        // TODO: Restore
-        //public this()
-        //{
-        //  value = JValue.Null();
-        //}
+        public this()
+        {
+          value = JValue.Null();
+        }
 
-        //public this(number : double) {value = JValue.Number(number)}
-        //public this(str : string) {value = JValue.String(str)}
-        //public this(boolean : bool) {value = JValue.Bool(boolean)}
+        public this(number : double) {value = JValue.Number(number)}
+        public this(str : string) {value = JValue.String(str)}
+        public this(boolean : bool) {value = JValue.Bool(boolean)}
       }
 
-    // TODO: Restore
-    //public static Null : JObject = JObject.Value();
-    public static Null : JObject = JObject.Value(JValue.Null());
+    public static Null : JObject = JObject.Value();
     public static Convert(jobj : JObject) : JObject {jobj}
     public static Convert(number : double) : JObject {JObject.Value(JValue.Number(number));}
     public static Convert(str : string) : JObject {JObject.Value(JValue.String(str));}

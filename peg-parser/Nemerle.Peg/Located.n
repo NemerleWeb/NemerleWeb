@@ -18,8 +18,7 @@ namespace Nemerle.Peg
     public StartPos : int { get { location.StartPos } }
     public EndPos : int { get { location.EndPos } }
 
-    // TODO: #37 Restore !
-    //public this() {}
+    public this() {}
 
     public this(location : Location)
     {

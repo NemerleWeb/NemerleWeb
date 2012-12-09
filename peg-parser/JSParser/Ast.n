@@ -11,7 +11,7 @@ namespace JSEngine {
 
     [Record]
     [Unit]
-    public variant Literal /*: Located*/ {
+    public variant Literal : Located {
         | Integer {
             value : IntegerLiteral;
         }
@@ -37,7 +37,7 @@ namespace JSEngine {
     
     [Record]
     [Unit]
-    public variant IntegerLiteral /*: Located*/ {
+    public variant IntegerLiteral : Located {
         | Decimal
         | Hex
         | Octal
@@ -59,7 +59,7 @@ namespace JSEngine {
 
     [Record]
     [Unit]
-    public variant BooleanLiteral /*: Located*/ {
+    public variant BooleanLiteral : Located {
         | True
         | False
 
@@ -80,7 +80,7 @@ namespace JSEngine {
 
     [Record]
     [Unit]
-    public variant StringLiteral /*: Located*/ {
+    public variant StringLiteral : Located {
         | SingleQuote
         | DoubleQuote
 
@@ -100,7 +100,7 @@ namespace JSEngine {
 
     [Record]
     [Unit]
-    public variant Expression /*: Located*/ {
+    public variant Expression : Located {
         | Literal {
             value : JSEngine.Literal;
         }
@@ -156,6 +156,8 @@ namespace JSEngine {
                     _ = sb.Append($"[..$args]");
                     
                 // TODO: Restor, Failed typing method ?!
+                // | Call(Operator(op, OperatorKind.Infix), [a, b])
+
                 | Call(Operator(op, kind), [a, b]) when kind == OperatorKind.Infix=>
                     _ = sb.Append("(");
                     a.ToString(sb, tab, current_tab);
@@ -211,7 +213,7 @@ namespace JSEngine {
 
     [Record]
     [Unit]
-    public variant Statement /*: Located*/ {
+    public variant Statement : Located {
         | Empty
         | Block {
             stmts : list[Statement];
