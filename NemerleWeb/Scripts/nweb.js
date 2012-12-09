@@ -657,7 +657,7 @@ var Nemerle_Utility_Identity_$A$$B$_ = {
 };
 
 
-function Nemerle_Core_Some_$T$__$T$_(val) {
+function Nemerle_Core_Some_$T$__$T$_(sig, val) {
   this.val = val;
   this._N_GetVariantCode = function () {
     return 1;
@@ -672,7 +672,7 @@ function Nemerle_Core_None_$T$__$T$_() {
 
 Nemerle_Core_None_$T$__$T$_._N_constant_object = new Nemerle_Core_None_$T$__$T$_();
 
-function Nemerle_Core_option_$T$__$T$_(val) {
+function Nemerle_Core_option_$T$__$T$_(sig, val) {
   this.val = val;
 }
 

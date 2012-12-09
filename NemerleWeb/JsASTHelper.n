@@ -318,7 +318,7 @@ namespace NemerleWeb
     // HACK: Handle properties and lambda according to name
     public IsSpecialMethod(method : string) : bool
     {
-      method.StartsWith("set_") || method.StartsWith("get_")
+      method.StartsWith("set_") || method.StartsWith("get_") || method == "apply" || method == "apply_void"
     }
     
     /// If parameters has value, use it and access method via dictionary

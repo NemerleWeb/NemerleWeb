@@ -336,6 +336,34 @@ namespace NemerleWeb.Tests
       public Y : int;
     }
     
+    [Unit]
+    class ConstructorsOverload
+    {
+      public A : string;
+      public B : int;
+      
+      public this()
+      {
+        this("a", 1)
+      }
+      
+      public this(a : int)
+      {
+        this("int", a)
+      }
+      
+      public this(a : string)
+      {
+        this(a, 10)
+      }
+      
+      public this(a : string, b : int)
+      {
+        A = a;
+        B = b;
+      }
+    }
+    
     public this()
     {
       def test(description, res)
@@ -1407,14 +1435,14 @@ namespace NemerleWeb.Tests
         lst.Equals([4, 3, 2, 1])
       });
       
-      test("tuple indexer", () =>
+      test("Tuple indexer", () =>
       {
         def tpl = (1, "a", 2.0);
         
         tpl[0] == 1 && tpl[1] == "a" && tpl[2] == 2.0
       });
       
-      test("method overload", () =>
+      test("Method overload", () =>
       {
         MethodOverloadTest().F() == 0 &&
         MethodOverloadTest().F(1) == 1 &&
@@ -1426,7 +1454,7 @@ namespace NemerleWeb.Tests
         MethodOverloadTest.Call(MethodOverloadTest()) == 0
       });
       
-      test("initializers", () =>
+      test("Initializers", () =>
       {
         InitializerTest().ListInit is [1, 2, 3] && 
         InitializerTest().TupleInit is (1, "a", 2.0) &&
@@ -1435,7 +1463,7 @@ namespace NemerleWeb.Tests
         InitializerTest().StringInit == "x"
       });
       
-      test("call base constructor", () =>
+      test("Call base constructor", () =>
       {
         def d = DerivedClass("x");
         d.S == "x"
@@ -1446,6 +1474,14 @@ namespace NemerleWeb.Tests
         // TODO: #53
         //NonAbstractDerived().X == 33 && NonAbstractDerived().Y == 66
         true
+      });
+      
+      test("Constructors overload", () =>
+      {
+        ConstructorsOverload().A == "a" && ConstructorsOverload().B == 1 &&
+        ConstructorsOverload(2).A == "int" && ConstructorsOverload(2).B == 2 &&
+        ConstructorsOverload("x").A == "x" && ConstructorsOverload("x").B == 10 &&
+        ConstructorsOverload("y", 3).A == "y" && ConstructorsOverload("y", 3).B == 3
       });
     }    
     

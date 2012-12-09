@@ -545,9 +545,13 @@ $(Body.Write(indent + "  "))
             public override Write(_ = "" : string) : string
             {
               def delimiter = if (Obj is Literal(JsLiteral.Integer)) " " else "";
-              $"$(Obj.Write())$delimiter.$(JsAstHelper.Method(Method, ParametersType))"
+              // HACK: Lambda support
+              if (Method == "apply" || Method == "apply_void")
+                $"$(Obj.Write())"
+              else
+                $"$(Obj.Write())$delimiter.$(JsAstHelper.Method(Method, ParametersType))"
             }
-        }    
+          }    
         | StaticMethodRef
           {
             Type : string;
