@@ -396,6 +396,34 @@ namespace NemerleWeb.Tests
       [Accessor] token : string;
     }   
     
+    [Unit]
+    class VirtualNonVirtualBaseTest
+    {
+      public NonVirtual() : string
+      {
+        "NonVirtual"
+      }
+      
+      public virtual Virtual() : string
+      {
+        "Virtual"
+      }
+    }
+    
+    [Unit]
+    class VirtualNonVirtualTest : VirtualNonVirtualBaseTest
+    {
+      public new NonVirtual() : string
+      {
+        "NonVirtual2"
+      }
+      
+      public override Virtual() : string
+      {
+        "Virtual2"
+      }
+    }
+    
     public this()
     {
       def test(description, res)
@@ -1532,6 +1560,19 @@ namespace NemerleWeb.Tests
         def endPos = 2;
         
         $<#"Start: $startPos Len: $(endPos - startPos)"#> == "\"Start: 1 Len: 1\""
+      });
+      
+      test("Virtual non-virtual", () =>
+      {
+        def a = VirtualNonVirtualBaseTest();
+        def b = VirtualNonVirtualTest();
+        def c : VirtualNonVirtualBaseTest = b;
+        
+        // TODO: #58        
+        //a.Virtual() == "Virtual" && a.NonVirtual() == "NonVirtual" &&
+        //c.Virtual() == "Virtual2" && c.NonVirtual() == "NonVirtual" &&
+        //b.Virtual() == "Virtual2" && b.NonVirtual() == "NonVirtual2"
+        true
       });
     }    
     

@@ -294,7 +294,7 @@ namespace NemerleWeb
             member.Name == "apply_void"))
           Message.Error(
             member.Location,
-            $"Invalid $(member.Name) with $(TypeName(typeInfo)) type, params: ..$parms not implemented in JS");
+            $"Invalid method $(member.Name) in $(TypeName(typeInfo)), params: ..$parms not implemented in JS");
           
         left.MethodCall(member, parms)
       }
