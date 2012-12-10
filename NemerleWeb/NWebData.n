@@ -25,7 +25,7 @@ namespace NemerleWeb
                            .GetAssemblies()
                            .SelectMany(a => a.GetTypes()
                            .Where(t => t.Name.EndsWith("NWebDataPerAssembly")));
-                           
+      
       foreach(dataType in datas)
       {
         def instance = Activator.CreateInstance(dataType, array[], array[]) :> NWebDataInstance;
@@ -48,7 +48,7 @@ namespace NemerleWeb
     {
       UnitDefinitions.Keys
     }
-    
+        
     public GetScript(unitName : string) : string
     {
       mutable unitDef;
