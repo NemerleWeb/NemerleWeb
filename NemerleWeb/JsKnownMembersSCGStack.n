@@ -1,0 +1,89 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  module JsKnownMembersSCGStack
+  {
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(System.Collections.Generic.Stack[_]), Handler); 
+    }
+    
+    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      (if (left is JsAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
+    }
+    
+    private InstanceHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      match (parms)
+      {
+      | [] =>
+        match (member.Name)
+        {
+        | "get_Count" => Some(JsAst.FieldRef(left, "length"))
+        | "Clear" =>
+          Some(JsAst.Assign(JsAst.FieldRef(left, "length"), JsAst.Literal(JsLiteral.Integer(0))))
+        | "GetEnumerator" => Some(left.JsMethodCall(member.Name, parms))
+        | "Peek" => 
+          // left[left.length - 1]
+          Some(
+            JsAst.ArrayIndexer(
+              left,
+              JsAst.Call(
+                JsAst.OpCode("-"),
+                [
+                  left.Field("length"),
+                  JsAst.Literal(JsLiteral.Integer(1))
+                ])
+              )
+          )
+        | "Pop" => Some(left.JsMethodCall(member.Name, parms))
+        | "ToArray" => Some(left)
+        | _ => None()
+        }
+        
+      | [_] =>
+        match (member.Name)
+        {
+        | "Add" => Some(left.JsMethodCall("push", parms))
+        | "Remove"
+        | "Push" => Some(left.JsMethodCall(member.Name, parms))
+        | _ => None()
+        }
+        
+      | _ => None()
+      }
+    }
+     
+    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      match (parms)
+      {
+      | [] =>
+        match (member.Name)
+        {
+        | ".ctor" => Some(JsAst.Array([]))
+        | _ => None()
+        }
+      | [arg] =>
+        match (member.Name)
+        {
+        | ".ctor" =>
+          Some(JsAst.Call(JsAst.GlobalRef("System_Collections_Generic_Stack"), [arg]))
+        | _ => None()
+        }
+      | _ => None()
+      }
+    }
+  }
+}
