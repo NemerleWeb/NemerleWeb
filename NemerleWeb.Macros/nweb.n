@@ -89,19 +89,24 @@ $$(function() {
         env.Define(<[ decl: 
           public module $(typeName : usesite)
           {
+            _locker : object = object();
             mutable _isInitialized : bool;
             
             public Initialize() : void
-            {
-              when(!_isInitialized) 
+            {   
+              lock(_locker) 
               {
-                def loadedAssemblies = System.AppDomain
-                                             .CurrentDomain
-                                             .GetAssemblies()
-                                             .Select(a => a.FullName)
-                                             .ToList();                                             
-                {..$assemblies;}
-                _isInitialized = true;
+                when(!_isInitialized) 
+                {
+                
+                  def loadedAssemblies = System.AppDomain
+                                               .CurrentDomain
+                                               .GetAssemblies()
+                                               .Select(a => a.FullName)
+                                               .ToList();                                             
+                  {..$assemblies;}
+                  _isInitialized = true;
+                }
               }
             }
           }
