@@ -41,10 +41,10 @@ namespace NemerleWeb
         | _ => None()
         }
         
-      | [_] =>
+      | [arg] =>
         match (member.Name)
         {
-        | "get_Item" => Some(JsAst.Call(JsAst.Indexer(left), parms))
+        | "get_Item" => Some(JsAst.ArrayIndexer(left, arg))
         | "Add" => Some(left.JsMethodCall("push", parms))
         | "Remove" => Some(left.JsMethodCall("remove", parms))
         | _ => None()

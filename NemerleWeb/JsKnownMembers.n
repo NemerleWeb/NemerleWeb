@@ -85,6 +85,7 @@ namespace NemerleWeb
       JsKnownMembersConvert.Register();
       
       JsKnownMembersSCGList.Register();
+      JsKnownMembersSCGStack.Register();
       JsKnownMembersIEnumerable.Register();
       JsKnownMembersEnumerator.Register();
       
