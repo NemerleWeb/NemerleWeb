@@ -1,0 +1,16 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+  [Record][Unit]
+  public variant TypeSpecifier : Located
+  {
+    | Pointer
+    | Array { rank : int; }
+  }
+}

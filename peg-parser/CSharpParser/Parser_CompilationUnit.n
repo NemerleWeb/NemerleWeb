@@ -1,0 +1,103 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+  public partial class Parser
+  {
+    //externAliasDirective    : ExternAlias         = "extern"S "alias"S identifier ";"s;
+    externAliasDirective( _extern     : NToken,
+                          _alias      : NToken,
+                          identifier  : Identifier,
+                          _comma      : NToken) : ExternAlias
+    {
+      ExternAlias(identifier)
+    }
+
+    //externAliasDirectives   : ExternAliasList     = externAliasDirective*;
+    externAliasDirectives(externAliasDirective : SCG.List[ExternAlias]) : ExternAliasList
+    {
+      NList.ToList(externAliasDirective)
+    }
+
+    //usingAliasDirective     : UsingDirective      = "using"S identifier "="s qualifiedIdentifier ";"s;
+    usingAliasDirective(_using              : NToken,
+                        identifier          : Identifier,
+                        _eq                 : NToken,
+                        namespaceOrTypeName : Expr,
+                        _comma              : NToken) : UsingDirective
+    {
+      UsingDirective.Alias(identifier, namespaceOrTypeName)
+    }
+
+    //usingNamespaceDirective : UsingDirective      = "using"S qualifiedIdentifier ";"s;
+    usingNamespaceDirective(_using        : NToken,
+                            namespaceName : Expr,
+                            _comma        : NToken) : UsingDirective
+    {
+      UsingDirective.Namespace(namespaceName)
+    }
+
+    //usingDirectives         : UsingDirectiveList  = usingDirective*;
+    usingDirectives(usingDirective : SCG.List[UsingDirective]) : UsingDirectiveList
+    {
+      NList.ToList(usingDirective)
+    }
+
+    //namespaceBody               : NamespaceBody     = "{"s externAliasDirectives usingDirectives namespaceMemberDeclarations "}"s;
+    namespaceBody(_lparen                     : NToken,
+                  externAliasDirectives       : ExternAliasList,
+                  usingDirectives             : UsingDirectiveList,
+                  namespaceMemberDeclarations : NamespaceNodeList,
+                  _rparen                     : NToken) : NamespaceBody
+    {
+      VToken((externAliasDirectives, usingDirectives, namespaceMemberDeclarations))
+    }
+
+    //namespaceDeclaration        : NamespaceNode     = "namespace"S qualifiedIdentifier namespaceBody (";"s)?;
+    namespaceDeclaration( _namespace          : NToken,
+                          qualifiedIdentifier : Expr,
+                          namespaceBody       : NamespaceBody,
+                          _semicolon          : NToken) : NamespaceNode
+    {
+      def (externAliases, usingDirectives, members) = namespaceBody;
+      NamespaceNode.Namespace(
+        //TODO: VladD2: Что здесь делать? _namespace + _semicolon,
+        qualifiedIdentifier,
+        externAliases,
+        usingDirectives,
+        members)
+    }
+
+    //namespaceTypeDeclaration    : NamespaceNode     = typeDeclaration;
+    namespaceTypeDeclaration(typeDeclaration : TypeDeclaration) : NamespaceNode
+    {
+      NamespaceNode.TypeDeclaration(
+        typeDeclaration)
+    }
+
+    //namespaceMemberDeclarations : NamespaceNodeList = namespaceMemberDeclaration*;
+    namespaceMemberDeclarations(members : SCG.List[NamespaceNode]) : list[NamespaceNode]
+    {
+      NList.ToList(members)
+    }
+
+    //compilationUnit : CompilationUnit = s externAliasDirectives usingDirectives globalAttributes namespaceMemberDeclarations;
+    compilationUnit(externAliasDirectives       : ExternAliasList,
+                    usingDirectives             : UsingDirectiveList,
+                    globalAttributes            : list[CustomAttribute],
+                    namespaceMemberDeclarations : NamespaceNodeList) : CompilationUnit
+    {
+      CompilationUnit(
+        externAliasDirectives,
+        usingDirectives,
+        globalAttributes,
+        namespaceMemberDeclarations)
+    }
+  }
+}
