@@ -206,9 +206,6 @@
     <Compile Include="JsKnownMembersTextStringBuilder.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsLib.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="JsLiteral.n">
       <SubType>Code</SubType>
     </Compile>

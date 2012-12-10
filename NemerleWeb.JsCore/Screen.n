@@ -1,0 +1,22 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.JsCore
+{  
+  [JsApi]
+  public class Screen
+  {
+    public mutable availHeight : int;
+    public mutable availWidth : int;
+    public mutable colorDepth	: int;
+    public mutable height	: int;
+    public mutable pixelDepth	: int;
+    public mutable width : int;
+  }
+}
