@@ -1,0 +1,31 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.JsCore
+{  
+  [JsApi]
+  public class Document
+  {
+    public mutable anchors : array[Tag];
+    public mutable applets : array[object];
+    public mutable body	: Tag;
+    public mutable cookie	: string; 
+    public mutable documentMode	: bool;
+    public mutable domain : string;
+    public mutable forms : array[Tag];
+    public mutable images	: array[Tag];
+    public mutable lastModified	: string;
+    public mutable links	: array[Tag];
+    public mutable readyState	: string;
+    public mutable referrer	: string;
+    public mutable title : string;
+    public mutable URL : string;
+  }
+  
+}

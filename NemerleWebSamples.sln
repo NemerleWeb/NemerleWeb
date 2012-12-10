@@ -25,6 +25,8 @@ Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "Nemerle.Json-VS_2012", "peg
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "Nemerle.Json.Macros-VS_2012", "peg-parser\Json\Nemerle.Json.Macros\Nemerle.Json.Macros-VS_2012.nproj", "{E5E664D3-29A2-41A9-A4DC-A44AC0C386A3}"
 EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.JsCore", "NemerleWeb.JsCore\NemerleWeb.JsCore.nproj", "{41019DDB-3F91-4F8F-A830-787AA7E0B5B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,10 @@ Global
 		{E5E664D3-29A2-41A9-A4DC-A44AC0C386A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5E664D3-29A2-41A9-A4DC-A44AC0C386A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5E664D3-29A2-41A9-A4DC-A44AC0C386A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41019DDB-3F91-4F8F-A830-787AA7E0B5B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41019DDB-3F91-4F8F-A830-787AA7E0B5B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41019DDB-3F91-4F8F-A830-787AA7E0B5B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41019DDB-3F91-4F8F-A830-787AA7E0B5B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

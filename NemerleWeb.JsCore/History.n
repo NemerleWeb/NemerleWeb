@@ -1,0 +1,22 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.JsCore
+{
+  [JsApi]
+  public class History
+  {
+    public mutable length : int;
+    
+    public back() : void {}
+    public forward() : void {}
+    public go(index : int) : void {}
+    public go(url : string) : void {}
+  }
+}
