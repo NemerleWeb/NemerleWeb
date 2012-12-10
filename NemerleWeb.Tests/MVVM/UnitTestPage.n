@@ -1572,7 +1572,20 @@ namespace NemerleWeb.Tests
         //a.Virtual() == "Virtual" && a.NonVirtual() == "NonVirtual" &&
         //c.Virtual() == "Virtual2" && c.NonVirtual() == "NonVirtual" &&
         //b.Virtual() == "Virtual2" && b.NonVirtual() == "NonVirtual2"
+        _ = a;
+        _ = b;
+        _ = c;
         true
+      });
+      
+      test("Stack", () =>
+      {
+        def s = System.Collections.Generic.Stack();
+        s.Push(1);
+        def v1 = s.Peek();
+        def v2 = s.Pop();        
+        
+        v1 == v2 && v1 == 1
       });
     }    
     
