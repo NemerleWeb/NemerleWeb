@@ -287,7 +287,8 @@ namespace NemerleWeb
       else
       {
         when (typeInfo != null &&
-          !(typeInfo.IsInterface ||
+          !(typeInfo.IsAbstract ||
+            typeInfo.IsInterface ||
             typeInfo.GetSuperTypes().Any(t => t.TryRequire(JsClass.IPageType)) ||
             member.Name == "apply" ||
             member.Name == "apply_void"))

@@ -108,8 +108,7 @@ namespace NemerleWeb.Tests
     class ClassWithConstructors
     {
       public this() { }
-      // TODO: #37  
-      //public this(_ : int) { }
+      public this(_ : int) { }
     }
     
     /*
@@ -300,7 +299,6 @@ namespace NemerleWeb.Tests
       }
     }
     
-    // TODO: #53
     [Unit]
     abstract class AbstractBase
     {
@@ -316,6 +314,12 @@ namespace NemerleWeb.Tests
       J : int = 20;
       
       public X : int;
+      
+      public virtual M() : string { N() }
+      public abstract N() : string;
+      
+      public virtual MProp : string { get { NProp } }
+      public abstract NProp : string { get; }
     }
     
     [Unit]
@@ -323,10 +327,9 @@ namespace NemerleWeb.Tests
     {
       public this()
       {
-        base();
         Y = Q() + W() + U + V;
       }
-            
+      
       Q() : int { 2 }      
       static W() : int { 4 }
       
@@ -334,6 +337,9 @@ namespace NemerleWeb.Tests
       V : int = 40;
       
       public Y : int;
+      
+      public override N() : string { "N" }      
+      public override NProp : string { get { "NProp" } }
     }
     
     [Unit]
@@ -388,7 +394,7 @@ namespace NemerleWeb.Tests
       | B
       
       [Accessor] token : string;
-    }
+    }   
     
     public this()
     {
@@ -1497,9 +1503,9 @@ namespace NemerleWeb.Tests
       
       test("Use fields and methods from constructor", () =>
       {
-        // TODO: #53
-        //NonAbstractDerived().X == 33 && NonAbstractDerived().Y == 66
-        true
+        def obj = NonAbstractDerived();
+        
+        obj.X == 33 && obj.Y == 66 && obj.M() == "N" && obj.MProp == "NProp"
       });
       
       test("Constructors overload", () =>

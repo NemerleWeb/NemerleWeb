@@ -135,9 +135,8 @@ namespace NemerleWeb
         
       public Write() : string 
       {
-        def isAbstract = this.ClassType.IsAbstract;
         def properTypeName = GetProperName(ClassType);
-        def parentPtr = if(isAbstract) properTypeName + ".prototype" else "this";
+        def parentPtr = "this";
         def bodyIndent = Indent + "  ";
         def properties = GetProperties(bodyIndent, parentPtr);        
         def staticProperties = GetStaticProperties(Indent);        
@@ -172,78 +171,24 @@ return self.apply_void.apply(self, arguments);
         //Message.Hint($"Fields: $fields");
         //Message.Hint($"Static fields: $staticFields");
         //Message.Hint($"Constructor body: $constructorsBody");
+        //Message.Hint($"Call constructor: callConstrutor");
         //Message.Hint($"Static constructor body: $staticConstructorBody");
         //Message.Hint($"Methods: $methods");
         //Message.Hint($"Static methods: $staticMethods");
         //Message.Hint($"Nested classes: $nestedClassesString");
 
-        if(isAbstract)
-        {
-          def commonProps = 
-            nestedClasses.Select(c => 
-              string.Join(
-                Environment.NewLine, 
-                Properties.Select(p => 
-                  if(p.IsIndexer) Message.FatalError(p.Location, "Indexed properties are not supported");
-                  else
-                  {
-                    def prop(name)
-                    {
-                      $"$(GetProperName(c.ClassType)).prototype.$name = $properTypeName.prototype.$name;"
-                    }
-                    
-                    def sb = StringBuilder();
-                    when (p.GetGetter() != null)
-                      _ = sb.AppendLine(prop("get_" + p.Name));
-                    when (p.GetSetter() != null)
-                      _ = sb.AppendLine(prop("set_" + p.Name));
-                      
-                    sb.ToString()
-                  })
-                ));
-                
-          def commonFields = 
-            nestedClasses.Select(c => 
-              string.Join(Environment.NewLine, 
-                          Fields.Select(p => $"$(GetProperName(c.ClassType)).prototype.$(p.Name) = $properTypeName.prototype.$(p.Name);")));
-          def commonMethods = 
-            nestedClasses.Select(c => 
-              string.Join(Environment.NewLine, 
-                          Methods.Select(p => $"$(GetProperName(c.ClassType)).prototype.$(p.Name) = $properTypeName.prototype.$(p.Name);")));
-$<#
-$nestedClassesString
-$(Indent)var $properTypeName$$ctor = {};
-$constructorsBody
-$(Indent)function $properTypeName() {
-$(bodyIndent)var self = this;
-$callConstrutor
-$(bodyIndent) {{{SignalR}}}
-$(bodyIndent)$returning
-$(Indent)}
-$properties
-..$(commonProps; Environment.NewLine)
-$fields
-..$(commonFields; Environment.NewLine)
-$methods
-..$(commonMethods; Environment.NewLine)
-$staticFields
-$staticMethods
-$staticProperties
-$staticConstructorBody
-#>
-        }
-        else
-        {
-$<#
+ $<#
 $nestedClassesString
 $(Indent)var $properTypeName$$ctor = {};
 $constructorsBody
 $(Indent)function $properTypeName() {
 $(bodyIndent)var self = this;
 $properties
-$fields
 $methods
+$fields
 $callConstrutor
+$properties
+$methods
 {{{SignalR}}}
 $returning
 $(Indent)}
@@ -252,9 +197,8 @@ $staticMethods
 $staticProperties
 $staticConstructorBody
 #>
-        }
       }
-           
+      
       GenerateProperties(indent : string, parentPtr : string, properties : IEnumerable[IProperty]) : string 
       {
         def propStrings = properties.Select(p =>
