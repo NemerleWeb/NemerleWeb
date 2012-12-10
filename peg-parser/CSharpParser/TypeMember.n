@@ -1,0 +1,96 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+  [Record][Unit]
+  public class PropertyAccessor : Located
+  {
+    [Accessor] attributes : list[CustomAttribute];
+    [Accessor] modifiers : list[Modifier];
+    [Accessor] body : Statement;
+  }
+
+  [Record][Unit]
+  public variant ConstructorInitializer : Located
+  {
+    | Default
+    | This { args : list[FunctionArgument]; }
+    | Base { args : list[FunctionArgument]; }
+  }
+
+  [Record][Unit]
+  public variant TypeMember : Located
+  {
+    | Constant {
+      memberType    : Expr;
+      constants     : list[Location * Expr * Expr];
+    }
+    | Field {
+      memberType    : Expr;
+      fields        : list[Location * Expr * VariableInitializer]; // initializers can be null
+    }
+    | FixedSizeBuffer {
+      elementType   : Expr;
+      buffers       : list[Location * Expr * Expr];
+    }
+    | Method {
+      name              : Expr;
+      returnType        : Expr;
+      formalParameters  : list[FormalParameter];
+      typeParameters    : list[TypeParameter];
+      constraints       : list[TypeParameterConstraintClause];
+      body              : Statement;
+    }
+    | Property {
+      name : Expr;
+      memberType : Expr;
+      getter : PropertyAccessor; //can be null
+      setter : PropertyAccessor; //can be null
+    }
+    | Event {
+      memberType : Expr;
+      adder   : PropertyAccessor; //can be null
+      remover : PropertyAccessor; //can be null
+      events : list[Location * Expr * VariableInitializer]; // initializers must be null
+    }
+    | Indexer {
+      name : Expr;
+      memberType        : Expr;
+      formalParameters  : list[FormalParameter];
+      getter : PropertyAccessor; //can be null
+      setter : PropertyAccessor; //can be null
+    }
+    | Operator {
+      op : Identifier;
+      returnType : Expr;
+      formalParameters  : list[FormalParameter];
+      body              : Statement;
+    }
+    | Constructor {
+      name : Expr;
+      formalParameters : list[FormalParameter];
+      init : ConstructorInitializer;
+      body : Statement;
+    }
+    | Destructor {
+      name : Expr;
+      formalParameters : list[FormalParameter]; // must be empty list
+      body : Statement;
+    }
+    | EnumOption {
+      name : Identifier;
+      value : Expr;  // can be null
+    }
+    | TypeDeclaration {
+      decl : CSharpParser.TypeDeclaration;
+    }
+
+    [Accessor] attributes : list[CustomAttribute];
+    [Accessor] modifiers : list[Modifier];
+  }
+}

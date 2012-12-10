@@ -1,0 +1,408 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+  public partial class Parser
+  {
+    #region Constant
+
+    //constantDeclaration : TypeMemberList = attributes? modifiers? "const"S anyType constantDeclarators ";"s;
+    constantDeclaration(attributes  : option[list[CustomAttribute]],
+                        modifiers   : option[list[Modifier]],
+                        _const      : NToken,
+                        memberType  : Expr,
+                        decls       : list[ConstantDeclarator],
+                        _semicolon  : NToken) : TypeMember
+    {
+      TypeMember.Constant(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        memberType,
+        decls.Map(d => (d.Location, Expr.Ref(d.Value[0]), d.Value[1])))
+    }
+
+    #endregion
+
+    #region Field
+
+    //fieldDeclaration    : TypeMemberList = attributes? modifiers? anyType variableDeclarators ";"s;
+    fieldDeclaration( attributes  : option[list[CustomAttribute]],
+                      modifiers   : option[list[Modifier]],
+                      memberType  : Expr,
+                      decls       : list[VariableDeclarator],
+                      _semicolon  : NToken) : TypeMember
+    {
+      TypeMember.Field(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        memberType,
+        decls.Map(d => (d.Location, Expr.Ref(d.Value[0]), d.Value[1])))
+    }
+
+    #endregion
+
+    #region Fixed size buffer
+
+    //fixedSizeBufferDeclarator   : FixedSizeBufferDeclarator     = identifier "["s constantExpression "]"s;
+    fixedSizeBufferDeclarator(identifier          : Identifier,
+                              _lparen             : NToken,
+                              constantExpression  : Expr,
+                              _rparen             : NToken) : FixedSizeBufferDeclarator
+    {
+      VToken(identifier, constantExpression)
+    }
+
+    //fixedSizeBufferDeclarators  : FixedSizeBufferDeclaratorList = fixedSizeBufferDeclarator (","s fixedSizeBufferDeclarator)*;
+    fixedSizeBufferDeclarators( head : FixedSizeBufferDeclarator,
+                                tail : SCG.List[NToken * FixedSizeBufferDeclarator]) : list[FixedSizeBufferDeclarator]
+    {
+      head.Cons(tail)
+    }
+
+    //fixedSizeBufferDeclaration  : TypeMemberList                = attributes? modifiers? "fixed"S anyType fixedSizeBufferDeclarators ";"s;
+    fixedSizeBufferDeclaration( attributes  : option[list[CustomAttribute]],
+                                modifiers   : option[list[Modifier]],
+                                _fixed      : NToken,
+                                elementType : Expr,
+                                decls       : list[FixedSizeBufferDeclarator],
+                                _semicolon  : NToken) : TypeMember
+    {
+      TypeMember.FixedSizeBuffer(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        elementType,
+        decls.Map(d => (d.Location, Expr.Ref(d.Value[0]), d.Value[1])))
+    }
+
+    #endregion
+
+    #region Method
+
+    //methodDeclaration : TypeMemberList = attributes? modifiers? anyType qualifiedIdentifier typeParameterList? "("s formalParameterList? ")"s typeParameterConstraintsClauses? methodBody;
+    methodDeclaration(attributes          : option[list[CustomAttribute]],
+                      modifiers           : option[list[Modifier]],
+                      returnType          : Expr,
+                      name                : Expr,
+                      typeParameterList   : option[list[TypeParameter]],
+                      _lparen             : NToken,
+                      formalParameterList : option[list[FormalParameter]],
+                      _rparen             : NToken,
+                      constraints         : option[list[TypeParameterConstraintClause]],
+                      body                : Statement) : TypeMember
+    {
+      TypeMember.Method(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        name,
+        returnType,
+        formalParameterList.WithDefault([]),
+        typeParameterList.WithDefault([]),
+        constraints.WithDefault([]),
+        body)
+    }
+
+    #endregion
+
+    #region Property
+
+    //getAccessorDeclaration  : PropertyAccessor  = attributes? modifiers? "get"S methodBody;
+    getAccessorDeclaration( attributes  : option[list[CustomAttribute]],
+                            modifiers   : option[list[Modifier]],
+                            _get        : NToken,
+                            body        : Statement) : PropertyAccessor
+    {
+      PropertyAccessor(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        body)
+    }
+
+    //setAccessorDeclaration  : PropertyAccessor  = attributes? modifiers? "set"S methodBody;
+    setAccessorDeclaration( attributes  : option[list[CustomAttribute]],
+                            modifiers   : option[list[Modifier]],
+                            _set        : NToken,
+                            body        : Statement) : PropertyAccessor
+    {
+      PropertyAccessor(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        body)
+    }
+
+    //accessorDeclarations_1  : PropertyAccessors = getAccessorDeclaration setAccessorDeclaration?;
+    accessorDeclarations_1( getter : PropertyAccessor,
+                            setter : option[PropertyAccessor]) : PropertyAccessor * PropertyAccessor
+    {
+      (getter, setter.WithDefault(null))
+    }
+
+    //accessorDeclarations_2  : PropertyAccessors = setAccessorDeclaration getAccessorDeclaration?;
+    accessorDeclarations_2( setter : PropertyAccessor,
+                            getter : option[PropertyAccessor]) : PropertyAccessor * PropertyAccessor
+    {
+      (getter.WithDefault(null), setter)
+    }
+
+    //propertyDeclaration     : TypeMemberList    = attributes? modifiers? anyType qualifiedIdentifier "{"s accessorDeclarations "}"s;
+    propertyDeclaration(attributes  : option[list[CustomAttribute]],
+                        modifiers   : option[list[Modifier]],
+                        memberType  : Expr,
+                        name        : Expr,
+                        _lparen     : NToken,
+                        accessors   : PropertyAccessor * PropertyAccessor,
+                        _rparen     : NToken) : TypeMember
+    {
+      def (getter, setter) = accessors;
+      TypeMember.Property(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        name,
+        memberType,
+        getter,
+        setter)
+    }
+
+    #endregion
+
+    #region Event
+
+    //addAccessorDeclaration      : PropertyAccessor   = attributes? "add"S block;
+    addAccessorDeclaration( attributes  : option[list[CustomAttribute]],
+                            _add        : NToken,
+                            body        : Statement) : PropertyAccessor
+    {
+      PropertyAccessor(
+        attributes.WithDefault([]),
+        [],
+        body)
+    }
+
+    //removeAccessorDeclaration   : PropertyAccessor   = attributes? "remove"S block;
+    removeAccessorDeclaration(attributes  : option[list[CustomAttribute]],
+                              _remove     : NToken,
+                              body        : Statement) : PropertyAccessor
+    {
+      PropertyAccessor(
+        attributes.WithDefault([]),
+        [],
+        body)
+    }
+
+    //eventAccessorDeclarations_1 : EventAccessors  = addAccessorDeclaration removeAccessorDeclaration;
+    eventAccessorDeclarations_1(adder   : PropertyAccessor,
+                                remover : PropertyAccessor) : PropertyAccessor * PropertyAccessor
+    {
+      (adder, remover)
+    }
+
+    //eventAccessorDeclarations_2 : EventAccessors  = removeAccessorDeclaration addAccessorDeclaration;
+    eventAccessorDeclarations_2(remover : PropertyAccessor,
+                                adder   : PropertyAccessor) : PropertyAccessor * PropertyAccessor
+    {
+      (adder, remover)
+    }
+
+    //eventDeclaration_1  : TypeMemberList = attributes? modifiers? "event"S anyType qualifiedIdentifier "{"s eventAccessorDeclarations "}"s;
+    eventDeclaration_1( attributes  : option[list[CustomAttribute]],
+                        modifiers   : option[list[Modifier]],
+                        _event      : NToken,
+                        memberType  : Expr,
+                        name        : Expr,
+                        _lparen     : NToken,
+                        accessors   : PropertyAccessor * PropertyAccessor,
+                        _rparen     : NToken) : TypeMember
+    {
+      def (adder, remover) = accessors;
+      TypeMember.Event(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        memberType,
+        adder,
+        remover,
+        [(name.Location, name, null)])
+    }
+
+    //eventDeclaration_2  : TypeMemberList = attributes? modifiers? "event"S anyType variableDeclarators ";"s;
+    eventDeclaration_2( attributes  : option[list[CustomAttribute]],
+                        modifiers   : option[list[Modifier]],
+                        _event      : NToken,
+                        memberType  : Expr,
+                        decls       : list[VariableDeclarator],
+                        _semicolon : NToken)  : TypeMember
+    {
+      TypeMember.Event(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        memberType,
+        null,
+        null,
+        decls.Map(d => (d.Location, Expr.Ref(d.Value[0]), d.Value[1])))
+    }
+
+    #endregion
+
+    #region Indexer
+
+    //indexerDeclaration  : TypeMember = attributes? modifiers? anyType (qualifiedIdentifier "."s)? "this"S "["s formalParameterList? "]"s "{"s accessorDeclarations "}"s;
+    indexerDeclaration( attributes        : option[list[CustomAttribute]],
+                        modifiers         : option[list[Modifier]],
+                        returnType        : Expr,
+                        ifaceType         : option[Expr * NToken],
+                        _this             : NToken,
+                        _lparen1          : NToken,
+                        formalParameters  : option[list[FormalParameter]],
+                        _rparen1          : NToken,
+                        _lparen2          : NToken,
+                        accessors         : PropertyAccessor * PropertyAccessor,
+                        _rparen2          : NToken,) : TypeMember
+    {
+      def name = match(ifaceType) {
+        | Some( (iface, _) ) =>
+          def member = Expr.This(GetLocation(_this));
+          Expr.Member(iface, member)
+        | _ => Expr.This(GetLocation(_this))
+      }
+      def (getter, setter) = accessors;
+      TypeMember.Indexer(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        name,
+        returnType,
+        formalParameters.WithDefault([]),
+        getter,
+        setter)
+    }
+
+    #endregion
+
+    #region Operator
+
+    //overloadableOperator : Identifier  = ("++" / "--" / "!" / "~" / "+" / "-" / "*" / "/" / "%" / "&" / "|"
+    //                                     / "^" / "<<" / ">>" / "==" / "!=" / ">" / "<" / ">=" / "<=" / "true" / "false")S;
+    overloadableOperator(op : NToken) : Identifier
+    {
+      Identifier(GetText(op))
+    }
+
+    //overloadableOperatorDeclarator  : OperatorDeclarator = anyType "operator"S overloadableOperator;
+    overloadableOperatorDeclarator( returnType  : Expr,
+                                    _operator   : NToken,
+                                    op          : Identifier) : Identifier * Expr
+    {
+      (op, returnType)
+    }
+
+    //conversionOperatorDeclarator    : OperatorDeclarator = ("implicit" / "explicit")S "operator"S anyType;
+    conversionOperatorDeclarator( op          : NToken,
+                                  _operator   : NToken,
+                                  returnType  : Expr) : Identifier * Expr
+    {
+      (Identifier(GetLocation(op), GetText(op)), returnType)
+    }
+
+    //operatorDeclarator : OperatorDeclarator = conversionOperatorDeclarator
+    //                                        / overloadableOperatorDeclarator;
+    operatorDeclarator(decl : Identifier * Expr) : Identifier * Expr
+    {
+      decl
+    }
+
+    //operatorDeclaration : TypeMember = attributes? modifiers? operatorDeclarator "("s formalParameterList? ")"s methodBody;
+    operatorDeclaration(attributes        : option[list[CustomAttribute]],
+                        modifiers         : option[list[Modifier]],
+                        decl              : Identifier * Expr,
+                        _lparen           : NToken,
+                        formalParameters  : option[list[FormalParameter]],
+                        _rparen           : NToken,
+                        body              : Statement) : TypeMember
+    {
+      def (op, returnType) = decl;
+      TypeMember.Operator(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        op,
+        returnType,
+        formalParameters.WithDefault([]),
+        body)
+    }
+
+    #endregion
+
+    #region Constructor
+
+    //constructorInitializer : ConstructorInitializer = ":"s ("this" / "base")S "("s argumentList? ")"s;
+    constructorInitializer( _colon  : NToken,
+                            keyword : NToken,
+                            _lparen : NToken,
+                            args    : option[list[FunctionArgument]],
+                            _rparen : NToken) : ConstructorInitializer
+    {
+      match(GetText(keyword)) {
+        | "this" => ConstructorInitializer.This(args.WithDefault([]))
+        | "base" => ConstructorInitializer.Base(args.WithDefault([]))
+        | _ => throw ArgumentOutOfRangeException("keyword")
+      }
+    }
+
+    //constructorDeclaration : TypeMember = attributes? modifiers? identifier "("s formalParameterList? ")"s constructorInitializer? methodBody;
+    constructorDeclaration( attributes        : option[list[CustomAttribute]],
+                            modifiers         : option[list[Modifier]],
+                            name              : Identifier,
+                            _lparen           : NToken,
+                            formalParameters  : option[list[FormalParameter]],
+                            _rparen           : NToken,
+                            init              : option[ConstructorInitializer],
+                            body              : Statement) : TypeMember
+    {
+      TypeMember.Constructor(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        Expr.Ref(name),
+        formalParameters.WithDefault([]),
+        init.WithDefault(ConstructorInitializer.Default(name.Location)),
+        body)
+    }
+
+    #endregion
+
+    #region Destructor
+
+    //destructorDeclaration  : TypeMember = attributes? modifiers? "~"s identifier "("s formalParameterList? ")"s methodBody;
+    destructorDeclaration(attributes        : option[list[CustomAttribute]],
+                          modifiers         : option[list[Modifier]],
+                          _tild : NToken,
+                          name              : Identifier,
+                          _lparen           : NToken,
+                          formalParameters  : option[list[FormalParameter]],
+                          _rparen           : NToken,
+                          body              : Statement) : TypeMember
+    {
+      TypeMember.Destructor(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        Expr.Ref(name),
+        formalParameters.WithDefault([]),
+        body)
+    }
+
+    #endregion
+
+    //nestedTypeDeclaration  : TypeMember = typeDeclaration;
+    nestedTypeDeclaration(decl : TypeDeclaration) : TypeMember
+    {
+      TypeMember.TypeDeclaration(decl.Attributes, decl.Modifiers, decl)
+    }
+
+    //typeMemberDeclarations : TypeMemberList = typeMemberDeclaration*;
+    typeMemberDeclarations(members : SCG.List[TypeMember]) : list[TypeMember]
+    {
+      NList.ToList(members)
+    }
+  }
+}

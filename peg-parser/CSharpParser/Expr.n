@@ -1,0 +1,189 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+  [Record][Unit]
+  public variant Expr : Located
+  {
+    | Alias {
+      id : Identifier;
+
+      public new this(id : Identifier)
+      {
+        this(id.Location, id);
+      }
+    }
+    | Ref {
+      id : Identifier;
+
+      public new this(id : Identifier)
+      {
+        this(id.Location, id);
+      }
+    }
+    | Member {
+      expr : Expr;
+      member : Expr;
+
+      public new this(expr : Expr, member : Expr)
+      {
+        this(expr.Location + member.Location, expr, member);
+      }
+    }
+    | PointerMember {
+      expr : Expr;
+      member : Expr;
+
+      public new this(expr : Expr, member : Expr)
+      {
+        this(expr.Location + member.Location, expr, member);
+      }
+    }
+    | TypeArguments {
+      expr : Expr;
+      args : list[Expr]; // list items can be null
+    }
+    | Literal {
+      literal : CSharpParser.Literal;
+
+      public new this(literal : CSharpParser.Literal)
+      {
+        this(literal.Location, literal);
+      }
+    }
+    | This
+    | Base
+    | BuiltInType {
+      name : string;
+    }
+    | ArrayType {
+      baseType : Expr;
+      rank : int;
+    }
+    | NullableType {
+      baseType : Expr;
+    }
+    | PointerType {
+      baseType : Expr;
+    }
+    | TypeOf {
+      typeRef : Expr;
+    }
+    | Checked {
+      expr : Expr;
+      is_checked : bool;
+    }
+    | DefaultValue {
+      typeRef : Expr;
+    }
+    | SizeOf {
+      typeRef : Expr;
+    }
+    | Function {
+      formalParameters : list[FormalParameter];
+      automaticParams : bool;
+      is_lambda : bool;
+      body : Statement;
+    }
+    | Call {
+      expr : Expr;
+      arguments : list[FunctionArgument];
+    }
+    | Indexer {
+      expr : Expr;
+      arguments : list[FunctionArgument];
+    }
+    | UnaryOperator  {
+      expr : Expr;
+      op : Identifier;
+      is_prefix : bool;
+    }
+    | BinaryOperator {
+      left : Expr;
+      right : Expr;
+      op : Identifier;
+    }
+    | ConditionalOperator {
+      cond : Expr;
+      trueExpr : Expr;
+      falseExpr : Expr;
+    }
+    | CastOperator {
+      expr : Expr;
+      toType : Expr;
+    }
+    | Assign {
+      to : Expr;
+      value : Expr;
+      op : Identifier;
+    }
+    | NewObject {
+      objType : Expr;
+      args : list[FunctionArgument];
+      init : VariableInitializer; // can be null
+    }
+    | NewArray {
+      elementType : Expr;     // can be null
+      args : list[Expr];
+      rank : int;
+      init : VariableInitializer; // can be null
+    }
+    | NewAnonymous {
+      init : VariableInitializer;
+    }
+    | Query {
+      query : list[QueryExpr];
+    }
+    
+    public override ToString() : string
+    {
+      match (this)
+      {
+        | Ref(id)
+        | Alias(id) => id.ToString()
+        | Member(Alias(id), member) => $"$id::$member"
+        | Member(expr, member) => $"$expr.$member"
+        | PointerMember(expr, member) => $"$expr->$member"
+        | TypeArguments(expr, args) => $"$expr<..$args>"
+        | Literal(literal) => literal.ToString()
+        | This => "this"
+        | Base => "base"
+        | BuiltInType(name) => name
+        | ArrayType (baseType, rank) => baseType.ToString() + "[" + string(',', rank - 1) + "]"
+        | NullableType(baseType) => baseType.ToString() + "?";
+        | PointerType(baseType) => "*" + baseType.ToString();
+        | TypeOf(typeRef) => $"typeof($typeRef)"
+        | Checked(expr, is_checked) => if (is_checked) $"checked $expr" else $"unchecked $expr"
+        | DefaultValue(typeRef) => $"default($typeRef)"
+        | SizeOf(typeRef) => $"sizeof($typeRef)"
+        | Function(formalParameters,    _, true, body) => $"(..$formalParameters) => $body"
+        | Function(               _, true,    _, body) => $"delegate $body" 
+        | Function(formalParameters,    _,    _, body) => $"delegate(..$formalParameters) $body"
+        | Call(expr, arguments) => $"$expr(..$arguments)"
+        | Indexer(expr, arguments) => $"$expr[..$arguments]"
+        | UnaryOperator(expr, op, is_prefix) => if (is_prefix) $"$op$expr" else $"$expr$op"
+        | BinaryOperator(left, right, op) => $"$left $op $right"
+        | ConditionalOperator(cond, trueExpr, falseExpr) => $"$cond ? $trueExpr : $falseExpr"
+        | CastOperator(expr, toType) => $"($toType)($expr)"
+        | Assign(to, value, op) => $"$to $op $value"
+        | NewObject(objType, args, init) => $"new $objType(..$args) $init"
+        | NewArray(elementType, args, rank, init) =>
+          def rankStr =
+            if(rank > 0) "[" + string(',', rank - 1) + "]"
+            else "";
+          def argsStr = 
+            if(args != []) $"[..$args]"
+            else "";
+          $"new $elementType$argsStr$rankStr$init"
+        | NewAnonymous(init) => $"new$init"
+        | Query(query) => $<#..$(query; " ")#>
+      }
+    }
+  }
+}

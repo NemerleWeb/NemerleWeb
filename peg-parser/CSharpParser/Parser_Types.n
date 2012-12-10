@@ -1,0 +1,291 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+  public partial class Parser
+  {
+    #region Type parameters
+  
+    //varianceAnnotation  : TypeParameterVariance = ("in" / "out")S;
+    varianceAnnotation(variance : NToken) : TypeParameterVariance
+    {
+      match(GetText(variance)) {
+        | "in"  => TypeParameterVariance.In()
+        | "out" => TypeParameterVariance.Out()
+        | _     => throw ArgumentOutOfRangeException("variance")
+      }
+    }
+
+    //typeParameter       : TypeParameter         = attributes? varianceAnnotation? identifier;
+    typeParameter(attributes          : option[list[CustomAttribute]],
+                  varianceAnnotation  : option[TypeParameterVariance],
+                  identifier          : Identifier) : TypeParameter
+    {
+      TypeParameter(
+        attributes.WithDefault([]),
+        identifier,
+        varianceAnnotation.WithDefault(TypeParameterVariance.Normal()))
+    }
+
+    //typeParameterList   : TypeParameterList     = "<"s typeParameter (","s typeParameter)* ">"s;
+    typeParameterList(_lparen : NToken,
+                      head    : TypeParameter,
+                      tail    : SCG.List[NToken * TypeParameter],
+                      _rparen : NToken) : list[TypeParameter]
+    {
+      head.Cons(tail)
+    }
+
+    //typeParameterConstraint_ctor : TypeParameterConstraint  = "new"S "("s ")"s;
+    typeParameterConstraint_ctor( _new    : NToken,
+                                  _lparen : NToken,
+                                  _rparen : NToken) : TypeParameterConstraint
+    {
+      TypeParameterConstraint.DefaultCtor()
+    }
+
+    //typeParameterConstraint_type : TypeParameterConstraint  = ("class" / "struct")S;
+    typeParameterConstraint_type(typeConstraint : NToken) : TypeParameterConstraint
+    {
+      match(GetText(typeConstraint)) {
+        | "class"   => TypeParameterConstraint.Class()
+        | "struct"  => TypeParameterConstraint.Struct()
+        | _         => throw ArgumentOutOfRangeException("typeConstraint")
+      }
+    }
+
+    //typeParameterConstraint_base : TypeParameterConstraint  = anyType;
+    typeParameterConstraint_base(baseType : Expr) : TypeParameterConstraint
+    {
+      TypeParameterConstraint.Base(baseType)
+    }
+
+    //typeParameterConstraints        : TypeParameterConstraintList       = typeParameterConstraint (","s typeParameterConstraint)*;
+    typeParameterConstraints( head : TypeParameterConstraint,
+                              tail : SCG.List[NToken * TypeParameterConstraint]) : list[TypeParameterConstraint]
+    {
+      head.Cons(tail)
+    }
+
+    //typeParameterConstraintsClause  : TypeParameterConstraintClause     = "where"S identifier ":"s typeParameterConstraints;
+    typeParameterConstraintsClause( _where                    : NToken,
+                                    identifier                : Identifier,
+                                    _colon                    : NToken,
+                                    typeParameterConstraints  : list[TypeParameterConstraint]) : TypeParameterConstraintClause
+    {
+      TypeParameterConstraintClause(identifier, typeParameterConstraints)
+    }
+
+    //typeParameterConstraintsClauses : TypeParameterConstraintClauseList = typeParameterConstraintsClause+;
+    typeParameterConstraintsClauses(clauses : SCG.List[TypeParameterConstraintClause]) : list[TypeParameterConstraintClause]
+    {
+      NList.ToList(clauses)
+    }
+
+    #endregion
+
+    #region Function parameters
+
+    //parameterModifier   : FormalParameterModifier = ("ref" / "out" / "this" / "params")S;
+    parameterModifier(mod : NToken) : FormalParameterModifier
+    {
+      match(GetText(mod)) {
+        | "ref"     => FormalParameterModifier.Ref()
+        | "out"     => FormalParameterModifier.Out()
+        | "this"    => FormalParameterModifier.This()
+        | "params"  => FormalParameterModifier.Params()
+        | _         => throw ArgumentOutOfRangeException("mod")
+      }
+    }
+
+    //defaultArgument     : Expr                    = "="s expression;
+    defaultArgument(_eq : NToken, expr : Expr) : Expr
+    {
+      expr
+    }
+
+    //formalParameter     : FormalParameter         = attributes? parameterModifier? anyType identifier defaultArgument?;
+    formalParameter(attributes        : option[list[CustomAttribute]],
+                    parameterModifier : option[FormalParameterModifier],
+                    paramType         : Expr,
+                    identifier        : Identifier,
+                    defaultArgument   : option[Expr]) : FormalParameter
+    {
+      FormalParameter(
+        attributes.WithDefault([]),
+        identifier,
+        parameterModifier.WithDefault(FormalParameterModifier.Normal()),
+        paramType,
+        defaultArgument.WithDefault(null))
+    }
+
+    //formalParameterList : FormalParameterList     = formalParameter (","s formalParameter)*;
+    formalParameterList(head : FormalParameter,
+                        tail : SCG.List[NToken * FormalParameter]) : list[FormalParameter]
+    {
+      head.Cons(tail)
+    }
+
+    #endregion
+
+    #region Class, Struct, Interface
+
+    //typeBase                        : TypeRefList     = ":"s anyType (","s anyType)*;
+    typeBase( _colon  : NToken,
+              head    : Expr,
+              tail    : SCG.List[NToken * Expr]) : list[Expr]
+    {
+      head.Cons(tail)
+    }
+
+    //typeBody                        : TypeBody  = "{"s typeMemberDeclarations "}"s;
+    typeBody( _lparen                 : NToken,
+              typeMemberDeclarations  : list[TypeMember],
+              _rparen                 : NToken) : TypeBody
+    {
+      VList(typeMemberDeclarations)
+    }
+
+    //classStructInterfaceDeclaration : TypeDeclaration = attributes? modifiers? ("class" / "struct" / "interface")S identifier typeParameterList? typeBase? typeParameterConstraintsClauses? typeBody (";"s)?;
+    classStructInterfaceDeclaration(attributes                      : option[list[CustomAttribute]],
+                                    modifiers                       : option[list[Modifier]],
+                                    keyword                         : NToken,
+                                    identifier                      : Identifier,
+                                    typeParameterList               : option[list[TypeParameter]],
+                                    typeBase                        : option[list[Expr]],
+                                    typeParameterConstraintsClauses : option[list[TypeParameterConstraintClause]],
+                                    typeBody                        : TypeBody,
+                                    _semicolon                      : NToken) : TypeDeclaration
+    {
+      match(GetText(keyword)) {
+        | "class"     =>
+          TypeDeclaration.Class(
+            attributes.WithDefault([]),
+            modifiers.WithDefault([]),
+            identifier, 
+            typeParameterList.WithDefault([]),
+            typeParameterConstraintsClauses.WithDefault([]),
+            typeBody.Location,
+            typeBase.WithDefault([]),
+            typeBody)
+
+        | "struct"    =>
+          TypeDeclaration.Struct(
+            attributes.WithDefault([]),
+            modifiers.WithDefault([]),
+            identifier, 
+            typeParameterList.WithDefault([]),
+            typeParameterConstraintsClauses.WithDefault([]),
+            typeBody.Location,
+            typeBase.WithDefault([]),
+            typeBody)
+
+        | "interface" =>
+          TypeDeclaration.Interface(
+            attributes.WithDefault([]),
+            modifiers.WithDefault([]),
+            identifier, 
+            typeParameterList.WithDefault([]),
+            typeParameterConstraintsClauses.WithDefault([]),
+            typeBody.Location,
+            typeBase.WithDefault([]),
+            typeBody)
+
+        | _           => throw ArgumentOutOfRangeException("keyword")
+      }
+    }
+
+    #endregion
+
+    #region Enum
+
+    //enumBase                : Expr         = ":"s anyType;
+    enumBase(_colon : NToken, baseType : Expr) : Expr
+    {
+      baseType
+    }
+
+    //enumMemberDeclaration   : TypeMember      = attributes? identifier ("="s constantExpression)?;
+    enumMemberDeclaration(attributes  : option[list[CustomAttribute]],
+                          identifier  : Identifier,
+                          value       : option[NToken * Expr]) : TypeMember
+    {
+      match(value) {
+        | Some( (_, v) ) => TypeMember.EnumOption(attributes.WithDefault([]), [], identifier, v)
+        | _              => TypeMember.EnumOption(attributes.WithDefault([]), [], identifier, null)
+      }
+    }
+
+    //enumMemberDeclarations  : TypeMemberList  = enumMemberDeclaration (","s enumMemberDeclaration)* (","s)?;
+    enumMemberDeclarations( head   : TypeMember,
+                            tail   : SCG.List[NToken * TypeMember],
+                            _comma : NToken) : list[TypeMember]
+    {
+      head.Cons(tail)
+    }
+
+    //enumBody                : TypeMemberList  = "{"s enumMemberDeclarations? "}"s;
+    enumBody( _lparen                 : NToken,
+              enumMemberDeclarations  : option[list[TypeMember]],
+              _rparent                : NToken) : VList[TypeMember]
+    {
+      VList(enumMemberDeclarations.WithDefault([]))
+    }
+
+    //enumDeclaration         : TypeDeclaration = attributes? modifiers? "enum"S identifier enumBase? enumBody (";"s)?;
+    enumDeclaration(attributes  : option[list[CustomAttribute]],
+                    modifiers   : option[list[Modifier]],
+                    _enum       : NToken,
+                    identifier  : Identifier,
+                    enumBase    : option[Expr],
+                    enumBody    : VList[TypeMember],
+                    _semicolon  : NToken) : TypeDeclaration
+    {
+      TypeDeclaration.Enum(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        identifier,
+        [],
+        [],
+        enumBody.Location,
+        enumBase.WithDefault(null),
+        enumBody)
+    }
+
+    #endregion
+
+    #region Delegate
+
+    //delegateDeclaration = attributes? modifiers? "delegate"S anyType identifier typeParameterList? "("s formalParameterList? ")"s typeParameterConstraintsClauses? ";"s;
+    delegateDeclaration(attributes                      : option[list[CustomAttribute]],
+                        modifiers                       : option[list[Modifier]],
+                        _delegate                       : NToken,
+                        returnType                      : Expr,
+                        identifier                      : Identifier,
+                        typeParameterList               : option[list[TypeParameter]],
+                        _lparen                         : NToken,
+                        formalParameterList             : option[list[FormalParameter]],
+                        _rparen                         : NToken,
+                        typeParameterConstraintsClauses : option[list[TypeParameterConstraintClause]],
+                        _comma                          : NToken) : TypeDeclaration
+    {
+      TypeDeclaration.Delegate(
+        attributes.WithDefault([]),
+        modifiers.WithDefault([]),
+        identifier, 
+        typeParameterList.WithDefault([]),
+        typeParameterConstraintsClauses.WithDefault([]),
+        GetLocation(_delegate) + GetLocation(_comma),
+        returnType,
+        formalParameterList.WithDefault([]))
+    }
+
+    #endregion
+  }
+}

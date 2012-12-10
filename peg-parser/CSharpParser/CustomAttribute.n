@@ -1,0 +1,48 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+  [Record][Unit]
+  public variant CustomAttributeTarget : Located
+  {
+    | Default
+    | Assembly
+    | Module
+    | Field
+    | Event
+    | Method
+    | Param
+    | Property
+    | Return
+    | Type
+
+    public override ToString() : string
+    {
+      match(this) {
+        | Default   => ""
+        | Assembly  => "assembly"
+        | Module    => "module"
+        | Field     => "field"
+        | Event     => "event"
+        | Method    => "method"
+        | Param     => "param"
+        | Property  => "property"
+        | Return    => "return"
+        | Type      => "type"
+      }
+    }
+  }
+
+  [Record][Unit]
+  public class CustomAttribute : Located
+  {
+    [Accessor] name : Expr;
+    [Accessor] target : CustomAttributeTarget;
+    [Accessor] args : list[FunctionArgument];
+  }
+}
