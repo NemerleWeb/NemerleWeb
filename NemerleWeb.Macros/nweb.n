@@ -22,10 +22,12 @@ namespace NemerleWeb
   {
     public TransformNweb(expr : PExpr, typer : Typer) : PExpr 
     {    
+      CreateNemerleWebInitializer(typer);
+      
       match(expr)
       {
       | <[ $_unitName() ]> with parms = []
-      | <[ $_unitName(..$parms) ]> =>
+      | <[ $_unitName(..$parms) ]> =>             
         def typedParms = parms.Map(typer.TypeExpr);
         def signature = JsAstHelper.MethodSignature(typedParms);
         
@@ -33,6 +35,7 @@ namespace NemerleWeb
         def serverParams = parms.Select(p => <[ paramList.Add("nweb.utils.toTypedObject(" + NWebUtils.ToJson($p) + ")") ]>);
         
         def res = <[
+          NemerleWebInitializer.Initialize();
           def allScripts = NemerleWeb.NWebData.GetAllScriptNames().Select(script =>
           {
             def mainScript = $<# <script type="text/javascript" src="NemerleWebResource/Unit/$script.js"></script> #>;
@@ -45,7 +48,7 @@ namespace NemerleWeb
             $<#$mainScript
 $lambdasScript#>  
           });
-
+    
         def templates = NWebData.GetAllScriptNames().Select(script => NWebData.GetTemplatesScripts(script));
         def allScripts = string.Join("", allScripts);
         def unitName = $(properName : string);
@@ -68,6 +71,42 @@ $$(function() {
       res
       | _ => Message.Error("Correct usage: nweb ClassName(arguments)"); <[ ]>
       }      
+    }
+    
+    CreateNemerleWebInitializer(typer : Typer) : void
+    {
+      def env = typer.Manager.CoreEnv;
+      def typeName = "NemerleWebInitializer";
+      def assemblies = typer.Manager
+                            .ReferencedAssemblies
+                            .Map(a =>                             
+                              <[ 
+                                when(!loadedAssemblies.Contains($(a.Assembly.FullName : string))) 
+                                  _ = System.Reflection.Assembly.Load($(a.Assembly.FullName : string)) 
+                               ]>);
+      when (env.LookupType([typeName]) is None())
+      {  
+        env.Define(<[ decl: 
+          public module $(typeName : usesite)
+          {
+            mutable _isInitialized : bool;
+            
+            public Initialize() : void
+            {
+              when(!_isInitialized) 
+              {
+                def loadedAssemblies = System.AppDomain
+                                             .CurrentDomain
+                                             .GetAssemblies()
+                                             .Select(a => a.FullName)
+                                             .ToList();                                             
+                {..$assemblies;}
+                _isInitialized = true;
+              }
+            }
+          }
+        ]>).Compile();
+      }
     }
   } 
 }
