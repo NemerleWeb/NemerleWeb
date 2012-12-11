@@ -16,6 +16,15 @@ module Program
 {
   Main() : void
   {
+    def parser = TypeScriptInterfaceParser();
+    def res = parser.Parse(System.IO.File.ReadAllText("c:\\dev\\jquery.d.ts"));
+    _ = match(res)
+    {
+    | Some(interfaces) => 
+      def i = interfaces;
+      ""
+    | None => "fuck that"
+    }
     def result = nweb Test();
     
     foreach (s in NWebData.GetAllScriptNames())
