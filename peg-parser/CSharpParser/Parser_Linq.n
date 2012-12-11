@@ -1,0 +1,207 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+  public partial class Parser
+  {
+    #region FROM clause
+
+    //fromClause_1  : QueryExpr = identifier "in"S expression;
+    fromClause_1( variable  : Identifier,
+                  _in       : NToken,
+                  expr      : Expr) : QueryExpr
+    {
+      QueryExpr.From(variable, null, expr)
+    }
+
+    //fromClause_2  : QueryExpr = anyType identifier "in"S expression;
+    fromClause_2( variableType  : Expr,
+                  variable      : Identifier,
+                  _in           : NToken,
+                  expr          : Expr) : QueryExpr
+    {
+      QueryExpr.From(variable, variableType, expr)
+    }
+
+    //fromClause    : QueryExpr = "from"S (fromClause_1 / fromClause_2);
+    fromClause(_from : NToken, opt : QueryExpr) : QueryExpr
+    {
+      opt
+    }
+
+    #endregion
+
+    #region LET clause
+
+    //letClause     : QueryExpr = "let"S identifier "="s expression;
+    letClause(_let      : NToken,
+              variable  : Identifier,
+              _eq       : NToken,
+              expr      : Expr) : QueryExpr
+    {
+      QueryExpr.Let(variable, expr)
+    }
+
+    #endregion
+
+    #region WHERE clause
+
+    //whereClause   : QueryExpr = "where"S booleanExpression;
+    whereClause(_where : NToken, expr : Expr): QueryExpr
+    {
+      QueryExpr.Where(expr)
+    }
+
+    #endregion
+
+    #region JOIN clause
+
+    //joinClause_1  : QueryExpr = identifier "in"S expression "on"S expression "equals"S expression ("into"S identifier)?;
+    joinClause_1( variable  : Identifier,
+                  _in       : NToken,
+                  expr      : Expr,
+                  _on       : NToken,
+                  lexpr     : Expr,
+                  _equals   : NToken,
+                  rexpr     : Expr,
+                  into      : option[NToken * Identifier]) : QueryExpr
+    {
+      def into = match(into) {
+        | Some( (_, id) ) => id
+        | _ => null
+      }
+      QueryExpr.Join(
+        variable,
+        null,
+        expr,
+        lexpr,
+        rexpr,
+        into)
+    }
+
+    //joinClause_2  : QueryExpr = anyType identifier "in"S expression "on"S expression "equals"S expression ("into"S identifier)?;
+    joinClause_2( variableType  : Expr,
+                  variable      : Identifier,
+                  _in           : NToken,
+                  expr          : Expr,
+                  _on           : NToken,
+                  lexpr         : Expr,
+                  _equals       : NToken,
+                  rexpr         : Expr,
+                  into          : option[NToken * Identifier]) : QueryExpr
+    {
+      def into = match(into) {
+        | Some( (_, id) ) => id
+        | _ => null
+      }
+      QueryExpr.Join(
+        variable,
+        variableType,
+        expr,
+        lexpr,
+        rexpr,
+        into)
+    }
+
+    //joinClause    : QueryExpr = "join"S (joinClause_1 / joinClause_2);
+    joinClause(_join : NToken, opt : QueryExpr) : QueryExpr 
+    {
+      opt
+    }
+
+    #endregion
+
+    #region ORDERBY clause
+
+    //orderingDirection : OrderDirection    = ("ascending" / "descending")S;
+    orderingDirection(keyword : NToken) : OrderDirection
+    {
+      match(GetText(keyword)) {
+        | "ascending"   => OrderDirection.Asc()
+        | "descending"  => OrderDirection.Desc()
+        | _ => throw ArgumentOutOfRangeException("keyword")
+      }
+    }
+
+    //ordering          : QueryOrdering     = expression orderingDirection?;
+    ordering(expr : Expr, direction : option[OrderDirection]): Expr * OrderDirection
+    {
+      (expr, direction.WithDefault(OrderDirection.Default()))
+    }
+
+    //oderings          : QueryOrderingList = ordering (","s ordering)*;
+    oderings( head : Expr * OrderDirection,  
+              tail : SCG.List[NToken * (Expr * OrderDirection)]) : list[Expr * OrderDirection]
+    {
+      head.Cons(tail)
+    }
+
+    //orderbyClause     : QueryExpr         = "orderby"S oderings;
+    orderbyClause(_orderby : NToken,
+                  oderings : list[Expr * OrderDirection]): QueryExpr
+    {
+      QueryExpr.OrderBy(oderings)
+    }
+
+    #endregion
+
+    #region SELECT and GROUP clauses
+
+    //selectClause        : QueryExpr = "select"S expression;
+    selectClause(_select : NToken, expr : Expr): QueryExpr
+    {
+      QueryExpr.Select(expr)
+    }
+
+    //groupClause         : QueryExpr = "group"S expression "by"S expression;
+    groupClause(_group    : NToken,
+                expr      : Expr,
+                _by       : NToken,
+                partition : Expr) : QueryExpr
+    {
+      QueryExpr.Group(expr, partition)
+    }
+
+    #endregion
+
+    #region INTO clause
+
+    //queryContinuation : QueryExpr = "into"S identifier queryBody;
+    queryContinuation(_into     : NToken,
+                      variable  : Identifier,
+                      query     : list[QueryExpr]) : QueryExpr
+    {
+      QueryExpr.Into(variable, query)
+    }
+
+    #endregion
+
+    //queryBodyClauses    : QueryExprList = queryBodyClause+;
+    queryBodyClauses(query : SCG.List[QueryExpr]) : list[QueryExpr]
+    {
+      NList.ToList(query)
+    }
+
+    //queryBody       : QueryExprList = queryBodyClauses? selectOrGroupClause queryContinuation?;
+    queryBody(body          : option[list[QueryExpr]],
+              selectOrGroup : QueryExpr,
+              into          : option[QueryExpr]) : list[QueryExpr]
+    {
+      body.WithDefault([])
+        + [selectOrGroup]
+        + match(into) { | Some(into) => [into] | _ => [] }
+    }
+
+    //queryExpression : Expr      = fromClause queryBody;
+    queryExpression(from : QueryExpr, body : list[QueryExpr]) : Expr
+    {
+      Expr.Query(from.Location, from :: body)
+    }
+  }
+}

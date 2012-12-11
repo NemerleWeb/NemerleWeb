@@ -1,0 +1,72 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+  public partial class Parser
+  {
+    private HexDigit(t : NToken) : int
+    {
+      unchecked {
+        def c = ParsingSource.Text[t.StartPos];
+        if('0' <= c && c <= '9')
+          c :> int - '0' :> int
+        else if('a' <= c && c <= 'f')
+          c :> int - 'a' :> int + 10
+        else if('A' <= c && c <= 'F')
+          c :> int - 'A' :> int + 10
+        else 
+          0
+      }
+    }
+
+    static ConvertUtf32(x : int) : VToken[string]
+    {
+      unchecked {
+        def x = x :> uint;
+        if(x < 0x10000u)
+          VToken(char.ToString(x :> char))
+        else if(x < 0x110000u) {
+          def x = x - 0x10000u;
+          VToken(string(array[(x / 0x400u + 0xD800u) :> char, (x % 0x400u + 0xDC00u) :> char]))
+        } else
+          VToken(null)
+      }
+    }
+  }
+
+  [Unit]
+  public module Utils
+  {
+    public WithDefault[T](this x : option[T], defaultValue : T) : T
+    {
+      match(x) {
+        | Some(x) => x
+        | _ => defaultValue
+      }
+    }
+
+    public Cons[T](this head : T, tail : SCG.List[NToken * T]) : list[T]
+    {
+      head :: NList.ToList(tail).Map((_, x) => x)
+    }
+
+    public Cons[T](this head : T, tail : SCG.List[NToken * NToken * T]) : list[T]
+    {
+      head :: NList.ToList(tail).Map((_, _, x) => x)
+    }
+
+    public Cons(this head : Expr, tail : SCG.List[Identifier * Expr]) : Expr
+    {
+      mutable chain = head;
+      foreach((op, expr) in tail)
+        chain = Expr.BinaryOperator(chain.Location + expr.Location, chain, expr, op);
+      chain
+    }
+  }
+}

@@ -1,0 +1,87 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+  public partial class Parser
+  {
+    //expressionInitializer   : VariableInitializer     = expression;
+    expressionInitializer(expr : Expr) : VariableInitializer
+    {
+      VariableInitializer.Expr(expr)
+    }
+
+    //propertyInitializer     : VariableInitializer     = identifier "="s (complexInitializer / expressionInitializer);
+    propertyInitializer(id    : Identifier,
+                        _eq   : NToken,
+                        init  : VariableInitializer) : VariableInitializer
+    {
+      VariableInitializer.Property(id, init)
+    }
+
+    //stackallocInitializer   : VariableInitializer     = "stackalloc"S anyType "["s expression "]"s;
+    stackallocInitializer(_stackalloc : NToken,
+                          allocType   : Expr,
+                          _lparen     : NToken,
+                          expr        : Expr,
+                          _rparen     : NToken) : VariableInitializer
+    {
+      VariableInitializer.StackAlloc(allocType, expr)
+    }
+
+    //variableInitializerList : VariableInitializerList = variableInitializer (","s variableInitializer)*;
+    variableInitializerList(head : VariableInitializer,
+                            tail  : SCG.List[NToken * VariableInitializer]) : list[VariableInitializer]
+    {
+      head.Cons(tail)
+    }
+
+    //complexInitializer      : VariableInitializer     = "{"s (variableInitializerList (","s)?)? "}"s;
+    complexInitializer( _lparen : NToken,
+                        init    : option[list[VariableInitializer] * NToken],
+                        _rparen : NToken) : VariableInitializer
+    {
+      match(init) {
+        | Some( (init, _) ) => VariableInitializer.Complex(init)
+        | _                 => VariableInitializer.Complex([])
+      }
+    }
+
+    //constantDeclarator  : ConstantDeclarator      = identifier "="s constantExpression;
+    constantDeclarator( identifier          : Identifier,
+                        _eq                 : NToken,
+                        constantExpression  : Expr) : ConstantDeclarator
+    {
+      VToken(identifier, constantExpression)
+    }
+
+    //constantDeclarators : ConstantDeclaratorList  = constantDeclarator (","s constantDeclarator)*;
+    constantDeclarators(head : ConstantDeclarator,
+                        tail  : SCG.List[NToken * ConstantDeclarator]) : list[ConstantDeclarator]
+    {
+      head.Cons(tail)
+    }
+
+    //variableDeclarator  : VariableDeclarator      = identifier ("="s variableInitializer)?;
+    variableDeclarator(identifier           : Identifier,
+                       variableInitializer  : option[NToken * VariableInitializer]) : VariableDeclarator
+    {
+      match(variableInitializer) {
+        | Some( (_, init) ) => VToken(identifier, init)
+        | _                 => VToken(identifier, null)
+      }
+    }
+
+    //variableDeclarators : VariableDeclaratorList  = variableDeclarator (","s variableDeclarator)*;
+    variableDeclarators(head : VariableDeclarator,
+                        tail : SCG.List[NToken * VariableDeclarator]) : list[VariableDeclarator]
+    {
+      head.Cons(tail)
+    }
+  }
+}

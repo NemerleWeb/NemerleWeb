@@ -1,0 +1,103 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+  public partial class Parser
+  {
+    //attributeArguments  : FunctionArgumentList  = "("s argumentList? ")"s;
+    attributeArguments( _lparen : NToken,
+                        args    : option[list[FunctionArgument]],
+                        _rparen : NToken) : list[FunctionArgument]
+    {
+      args.WithDefault([])
+    }
+
+    //attribute           : CustomAttributeInfo   = qualifiedIdentifier attributeArguments?;
+    attribute(id : Expr, args : option[list[FunctionArgument]]) : Location * Expr * list[FunctionArgument]
+    {
+      (id.Location, id, args.WithDefault([]))
+    }
+
+    //attributeList       : CustomAttributeInfoList   = attribute (","s attribute)*;
+    attributeList(head : Location * Expr * list[FunctionArgument],
+                  tail : SCG.List[NToken * (Location * Expr * list[FunctionArgument])]) : list[Location * Expr * list[FunctionArgument]]
+    {
+      head.Cons(tail)
+    }
+
+    //globalAttributeTarget           : CustomAttributeTarget = ("assembly" / "module")S;
+    globalAttributeTarget(keyword : NToken) : CustomAttributeTarget
+    {
+      match(GetText(keyword)) {
+        | "assembly"  => CustomAttributeTarget.Assembly()
+        | "module"    => CustomAttributeTarget.Module()
+        | _           => throw ArgumentOutOfRangeException("keyword")
+      }
+    }
+
+    //globalAttributeTargetSpecifier  : CustomAttributeTarget = globalAttributeTarget ":"s;
+    globalAttributeTargetSpecifier(target : CustomAttributeTarget, _colon : NToken) : CustomAttributeTarget
+    {
+      target
+    }
+
+    //globalAttributeSection          : CustomAttributeList   = "["s globalAttributeTargetSpecifier attributeList (","s)? "]"s;
+    globalAttributeSection( _lparen : NToken,
+                            target  : CustomAttributeTarget,
+                            attrs   : list[Location * Expr * list[FunctionArgument]],
+                            _comma  : NToken,
+                            _rparen : NToken) : list[CustomAttribute]
+    {
+      attrs.Map((loc, id, args) => CustomAttribute(loc, id, target, args))
+    }
+
+    //globalAttributes                : CustomAttributeList   = globalAttributeSection*;
+    globalAttributes(attrs : SCG.List[list[CustomAttribute]]) : list[CustomAttribute]
+    {
+      NList.ToList(attrs).Flatten()
+    }
+
+    //attributeTarget           : CustomAttributeTarget = ("field" / "event" / "method" / "param" / "property" / "return" / "type")S;
+    attributeTarget(keyword : NToken) : CustomAttributeTarget
+    {
+      match(GetText(keyword)) {
+        | "field"     => CustomAttributeTarget.Field()
+        | "event"     => CustomAttributeTarget.Event()
+        | "method"    => CustomAttributeTarget.Method()
+        | "param"     => CustomAttributeTarget.Param()
+        | "property"  => CustomAttributeTarget.Property()
+        | "return"    => CustomAttributeTarget.Return()
+        | "type"      => CustomAttributeTarget.Type()
+        | _           => throw ArgumentOutOfRangeException("keyword")
+      }
+    }
+
+    //attributeTargetSpecifier  : CustomAttributeTarget = attributeTarget ":"s;
+    attributeTargetSpecifier(target : CustomAttributeTarget, _colon : NToken) : CustomAttributeTarget
+    {
+      target
+    }
+
+    //attributeSection          : CustomAttributeList   = "["s attributeTargetSpecifier? attributeList (","s)? "]"s;
+    attributeSection( _lparen : NToken,
+                      target  : option[CustomAttributeTarget],
+                      attrs   : list[Location * Expr * list[FunctionArgument]],
+                      _comma  : NToken,
+                      _rparen : NToken) : list[CustomAttribute]
+    {
+      attrs.Map((loc, id, args) => CustomAttribute(loc, id, target.WithDefault(CustomAttributeTarget.Default(loc)), args))
+    }
+
+    //attributes                : CustomAttributeList   = attributeSection+;
+    attributes(attrs : SCG.List[list[CustomAttribute]]) : list[CustomAttribute]
+    {
+      NList.ToList(attrs).Flatten()
+    }
+  }
+}

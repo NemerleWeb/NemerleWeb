@@ -1,0 +1,40 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+  [Record][Unit]
+  public variant OrderDirection : Located
+  {
+    | Default
+    | Asc
+    | Desc
+  }
+
+  [Record][Unit]
+  public variant QueryExpr : Located
+  {
+    | From {  variable      : Identifier;
+              variableType  : Expr;    // can be null
+              expr          : Expr; }
+    | Let { variable  : Identifier;
+            expr      : Expr; }
+    | Where { expr : Expr; }
+    | Join { variable     : Identifier;
+             variableType : Expr;      // can be null
+             expr         : Expr;
+             leftExpr     : Expr;
+             rightExpr    : Expr;
+             into         : Identifier; }  // can be null
+    | OrderBy { orderings : list[Expr * OrderDirection]; }
+    | Select { expr : Expr; }
+    | Group { expr      : Expr;
+              partition : Expr; }
+    | Into {  variable  : Identifier;
+              query     : list[QueryExpr] }
+  }
+}

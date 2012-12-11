@@ -743,6 +743,14 @@ function System_Collections_Generic_List(arg) {
         return Enumerable.from(arg).toArray();
 }
 
+// This is not constructor, call directly without 'new'.
+function System_Collections_Generic_Stack(arg) {
+    if (typeof arg === typeof 0)
+        return [];
+    else
+        return Enumerable.from(arg).toArray();
+}
+
 function System_ArgumentNullException(paramName, message) {
     this.paramName = paramName;
     this.message = messages;

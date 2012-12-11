@@ -1,0 +1,41 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+  [Record][Unit]
+  public variant TypeDeclaration : Located
+  {
+    | Class {
+      baseTypes : list[Expr];
+      members   : list[TypeMember];
+    }
+    | Struct {
+      baseTypes : list[Expr];
+      members   : list[TypeMember];
+    }
+    | Interface {
+      baseTypes : list[Expr];
+      members   : list[TypeMember];
+    }
+    | Enum      {
+      baseType      : Expr; // can be null
+      members       : list[TypeMember];
+    }
+    | Delegate  {   
+      returnType    : Expr;
+      formalParameters : list[FormalParameter];
+    }
+
+    [Accessor] attributes     : list[CustomAttribute];
+    [Accessor] modifiers      : list[Modifier];
+    [Accessor] name           : Identifier;
+    [Accessor] typeParameters : list[TypeParameter];
+    [Accessor] constraints    : list[TypeParameterConstraintClause];
+    [Accessor] bodyLocation   : Location;
+  }
+}

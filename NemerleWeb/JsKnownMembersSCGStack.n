@@ -11,14 +11,11 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  /// <summary>
-  /// Description of JsKnownMembersSCGList.
-  /// </summary>
-  module JsKnownMembersSCGList
+  module JsKnownMembersSCGStack
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(List[_]), Handler); 
+      JsKnownMembers.RegisterType(typeof(System.Collections.Generic.Stack[_]), Handler); 
     }
     
     private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
@@ -37,16 +34,30 @@ namespace NemerleWeb
         | "Clear" =>
           Some(JsAst.Assign(JsAst.FieldRef(left, "length"), JsAst.Literal(JsLiteral.Integer(0))))
         | "GetEnumerator" => Some(left.JsMethodCall(member.Name, parms))
+        | "Peek" => 
+          // left[left.length - 1]
+          Some(
+            JsAst.ArrayIndexer(
+              left,
+              JsAst.Call(
+                JsAst.OpCode("-"),
+                [
+                  left.Field("length"),
+                  JsAst.Literal(JsLiteral.Integer(1))
+                ])
+              )
+          )
+        | "Pop" => Some(left.JsMethodCall(member.Name, parms))
         | "ToArray" => Some(left)
         | _ => None()
         }
         
-      | [arg] =>
+      | [_] =>
         match (member.Name)
         {
-        | "get_Item" => Some(JsAst.ArrayIndexer(left, arg))
         | "Add" => Some(left.JsMethodCall("push", parms))
-        | "Remove" => Some(left.JsMethodCall("remove", parms))
+        | "Remove"
+        | "Push" => Some(left.JsMethodCall(member.Name, parms))
         | _ => None()
         }
         
@@ -68,7 +79,7 @@ namespace NemerleWeb
         match (member.Name)
         {
         | ".ctor" =>
-          Some(JsAst.Call(JsAst.GlobalRef("System_Collections_Generic_List"), [arg]))
+          Some(JsAst.Call(JsAst.GlobalRef("System_Collections_Generic_Stack"), [arg]))
         | _ => None()
         }
       | _ => None()
