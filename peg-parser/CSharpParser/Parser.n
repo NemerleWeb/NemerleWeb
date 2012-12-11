@@ -1,0 +1,646 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+
+  #region Type aliases for PegGrammar macro
+
+  type BinaryOperatorInfo       = Identifier * int * int;
+  type CallOrIndexerArgumentList  = FunctionArgumentList * bool;
+  type ConstantDeclarator       = VToken[Identifier * Expr];
+  type ConstantDeclaratorList   = list[ConstantDeclarator];
+  type CustomAttributeInfo      = Location * Expr * list[FunctionArgument];
+  type CustomAttributeInfoList  = list[CustomAttributeInfo];
+  type CustomAttributeList      = list[CustomAttribute];
+  type EnumBody                 = VList[TypeMember];
+  type ExprList                 = list[Expr];
+  type ExprOption               = option[Expr];
+  type ExternAliasList          = list[ExternAlias];
+  type FixedSizeBufferDeclarator      = VToken[Identifier * Expr];
+  type FixedSizeBufferDeclaratorList  = list[FixedSizeBufferDeclarator];
+  type FormalParameterList      = list[FormalParameter];
+  type FunctionArgumentList     = list[FunctionArgument];
+  type IdentifierList           = list[Identifier];
+  type ModifierList             = list[Modifier];
+  type NamespaceBody            = ExternAliasList * UsingDirectiveList * NamespaceNodeList;
+  type NamespaceNodeList        = list[NamespaceNode];
+  type OperatorDeclarator       = Identifier * Expr;
+  type PropertyAccessors        = PropertyAccessor * PropertyAccessor;
+  type QualifiedPart            = Identifier * object;
+  type QueryExprList            = list[QueryExpr];
+  type QueryOrdering            = Expr * OrderDirection;
+  type QueryOrderingList        = list[QueryOrdering];
+  type StatementList            = list[Statement];
+  type SwitchCaseEntryList      = list[SwitchCaseEntry];
+  type TryCatchEntryList        = list[TryCatchEntry];
+  type TryCatchFinallyTail      = list[TryCatchEntry] * option[Statement];
+  type TypeBody                 = VList[TypeMember];
+  type TypeMemberList           = list[TypeMember];
+  type TypeParameterConstraintClauseList  = list[TypeParameterConstraintClause];
+  type TypeParameterConstraintList        = list[TypeParameterConstraint];
+  type TypeParameterList        = list[TypeParameter];
+  type UsingDirectiveList       = list[UsingDirective];
+  type VString                  = VToken[string];
+  type VariableDeclarator       = VToken[Identifier * VariableInitializer];
+  type VariableDeclaratorList   = list[VariableDeclarator];
+  type VariableInitializerList  = list[VariableInitializer];
+
+  #endregion
+
+  [PegGrammar(Options = EmitDebugSources,
+    start,
+    grammar {
+      start : CompilationUnit = compilationUnit ![Any];
+      semicolon : NToken      = ";"s;
+      semicolonOpt            = (";"s)?;
+
+      #region Line terminators
+
+      newLineCharacter = '\n'
+                        / '\r'
+                        / '\u2028'    /*  line separator       */
+                        / '\u2029';   /*  paragraph separator  */
+      newLine   = "\r\n" / newLineCharacter;
+
+      #endregion
+
+      #region White space
+
+      whitespace = [Zs]
+                / '\t'
+                / '\v'        /*  vertial tab          */
+                / '\f';       /*  form feed            */
+
+      #endregion
+
+      #region Spacer
+
+      space = whitespace / newLine;
+
+      [InlineAllSubrules]
+      s : void = space*;                      /* optional spacer          */
+      S : void = !identifierPartCharacters s; /* identifier break spacer  */
+
+      #endregion
+
+      #region Identifiers
+
+      // illegal identifiers:
+      keyword = ("abstract"     / "as"          / "base"        / "bool"        / "break"
+                / "byte"        / "case"        / "catch"       / "char"        / "checked"
+                / "class"       / "const"       / "continue"    / "decimal"     / "default"
+                / "delegate"    / "do"          / "double"      / "else"        / "enum"
+                / "event"       / "explicit"    / "extern"      / "false"       / "finally"
+                / "fixed"       / "float"       / "for"         / "foreach"     / "goto"
+                / "if"          / "implicit"    / "in"          / "int"         / "interface"
+                / "internal"    / "is"          / "lock"        / "long"        / "namespace"
+                / "new"         / "null"        / "object"      / "operator"    / "out"
+                / "override"    / "params"      / "private"     / "protected"   / "public"
+                / "readonly"    / "ref"         / "return"      / "sbyte"       / "sealed"
+                / "short"       / "sizeof"      / "stackalloc"  / "static"      / "string"
+                / "struct"      / "switch"      / "this"        / "throw"       / "true"
+                / "try"         / "typeof"      / "uint"        / "ulong"       / "unchecked"
+                / "unsafe"      / "ushort"      / "using"       / "virtual"     / "void"
+                / "volatile"    / "while"       ) !identifierPartCharacters;
+
+      letterCharacter       = [Lu, Ll, Lt, Lm, Lo, Nl];
+      combiningCharacter    = [Mn, Mc];
+      decimalDigitCharacter = [Nd];
+      connectingCharacter   = [Pc];
+      formattingCharacter   = [Cf];
+
+      identifierStartCharacter  = letterCharacter / "_";
+      identifierPartCharacters  = letterCharacter / decimalDigitCharacter / connectingCharacter / combiningCharacter / formattingCharacter;
+      normalIdentifierBody             : VString = identifierStartCharacter identifierPartCharacters* !unicodeEscapeSequence;
+      escapedIdentifierPartCharacter   : VString = identifierPartCharacters;
+      escapedIdentifierStartCharacter  : VString = identifierStartCharacter;
+      escapedIdentifierBody            : VString = (unicodeEscapeSequence / escapedIdentifierStartCharacter) (unicodeEscapeSequence / escapedIdentifierPartCharacter)*;
+      identifierBody        : VString = normalIdentifierBody / &escapedIdentifierBody escapedIdentifierBody;
+      identifier            : Identifier  = !keyword "@"? identifierBody s;
+
+      qualifiedIdentifierPartTypeArguments      : object = "<"s typeArguments ">"s;
+      qualifiedIdentifierPartOpenTypeArguments  : object = "<"s rankSeparators ">"s;
+      qualifiedIdentifierPart : QualifiedPart = identifier (qualifiedIdentifierPartTypeArguments / qualifiedIdentifierPartOpenTypeArguments)?;
+      qualifiedIdentifier     : Expr          = (identifier "::"s)? qualifiedIdentifierPart ("."s qualifiedIdentifierPart)*;
+
+       // same as 'qualifiedIdentifierPart' but avoids capturing type arguments of method name
+      typeMemberIdentifierPart  : QualifiedPart = identifier ((qualifiedIdentifierPartTypeArguments / qualifiedIdentifierPartOpenTypeArguments) !"(")?;
+      typeMemberIdentifier      : Expr          = (identifier "::"s)? typeMemberIdentifierPart ("."s typeMemberIdentifierPart)*;
+
+      #endregion
+
+      #region Literals
+
+      nullLiteral    : Literal = "null"S;
+
+      booleanLiteral : Literal = ("true" / "false")S;
+
+      decimalDigit                        = ['0'..'9'];
+      hexDigit                            = ['0'..'9', 'a'..'f', 'A'..'F'];
+      integerTypeSuffixTerminal           = ('U' / 'u') ('l' / 'L')? / ('l' / 'L') ('U' / 'u')?;
+      integerTypeSuffix         : string  = integerTypeSuffixTerminal;// "UL" / "ul" / "uL" / "Ul" / "LU" / "lu" / "Lu" / "lU" / "U" / "u" / "L" / "l";
+      decimalIntegerLiteral     : Literal = decimalDigit+ integerTypeSuffix?;
+      hexadecimalIntegerLiteral : Literal = ("0x" / "0X") hexDigit+ integerTypeSuffix?;
+      integerLiteral            : Literal = (hexadecimalIntegerLiteral / decimalIntegerLiteral) s;
+
+      realTypeSuffix  : string  = "F" / "f" / "D" / "d" / "M" / "m";
+      exponentPart    : string  = ("E" / "e") ("-" / "+")? decimalDigit+;
+      realLiteral_1   : Literal = decimalDigit* "." decimalDigit+ exponentPart? realTypeSuffix?;
+      realLiteral_2   : Literal = decimalDigit+ exponentPart realTypeSuffix?;
+      realLiteral_3   : Literal = decimalDigit+ realTypeSuffix;
+      realLiteral     : Literal = (realLiteral_1 / realLiteral_2 / realLiteral_3) s;
+
+      unicodeEscapeSequence_u   : VString = "\\u" hexDigit hexDigit hexDigit hexDigit;
+      unicodeEscapeSequence_U   : VString = "\\U" hexDigit hexDigit hexDigit hexDigit hexDigit hexDigit hexDigit hexDigit;
+      unicodeEscapeSequence     : VString = unicodeEscapeSequence_u / unicodeEscapeSequence_U;
+      hexadecimalEscapeSequence : VString = "\\x" hexDigit hexDigit? hexDigit? hexDigit?;
+      simpleEscapeSequence      : VString = "\\'" / "\\\"" / "\\\\" / "\\0" / "\\a" / "\\b" / "\\f" / "\\n" / "\\r" / "\\t" / "\\v";
+      singleCharacter           : VString = !(newLineCharacter / "'" / "\\") [Any];
+      character                 : VString = simpleEscapeSequence / unicodeEscapeSequence / hexadecimalEscapeSequence / singleCharacter;
+      characterLiteral          : Literal = "'" character "'" s;
+
+      singleRegularStringLiteralCharacter                = !(newLineCharacter / "\"" / "\\") [Any];
+      regularStringLiteralCharacterSequence     : VString = singleRegularStringLiteralCharacter+;
+      regularStringLiteralPart                  : VString = simpleEscapeSequence
+                                                          / unicodeEscapeSequence
+                                                          / hexadecimalEscapeSequence
+                                                          / regularStringLiteralCharacterSequence;
+      regularStringLiteral                      : Literal = "\"" regularStringLiteralPart* "\"";
+
+      singleVerbatimStringLiteralCharacter               = !"\"" [Any];
+      verbatimStringLiteralCharacterSequence    : string = singleVerbatimStringLiteralCharacter+;
+      quoteEscapeSequence                       : string = "\"\"";
+      verbatimStringLiteralPart                 : string = quoteEscapeSequence
+                                                          / verbatimStringLiteralCharacterSequence;
+      verbatimStringLiteral                     : Literal = "@\"" verbatimStringLiteralPart* "\"";
+
+      stringLiteral                             : Literal = (regularStringLiteral / verbatimStringLiteral) s;
+
+      literal : Literal = booleanLiteral / nullLiteral / realLiteral / integerLiteral  / characterLiteral / stringLiteral;
+
+      #endregion
+
+      #region Types
+
+      predefinedType : Expr  = ("sbyte" / "byte"   / "short" / "ushort"  / "int"   / "uint"
+                                  / "long" / "ulong"  / "char"  / "decimal" / "void"  / "bool"
+                                  / "string" / "dynamic" / "object" / "float" / "double" )S;
+      typeName       : Expr  = qualifiedIdentifier;
+
+      rankSeparators            : int           = (","s)*;
+      rankSpecifier             : TypeSpecifier = "["s rankSeparators "]"s;
+      pointerSpecifier          : TypeSpecifier = "*"s;
+      nullableSpecifier                         = "?" !"?" s; // dont't collide with `??' operator
+      typeSpecifier             : TypeSpecifier = rankSpecifier / pointerSpecifier;
+
+      anyNonArrayType           : Expr     = (predefinedType / typeName) nullableSpecifier?;
+      anyNonArrayTypeNullableHack : Expr   = (predefinedType / typeName) (nullableSpecifier !(expression ":"s expression))?; // don't collide with ternary op ? :
+      anyType                   : Expr     = anyNonArrayType typeSpecifier*;
+      anyTypeWithSpecifier_1    : Expr     = anyNonArrayType typeSpecifier+;
+      anyTypeWithSpecifier_2    : Expr     = (predefinedType / typeName) nullableSpecifier;      
+      anyTypeWithSpecifier      : Expr     = anyTypeWithSpecifier_1 / anyTypeWithSpecifier_2;
+      anyTypeNullableHack       : Expr     = anyNonArrayTypeNullableHack typeSpecifier*;
+      typeArgument              : Expr     = anyType;
+      typeArguments             : ExprList = typeArgument (","s typeArgument)*;
+
+      mayBeGenericArgumentList  : ExprList = "<"s typeArguments ">"s &('(' / ')' / ']' / '}' / ':' / ';' / ',' / '.' / '?' / "==" / "!=");
+
+      typeDeclaration : TypeDeclaration = classStructInterfaceDeclaration
+                                        / enumDeclaration
+                                        / delegateDeclaration;
+
+      #endregion
+
+      #region Namespaces
+
+      externAliasDirective    : ExternAlias         = "extern"S "alias"S identifier semicolon;
+      externAliasDirectives   : ExternAliasList     = externAliasDirective*;
+
+      usingAliasDirective     : UsingDirective      = "using"S identifier "="s qualifiedIdentifier semicolon;
+      usingNamespaceDirective : UsingDirective      = "using"S qualifiedIdentifier semicolon;
+      usingDirective          : UsingDirective      = usingAliasDirective
+                                                    / usingNamespaceDirective;
+      usingDirectives         : UsingDirectiveList  = usingDirective*;
+
+      namespaceBody               : NamespaceBody     = "{"s externAliasDirectives usingDirectives namespaceMemberDeclarations "}"s;
+      namespaceDeclaration        : NamespaceNode     = "namespace"S qualifiedIdentifier namespaceBody semicolonOpt;
+      namespaceTypeDeclaration    : NamespaceNode     = typeDeclaration;
+      namespaceMemberDeclaration  : NamespaceNode     = namespaceDeclaration
+                                                      / namespaceTypeDeclaration;
+      namespaceMemberDeclarations : NamespaceNodeList = namespaceMemberDeclaration*;
+
+      compilationUnit : CompilationUnit = s externAliasDirectives usingDirectives globalAttributes namespaceMemberDeclarations;
+
+      #endregion
+
+      #region Variables and Constants
+
+      expressionInitializer   : VariableInitializer     = expression;
+      propertyInitializer     : VariableInitializer     = identifier "="s (complexInitializer / expressionInitializer);
+      stackallocInitializer   : VariableInitializer     = "stackalloc"S anyType "["s expression "]"s;
+      variableInitializerList : VariableInitializerList = variableInitializer (","s variableInitializer)*;
+      complexInitializer      : VariableInitializer     = "{"s (variableInitializerList (","s)?)? "}"s;
+      variableInitializer     : VariableInitializer     = complexInitializer
+                                                        / stackallocInitializer
+                                                        / propertyInitializer
+                                                        / expressionInitializer;
+
+      constantDeclarator  : ConstantDeclarator      = identifier "="s constantExpression;
+      constantDeclarators : ConstantDeclaratorList  = constantDeclarator (","s constantDeclarator)*;
+
+      variableDeclarator  : VariableDeclarator      = identifier ("="s (stackallocInitializer / expressionInitializer / complexInitializer))?;
+      variableDeclarators : VariableDeclaratorList  = variableDeclarator (","s variableDeclarator)*;
+
+      #endregion
+
+      #region Expressions
+
+      argumentName    : Identifier                = identifier ":" !":" s; // avoid conflict with alias
+      argumentModfier : FunctionArgumentModifier  = ("ref" / "out")S;
+      argument        : FunctionArgument          = argumentName? argumentModfier? expression;
+      argumentList    : FunctionArgumentList      = argument (","s argument)*;
+
+      expression          : Expr  = lambdaExpression
+                                  / assignmentExpression;
+      expressionList      : ExprList = expression (","s expression)*;
+      constantExpression  : Expr = expression;
+      booleanExpression   : Expr = expression;
+
+      simpleName        : Expr = identifier ("::"s identifier)? mayBeGenericArgumentList?;
+      literalExpression : Expr = literal;
+
+      parenthesizedExpression : Expr = "("s expression ")"s;
+
+      thisAccess        : Expr = "this"S;
+      baseAccess        : Expr = "base"S;
+      predefinedAccess  : Expr = predefinedType;
+      anyTypeNullableHackAccess : Expr = anyTypeNullableHack;
+
+      typeofExpression        : Expr = "typeof"S "("s anyType ")"s;
+      checkedExpression       : Expr = "checked"S "("s expression ")"s;
+      uncheckedExpression     : Expr = "unchecked"S "("s expression ")"s;
+      defaultValueExpression  : Expr = "default"S "("s anyType ")"s;
+      sizeofExpression        : Expr = "sizeof"S "("s anyType ")"s;
+
+      newObject_1   : Expr = anyNonArrayType "("s argumentList? ")"s complexInitializer?;
+      newObject_2   : Expr = anyNonArrayType complexInitializer;
+      newArray_1    : Expr = anyNonArrayType "["s expressionList "]"s rankSpecifier* complexInitializer?;
+      newArray_2    : Expr = anyNonArrayType rankSpecifier+ complexInitializer;
+      newArray_3    : Expr = rankSpecifier complexInitializer;
+      newAnonymous  : Expr = complexInitializer;
+      newExpression : Expr = "new"S (newObject_1 / newArray_1 / newArray_2 / newObject_2 / newArray_3 / newAnonymous);
+
+      explicitAnonymousFunctionParameterModifier  : FormalParameterModifier = ("ref" / "out")S;
+      explicitAnonymousFunctionParameter          : FormalParameter         = explicitAnonymousFunctionParameterModifier? anyType identifier;
+      explicitAnonymousFunctionParameterList      : FormalParameterList     = explicitAnonymousFunctionParameter (","s explicitAnonymousFunctionParameter)*;
+      explicitAnonymousFunctionSignature          : FormalParameterList     = "("s explicitAnonymousFunctionParameterList? ")"s;
+      anonymousMethodExpression : Expr = "delegate"S explicitAnonymousFunctionSignature? block;
+
+      otherExpression : Expr  = queryExpression
+                              / simpleName
+                              / literalExpression
+                              / parenthesizedExpression
+                              / thisAccess
+                              / baseAccess
+                              / predefinedAccess
+                              / newExpression
+                              / typeofExpression
+                              / checkedExpression
+                              / uncheckedExpression
+                              / defaultValueExpression
+                              / anonymousMethodExpression
+                              / sizeofExpression;
+
+      indexerArguments        : CallOrIndexerArgumentList = "["s argumentList? "]"s;
+      callArguments           : CallOrIndexerArgumentList = "("s argumentList? ")"s;
+      callOrIndexerExpression : Expr                      = otherExpression (indexerArguments / callArguments)*;
+
+      memberOperator    : bool = ("." / "->")s;
+      memberExpression  : Expr = callOrIndexerExpression (memberOperator callOrIndexerExpression)*;
+
+      postfixOperator   : Identifier  = ("++" / "--")s;
+      postfixExpression : Expr        = memberExpression postfixOperator*;
+
+      prefixOperator    : Located = ("++" / "--" / "+" / "-" / "~" / "!" / "&" !"&" / "*")s;
+      castSuffix_1  : Expr = predefinedType ")"s;
+      castSuffix_2  : Expr = anyTypeWithSpecifier ")"s;
+      castSuffix_3  : Expr = anyType ")"s  &( '~'
+                                            / '!' !'='
+                                            / '&' !'&'
+                                            / '('
+                                            / !("as"S / "is"S) identifierStartCharacter
+                                            / '@'
+                                            / prefixOperator? literal); 
+      castOperator      : Located = "("s (castSuffix_1 / castSuffix_2 / castSuffix_3);
+      prefixExpression  : Expr   = (prefixOperator / castOperator)* postfixExpression;
+
+      binaryOperator            : BinaryOperatorInfo = ("??" / "||" / "|" / "&&" / "&" / "==" / "!=" / "<=" / "<<" / "<" 
+                                                        / ">=" / ">>" / ">" / "*" / "/" / "%" / "+" / "-" / "^")s;
+      typeTestingOperator       : BinaryOperatorInfo = ("is" / "as")S;
+      binaryOperatorExpression  : Expr = prefixExpression ( (binaryOperator prefixExpression) / (typeTestingOperator anyTypeNullableHackAccess) )*;
+
+      conditionalExpression   : Expr    = binaryOperatorExpression ("?"s expression ":"s expression)?;
+
+      assignmentOperator   : Identifier = ("=" / "+=" / "-=" / "*=" / "/=" / "%=" / "&=" / "|=" / "^=" / "<<=" / ">>=")s;
+      assignmentExpression : Expr       = conditionalExpression (assignmentOperator expression)?;
+
+      implicitAnonymousFunctionParameter     : FormalParameter      = identifier;
+      implicitAnonymousFunctionParameterList : FormalParameterList  = implicitAnonymousFunctionParameter (","s implicitAnonymousFunctionParameter)*;
+
+      implicitAnonymousFunctionSignature_1  : FormalParameterList = implicitAnonymousFunctionParameter;
+      implicitAnonymousFunctionSignature_2  : FormalParameterList = "("s implicitAnonymousFunctionParameterList? ")"s;
+      implicitAnonymousFunctionSignature    : FormalParameterList = implicitAnonymousFunctionSignature_1
+                                                                  / implicitAnonymousFunctionSignature_2;
+
+      anonymousFunctionSignature  : FormalParameterList = explicitAnonymousFunctionSignature
+                                                        / implicitAnonymousFunctionSignature;
+      anonymousFunctionBody_expression  : Statement = expression;
+      anonymousFunctionBody_block       : Statement = block;
+      anonymousFunctionBody             : Statement = anonymousFunctionBody_expression
+                                                    / anonymousFunctionBody_block;
+      lambdaExpression : Expr = anonymousFunctionSignature "=>"s anonymousFunctionBody;
+
+      fromClause_1  : QueryExpr = identifier "in"S expression;
+      fromClause_2  : QueryExpr = anyType identifier "in"S expression;
+      fromClause    : QueryExpr = "from"S (fromClause_1 / fromClause_2);
+
+      letClause     : QueryExpr = "let"S identifier "="s expression;
+
+      whereClause   : QueryExpr = "where"S booleanExpression;
+
+      joinClause_1  : QueryExpr = identifier "in"S expression "on"S expression "equals"S expression ("into"S identifier)?;
+      joinClause_2  : QueryExpr = anyType identifier "in"S expression "on"S expression "equals"S expression ("into"S identifier)?;
+      joinClause    : QueryExpr = "join"S (joinClause_1 / joinClause_2);
+
+      orderingDirection : OrderDirection    = ("ascending" / "descending")S;
+      ordering          : QueryOrdering     = expression orderingDirection?;
+      oderings          : QueryOrderingList = ordering (","s ordering)*;
+      orderbyClause     : QueryExpr         = "orderby"S oderings;
+
+      selectClause        : QueryExpr = "select"S expression;
+      groupClause         : QueryExpr = "group"S expression "by"S expression;
+      selectOrGroupClause : QueryExpr = selectClause
+                                      / groupClause;
+
+      queryContinuation : QueryExpr = "into"S identifier queryBody;
+
+      queryBodyClause     : QueryExpr     = fromClause
+                                          / letClause
+                                          / whereClause
+                                          / joinClause
+                                          / orderbyClause;
+      queryBodyClauses    : QueryExprList = queryBodyClause+;
+
+      queryBody       : QueryExprList = queryBodyClauses? selectOrGroupClause queryContinuation?;
+      queryExpression : Expr      = fromClause queryBody;
+
+      #endregion
+
+      #region Statements
+
+      emptyStatement : Statement = semicolon;
+
+      labeledStatement : Statement = identifier ":" !":" s statement; // don't collide with `::' operator
+
+      localConstantDeclaration : Statement = "const"S anyType constantDeclarators;
+
+      localVariableType_var : ExprOption = "var"S;
+      localVariableType_any : ExprOption = anyType;
+      localVariableType     : ExprOption = localVariableType_var / localVariableType_any;
+      localVariableDeclaration : Statement = localVariableType variableDeclarators;
+
+      declarationStatement : Statement = (localConstantDeclaration / localVariableDeclaration) semicolon;
+
+      statementExpression     : Expr      = expression;
+      statementExpressionList : ExprList  = statementExpression (","s statementExpression)*;
+      expressionStatement     : Statement = statementExpression semicolon;
+
+      embeddedStatement : Statement = block
+                                    / emptyStatement
+                                    / expressionStatement
+                                    / selectionStatement
+                                    / iterationStatement
+                                    / jumpStatement
+                                    / tryStatement
+                                    / checkedStatement
+                                    / uncheckedStatement
+                                    / lockStatement
+                                    / usingStatement
+                                    / yieldStatement
+                                    / unsafeStatement
+                                    / fixedStatement;
+
+      [%(statementRecovery, (';' /  '}' / "case"S / "default"S / statement), (space+ / stringLiteral+ / block / [Any]))]
+      ifStatement : Statement = "if"S "("s booleanExpression ")"s embeddedStatement ("else"S embeddedStatement)?;
+      switchLabel_case    : ExprOption = "case"S constantExpression ":"s;
+      switchLabel_default : ExprOption = "default"S ":"s;
+      switchSection       : SwitchCaseEntry     = (switchLabel_case / switchLabel_default) statementList?;
+      switchSections      : SwitchCaseEntryList = switchSection+;
+      switchStatement     : Statement           = "switch"S "("s expression ")"s "{"s switchSections? "}"s;
+
+      selectionStatement  : Statement = ifStatement
+                                      / switchStatement;
+
+      whileStatement  : Statement = "while"S "("s booleanExpression ")"s embeddedStatement;
+      doStatement     : Statement = "do"S embeddedStatement "while"S "("s booleanExpression ")"s semicolon;
+
+      forInitializer_var  : object = localVariableDeclaration;
+      forInitializer_expr : object = statementExpressionList;
+      forInitializer      : object = forInitializer_var / forInitializer_expr;
+      forCondition : Expr = booleanExpression;
+      forIterator  : ExprList = statementExpressionList;
+      forStatement : Statement = "for"S "("s forInitializer? semicolon forCondition? semicolon forIterator? ")"s embeddedStatement;
+
+      foreachStatement : Statement = "foreach"S "("s localVariableType identifier "in"s expression ")"s embeddedStatement;
+
+      iterationStatement : Statement = whileStatement
+                                     / doStatement
+                                     / forStatement
+                                     / foreachStatement;
+
+      breakStatement        : Statement = "break"S semicolon;
+      continueStatement     : Statement = "continue"S semicolon;
+      gotoStatement_case    : Statement = "goto"S "case"S constantExpression semicolon;
+      gotoStatement_default : Statement = "goto"S "default"S semicolon;
+      gotoStatement_id      : Statement = "goto"S identifier semicolon;
+      gotoStatement         : Statement = gotoStatement_case / gotoStatement_default / gotoStatement_id;
+      returnStatement       : Statement = "return"S expression? semicolon;
+      throwStatement        : Statement = "throw"S expression? semicolon;
+
+      jumpStatement : Statement = breakStatement
+                                / continueStatement
+                                / gotoStatement
+                                / returnStatement
+                                / throwStatement;
+
+      catchClause   : TryCatchEntry     = "catch"S ("("s anyType identifier? ")"s)? block;
+      catchClauses  : TryCatchEntryList = catchClause+;
+      finallyClause : Statement         = "finally"S block;
+      tryStatement_catch    : TryCatchFinallyTail = catchClauses finallyClause?;
+      tryStatement_finally  : TryCatchFinallyTail = finallyClause;
+      tryStatement          : Statement           = "try"S block (tryStatement_catch / tryStatement_finally);
+
+      checkedStatement    : Statement = "checked"S block;
+      uncheckedStatement  : Statement = "unchecked"S block;
+
+      lockStatement : Statement = "lock"S "("s expression ")"s embeddedStatement;
+
+      resourceAcquisition_var   : object = localVariableDeclaration &")";
+      resourceAcquisition_expr  : object = expression;
+      resourceAcquisition       : object = resourceAcquisition_var / resourceAcquisition_expr;
+      usingStatement  : Statement = "using"S "("s resourceAcquisition ")"s embeddedStatement;
+
+      yieldStatement_return : Statement = "yield"S "return"S expression semicolon;
+      yieldStatement_break  : Statement = "yield"S "break"S semicolon;
+      yieldStatement        : Statement = yieldStatement_return / yieldStatement_break;
+
+      unsafeStatement : Statement = "unsafe"S block;
+      fixedStatement  : Statement = "fixed"S "("s localVariableDeclaration ")"s embeddedStatement;
+
+      [FailureRecovery(statementRecovery, ("}" / statement / switchSection), (space+ / stringLiteral+ / block / [Any]))]
+      statement     : Statement     = labeledStatement
+                                    / declarationStatement
+                                    / embeddedStatement;
+      statementList : StatementList = statement+;
+      block         : Statement     = "{"s statementList? "}"s;
+
+      #endregion
+
+      #region Type members
+
+      varianceAnnotation  : TypeParameterVariance = ("in" / "out")S;
+      typeParameter       : TypeParameter         = attributes? varianceAnnotation? identifier;
+      typeParameterList   : TypeParameterList     = "<"s typeParameter (","s typeParameter)* ">"s;
+
+      typeParameterConstraint_ctor : TypeParameterConstraint  = "new"S "("s ")"s;
+      typeParameterConstraint_type : TypeParameterConstraint  = ("class" / "struct")S;
+      typeParameterConstraint_base : TypeParameterConstraint  = anyType;
+      typeParameterConstraint      : TypeParameterConstraint  = typeParameterConstraint_ctor
+                                                              / typeParameterConstraint_type
+                                                              / typeParameterConstraint_base;
+      typeParameterConstraints        : TypeParameterConstraintList       = typeParameterConstraint (","s typeParameterConstraint)*;
+      typeParameterConstraintsClause  : TypeParameterConstraintClause     = "where"S identifier ":"s typeParameterConstraints;
+      typeParameterConstraintsClauses : TypeParameterConstraintClauseList = typeParameterConstraintsClause+;
+
+      modifier  : Modifier      = ("new" / "public" / "protected" / "internal" / "private" / "partial" / "virtual"
+                                  / "volatile" / "static" / "readonly" / "sealed" / "override" / "abstract" / "extern" / "unsafe")S;
+      modifiers : ModifierList  = modifier+;
+
+      constantDeclaration : TypeMember = attributes? modifiers? "const"S anyType constantDeclarators semicolon;
+
+      fieldDeclaration    : TypeMember = attributes? modifiers? anyType variableDeclarators semicolon;
+
+      fixedSizeBufferDeclarator   : FixedSizeBufferDeclarator     = identifier "["s constantExpression "]"s;
+      fixedSizeBufferDeclarators  : FixedSizeBufferDeclaratorList = fixedSizeBufferDeclarator (","s fixedSizeBufferDeclarator)*;
+      fixedSizeBufferDeclaration  : TypeMember                    = attributes? modifiers? "fixed"S anyType fixedSizeBufferDeclarators semicolon;
+
+      parameterModifier   : FormalParameterModifier = ("ref" / "out" / "this" / "params")S;
+      defaultArgument     : Expr                    = "="s expression;
+      formalParameter     : FormalParameter         = attributes? parameterModifier? anyType identifier defaultArgument?;
+      formalParameterList : FormalParameterList     = formalParameter (","s formalParameter)*;
+
+      methodBody  : Statement = emptyStatement / block;
+      methodDeclaration : TypeMember = attributes? modifiers? anyType typeMemberIdentifier typeParameterList? "("s formalParameterList? ")"s typeParameterConstraintsClauses? methodBody;
+
+      getAccessorDeclaration  : PropertyAccessor  = attributes? modifiers? "get"S methodBody;
+      setAccessorDeclaration  : PropertyAccessor  = attributes? modifiers? "set"S methodBody;
+      accessorDeclarations_1  : PropertyAccessors = getAccessorDeclaration setAccessorDeclaration?;
+      accessorDeclarations_2  : PropertyAccessors = setAccessorDeclaration getAccessorDeclaration?;
+      accessorDeclarations    : PropertyAccessors = accessorDeclarations_1 / accessorDeclarations_2;
+      propertyDeclaration     : TypeMember        = attributes? modifiers? anyType typeMemberIdentifier "{"s accessorDeclarations "}"s;
+
+      addAccessorDeclaration      : PropertyAccessor   = attributes? "add"S block;
+      removeAccessorDeclaration   : PropertyAccessor   = attributes? "remove"S block;
+      eventAccessorDeclarations_1 : PropertyAccessors  = addAccessorDeclaration removeAccessorDeclaration;
+      eventAccessorDeclarations_2 : PropertyAccessors  = removeAccessorDeclaration addAccessorDeclaration;
+      eventAccessorDeclarations   : PropertyAccessors  = eventAccessorDeclarations_1 / eventAccessorDeclarations_2;
+      eventDeclaration_1  : TypeMember = attributes? modifiers? "event"S anyType typeMemberIdentifier "{"s eventAccessorDeclarations "}"s;
+      eventDeclaration_2  : TypeMember = attributes? modifiers? "event"S anyType variableDeclarators semicolon;
+      eventDeclaration    : TypeMember = eventDeclaration_1 / eventDeclaration_2;
+
+      indexerDeclaration  : TypeMember = attributes? modifiers? anyType (typeMemberIdentifier "."s)? "this"S "["s formalParameterList? "]"s "{"s accessorDeclarations "}"s;
+
+      overloadableOperator : Identifier = ("++" / "--" / "<<" / ">>" / "==" / "!=" / ">=" / "<=" / ">" / "<" / "true" / "false"
+                                          / "^" / "!" / "~" / "+" / "-" / "*" / "/" / "%" / "&" / "|")S;
+      overloadableOperatorDeclarator  : OperatorDeclarator = anyType "operator"S overloadableOperator;
+      conversionOperatorDeclarator    : OperatorDeclarator = ("implicit" / "explicit")S "operator"S anyType;
+      operatorDeclarator : OperatorDeclarator = conversionOperatorDeclarator
+                                              / overloadableOperatorDeclarator;
+      operatorDeclaration : TypeMember = attributes? modifiers? operatorDeclarator "("s formalParameterList? ")"s methodBody;
+
+      constructorInitializer : ConstructorInitializer = ":"s ("this" / "base")S "("s argumentList? ")"s;
+      constructorDeclaration : TypeMember = attributes? modifiers? identifier "("s formalParameterList? ")"s constructorInitializer? methodBody;
+
+      destructorDeclaration  : TypeMember = attributes? modifiers? "~"s identifier "("s formalParameterList? ")"s methodBody;
+
+      nestedTypeDeclaration  : TypeMember = typeDeclaration;
+
+      typeMemberDeclaration  : TypeMember = methodDeclaration
+                                          / propertyDeclaration 
+                                          / fieldDeclaration
+                                          / constantDeclaration
+                                          / constructorDeclaration
+                                          / eventDeclaration
+                                          / operatorDeclaration
+                                          / indexerDeclaration
+                                          / destructorDeclaration
+                                          / nestedTypeDeclaration
+                                          / fixedSizeBufferDeclaration;
+      typeMemberDeclarations : TypeMemberList = typeMemberDeclaration*;
+
+      #endregion
+
+      #region Class, Struct, Interface
+
+      typeBase                        : ExprList     = ":"s anyType (","s anyType)*;
+      typeBody                        : TypeBody        = "{"s typeMemberDeclarations "}"s;
+      classStructInterfaceDeclaration : TypeDeclaration = attributes? modifiers? ("class" / "struct" / "interface")S
+                                                          identifier typeParameterList? typeBase? typeParameterConstraintsClauses? typeBody semicolonOpt;
+
+      #endregion
+
+      #region Enum
+
+      enumBase                : Expr            = ":"s anyType;
+      enumMemberDeclaration   : TypeMember      = attributes? identifier ("="s constantExpression)?;
+      enumMemberDeclarations  : TypeMemberList  = enumMemberDeclaration (","s enumMemberDeclaration)* (","s)?;
+      enumBody                : EnumBody        = "{"s enumMemberDeclarations? "}"s;
+      enumDeclaration         : TypeDeclaration = attributes? modifiers? "enum"S identifier enumBase? enumBody semicolonOpt;
+
+      #endregion
+
+      #region Delegate
+
+      delegateDeclaration : TypeDeclaration = attributes? modifiers? "delegate"S anyType identifier typeParameterList? "("s formalParameterList? ")"s typeParameterConstraintsClauses? semicolon;
+
+      #endregion
+
+      #region Attributes
+
+      attributeArguments  : FunctionArgumentList  = "("s argumentList? ")"s;
+      attribute           : CustomAttributeInfo   = qualifiedIdentifier attributeArguments?;
+      attributeList       : CustomAttributeInfoList   = attribute (","s attribute)*;
+
+      globalAttributeTarget           : CustomAttributeTarget = ("assembly" / "module")S;
+      globalAttributeTargetSpecifier  : CustomAttributeTarget = globalAttributeTarget ":"s;
+      globalAttributeSection          : CustomAttributeList   = "["s globalAttributeTargetSpecifier attributeList (","s)? "]"s;
+      globalAttributes                : CustomAttributeList   = globalAttributeSection*;
+
+      attributeTarget           : CustomAttributeTarget = ("field" / "event" / "method" / "param" / "property" / "return" / "type")S;
+      attributeTargetSpecifier  : CustomAttributeTarget = attributeTarget ":"s;
+      attributeSection          : CustomAttributeList   = "["s attributeTargetSpecifier? attributeList (","s)? "]"s;
+      attributes                : CustomAttributeList   = attributeSection+;
+
+      #endregion
+    }
+  )]
+  [Unit]
+  public partial class Parser
+  {
+  }
+}

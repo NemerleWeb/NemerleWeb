@@ -416,12 +416,15 @@ $indent#>
             else
               generatedMethods.Add(m.Name, Some(methodWithSignature))
           }
-
+          
+          if (!m.IsAbstract)
 $<#$methodVariable
 $(indent)$parentPtr.$methodWithSignature = function(..$(methodParms(m))) {
 $(indent)  $self
 $(TranslateMethodBody(m, indent + "  "))
 $(indent)}#>
+        else
+          ""
         });
         
         // Default methods signature for first method if there are no methods without parameters

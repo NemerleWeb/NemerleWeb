@@ -196,6 +196,9 @@
     <Compile Include="JsKnownMembersSCGList.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JsKnownMembersSCGStack.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JsKnownMembersString.n">
       <SubType>Code</SubType>
     </Compile>

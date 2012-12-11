@@ -1,0 +1,625 @@
+﻿using System;
+using SCG = System.Collections.Generic;
+
+using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Utility;
+using Nemerle.Peg; using NemerleWeb;
+
+namespace CSharpParser
+{
+  public partial class Parser
+  {
+    #region Function arguments
+
+    //argumentName    : Identifier                = identifier ":" !":" s; // avoid conflict with alias
+    argumentName( identifier : Identifier,
+                  _colon     : NToken) : Identifier
+    {
+      identifier
+    }
+
+    //argumentModfier : FunctionArgumentModifier  = ("ref" / "out")S;
+    argumentModfier(keyword : NToken) : FunctionArgumentModifier
+    {
+      match(GetText(keyword)) {
+        | "ref" => FunctionArgumentModifier.Ref()
+        | "out" => FunctionArgumentModifier.Out()
+        | _     => throw ArgumentOutOfRangeException("keyword")
+      }
+    }
+
+    //argument        : FunctionArgument          = argumentName? argumentModfier? expression;
+    argument( argumentName    : option[Identifier],
+              argumentModfier : option[FunctionArgumentModifier],
+              expr            : Expr) : FunctionArgument
+    {
+      FunctionArgument(
+        argumentName.WithDefault(null),
+        argumentModfier.WithDefault(FunctionArgumentModifier.Normal()),
+        expr)
+    }
+
+    //argumentList    : FunctionArgumentList      = argument (","s argument)*;
+    argumentList( head : FunctionArgument,
+                  tail : SCG.List[NToken * FunctionArgument]) : list[FunctionArgument]
+    {
+      head.Cons(tail)
+    }
+
+    #endregion
+
+    #region Common expressions
+
+    //expressionList      : ExprList = expression (","s expression)*;
+    expressionList( head : Expr,
+                    tail  : SCG.List[NToken * Expr]) : list[Expr]
+    {
+      head.Cons(tail)
+    }
+
+    //simpleName        : Expr = identifier ("::"s identifier)? typeArgumentList?;
+    simpleName( identifierOrAlias   : Identifier,
+                identifier          : option[NToken * Identifier],
+                typeArgumentList    : option[list[Expr]]) : Expr
+    {
+      def name = 
+        match(identifier) {
+          | Some((_, id)) =>
+            def alias = Expr.Alias(identifierOrAlias);
+            def member = Expr.Ref(id);
+            Expr.Member(alias, member)
+            
+          | _ => Expr.Ref(identifierOrAlias);
+        };
+        
+      match(typeArgumentList) {
+        | Some(args)  => Expr.TypeArguments(name.Location, name, args) //TODO: handle location
+        | _           => name
+      }
+    }
+
+    //literalExpression : Expr = literal;
+    literalExpression(literal : Literal) : Expr
+    {
+      Expr.Literal(literal)
+    }
+
+    //parenthesizedExpression : Expr = "("s expression ")"s;
+    parenthesizedExpression(_lparen : NToken,
+                            expr    : Expr,
+                            _rparen : NToken) : Expr
+    {
+      expr
+    }
+
+    //thisAccess        : Expr = "this"S;
+    thisAccess(_this : NToken) : Expr
+    {
+      Expr.This()
+    }
+
+    //baseAccess        : Expr = "base"S;
+    baseAccess(_base : NToken) : Expr
+    {
+      Expr.Base()
+    }
+
+    //predefinedAccess  : Expr = predefinedType;
+    predefinedAccess(predefinedType : Expr) : Expr
+    {
+      predefinedType
+    }
+
+    //anyTypeNullableHackAccess : Expr = anyTypeNullableHack;
+    anyTypeNullableHackAccess(anyType : Expr) : Expr
+    {
+      anyType
+    }
+
+    //typeofExpression        : Expr = "typeof"S "("s anyType ")"s;
+    typeofExpression( _typeof : NToken,
+                      _lparen : NToken,
+                      typeRef : Expr,
+                      _rparen : NToken) : Expr
+    {
+      Expr.TypeOf(typeRef)
+    }
+
+    //checkedExpression       : Expr = "checked"S "("s expression ")"s;
+    checkedExpression(_checked  : NToken,
+                      _lparen   : NToken,
+                      expr      : Expr,
+                      _rparen   : NToken) : Expr
+    {
+      Expr.Checked(expr, true)
+    }
+
+    //uncheckedExpression       : Expr = "unchecked"S "("s expression ")"s;
+    uncheckedExpression(_unchecked  : NToken,
+                        _lparen     : NToken,
+                        expr        : Expr,
+                        _rparen     : NToken) : Expr
+    {
+      Expr.Checked(expr, false)
+    }
+
+    //defaultValueExpression  : Expr = "default"S "("s anyType ")"s;
+    defaultValueExpression( _default  : NToken,
+                            _lparen   : NToken,
+                            typeRef   : Expr,
+                            _rparen   : NToken) : Expr
+    {
+      Expr.DefaultValue(typeRef)
+    }
+
+    //sizeofExpression        : Expr = "sizeof"S "("s anyType ")"s;
+    sizeofExpression( _sizeof : NToken,
+                      _lparen : NToken,
+                      typeRef : Expr,
+                      _rparen : NToken) : Expr
+    {
+      Expr.SizeOf(typeRef)
+    }
+
+    #endregion 
+
+    #region New object expression
+
+    //newObject_1   : Expr = anyNonArrayType "("s argumentList? ")"s complexInitializer?;
+    newObject_1(objType   : Expr,
+                _lparen   : NToken,
+                ctorArgs  : option[list[FunctionArgument]],
+                _rparen   : NToken,
+                init      : option[VariableInitializer]) : Expr
+    {
+      Expr.NewObject(
+        objType,
+        ctorArgs.WithDefault([]),
+        init.WithDefault(null))
+    }
+
+    //newObject_2   : Expr = anyNonArrayType complexInitializer;
+    newObject_2(objType   : Expr,
+                init      : VariableInitializer) : Expr
+    {
+      Expr.NewObject(
+        objType,
+        [],
+        init)
+    }
+
+    //newArray_1    : Expr = anyNonArrayType "["s expressionList "]"s rankSpecifier* complexInitializer?;
+    newArray_1( elementType : Expr,
+                _lparen     : NToken,
+                args        : list[Expr],
+                _rparen     : NToken,
+                ranks       : SCG.List[TypeSpecifier],
+                init        : option[VariableInitializer]) : Expr
+    {
+      mutable finalElementType = elementType;
+      mutable arrayType = elementType;
+      foreach(rank in ranks) {
+        | TypeSpecifier.Array(rank) as spec =>
+          finalElementType = arrayType;
+          arrayType = Expr.ArrayType(finalElementType.Location + spec.Location, finalElementType, rank);
+        | _ => throw ArgumentOutOfRangeException("ranks")
+      }
+      Expr.NewArray(
+        finalElementType,
+        args,
+        args.Length,
+        init.WithDefault(null))
+    }
+
+    //newArray_2    : Expr = anyNonArrayType rankSpecifier+ complexInitializer;
+    newArray_2( elementType   : Expr,
+                ranks         : SCG.List[TypeSpecifier],
+                init          : VariableInitializer) : Expr
+    {
+      mutable finalElementType = elementType;
+      mutable arrayType = elementType;
+      mutable finalRank = 0;
+      foreach(rank in ranks) {
+        | TypeSpecifier.Array(rank) as spec =>
+          finalElementType = arrayType;
+          arrayType = Expr.ArrayType(finalElementType.Location + spec.Location, finalElementType, rank);
+          finalRank = rank;
+        | _ => throw ArgumentOutOfRangeException("ranks")
+      }
+      Expr.NewArray(
+        finalElementType,
+        [],
+        finalRank,
+        init)
+    }
+
+    //newArray_3    : Expr = rankSpecifier complexInitializer;
+    newArray_3(rank : TypeSpecifier,
+               init : VariableInitializer) : Expr
+    {
+      match(rank) {
+        | TypeSpecifier.Array(rank) =>
+          Expr.NewArray(
+            null,
+            [],
+            rank,
+            init)
+        | _ => throw ArgumentOutOfRangeException("rank")
+      }
+    }
+
+    //newAnonymous  : Expr = complexInitializer;
+    newAnonymous(init : VariableInitializer) : Expr
+    {
+      Expr.NewAnonymous(init)
+    }
+
+    //newExpression : Expr = "new"S (newObject_1 / newArray_1 / newArray_2 / newObject_2 / newArray_3 / newAnonymous);
+    newExpression(_new  : NToken,
+                  opt   : Expr) : Expr
+    {
+      opt
+    }
+
+    #endregion
+
+    #region Delegate expression
+
+    //explicitAnonymousFunctionParameterModifier  : FormalParameterModifier = ("ref" / "out")S;
+    explicitAnonymousFunctionParameterModifier(keyword : NToken) : FormalParameterModifier
+    {
+      match(GetText(keyword)) {
+        | "ref" => FormalParameterModifier.Ref()
+        | "out" => FormalParameterModifier.Out()
+        | _     => throw ArgumentOutOfRangeException("keyword")
+      }
+    }
+
+    //explicitAnonymousFunctionParameter          : FormalParameter         = explicitAnonymousFunctionParameterModifier? anyType identifier;
+    explicitAnonymousFunctionParameter( modifier      : option[FormalParameterModifier],
+                                        parameterType : Expr,
+                                        identifier    : Identifier) : FormalParameter
+    {
+      FormalParameter(
+        [],
+        identifier, 
+        modifier.WithDefault(FormalParameterModifier.Normal()),
+        parameterType,
+        null)
+    }
+
+    //explicitAnonymousFunctionParameterList      : FormalParameterList     = explicitAnonymousFunctionParameter (","s explicitAnonymousFunctionParameter)*;
+    explicitAnonymousFunctionParameterList( head : FormalParameter,
+                                            tail  : SCG.List[NToken * FormalParameter]) : list[FormalParameter]
+    {
+      head.Cons(tail)
+    }
+
+    //explicitAnonymousFunctionSignature          : FormalParameterList     = "("s explicitAnonymousFunctionParameterList? ")"s;
+    explicitAnonymousFunctionSignature( _lparen : NToken,
+                                        parms   : option[list[FormalParameter]],
+                                        _rparen : NToken) : list[FormalParameter]
+    {
+      parms.WithDefault([])
+    }
+
+    //anonymousMethodExpression : Expr = "delegate"S explicitAnonymousFunctionSignature? block;
+    anonymousMethodExpression(_delegate : NToken,
+                              signature : option[list[FormalParameter]],
+                              body      : Statement) : Expr
+    {
+      match(signature) {
+        | Some(parms) => Expr.Function(parms, false, false, body)
+        | _           => Expr.Function([],    true,  false, body)
+      }
+    }
+
+    #endregion
+
+    #region Call or indexer
+
+    //indexerArguments        : CallOrIndexerArgumentList = "["s argumentList? "]"s;
+    indexerArguments( _lparen       : NToken,
+                      argumentList  : option[list[FunctionArgument]],
+                      _rparen       : NToken) : list[FunctionArgument] * bool
+    {
+      (argumentList.WithDefault([]), false)
+    }
+
+    //callArguments           : CallOrIndexerArgumentList = "("s argumentList? ")"s;
+    callArguments(_lparen       : NToken,
+                  argumentList  : option[list[FunctionArgument]],
+                  _rparen       : NToken) : list[FunctionArgument] * bool
+    {
+      (argumentList.WithDefault([]), true)
+    }
+
+    //callOrIndexerExpression : Expr                      = otherExpression (indexerArguments / callArguments)*;
+    callOrIndexerExpression(otherExpression : Expr, applies : SCG.List[list[FunctionArgument] * bool]) : Expr
+    {
+      mutable chain = otherExpression;
+      foreach(apply in applies) {
+        def loc = chain.Location; //TODO: handle location
+        chain = match(apply) {
+          | (args, true)  => Expr.Call(loc, chain, args)
+          | (args, false) => Expr.Indexer(loc, chain, args)
+        }
+      }
+      chain
+    }
+
+    #endregion
+
+    #region Member / Pointer access
+
+    //memberOperator    : bool = ("." / "->")s;
+    memberOperator(op : NToken) : bool
+    {
+      match(GetText(op)) {
+        | "."   => true
+        | "->"  => false
+        | _     => throw ArgumentOutOfRangeException("op")
+      }
+    }
+
+    //memberExpression  : Expr = callOrIndexerExpression (memberOperator callOrIndexerExpression)*;
+    memberExpression(expr : Expr, applies : SCG.List[bool * Expr]) : Expr
+    {
+      mutable chain = expr;
+      foreach((memberAccess, valueExpr) in applies) {
+        def loc = chain.Location;
+
+        def highjackMemberExpr(e) {
+          | Expr.TypeArguments(expr, args) =>
+            Expr.TypeArguments(loc + e.Location, highjackMemberExpr(expr), args)
+
+          | Expr.Call(expr, args) =>
+            Expr.Call(loc + e.Location, highjackMemberExpr(expr), args)
+
+          | Expr.Indexer(expr, args) =>
+            Expr.Indexer(loc + e.Location, highjackMemberExpr(expr), args)
+
+          | expr when memberAccess =>
+              Expr.Member(loc, chain, expr)
+
+          | expr =>
+              Expr.PointerMember(loc, chain, expr)
+        }
+
+        chain = highjackMemberExpr(valueExpr)
+      }
+      chain
+    }
+
+    #endregion
+
+    #region Unary and Cast operators
+
+    //postfixOperator   : Identifier = ("++" / "--")s;
+    postfixOperator(op : NToken) : Identifier
+    {
+      Identifier(GetText(op))
+    }
+
+    //postfixExpression : Expr = memberExpression postfixOperator*;
+    postfixExpression(expr : Expr, ops : SCG.List[Identifier]) : Expr
+    {
+      mutable chain = expr;
+      foreach(op in ops)
+        chain = Expr.UnaryOperator(chain.Location + op.Location, chain, op, false);
+      chain
+    }
+
+    //prefixOperator    : object = ("++" / "--" / "+" / "-" / "~" / "!" / "&" / "*")s;
+    prefixOperator(op : NToken) : Located
+    {
+      Identifier(GetText(op))
+    }
+
+    castSuffix_1(toType : Expr, _ : NToken) : Expr
+    {
+      toType
+    }
+
+    castSuffix_2(toType : Expr, _ : NToken) : Expr
+    {
+      toType
+    }
+    
+    castSuffix_3(toType : Expr, _ : NToken) : Expr
+    {
+      toType
+    }
+
+    castOperator(_ : NToken, toType : Expr) : Located
+    {
+      toType
+    }
+
+    //prefixExpression  : Expr   = (prefixOperator / castOperator)* postfixExpression;
+    prefixExpression(ops : SCG.List[Located], expr : Expr) : Expr
+    {
+      mutable chain = expr;
+      for(mutable i = ops.Count - 1; i >= 0; --i) {
+        def op = ops[i];
+        def loc = chain.Location + op.Location;
+        chain = match(op) {
+          | op is Identifier  => Expr.UnaryOperator(loc, chain, op, true)
+          | toType is Expr => Expr.CastOperator(loc, chain, toType)
+          | _ => throw ArgumentOutOfRangeException("ops")
+        }
+      }
+      chain
+    }
+
+    #endregion
+
+    #region Binary operators
+
+    //binaryOperator            : BinaryOperatorInfo = ("??" / "||" / "|" / "&&" / "&" / "==" / "!=" / "<=" / "<<" / "<" 
+    //                                                  / ">=" / ">>" / ">" / "*" / "/" / "%" / "+" / "-" / "^")s;
+    binaryOperator(op : NToken) : Identifier * int * int
+    {
+      def opStr = GetText(op);
+      def opId = Identifier(GetLocation(op), opStr);
+      match(opStr) {
+        | "??"  => (opId, 11, 10) // right associative
+        | "||"  => (opId, 20, 20)
+        | "|"   => (opId, 40, 40)
+        | "&&"  => (opId, 30, 30)
+        | "&"   => (opId, 60, 60)
+        | "=="  => (opId, 70, 70)
+        | "!="  => (opId, 70, 70)
+        | "<="  => (opId, 80, 80)
+        | "<<"  => (opId, 90, 90)
+        | "<"   => (opId, 80, 80)
+        | ">="  => (opId, 80, 80)
+        | ">>"  => (opId, 90, 90)
+        | ">"   => (opId, 80, 80)
+        | "*"   => (opId, 110, 110)
+        | "/"   => (opId, 110, 110)
+        | "%"   => (opId, 110, 110)
+        | "+"   => (opId, 100, 100)
+        | "-"   => (opId, 100, 100)
+        | "^"   => (opId, 50, 50)
+        | _ => throw ArgumentOutOfRangeException("op")
+      }
+    }
+
+    //typeTestingOperator       : BinaryOperatorInfo = ("is" / "as")S;
+    typeTestingOperator(op : NToken) : Identifier * int * int
+    {
+      (Identifier(GetLocation(op), GetText(op)), 70, 200)
+    }
+
+    //binaryOperatorExpression  : Expr = prefixExpression ( (binaryOperator prefixExpression) / (typeTestingOperator anyTypeNullableHack) )*;
+    binaryOperatorExpression( head : Expr,
+                              tail : SCG.List[(Identifier * int * int) * Expr]) : Expr
+    {
+      match(tail.Count) {
+        | 0 => head
+
+        | 1 =>
+          def a = head;
+          def ((op, _, _), b) = tail[0];
+          Expr.BinaryOperator(a.Location + b.Location, a, b, op)
+
+        | _ =>
+          def opStack = SCG.Stack();
+          def exprStack = SCG.Stack();
+          exprStack.Push(head);
+  
+          def evalOperandsOnStack() {
+            def b = exprStack.Pop();
+            def a = exprStack.Pop();
+            def op = opStack.Pop()[0];
+            exprStack.Push(Expr.BinaryOperator(a.Location + b.Location, a, b, op));
+          }
+  
+          foreach(((op, leftPrior, rightPrior), operand) in tail) {
+            while(!opStack.IsEmpty() && opStack.Peek()[1] >= leftPrior)
+              evalOperandsOnStack();
+            exprStack.Push(operand);
+            opStack.Push(op, rightPrior);
+          }
+  
+          while(!opStack.IsEmpty())
+            evalOperandsOnStack();
+  
+          exprStack.Pop() // exprStack becomes empty
+      }
+    }
+
+    #endregion
+
+    #region Assignment
+
+    //assignmentOperator   : Identifier = ("=" / "+=" / "-=" / "*=" / "/=" / "%=" / "&=" / "|=" / "^=" / "<<=" / ">>=")s;
+    assignmentOperator(op : NToken) : Identifier
+    {
+      Identifier(GetText(op))
+    }
+
+    //assignmentExpression : Expr = conditionalExpression (assignmentOperator expression)?;
+    assignmentExpression(expr : Expr, assign : option[Identifier * Expr]) : Expr
+    {
+      match(assign) {
+        | Some( (op, value) ) => Expr.Assign(expr, value, op)
+        | _ => expr
+      }
+    }
+
+    #endregion
+
+    #region Conditional expression
+
+    //conditionalExpression   : Expr    = nullCoalescingExpression ("?"s expression ":"s expression)?;
+    conditionalExpression(head  : Expr,
+                          tail  : option[NToken * Expr * NToken * Expr]) : Expr
+    {
+      match(tail) {
+        | Some( (_, trueExpr, _, falseExpr) ) => Expr.ConditionalOperator(head, trueExpr, falseExpr)
+        | _ => head
+      }
+    }
+
+    #endregion
+
+    #region Lambda expression
+
+    //implicitAnonymousFunctionParameter     : FormalParameter      = identifier;
+    implicitAnonymousFunctionParameter(id : Identifier) : FormalParameter
+    {
+      FormalParameter(
+        [],
+        id,
+        FormalParameterModifier.Normal(),
+        null,
+        null)
+    }
+
+    //implicitAnonymousFunctionParameterList : FormalParameterList  = implicitAnonymousFunctionParameter (","s implicitAnonymousFunctionParameter)*;
+    implicitAnonymousFunctionParameterList( head : FormalParameter,
+                                            tail  : SCG.List[NToken * FormalParameter]) : list[FormalParameter]
+    {
+      head.Cons(tail)
+    }
+
+    //implicitAnonymousFunctionSignature_1  : FormalParameterList = implicitAnonymousFunctionParameter;
+    implicitAnonymousFunctionSignature_1(single : FormalParameter) : list[FormalParameter]
+    {
+      [single]
+    }
+
+    //implicitAnonymousFunctionSignature_2  : FormalParameterList = "("s implicitAnonymousFunctionParameterList? ")"s;
+    implicitAnonymousFunctionSignature_2( _lparen : NToken,
+                                          parms   : option[list[FormalParameter]],
+                                          _rparen : NToken) : list[FormalParameter]
+    {
+      parms.WithDefault([])
+    }
+
+    //anonymousFunctionBody_expression  : Statement = expression;
+    anonymousFunctionBody_expression(expr : Expr) : Statement
+    {
+      Statement.Block([Statement.Return(expr.Location, expr)])
+    }
+
+    //anonymousFunctionBody_block       : Statement = block;
+    anonymousFunctionBody_block(block : Statement) : Statement
+    {
+      block
+    }
+
+    //lambdaExpression : Expr = anonymousFunctionSignature "=>"s anonymousFunctionBody;
+    lambdaExpression( signature : list[FormalParameter],
+                      _arrow    : NToken,
+                      body      : Statement) : Expr
+    {
+      Expr.Function(signature, false, true, body)
+    }
+
+    #endregion
+  }
+}
