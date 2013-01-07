@@ -194,6 +194,9 @@
     <Compile Include="MVVM\Peg\JSPage.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MVVM\Peg\TypeScriptInterfacePage.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\Samples.n">
       <SubType>Code</SubType>
     </Compile>
@@ -442,6 +445,11 @@
       <Project>{76db8b13-a01a-47bd-98be-f2d3755770fe}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\peg-parser\TypeScriptInterfaceParser\TypeScriptInterfaceParser.nproj">
+      <Name>TypeScriptInterfaceParser</Name>
+      <Project>{24499101-e8de-4a70-87ee-0787577b7327}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets" />
@@ -471,6 +479,11 @@
     </ItemGroup>
     <Copy SourceFiles="@(JSParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\JSParser" />
     <Copy SourceFiles="@(JSParser)" DestinationFolder="$(YourDestinationDirectory2)\Peg\JSParser" />
+    <ItemGroup>
+      <TypeScriptInterfaceParser Include="$(ProjectDir)..\peg-parser\TypeScriptInterfaceParser\*.n" />
+    </ItemGroup>
+    <Copy SourceFiles="@(TypeScriptInterfaceParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\TypeScriptInterfaceParser" />
+    <Copy SourceFiles="@(TypeScriptInterfaceParser)" DestinationFolder="$(YourDestinationDirectory2)\Peg\TypeScriptInterfaceParser" />
     <CreateItem Include="$(YourSourceDirectory)\**\*.*">
       <Output TaskParameter="Include" ItemName="YourFilesToCopy" />
     </CreateItem>

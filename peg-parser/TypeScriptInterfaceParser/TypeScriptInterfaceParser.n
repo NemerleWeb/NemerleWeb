@@ -3,12 +3,13 @@ using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
 using Nemerle.Peg;
+using NemerleWeb;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NemerleWeb
+namespace TypeScriptInterface
 {
   
   [PegGrammar(Options = EmitDebugSources,
@@ -66,17 +67,18 @@ namespace NemerleWeb
         start : list[Interface] = spaces _interface*;
       }
     )]
+  [Unit]
   public class TypeScriptInterfaceParser
   {
     identifier(idValue : NToken) : string 
     {
-      System.Diagnostics.Debug.WriteLine("identifier: " + GetText(idValue));
+      //System.Diagnostics.Debug.WriteLine("identifier: " + GetText(idValue));
       GetText(idValue)
     }
 
     identifiers(id : string, tail : option[NToken * list[string]]) : list[string] 
     {
-      System.Diagnostics.Debug.WriteLine("identifiers");
+      //System.Diagnostics.Debug.WriteLine("identifiers");
       match(tail) {
       | Some((_, tail)) => id :: tail
       | _ => [id]
@@ -110,13 +112,13 @@ namespace NemerleWeb
 
     nonOptionalParam(name : string, _ : NToken, type : TypescriptType) : Parameter
     {
-      System.Diagnostics.Debug.WriteLine("nonOptionalParm");
+      //System.Diagnostics.Debug.WriteLine("nonOptionalParm");
       Parameter(name, type, false, false)
     }
     
     optionalParam(name : string, _ : NToken, _ : NToken, type : TypescriptType) : Parameter
     {
-      System.Diagnostics.Debug.WriteLine("optionalParm");
+      //System.Diagnostics.Debug.WriteLine("optionalParm");
       Parameter(name, type, true, false)
     }
     
@@ -127,7 +129,7 @@ namespace NemerleWeb
     
     parms(p : Parameter, tail : option[(NToken * list[Parameter])]) : list[Parameter]
     {
-      System.Diagnostics.Debug.WriteLine("parms");
+      //System.Diagnostics.Debug.WriteLine("parms");
       match(tail)
       {
       | Some((_, tail)) => p :: tail
@@ -146,14 +148,14 @@ namespace NemerleWeb
     
     methodDeclaration(name : string, isNullable : NToken, _ : NToken, parms : option[list[Parameter]], _ : NToken, type : option[(NToken * TypescriptType)],  _ : NToken) : Member.Method
     {
-      System.Diagnostics.Debug.WriteLine("method");
+      //System.Diagnostics.Debug.WriteLine("method");
       def type = if(type is Some((_, type))) type else null;
       Member.Method(name, GetText(isNullable) == "?", if(parms is Some(parms)) parms else [], type)
     }
     
     propertyDeclaration(name : string, isNullable : NToken, _ : NToken, type : TypescriptType, _ : NToken) : Member.Property
     {
-      System.Diagnostics.Debug.WriteLine("prop");
+      //System.Diagnostics.Debug.WriteLine("prop");
       Member.Property(name, GetText(isNullable) == "?", type)
     }
     
@@ -169,25 +171,25 @@ namespace NemerleWeb
     
     memberDeclaration(member : Member) : Member
     {
-      System.Diagnostics.Debug.WriteLine("decl");
+      //System.Diagnostics.Debug.WriteLine("decl");
       member
     }
     
     interfaceBlock(_ : NToken, declarations : List[Member], _ : NToken) : list[Member]
     {
-      System.Diagnostics.Debug.WriteLine("block");
+      //System.Diagnostics.Debug.WriteLine("block");
       declarations.NToList()
     }
     
     extends_(_ : NToken, extendTypes : list[string]) : list[string]
     {
-      System.Diagnostics.Debug.WriteLine("extends");
+      //System.Diagnostics.Debug.WriteLine("extends");
       extendTypes
     }
     
     _interface(_ : NToken, name : string, extends_ : option[list[string]], members : list[Member]) : Interface
     {
-      System.Diagnostics.Debug.WriteLine("interface: " + name);
+      //System.Diagnostics.Debug.WriteLine("interface: " + name);
       Interface(name, extends_, members)
     }
     
@@ -197,14 +199,25 @@ namespace NemerleWeb
     }
   }
   
-  [Record]
+  //[Record]
+  [Unit]
   public class Interface : Located
   {
     public Name : string;
     public Extends :  option[list[string]];
     public Members : list[Member];
+    
+    // Workraround
+    // TODO: Resolve issue with clashing reserved names
+    public this(name : string, extends_ : option[list[string]], members : list[Member])
+    {
+      Name = name;
+      Extends = extends_;
+      Members = members;
+    }
   }
   
+  [Unit]
   public variant Member : Located
   {
     | Property  { Name : string; IsNullable : bool; Type : TypescriptType }
@@ -214,12 +227,14 @@ namespace NemerleWeb
   }
   
   [Record]
+  [Unit]
   public class Declaration : Located
   {
     public Member : Member;
   }
   
   [Record]
+  [Unit]
   public class Parameter
   {
     public Name : string;
@@ -227,7 +242,8 @@ namespace NemerleWeb
     public IsOptional : bool;
     public IsParams : bool;
   }
-    
+  
+  [Unit]
   public variant TypescriptType
   {
     | Object { Parms : list[Parameter] }
