@@ -14,6 +14,7 @@
     <FileAlignment>512</FileAlignment>
     <NoStdLib>true</NoStdLib>
     <NemerleVersion>Net-4.5</NemerleVersion>
+    <NemerleBinPathRoot Condition=" '$(Configuration)' == 'Release' ">$(SolutionDir)\Nemerle</NemerleBinPathRoot>
     <NemerleBinPathRoot Condition=" '$(NemerleBinPathRoot)' == '' ">$(ProgramFiles)\Nemerle</NemerleBinPathRoot>
     <Nemerle Condition=" '$(Nemerle)' == '' ">$(NemerleBinPathRoot)\$(NemerleVersion)</Nemerle>
     <Name>NemerleWeb.JsCore</Name>

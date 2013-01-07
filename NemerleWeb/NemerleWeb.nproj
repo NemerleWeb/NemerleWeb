@@ -64,14 +64,6 @@
       <AssemblyName>Microsoft.Web.Infrastructure.dll</AssemblyName>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Nemerle.Peg">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(Nemerle)\Nemerle.Peg.dll</HintPath>
-    </Reference>
-    <MacroReference Include="Nemerle.Peg.Macros">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(Nemerle)\Nemerle.Peg.Macros.dll</HintPath>
-    </MacroReference>
     <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json">
       <Name>Newtonsoft.Json</Name>
@@ -221,9 +213,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="NWebData.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TypeScriptInterfaceParser.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UnitAttribute.n">
