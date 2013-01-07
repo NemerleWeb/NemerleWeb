@@ -756,6 +756,11 @@ function System_ArgumentNullException(paramName, message) {
     this.message = messages;
 }
 
+var System_Environment = {};
+System_Environment.get_NewLine = function () {
+    return "\n";
+}
+
 nweb.collection = {
     areArrayEqual : function(arr1, arr2) {
         if (arr1.length != arr2.length)
