@@ -45,12 +45,12 @@ namespace NemerleWeb.Samples
       }      
       and printType(type)
       {
+        | null => "null"
         | t is TypescriptType.Object => $"[Object] Parms: $(printParams(t.Parms))"
         | t is TypescriptType.Dictionary => "[Dictionary] Key: $(t.Key), Value: $(t.Value)"
         | t is TypescriptType.Array => $"[Array] Name: $(t.Name)"
         | t is TypescriptType.Lambda => $"[Lambda] $(printMaybeParams(t.Parms)), ReturnType : $(printType(t.ReturnType))"
         | t is TypescriptType.Normal => $"[Normal] Name: $(t.Name)"
-        | null => "null"
       }      
       and printMaybeParams(p)
       {
