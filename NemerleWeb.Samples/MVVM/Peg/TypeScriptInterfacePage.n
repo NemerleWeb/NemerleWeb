@@ -50,7 +50,7 @@ namespace NemerleWeb.Samples
         | t is TypescriptType.Array => $"[Array] Name: $(t.Name)"
         | t is TypescriptType.Lambda => $"[Lambda] $(printMaybeParams(t.Parms)), ReturnType : $(printType(t.ReturnType))"
         | t is TypescriptType.Normal => $"[Normal] Name: $(t.Name)"
-        | _ => ""
+        | null => "null"
       }      
       and printMaybeParams(p)
       {
