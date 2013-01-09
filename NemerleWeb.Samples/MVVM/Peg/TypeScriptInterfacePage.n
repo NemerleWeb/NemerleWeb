@@ -47,7 +47,7 @@ namespace NemerleWeb.Samples
       {
         | null => "null"
         | t is TypescriptType.Object => $"[Object] Parms: $(printParams(t.Parms))"
-        | t is TypescriptType.Dictionary => "[Dictionary] Key: $(t.Key), Value: $(t.Value)"
+        | t is TypescriptType.Dictionary => $"[Dictionary] Key: $(t.Key), Value: $(t.Value)"
         | t is TypescriptType.Array => $"[Array] Name: $(t.Name)"
         | t is TypescriptType.Lambda => $"[Lambda] $(printMaybeParams(t.Parms)), ReturnType : $(printType(t.ReturnType))"
         | t is TypescriptType.Normal => $"[Normal] Name: $(t.Name)"
@@ -60,8 +60,8 @@ namespace NemerleWeb.Samples
       
       def printMember(member)
       {
-        | m is Member.Property => $"[Property] Name: $(m.Name), IsNullable: $(m.IsNullable), Type: $(printType(m.Type))"
-        | m is Member.Method   => $"[Method] Name: $(m.Name), IsNullable : $(m.IsNullable), Parms: $(printParams(m.Parms)), Type: $(printType(m.Type))"
+        | m is Member.Property => $<#"[Property] Name: $(m.Name), Type: $(printType(m.Type))$(if(m.IsNullable) "?" else "")#>
+        | m is Member.Method   => $<#[Method] Name: $(m.Name), Parms: $(printParams(m.Parms)), Type: $(printType(m.Type))$(if(m.IsNullable) "?" else "")#>
         | m is Member.Call     => $"[Call] $(printMaybeParams(m.Parms))ReturnType: $(printType(m.ReturnType))"
         | m is Member.IndexCall=> $"[IndexCall]  $(printMaybeParams(m.Parms))ReturnType: $(printType(m.ReturnType))"
         | _ => ""
