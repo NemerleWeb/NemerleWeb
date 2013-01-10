@@ -69,13 +69,11 @@ namespace NemerleWeb
   {
     identifier(idValue : NToken) : string 
     {
-      System.Diagnostics.Debug.WriteLine("identifier: " + GetText(idValue));
       GetText(idValue)
     }
 
     identifiers(id : string, tail : option[NToken * list[string]]) : list[string] 
     {
-      System.Diagnostics.Debug.WriteLine("identifiers");
       match(tail) {
       | Some((_, tail)) => id :: tail
       | _ => [id]
@@ -109,13 +107,11 @@ namespace NemerleWeb
 
     nonOptionalParam(name : string, _ : NToken, type : TypescriptType) : Parameter
     {
-      System.Diagnostics.Debug.WriteLine("nonOptionalParm");
       Parameter(name, type, false, false)
     }
     
     optionalParam(name : string, _ : NToken, _ : NToken, type : TypescriptType) : Parameter
     {
-      System.Diagnostics.Debug.WriteLine("optionalParm");
       Parameter(name, type, true, false)
     }
     
@@ -126,7 +122,6 @@ namespace NemerleWeb
     
     parms(p : Parameter, tail : option[(NToken * list[Parameter])]) : list[Parameter]
     {
-      System.Diagnostics.Debug.WriteLine("parms");
       match(tail)
       {
       | Some((_, tail)) => p :: tail
@@ -145,14 +140,12 @@ namespace NemerleWeb
     
     methodDeclaration(name : string, isNullable : NToken, _ : NToken, parms : option[list[Parameter]], _ : NToken, type : option[(NToken * TypescriptType)],  _ : NToken) : Member.Method
     {
-      System.Diagnostics.Debug.WriteLine("method");
       def type = if(type is Some((_, type))) type else null;
       Member.Method(name, GetText(isNullable) == "?", if(parms is Some(parms)) parms else [], type)
     }
     
     propertyDeclaration(name : string, isNullable : NToken, _ : NToken, type : TypescriptType, _ : NToken) : Member.Property
     {
-      System.Diagnostics.Debug.WriteLine("prop");
       Member.Property(name, GetText(isNullable) == "?", type)
     }
     
@@ -168,25 +161,21 @@ namespace NemerleWeb
     
     memberDeclaration(member : Member) : Member
     {
-      System.Diagnostics.Debug.WriteLine("decl");
       member
     }
     
     interfaceBlock(_ : NToken, declarations : List[Member], _ : NToken) : list[Member]
     {
-      System.Diagnostics.Debug.WriteLine("block");
       declarations.NToList()
     }
     
     extends(_ : NToken, extendTypes : list[string]) : list[string]
     {
-      System.Diagnostics.Debug.WriteLine("extends");
       extendTypes
     }
     
     _interface(_ : NToken, name : string, extends : option[list[string]], members : list[Member]) : Interface
     {
-      System.Diagnostics.Debug.WriteLine("interface: " + name);
       Interface(name, extends, members)
     }
     

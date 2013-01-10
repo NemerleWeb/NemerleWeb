@@ -1,0 +1,33 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using Nemerle.Compiler;
+using PExpr = Nemerle.Compiler.Parsetree.PExpr;
+ 
+[Nemerle.MacroUsage (Nemerle.MacroPhase.BeforeTypedMembers,
+                     Nemerle.MacroTargets.Assembly)]
+macro NemerleWebProperties(params options : list[PExpr])
+{  
+  NemerleWebPropertiesImpl.Impl(Nemerle.Macros.ImplicitCTX(), options) 
+}
+
+module NemerleWebPropertiesImpl
+{
+  public Impl(typer : Typer, options : list[PExpr]) : void
+  {
+    def resultOptions = List();
+    def allowedOptions = [<#TypeScriptPath#>, <#MVVMPath#>];
+    
+    foreach(opt in options)
+    {
+      match(opt)
+      {
+      | <[ ($(t1 : string), $(t2 : string)) ]> => 
+        if(allowedOptions.Any(o => o == t1))
+          resultOptions.Add((t1, t2));
+        else
+          Message.Error($"Unrecognized option: $t1, allowed options: ..$allowedOptions");
+      | _ => Message.Error(<#Unrecognized option format, should be tuple of two strings: ("TypeScriptPath", "Typescripts") #>)
+      }
+    }
+  }
+}
