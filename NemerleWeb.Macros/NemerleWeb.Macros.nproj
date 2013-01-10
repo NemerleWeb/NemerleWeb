@@ -120,6 +120,9 @@
     <Compile Include="nweb.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="NWebProperties.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SignalR\SignalRMacro.n">
       <SubType>Code</SubType>
     </Compile>
