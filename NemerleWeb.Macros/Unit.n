@@ -197,8 +197,7 @@ namespace NemerleWeb
     
     public AddTemplateData(tb : TypeBuilder, template : string, data : PExpr) : void
     {      
-      def ctor = GetNWebDataConstructor(tb);
-      
+      def ctor = GetNWebDataConstructor(tb);      
       ctor.Body = <[ 
         $(ctor.Body);
         AddUnitTemplate($(JsClass.GetProperName(tb) : string), $(template : string), NWebUtils.GetHtml($data));

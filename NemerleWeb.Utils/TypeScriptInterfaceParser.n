@@ -59,8 +59,9 @@ namespace NemerleWeb
         propertyDeclaration : Member          = identifier QUEST? COLON type SEMICOLON;
         memberDeclaration : Member            = (propertyDeclaration / methodDeclaration / callDeclaration / indexCallDeclaration);
         interfaceBlock : list[Member]         = LFBRACE memberDeclaration* RFBRACE;        
-        extends : list[string]                = "extends" spaces identifiers;        
-        _interface : Interface                = "interface" spaces identifier extends? interfaceBlock;
+        // extends is reserved keyword in JS
+        extends_ : list[string]                = "extends" spaces identifiers;
+        _interface : Interface                = "interface" spaces identifier extends_? interfaceBlock;
 
         start : list[Interface] = spaces _interface*;
       }
@@ -80,27 +81,27 @@ namespace NemerleWeb
       }
     }
     
-    dictionaryType(_ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, key : string, _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, value : string, _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken) : NemerleWeb.TypescriptType
+    dictionaryType(_ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, key : string, _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, value : string, _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken) : TypescriptType
     {
       TypescriptType.Dictionary(key, value)
     }
     
-    objectType(_ : Nemerle.Peg.NToken, parms : option[list[NemerleWeb.Parameter]], _ : Nemerle.Peg.NToken) : NemerleWeb.TypescriptType
+    objectType(_ : Nemerle.Peg.NToken, parms : option[list[Parameter]], _ : Nemerle.Peg.NToken) : TypescriptType
     {
       TypescriptType.Object(if(parms is Some(parms)) parms else [])
     }
     
-    arrayType(name : string, _ : Nemerle.Peg.NToken) : NemerleWeb.TypescriptType
+    arrayType(name : string, _ : Nemerle.Peg.NToken) : TypescriptType
     {
       TypescriptType.Array(name)
     }
 
-    normalType(name : string) : NemerleWeb.TypescriptType
+    normalType(name : string) : TypescriptType
     {
       TypescriptType.Normal(name)
     }
 
-    lambdaType(_ : Nemerle.Peg.NToken, parms : option[list[NemerleWeb.Parameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : NemerleWeb.TypescriptType) : NemerleWeb.TypescriptType    
+    lambdaType(_ : Nemerle.Peg.NToken, parms : option[list[Parameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : TypescriptType) : TypescriptType    
     {
       TypescriptType.Lambda(parms, returnType)
     }
@@ -129,7 +130,7 @@ namespace NemerleWeb
       }
     }
     
-    parmsSemicolon(p : NemerleWeb.Parameter, tail : option[(Nemerle.Peg.NToken * list[NemerleWeb.Parameter])], _ : NToken) : list[NemerleWeb.Parameter]
+    parmsSemicolon(p : Parameter, tail : option[(Nemerle.Peg.NToken * list[Parameter])], _ : NToken) : list[Parameter]
     {
       match(tail)
       {
@@ -149,12 +150,12 @@ namespace NemerleWeb
       Member.Property(name, GetText(isNullable) == "?", type)
     }
     
-    callDeclaration(_ : Nemerle.Peg.NToken, parms : option[list[NemerleWeb.Parameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : NemerleWeb.TypescriptType, _ : Nemerle.Peg.NToken) : NemerleWeb.Member
+    callDeclaration(_ : Nemerle.Peg.NToken, parms : option[list[Parameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : TypescriptType, _ : Nemerle.Peg.NToken) : Member
     {
       Member.Call(parms, returnType)
     }
 
-    indexCallDeclaration(_ : Nemerle.Peg.NToken, parms : option[list[NemerleWeb.Parameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : NemerleWeb.TypescriptType, _ : Nemerle.Peg.NToken) : NemerleWeb.Member
+    indexCallDeclaration(_ : Nemerle.Peg.NToken, parms : option[list[Parameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : TypescriptType, _ : Nemerle.Peg.NToken) : Member
     {
       Member.IndexCall(parms, returnType)
     }
@@ -169,14 +170,14 @@ namespace NemerleWeb
       declarations.NToList()
     }
     
-    extends(_ : NToken, extendTypes : list[string]) : list[string]
+    extends_(_ : NToken, extendTypes : list[string]) : list[string]
     {
       extendTypes
     }
     
-    _interface(_ : NToken, name : string, extends : option[list[string]], members : list[Member]) : Interface
+    _interface(_ : NToken, name : string, extends_ : option[list[string]], members : list[Member]) : Interface
     {
-      Interface(name, extends, members)
+      Interface(name, extends_, members)
     }
     
     start(interfaces : List[Interface]) : list[Interface]
@@ -197,8 +198,8 @@ namespace NemerleWeb
   {
     | Property  { Name : string; IsNullable : bool; Type : TypescriptType }
     | Method    { Name : string; IsNullable : bool; Parms : list[Parameter]; Type : TypescriptType }
-    | Call      { Parms : option[list[NemerleWeb.Parameter]]; ReturnType : TypescriptType }
-    | IndexCall { Parms : option[list[NemerleWeb.Parameter]]; ReturnType : TypescriptType }
+    | Call      { Parms : option[list[Parameter]]; ReturnType : TypescriptType }
+    | IndexCall { Parms : option[list[Parameter]]; ReturnType : TypescriptType }
   }
   
   [Record]
@@ -221,7 +222,7 @@ namespace NemerleWeb
     | Object { Parms : list[Parameter] }
     | Dictionary { Key : string; Value : string }
     | Array { Name : string }
-    | Lambda { Parms : option[list[NemerleWeb.Parameter]]; ReturnType : TypescriptType }
+    | Lambda { Parms : option[list[Parameter]]; ReturnType : TypescriptType }
     | Normal { Name : string }
   }
 }
