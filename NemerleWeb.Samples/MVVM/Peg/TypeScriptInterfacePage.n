@@ -1,0 +1,101 @@
+﻿using NemerleWeb;
+using Nemerle.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using TypeScriptInterface;
+
+namespace NemerleWeb.Samples
+{
+  [Unit]
+  public class TypeScriptInterfacePage
+  {
+    _parser : TypeScriptInterface.TypeScriptInterfaceParser;
+    
+    public this()
+    {
+      _parser = TypeScriptInterface.TypeScriptInterfaceParser();
+    }
+         
+    ParserOutput : string
+    {
+      get
+      {
+        if (!string.IsNullOrEmpty(ParserInput))
+          if (_parser.Parse(ParserInput) is Some(res))
+            PrintTSAst(res)
+          else
+            "Incorrect input"
+        else
+          "";
+      }
+    }
+     
+    public ParserInput : string { get; set; }
+    
+    PrintTSAst(interfaces : list[Interface]) : string
+    {
+      def printParam(p)
+      {
+        $"Name: $(p.Name), Type: $(printType(p.Type)), IsOptional: $(p.IsOptional), IsParams: $(p.IsParams)"
+      }
+      and printParams(p)
+      {
+        $<#..$(p; "\n"; printParam)#>
+      }      
+      and printType(type)
+      {
+        | null => "null"
+        | t is TypescriptType.Object => $"[Object] Parms: $(printParams(t.Parms))"
+        | t is TypescriptType.Dictionary => $"[Dictionary] Key: $(t.Key), Value: $(t.Value)"
+        | t is TypescriptType.Array => $"[Array] Name: $(t.Name)"
+        | t is TypescriptType.Lambda => $"[Lambda] $(printMaybeParams(t.Parms)), ReturnType : $(printType(t.ReturnType))"
+        | t is TypescriptType.Normal => $"[Normal] Name: $(t.Name)"
+      }      
+      and printMaybeParams(p)
+      {
+        | None => ""
+        | Some(parms) => $"Params: $(printParams(parms))"
+      }
+      
+      def printMember(member)
+      {
+        | m is Member.Property => $<#"[Property] Name: $(m.Name), Type: $(printType(m.Type))$(if(m.IsNullable) "?" else "")#>
+        | m is Member.Method   => $<#[Method] Name: $(m.Name), Parms: $(printParams(m.Parms)), Type: $(printType(m.Type))$(if(m.IsNullable) "?" else "")#>
+        | m is Member.Call     => $"[Call] $(printMaybeParams(m.Parms))ReturnType: $(printType(m.ReturnType))"
+        | m is Member.IndexCall=> $"[IndexCall]  $(printMaybeParams(m.Parms))ReturnType: $(printType(m.ReturnType))"
+        | _ => ""
+      }
+      
+      def print(i)
+      {
+        def ex = if(i.Extends is Some(e)) $"..$e" else "";
+                    
+        $<#[Interface] Name : $(i.Name)
+Extends: $ex
+Members: ..$(i.Members; "\n\n"; printMember)
+#>
+      }
+      
+      $<#..$(interfaces; "\n"; print)#>
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+        <div>
+          <span>This is demonstration of TypeScript interface parser</span><br />
+          <div>Input:</div>
+          <div class="parser-input">
+            <textarea rows="6" cols="50" value="$ParserInput"/>
+          </div>
+          <div>AST:</div>
+          <div class="output">
+            <textarea rows="6" cols="50" value="$ParserOutput"/>
+          </div>
+        </div>
+      #>
+    }    
+  }
+}

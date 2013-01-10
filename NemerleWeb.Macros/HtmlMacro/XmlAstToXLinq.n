@@ -81,12 +81,12 @@ namespace NemerleWeb
     {          
       def splicedMethod = CleanupCallRefs(<[ $(GetMethodWithSplicesOnly(xmlAsts)) ]>);
       def splices = TyperHelper.GetSplices(splicedMethod, _typer);
-      _typer.CurrentTypeBuilder.Compile();
-      def res = Util.locate(ToLocation(xmlAsts), TransformImpl(xmlAsts, splices));
+      _typer.CurrentTypeBuilder.Compile();      
+      def res = Util.locate(ToLocation(xmlAsts), TransformImpl(xmlAsts, splices, [], true));
       res;
     }
     
-    public TransformImpl([NotNull] xmlAst : XmlAst, [NotNull] splices : Dictionary[int, string], loopStack = null : list[string]) : PExpr
+    public TransformImpl([NotNull] xmlAst : XmlAst, [NotNull] splices : Dictionary[int, string], loopStack = null : list[string], topLevel = false : bool) : PExpr
     {
         _transformCounter++;
         Debug.WriteLine(_transformCounter + ": " + xmlAst.ToString());
@@ -201,7 +201,6 @@ namespace NemerleWeb
             
             def textAndSplices = content.Filter(c => c is XmlAst.Text || c is XmlAst.TagSplice);
             def rest = content.Filter(c => !(c is XmlAst.Text || c is XmlAst.TagSplice));
-            
             def cont = if(textAndSplices.Any(t => t is XmlAst.TagSplice)) {
                             def asStrings = textAndSplices.Map(t : XmlAst => {                              
                               match(t) {
@@ -226,7 +225,7 @@ namespace NemerleWeb
                             content.Select(x => <[ $(TransformImpl(x, splices, loopStack)) ]>);
                           }
             <[ [L.XElement($nameExpr2, 
-                  [..$(cont.NToList())].SelectMany(c => c).CombineAttributes().ToArray())]; ]>;            
+                  [..$(cont.NToList())].SelectMany(c => c).CombineAttributes().ToArray())] ]>;            
         | TagSplice(_t, false)               => 
           <[ [L.XAttribute("nw-text", $(getSplice()))] ]>
         | TagSplice(expr, true)             => <[ [NColl.NToArray($(Parse(ToLocation(xmlAst), expr)))] ]>
@@ -237,7 +236,13 @@ namespace NemerleWeb
         | AttrSplice(_, SpliceType.Unless)  => Message.FatalError("Control instruction must place before attributes.");
         | Seq(items) => 
             def exprs = items.Map(x => <[ $(TransformImpl(x, splices, loopStack)) ]>);
-            <[ { ..$exprs } ]>
+            if(topLevel)
+            { 
+              def lst = PExpr.ListLiteral(exprs);
+              <[ $lst.Flatten(e => e) ]>
+            }
+            else
+              <[ { ..$exprs } ]>
         }
     }
     

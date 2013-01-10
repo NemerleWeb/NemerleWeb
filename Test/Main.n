@@ -16,7 +16,7 @@ module Program
 {
   Main() : void
   {
-    def parser = TypeScriptInterfaceParser();
+    /*def parser = TypeScriptInterfaceParser();
     def res = parser.Parse(System.IO.File.ReadAllText("c:\\dev\\jquery.d.ts"));
     _ = match(res)
     {
@@ -25,6 +25,7 @@ module Program
       ""
     | None => "fuck that"
     }
+    */
     def result = nweb Test();
     
     foreach (s in NWebData.GetAllScriptNames())
@@ -41,10 +42,19 @@ public class Test
   x  : list[string] = ["3", "4"];
   
   F() : void  { _ = x is ["3", "4"]; } 
-
+  More() : void {}
+  Less() : void {}
+  Letters : list[string];
+  OddLettersOnly : bool;
+  
   [Html]
   public View() : string
   {
-    <# <div></div> #>
+    <# 
+       <div>
+        <div></div>
+        <div></div>
+       </div>
+    #>
   }
 }

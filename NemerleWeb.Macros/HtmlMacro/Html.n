@@ -74,6 +74,7 @@ namespace NemerleWeb
               if (expected.Count == 1) $"Expected $(expected.Last())";
               else
               {
+                assert2(false);
                 $"Expected ..$(expected.Take(expected.Count -1)) $(expected.Last())";
               }
           
