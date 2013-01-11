@@ -1,13 +1,12 @@
-## Attention
-
-The development has been moved to [http://github.com/NemerleWeb/NemerleWeb](http://github.com/NemerleWeb/NemerleWeb)
-
-**NemerleWeb** is a .Net [MVVM](http://en.wikipedia.org/wiki/Model_View_ViewModel) library.
+**NemerleWeb** is a Web [MVVM](http://en.wikipedia.org/wiki/Model_View_ViewModel) library for .Net.
 It uses reactive data model which allows creating rich internet applications.
 
 ##New to NemerleWeb ?
 
-You can see samples on [Demo site](http:/nemerlewebsamples.apphb.com/), tests running on [Tests site](http://nemerlewebtests.apphb.com/)
+Read [tutorial](https://docs.google.com/document/d/1-6O562WH7XCpILAP_4j0RGpB7VV4nV01ZK2brQiWf_Q/edit).
+It is not complete yet. Feel free to comment.
+
+Watch samples on [Demo site](http:/nemerlewebsamples.apphb.com/), and [tests](http://nemerlewebtests.apphb.com/)
 
 Currently there is no documentation wiki, you are free to help us.
 
