@@ -248,7 +248,7 @@ namespace NemerleWeb
               def scripts =
               [
                 "NemerleWeb.Scripts.jquery-1.8.2.js",
-                "NemerleWeb.Scripts.jquery.signalR-1.0.0-alpha2.js",
+                "NemerleWeb.Scripts.jquery.signalR-1.0.0-rc2.js",
                 "NemerleWeb.Scripts.linq.js",
                 "NemerleWeb.Scripts.nweb.js"
               ];
