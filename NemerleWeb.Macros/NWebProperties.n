@@ -2,7 +2,9 @@
 using System.Linq;
 using Nemerle.Compiler;
 using PExpr = Nemerle.Compiler.Parsetree.PExpr;
- 
+using TypeScriptInterface;
+using System.IO;
+
 [Nemerle.MacroUsage (Nemerle.MacroPhase.BeforeTypedMembers,
                      Nemerle.MacroTargets.Assembly)]
 macro NemerleWebProperties(params options : list[PExpr])
@@ -14,20 +16,104 @@ module NemerleWebPropertiesImpl
 {
   public Impl(typer : Typer, options : list[PExpr]) : void
   {
-    def resultOptions = List();
-    def allowedOptions = [<#TypeScriptPath#>, <#MVVMPath#>];
-    
     foreach(opt in options)
     {
       match(opt)
       {
-      | <[ ($(t1 : string), $(t2 : string)) ]> => 
-        if(allowedOptions.Any(o => o == t1))
-          resultOptions.Add((t1, t2));
-        else
-          Message.Error($"Unrecognized option: $t1, allowed options: ..$allowedOptions");
+      | <[ (TypeScriptPath, $(path)) ]> => 
+          def path = path.ToString();
+          def parser = TypeScriptInterfaceParser();
+          def dir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
+          def tsFiles = Directory.GetFiles(Path.Combine(dir, path), "*.ts");
+          def globalJs = typer.Env.Define(<[ decl: public module javascript {} ]>);
+
+          assert2(false);  
+              
+          foreach(tsFile in tsFiles.Reverse()) {
+            match(parser.TryParse(File.ReadAllText(tsFile)))
+            {
+            | (pos, result) when pos == parser.ParsingSource.OriginalText.Length => 
+              foreach(r in result) 
+              {
+              | Var as v => CreateTypeScriptGlobalVar(globalJs, v, typer);
+              | Function as f => CreateTypeScriptGlobalFunction(globalJs, f, typer); 
+              | Interface as i => CreateTypeScriptInterface(i, typer);
+              }
+            | (pos, _) when pos < parser.ParsingSource.OriginalText.Length => 
+              def text = parser.ParsingSource.OriginalText;
+              Message.Error($"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...")
+            }            
+          }
+                    
       | _ => Message.Error(<#Unrecognized option format, should be tuple of two strings: ("TypeScriptPath", "Typescripts") #>)
       }
     }
+  }
+  
+  private CreateTypeScriptGlobalVar(tb : TypeBuilder, var : TypeScriptGlobalDeclaration.Var, typer : Typer) : void
+  {
+    tb.DefineWithSource(<[ decl: public $(var.Name : usesite) : option[$(ConvertType(var.Type))] ]>)
+  }
+  
+  private CreateTypeScriptGlobalFunction(tb : TypeBuilder, function : TypeScriptGlobalDeclaration.Function, typer : Typer) : void
+  {
+    def method = function.Method;
+    tb.DefineWithSource(<[ decl: public $(method.Name : usesite)(..$(method.Parms.Map(ConvertParm))) : $(ConvertType(method.Type)) { throw System.Exception() }; ]>);
+  }
+  
+  private CreateTypeScriptInterface(inter : TypeScriptGlobalDeclaration.Interface, typer : Typer) : void
+  {
+    
+    def tb = match(inter.Extends)
+    {
+    | Some(extends) => 
+      def extends = extends.Map(e => <[ $(e : usesite) ]>);
+      typer.Env.Define(<[ decl: public class $(inter.Name : usesite) : ..$(extends) {} ]>);
+    | _ => typer.Env.Define(<[ decl: public class $(inter.Name : usesite) {} ]>);
+    }
+          
+    foreach(m in inter.Members) 
+    {
+    | Property(name, true as _isNullable, type) => tb.DefineWithSource(<[ decl: public $(name : usesite) : option[$(ConvertType(type))] ]>)
+    | Property(name, false as _isNullable, type) => tb.DefineWithSource(<[ decl: public $(name : usesite) : $(ConvertType(type)) ]>)
+    | Method(name, _isNullable, parms, type) => tb.DefineWithSource(<[ decl: public $(name : usesite)(..$(parms.Map(ConvertParm))) : $(ConvertType(type)) { throw System.Exception() }; ]>);
+    | Call(Some(parms), type) => 
+      def parms = parms.Map(ConvertParm);
+      def parms = [<[parameter: this inst : $(tb.Name : usesite)]>].Append(parms);
+      tb.DefineWithSource(<[ decl: public static @()(..$(parms)) : $(ConvertType(type)) { throw System.Exception() }]>);
+    | _ => ()
+    /*| IndexCall(Some(parms), type) =>
+      def parms = parms.Map(p => <[ $(convertParm(p)) ]>).First();
+      tb.Define(<[ decl: public Item [$parms] : $(convertType(type)) 
+                         { 
+                           get { throw System.Exception() }
+                           set { throw System.Exception() }
+                         }]>);*/
+    }
+  }
+  
+  private ConvertParm(p : TypeScriptParameter) : Parsetree.PParameter {
+      match((p.IsParams, p.IsOptional))
+      {
+      | (true, true) => <[ parameter: params $(p.Name : usesite) : option[$(ConvertType(p.Type))] ]>
+      | (false, true) => <[ parameter: $(p.Name : usesite) : option[$(ConvertType(p.Type))] ]>
+      | (true, false) => <[ parameter: params $(p.Name : usesite) : $(ConvertType(p.Type)) ]>
+      | (false, false) => <[ parameter: $(p.Name : usesite) : $(ConvertType(p.Type)) ]>
+      }
+    }  
+  
+  private ConvertType(t : TypescriptType) : PExpr
+  {
+    | Object(_parms) => <[ object ]>
+    | Dictionary(key, val) => 
+      <[ System.Collections.Generic.Dictionary.[$(ConvertType(key)), $(ConvertType(val))] ]>
+    | Array(type) => <[ array[$(ConvertType(type))] ]>
+    | Lambda(Some(parms), ret) => 
+        def parms = parms.Map(p => p.Type).Append([ret]).Map(ConvertType);
+        <[ System.Func.[{..$(parms)}] ]>
+    | Normal("any") => <[ object ]>
+    | Normal("number") => <[ float ]>
+    | Normal(name) => <[ $(name : usesite) ]> 
+    | _ => <[ object ]>
   }
 }
