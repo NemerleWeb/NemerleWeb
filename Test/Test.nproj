@@ -74,6 +74,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="TS" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
@@ -94,6 +95,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="TS\jquery.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="TS\lib.d.ts">
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>
