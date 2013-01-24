@@ -2,14 +2,14 @@
 using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
-using Nemerle.Peg;
+using NemerleWeb.Peg;
 using NemerleWeb;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TypeScriptInterface
+namespace TypeScriptInterfaceSample
 {
   
   [PegGrammar(Options = EmitDebugSources,
@@ -85,17 +85,17 @@ namespace TypeScriptInterface
       }
     }
     
-    dictionaryType(_ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, key : string, _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, value : string, _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken) : TypescriptType
+    dictionaryType(_ : NToken, _ : NToken, _ : NToken, key : string, _ : NToken, _ : NToken, value : string, _ : NToken, _ : NToken) : TypescriptType
     {
       TypescriptType.Dictionary(key, value)
     }
     
-    objectType(_ : Nemerle.Peg.NToken, parms : option[list[Parameter]], _ : Nemerle.Peg.NToken) : TypescriptType
+    objectType(_ : NToken, parms : option[list[Parameter]], _ : NToken) : TypescriptType
     {
       TypescriptType.Object(if(parms is Some(parms)) parms else [])
     }
     
-    arrayType(name : string, _ : Nemerle.Peg.NToken) : TypescriptType
+    arrayType(name : string, _ : NToken) : TypescriptType
     {
       TypescriptType.Array(name)
     }
@@ -105,7 +105,7 @@ namespace TypeScriptInterface
       TypescriptType.Normal(name)
     }
 
-    lambdaType(_ : Nemerle.Peg.NToken, parms : option[list[Parameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : TypescriptType) : TypescriptType    
+    lambdaType(_ : NToken, parms : option[list[Parameter]], _ : NToken, _ : NToken, returnType : TypescriptType) : TypescriptType    
     {
       TypescriptType.Lambda(parms, returnType)
     }
@@ -137,7 +137,7 @@ namespace TypeScriptInterface
       }
     }
     
-    parmsSemicolon(p : Parameter, tail : option[(Nemerle.Peg.NToken * list[Parameter])], _ : NToken) : list[Parameter]
+    parmsSemicolon(p : Parameter, tail : option[(NToken * list[Parameter])], _ : NToken) : list[Parameter]
     {
       match(tail)
       {
@@ -159,12 +159,12 @@ namespace TypeScriptInterface
       Member.Property(name, GetText(isNullable) == "?", type)
     }
     
-    callDeclaration(_ : Nemerle.Peg.NToken, parms : option[list[Parameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : TypescriptType, _ : Nemerle.Peg.NToken) : Member
+    callDeclaration(_ : NToken, parms : option[list[Parameter]], _ : NToken, _ : NToken, returnType : TypescriptType, _ : NToken) : Member
     {
       Member.Call(parms, returnType)
     }
 
-    indexCallDeclaration(_ : Nemerle.Peg.NToken, parms : option[list[Parameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : TypescriptType, _ : Nemerle.Peg.NToken) : Member
+    indexCallDeclaration(_ : NToken, parms : option[list[Parameter]], _ : NToken, _ : NToken, returnType : TypescriptType, _ : NToken) : Member
     {
       Member.IndexCall(parms, returnType)
     }

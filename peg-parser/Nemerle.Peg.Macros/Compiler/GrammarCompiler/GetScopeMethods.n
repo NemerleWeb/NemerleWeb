@@ -10,7 +10,7 @@ using System;
 using System.Linq;
 using SCG = System.Collections.Generic;
 
-namespace Nemerle.Peg
+namespace NemerleWeb.Peg
 {
   partial internal class GrammarCompiler
   {

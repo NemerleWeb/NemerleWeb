@@ -2,7 +2,7 @@
 using Nemerle.Utility;
 using NemerleWeb;
 
-namespace Nemerle.Peg
+namespace NemerleWeb.Peg
 {
   [Record, StructuralEquality(EmitDebugSources = false), StructuralHashCode, Unit]
   public class /* TODO: #32 struct*/ NToken : IToken

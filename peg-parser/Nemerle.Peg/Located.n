@@ -7,7 +7,7 @@ using Nemerle.Utility;
 using Nemerle.Imperative;
 using NemerleWeb;
 
-namespace Nemerle.Peg
+namespace NemerleWeb.Peg
 {
   [Unit]
   public class Located : IToken

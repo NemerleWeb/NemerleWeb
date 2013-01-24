@@ -8,7 +8,7 @@ using System;
 using System.Linq;
 using SCG = System.Collections.Generic;
 
-namespace Nemerle.Peg
+namespace NemerleWeb.Peg
 {
   partial internal class GrammarCompiler
   {
@@ -31,7 +31,7 @@ namespace Nemerle.Peg
         }
       ]>);
        PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
-        public Parse(source : Nemerle.Peg.SourceSnapshot) : option[$tyParam]
+        public Parse(source : NemerleWeb.Peg.SourceSnapshot) : option[$tyParam]
         {
           def (pos, res) = TryParse(source);
           if (pos < 0) None() else Some(res)
@@ -41,14 +41,14 @@ namespace Nemerle.Peg
        PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
         public TryParse(text : string) : int * $tyParam
         {
-          TryParse(Nemerle.Peg.SourceSnapshot(text))
+          TryParse(NemerleWeb.Peg.SourceSnapshot(text))
         }
       ]>);
 
       if (_typer.Manager.IsIntelliSenseMode)
       {
         PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
-          public TryParse(/*[Nemerle.Assertions.NotNull]*/ source : Nemerle.Peg.SourceSnapshot) : int * $tyParam
+          public TryParse(/*[Nemerle.Assertions.NotNull]*/ source : NemerleWeb.Peg.SourceSnapshot) : int * $tyParam
           {
             _parsingSource = source;
             mutable result;
@@ -59,7 +59,7 @@ namespace Nemerle.Peg
       else
       {
            PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
-          public TryParse(/*[Nemerle.Assertions.NotNull]*/ source : Nemerle.Peg.SourceSnapshot) : int * $tyParam
+          public TryParse(/*[Nemerle.Assertions.NotNull]*/ source : NemerleWeb.Peg.SourceSnapshot) : int * $tyParam
           {
             ResetMemoization();
             ResetMaxRollbackPos();
