@@ -3,18 +3,18 @@ using Nemerle.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TypeScriptInterface;
+using TS = TypeScriptInterfaceSample;
 
 namespace NemerleWeb.Samples
 {
   [Unit]
   public class TypeScriptInterfacePage
   {
-    _parser : TypeScriptInterface.TypeScriptInterfaceParser;
+    _parser : TS.TypeScriptInterfaceParser;
     
     public this()
     {
-      _parser = TypeScriptInterface.TypeScriptInterfaceParser();
+      _parser = TS.TypeScriptInterfaceParser();
     }
          
     ParserOutput : string
@@ -33,7 +33,7 @@ namespace NemerleWeb.Samples
      
     public ParserInput : string { get; set; }
     
-    PrintTSAst(interfaces : list[Interface]) : string
+    PrintTSAst(interfaces : list[TS.Interface]) : string
     {
       def printParam(p)
       {
@@ -46,11 +46,11 @@ namespace NemerleWeb.Samples
       and printType(type)
       {
         | null => "null"
-        | t is TypescriptType.Object => $"[Object] Parms: $(printParams(t.Parms))"
-        | t is TypescriptType.Dictionary => $"[Dictionary] Key: $(t.Key), Value: $(t.Value)"
-        | t is TypescriptType.Array => $"[Array] Name: $(t.Name)"
-        | t is TypescriptType.Lambda => $"[Lambda] $(printMaybeParams(t.Parms)), ReturnType : $(printType(t.ReturnType))"
-        | t is TypescriptType.Normal => $"[Normal] Name: $(t.Name)"
+        | t is TS.TypescriptType.Object => $"[Object] Parms: $(printParams(t.Parms))"
+        | t is TS.TypescriptType.Dictionary => $"[Dictionary] Key: $(t.Key), Value: $(t.Value)"
+        | t is TS.TypescriptType.Array => $"[Array] Name: $(t.Name)"
+        | t is TS.TypescriptType.Lambda => $"[Lambda] $(printMaybeParams(t.Parms)), ReturnType : $(printType(t.ReturnType))"
+        | t is TS.TypescriptType.Normal => $"[Normal] Name: $(t.Name)"
       }      
       and printMaybeParams(p)
       {
@@ -60,10 +60,10 @@ namespace NemerleWeb.Samples
       
       def printMember(member)
       {
-        | m is Member.Property => $<#"[Property] Name: $(m.Name), Type: $(printType(m.Type))$(if(m.IsNullable) "?" else "")#>
-        | m is Member.Method   => $<#[Method] Name: $(m.Name), Parms: $(printParams(m.Parms)), Type: $(printType(m.Type))$(if(m.IsNullable) "?" else "")#>
-        | m is Member.Call     => $"[Call] $(printMaybeParams(m.Parms))ReturnType: $(printType(m.ReturnType))"
-        | m is Member.IndexCall=> $"[IndexCall]  $(printMaybeParams(m.Parms))ReturnType: $(printType(m.ReturnType))"
+        | m is TS.Member.Property => $<#"[Property] Name: $(m.Name), Type: $(printType(m.Type))$(if(m.IsNullable) "?" else "")#>
+        | m is TS.Member.Method   => $<#[Method] Name: $(m.Name), Parms: $(printParams(m.Parms)), Type: $(printType(m.Type))$(if(m.IsNullable) "?" else "")#>
+        | m is TS.Member.Call     => $"[Call] $(printMaybeParams(m.Parms))ReturnType: $(printType(m.ReturnType))"
+        | m is TS.Member.IndexCall=> $"[IndexCall]  $(printMaybeParams(m.Parms))ReturnType: $(printType(m.ReturnType))"
         | _ => ""
       }
       

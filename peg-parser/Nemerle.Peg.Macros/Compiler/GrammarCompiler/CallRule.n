@@ -1,6 +1,6 @@
 ﻿using Nemerle.Collections;
 
-namespace Nemerle.Peg
+namespace NemerleWeb.Peg
 {
   partial internal class GrammarCompiler
   {

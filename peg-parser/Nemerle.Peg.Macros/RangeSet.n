@@ -5,7 +5,7 @@ using Nemerle.Text;
 using Nemerle.Extensions;
 using Nemerle.Utility;
 
-namespace Nemerle.Peg
+namespace NemerleWeb.Peg
 {
   [StructuralHashCode, StructuralEquality(EmitDebugSources = false)]
   public class RangeSet
