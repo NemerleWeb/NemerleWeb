@@ -33,7 +33,7 @@ namespace NemerleWeb.Samples
      
     public ParserInput : string { get; set; }
     
-    PrintTSAst(interfaces : list[TS.Interface]) : string
+    PrintTSAst(interfaces : list[TS.TypeScriptGlobalDeclaration]) : string
     {
       def printParam(p)
       {
@@ -48,7 +48,7 @@ namespace NemerleWeb.Samples
         | null => "null"
         | t is TS.TypescriptType.Object => $"[Object] Parms: $(printParams(t.Parms))"
         | t is TS.TypescriptType.Dictionary => $"[Dictionary] Key: $(t.Key), Value: $(t.Value)"
-        | t is TS.TypescriptType.Array => $"[Array] Name: $(t.Name)"
+        | t is TS.TypescriptType.Array => $"[Array] Type: $(printType(t.Type))"
         | t is TS.TypescriptType.Lambda => $"[Lambda] $(printMaybeParams(t.Parms)), ReturnType : $(printType(t.ReturnType))"
         | t is TS.TypescriptType.Normal => $"[Normal] Name: $(t.Name)"
       }      
@@ -60,21 +60,26 @@ namespace NemerleWeb.Samples
       
       def printMember(member)
       {
-        | m is TS.Member.Property => $<#"[Property] Name: $(m.Name), Type: $(printType(m.Type))$(if(m.IsNullable) "?" else "")#>
-        | m is TS.Member.Method   => $<#[Method] Name: $(m.Name), Parms: $(printParams(m.Parms)), Type: $(printType(m.Type))$(if(m.IsNullable) "?" else "")#>
-        | m is TS.Member.Call     => $"[Call] $(printMaybeParams(m.Parms))ReturnType: $(printType(m.ReturnType))"
-        | m is TS.Member.IndexCall=> $"[IndexCall]  $(printMaybeParams(m.Parms))ReturnType: $(printType(m.ReturnType))"
+        | m is TS.TypeScriptMember.Property => $<#"[Property] Name: $(m.Name), Type: $(printType(m.Type))$(if(m.IsNullable) "?" else "")#>
+        | m is TS.TypeScriptMember.Method   => $<#[Method] Name: $(m.Name), Parms: $(printParams(m.Parms)), Type: $(printType(m.Type))$(if(m.IsNullable) "?" else "")#>
+        | m is TS.TypeScriptMember.Call     => $"[Call] $(printMaybeParams(m.Parms))ReturnType: $(printType(m.ReturnType))"
+        | m is TS.TypeScriptMember.IndexCall=> $"[IndexCall]  $(printMaybeParams(m.Parms))ReturnType: $(printType(m.ReturnType))"
         | _ => ""
       }
       
-      def print(i)
+      def print(v)
       {
+      | i is TS.TypeScriptGlobalDeclaration.Interface =>
         def ex = if(i.Extends is Some(e)) $"..$e" else "";
                     
         $<#[Interface] Name : $(i.Name)
 Extends: $ex
 Members: ..$(i.Members; "\n\n"; printMember)
 #>
+      | v is TS.TypeScriptGlobalDeclaration.Var =>
+        "[Var] Name: $(v.Name), Type: $(printType(v.Type))"
+      | f is TS.TypeScriptGlobalDeclaration.Function =>
+        "[Function] $(printMember(f.Method))"
       }
       
       $<#..$(interfaces; "\n"; print)#>
