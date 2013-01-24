@@ -72,7 +72,6 @@ namespace TypeScriptInterface
         start : list[TypeScriptGlobalDeclaration] = spaces (_interface / globalVarDeclaration / globalFunctionDeclaration)*;
       }
     )]
-  [Unit]
   public class TypeScriptInterfaceParser
   {
     identifier(idValue : NToken) : string 
@@ -95,17 +94,17 @@ namespace TypeScriptInterface
       }
     }
     
-    dictionaryType(_ : NToken, _ : NToken, _keyname : string, _ : NToken, key : TypescriptType, _ : NToken, _ : NToken, value : TypescriptType, _ : NToken, _ : NToken) : TypescriptType
+    dictionaryType(_ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, _keyname : string, _ : Nemerle.Peg.NToken, key : TypescriptType, _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, value : TypescriptType, _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken) : TypescriptType
     {
       TypescriptType.Dictionary(key, value)
     }
     
-    objectType(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken) : TypescriptType
+    objectType(_ : Nemerle.Peg.NToken, parms : option[list[TypeScriptParameter]], _ : Nemerle.Peg.NToken) : TypescriptType
     {
       TypescriptType.Object(if(parms is Some(parms)) parms else [])
     }
     
-    arrayType(type : TypescriptType, _ : NToken) : TypescriptType
+    arrayType(type : TypescriptType, _ : Nemerle.Peg.NToken) : TypescriptType
     {
       TypescriptType.Array(type)
     }
@@ -115,7 +114,7 @@ namespace TypeScriptInterface
       TypescriptType.Normal(name)
     }
 
-    lambdaType(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypescriptType) : TypescriptType    
+    lambdaType(_ : Nemerle.Peg.NToken, parms : option[list[TypeScriptParameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : TypescriptType) : TypescriptType    
     {
       TypescriptType.Lambda(parms, returnType)
     }
@@ -147,7 +146,7 @@ namespace TypeScriptInterface
       }
     }
     
-    parmsSemicolon(p : TypeScriptParameter, tail : option[(NToken * list[TypeScriptParameter])], _ : NToken) : list[TypeScriptParameter]
+    parmsSemicolon(p : TypeScriptParameter, tail : option[(Nemerle.Peg.NToken * list[TypeScriptParameter])], _ : NToken) : list[TypeScriptParameter]
     {
       match(tail)
       {
@@ -169,12 +168,12 @@ namespace TypeScriptInterface
       TypeScriptMember.Property(name, GetText(isNullable) == "?", type)
     }
     
-    callDeclaration(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypescriptType, _ : NToken) : TypeScriptMember
+    callDeclaration(_ : Nemerle.Peg.NToken, parms : option[list[TypeScriptParameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : TypescriptType, _ : Nemerle.Peg.NToken) : TypeScriptMember
     {
       TypeScriptMember.Call(parms, returnType)
     }
 
-    indexCallDeclaration(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypescriptType, _ : NToken) : TypeScriptMember
+    indexCallDeclaration(_ : Nemerle.Peg.NToken, parms : option[list[TypeScriptParameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : TypescriptType, _ : Nemerle.Peg.NToken) : TypeScriptMember
     {
       TypeScriptMember.IndexCall(parms, returnType)
     }
@@ -226,7 +225,6 @@ namespace TypeScriptInterface
     | Function  { Method : TypeScriptMember.Method  }
   }
     
-  [Unit]
   public variant TypeScriptMember : Located
   {
     | Property  { Name : string; IsNullable : bool; Type : TypescriptType }
@@ -236,14 +234,12 @@ namespace TypeScriptInterface
   }
   
   [Record]
-  [Unit]
   public class TypeScriptDeclaration : Located
   {
     public Member : TypeScriptMember;
   }
   
   [Record]
-  [Unit]
   public class TypeScriptParameter
   {
     public Name : string;
@@ -252,7 +248,6 @@ namespace TypeScriptInterface
     public IsParams : bool;
   }
     
-  [Unit]
   public variant TypescriptType
   {
     | Object { Parms : list[TypeScriptParameter] }

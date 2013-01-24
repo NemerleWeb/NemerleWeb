@@ -42,29 +42,34 @@ namespace TypeScriptInterfaceSample
         identifier      : string    = identifierValue spaces;
         identifiers     : list[string] = identifier (COMMA identifiers)?;
 
-        dictionaryType : TypescriptType       = LFBRACE LBRACE "key:" spaces identifier RBRACE COLON identifier SEMICOLON RFBRACE;        
-        objectType : TypescriptType           = LFBRACE parmsSemicolon? RFBRACE;        
-        arrayType : TypescriptType            = identifier "[]";
+        constructor : TypeScriptParameter     = "new" spaces LPAREN parms? RPAREN (COLON type)? SEMICOLON;
+        dictionaryType : TypescriptType       = LFBRACE LBRACE identifier COLON spaces type RBRACE COLON type SEMICOLON RFBRACE;
+        objectType : TypescriptType           = LFBRACE parmsSemicolon? RFBRACE;
+        arrayType : TypescriptType            = nonArrayType "[]";
         normalType : TypescriptType           = identifier;
         lambdaType : TypescriptType           = LPAREN parms? RPAREN "=>" spaces type;
-        type : TypescriptType                 = (arrayType / lambdaType / normalType / objectType / dictionaryType);
-        nonOptionalParam : Parameter          = identifier COLON type;
-        optionalParam : Parameter             = identifier QUEST COLON type;
-        param : Parameter                     = (nonOptionalParam / optionalParam);
-        multipleParam : Parameter             = "..." param;
-        parms : list[Parameter]               = (param/multipleParam) (COMMA parms)?;
-        parmsSemicolon : list[Parameter]      = param (SEMICOLON parmsSemicolon)? SEMICOLON?;
-        callDeclaration : Member              = LPAREN parms? RPAREN COLON type SEMICOLON;
-        indexCallDeclaration : Member         = LBRACE parms? RBRACE COLON type SEMICOLON;
-        methodDeclaration : Member            = identifier QUEST? LPAREN parms? RPAREN (COLON type)? SEMICOLON;
-        propertyDeclaration : Member          = identifier QUEST? COLON type SEMICOLON;
-        memberDeclaration : Member            = (propertyDeclaration / methodDeclaration / callDeclaration / indexCallDeclaration);
-        interfaceBlock : list[Member]         = LFBRACE memberDeclaration* RFBRACE;        
+        nonArrayType : TypescriptType         = lambdaType / normalType / objectType / dictionaryType;
+        type : TypescriptType                 = nonArrayType / arrayType;
+        nonOptionalParam : TypeScriptParameter          = (identifier COLON type);
+        optionalParam : TypeScriptParameter             = identifier QUEST COLON type;
+        param : TypeScriptParameter                     = (constructor / nonOptionalParam / optionalParam);
+        multipleParam : TypeScriptParameter             = "..." param;
+        parms : list[TypeScriptParameter]               = (param/multipleParam) (COMMA parms)?;
+        parmsSemicolon : list[TypeScriptParameter]      = param (SEMICOLON parmsSemicolon)? SEMICOLON?;
+        callDeclaration : TypeScriptMember              = LPAREN parms? RPAREN COLON type SEMICOLON;
+        indexCallDeclaration : TypeScriptMember         = LBRACE parms? RBRACE COLON type SEMICOLON;
+        methodDeclaration : TypeScriptMember            = identifier QUEST? LPAREN parms? RPAREN (COLON type)? SEMICOLON;
+        propertyDeclaration : TypeScriptMember          = identifier QUEST? COLON type SEMICOLON;
+        memberDeclaration : TypeScriptMember            = (propertyDeclaration / methodDeclaration / callDeclaration / indexCallDeclaration);
+        interfaceBlock : list[TypeScriptMember]         = LFBRACE memberDeclaration* RFBRACE;        
         // extends is reserved keyword in JS
         extends_ : list[string]                = "extends" spaces identifiers;
-        _interface : Interface                = "interface" spaces identifier extends_? interfaceBlock;
-
-        start : list[Interface] = spaces _interface*;
+        _interface : TypeScriptGlobalDeclaration                = "interface" spaces identifier extends_? interfaceBlock;
+        
+        globalVarDeclaration : TypeScriptGlobalDeclaration = "declare" spaces "var" spaces identifier COLON type SEMICOLON;
+        globalFunctionDeclaration : TypeScriptGlobalDeclaration = "declare" spaces "function " methodDeclaration;
+        
+        start : list[TypeScriptGlobalDeclaration] = spaces (_interface / globalVarDeclaration / globalFunctionDeclaration)*;
       }
     )]
   [Unit]
@@ -75,7 +80,12 @@ namespace TypeScriptInterfaceSample
       //System.Diagnostics.Debug.WriteLine("identifier: " + GetText(idValue));
       GetText(idValue)
     }
-
+    
+    constructor(_ : NToken, _ : NToken, lst : option[list[TypeScriptParameter]], _ : NToken, _ : option[(NToken * TypescriptType)], _ : NToken) : TypeScriptParameter
+    {
+      TypeScriptParameter("ctor", TypescriptType.Normal("void"), false, false)
+    }    
+    
     identifiers(id : string, tail : option[NToken * list[string]]) : list[string] 
     {
       //System.Diagnostics.Debug.WriteLine("identifiers");
@@ -85,19 +95,19 @@ namespace TypeScriptInterfaceSample
       }
     }
     
-    dictionaryType(_ : NToken, _ : NToken, _ : NToken, key : string, _ : NToken, _ : NToken, value : string, _ : NToken, _ : NToken) : TypescriptType
+    dictionaryType(_ : NToken, _ : NToken, _keyname : string, _ : NToken, key : TypescriptType, _ : NToken, _ : NToken, value : TypescriptType, _ : NToken, _ : NToken) : TypescriptType
     {
       TypescriptType.Dictionary(key, value)
     }
     
-    objectType(_ : NToken, parms : option[list[Parameter]], _ : NToken) : TypescriptType
+    objectType(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken) : TypescriptType
     {
       TypescriptType.Object(if(parms is Some(parms)) parms else [])
     }
     
-    arrayType(name : string, _ : NToken) : TypescriptType
+    arrayType(type : TypescriptType, _ : NToken) : TypescriptType
     {
-      TypescriptType.Array(name)
+      TypescriptType.Array(type)
     }
 
     normalType(name : string) : TypescriptType
@@ -105,29 +115,29 @@ namespace TypeScriptInterfaceSample
       TypescriptType.Normal(name)
     }
 
-    lambdaType(_ : NToken, parms : option[list[Parameter]], _ : NToken, _ : NToken, returnType : TypescriptType) : TypescriptType    
+    lambdaType(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypescriptType) : TypescriptType    
     {
       TypescriptType.Lambda(parms, returnType)
     }
 
-    nonOptionalParam(name : string, _ : NToken, type : TypescriptType) : Parameter
+    nonOptionalParam(name : string, _ : NToken, type : TypescriptType) : TypeScriptParameter
     {
       //System.Diagnostics.Debug.WriteLine("nonOptionalParm");
-      Parameter(name, type, false, false)
+      TypeScriptParameter(name, type, false, false)
     }
     
-    optionalParam(name : string, _ : NToken, _ : NToken, type : TypescriptType) : Parameter
+    optionalParam(name : string, _ : NToken, _ : NToken, type : TypescriptType) : TypeScriptParameter
     {
       //System.Diagnostics.Debug.WriteLine("optionalParm");
-      Parameter(name, type, true, false)
+      TypeScriptParameter(name, type, true, false)
     }
     
-    multipleParam(_ : NToken, parm : Parameter) : Parameter
+    multipleParam(_ : NToken, parm : TypeScriptParameter) : TypeScriptParameter
     {
-      Parameter(parm.Name, parm.Type, parm.IsOptional, true)
+      TypeScriptParameter(parm.Name, parm.Type, parm.IsOptional, true)
     }
     
-    parms(p : Parameter, tail : option[(NToken * list[Parameter])]) : list[Parameter]
+    parms(p : TypeScriptParameter, tail : option[(NToken * list[TypeScriptParameter])]) : list[TypeScriptParameter]
     {
       //System.Diagnostics.Debug.WriteLine("parms");
       match(tail)
@@ -137,7 +147,7 @@ namespace TypeScriptInterfaceSample
       }
     }
     
-    parmsSemicolon(p : Parameter, tail : option[(NToken * list[Parameter])], _ : NToken) : list[Parameter]
+    parmsSemicolon(p : TypeScriptParameter, tail : option[(NToken * list[TypeScriptParameter])], _ : NToken) : list[TypeScriptParameter]
     {
       match(tail)
       {
@@ -146,36 +156,36 @@ namespace TypeScriptInterfaceSample
       }
     }
     
-    methodDeclaration(name : string, isNullable : NToken, _ : NToken, parms : option[list[Parameter]], _ : NToken, type : option[(NToken * TypescriptType)],  _ : NToken) : Member.Method
+    methodDeclaration(name : string, isNullable : NToken, _ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, type : option[(NToken * TypescriptType)],  _ : NToken) : TypeScriptMember.Method
     {
       //System.Diagnostics.Debug.WriteLine("method");
       def type = if(type is Some((_, type))) type else null;
-      Member.Method(name, GetText(isNullable) == "?", if(parms is Some(parms)) parms else [], type)
+      TypeScriptMember.Method(name, GetText(isNullable) == "?", if(parms is Some(parms)) parms else [], type)
     }
     
-    propertyDeclaration(name : string, isNullable : NToken, _ : NToken, type : TypescriptType, _ : NToken) : Member.Property
+    propertyDeclaration(name : string, isNullable : NToken, _ : NToken, type : TypescriptType, _ : NToken) : TypeScriptMember.Property
     {
       //System.Diagnostics.Debug.WriteLine("prop");
-      Member.Property(name, GetText(isNullable) == "?", type)
+      TypeScriptMember.Property(name, GetText(isNullable) == "?", type)
     }
     
-    callDeclaration(_ : NToken, parms : option[list[Parameter]], _ : NToken, _ : NToken, returnType : TypescriptType, _ : NToken) : Member
+    callDeclaration(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypescriptType, _ : NToken) : TypeScriptMember
     {
-      Member.Call(parms, returnType)
+      TypeScriptMember.Call(parms, returnType)
     }
 
-    indexCallDeclaration(_ : NToken, parms : option[list[Parameter]], _ : NToken, _ : NToken, returnType : TypescriptType, _ : NToken) : Member
+    indexCallDeclaration(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypescriptType, _ : NToken) : TypeScriptMember
     {
-      Member.IndexCall(parms, returnType)
+      TypeScriptMember.IndexCall(parms, returnType)
     }
     
-    memberDeclaration(member : Member) : Member
+    memberDeclaration(member : TypeScriptMember) : TypeScriptMember
     {
       //System.Diagnostics.Debug.WriteLine("decl");
       member
     }
     
-    interfaceBlock(_ : NToken, declarations : List[Member], _ : NToken) : list[Member]
+    interfaceBlock(_ : NToken, declarations : List[TypeScriptMember], _ : NToken) : list[TypeScriptMember]
     {
       //System.Diagnostics.Debug.WriteLine("block");
       declarations.NToList()
@@ -187,69 +197,69 @@ namespace TypeScriptInterfaceSample
       extendTypes
     }
     
-    _interface(_ : NToken, name : string, extends_ : option[list[string]], members : list[Member]) : Interface
+    _interface(_ : NToken, name : string, extends_ : option[list[string]], members : list[TypeScriptMember]) : TypeScriptGlobalDeclaration
     {
       //System.Diagnostics.Debug.WriteLine("interface: " + name);
-      Interface(name, extends_, members)
+      TypeScriptGlobalDeclaration.Interface(name, extends_, members)
     }
     
-    start(interfaces : List[Interface]) : list[Interface]
+    globalVarDeclaration(_ : NToken, _ : NToken, name : string, _ : NToken, type : TypescriptType, _ : NToken) : TypeScriptGlobalDeclaration
+    {
+      TypeScriptGlobalDeclaration.Var(name, type)
+    }
+    
+    globalFunctionDeclaration(_ : NToken, _ : NToken, method : TypeScriptMember) : TypeScriptGlobalDeclaration
+    {
+      TypeScriptGlobalDeclaration.Function(method :> TypeScriptMember.Method);
+    }
+    
+    start(interfaces : List[TypeScriptGlobalDeclaration]) : list[TypeScriptGlobalDeclaration]
     {
       interfaces.NToList()
     }
   }
   
-  //[Record]
   [Unit]
-  public class Interface : Located
+  public variant TypeScriptGlobalDeclaration
   {
-    public Name : string;
-    public Extends :  option[list[string]];
-    public Members : list[Member];
-    
-    // Workraround
-    // TODO: Resolve issue with clashing reserved names
-    public this(name : string, extends_ : option[list[string]], members : list[Member])
-    {
-      Name = name;
-      Extends = extends_;
-      Members = members;
-    }
+    | Interface { Name : string; Extends : option[list[string]]; Members : list[TypeScriptMember] }
+    | Var       { Name : string; Type : TypescriptType }
+    | Function  { Method : TypeScriptMember.Method  }
   }
-  
+    
   [Unit]
-  public variant Member : Located
+  public variant TypeScriptMember : Located
   {
     | Property  { Name : string; IsNullable : bool; Type : TypescriptType }
-    | Method    { Name : string; IsNullable : bool; Parms : list[Parameter]; Type : TypescriptType }
-    | Call      { Parms : option[list[Parameter]]; ReturnType : TypescriptType }
-    | IndexCall { Parms : option[list[Parameter]]; ReturnType : TypescriptType }
+    | Method    { Name : string; IsNullable : bool; Parms : list[TypeScriptParameter]; Type : TypescriptType }
+    | Call      { Parms : option[list[TypeScriptParameter]]; ReturnType : TypescriptType }
+    | IndexCall { Parms : option[list[TypeScriptParameter]]; ReturnType : TypescriptType }
   }
   
   [Record]
   [Unit]
-  public class Declaration : Located
+  public class TypeScriptDeclaration : Located
   {
-    public Member : Member;
+    public Member : TypeScriptMember;
   }
   
   [Record]
   [Unit]
-  public class Parameter
+  public class TypeScriptParameter
   {
     public Name : string;
     public Type : TypescriptType;
     public IsOptional : bool;
     public IsParams : bool;
   }
-  
+    
   [Unit]
   public variant TypescriptType
   {
-    | Object { Parms : list[Parameter] }
-    | Dictionary { Key : string; Value : string }
-    | Array { Name : string }
-    | Lambda { Parms : option[list[Parameter]]; ReturnType : TypescriptType }
+    | Object { Parms : list[TypeScriptParameter] }
+    | Dictionary { Key : TypescriptType; Value : TypescriptType }
+    | Array { Type : TypescriptType }
+    | Lambda { Parms : option[list[TypeScriptParameter]]; ReturnType : TypescriptType }
     | Normal { Name : string }
   }
 }
