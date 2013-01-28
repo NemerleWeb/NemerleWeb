@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>c:\dev\open-source\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.Peg.xml</name>
+    <name>C:\TeamCity\buildAgent\work\b8caae985926e367\bin\Release\net-4.5\\PowerPack\\Nemerle.Peg.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.Peg.ExtensionRuleBase`1" />
@@ -94,7 +94,7 @@
     <member name="T:Nemerle.Peg.SingleLineSourceSnapshot" />
     <member name="M:Nemerle.Peg.SingleLineSourceSnapshot.#ctor(System.String,System.Int32,System.String)" />
     <member name="T:Nemerle.Peg.SourceSnapshot" />
-    <member name="F:Nemerle.Peg.SourceSnapshot._N_cache_3874" />
+    <member name="F:Nemerle.Peg.SourceSnapshot._N_cache_3875" />
     <member name="F:Nemerle.Peg.SourceSnapshot.originalText" />
     <member name="F:Nemerle.Peg.SourceSnapshot.text" />
     <member name="F:Nemerle.Peg.SourceSnapshot.fileIndex" />

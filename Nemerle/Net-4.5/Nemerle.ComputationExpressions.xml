@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>c:\dev\open-source\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.ComputationExpressions.xml</name>
+    <name>C:\TeamCity\buildAgent\work\b8caae985926e367\bin\Release\net-4.5\\PowerPack\\Nemerle.ComputationExpressions.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.ComputationExpressions.Async.Async`1" />
@@ -234,7 +234,7 @@
     <member name="M:Nemerle.ComputationExpressions.Async.AsyncJobBase.get_State" />
     <member name="M:Nemerle.ComputationExpressions.Async.AsyncJobBase.set_State(System.Int32)" />
     <member name="P:Nemerle.ComputationExpressions.Async.AsyncJobBase.State" />
-    <member name="F:Nemerle.ComputationExpressions.Async.AsyncJobBase._N_ExecutionContext_3851" />
+    <member name="F:Nemerle.ComputationExpressions.Async.AsyncJobBase._N_ExecutionContext_3852" />
     <member name="M:Nemerle.ComputationExpressions.Async.AsyncJobBase.get_ExecutionContext" />
     <member name="M:Nemerle.ComputationExpressions.Async.AsyncJobBase.set_ExecutionContext(Nemerle.ComputationExpressions.Async.ExecutionContext)" />
     <member name="P:Nemerle.ComputationExpressions.Async.AsyncJobBase.ExecutionContext" />
