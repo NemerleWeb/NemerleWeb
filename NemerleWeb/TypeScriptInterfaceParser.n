@@ -44,14 +44,14 @@ namespace TypeScriptInterface
         constructor : TypeScriptParameter     = "new" spaces LPAREN parms? RPAREN (COLON type)? SEMICOLON;
         dictionaryType : TypeScriptType       = LFBRACE LBRACE identifier COLON spaces type RBRACE COLON type SEMICOLON? RFBRACE;
         objectType : TypeScriptType           = LFBRACE parmsSemicolon? RFBRACE;
-        arrayType : TypeScriptType            = nonArrayType '[' spaces ']';
+        arrayType : TypeScriptType            = nonArrayType (spaces "[" spaces "]")+;
         normalType : TypeScriptType           = identifier;
         lambdaType : TypeScriptType           = LPAREN parms? RPAREN "=>" spaces type;
         nonArrayType : TypeScriptType         = lambdaType / normalType / objectType / dictionaryType;
         type : TypeScriptType                 = arrayType / nonArrayType;
-        nonOptionalParam : TypeScriptParameter          = (identifier COLON type);
-        optionalParam : TypeScriptParameter             = identifier QUEST COLON type;
-        param : TypeScriptParameter                     = (constructor / nonOptionalParam / optionalParam);
+        nonOptionalParam : TypeScriptParameter          = identifier (COLON type)?;
+        optionalParam : TypeScriptParameter             = identifier QUEST (COLON type)?;
+        param : TypeScriptParameter                     = (constructor / optionalParam/ nonOptionalParam);
         multipleParam : TypeScriptParameter             = "..." param;
         parms : list[TypeScriptParameter]               = (param/multipleParam) (COMMA parms)?;
         parmsSemicolon : list[TypeScriptParameter]      = param (SEMICOLON parmsSemicolon)? SEMICOLON?;
@@ -104,9 +104,9 @@ namespace TypeScriptInterface
       TypeScriptType.Object(if(parms is Some(parms)) parms else [])
     }
     
-    arrayType(type : TypeScriptType, _ : NToken, _ : NToken) : TypeScriptType
+    arrayType(type : TypeScriptType, arity : List[NToken * NToken]) : TypeScriptType
     {
-      TypeScriptType.Array(type)
+      TypeScriptType.Array(type, arity.Count)
     }
 
     normalType(name : string) : TypeScriptType
@@ -118,17 +118,17 @@ namespace TypeScriptInterface
     {
       TypeScriptType.Lambda(parms, returnType)
     }
-
-    nonOptionalParam(name : string, _ : NToken, type : TypeScriptType) : TypeScriptParameter
+    
+    nonOptionalParam(name : string, type : option[NToken * TypeScriptType]) : TypeScriptParameter
     {
       //System.Diagnostics.Debug.WriteLine("nonOptionalParm");
-      TypeScriptParameter(name, type, false, false)
+      TypeScriptParameter(name, getType(type), false, false)
     }
     
-    optionalParam(name : string, _ : NToken, _ : NToken, type : TypeScriptType) : TypeScriptParameter
+    optionalParam(name : string, _ : NToken, type : option[NToken * TypeScriptType]) : TypeScriptParameter
     {
       //System.Diagnostics.Debug.WriteLine("optionalParm");
-      TypeScriptParameter(name, type, true, false)
+      TypeScriptParameter(name, getType(type), true, false)
     }
     
     multipleParam(_ : NToken, parm : TypeScriptParameter) : TypeScriptParameter
@@ -221,6 +221,13 @@ namespace TypeScriptInterface
     {
       interfaces.NToList()
     }
+    
+    /// Return type if present or any.
+    static getType(type : option[NToken * TypeScriptType]) : TypeScriptType
+    {
+      | Some((_, t)) => t
+      | _ => TypeScriptType.Normal("any")
+    }
   }
   
   public variant TypeScriptGlobalDeclaration
@@ -258,7 +265,7 @@ namespace TypeScriptInterface
   {
     | Object { Parms : list[TypeScriptParameter] }
     | Dictionary { Key : TypeScriptType; Value : TypeScriptType }
-    | Array { Type : TypeScriptType }
+    | Array { Type : TypeScriptType; Arity : int; }
     | Lambda { Parms : option[list[TypeScriptParameter]]; ReturnType : TypeScriptType }
     | Normal { Name : string }
   }
