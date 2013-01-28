@@ -74,13 +74,16 @@ module NemerleWebPropertiesImpl
           
     foreach(m in inter.Members) 
     {
-    | Property(name, true as _isNullable, type) => tb.DefineWithSource(<[ decl: public $(name : usesite) : option[$(ConvertType(type))] ]>)
-    | Property(name, false as _isNullable, type) => tb.DefineWithSource(<[ decl: public $(name : usesite) : $(ConvertType(type)) ]>)
-    | Method(name, _isNullable, parms, type) => tb.DefineWithSource(<[ decl: public $(name : usesite)(..$(parms.Map(ConvertParm))) : $(ConvertType(type)) { throw System.Exception() }; ]>);
+    | Property(name, true as _isNullable, type) =>
+      _ = tb.DefineWithSource(<[ decl: public $(name : usesite) : option[$(ConvertType(type))] ]>)
+    | Property(name, false as _isNullable, type) =>
+      _ = tb.DefineWithSource(<[ decl: public $(name : usesite) : $(ConvertType(type)) ]>)
+    | Method(name, _isNullable, parms, type) =>
+      _ = tb.DefineWithSource(<[ decl: public $(name : usesite)(..$(parms.Map(ConvertParm))) : $(ConvertType(type)) { throw System.Exception() }; ]>);
     | Call(Some(parms), type) => 
       def parms = parms.Map(ConvertParm);
-      def parms = [<[parameter: this inst : $(tb.Name : usesite)]>].Append(parms);
-      tb.DefineWithSource(<[ decl: public static @()(..$(parms)) : $(ConvertType(type)) { throw System.Exception() }]>);
+      def parms = [<[parameter: this inst : this]>].Append(parms);
+      _ = tb.DefineWithSource(<[ decl: public static @()(..$(parms)) : $(ConvertType(type)) { throw System.Exception() }]>);
     | _ => ()
     /*| IndexCall(Some(parms), type) =>
       def parms = parms.Map(p => <[ $(convertParm(p)) ]>).First();
@@ -102,7 +105,7 @@ module NemerleWebPropertiesImpl
       }
     }  
   
-  private ConvertType(t : TypescriptType) : PExpr
+  private ConvertType(t : TypeScriptType) : PExpr
   {
     | Object(_parms) => <[ object ]>
     | Dictionary(key, val) => 

@@ -77,9 +77,9 @@ Extends: $ex
 Members: ..$(i.Members; "\n\n"; printMember)
 #>
       | v is TS.TypeScriptGlobalDeclaration.Var =>
-        "[Var] Name: $(v.Name), Type: $(printType(v.Type))"
+        $"[Var] Name: $(v.Name), Type: $(printType(v.Type))"
       | f is TS.TypeScriptGlobalDeclaration.Function =>
-        "[Function] $(printMember(f.Method))"
+        $"[Function] $(printMember(f.Method))"
       }
       
       $<#..$(interfaces; "\n"; print)#>
