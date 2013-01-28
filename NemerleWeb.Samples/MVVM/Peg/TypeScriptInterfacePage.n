@@ -46,11 +46,11 @@ namespace NemerleWeb.Samples
       and printType(type)
       {
         | null => "null"
-        | t is TS.TypescriptType.Object => $"[Object] Parms: $(printParams(t.Parms))"
-        | t is TS.TypescriptType.Dictionary => $"[Dictionary] Key: $(t.Key), Value: $(t.Value)"
-        | t is TS.TypescriptType.Array => $"[Array] Type: $(printType(t.Type))"
-        | t is TS.TypescriptType.Lambda => $"[Lambda] $(printMaybeParams(t.Parms)), ReturnType : $(printType(t.ReturnType))"
-        | t is TS.TypescriptType.Normal => $"[Normal] Name: $(t.Name)"
+        | t is TS.TypeScriptType.Object => $"[Object] Parms: $(printParams(t.Parms))"
+        | t is TS.TypeScriptType.Dictionary => $"[Dictionary] Key: $(t.Key), Value: $(t.Value)"
+        | t is TS.TypeScriptType.Array => $"[Array] Type: $(printType(t.Type))"
+        | t is TS.TypeScriptType.Lambda => $"[Lambda] $(printMaybeParams(t.Parms)), ReturnType : $(printType(t.ReturnType))"
+        | t is TS.TypeScriptType.Normal => $"[Normal] Name: $(t.Name)"
       }      
       and printMaybeParams(p)
       {
@@ -61,12 +61,17 @@ namespace NemerleWeb.Samples
       def printMember(member)
       {
         | m is TS.TypeScriptMember.Property => $<#"[Property] Name: $(m.Name), Type: $(printType(m.Type))$(if(m.IsNullable) "?" else "")#>
+        //| m is TS.TypeScriptMember.PropertType => $<#"[Property] Name: $(m.Name)$(if(m.IsNullable) "?" else ""), Members: $(printMembers(m.Members))#>
         | m is TS.TypeScriptMember.Method   => $<#[Method] Name: $(m.Name), Parms: $(printParams(m.Parms)), Type: $(printType(m.Type))$(if(m.IsNullable) "?" else "")#>
         | m is TS.TypeScriptMember.Call     => $"[Call] $(printMaybeParams(m.Parms))ReturnType: $(printType(m.ReturnType))"
         | m is TS.TypeScriptMember.IndexCall=> $"[IndexCall]  $(printMaybeParams(m.Parms))ReturnType: $(printType(m.ReturnType))"
         | _ => ""
       }
-      
+      and printMembers(members)
+      {
+        $<#Members: ..$(members; "\n\n"; printMember)#>
+      }
+          
       def print(v)
       {
       | i is TS.TypeScriptGlobalDeclaration.Interface =>
@@ -74,9 +79,11 @@ namespace NemerleWeb.Samples
                     
         $<#[Interface] Name : $(i.Name)
 Extends: $ex
-Members: ..$(i.Members; "\n\n"; printMember)
+Members: $(printMembers(i.Members))
 #>
       | v is TS.TypeScriptGlobalDeclaration.Var =>
+        $"[Var] Name: $(v.Name), Members: $(printMembers(v.Members))"
+      | v is TS.TypeScriptGlobalDeclaration.VarType =>
         $"[Var] Name: $(v.Name), Type: $(printType(v.Type))"
       | f is TS.TypeScriptGlobalDeclaration.Function =>
         $"[Function] $(printMember(f.Method))"
