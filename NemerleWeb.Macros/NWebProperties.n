@@ -51,7 +51,7 @@ module NemerleWebPropertiesImpl
     }
   }
   
-  private CreateTypeScriptGlobalVar(tb : TypeBuilder, var : TypeScriptGlobalDeclaration.Var, _typer : Typer) : void
+  private CreateTypeScriptGlobalVar(tb : TypeBuilder, var : TypeScriptGlobalDeclaration.Var, typer : Typer) : void
   {
     _ = tb.DefineWithSource(<[ decl: public $(var.Name : usesite) {} ]>);
     DefineMembers(tb, var.Members);
@@ -80,15 +80,25 @@ module NemerleWebPropertiesImpl
     
     DefineMembers(tb, inter.Members);
   }
+
+  private DefineField(tb : TypeBuilder, name : string, isNullable : bool, type : PExpr) : void
+  {
+    if (isNullable)
+      _ = tb.DefineWithSource(<[ decl: public $(name : usesite) : option[$type] ]>)
+    else
+      _ = tb.DefineWithSource(<[ decl: public $(name : usesite) : $type ]>);
+  }
   
   private DefineMembers(tb : TypeBuilder, members : list[TypeScriptMember]) : void
   {
     foreach(m in members) 
     {
-    | Property(name, true as _isNullable, type) =>
-      _ = tb.DefineWithSource(<[ decl: public $(name : usesite) : option[$(ConvertType(type))] ]>)
-    | Property(name, false as _isNullable, type) =>
-      _ = tb.DefineWithSource(<[ decl: public $(name : usesite) : $(ConvertType(type)) ]>)
+    | Property(name, isNullable, type) => DefineField(tb, name, isNullable, ConvertType(type))
+    | PropertyType(name, isNullable, members) =>
+      def newName = "_N_" + name;
+      def mb = tb.DefineWithSource(<[ decl: public $(newName : usesite) {} ]>);
+      DefineMembers(mb.DeclaringType, members);      
+      DefineField(tb, name, isNullable, <[ $(newName : usesite) ]>);
     | Method(name, _isNullable, parms, type) =>
       _ = tb.DefineWithSource(<[ decl: public $(name : usesite)(..$(parms.Map(ConvertParm))) : $(ConvertType(type)) { throw System.Exception() }; ]>);
     | Call(Some(parms), type) => 
@@ -106,7 +116,8 @@ module NemerleWebPropertiesImpl
     }
   }
   
-  private ConvertParm(p : TypeScriptParameter) : Parsetree.PParameter {
+  private ConvertParm(p : TypeScriptParameter) : Parsetree.PParameter
+  {
       match((p.IsParams, p.IsOptional))
       {
       | (true, true) => <[ parameter: params $(p.Name : usesite) : option[$(ConvertType(p.Type))] ]>

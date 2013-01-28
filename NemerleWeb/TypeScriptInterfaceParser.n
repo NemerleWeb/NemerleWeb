@@ -59,7 +59,8 @@ namespace TypeScriptInterface
         indexCallDeclaration : TypeScriptMember         = LBRACE parms? RBRACE COLON type SEMICOLON;
         methodDeclaration : TypeScriptMember            = identifier QUEST? LPAREN parms? RPAREN (COLON type)? SEMICOLON;
         propertyDeclaration : TypeScriptMember          = identifier QUEST? COLON type SEMICOLON;
-        memberDeclaration : TypeScriptMember            = (propertyDeclaration / methodDeclaration / callDeclaration / indexCallDeclaration);
+        propertyTypeDeclaration : TypeScriptMember      = identifier QUEST? COLON interfaceBlock SEMICOLON;
+        memberDeclaration : TypeScriptMember            = (propertyDeclaration / propertyTypeDeclaration / methodDeclaration / callDeclaration / indexCallDeclaration);
         interfaceBlock : list[TypeScriptMember]         = LFBRACE memberDeclaration* RFBRACE;
         // extends is reserved keyword in JS
         extends_ : list[string]                = "extends" spaces identifiers;
@@ -168,6 +169,11 @@ namespace TypeScriptInterface
       TypeScriptMember.Property(name, GetText(isNullable) == "?", type)
     }
     
+    propertyTypeDeclaration(name : string, isNullable : NToken, _ : NToken, members : list[TypeScriptMember], _ : NToken) : TypeScriptMember.PropertyType
+    {
+      TypeScriptMember.PropertyType(name, GetText(isNullable) == "?", members)
+    }
+    
     callDeclaration(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypeScriptType, _ : NToken) : TypeScriptMember
     {
       TypeScriptMember.Call(parms, returnType)
@@ -240,10 +246,11 @@ namespace TypeScriptInterface
     
   public variant TypeScriptMember : Located
   {
-    | Property  { Name : string; IsNullable : bool; Type : TypeScriptType }
-    | Method    { Name : string; IsNullable : bool; Parms : list[TypeScriptParameter]; Type : TypeScriptType }
-    | Call      { Parms : option[list[TypeScriptParameter]]; ReturnType : TypeScriptType }
-    | IndexCall { Parms : option[list[TypeScriptParameter]]; ReturnType : TypeScriptType }
+    | Property     { Name : string; IsNullable : bool; Type : TypeScriptType }
+    | PropertyType { Name : string; IsNullable : bool; Members : list[TypeScriptMember]; }
+    | Method       { Name : string; IsNullable : bool; Parms : list[TypeScriptParameter]; Type : TypeScriptType }
+    | Call         { Parms : option[list[TypeScriptParameter]]; ReturnType : TypeScriptType }
+    | IndexCall    { Parms : option[list[TypeScriptParameter]]; ReturnType : TypeScriptType }
   }
   
   [Record]
