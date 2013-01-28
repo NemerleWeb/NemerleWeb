@@ -240,7 +240,7 @@ namespace TypeScriptInterfaceSample
   [Unit]
   public variant TypeScriptGlobalDeclaration
   {
-    | Interface { Name : string; Extends : option[list[string]]; Members : list[TypeScriptMember] }
+    | Interface { Name : string; Extend : option[list[string]]; Members : list[TypeScriptMember] }
     | Var       { Name : string; Members : list[TypeScriptMember]; }
     | VarType   { Name : string; Type : TypeScriptType; }
     | Function  { Method : TypeScriptMember.Method  }
