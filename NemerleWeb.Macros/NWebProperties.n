@@ -27,7 +27,7 @@ module NemerleWebPropertiesImpl
           def tsFiles = Directory.GetFiles(Path.Combine(dir, path), "*.ts");
           def globalJs = typer.Env.Define(<[ decl: public module javascript {} ]>);
 
-          assert2(false);  
+          //assert2(false);  
               
           foreach(tsFile in tsFiles.Reverse()) {
             match(parser.TryParse(File.ReadAllText(tsFile)))
@@ -36,10 +36,11 @@ module NemerleWebPropertiesImpl
               foreach(r in result) 
               {
               | Var as v => CreateTypeScriptGlobalVar(globalJs, v, typer);
+              | VarType as v => CreateTypeScriptGlobalVarType(globalJs, v, typer);
               | Function as f => CreateTypeScriptGlobalFunction(globalJs, f, typer); 
               | Interface as i => CreateTypeScriptInterface(i, typer);
               }
-            | (pos, _) when pos < parser.ParsingSource.OriginalText.Length => 
+            | (pos, _) => 
               def text = parser.ParsingSource.OriginalText;
               Message.Error($"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...")
             }            
@@ -50,20 +51,25 @@ module NemerleWebPropertiesImpl
     }
   }
   
-  private CreateTypeScriptGlobalVar(tb : TypeBuilder, var : TypeScriptGlobalDeclaration.Var, typer : Typer) : void
+  private CreateTypeScriptGlobalVar(tb : TypeBuilder, var : TypeScriptGlobalDeclaration.Var, _typer : Typer) : void
   {
-    tb.DefineWithSource(<[ decl: public $(var.Name : usesite) : option[$(ConvertType(var.Type))] ]>)
+    _ = tb.DefineWithSource(<[ decl: public $(var.Name : usesite) {} ]>);
+    DefineMembers(tb, var.Members);
   }
   
-  private CreateTypeScriptGlobalFunction(tb : TypeBuilder, function : TypeScriptGlobalDeclaration.Function, typer : Typer) : void
+  private CreateTypeScriptGlobalVarType(tb : TypeBuilder, var : TypeScriptGlobalDeclaration.VarType, _typer : Typer) : void
+  {
+    _ = tb.DefineWithSource(<[ decl: public $(var.Name : usesite) : option[$(ConvertType(var.Type))] ]>)
+  }
+  
+  private CreateTypeScriptGlobalFunction(tb : TypeBuilder, function : TypeScriptGlobalDeclaration.Function, _typer : Typer) : void
   {
     def method = function.Method;
-    tb.DefineWithSource(<[ decl: public $(method.Name : usesite)(..$(method.Parms.Map(ConvertParm))) : $(ConvertType(method.Type)) { throw System.Exception() }; ]>);
+    _ = tb.DefineWithSource(<[ decl: public $(method.Name : usesite)(..$(method.Parms.Map(ConvertParm))) : $(ConvertType(method.Type)) { throw System.Exception() }; ]>);
   }
   
   private CreateTypeScriptInterface(inter : TypeScriptGlobalDeclaration.Interface, typer : Typer) : void
-  {
-    
+  {    
     def tb = match(inter.Extends)
     {
     | Some(extends) => 
@@ -71,8 +77,13 @@ module NemerleWebPropertiesImpl
       typer.Env.Define(<[ decl: public class $(inter.Name : usesite) : ..$(extends) {} ]>);
     | _ => typer.Env.Define(<[ decl: public class $(inter.Name : usesite) {} ]>);
     }
-          
-    foreach(m in inter.Members) 
+    
+    DefineMembers(tb, inter.Members);
+  }
+  
+  private DefineMembers(tb : TypeBuilder, members : list[TypeScriptMember]) : void
+  {
+    foreach(m in members) 
     {
     | Property(name, true as _isNullable, type) =>
       _ = tb.DefineWithSource(<[ decl: public $(name : usesite) : option[$(ConvertType(type))] ]>)
@@ -110,7 +121,8 @@ module NemerleWebPropertiesImpl
     | Object(_parms) => <[ object ]>
     | Dictionary(key, val) => 
       <[ System.Collections.Generic.Dictionary.[$(ConvertType(key)), $(ConvertType(val))] ]>
-    | Array(type) => <[ array[$(ConvertType(type))] ]>
+    | Array(type, 0) => <[ $(ConvertType(type)) ]>
+    | Array(type, arity) => <[ array[$(ConvertType(TypeScriptType.Array(type, arity - 1)))] ]>
     | Lambda(Some(parms), ret) => 
         def parms = parms.Map(p => p.Type).Append([ret]).Map(ConvertType);
         <[ System.Func.[{..$(parms)}] ]>
