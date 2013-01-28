@@ -70,7 +70,7 @@ module NemerleWebPropertiesImpl
   
   private CreateTypeScriptInterface(inter : TypeScriptGlobalDeclaration.Interface, typer : Typer) : void
   {    
-    def tb = match(inter.Extends)
+    def tb = match(inter.Extend)
     {
     | Some(extends) => 
       def extends = extends.Map(e => <[ $(e : usesite) ]>);
