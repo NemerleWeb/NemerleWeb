@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Nemerle.Compiler;
-using PExpr = Nemerle.Compiler.Parsetree.PExpr;
+using Nemerle.Compiler.Parsetree;
 using TypeScriptInterface;
 using System.IO;
 
@@ -18,36 +18,37 @@ module NemerleWebPropertiesImpl
   {
     foreach(opt in options)
     {
-      match(opt)
-      {
-      | <[ (TypeScriptPath, $(path)) ]> => 
-          def path = path.ToString();
-          def parser = TypeScriptInterfaceParser();
-          def dir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
-          def tsFiles = Directory.GetFiles(Path.Combine(dir, path), "*.ts");
-          def globalJs = typer.Env.Define(<[ decl: public module javascript {} ]>);
+    | <[ (TypeScriptPath, $(path)) ]> => 
+      def path = path.ToString();
+      def parser = TypeScriptInterfaceParser();
+      def dir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
+      def tsFiles = Directory.EnumerateFiles(Path.Combine(dir, path), "*.d.ts", SearchOption.AllDirectories);
+      //def globalJs = typer.Env.Define(<[ decl: public module javascript {} ]>);
 
-          //assert2(false);  
+      //assert2(false);  
               
-          foreach(tsFile in tsFiles.Reverse()) {
-            match(parser.TryParse(File.ReadAllText(tsFile)))
-            {
-            | (pos, result) when pos == parser.ParsingSource.OriginalText.Length => 
-              foreach(r in result) 
-              {
-              | Var as v => CreateTypeScriptGlobalVar(globalJs, v, typer);
-              | VarType as v => CreateTypeScriptGlobalVarType(globalJs, v, typer);
-              | Function as f => CreateTypeScriptGlobalFunction(globalJs, f, typer); 
-              | Interface as i => CreateTypeScriptInterface(i, typer);
-              }
-            | (pos, _) => 
-              def text = parser.ParsingSource.OriginalText;
-              Message.Error($"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...")
-            }            
+      foreach(tsFile in tsFiles)
+      {
+        match(parser.TryParse(File.ReadAllText(tsFile)))
+        {
+        | (pos, result) when pos == parser.ParsingSource.OriginalText.Length => 
+          foreach(r in result) 
+          {
+          //| Var as v => CreateTypeScriptGlobalVar(globalJs, v, typer);
+          //| VarType as v => CreateTypeScriptGlobalVarType(globalJs, v, typer);
+          //| Function as f => CreateTypeScriptGlobalFunction(globalJs, f, typer); 
+          //| Interface as i => CreateTypeScriptInterface(i, typer);
+          | _ => ()
           }
-                    
-      | _ => Message.Error(<#Unrecognized option format, should be tuple of two strings: ("TypeScriptPath", "Typescripts") #>)
+        | (pos, _) => 
+          def text = parser.ParsingSource.OriginalText;
+          Message.Error(Location(tsFile, pos, pos, pos, pos), $"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...")
+        }            
       }
+      
+      // Fixate global
+      //globalJs.Compile();
+    | _ => Message.Error(<#Unrecognized option format, should be tuple of two strings: ("TypeScriptPath", "Typescripts") #>)
     }
   }
   
