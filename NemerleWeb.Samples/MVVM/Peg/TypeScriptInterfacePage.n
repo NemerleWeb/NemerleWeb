@@ -75,10 +75,10 @@ namespace NemerleWeb.Samples
       def print(v)
       {
       | i is TS.TypeScriptGlobalDeclaration.Interface =>
-        def ex = if(i.Extends is Some(e)) $"..$e" else "";
+        def ex = if(i.Extend is Some(e)) $"..$e" else "";
                     
         $<#[Interface] Name : $(i.Name)
-Extends: $ex
+Extend: $ex
 Members: $(printMembers(i.Members))
 #>
       | v is TS.TypeScriptGlobalDeclaration.Var =>
