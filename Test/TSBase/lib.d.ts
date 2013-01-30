@@ -8233,3 +8233,4 @@ declare var WScript : {
     ScriptFullName: string;
     Quit(exitCode?: number);
 }
+
