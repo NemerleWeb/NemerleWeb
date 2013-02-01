@@ -6,7 +6,7 @@ using SCG = System.Collections.Generic;
 using Nemerle.Collections;
 using Nemerle.Extensions;
 
-namespace Nemerle.Peg
+namespace NemerleWeb.Peg
 {
   public module RangeSets
   {
