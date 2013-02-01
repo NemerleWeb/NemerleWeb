@@ -10,8 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace TypeScriptInterface
-{
-  
+{  
   [PegGrammar(Options = EmitDebugSources,
       start,
       grammar {
@@ -43,16 +42,16 @@ namespace TypeScriptInterface
         identifiers     : list[string] = identifier (COMMA identifiers)?;
 
         constructor : TypeScriptParameter     = "new" spaces LPAREN parms? RPAREN (COLON type)? SEMICOLON;
-        dictionaryType : TypescriptType       = LFBRACE LBRACE identifier COLON spaces type RBRACE COLON type SEMICOLON RFBRACE;
-        objectType : TypescriptType           = LFBRACE parmsSemicolon? RFBRACE;
-        arrayType : TypescriptType            = nonArrayType "[]";
-        normalType : TypescriptType           = identifier;
-        lambdaType : TypescriptType           = LPAREN parms? RPAREN "=>" spaces type;
-        nonArrayType : TypescriptType         = lambdaType / normalType / objectType / dictionaryType;
-        type : TypescriptType                 = nonArrayType / arrayType;
-        nonOptionalParam : TypeScriptParameter          = (identifier COLON type);
-        optionalParam : TypeScriptParameter             = identifier QUEST COLON type;
-        param : TypeScriptParameter                     = (constructor / nonOptionalParam / optionalParam);
+        dictionaryType : TypeScriptType       = LFBRACE LBRACE identifier COLON spaces type RBRACE COLON type SEMICOLON? RFBRACE;
+        objectType : TypeScriptType           = LFBRACE parmsSemicolon? RFBRACE;
+        arrayType : TypeScriptType            = nonArrayType (spaces "[" spaces "]")+;
+        normalType : TypeScriptType           = identifier;
+        lambdaType : TypeScriptType           = LPAREN parms? RPAREN "=>" spaces type;
+        nonArrayType : TypeScriptType         = lambdaType / normalType / objectType / dictionaryType;
+        type : TypeScriptType                 = arrayType / nonArrayType;
+        nonOptionalParam : TypeScriptParameter          = identifier (COLON type)?;
+        optionalParam : TypeScriptParameter             = identifier QUEST (COLON type)?;
+        param : TypeScriptParameter                     = (constructor / optionalParam/ nonOptionalParam);
         multipleParam : TypeScriptParameter             = "..." param;
         parms : list[TypeScriptParameter]               = (param/multipleParam) (COMMA parms)?;
         parmsSemicolon : list[TypeScriptParameter]      = param (SEMICOLON parmsSemicolon)? SEMICOLON?;
@@ -60,19 +59,20 @@ namespace TypeScriptInterface
         indexCallDeclaration : TypeScriptMember         = LBRACE parms? RBRACE COLON type SEMICOLON;
         methodDeclaration : TypeScriptMember            = identifier QUEST? LPAREN parms? RPAREN (COLON type)? SEMICOLON;
         propertyDeclaration : TypeScriptMember          = identifier QUEST? COLON type SEMICOLON;
-        memberDeclaration : TypeScriptMember            = (propertyDeclaration / methodDeclaration / callDeclaration / indexCallDeclaration);
-        interfaceBlock : list[TypeScriptMember]         = LFBRACE memberDeclaration* RFBRACE;        
+        propertyTypeDeclaration : TypeScriptMember      = identifier QUEST? COLON interfaceBlock SEMICOLON;
+        memberDeclaration : TypeScriptMember            = (propertyDeclaration / propertyTypeDeclaration / methodDeclaration / callDeclaration / indexCallDeclaration);
+        interfaceBlock : list[TypeScriptMember]         = LFBRACE memberDeclaration* RFBRACE;
         // extends is reserved keyword in JS
         extends_ : list[string]                = "extends" spaces identifiers;
         _interface : TypeScriptGlobalDeclaration                = "interface" spaces identifier extends_? interfaceBlock;
         
-        globalVarDeclaration : TypeScriptGlobalDeclaration = "declare" spaces "var" spaces identifier COLON type SEMICOLON;
+        globalVarDeclaration : TypeScriptGlobalDeclaration = "declare" spaces "var" spaces identifier COLON interfaceBlock SEMICOLON?;
+        globalVarDeclarationType : TypeScriptGlobalDeclaration = "declare" spaces "var" spaces identifier COLON type SEMICOLON?;
         globalFunctionDeclaration : TypeScriptGlobalDeclaration = "declare" spaces "function " methodDeclaration;
         
-        start : list[TypeScriptGlobalDeclaration] = spaces (_interface / globalVarDeclaration / globalFunctionDeclaration)*;
+        start : list[TypeScriptGlobalDeclaration] = spaces (_interface / globalVarDeclaration / globalVarDeclarationType / globalFunctionDeclaration)*;
       }
     )]
-  [Unit]
   public class TypeScriptInterfaceParser
   {
     identifier(idValue : NToken) : string 
@@ -81,10 +81,10 @@ namespace TypeScriptInterface
       GetText(idValue)
     }
     
-    constructor(_ : NToken, _ : NToken, lst : option[list[TypeScriptParameter]], _ : NToken, _ : option[(NToken * TypescriptType)], _ : NToken) : TypeScriptParameter
+    constructor(_ : NToken, _ : NToken, lst : option[list[TypeScriptParameter]], _ : NToken, _ : option[(NToken * TypeScriptType)], _ : NToken) : TypeScriptParameter
     {
-      TypeScriptParameter("ctor", TypescriptType.Normal("void"), false, false)
-    }    
+      TypeScriptParameter("ctor", TypeScriptType.Normal("void"), false, false)
+    }
     
     identifiers(id : string, tail : option[NToken * list[string]]) : list[string] 
     {
@@ -95,41 +95,41 @@ namespace TypeScriptInterface
       }
     }
     
-    dictionaryType(_ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, _keyname : string, _ : Nemerle.Peg.NToken, key : TypescriptType, _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, value : TypescriptType, _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken) : TypescriptType
+    dictionaryType(_ : NToken, _ : NToken, _keyname : string, _ : NToken, key : TypeScriptType, _ : NToken, _ : NToken, value : TypeScriptType, _ : NToken, _ : NToken) : TypeScriptType
     {
-      TypescriptType.Dictionary(key, value)
+      TypeScriptType.Dictionary(key, value)
     }
     
-    objectType(_ : Nemerle.Peg.NToken, parms : option[list[TypeScriptParameter]], _ : Nemerle.Peg.NToken) : TypescriptType
+    objectType(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken) : TypeScriptType
     {
-      TypescriptType.Object(if(parms is Some(parms)) parms else [])
+      TypeScriptType.Object(if(parms is Some(parms)) parms else [])
     }
     
-    arrayType(type : TypescriptType, _ : Nemerle.Peg.NToken) : TypescriptType
+    arrayType(type : TypeScriptType, arity : List[NToken * NToken]) : TypeScriptType
     {
-      TypescriptType.Array(type)
+      TypeScriptType.Array(type, arity.Count)
     }
 
-    normalType(name : string) : TypescriptType
+    normalType(name : string) : TypeScriptType
     {
-      TypescriptType.Normal(name)
+      TypeScriptType.Normal(name)
     }
 
-    lambdaType(_ : Nemerle.Peg.NToken, parms : option[list[TypeScriptParameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : TypescriptType) : TypescriptType    
+    lambdaType(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypeScriptType) : TypeScriptType    
     {
-      TypescriptType.Lambda(parms, returnType)
+      TypeScriptType.Lambda(parms, returnType)
     }
-
-    nonOptionalParam(name : string, _ : NToken, type : TypescriptType) : TypeScriptParameter
+    
+    nonOptionalParam(name : string, type : option[NToken * TypeScriptType]) : TypeScriptParameter
     {
       //System.Diagnostics.Debug.WriteLine("nonOptionalParm");
-      TypeScriptParameter(name, type, false, false)
+      TypeScriptParameter(name, getType(type), false, false)
     }
     
-    optionalParam(name : string, _ : NToken, _ : NToken, type : TypescriptType) : TypeScriptParameter
+    optionalParam(name : string, _ : NToken, type : option[NToken * TypeScriptType]) : TypeScriptParameter
     {
       //System.Diagnostics.Debug.WriteLine("optionalParm");
-      TypeScriptParameter(name, type, true, false)
+      TypeScriptParameter(name, getType(type), true, false)
     }
     
     multipleParam(_ : NToken, parm : TypeScriptParameter) : TypeScriptParameter
@@ -147,7 +147,7 @@ namespace TypeScriptInterface
       }
     }
     
-    parmsSemicolon(p : TypeScriptParameter, tail : option[(Nemerle.Peg.NToken * list[TypeScriptParameter])], _ : NToken) : list[TypeScriptParameter]
+    parmsSemicolon(p : TypeScriptParameter, tail : option[(NToken * list[TypeScriptParameter])], _ : NToken) : list[TypeScriptParameter]
     {
       match(tail)
       {
@@ -156,25 +156,30 @@ namespace TypeScriptInterface
       }
     }
     
-    methodDeclaration(name : string, isNullable : NToken, _ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, type : option[(NToken * TypescriptType)],  _ : NToken) : TypeScriptMember.Method
+    methodDeclaration(name : string, isNullable : NToken, _ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, type : option[(NToken * TypeScriptType)],  _ : NToken) : TypeScriptMember.Method
     {
       //System.Diagnostics.Debug.WriteLine("method");
       def type = if(type is Some((_, type))) type else null;
       TypeScriptMember.Method(name, GetText(isNullable) == "?", if(parms is Some(parms)) parms else [], type)
     }
     
-    propertyDeclaration(name : string, isNullable : NToken, _ : NToken, type : TypescriptType, _ : NToken) : TypeScriptMember.Property
+    propertyDeclaration(name : string, isNullable : NToken, _ : NToken, type : TypeScriptType, _ : NToken) : TypeScriptMember.Property
     {
       //System.Diagnostics.Debug.WriteLine("prop");
       TypeScriptMember.Property(name, GetText(isNullable) == "?", type)
     }
     
-    callDeclaration(_ : Nemerle.Peg.NToken, parms : option[list[TypeScriptParameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : TypescriptType, _ : Nemerle.Peg.NToken) : TypeScriptMember
+    propertyTypeDeclaration(name : string, isNullable : NToken, _ : NToken, members : list[TypeScriptMember], _ : NToken) : TypeScriptMember.PropertyType
+    {
+      TypeScriptMember.PropertyType(name, GetText(isNullable) == "?", members)
+    }
+    
+    callDeclaration(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypeScriptType, _ : NToken) : TypeScriptMember
     {
       TypeScriptMember.Call(parms, returnType)
     }
 
-    indexCallDeclaration(_ : Nemerle.Peg.NToken, parms : option[list[TypeScriptParameter]], _ : Nemerle.Peg.NToken, _ : Nemerle.Peg.NToken, returnType : TypescriptType, _ : Nemerle.Peg.NToken) : TypeScriptMember
+    indexCallDeclaration(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypeScriptType, _ : NToken) : TypeScriptMember
     {
       TypeScriptMember.IndexCall(parms, returnType)
     }
@@ -203,9 +208,14 @@ namespace TypeScriptInterface
       TypeScriptGlobalDeclaration.Interface(name, extends_, members)
     }
     
-    globalVarDeclaration(_ : NToken, _ : NToken, name : string, _ : NToken, type : TypescriptType, _ : NToken) : TypeScriptGlobalDeclaration
+    globalVarDeclaration(_ : NToken, _ : NToken, name : string, _ : NToken, members : list[TypeScriptMember], _ : NToken) : TypeScriptGlobalDeclaration
     {
-      TypeScriptGlobalDeclaration.Var(name, type)
+      TypeScriptGlobalDeclaration.Var(name, members)
+    }
+    
+    globalVarDeclarationType(_ : NToken, _ : NToken, name : string, _ : NToken, type : TypeScriptType, _ : NToken) : TypeScriptGlobalDeclaration
+    {
+      TypeScriptGlobalDeclaration.VarType(name, type)
     }
     
     globalFunctionDeclaration(_ : NToken, _ : NToken, method : TypeScriptMember) : TypeScriptGlobalDeclaration
@@ -217,48 +227,53 @@ namespace TypeScriptInterface
     {
       interfaces.NToList()
     }
+    
+    /// Return type if present or any.
+    static getType(type : option[NToken * TypeScriptType]) : TypeScriptType
+    {
+      | Some((_, t)) => t
+      | _ => TypeScriptType.Normal("any")
+    }
   }
   
   public variant TypeScriptGlobalDeclaration
   {
-    | Interface { Name : string; Extends : option[list[string]]; Members : list[TypeScriptMember] }
-    | Var       { Name : string; Type : TypescriptType }
+    | Interface { Name : string; Extend : option[list[string]]; Members : list[TypeScriptMember] }
+    | Var       { Name : string; Members : list[TypeScriptMember]; }
+    | VarType   { Name : string; Type : TypeScriptType; }
     | Function  { Method : TypeScriptMember.Method  }
   }
     
-  [Unit]
   public variant TypeScriptMember : Located
   {
-    | Property  { Name : string; IsNullable : bool; Type : TypescriptType }
-    | Method    { Name : string; IsNullable : bool; Parms : list[TypeScriptParameter]; Type : TypescriptType }
-    | Call      { Parms : option[list[TypeScriptParameter]]; ReturnType : TypescriptType }
-    | IndexCall { Parms : option[list[TypeScriptParameter]]; ReturnType : TypescriptType }
+    | Property     { Name : string; IsNullable : bool; Type : TypeScriptType }
+    | PropertyType { Name : string; IsNullable : bool; Members : list[TypeScriptMember]; }
+    | Method       { Name : string; IsNullable : bool; Parms : list[TypeScriptParameter]; Type : TypeScriptType }
+    | Call         { Parms : option[list[TypeScriptParameter]]; ReturnType : TypeScriptType }
+    | IndexCall    { Parms : option[list[TypeScriptParameter]]; ReturnType : TypeScriptType }
   }
   
   [Record]
-  [Unit]
   public class TypeScriptDeclaration : Located
   {
     public Member : TypeScriptMember;
   }
   
   [Record]
-  [Unit]
   public class TypeScriptParameter
   {
     public Name : string;
-    public Type : TypescriptType;
+    public Type : TypeScriptType;
     public IsOptional : bool;
     public IsParams : bool;
   }
     
-  [Unit]
-  public variant TypescriptType
+  public variant TypeScriptType
   {
     | Object { Parms : list[TypeScriptParameter] }
-    | Dictionary { Key : TypescriptType; Value : TypescriptType }
-    | Array { Type : TypescriptType }
-    | Lambda { Parms : option[list[TypeScriptParameter]]; ReturnType : TypescriptType }
+    | Dictionary { Key : TypeScriptType; Value : TypeScriptType }
+    | Array { Type : TypeScriptType; Arity : int; }
+    | Lambda { Parms : option[list[TypeScriptParameter]]; ReturnType : TypeScriptType }
     | Normal { Name : string }
   }
 }

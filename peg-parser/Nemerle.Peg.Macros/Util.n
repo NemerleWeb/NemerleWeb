@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Nemerle.Peg
+namespace NemerleWeb.Peg
 {
   /// <summary>
   /// Description of Util.
@@ -69,8 +69,8 @@ namespace Nemerle.Peg
     {
       public EvalLocation(typer : Typer, prop : PT.Splicable, x : PT.PExpr, default : PT.PExpr) : PT.PExpr
       {
-        def pegLocatedType = FixedType.Class(typer.Manager.LookupTypeInfo("Nemerle.Peg.Located", 0), []);
-        def pegNTokenType = FixedType.Class(typer.Manager.LookupTypeInfo("Nemerle.Peg.NToken", 0), []);
+        def pegLocatedType = FixedType.Class(typer.Manager.LookupTypeInfo("NemerleWeb.Peg.Located", 0), []);
+        def pegNTokenType = FixedType.Class(typer.Manager.LookupTypeInfo("NemerleWeb.Peg.NToken", 0), []);
   
         def makeResult(tX)
         {

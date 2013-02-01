@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>c:\dev\open-source\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.Xml.Macro.xml</name>
+    <name>C:\TeamCity\buildAgent\work\b8caae985926e367\bin\Release\net-4.5\\PowerPack\\Nemerle.Xml.Macro.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.Xml.DefineXmlns_assembly_postscanMacro" />
@@ -148,8 +148,8 @@
     <member name="M:Nemerle.Xml.XmlAstToXLinq.Transform(Nemerle.Xml.XmlAst,Nemerle.Collections.Set{System.String},System.String)" />
     <member name="M:Nemerle.Xml.XmlAstToXLinq.TransformImpl(Nemerle.Xml.XmlAst,Nemerle.Collections.Set{System.String},System.String)" />
     <member name="T:Nemerle.Xml.XmlQuotParser" />
-    <member name="M:Nemerle.Xml.XmlQuotParser._N_testSpaces_14978(Nemerle.Xml.XmlQuotParser._N_closureOf_prefixedName_14970,Nemerle.Peg.NToken)" />
-    <member name="M:Nemerle.Xml.XmlQuotParser._N_getTextPoint_14925(Nemerle.Xml.XmlQuotParser._N_closureOf_ToLocation_14917,System.Int32)" />
+    <member name="M:Nemerle.Xml.XmlQuotParser._N_testSpaces_14989(Nemerle.Xml.XmlQuotParser._N_closureOf_prefixedName_14981,Nemerle.Peg.NToken)" />
+    <member name="M:Nemerle.Xml.XmlQuotParser._N_getTextPoint_14936(Nemerle.Xml.XmlQuotParser._N_closureOf_ToLocation_14928,System.Int32)" />
     <member name="M:Nemerle.Xml.XmlQuotParser.GetLocation(Nemerle.Peg.NToken)" />
     <member name="M:Nemerle.Xml.XmlQuotParser.GetText(Nemerle.Peg.NToken)" />
     <member name="P:Nemerle.Xml.XmlQuotParser.ParsingSource" />

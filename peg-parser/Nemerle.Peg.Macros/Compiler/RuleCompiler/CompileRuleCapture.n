@@ -9,7 +9,7 @@ using System;
 using System.Linq;
 using SCG = System.Collections.Generic;
 
-namespace Nemerle.Peg
+namespace NemerleWeb.Peg
 {
   partial internal class RuleCompiler
   {
@@ -26,7 +26,7 @@ namespace Nemerle.Peg
               <[
                 def newPos = $code;
                 when (newPos >= 0)
-                  $(result : dyn) = Nemerle.Peg.NToken(pos, newPos);
+                  $(result : dyn) = NemerleWeb.Peg.NToken(pos, newPos);
                 newPos
               ]>
             | _ => assert(false);
@@ -54,10 +54,10 @@ namespace Nemerle.Peg
                   {
                     | []  with (start = <[ pos ]>,
                                 end   = <[ newPos ]>)
-                    | _   with (start = <[ Nemerle.Peg.Internal.EvalLocationStart($(varNames.Head : dyn), pos) ]>,
-                                end   = <[ Nemerle.Peg.Internal.EvalLocationEnd($(varNames.Last() : dyn), newPos) ]>)
+                    | _   with (start = <[ NemerleWeb.Peg.Internal.EvalLocationStart($(varNames.Head : dyn), pos) ]>,
+                                end   = <[ NemerleWeb.Peg.Internal.EvalLocationEnd($(varNames.Last() : dyn), newPos) ]>)
                       =>
-                      <[ $(result : dyn).Location = Nemerle.Peg.Location(_parsingSource, $start, $end); ]>
+                      <[ $(result : dyn).Location = NemerleWeb.Peg.Location(_parsingSource, $start, $end); ]>
                   }
                 else
                   <[ () ]>;

@@ -8,7 +8,7 @@ using System;
 using System.Linq;
 using SCG = System.Collections.Generic;
 
-namespace Nemerle.Peg
+namespace NemerleWeb.Peg
 {
   partial internal class GrammarCompiler
   {
@@ -20,9 +20,9 @@ namespace Nemerle.Peg
       DefineResetMemoization();
       DefineParseMethods();
 
-      _tb.Define(<[decl: mutable _parsingSource : Nemerle.Peg.SourceSnapshot; ]>);
+      _tb.Define(<[decl: mutable _parsingSource : NemerleWeb.Peg.SourceSnapshot; ]>);
       _tb.Define(<[decl:
-        public ParsingSource : Nemerle.Peg.SourceSnapshot
+        public ParsingSource : NemerleWeb.Peg.SourceSnapshot
         {
           get { _parsingSource }
         }
@@ -30,7 +30,7 @@ namespace Nemerle.Peg
       
       PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
         // should it be macro?
-        protected GetText(tok : Nemerle.Peg.NToken) : string
+        protected GetText(tok : NemerleWeb.Peg.NToken) : string
         {
           _parsingSource.OriginalText.Substring(tok.StartPos, tok.EndPos - tok.StartPos)
         }
@@ -38,9 +38,9 @@ namespace Nemerle.Peg
          
       PegGrammarOptions.GetDefineMethod(_tb)(<[decl:
         // should it be macro?
-        protected GetLocation(tok : Nemerle.Peg.NToken) : Nemerle.Peg.Location
+        protected GetLocation(tok : NemerleWeb.Peg.NToken) : NemerleWeb.Peg.Location
         {
-          Nemerle.Peg.Location(_parsingSource, tok.StartPos, tok.EndPos)
+          NemerleWeb.Peg.Location(_parsingSource, tok.StartPos, tok.EndPos)
         }
       ]>);
     }

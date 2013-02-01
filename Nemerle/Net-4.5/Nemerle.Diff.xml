@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>c:\dev\open-source\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.Diff.xml</name>
+    <name>C:\TeamCity\buildAgent\work\b8caae985926e367\bin\Release\net-4.5\\PowerPack\\Nemerle.Diff.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.Diff.DiffData`1">
@@ -32,9 +32,9 @@
 
 </member>
     <member name="T:Nemerle.Diff.Diff" />
-    <member name="M:Nemerle.Diff.Diff._N_optimizeDiffData_4571``1(Nemerle.Diff.DiffData{``0})" />
-    <member name="M:Nemerle.Diff.Diff._N_computeLcs_4531``1(Nemerle.Diff.Diff._N_closureOf_Diff_4431{``0},Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,System.Int32[],System.Int32[])" />
-    <member name="M:Nemerle.Diff.Diff._N_computeSms_4442``1(Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,System.Int32[],System.Int32[])" />
+    <member name="M:Nemerle.Diff.Diff._N_optimizeDiffData_4572``1(Nemerle.Diff.DiffData{``0})" />
+    <member name="M:Nemerle.Diff.Diff._N_computeLcs_4532``1(Nemerle.Diff.Diff._N_closureOf_Diff_4432{``0},Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,System.Int32[],System.Int32[])" />
+    <member name="M:Nemerle.Diff.Diff._N_computeSms_4443``1(Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,Nemerle.Diff.DiffData{``0},System.Int32,System.Int32,System.Int32[],System.Int32[])" />
     <member name="M:Nemerle.Diff.Diff.Diff``1(``0[],``0[])">
       <summary>
         <para>This method implements the Difference Algorithm published in

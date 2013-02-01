@@ -13,7 +13,7 @@ using System.Linq;
 
 using Nemerle.Compiler.Util;
 
-namespace Nemerle.Peg
+namespace NemerleWeb.Peg
 {
   public partial module GrammarTyper
   {
@@ -33,7 +33,7 @@ namespace Nemerle.Peg
       def ruleTypeToNType(_ : RuleType)
       {
         | Option(ty) when GrammarTyper.IsOptimizableOptionType(ty)
-        | Chars        => FixedType.Class(typer.Manager.LookupTypeInfo("Nemerle.Peg.NToken", 0), [])
+        | Chars        => FixedType.Class(typer.Manager.LookupTypeInfo("NemerleWeb.Peg.NToken", 0), [])
         | NType(ty)    => ty
         | List(ty)     => FixedType.Class(typer.Manager.LookupTypeInfo("System.Collections.Generic.List", 1), [ruleTypeToNType(ty)])
         | Option(ty)   => FixedType.Class(typer.Manager.LookupTypeInfo("Nemerle.Core.option", 1), [ruleTypeToNType(ty)])

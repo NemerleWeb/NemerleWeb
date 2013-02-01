@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nemerle.Compiler.Parsetree;
 
-namespace Nemerle.Peg
+namespace NemerleWeb.Peg
 {
   [Record]
   internal class Usage : Attribute

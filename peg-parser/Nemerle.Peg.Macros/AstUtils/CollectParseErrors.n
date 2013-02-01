@@ -9,18 +9,18 @@ using Nemerle.Utility;
 using PT = Nemerle.Compiler.Parsetree;
 using TT = Nemerle.Compiler.Typedtree;
 
-namespace Nemerle.Peg.AstUtils
+namespace NemerleWeb.Peg.AstUtils
 {
-  /// Walks through AST object and collects all ancestors of `Nemerle.Peg.Located' class
+  /// Walks through AST object and collects all ancestors of `NemerleWeb.Peg.Located' class
   /// which name starts with "Error".
-  /// Code returns `SCG.List[Nemerle.Peg.Located]' instance.
+  /// Code returns `SCG.List[NemerleWeb.Peg.Located]' instance.
   macro CollectParseErrors(ast)
   {
     def typer = ImplicitCTX();
 
     def makeResult(_ : PT.PExpr, x : TT.TExpr)
     {
-      def pegLocatedType = FixedType.Class(typer.Manager.LookupTypeInfo("Nemerle.Peg.Located", 0), []);
+      def pegLocatedType = FixedType.Class(typer.Manager.LookupTypeInfo("NemerleWeb.Peg.Located", 0), []);
       def typeHandler(ty : FixedType, var : PT.PExpr) : option[PT.PExpr]
       {
         match(ty)
@@ -34,14 +34,14 @@ namespace Nemerle.Peg.AstUtils
       def typeWalker = TypeWalker(typeHandler);
       typeWalker.Run(x.Type);
       <[
-        def buffer = System.Collections.Generic.List.[Nemerle.Peg.Located]();
+        def buffer = System.Collections.Generic.List.[NemerleWeb.Peg.Located]();
         $(typeWalker.Compile(x));
         buffer
       ]>
     }
 
     if(Manager().IsIntelliSenseMode)
-      <[ System.Collections.Generic.List.[Nemerle.Peg.Located]() ]>
+      <[ System.Collections.Generic.List.[NemerleWeb.Peg.Located]() ]>
     else
       typer.TransformWhenAllTypesWouldBeInfered(makeResult, typer.TypeExpr(ast))
   }

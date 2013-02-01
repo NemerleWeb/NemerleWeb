@@ -17,7 +17,7 @@ using Nemerle.Imperative;
 using Nemerle.Profiling;
 using System.Diagnostics;
 
-namespace Nemerle.Peg
+namespace NemerleWeb.Peg
 {
   public partial module GrammarTyper
   {

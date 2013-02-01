@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>c:\dev\open-source\nemerle\bin\Release\net-4.5\\TestFramework\\Nemerle.Test.Framework.xml</name>
+    <name>C:\TeamCity\buildAgent\work\b8caae985926e367\bin\Release\net-4.5\\TestFramework\\Nemerle.Test.Framework.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.Test.Framework.ColorizedOutputWriter" />
@@ -49,13 +49,13 @@
     <member name="M:Nemerle.Test.Framework.Runner.Run(System.Collections.Generic.IEnumerable{Nemerle.Test.Framework.Test})" />
     <member name="F:Nemerle.Test.Framework.Runner._executionListener" />
     <member name="T:Nemerle.Test.Framework.Statistics" />
-    <member name="F:Nemerle.Test.Framework.Statistics._N_Elapsed_3656" />
+    <member name="F:Nemerle.Test.Framework.Statistics._N_Elapsed_3657" />
     <member name="M:Nemerle.Test.Framework.Statistics.get_Elapsed" />
     <member name="P:Nemerle.Test.Framework.Statistics.Elapsed" />
-    <member name="F:Nemerle.Test.Framework.Statistics._N_ElapsedMilliseconds_3664" />
+    <member name="F:Nemerle.Test.Framework.Statistics._N_ElapsedMilliseconds_3665" />
     <member name="M:Nemerle.Test.Framework.Statistics.get_ElapsedMilliseconds" />
     <member name="P:Nemerle.Test.Framework.Statistics.ElapsedMilliseconds" />
-    <member name="F:Nemerle.Test.Framework.Statistics._N_ElapsedTicks_3669" />
+    <member name="F:Nemerle.Test.Framework.Statistics._N_ElapsedTicks_3670" />
     <member name="M:Nemerle.Test.Framework.Statistics.get_ElapsedTicks" />
     <member name="P:Nemerle.Test.Framework.Statistics.ElapsedTicks" />
     <member name="M:Nemerle.Test.Framework.Statistics.#ctor(System.TimeSpan,System.Int64,System.Int64)" />
