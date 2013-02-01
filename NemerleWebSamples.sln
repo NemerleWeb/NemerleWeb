@@ -31,6 +31,8 @@ Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Utils", "Nemerle
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "TypeScriptInterfaceParser", "peg-parser\TypeScriptInterfaceParser\TypeScriptInterfaceParser.nproj", "{24499101-E8DE-4A70-87EE-0787577B7327}"
 EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NeWebSample", "NeWebSample\NeWebSample.nproj", "{3253CC18-AE43-4586-889B-1F0B30E20FDE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,10 @@ Global
 		{24499101-E8DE-4A70-87EE-0787577B7327}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24499101-E8DE-4A70-87EE-0787577B7327}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24499101-E8DE-4A70-87EE-0787577B7327}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3253CC18-AE43-4586-889B-1F0B30E20FDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3253CC18-AE43-4586-889B-1F0B30E20FDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3253CC18-AE43-4586-889B-1F0B30E20FDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3253CC18-AE43-4586-889B-1F0B30E20FDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
