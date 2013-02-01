@@ -38,10 +38,10 @@ namespace NemerleWeb
           NemerleWebInitializer.Initialize();
           def allScripts = NemerleWeb.NWebData.GetAllScriptNames().Select(script =>
           {
-            def mainScript = $<# <script type="text/javascript" src="NemerleWebResource/Unit/$script.js"></script> #>;
+            def mainScript = $<# <script type="text/javascript" src="/NemerleWebResource/Unit/$script.js"></script> #>;
             def lambdasScript = 
               if(!string.IsNullOrEmpty(NWebData.GetLambdasScript(script)))
-                $<# <script type="text/javascript" src="NemerleWebResource/Lambdas/$script.js"></script> #>;
+                $<# <script type="text/javascript" src="/NemerleWebResource/Lambdas/$script.js"></script> #>;
               else
                 "";  
 
