@@ -12,22 +12,29 @@ namespace NemerleWeb.SC2Score
   [Unit]
   public class Tourney
   {
-    public Name : string;
+    public Name : string { get; set; }
     public Source : string;
     
-    private _rendered : string;    
+    private _rendered : string;
+    private Rendered : string {
+      get
+      {
+        when(_rendered == null)
+          RenderMarkdown();
+        _rendered;
+      }
+    };    
     
+    public this() {}    
     public this(name : string)
     {
       Name = name;
       Source = <# This is a test source #>;
-      
-      RenderMarkdown();
     }
     
     public RenderMarkdown() : void
     {
-       js <# self._rendered = markdown.toHTML(self.Source); #>;       
+       js <# self._rendered = markdown.toHTML(self.Source); #>;
     }
     
     public SourceChanged() : void
@@ -35,16 +42,34 @@ namespace NemerleWeb.SC2Score
       RenderMarkdown();
     }
     
+    public Save() : void
+    {
+      server.Save(this, r => {
+        js <# console.log(r) #>;
+      });
+    }
+    
     [Html]
     public SourceView() : string
     {
-      <#<textarea event-keyup="$SourceChanged">$Source</textarea>#>
+      <#
+        <textarea event-keyup="$SourceChanged">$Source</textarea>
+        <button click="$Save" class="btn btn-info">Save</button>
+      #>
     }
     
     [Html]
     public RenderedView() : string
     {
-      <#<div class="rendered-tourney" html="$_rendered"></div>#>
+      <#<div class="rendered-tourney" html="$Rendered"></div>#>
+    }
+    
+    public class Server
+    {
+      public Save(tourney : Tourney) : string
+      {
+        "saved, thx"
+      }
     }
   }  
 }

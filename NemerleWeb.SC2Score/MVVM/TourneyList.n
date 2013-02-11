@@ -15,7 +15,6 @@ namespace NemerleWeb.SC2Score
     public PinnedTourneys : List[Tourney] { get; set; }
     public NormalTourneys : List[Tourney] { get; set; }
     public Selected : Tourney { get; set; }
-    public LeftOffset : int { get; set; }
     
     public this()
     {
@@ -45,15 +44,13 @@ namespace NemerleWeb.SC2Score
       <#
         <div class="tourney-list-container">
           <h2>Pinned</h2>
-          <ul class="tourney-list"
-              style-margin-left="$(LeftOffset + "px")">
+          <ul class="tourney-list">
             <li $foreach(t in PinnedTourneys) 
                 click="$SelectTourney"
                 class="btn btn-info">$(t.Name)</li>
           </ul>
           <h2>Rest</h2>
-          <ul class="tourney-list"
-              style-margin-left="$(LeftOffset + "px")">
+          <ul class="tourney-list">
             <li $foreach(t in NormalTourneys) 
                 click="$SelectTourney"
                 class="btn btn-info">$(t.Name)</li>

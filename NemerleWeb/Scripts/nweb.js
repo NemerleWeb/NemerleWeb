@@ -204,6 +204,9 @@ var nweb = {
         });
       });
     };
+
+    $el.val(eval(expr));
+    
     return {
       el: el,
       getValue: function() {
@@ -301,7 +304,10 @@ var nweb = {
       },
       apply: function(value) {
         $el = nweb.utils.replaceWith($el, $(html).removeAttr("nw-template"));
-        nweb.applyBindings(value, $el[0], binding.subBindings = [], loopStack, true);        
+
+        jQuery.each($el, function(i, e) {
+          nweb.applyBindings(value, e, binding.subBindings = [], loopStack, true);
+        });
       }
     };
     return binding;

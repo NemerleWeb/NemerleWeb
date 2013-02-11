@@ -96,7 +96,7 @@ namespace NemerleWeb
         {
           def res = if(expr.StartsWith("\"") && expr.EndsWith("\"")) expr.Trim('\"') else expr;
           //def res = Regex.Replace(res, <#(^(?<b>)_self\W|(?<b>\W)_self\W)#>, "${b}");
-          def res = if(res.EndsWith(";")) res.Substring(0, res.Length - 1) else res;
+          def res = if(res.EndsWith(";")) res.Substring(0, res.Length - 1) else res;          
           res
         }
                 
