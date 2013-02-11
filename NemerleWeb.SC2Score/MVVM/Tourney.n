@@ -15,14 +15,7 @@ namespace NemerleWeb.SC2Score
     public Name : string;
     public Source : string;
     
-    private _rendered : string;
-    public Rendered : string
-    {
-      get 
-      {
-        _rendered;
-      }
-    }
+    private _rendered : string;    
     
     public this(name : string)
     {
@@ -34,14 +27,12 @@ namespace NemerleWeb.SC2Score
     
     public RenderMarkdown() : void
     {
-       js <# self._rendered = markdown.toHTML(self.Source); #>;
-       js <# console.log(self._rendered); #>;
+       js <# self._rendered = markdown.toHTML(self.Source); #>;       
     }
     
-    public SourceChanged(ev : EventData, o : object) : void
+    public SourceChanged() : void
     {
       RenderMarkdown();
-      Events.Invalidate();
     }
     
     [Html]
@@ -53,7 +44,7 @@ namespace NemerleWeb.SC2Score
     [Html]
     public RenderedView() : string
     {
-      <#<div class="rendered-tourney" html="$Rendered"></div>#>
+      <#<div class="rendered-tourney" html="$_rendered"></div>#>
     }
   }  
 }
