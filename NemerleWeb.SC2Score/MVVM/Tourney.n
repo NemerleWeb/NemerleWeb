@@ -15,7 +15,7 @@ namespace NemerleWeb.SC2Score
     public Name : string { get; set; }
     public Source : string;
     
-    private _rendered : string;
+    private mutable _rendered : string;
     private Rendered : string {
       get
       {
@@ -34,7 +34,7 @@ namespace NemerleWeb.SC2Score
     
     public RenderMarkdown() : void
     {
-       js <# self._rendered = markdown.toHTML(self.Source); #>;
+      _rendered = callJs.[string]("markdown.toHTML", Source);
     }
     
     public SourceChanged() : void
