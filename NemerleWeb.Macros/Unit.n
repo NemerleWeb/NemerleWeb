@@ -314,6 +314,7 @@ namespace NemerleWeb
       tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public clearTimeout(_id : int) : void {} ]>);
       tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public setInterval(_callback : void -> void, _timeoutMilliseconds : int) : int { 0 } ]> );
       tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public clearInterval(_id : int) : void {} ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public callJs[T](objName : string, params parms : array[object]) : T { throw InvalidOperationException("callJs shouldn't be called on server side"); } ]>);
     }
   }
 }
