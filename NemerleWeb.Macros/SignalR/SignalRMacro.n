@@ -49,10 +49,10 @@ $$.connection.hub.start({}, function() {
   $$.get('$(declaringType.Name)/__SetSignalRConnectionId', {id: this.id});
 });
 }, 1000);#>;
-            
+
       UnitImpl.AddSignalrData(declaringType, script);
-        
-      tb.Define(<[ decl: client : $(declaringType.ParsedTypeName) = $(declaringType.ParsedTypeName)() ]>);        
+
+      tb.Define(<[ decl: client : $(declaringType.ParsedTypeName); ]>);        
       tb.DefineNestedType(<[ decl: public class $(hubName : dyn) : HubBase {} ]>).Compile();
     }
   }
