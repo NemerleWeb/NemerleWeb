@@ -187,8 +187,6 @@ $properties
 $methods
 $fields
 $callConstrutor
-$properties
-$methods
 {{{SignalR}}}
 $returning
 $(Indent)}
