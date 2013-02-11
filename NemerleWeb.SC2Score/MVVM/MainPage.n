@@ -31,8 +31,11 @@ namespace NemerleWeb.SC2Score
           <div class="login-info">Logged in as <strong>$(CurrentUser.Name)</strong></div>
           <div template="$(template(TourneyList, _.View))"></div>
           <div class="main-container">
+            <div $when(TourneyList.Selected != null) class="tourney-info">
+              <div template="$(template(TourneyList.Selected, _.SourceView))" />
+              <div template="$(template(TourneyList.Selected, _.RenderedView))" />
+            </div>
             <div class="chat" template="$(template(Chat, _.View))"></div>
-            <div $when(TourneyList.Selected != null) class="tourney-info">$(TourneyList.Selected.Rendered)</div>
           </div>
         </div>
       #>

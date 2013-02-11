@@ -12,39 +12,24 @@ namespace NemerleWeb.SC2Score
   [Unit]
   public class TourneyList
   {
-    public All : List[Tourney] { get; set; }
+    public PinnedTourneys : List[Tourney] { get; set; }
+    public NormalTourneys : List[Tourney] { get; set; }
     public Selected : Tourney { get; set; }
     public LeftOffset : int { get; set; }
     
     public this()
     {
-      server.LoadFrontPageTourneys(tourneys => { All = tourneys });
-      //this.setInterval(GenerateTourneys, 1);
+      server.LoadFrontPageTourneys(tourneys => {         
+        PinnedTourneys = tourneys.Take(3).ToList();
+        NormalTourneys = tourneys.Skip(3).ToList();
+      });
     }
     
     public SelectTourney(tourney : Tourney) : void
     {
       Selected = tourney;
     }
-    
-    public HandleDragging() : void 
-    {
-      handle mousedown md "this" {
-        mutable lastX = md.pageX;
-        handle mousemove mm "window" until mouseup {                    
-          LeftOffset += mm.pageX - lastX;
-          LeftOffset = if(LeftOffset > 0) 0 else LeftOffset;
-          lastX = mm.pageX;
-        }
-      }
-    }
-    
-    public GenerateTourneys() : void
-    {
-      All = [Tourney("DreamHack Open - Bucharest"), Tourney("WCS Asia Finals"), Tourney("NASL Season 4"), Tourney("IPTL Season 1"),
-             Tourney("GSTL Season 3"), Tourney("MLG vs Proleague Invit."), Tourney("OSL Season 1"), Tourney("GSL Season 4")].ToList();
-    }
-    
+        
     public class Server
     {
       public LoadFrontPageTourneys() : List[Tourney]
@@ -59,10 +44,17 @@ namespace NemerleWeb.SC2Score
     {
       <#
         <div class="tourney-list-container">
-          <ul class="tourney-list" 
-              events="$HandleDragging"
+          <h2>Pinned</h2>
+          <ul class="tourney-list"
               style-margin-left="$(LeftOffset + "px")">
-            <li $foreach(t in All) 
+            <li $foreach(t in PinnedTourneys) 
+                click="$SelectTourney"
+                class="btn btn-info">$(t.Name)</li>
+          </ul>
+          <h2>Rest</h2>
+          <ul class="tourney-list"
+              style-margin-left="$(LeftOffset + "px")">
+            <li $foreach(t in NormalTourneys) 
                 click="$SelectTourney"
                 class="btn btn-info">$(t.Name)</li>
           </ul>

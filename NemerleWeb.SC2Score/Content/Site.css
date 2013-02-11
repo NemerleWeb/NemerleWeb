@@ -3,23 +3,13 @@ body {
     margin: 0 auto;
 }
 
+.login-info {
+    text-align: right;
+}
+
 .tourney-list-container {
-    width: 960px;
-    height: 45px;
-    overflow: hidden;
-}
-
-.tourney-list {
-    width: 20000px;
-    margin: 0;
-    -moz-user-select: none;
-    -khtml-user-select: none;
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-.tourney-list li {
-    margin: 1px 2px 1px 0;
+    width: 180px;
+    float: left;
 }
 
 .main-container {
@@ -27,10 +17,32 @@ body {
     margin-top: 2px;
 }
 
-.chat-container {
+.tourney-info {
+    padding: 20px 10px 0 10px;
     float: left;
-    width: 280px;
 }
+
+.chat-container {
+    margin-top: 20px;
+    float: right;
+    width: 250px;
+}
+
+.tourney-list {
+    margin: 0;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    overflow: hidden;
+}
+
+.tourney-list li {
+    margin: 1px 2px 1px 0;
+    font-size: 12px;
+    display: block;
+}
+
 
 .chat-container .messages {
     height: 500px;
@@ -51,5 +63,5 @@ body {
 }
 
 .chat-container .chat-new-message input {
-    width: 222px;
+    width: 190px;
 }
