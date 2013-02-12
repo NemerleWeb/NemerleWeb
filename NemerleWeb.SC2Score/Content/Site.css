@@ -18,14 +18,25 @@ body {
 }
 
 .tourney-info {
-    padding: 20px 10px 0 10px;
+    padding: 60px 10px 0 10px;
     float: left;
+    width: 510px;
 }
 
-.chat-container {
-    margin-top: 20px;
+.tourney-info .editor {
+    overflow: hidden;
+}
+
+.tourney-info .editor textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+.tourney-info .editor button {
     float: right;
-    width: 250px;
 }
 
 .tourney-list {
@@ -43,6 +54,11 @@ body {
     display: block;
 }
 
+.chat-container {
+    margin-top: 20px;
+    float: right;
+    width: 250px;
+}
 
 .chat-container .messages {
     height: 500px;

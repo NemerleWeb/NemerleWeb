@@ -53,8 +53,10 @@ namespace NemerleWeb.SC2Score
     public SourceView() : string
     {
       <#
-        <textarea event-keyup="$SourceChanged">$Source</textarea>
-        <button click="$Save" class="btn btn-info">Save</button>
+        <div class="editor">
+          <textarea event-keyup="$SourceChanged">$Source</textarea>
+          <button click="$Save" class="btn btn-info">Save</button>
+        </div>
       #>
     }
     
