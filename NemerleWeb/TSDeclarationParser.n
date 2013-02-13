@@ -1,0 +1,627 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Peg;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace TypeScript
+{
+  [PegGrammar(Options = EmitDebugSources,
+      start,
+      grammar
+      {
+        #region SourceCharacter (6)
+
+        SourceCharacter = [Any];
+
+        #endregion
+
+        #region WhiteSpace (7.2)
+
+        NBSP = '\u00A0';
+        BOM = '\uFEFF';
+        WhiteSpace = [Zs] / '\t' / '\v' / '\f' / ' ' / NBSP / BOM;
+
+        #endregion
+
+        #region Line terminators (7.3)
+
+        LineSeparator = '\u2028';
+        ParagraphSeparator = '\u2029';
+        LineTerminator = '\n' / '\r' / LineSeparator / ParagraphSeparator;
+        LineTerminatorSequence = "\r\n" / LineTerminator;
+
+        #endregion
+
+        #region Comment (7.4)
+        
+        Comment = MultiLineComment / SingleLineComment;
+        MultiLineComment = "/*" (!"*/" [Any])* "*/";
+        SingleLineComment = "//" (!LineTerminator [Any])*;
+
+        #endregion
+        
+        #region Identifier (7.6)
+        
+        ZWNJ = '\u200C';
+        ZWJ = '\u200D';        
+        
+        Identifier = !ReservedWord IdentifierName;
+        IdentifierName = IdentifierStart+ IdentifierPart?;
+        IdentifierStart = UnicodeLetter / '$' / '_' / '\\' UnicodeEscapeSequence;
+        IdentifierPart =
+          IdentifierStart /
+          UnicodeCombiningMark /
+          UnicodeDigit /
+          UnicodeConnectorPunctuation /
+          ZWNJ /
+          ZWJ;
+          
+        UnicodeLetter = [Lu, Ll, Lt, Lm, Lo, Nl];
+        UnicodeCombiningMark = [Mn, Mc];
+        UnicodeDigit = [Nd];
+        UnicodeConnectorPunctuation = [Pc];        
+        
+        #endregion
+        
+        #region ReservedWord (7.6.1)
+        
+        ReservedWord = Keyword / FutureReservedWord / StrictReservedWord / NullLiteral / BooleanLiteral;
+        StrictModeReservedWord = ReservedWord / StrictReservedWord;
+        
+        Keyword =
+          "break" / "do" / "instanceof" / "typeof" / "case" / "else" / 
+          "new" / "var" / "catch" / "finally" / "return" / "void" / "continue" /
+          "for" / "switch" / "while" / "debugger" / "function" / "this" / "with" / 
+          "default" / "if" / "throw" / "delete" / "in" / "try";
+          
+        // 7.6.1.2          
+        FutureReservedWord =
+          "class" / "enum" / "extends" / "super" / "const" / "export" / "import";
+          
+        // 10.1.1  
+        StrictReservedWord =
+          "implements" / "let" / "private" / "public" / "yield" / "interface" /
+          "package" / "protected" / "static";
+        
+        #endregion
+        
+        #region Literals (7.8)
+
+        //Literal = NullLiteral / BooleanLiteral / NumericLiteral / StringLiteral / RegularExpressionLiteral;
+
+        #endregion
+        
+        #region NullLiteral (7.8.1)
+        
+        NullLiteral = "null";
+        
+        #endregion
+        
+        #region BooleanLiteral (7.8.2)
+        
+        BooleanLiteral = "true" / "false";
+        
+        #endregion
+
+        #region NumericLiteral (7.8.3)
+
+        NumericLiteral = (DecimalLiteral / HexIntegerLiteral) !(IdentifierStart / DecimalDigit);
+
+        DecimalLiteral =
+          DecimalIntegerLiteral "." DecimalDigit* ExponentPart? /
+          "." DecimalDigit+ ExponentPart? /
+          DecimalIntegerLiteral ExponentPart?;
+
+        DecimalIntegerLiteral = '0' / NonZeroDigit DecimalDigit*;
+        DecimalDigit = ['0'..'9'];
+        NonZeroDigit = ['1'..'9'];        
+        ExponentPart = ExponentIndicator SignedInteger;
+        ExponentIndicator = 'e' / 'E';
+        SignedInteger = DecimalDigit+ / "+" DecimalDigit+ / "-" DecimalDigit+;
+        HexIntegerLiteral = ("0x" / "0X") HexDigit+;
+        HexDigit = ['0'..'9', 'a'..'f', 'A'..'F'];        
+
+        #endregion
+
+        #region StringLiteral (7.8.4)
+        
+        //StringLiteral = '"' DoubleStringCharacter* '"' / '\'' SingleStringCharacter* '\'';
+        //DoubleStringCharacter = 
+        //SingleStringCharacter
+        
+        HexEscapeSequence = "x" HexDigit HexDigit;
+        UnicodeEscapeSequence = "u" HexDigit HexDigit HexDigit HexDigit;
+        
+        #endregion
+        
+        
+
+        start : string = Identifier;
+
+/*
+
+        #region Spacer
+
+        space = whitespace / newLine;
+
+        [InlineAllSubrules]
+        s : void = space*;
+        S : void = !IdentifierPartCharacters s;
+
+        #endregion
+
+        #region Identifiers
+
+        
+
+        keyword = (CurrentWord / FutureReservedWord / StrictReservedWord) !IdentifierPartCharacters;
+
+        letterCharacter       = [Lu, Ll, Lt, Lm, Lo, Nl];
+        combiningCharacter    = [Mn, Mc];
+        decimalDigitCharacter = [Nd];
+        connectingCharacter   = [Pc];
+        formattingCharacter   = [Cf];
+
+        IdentifierName = IdentifierStart / IdentifierName IdentifierPart;
+        IdentifierStart = letterCharacter / '$' / '_' / ;
+
+        #endregion
+
+
+        #region Escape sequence
+
+        HexEscapeSequence = "x" HexDigit HexDigit;
+        UnicodeEscapeSequence = "u" HexDigit HexDigit HexDigit HexDigit
+
+        #endregion
+
+
+        identifierLetter            = letter / '_' / '$';
+        decimalDigit                = ['0'..'9'];
+        hexDigit                    = ['0'..'9', 'A'..'F', 'a'..'f'];
+        octalDigit                  = ['0'..'7'];
+        #endregion
+
+        #region Special Symbols
+        semicolon : void            = ';' s;
+        colon     : void            = ':' s;
+        dot       : void            = '.' s;
+        comma     : void            = ',' s;
+        lparen    : void            = '(' s;
+        rparen    : void            = ')' s;
+        lsbrack   : void            = '[' s;
+        rsbrack   : void            = ']' s;
+        lcbrace   : void            = '{' s;
+        rcbrace   : void            = '}' s;
+        eq        : void            = '=' s;
+        quest     : void            = '?' s;
+        arrow     : void            = "=>" s;
+        elipsis   : void            = "..." s;
+        #endregion
+
+        #region Reference
+        referencePathQuote          = '"' (!'"') '"';
+        referencePathSingleQuote    = '\'' (!'\'') '\'';
+        reference                   = s "<" s "reference" s 
+                                      "path" s "=" (referencePathQuote / referencePathSingleQuote)
+                                      s "/" s ">" s newLine?;        
+        referenceComment            = "///" referenceComment;
+        #endregion
+
+        #region Identifier
+        identifierValue              = identifierLetter (identifierLetter / decimalDigit)*;
+        identifier    : string       = identifierValue s;
+        identifiers   : list[string] = identifier (COMMA identifiers)?;
+        #endregion
+
+        normalType : TSType = identifier;
+
+        start : List[TSType] = DeclarationSourceFile;
+
+
+
+        //Identifier = 
+
+
+
+
+        /*
+        methodDeclaration : TypeScriptMember            = identifier QUEST? LPAREN parms? RPAREN (COLON type)? SEMICOLON;
+        propertyDeclaration : TypeScriptMember          = identifier QUEST? COLON type SEMICOLON;
+        propertyTypeDeclaration : TypeScriptMember      = identifier QUEST? COLON interfaceBlock SEMICOLON;
+        callDeclaration : TypeScriptMember              = LPAREN parms? RPAREN COLON type SEMICOLON;
+        indexDeclaration : TypeScriptMember         = LSBRACK parms? RSBRACK COLON type SEMICOLON;
+
+        objectProperty = propertyDeclaration / methodDeclaration / callDeclaration / indexDeclaration;
+        objectPropertyList = LCBRACE objectProperty* RCBRACE;
+
+        // Same as objectProperty but supports static members
+        classProperty;
+        classPropertyList = objectProperty*;
+
+        nonArrayType : TypeScriptType = normalType / lambdaType / objectPropertyList;
+        arrayType   : TypeScriptType = nonArrayType (s LSBRACK s RSBRACK)+;
+        type : TypeScriptType        = arrayType / nonArrayType;
+
+
+        parameter : TypeScriptParameter = (constructor / optionalParam/ nonOptionalParam);
+        multipleParameters : TypeScriptParameter  = ELIPSIS parameter;
+        parameters : list[TypeScriptParameter]  = (parameter/multipleParameters) (COMMA parmeters)?;
+
+
+        lambdaType : TypeScriptType  = LPAREN parms? RPAREN ARROW type;
+
+        globalObject = s;
+        classType = s;
+        interfaceType = s;
+        structuralType = s;
+        declareClass = s;
+
+
+        declare = "declare" (globalVar / globalFunc / globalEnum / globalObject/
+                             globalInterface / globalModule);
+        export = "export" (declareClass / globalVar / globalFunc / globalEnum /
+                           globalInterface / globalModule);
+        globalVar;
+        globalFunc;
+        globalModule;
+        globalEnum;
+        globalInterface;
+        globalImportModule;
+
+        declaration = declare / export / globalVar / globalFunc / globalModule /
+                      globalEnum / globalInterface / globalImportModule;
+        declarations = s declaration*;
+        start = declarations;*/
+
+        /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        nonArrayType : TypeScriptType = lambdaType / normalType / objectType / dictionaryType;
+        arrayType   : TypeScriptType = nonArrayType (s "[" s "]")+;
+        type : TypeScriptType                 = arrayType / nonArrayType;
+
+
+        dictionaryType : TypeScriptType       = LCBRACE LSBRACK identifier COLON s type RSBRACK COLON type SEMICOLON? RCBRACE;
+        objectType : TypeScriptType           = LCBRACE parmsSemicolon? RCBRACE;
+
+        constructor : TypeScriptParameter     = "new" s LPAREN parms? RPAREN (COLON type)? SEMICOLON;
+        nonOptionalParam : TypeScriptParameter          = identifier (COLON type)?;
+        optionalParam : TypeScriptParameter             = identifier QUEST (COLON type)?;
+        param : TypeScriptParameter                     = (constructor / optionalParam/ nonOptionalParam);
+        multipleParam : TypeScriptParameter             = "..." param;
+        parms : list[TypeScriptParameter]               = (param/multipleParam) (COMMA parms)?;
+        parmsSemicolon : list[TypeScriptParameter]      = param (SEMICOLON parmsSemicolon)? SEMICOLON?;
+        callDeclaration : TypeScriptMember              = LPAREN parms? RPAREN COLON type SEMICOLON;
+        indexCallDeclaration : TypeScriptMember         = LSBRACK parms? RSBRACK COLON type SEMICOLON;
+        methodDeclaration : TypeScriptMember            = identifier QUEST? LPAREN parms? RPAREN (COLON type)? SEMICOLON;
+        propertyDeclaration : TypeScriptMember          = identifier QUEST? COLON type SEMICOLON;
+        propertyTypeDeclaration : TypeScriptMember      = identifier QUEST? COLON interfaceBlock SEMICOLON;
+        memberDeclaration : TypeScriptMember            = (propertyDeclaration / propertyTypeDeclaration / methodDeclaration / callDeclaration / indexCallDeclaration);
+        interfaceBlock : list[TypeScriptMember]         = LCBRACE memberDeclaration* RCBRACE;
+        // extends is reserved keyword in JS
+        extends_ : list[string]                = "extends" s identifiers;
+        _interface : TypeScriptGlobalDeclaration                = "interface" s identifier extends_? interfaceBlock;
+
+        globalVarDeclaration : TypeScriptGlobalDeclaration = "declare" s "var" s identifier COLON interfaceBlock SEMICOLON?;
+        globalVarDeclarationType : TypeScriptGlobalDeclaration = "declare" s "var" s identifier COLON type SEMICOLON?;
+        globalFunctionDeclaration : TypeScriptGlobalDeclaration = "declare" s "function " methodDeclaration;
+
+        start : List[TypeScriptGlobalDeclaration] = s (_interface / globalVarDeclaration / globalVarDeclarationType / globalFunctionDeclaration)*;
+        */
+      }
+    )]
+  public class TSDeclarationParser
+  {
+    start(t : NToken) : string
+    {
+      GetText(t)
+    }
+    
+    /*
+    #region Identifier
+    identifier(idValue : NToken) : string 
+    {
+      GetText(idValue)
+    }
+
+    identifiers(id : string, tail : option[list[string]]) : list[string] 
+    {
+      match(tail)
+      {
+      | Some(tail) => id :: tail
+      | _ => [id]
+      }
+    }
+    #endregion
+
+    constructor(_ : NToken, _ : NToken, lst : option[list[TypeScriptParameter]], _ : NToken, _ : option[(NToken * TypeScriptType)], _ : NToken) : TypeScriptParameter
+    {
+      TypeScriptParameter("ctor", TypeScriptType.Normal("void"), false, false)
+    }
+
+
+    dictionaryType(_ : NToken, _ : NToken, _keyname : string, _ : NToken, key : TypeScriptType, _ : NToken, _ : NToken, value : TypeScriptType, _ : NToken, _ : NToken) : TypeScriptType
+    {
+      TypeScriptType.Dictionary(key, value)
+    }
+
+    objectType(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken) : TypeScriptType
+    {
+      TypeScriptType.Object(if(parms is Some(parms)) parms else [])
+    }
+
+    arrayType(type : TypeScriptType, arity : List[NToken * NToken]) : TypeScriptType
+    {
+      TypeScriptType.Array(type, arity.Count)
+    }
+
+    normalType(name : string) : TSType
+    {
+      | "any"    => TSType.Any()
+      | "number" => TSType.Number()
+      | "bool"   => TSType.Boolean()
+      | "string" => TSType.String()
+      | "void"   => TSType.Void()
+      | _        => TSType.Named(name)
+    }
+
+    enumType(_ : NToken, id : string, _ : NToken) : TSType
+    {
+      TSType.Enumeration(id)
+    }    
+
+    lambdaType(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypeScriptType) : TypeScriptType    
+    {
+      TypeScriptType.Lambda(parms, returnType)
+    }
+
+    nonOptionalParam(name : string, type : option[NToken * TypeScriptType]) : TypeScriptParameter
+    {
+      //System.Diagnostics.Debug.WriteLine("nonOptionalParm");
+      TypeScriptParameter(name, getType(type), false, false)
+    }
+
+    optionalParam(name : string, _ : NToken, type : option[NToken * TypeScriptType]) : TypeScriptParameter
+    {
+      //System.Diagnostics.Debug.WriteLine("optionalParm");
+      TypeScriptParameter(name, getType(type), true, false)
+    }
+
+    multipleParam(_ : NToken, parm : TypeScriptParameter) : TypeScriptParameter
+    {
+      TypeScriptParameter(parm.Name, parm.Type, parm.IsOptional, true)
+    }
+
+    parms(p : TypeScriptParameter, tail : option[(NToken * list[TypeScriptParameter])]) : list[TypeScriptParameter]
+    {
+      //System.Diagnostics.Debug.WriteLine("parms");
+      match(tail)
+      {
+      | Some((_, tail)) => p :: tail
+      | _ => [p]
+      }
+    }
+
+    parmsSemicolon(p : TypeScriptParameter, tail : option[(NToken * list[TypeScriptParameter])], _ : NToken) : list[TypeScriptParameter]
+    {
+      match(tail)
+      {
+      | Some((_, tail)) => p :: tail
+      | _ => [p]
+      }
+    }
+
+    methodDeclaration(name : string, isNullable : NToken, _ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, type : option[(NToken * TypeScriptType)],  _ : NToken) : TypeScriptMember.Method
+    {
+      //System.Diagnostics.Debug.WriteLine("method");
+      def type = if(type is Some((_, type))) type else null;
+      TypeScriptMember.Method(name, GetText(isNullable) == "?", if(parms is Some(parms)) parms else [], type)
+    }
+
+    propertyDeclaration(name : string, isNullable : NToken, _ : NToken, type : TypeScriptType, _ : NToken) : TypeScriptMember.Property
+    {
+      //System.Diagnostics.Debug.WriteLine("prop");
+      TypeScriptMember.Property(name, GetText(isNullable) == "?", type)
+    }
+
+    propertyTypeDeclaration(name : string, isNullable : NToken, _ : NToken, members : list[TypeScriptMember], _ : NToken) : TypeScriptMember.PropertyType
+    {
+      TypeScriptMember.PropertyType(name, GetText(isNullable) == "?", members)
+    }
+
+    callDeclaration(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypeScriptType, _ : NToken) : TypeScriptMember
+    {
+      TypeScriptMember.Call(parms, returnType)
+    }
+
+    indexCallDeclaration(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypeScriptType, _ : NToken) : TypeScriptMember
+    {
+      TypeScriptMember.IndexCall(parms, returnType)
+    }
+
+    memberDeclaration(member : TypeScriptMember) : TypeScriptMember
+    {
+      //System.Diagnostics.Debug.WriteLine("decl");
+      member
+    }
+
+    interfaceBlock(_ : NToken, declarations : List[TypeScriptMember], _ : NToken) : list[TypeScriptMember]
+    {
+      //System.Diagnostics.Debug.WriteLine("block");
+      declarations.NToList()
+    }
+
+    extends_(_ : NToken, extendTypes : list[string]) : list[string]
+    {
+      //System.Diagnostics.Debug.WriteLine("extends");
+      extendTypes
+    }
+
+    _interface(_ : NToken, name : string, extends_ : option[list[string]], members : list[TypeScriptMember]) : TypeScriptGlobalDeclaration
+    {
+      //System.Diagnostics.Debug.WriteLine("interface: " + name);
+      TypeScriptGlobalDeclaration.Interface(name, extends_, members)
+    }
+
+    globalVarDeclaration(_ : NToken, _ : NToken, name : string, _ : NToken, members : list[TypeScriptMember], _ : NToken) : TypeScriptGlobalDeclaration
+    {
+      TypeScriptGlobalDeclaration.Var(name, members)
+    }
+
+    globalVarDeclarationType(_ : NToken, _ : NToken, name : string, _ : NToken, type : TypeScriptType, _ : NToken) : TypeScriptGlobalDeclaration
+    {
+      TypeScriptGlobalDeclaration.VarType(name, type)
+    }
+
+    globalFunctionDeclaration(_ : NToken, _ : NToken, method : TypeScriptMember) : TypeScriptGlobalDeclaration
+    {
+      TypeScriptGlobalDeclaration.Function(method :> TypeScriptMember.Method);
+    }
+
+    start(lst : List[TSType]) : list[TSType]
+    {
+      lst.NToList()
+    }
+
+    /*start(interfaces : List[TypeScriptGlobalDeclaration]) : List[TypeScriptGlobalDeclaration]
+    {
+      interfaces
+    }
+    
+
+    /// Return type if present or any.
+    static getType(type : option[NToken * TypeScriptType]) : TypeScriptType
+    {
+      | Some((_, t)) => t
+      | _ => TypeScriptType.Normal("any")
+    }*/
+  }
+
+  public variant TypeScriptGlobalDeclaration
+  {
+    | Interface { Name : string; Extend : option[list[string]]; Members : list[TypeScriptMember] }
+    | Var       { Name : string; Members : list[TypeScriptMember]; }
+    | VarType   { Name : string; Type : TypeScriptType; }
+    | Function  { Method : TypeScriptMember.Method  }
+  }
+
+  public variant TypeScriptMember : Located
+  {
+    | Property     { Name : string; IsNullable : bool; Type : TypeScriptType }
+    | PropertyType { Name : string; IsNullable : bool; Members : list[TypeScriptMember]; }
+    | Method       { Name : string; IsNullable : bool; Parms : list[TypeScriptParameter]; Type : TypeScriptType }
+    | Call         { Parms : option[list[TypeScriptParameter]]; ReturnType : TypeScriptType }
+    | IndexCall    { Parms : option[list[TypeScriptParameter]]; ReturnType : TypeScriptType }
+  }
+
+  [Record]
+  public class TypeScriptDeclaration : Located
+  {
+    public Member : TypeScriptMember;
+  }
+
+  [Record]
+  public class TypeScriptParameter
+  {
+    public Name : string;
+    public Type : TypeScriptType;
+    public IsOptional : bool;
+    public IsParams : bool;
+  }
+
+  public variant TypeScriptType
+  {
+    | Object     { Parms : list[TypeScriptParameter] }
+    | Dictionary { Key : TypeScriptType; Value : TypeScriptType }
+    | Array      { Type : TypeScriptType; Arity : int; }
+    | Lambda     { Parms : option[list[TypeScriptParameter]]; ReturnType : TypeScriptType }
+    | Normal     { Name : string }
+  }
+
+  public variant TSType
+  {
+    | Any
+    | Number
+    | Boolean
+    | String
+    | Void
+    | Named        { Name : string; }
+    | GlobalObject { Name : string; }
+    | Enumeration  { Name : string; }
+    | Class        { Name : string; }
+    | Interface    { Name : string; }
+    | Array        { Type : TSType; }
+    | Lambda       { Parms : list[TSParameter]; ReturnType : TSType; }
+    | Structural   { Member : list[TSObjectMember]; }
+  }
+
+  [Record]
+  public class TSVariable
+  {
+    Name : string;
+    Type : TSType;
+    IsOptional : bool;
+  }
+
+  [Record]
+  public class TSParameter
+  {
+    Var : TSVariable;
+    IsParamArray : bool;
+  }
+
+  [Record]
+  public class TSFunction
+  {
+    Name : string;
+    Type : TSType;
+    Parameters : list[TSParameter];
+    IsOptional : bool;
+  }
+
+  public variant TSObjectMember
+  {
+    | Property { Var : TSVariable; IsStatic : bool; }
+    | Method   { Var : TSFunction; IsStatic : bool; }
+    | Indexer  { Var : TSFunction; IsStatic : bool; }
+  }
+
+  [Record]
+  public class TSObject
+  {
+    Name : string;
+    Members : list[TSObjectMember];
+    SuperTypes : list[string];
+  }
+
+  public variant TSGlobal
+  {
+    | DeclareVar       { Var : TSVariable; }
+    | DeclareFunction  { Function : TSFunction; }
+    | DeclareInterface { Interface : TSObject; }
+    | DeclareClass     { Class : TSObject; }
+    | DeclareObject    { Obj : TSObject; }
+    | DeclareModule    { Name : string; Members : list[TSGlobal]; }
+    | DeclareEnum      { Name : string; Members : list[string]; }
+    | ImportModule     { Alias : string; Module : string; }
+  }
+}
