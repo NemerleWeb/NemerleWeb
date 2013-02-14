@@ -501,15 +501,6 @@ nweb.utils = {
         for(var v in obj) return v;
     },
     toTypedObject: function (obj) {
-        /*
-        if (typeof obj === "string") {
-            try {
-                obj = JSON.parse(obj);
-            } catch(e) {
-            
-            }
-        }*/
-
         if (obj != null && !!obj.$type) {
           var typename = obj.$type.replace(/\./g, "_").replace(/\+/g, "_").replace(/(.+),.+/g, "$1");
           
@@ -555,6 +546,21 @@ nweb.utils = {
     },
     isTuple: function(obj) {
       return !!obj.$type && obj.$type.indexOf('Nemerle.Builtins.Tuple`') == 0;
+    },
+    normalizeObjectForServer: function (obj) {
+      if (typeof obj !== "object" || typeof obj === 'undefined' || obj === null)
+        return obj;
+      
+      var result = {};
+      for (var member in obj) {
+        if (obj.hasOwnProperty(member)) {
+          if (typeof obj[member] === 'function' && member.indexOf("get_") === 0)
+            result[member.substr(4)] = obj[member]();
+          else 
+            result[member] = obj[member];
+        }
+      }
+      return result;
     },
     getTemplateName: function(model, viewName) {
         if (!model)
