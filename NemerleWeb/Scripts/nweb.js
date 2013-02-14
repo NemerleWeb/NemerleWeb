@@ -548,16 +548,16 @@ nweb.utils = {
       return !!obj.$type && obj.$type.indexOf('Nemerle.Builtins.Tuple`') == 0;
     },
     normalizeObjectForServer: function (obj) {
-      if (typeof obj !== "object" || typeof obj === 'undefined' || obj === null)
+      if (typeof obj !== "object" || obj === null)
         return obj;
       
       var result = {};
       for (var member in obj) {
         if (obj.hasOwnProperty(member)) {
           if (typeof obj[member] === 'function' && member.indexOf("get_") === 0)
-            result[member.substr(4)] = obj[member]();
+            result[member.substr(4)] = nweb.utils.normalizeObjectForServer(obj[member]());
           else 
-            result[member] = obj[member];
+            result[member] = nweb.utils.normalizeObjectForServer(obj[member]);
         }
       }
       return result;

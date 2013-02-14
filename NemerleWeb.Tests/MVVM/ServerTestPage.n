@@ -35,6 +35,11 @@ namespace NemerleWeb.Tests
          def res = result.Name == "Peter" && result.Age == 45;
          Results.Add(("Test object with properties", res));
        });
+       
+       server.TestObjectWithNestedObject(DummyWithOtherDummy(DummyWithProperties("Peter", 45)), result => {
+         def res = result.Dummy.Name == "Peter" && result.Dummy.Age == 45;
+         Results.Add(("Test object with nested objects", res));
+       });
     }
     
     [Html]
@@ -73,6 +78,11 @@ namespace NemerleWeb.Tests
       {
         dummy
       }
+      
+      public TestObjectWithNestedObject(dummy : DummyWithOtherDummy) : DummyWithOtherDummy
+      {
+        dummy
+      }
     }
     
     [Unit, Record]
@@ -87,6 +97,12 @@ namespace NemerleWeb.Tests
     { 
       public Name : string { get; set; }
       public Age : int { get; set; }      
+    }
+    
+    [Unit, Record]
+    public class DummyWithOtherDummy
+    {
+      public Dummy : DummyWithProperties { get; set; }
     }
   }
 }
