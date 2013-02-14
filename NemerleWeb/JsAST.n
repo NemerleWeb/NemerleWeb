@@ -655,7 +655,7 @@ $(indent)break;#>
         }
         | ServerCall     { MethodName : string; TypeName : string; Parameters : list[string * JsAst]; Callback : JsAst;
             public override Write(indent = "" : string) : string {                            
-              def jsparms = Parameters.Map((name, val) => $"$name: ' + JSON.stringify($(val.Write())) + '");
+              def jsparms = Parameters.Map((name, val) => $"$name: ' + JSON.stringify(nweb.utils.normalizeObjectForServer($(val.Write()))) + '");
               def callback = Callback.Write().TrimEnd(';');
 $<#
 $(indent)$$.ajax({

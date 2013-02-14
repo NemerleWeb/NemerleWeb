@@ -26,9 +26,14 @@ namespace NemerleWeb.Tests
          Results.Add(("Test tuple", res));
        });
               
-       server.TestObject(Dummy("Peter", 45), "", result => {
+       server.TestObject(Dummy("Peter", 45), result => {
          def res = result.Name == "Peter" && result.Age == 45;
          Results.Add(("Test object", res));
+       });
+       
+       server.TestObjectWithProperties(DummyWithProperties("Peter", 45), result => {
+         def res = result.Name == "Peter" && result.Age == 45;
+         Results.Add(("Test object with properties", res));
        });
     }
     
@@ -59,17 +64,29 @@ namespace NemerleWeb.Tests
         (text, number)
       }
       
-      public TestObject(dummy : Dummy, text : string) : Dummy
+      public TestObject(dummy : Dummy) : Dummy
+      {
+        dummy
+      }
+      
+      public TestObjectWithProperties(dummy : DummyWithProperties) : DummyWithProperties
       {
         dummy
       }
     }
     
-    [Record]
+    [Unit, Record]
     public class Dummy
     { 
       public Name : string;
       public Age : int;
+    }
+
+    [Unit, Record]    
+    public class DummyWithProperties
+    { 
+      public Name : string { get; set; }
+      public Age : int { get; set; }      
     }
   }
 }
