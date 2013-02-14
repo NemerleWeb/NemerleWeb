@@ -498,39 +498,53 @@ nweb.utils = {
         return obj && { }.toString.call(obj) == '[object Function]';
     },
     firstProperty: function(obj) {
-        for(v in obj) return v;
+        for(var v in obj) return v;
     },
-    toTypedObject: function(obj) {
+    toTypedObject: function (obj) {
+        /*
         if (typeof obj === "string") {
             try {
                 obj = JSON.parse(obj);
             } catch(e) {
             
             }
-        }
+        }*/
 
         if (obj != null && !!obj.$type) {
-            var typename = obj.$type.replace(/\./g, "_").replace(/\+/g, "_").replace(/(.+),.+/g, "$1");
-            // HACK: Support constructor's signature
-            var typenameCtor = typename + '$ctor';
-            var hasTypenameCtor = eval('typeof ' +  typenameCtor + '!== "undefined"');
-
-            var newObjectExpr =
-                'new ' + typename + '("' +
-                    (hasTypenameCtor ? nweb.utils.firstProperty(eval(typenameCtor)) : '') +
-                '")';
-            var newObj = eval(newObjectExpr);
-
-            for (var p in obj) {
-              var propSetter = "set_" + p;
-              if (obj.hasOwnProperty(p)) {
-                if (newObj.hasOwnProperty(propSetter) && typeof newObj[propSetter] === "function")
-                  newObj[propSetter](nweb.utils.toTypedObject(obj[p]));
-                else if (newObj.hasOwnProperty(p))
-                  newObj[p] = nweb.utils.toTypedObject(obj[p]);
+          var typename = obj.$type.replace(/\./g, "_").replace(/\+/g, "_").replace(/(.+),.+/g, "$1");
+          
+          if (nweb.utils.isTuple(obj)) {
+            var tuple = [];
+            for (var field in obj) {
+              var match = field.match(/Field(\d+)/);
+              if (match) {
+                tuple[match[1]] = nweb.utils.toTypedObject(obj[field]);
               }
             }
-            return newObj;
+            
+            return tuple;
+          }
+
+          // HACK: Support constructor's signature
+          var typenameCtor = typename + '$ctor';
+          var hasTypenameCtor = eval('typeof ' +  typenameCtor + '!== "undefined"');
+
+          var newObjectExpr =
+              'new ' + typename + '("' +
+                  (hasTypenameCtor ? nweb.utils.firstProperty(eval(typenameCtor)) : '') +
+              '")';
+          var newObj = eval(newObjectExpr);
+
+          for (var p in obj) {
+            var propSetter = "set_" + p;
+            if (obj.hasOwnProperty(p)) {
+              if (newObj.hasOwnProperty(propSetter) && typeof newObj[propSetter] === "function")
+                newObj[propSetter](nweb.utils.toTypedObject(obj[p]));
+              else if (newObj.hasOwnProperty(p))
+                newObj[p] = nweb.utils.toTypedObject(obj[p]);
+            }
+          }
+          return newObj;
         }
         if (obj instanceof Array) {
             var newArr = [];
@@ -538,6 +552,9 @@ nweb.utils = {
             return newArr;
         }
         return obj;
+    },
+    isTuple: function(obj) {
+      return !!obj.$type && obj.$type.indexOf('Nemerle.Builtins.Tuple`') == 0;
     },
     getTemplateName: function(model, viewName) {
         if (!model)
@@ -591,9 +608,9 @@ nweb.utils = {
 Array.prototype.getEnumerator = function() {
     this.__enumeratorIndex = -1;
     this.Current = null;
-    this.get_Current = function () {
-        return this.Current;
-    }
+    this.get_Current = function() {
+      return this.Current;
+    };
     return this;
 };
 

@@ -1,0 +1,111 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Imperative;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Configuration;
+
+using ServiceStack.Redis;
+
+namespace NemerleWeb.SC2Score
+{
+  module Redis
+  {
+    private _pool : PooledRedisClientManager;
+    
+    this()
+    {
+      def url = ConfigurationManager.AppSettings["REDISCLOUD_URL"];
+      def regex = Regex("redis://(?<login>[^@|^:]+):(?<pass>[^@]+)@(?<host>[^:]+):(?<port>[^/]+)");
+      def mtch = regex.Match(url);
+      def login = mtch.Groups["login"].Value;
+      def pass = mtch.Groups["pass"].Value;
+      def host = mtch.Groups["host"].Value;
+      def port = mtch.Groups["port"].Value;
+            
+      _pool = PooledRedisClientManager(10, 5, pass + "@" + "pub-" + host + ":" + port);
+    }
+    
+    public GetClient() : IRedisClient
+    {
+      _pool.GetClient();
+    }
+    
+    public Exec[T](action : RedisOperations -> T) : T {
+      using(client = GetClient()) {
+        action(RedisOperations(client));
+      }
+    }
+    
+    public class RedisOperations
+    {      
+      private _client : IRedisClient;
+      
+      public this(client : IRedisClient)
+      {
+        _client = client;        
+      }
+      
+      public AddTourney(tourney : Tourney) : long
+      {                
+        def newId = _client.As.[Tourney]().GetNextSequence();
+        
+        using(pipeline = _client.CreatePipeline()) {          
+          def shortInfo = TourneyShortInfo(tourney, newId);
+          
+          //Add to common Tourney hash table
+          pipeline.QueueCommand(cl : IRedisClient => { 
+            def tourneys = cl.As.[Tourney]();
+            tourneys.SetEntry(newId.ToString(), tourney);
+          });
+
+          //Add info to list of all tourneys
+          pipeline.QueueCommand(cl : IRedisClient => { 
+            def shortInfos = cl.As.[TourneyShortInfo]();
+            shortInfos.Lists["all"].Prepend(shortInfo);
+          });
+
+          //Add to "most recent 50" list        
+          pipeline.QueueCommand(cl : IRedisClient => { 
+            def shortInfos = cl.As.[TourneyShortInfo](); 
+            shortInfos.Lists["recent50"].Prepend(shortInfo);
+          });
+
+          //Trim "most recent 50" list        
+          pipeline.QueueCommand(cl : IRedisClient => { 
+            def shortInfos = cl.As.[TourneyShortInfo](); 
+            shortInfos.Lists["recent50"].Trim(0, 49);
+          });
+          
+          pipeline.Flush();
+          
+          return newId;
+        }
+        
+        throw Exception("Couldn't add tourney due to database problems");
+      }
+      
+      public SaveTourney(tourney : Tourney) : long
+      {
+        _client.As.[Tourney]().SetEntry(tourney.Id.ToString(), tourney);
+        tourney.Id
+      }
+      
+      public GetRecent50() : IEnumerable[TourneyShortInfo]
+      {
+        def infos = _client.As.[TourneyShortInfo]();
+        infos.Lists["recent50"].ToList();
+      }
+      
+      public GetTourneyById(id : long) : Tourney
+      {
+        _client.As.[Tourney]().GetById(id);
+      }
+    }    
+  }
+}

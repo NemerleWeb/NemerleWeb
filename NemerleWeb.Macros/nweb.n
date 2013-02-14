@@ -103,7 +103,7 @@ $$(function() {
                                                .CurrentDomain
                                                .GetAssemblies()
                                                .Select(a => a.FullName)
-                                               .ToList();                                             
+                                               .ToList();
                   {..$assemblies;}
                   _isInitialized = true;
                 }

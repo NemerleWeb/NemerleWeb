@@ -78,7 +78,7 @@ namespace NemerleWeb
             </script>
             #>
         });      
-        $"..$templateScripts"
+        $<#..$(templateScripts; "\n")#>
       }
       else
         ""   
