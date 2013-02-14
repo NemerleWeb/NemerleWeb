@@ -20,5 +20,10 @@ namespace NemerleWeb.Tests.Controllers
     {
       View("Index", (nweb TemplateTestsPage()) : object);
     }
+    
+    public ServerTests() : ActionResult
+    {
+      View("Index", (nweb ServerTestPage()) : object);
+    }
   }
 }

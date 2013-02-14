@@ -12,8 +12,11 @@ namespace NemerleWeb.SC2Score
   [Unit]
   public class Tourney
   {
-    public Name : string { get; set; }
-    public Source : string;
+    public Id : long { get; set; }
+    public Name : string { get; set; };
+    public Source : string { get; set; };
+    public FromDate : DateTime { get; set; };
+    public ToDate : DateTime { get; set; };
     
     private mutable _rendered : string;
     private Rendered : string {
@@ -34,7 +37,8 @@ namespace NemerleWeb.SC2Score
     
     public RenderMarkdown() : void
     {
-      _rendered = callJs.[string]("markdown.toHTML", Source);
+      when(Source != null)
+        _rendered = callJs.[string]("markdown.toHTML", Source);
     }
     
     public SourceChanged() : void
@@ -50,11 +54,14 @@ namespace NemerleWeb.SC2Score
     }
     
     [Html]
-    public SourceView() : string
+    public EditorView() : string
     {
       <#
         <div class="editor">
+          <input type="text" value="$Name" />
           <textarea event-keyup="$SourceChanged">$Source</textarea>
+          <input type="text" value="$FromDate" />
+          <input type="text" value="$ToDate" />
           <button click="$Save" class="btn btn-info">Save</button>
         </div>
       #>
@@ -68,9 +75,12 @@ namespace NemerleWeb.SC2Score
     
     public class Server
     {
-      public Save(tourney : Tourney) : string
+      public Save(tourney : Tourney) : long
       {
-        "saved, thx"
+        if(tourney.Id == 0)
+          Redis.Exec(_.AddTourney(tourney));
+        else
+          Redis.Exec(_.SaveTourney(tourney));
       }
     }
   }  

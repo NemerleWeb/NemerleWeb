@@ -1,0 +1,75 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Extensions;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.Tests
+{
+  [Unit]
+  public class ServerTestPage
+  {
+    Results : List[(string * bool)] { get; set; }
+    
+    public this() 
+    {      
+       server.TestPrimitive("123", result => {
+         Results.Add(("Test primitive", result == "123"));
+       });
+       
+       server.TestPrimitives("123", 321, result => {
+         def res = result[0] == "123" && result[1] == 321;
+         Results.Add(("Test tuple", res));
+       });
+              
+       server.TestObject(Dummy("Peter", 45), "", result => {
+         def res = result.Name == "Peter" && result.Age == 45;
+         Results.Add(("Test object", res));
+       });
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+        <table class="jsast-tests">
+          <tbody>
+            <tr $foreach(r in Results) css-succeeded='$(r[1].ToString() == "true")'>
+              <td>$(r[0])</td>
+              <td>$(r[1])</td>
+            </tr>
+          </tbody>
+        </table>
+      #>
+    }
+    
+    public class Server
+    {
+      public TestPrimitive(text : string) : string
+      {
+        text
+      }
+      
+      public TestPrimitives(text : string, number : int) : (string * int)
+      {
+        (text, number)
+      }
+      
+      public TestObject(dummy : Dummy, text : string) : Dummy
+      {
+        dummy
+      }
+    }
+    
+    [Record]
+    public class Dummy
+    { 
+      public Name : string;
+      public Age : int;
+    }
+  }
+}

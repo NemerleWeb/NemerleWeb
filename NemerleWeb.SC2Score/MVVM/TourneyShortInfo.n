@@ -1,0 +1,29 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.SC2Score
+{  
+  [Unit]
+  public class TourneyShortInfo
+  {
+    public Id : long;
+    public Name : string;
+    public FromDate : DateTime;
+    public ToDate : DateTime;
+    
+    public this() {}
+    public this(tourney : Tourney, id : long)
+    {
+      Id = id;
+      Name = tourney.Name;
+      FromDate = tourney.FromDate;
+      ToDate = tourney.ToDate;
+    }
+  }
+}

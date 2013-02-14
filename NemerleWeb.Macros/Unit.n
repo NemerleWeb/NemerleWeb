@@ -92,14 +92,20 @@ namespace NemerleWeb
                   
             when(method.ReturnType.TryRequire(<[ ttype: void ]>))
               Message.FatalError("Server methods cannot return void, please return something");
-                    
-            ctb.Define(<[ decl: 
-              public $(methodName : name) (..$fparms) : System.Web.Mvc.ActionResult
+                
+            def deserializedParams = method.GetParameters().Map(p => <[ parsedModel[$(p.Name : string)].ToObject.[$(p.ty : typed)]() ]>);
+              
+            _ = ctb.DefineWithSource(<[ decl: 
+              public $(methodName : name) (model : string) : System.Web.Mvc.ActionResult
               {
-                  def result = _server.$(method.Name : dyn)(..$parameters);
-                  def settings = Newtonsoft.Json.JsonSerializerSettings();
-                  settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
-                  Content(Newtonsoft.Json.JsonConvert.SerializeObject(result, settings));
+                def parsedModel = Newtonsoft.Json.Linq.JObject.Parse(model);
+                
+                def result = _server.$(method.Name : dyn)(..$deserializedParams);
+                  
+                def settings = Newtonsoft.Json.JsonSerializerSettings();
+                settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
+                                
+                Content(Newtonsoft.Json.JsonConvert.SerializeObject(result, settings));
               }
             ]>);
                   
@@ -110,10 +116,12 @@ namespace NemerleWeb
             else
               serverMethods.Add(method.Name, fparms);
                   
-            def fparms = fparms.Append([<[ parameter: _callback : $(method.ReturnType : typed) -> void ]>]);
+            //when(method.Name == "TestPrimitives")
+            //assert2(false);
+            def allParms = fparms.Append([<[ parameter: _callback : Action[$(method.ReturnType : typed)] ]>]);
                   
             ptb.Define(<[ decl:                   
-              public $(methodName : name) (..$(fparms)) : void
+              public $(methodName : name) (..$(allParms)) : void
               {}
             ]>);
           }

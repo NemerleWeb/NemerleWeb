@@ -188,6 +188,9 @@
     <Compile Include="Infrastructure\HtmlHelperExtensions.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MVVM\ServerTestPage.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\TemplateTestPage.n">
       <SubType>Code</SubType>
     </Compile>
