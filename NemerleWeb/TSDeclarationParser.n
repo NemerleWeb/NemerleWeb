@@ -14,6 +14,8 @@ namespace TypeScript
       start,
       grammar
       {
+        #region EcmaScript
+        
         #region SourceCharacter (6)
 
         SourceCharacter = [Any];
@@ -155,10 +157,284 @@ namespace TypeScript
         UnicodeEscapeSequence = "u" HexDigit HexDigit HexDigit HexDigit;
         
         #endregion
+                
+        #if A
+        #region Left-Hand-Side Expressions (11.2)
         
+        LeftHandSideExpression = NewExpression / CallExpressoin;
         
+        #endregion
+        
+        #region Conditional Operator (11.12)
+        
+        ConditionalExpression =
+          LogicalORExpression /
+          LogicalORExpression "?" AssignmentExpression ":" AssignmentExpression;
+        
+        #endregion        
+        
+        #region Assignement Operators (11.13)
+        
+        AssignmentExpression =
+          ConditionalExpression /
+          LeftHandSideExpression "=" AssignmentExpression /
+          LeftHandSideExpression AssignmentOperator AssignmentExpression;
+        
+        AssignmentOperator = "*=" / "/=" / "%=" / "+=" / "-=" / "<<=" / ">>=" / ">>>=" / "&=" / "^=" / "|=";
+        
+        #endregion
+        #endif
+        #region Variable Statement (12.2)
+        
+        VariableStatement = "var" VariableDeclarationList ";";
+        VariableDeclarationList = VariableDeclaration ("," VariableDeclaration)*;
+        VariableDeclaration = Identifier;
+        // TODO: Add;
+        Initialiser = "a";// "=" AssignmentExpression;
+        
+        #endregion
+        
+        #endregion
+        
+        #region TypeScript
+        
+        #region Specifying Types (3.5)
+        
+        ScriptType = PredefinedType / TypeName / TypeLiteral;
+        PredefinedType = "any" / "number" / "bool" / "string";
+        TypeName = Identifier ("." Identifier)*;
+        ModuleName = TypeName;
+        TypeLiteral = ObjectType / /*ArrayType /*/ FunctionType / ConstructorType;
+        
+        #endregion
+        
+        #region Object Type Literals (3.5.3)
+        
+        ObjectType = "{" TypeBody "}";
+        TypeBody = TypeMemberList? / TypeMemberList ";";
+        TypeMemberList = TypeMember (";" TypeMember)*;
+        TypeMember =
+          CallSignature /
+          ConstructSignature /
+          IndexSignature /
+          PropertySignature /
+          FunctionSignature;
+        
+        CallSignature = "(" ParameterList? ")" ReturnTypeAnnotation?;
+        ConstructSignature = "new" "(" ParameterList? ")" TypeAnnotation?;        
+        IndexSignature = "[" RequiredParameter "]" TypeAnnotation?;
+        PropertySignature = Identifier "?"? TypeAnnotation?;
+        FunctionSignature = Identifier "?"? "(" ParameterList? ")" ReturnTypeAnnotation?;
+        
+        #endregion
+        
+        #region Array Type Literals (3.5.4)
+        
+        ArrayType = ScriptType "[" "]";
+        
+        #endregion
+        
+        #region Function Type Literals (3.5.6)
+        
+        FunctionType = "(" ParameterList? ")" "=>" ReturnType;
+        
+        #endregion
+        
+        #region Constructor Type Literals (3.5.6)
+        
+        ConstructorType = "new" "(" ParameterList? ")" "=>" ScriptType;
 
-        start : string = StringLiteral;
+        #endregion
+        
+        #region Variable Statements (5.1)
+        
+        TypeAnnotation = ScriptType;
+        
+        #endregion
+        
+        #region Function Declarations
+        
+        // Modified
+        FunctionDeclaration = FunctionOverload+;
+        FunctionOverload = "function" FunctionSignature ";";
+        
+        #endregion
+        
+        #region Function Signatures (6.2)
+        
+        ParameterList =
+          RequiredParameterList /
+          OptionalParameterList /
+          RestParameter /
+          RequiredParameterList "," OptionalParameterList /
+          RequiredParameterList "," RestParameter /
+          OptionalParameterList "," RestParameter /
+          RequiredParameterList "," OptionalParameterList "," RestParameter;
+        RequiredParameterList = RequiredParameter ("," RequiredParameter)*;
+        RequiredParameter = PublicOrPrivate? Identifier TypeAnnotation?;
+        PublicOrPrivate = "public" / "private";
+        OptionalParameterList = OptionalParameter ("," OptionalParameter)*;
+        OptionalParameter =
+          PublicOrPrivate? Identifier "?" TypeAnnotation? /
+          PublicOrPrivate? Identifier TypeAnnotation? Initialiser;
+        RestParameter = "..." RequiredParameter;
+        ReturnTypeAnnotation = ":" ReturnType;
+        ReturnType = ScriptType / "void";
+        
+        #endregion
+        
+        #region Interface Declarations (7.1)
+        
+        InterfaceDeclaration = "interface" Identifier InterfaceExtendsClause? ObjectType;
+        InterfaceExtendsClause = "extends" InterfaceNameList;
+        InterfaceNameList = InterfaceName ("," InterfaceName)*;
+        InterfaceName = TypeName;
+        
+        #endregion
+        
+        #region Class Declarations (8.1)
+        
+        ClassDeclaration = "class" Identifier ClassHeritage "{" ClassBody "}";
+        
+        ClassHeritage = ClassExtendsClause? ImplementsClause?;
+        ClassExtendsClause = "extends" ClassName;
+        ClassName = TypeName;
+        ImplementsClause = "implements" InterfaceNameList;
+        
+        ClassBody = ClassElement*;
+        ClassElement = ConstructorDeclaration / MemberDeclaration;
+        
+        #endregion
+        
+        #region Constructor Declaration (8.3)
+        
+        ConstructorDeclaration = ConstructorOverload+;
+        ConstructorOverload = "constructor" "(" ParameterList? ")" ";";
+        
+        #endregion
+        
+        #region Member Declarations (8.4)
+        
+        MemberDeclaration = MemberVariableDeclaration / MemberFunctionDeclaration;
+        
+        MemberVariableDeclaration = PublicOrPrivate? "static" VariableDeclaration ";";
+        
+        MemberFunctionDeclaration = MemberFunctionOverload+;
+        MemberFunctionOverload = PublicOrPrivate? "static"? FunctionSignature ";";
+                
+        #endregion
+        
+        #region Programs (9.1)
+        
+        SourceFile = DeclarationSourceFile;
+        ModuleElement =
+          // TODO: Do we need it ?
+          // Statement /
+          FunctionDeclaration /
+          ClassDeclaration /
+          InterfaceDeclaration /
+          ModuleDeclaration /
+          ImportDeclaration /
+          ExportDeclaration /
+          AmbientDeclaration;
+        
+        #endregion
+        
+        #region Module Declarations (9.2)
+        
+        ModuleDeclaration = "module" IdentifierPath? "{" ModuleBody "}";
+        IdentifierPath = Identifier ("." Identifier)*;
+        ModuleBody = ModuleElement*;
+        
+        #endregion
+        
+        #region Export Declarations (9.2.1)
+        
+        ExportDeclaration =
+          "export"
+            (
+              VariableStatement /
+              FunctionDeclaration /
+              ClassDeclaration /
+              InterfaceDeclaration /
+              ModuleDeclaration /
+              AmbientDeclaration
+            );
+            
+        #endregion 
+        
+        #region Import Declarations (9.2.2)
+        
+        ImportDeclaration = "import" Identifier "=" ModuleReference ";";
+        ModuleReference = ExternalModuleReference ModuleName;
+        ExternalModuleReference = "module" "(" StringLiteral ")";
+        
+        #endregion
+        
+        #region Ambient Declarations (10.1)
+        
+        AmbientDeclaration =
+          "declare"
+           (
+            AmbientVariableDeclaration /
+            AmbientFunctionDeclaration /
+            AmbientClassDeclaration /
+            AmbientModuleDeclaration
+           );
+        
+        #endregion
+        
+        #region Ambient Variable Declarations (10.1.1)
+        
+        AmbientVariableDeclaration = "var" Identifier TypeAnnotation?;
+                
+        #endregion
+        
+        #region Ambient Variable Declarations (10.1.2)
+        
+        AmbientFunctionDeclaration = "function" FunctionSignature;       
+        
+        #endregion
+        
+        #region Ambient Class Declarations (10.1.3)
+        
+        AmbientClassDeclaration = "class" Identifier ClassHeritage "{" AmbientClassBody "}";
+        AmbientClassBody = AmbientClassBodyElement*;
+        AmbientClassBodyElement = AmbientConstructorDeclaration AmbientMemberDeclaration AmbientStaticDeclaration;
+        AmbientConstructorDeclaration = "constructor" "(" ParameterList? ")" ";";
+        AmbientMemberDeclaration = PublicOrPrivate? Identifier TypeAnnotation? ";" PublicOrPrivate? FunctionSignature ";";
+        AmbientStaticDeclaration = "static" Identifier TypeAnnotation? ";" "static" FunctionSignature ";";
+        
+        #endregion        
+        
+        #region Ambient Module Declarations (10.1.4)
+        
+        AmbientModuleDeclaration = "module" AmbientModuleIdentification "{" AmbientModuleBody "}";
+        AmbientModuleIdentification = IdentifierPath StringLiteral;
+        AmbientModuleBody = AmbientElement*;
+        
+        AmbientElement = 
+          "export"?
+            (
+              AmbientVariableDeclaration /
+              AmbientFunctionDeclaration /
+              AmbientClassDeclaration /
+              InterfaceDeclaration /
+              AmbientModuleDeclaration
+            ) /         
+          ImportDeclaration;
+                  
+        #endregion
+                
+        #region Declaration Source Files (10.2)
+        
+        DeclarationSourceFile = AmbientElement*;
+        
+        #endregion
+        
+        #endregion
+        
+        start : string = DeclarationSourceFile;
 
 /*
 
