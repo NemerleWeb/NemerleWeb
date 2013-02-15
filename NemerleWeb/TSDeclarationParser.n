@@ -14,9 +14,9 @@ namespace TypeScript
       start,
       grammar
       {
-        WhiteSpaceOrLineTerminatorSequence = WhiteSpace / LineTerminatorSequence;
-        s : void = WhiteSpaceOrLineTerminatorSequence*;
-        S : void = (WhiteSpaceOrLineTerminatorSequence / ';')*;
+        Spacing = WhiteSpace / LineTerminatorSequence / Comment;
+        s : void = Spacing*;
+        S : void = (Spacing / ';')*;
         
         #region EcmaScript
         
@@ -252,7 +252,7 @@ namespace TypeScript
         
         #region Variable Statements (5.1)
         
-        TypeAnnotation = ScriptType;
+        TypeAnnotation = ":"s ScriptType;
         
         #endregion
         
@@ -270,19 +270,19 @@ namespace TypeScript
           RequiredParameterList /
           OptionalParameterList /
           RestParameter /
-          RequiredParameterList "," OptionalParameterList /
-          RequiredParameterList "," RestParameter /
-          OptionalParameterList "," RestParameter /
-          RequiredParameterList "," OptionalParameterList "," RestParameter;
-        RequiredParameterList = RequiredParameter ("," RequiredParameter)*;
+          RequiredParameterList ","s OptionalParameterList /
+          RequiredParameterList ","s RestParameter /
+          OptionalParameterList ","s RestParameter /
+          RequiredParameterList ","s OptionalParameterList ","s RestParameter;
+        RequiredParameterList = RequiredParameter (","s RequiredParameter)*;
         RequiredParameter = PublicOrPrivate? Identifier TypeAnnotation?;
-        PublicOrPrivate = "public" / "private";
-        OptionalParameterList = OptionalParameter ("," OptionalParameter)*;
+        PublicOrPrivate = ("public" / "private")s;
+        OptionalParameterList = OptionalParameter (","s OptionalParameter)*;
         OptionalParameter =
-          PublicOrPrivate? Identifier "?" TypeAnnotation? /
+          PublicOrPrivate? Identifier "?"s TypeAnnotation? /
           PublicOrPrivate? Identifier TypeAnnotation? Initialiser;
         RestParameter = "..." RequiredParameter;
-        ReturnTypeAnnotation = ":" ReturnType;
+        ReturnTypeAnnotation = ":"s ReturnType;
         ReturnType = ScriptType / "void";
         
         #endregion
@@ -391,7 +391,7 @@ namespace TypeScript
         #region Ambient Variable Declarations (10.1.1)
         
         AmbientVariableDeclaration = "var"s Identifier TypeAnnotation? S;
-                
+        
         #endregion
         
         #region Ambient Variable Declarations (10.1.2)
@@ -417,8 +417,8 @@ namespace TypeScript
         AmbientModuleIdentification = IdentifierPath / StringLiteral;
         AmbientModuleBody = AmbientElement*;
         
-        AmbientElement = 
-          "export"?s
+        AmbientElement =
+          "export"?s "declare"?s
             (
               AmbientVariableDeclaration /
               AmbientFunctionDeclaration /
@@ -432,7 +432,7 @@ namespace TypeScript
                 
         #region Declaration Source Files (10.2)
         
-        DeclarationSourceFile = AmbientElement*;
+        DeclarationSourceFile = S AmbientElement*;
         
         #endregion
         
