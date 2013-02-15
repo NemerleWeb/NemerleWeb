@@ -130,10 +130,27 @@ namespace TypeScript
 
         #region StringLiteral (7.8.4)
         
-        //StringLiteral = '"' DoubleStringCharacter* '"' / '\'' SingleStringCharacter* '\'';
-        //DoubleStringCharacter = 
-        //SingleStringCharacter
+        StringLiteral = '"' DoubleStringCharacter* '"' / '\'' SingleStringCharacter* '\'';
+        DoubleStringCharacter = 
+          !('"' / '\\' / LineTerminator) SourceCharacter /
+          '\\' EscapeSequence /
+          LineContinuation;                 
+        SingleStringCharacter =
+          !('\'' / '\\' / LineTerminator) SourceCharacter /
+          '\\' EscapeSequence /
+          LineContinuation;
+        LineContinuation = '\\' LineTerminatorSequence ;
         
+        EscapeSequence = 
+          CharacterEscapeSequence /
+          '0' !DecimalDigit /
+          HexEscapeSequence /
+          UnicodeEscapeSequence;
+        
+        CharacterEscapeSequence = SingleEscapeCharacter / NonEscapeCharacter;
+        SingleEscapeCharacter = '\'' / '\"' / '\\' / 'b' / 'f' / 'n' / 'r' / 't' / 'v';
+        NonEscapeCharacter = !(EscapeCharacter / LineTerminator) SourceCharacter;        
+        EscapeCharacter = SingleEscapeCharacter / DecimalDigit / 'x' / 'u';
         HexEscapeSequence = "x" HexDigit HexDigit;
         UnicodeEscapeSequence = "u" HexDigit HexDigit HexDigit HexDigit;
         
@@ -141,7 +158,7 @@ namespace TypeScript
         
         
 
-        start : string = Identifier;
+        start : string = StringLiteral;
 
 /*
 
