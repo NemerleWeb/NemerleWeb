@@ -215,6 +215,9 @@
     <Compile Include="NWebData.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="TSDeclarationParser.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="TypeScriptInterfaceParser.n">
       <SubType>Code</SubType>
     </Compile>
