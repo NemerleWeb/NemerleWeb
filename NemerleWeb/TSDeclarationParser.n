@@ -56,7 +56,7 @@ namespace TypeScript
         ZWNJ = '\u200C';
         ZWJ = '\u200D';        
         
-        Identifier = !ReservedWord IdentifierName s;
+        Identifier = !(ReservedWord Spacing+) IdentifierName s;
         IdentifierName = IdentifierStart+ IdentifierPart?;
         IdentifierStart = UnicodeLetter / '$' / '_' / '\\' UnicodeEscapeSequence;
         IdentifierPart =
@@ -173,7 +173,7 @@ namespace TypeScript
         
         ConditionalExpression =
           LogicalORExpression /
-          LogicalORExpression "?" AssignmentExpression ":" AssignmentExpression;
+          LogicalORExpression '?' AssignmentExpression ':' AssignmentExpression;
         
         #endregion        
         
@@ -190,11 +190,11 @@ namespace TypeScript
         #endif
         #region Variable Statement (12.2)
         
-        VariableStatement = "var"s VariableDeclarationList ";"s;
-        VariableDeclarationList = VariableDeclaration (","s VariableDeclaration)*;
+        VariableStatement = "var"s VariableDeclarationList ';'S;
+        VariableDeclarationList = VariableDeclaration (','s VariableDeclaration)*;
         VariableDeclaration = Identifier;
         // TODO: Add;
-        Initialiser = "a";// "=" AssignmentExpression;
+        Initialiser = '=' (!',' !')' [Any])* s;// "=" AssignmentExpression;
         
         #endregion
         
@@ -214,45 +214,45 @@ namespace TypeScript
         
         #region Object Type Literals (3.5.3)
         
-        ObjectType = "{"s TypeBody "}"s;
-        TypeBody = TypeMemberList? / TypeMemberList ";"s;
-        TypeMemberList = TypeMember (";"s TypeMember)*;
+        ObjectType = '{'s TypeBody '}'S;
+        TypeBody = TypeMemberList? / TypeMemberList ';'S;
+        TypeMemberList = TypeMember (';'S TypeMember)* S;
         TypeMember =
           CallSignature /
           ConstructSignature /
           IndexSignature /
-          PropertySignature /
-          FunctionSignature;
+          FunctionSignature /
+          PropertySignature;
         
-        CallSignature = "("s ParameterList? ")"s ReturnTypeAnnotation?;
-        ConstructSignature = "new"s "("s ParameterList? ")"s TypeAnnotation?;        
+        CallSignature = '('s ParameterList? ')'s ReturnTypeAnnotation?;
+        ConstructSignature = "new"s '('s ParameterList? ')'s TypeAnnotation?;        
         IndexSignature = "["s RequiredParameter "]"s TypeAnnotation?;
-        PropertySignature = Identifier "?"?s TypeAnnotation?;
-        FunctionSignature = Identifier "?"?s "("s ParameterList? ")"s ReturnTypeAnnotation?;
+        PropertySignature = Identifier '?'?s TypeAnnotation?;
+        FunctionSignature = Identifier '?'?s '('s ParameterList? ')'s ReturnTypeAnnotation?;
         
         #endregion
         
         #region Array Type Literals (3.5.4)
         
-        ArrayType = ScriptType "[" "]";
+        ArrayType = ScriptType "["s "]"s;
         
         #endregion
         
         #region Function Type Literals (3.5.6)
         
-        FunctionType = "(" ParameterList? ")" "=>" ReturnType;
+        FunctionType = '('s ParameterList? ')'s "=>"s ReturnType s;
         
         #endregion
         
         #region Constructor Type Literals (3.5.6)
         
-        ConstructorType = "new" "(" ParameterList? ")" "=>" ScriptType;
+        ConstructorType = "new"s '('s ParameterList? ')'s "=>"s ScriptType s;
 
         #endregion
         
         #region Variable Statements (5.1)
         
-        TypeAnnotation = ":"s ScriptType;
+        TypeAnnotation = ':'s ScriptType s;
         
         #endregion
         
@@ -260,45 +260,44 @@ namespace TypeScript
         
         // Modified
         FunctionDeclaration = FunctionOverload+;
-        FunctionOverload = "function"s FunctionSignature ";"S;
+        FunctionOverload = "function"s FunctionSignature ';'S;
         
         #endregion
         
         #region Function Signatures (6.2)
         
         ParameterList =
-          RequiredParameterList /
+          RequiredParameterList ','s OptionalParameterList ','s RestParameter /
+          OptionalParameterList ','s RestParameter /
+          RequiredParameterList ','s OptionalParameterList /
+          RequiredParameterList ','s RestParameter /                    
           OptionalParameterList /
-          RestParameter /
-          RequiredParameterList ","s OptionalParameterList /
-          RequiredParameterList ","s RestParameter /
-          OptionalParameterList ","s RestParameter /
-          RequiredParameterList ","s OptionalParameterList ","s RestParameter;
-        RequiredParameterList = RequiredParameter (","s RequiredParameter)*;
-        RequiredParameter = PublicOrPrivate? Identifier TypeAnnotation?;
+          RequiredParameterList /
+          RestParameter;
+        RequiredParameterList = RequiredParameter (','s RequiredParameter)*;
+        RequiredParameter = PublicOrPrivate? Identifier !'?' TypeAnnotation?;
         PublicOrPrivate = ("public" / "private")s;
-        OptionalParameterList = OptionalParameter (","s OptionalParameter)*;
-        OptionalParameter =
-          PublicOrPrivate? Identifier "?"s TypeAnnotation? /
-          PublicOrPrivate? Identifier TypeAnnotation? Initialiser;
-        RestParameter = "..." RequiredParameter;
-        ReturnTypeAnnotation = ":"s ReturnType;
+        OptionalParameterList = OptionalParameter (','s OptionalParameter)*;
+        OptionalParameter = 
+          PublicOrPrivate? Identifier ('?'s TypeAnnotation? / TypeAnnotation? Initialiser) s;
+        RestParameter = "..."s RequiredParameter;
+        ReturnTypeAnnotation = ':'s ReturnType s;
         ReturnType = ScriptType / "void";
         
         #endregion
         
         #region Interface Declarations (7.1)
         
-        InterfaceDeclaration = "interface"s Identifier InterfaceExtendsClause? ObjectType;
+        InterfaceDeclaration = "interface"s Identifier InterfaceExtendsClause? ObjectType S;
         InterfaceExtendsClause = "extends"s InterfaceNameList;
-        InterfaceNameList = InterfaceName ("," InterfaceName)*;
+        InterfaceNameList = InterfaceName (',' InterfaceName)*;
         InterfaceName = TypeName;
         
         #endregion
         
         #region Class Declarations (8.1)
         
-        ClassDeclaration = "class"s Identifier ClassHeritage "{"s ClassBody "}"s;
+        ClassDeclaration = "class"s Identifier ClassHeritage '{'s ClassBody '}'s;
         
         ClassHeritage = ClassExtendsClause? ImplementsClause?;
         ClassExtendsClause = "extends"s ClassName;
@@ -313,7 +312,7 @@ namespace TypeScript
         #region Constructor Declaration (8.3)
         
         ConstructorDeclaration = ConstructorOverload+;
-        ConstructorOverload = "constructor"s "("s ParameterList? ")"s ";"S;
+        ConstructorOverload = "constructor"s '('s ParameterList? ')'s ';'S;
         
         #endregion
         
@@ -321,10 +320,10 @@ namespace TypeScript
         
         MemberDeclaration = MemberVariableDeclaration / MemberFunctionDeclaration;
         
-        MemberVariableDeclaration = PublicOrPrivate? "static"s VariableDeclaration ";"S;
+        MemberVariableDeclaration = PublicOrPrivate? "static"s VariableDeclaration ';'S;
         
         MemberFunctionDeclaration = MemberFunctionOverload+;
-        MemberFunctionOverload = PublicOrPrivate? "static"?s FunctionSignature ";"S;
+        MemberFunctionOverload = PublicOrPrivate? "static"?s FunctionSignature ';'S;
                 
         #endregion
         
@@ -346,7 +345,7 @@ namespace TypeScript
         
         #region Module Declarations (9.2)
         
-        ModuleDeclaration = "module"s IdentifierPath? "{"s ModuleBody "}"S;
+        ModuleDeclaration = "module"s IdentifierPath? '{'s ModuleBody '}'S;
         IdentifierPath = Identifier ("." Identifier)*;
         ModuleBody = ModuleElement*;
         
@@ -369,9 +368,9 @@ namespace TypeScript
         
         #region Import Declarations (9.2.2)
         
-        ImportDeclaration = "import"s Identifier "="s ModuleReference ";"S;
+        ImportDeclaration = "import"s Identifier "="s ModuleReference ';'S;
         ModuleReference = ExternalModuleReference ModuleName;
-        ExternalModuleReference = "module"s "("s StringLiteral ")"S;
+        ExternalModuleReference = "module"s '('s StringLiteral ')'S;
         
         #endregion
         
@@ -402,18 +401,18 @@ namespace TypeScript
         
         #region Ambient Class Declarations (10.1.3)
         
-        AmbientClassDeclaration = "class"s Identifier ClassHeritage "{"s AmbientClassBody "}"S;
+        AmbientClassDeclaration = "class"s Identifier ClassHeritage '{'s AmbientClassBody '}'S;
         AmbientClassBody = AmbientClassBodyElement*;
         AmbientClassBodyElement = AmbientConstructorDeclaration AmbientMemberDeclaration AmbientStaticDeclaration;
-        AmbientConstructorDeclaration = "constructor"s "("s ParameterList? ")"s ";"S;
-        AmbientMemberDeclaration = PublicOrPrivate? (Identifier TypeAnnotation? / FunctionSignature) ";"S;
-        AmbientStaticDeclaration = "static"s (Identifier TypeAnnotation? / FunctionSignature) ";"S;
+        AmbientConstructorDeclaration = "constructor"s '('s ParameterList? ')'s ';'S;
+        AmbientMemberDeclaration = PublicOrPrivate? (Identifier TypeAnnotation? / FunctionSignature) ';'S;
+        AmbientStaticDeclaration = "static"s (Identifier TypeAnnotation? / FunctionSignature) ';'S;
         
         #endregion        
         
         #region Ambient Module Declarations (10.1.4)
         
-        AmbientModuleDeclaration = "module"s AmbientModuleIdentification "{"s AmbientModuleBody "}"S;
+        AmbientModuleDeclaration = "module"s AmbientModuleIdentification '{'s AmbientModuleBody '}'S;
         AmbientModuleIdentification = IdentifierPath / StringLiteral;
         AmbientModuleBody = AmbientElement*;
         
@@ -546,18 +545,18 @@ namespace TypeScript
     {
       //System.Diagnostics.Debug.WriteLine("method");
       def type = if(type is Some((_, type))) type else null;
-      TypeScriptMember.Method(name, GetText(isNullable) == "?", if(parms is Some(parms)) parms else [], type)
+      TypeScriptMember.Method(name, GetText(isNullable) == '?', if(parms is Some(parms)) parms else [], type)
     }
 
     propertyDeclaration(name : string, isNullable : NToken, _ : NToken, type : TypeScriptType, _ : NToken) : TypeScriptMember.Property
     {
       //System.Diagnostics.Debug.WriteLine("prop");
-      TypeScriptMember.Property(name, GetText(isNullable) == "?", type)
+      TypeScriptMember.Property(name, GetText(isNullable) == '?', type)
     }
 
     propertyTypeDeclaration(name : string, isNullable : NToken, _ : NToken, members : list[TypeScriptMember], _ : NToken) : TypeScriptMember.PropertyType
     {
-      TypeScriptMember.PropertyType(name, GetText(isNullable) == "?", members)
+      TypeScriptMember.PropertyType(name, GetText(isNullable) == '?', members)
     }
 
     callDeclaration(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypeScriptType, _ : NToken) : TypeScriptMember
