@@ -193,8 +193,8 @@ namespace TypeScript
         VariableStatement = "var"s VariableDeclarationList ';'S;
         VariableDeclarationList = VariableDeclaration (','s VariableDeclaration)*;
         VariableDeclaration = Identifier;
-        // TODO: Add;
-        Initialiser = '=' (!',' !')' [Any])* s;// "=" AssignmentExpression;
+        // TODO: Add initializer
+        Initialiser = '=' (!',' !')' !'}' [Any])* s;// "=" AssignmentExpression;
         
         #endregion
         
@@ -322,6 +322,14 @@ namespace TypeScript
                 
         #endregion
         
+        #region Enum Declaration
+        
+        EnumDeclaration = "enum"s Identifier '{'s EnumBody '}'S;
+        EnumBody = (EnumElement (','s EnumElement)* / EnumElement?) ','?;
+        EnumElement = Identifier Initialiser?;
+        
+        #endregion
+        
         #region Programs (9.1)
         
         SourceFile = DeclarationSourceFile;
@@ -332,6 +340,7 @@ namespace TypeScript
           ClassDeclaration /
           InterfaceDeclaration /
           ModuleDeclaration /
+          EnumDeclaration /
           ImportDeclaration /
           ExportDeclaration /
           AmbientDeclaration;
@@ -356,6 +365,7 @@ namespace TypeScript
               ClassDeclaration /
               InterfaceDeclaration /
               ModuleDeclaration /
+              EnumDeclaration /
               AmbientDeclaration
             );
             
@@ -377,7 +387,8 @@ namespace TypeScript
             AmbientVariableDeclaration /
             AmbientFunctionDeclaration /
             AmbientClassDeclaration /
-            AmbientModuleDeclaration
+            AmbientModuleDeclaration /
+            AmbientEnumDeclaration
            );
         
         #endregion
@@ -402,6 +413,7 @@ namespace TypeScript
         AmbientConstructorDeclaration = "constructor"s '('s ParameterList? ')'s ';'S;
         AmbientMemberDeclaration = PublicOrPrivate? (FunctionSignature / Identifier TypeAnnotation?) ';'S;
         AmbientStaticDeclaration = "static"s (FunctionSignature / Identifier TypeAnnotation?) ';'S;
+        AmbientEnumDeclaration = "enum"s Identifier '{'s EnumBody '}'S;
         
         #endregion        
         
@@ -418,7 +430,8 @@ namespace TypeScript
               AmbientFunctionDeclaration /
               AmbientClassDeclaration /
               InterfaceDeclaration /
-              AmbientModuleDeclaration
+              AmbientModuleDeclaration /
+              AmbientEnumDeclaration
             ) /
           ImportDeclaration;
                   
