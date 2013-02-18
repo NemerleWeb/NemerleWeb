@@ -373,9 +373,9 @@ namespace TypeScript
         
         #region Import Declarations (9.2.2)
         
-        ImportDeclaration = "import"s Identifier '='s ModuleReference ';'S;
+        ImportDeclaration = "import"s Identifier '='s ModuleReference s ';'S;
         ModuleReference = ExternalModuleReference / ModuleName;
-        ExternalModuleReference = "module"s '('s StringLiteral ')'S;
+        ExternalModuleReference = "module"s '('s StringLiteral s ')';
         
         #endregion
         
@@ -419,8 +419,8 @@ namespace TypeScript
         
         #region Ambient Module Declarations (10.1.4)
         
-        AmbientModuleDeclaration = "module"s AmbientModuleIdentification '{'s AmbientModuleBody '}'S;
-        AmbientModuleIdentification = IdentifierPath / StringLiteral;
+        AmbientModuleDeclaration = "module"s AmbientModuleIdentification s '{'s AmbientModuleBody '}'S;
+        AmbientModuleIdentification = StringLiteral / IdentifierPath;
         AmbientModuleBody = AmbientElement*;
         
         AmbientElement =
