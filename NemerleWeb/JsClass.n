@@ -38,7 +38,7 @@ namespace NemerleWeb
       public static IEnumerableType : TypeVar { get; set; }        
       public static IPageType : TypeVar { get; set; }
       public static ObjectType : TypeVar { get; set; }
-              
+                    
       public Fields : IEnumerable[IField]
       {
         [Memoize]
@@ -135,12 +135,13 @@ namespace NemerleWeb
         
       public Write() : string 
       {
+        def meta = JsClassMeta();
         def properTypeName = GetProperName(ClassType);
         def parentPtr = "this";
         def bodyIndent = Indent + "  ";
-        def properties = GetProperties(bodyIndent, parentPtr);        
-        def staticProperties = GetStaticProperties(Indent);        
-        def fields = GetFields(bodyIndent, parentPtr);        
+        def properties = GetProperties(bodyIndent, parentPtr, meta);        
+        def staticProperties = GetStaticProperties(Indent, meta);        
+        def fields = GetFields(bodyIndent, parentPtr, meta);        
         def staticFields = GetStaticFields(Indent);
         def constructorsBody = GetConstructorsBody(Indent, bodyIndent);
         def callConstrutor = GetCallConstructor(bodyIndent);
@@ -165,17 +166,6 @@ return self.apply_void.apply(self, arguments);
 <#return self.apply_void;#>
         | _ => ""
         };
-  
-        //Message.Hint($"Properties: $properties");
-        //Message.Hint($"Static properties: $staticProperties");
-        //Message.Hint($"Fields: $fields");
-        //Message.Hint($"Static fields: $staticFields");
-        //Message.Hint($"Constructor body: $constructorsBody");
-        //Message.Hint($"Call constructor: callConstrutor");
-        //Message.Hint($"Static constructor body: $staticConstructorBody");
-        //Message.Hint($"Methods: $methods");
-        //Message.Hint($"Static methods: $staticMethods");
-        //Message.Hint($"Nested classes: $nestedClassesString");
 
  $<#
 $nestedClassesString
@@ -188,6 +178,7 @@ $methods
 $fields
 $callConstrutor
 {{{SignalR}}}
+$(meta.WriteToJs(Indent))
 $returning
 $(Indent)}
 $staticFields
@@ -197,13 +188,18 @@ $staticConstructorBody
 #>
       }
       
-      GenerateProperties(indent : string, parentPtr : string, properties : IEnumerable[IProperty]) : string 
+      GenerateProperties(indent : string, parentPtr : string, properties : IEnumerable[IProperty], meta : JsClassMeta) : string 
       {
         def propStrings = properties.Select(p =>
           {
             when (p.IsIndexer)
               Message.Error(p.Location, $"Indexed properties are not supported, $p");
             
+            meta.Properties.Add(JsClassMemberMeta(p.Name, p.GetModifiers()
+                                                           .CustomAttributes
+                                                           .Select(a => a.ToString())
+                                                           .ToList()));
+              
             def sb = StringBuilder();
             
             when (p.GetGetter() != null)
@@ -232,14 +228,14 @@ $indent};#>);
         $<#..$(propStrings; "\n")#>;
       }
       
-      GetProperties(indent : string, parentPtr : string) : string
+      GetProperties(indent : string, parentPtr : string, meta : JsClassMeta) : string
       {
-        GenerateProperties(indent, parentPtr, Properties)
+        GenerateProperties(indent, parentPtr, Properties, meta)
       }
       
-      GetStaticProperties(indent : string) : string 
+      GetStaticProperties(indent : string, meta : JsClassMeta) : string 
       {
-        GenerateProperties(indent, GetProperName(ClassType), StaticProperties)
+        GenerateProperties(indent, GetProperName(ClassType), StaticProperties, meta)
       }
       
       FieldValue(field : IField) : string
@@ -302,16 +298,22 @@ $indent};#>);
         }
       }
       
-      GenerateFields(indent : string, parentPtr : string, fields: IEnumerable[IField]) : string
+      GenerateFields(indent : string, parentPtr : string, fields: IEnumerable[IField], meta : JsClassMeta) : string
       {
-        def fieldStrings = fields.Select(f => $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>);
-        
+        def fieldStrings = fields.Select(f => {
+          meta.Fields.Add(JsClassMemberMeta(f.Name, f.GetModifiers()
+                                                     .GetCustomAttributes()
+                                                     .Select(a => a.ToString())
+                                                     .ToList()));
+          $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>;
+        });
+                
         $<#..$(fieldStrings; ";\n")#>;
       }
         
-      GetFields(indent : string, parentPtr : string) : string 
+      GetFields(indent : string, parentPtr : string, meta : JsClassMeta) : string 
       {
-        GenerateFields(indent, parentPtr, Fields)
+        GenerateFields(indent, parentPtr, Fields, meta)
       }
         
       GetStaticFields(indent : string) : string 
@@ -501,6 +503,41 @@ $(indent)}#>
                .Where(m => !pageMethods.Contains(m.Name))
                .Where(m => m.Name != "View")
                .Where(m => !(m.Name.StartsWith("_N__") && m.Name.EndsWith("____")))
+      }
+      
+      public class JsClassMeta
+      {
+        public Properties : List[JsClassMemberMeta];
+        public Fields : List[JsClassMemberMeta];
+        public Methods : List[JsClassMemberMeta];
+        
+        public this() 
+        {
+          Properties = List();
+          Fields = List();
+          Methods = List();
+        }
+        
+        public WriteToJs(indent : string) : string
+        {
+$<#$(indent)  this.__nweb_meta = {
+$(indent)    properties: [..$(Properties; ","; _.Write())],
+$(indent)    fields: [..$(Fields;         ","; _.Write())],
+$(indent)    methods: [..$(Methods;       ","; _.Write())]
+$(indent)  };#>;
+        }
+      }
+        
+      [Record]
+      public class JsClassMemberMeta
+      {
+        Name : string { get; set; }
+        Attributes : List[string] { get; set; }
+                    
+        public Write() : string
+        {
+          $<#{ name: "$Name", attrs: ['..$(Attributes; "','")'] }#>
+        }
       }
   }
 }

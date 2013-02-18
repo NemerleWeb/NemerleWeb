@@ -40,6 +40,8 @@ namespace NemerleWeb.SC2Score
     public AddTourney() : void
     {
       Selected = Tourney();
+      Selected.IsBeingEdited = true;
+      Selected.SubscribeOnSave(() => UpdateTourneyList());
     }
     
     [Html]
