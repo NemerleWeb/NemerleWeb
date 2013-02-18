@@ -181,7 +181,7 @@ namespace TypeScript
         
         AssignmentExpression =
           ConditionalExpression /
-          LeftHandSideExpression "=" AssignmentExpression /
+          LeftHandSideExpression '=' AssignmentExpression /
           LeftHandSideExpression AssignmentOperator AssignmentExpression;
         
         AssignmentOperator = "*=" / "/=" / "%=" / "+=" / "-=" / "<<=" / ">>=" / ">>>=" / "&=" / "^=" / "|=";
@@ -194,7 +194,7 @@ namespace TypeScript
         VariableDeclarationList = VariableDeclaration (','s VariableDeclaration)*;
         VariableDeclaration = Identifier;
         // TODO: Add initializer
-        Initialiser = '=' (!',' !')' !'}' [Any])* s;// "=" AssignmentExpression;
+        Initialiser = '=' (!',' !')' !'}' [Any])* s;// '=' AssignmentExpression;
         
         #endregion
         
@@ -313,9 +313,9 @@ namespace TypeScript
         
         #region Member Declarations (8.4)
         
-        MemberDeclaration = MemberVariableDeclaration / MemberFunctionDeclaration;
+        MemberDeclaration = MemberFunctionDeclaration / MemberVariableDeclaration;
         
-        MemberVariableDeclaration = PublicOrPrivate? "static"s VariableDeclaration ';'S;
+        MemberVariableDeclaration = PublicOrPrivate? "static"?s VariableDeclaration ';'S;
         
         MemberFunctionDeclaration = MemberFunctionOverload+;
         MemberFunctionOverload = PublicOrPrivate? "static"?s FunctionSignature ';'S;
@@ -373,8 +373,8 @@ namespace TypeScript
         
         #region Import Declarations (9.2.2)
         
-        ImportDeclaration = "import"s Identifier "="s ModuleReference ';'S;
-        ModuleReference = ExternalModuleReference ModuleName;
+        ImportDeclaration = "import"s Identifier '='s ModuleReference ';'S;
+        ModuleReference = ExternalModuleReference / ModuleName;
         ExternalModuleReference = "module"s '('s StringLiteral ')'S;
         
         #endregion
@@ -412,7 +412,7 @@ namespace TypeScript
         AmbientClassBodyElement = AmbientConstructorDeclaration / AmbientStaticDeclaration / AmbientMemberDeclaration;
         AmbientConstructorDeclaration = "constructor"s '('s ParameterList? ')'s ';'S;
         AmbientMemberDeclaration = PublicOrPrivate? (FunctionSignature / Identifier TypeAnnotation?) ';'S;
-        AmbientStaticDeclaration = "static"s (FunctionSignature / Identifier TypeAnnotation?) ';'S;
+        AmbientStaticDeclaration = PublicOrPrivate? "static"s (FunctionSignature / Identifier TypeAnnotation?) ';'S;
         AmbientEnumDeclaration = "enum"s Identifier '{'s EnumBody '}'S;
         
         #endregion        
