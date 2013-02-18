@@ -552,11 +552,17 @@ nweb.utils = {
         return obj;
       
       var result = {};
+      var isFunction = function (m) {
+        var isGeneratedMethod = typeof m === 'object' && typeof m[""] === 'function';
+        var isNormalFunction = typeof m === 'function';
+        return isGeneratedMethod || isNormalFunction;
+      };
+
       for (var member in obj) {
-        if (obj.hasOwnProperty(member)) {
+        if (obj.hasOwnProperty(member) && member.indexOf('_N_') != 0) {
           if (typeof obj[member] === 'function' && member.indexOf("get_") === 0)
             result[member.substr(4)] = nweb.utils.normalizeObjectForServer(obj[member]());
-          else 
+          else if(!isFunction(obj[member]))
             result[member] = nweb.utils.normalizeObjectForServer(obj[member]);
         }
       }
@@ -625,8 +631,7 @@ Array.prototype.dispose = Array.prototype.getEnumerator;
 Array.prototype.moveNext = function() {
     if (typeof this.__enumeratorIndex === 'undefined')
         this.__enumeratorIndex = -1;
-    this.__enumeratorIndex++;
-    this.Current = this[this.__enumeratorIndex];
+    this.Current = this[this.__enumeratorIndex++];
     return this.__enumeratorIndex < this.length;
 };
 
@@ -782,13 +787,13 @@ function System_Collections_Generic_Stack(arg) {
 
 function System_ArgumentNullException(paramName, message) {
     this.paramName = paramName;
-    this.message = messages;
+    this.message = message;
 }
 
 var System_Environment = {};
-System_Environment.get_NewLine = function () {
-    return "\n";
-}
+System_Environment.get_NewLine = function() {
+  return "\n";
+};
 
 nweb.collection = {
     areArrayEqual : function(arr1, arr2) {

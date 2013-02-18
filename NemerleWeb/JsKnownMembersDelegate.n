@@ -21,12 +21,13 @@ namespace NemerleWeb
       {
         JsKnownMembers.RegisterType(
           name,
-          (_, _, parms) =>
+          (left, m, parms) =>
           {
             match (parms)
             {
             | [lambda, _] => Some(lambda)
-            | _ => None()
+            | [] when m.Name == "Invoke" => Some(JsAst.Call(left, []));
+            | _ => None();
           }});
       }
       
