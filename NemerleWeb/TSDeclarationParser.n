@@ -324,8 +324,8 @@ namespace TypeScript
         
         #region Enum Declaration
         
-        EnumDeclaration = "enum"s Identifier '{'s EnumBody '}'S;
-        EnumBody = (EnumElement (','s EnumElement)* / EnumElement?) ','?;
+        EnumDeclaration = "enum"s Identifier '{'s EnumBody? '}'S;
+        EnumBody = EnumElement (','s EnumElement)* ','?s;
         EnumElement = Identifier Initialiser?;
         
         #endregion
