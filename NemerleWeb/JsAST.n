@@ -665,7 +665,7 @@ $(indent)  dataType: 'json',
 $(indent)  data: { model: '{..$jsparms}' },
 $(indent)  success: function(result) {
 $(indent)    var typed = nweb.utils.toTypedObject(result);
-$(indent)    if(nweb.utils.isTuple(result))
+$(indent)    if(result != null && nweb.utils.isTuple(result))
 $(indent)      $(callback).apply(undefined, typed);
 $(indent)    else
 $(indent)      $(callback)(typed);

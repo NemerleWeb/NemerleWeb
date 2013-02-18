@@ -108,7 +108,7 @@ namespace NemerleWeb.SC2Score
       
       public GetTourneyById(id : long) : Tourney
       {
-        _client.As.[Tourney]().GetById(id);
+        _client.As.[Tourney]().GetValue(id.ToString())
       }
     }    
   }
