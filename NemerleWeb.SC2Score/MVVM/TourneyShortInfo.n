@@ -14,16 +14,12 @@ namespace NemerleWeb.SC2Score
   {
     public Id : long { get; set; }
     public Name : string { get; set; }
-    public FromDate : DateTime? { get; set; }
-    public ToDate : DateTime? { get; set; }
     
     public this() {}
-    public this(tourney : Tourney, id : long)
+    public this(tourney : Tourney)
     {
-      Id = id;
+      Id = tourney.Id;
       Name = tourney.Name;
-      FromDate = tourney.FromDate;
-      ToDate = tourney.ToDate;
     }
   }
 }

@@ -550,7 +550,25 @@ nweb.utils = {
     normalizeObjectForServer: function (obj) {
       if (typeof obj !== "object" || obj === null)
         return obj;
-      
+
+      var excludedFields = [];
+      var meta = obj["__nweb_meta"];
+      if (meta !== null && typeof meta !== 'undefined') {
+        for (var i = 0; i < meta.properties.length; i++) {
+          var property = meta.properties[i];
+          if (property.attrs.indexOf("ClientOnly") != -1)
+            excludedFields.push("get_" + property.name);
+        }
+        
+        for (var i = 0; i < meta.fields.length; i++) {
+          var field = meta.fields[i];
+          if (field.attrs.indexOf("ClientOnly") != -1)
+            excludedFields.push(field.name);
+        }
+
+        excludedFields.push("__nweb_meta");
+      }
+
       var result = {};
       var isFunction = function (m) {
         var isGeneratedMethod = typeof m === 'object' && typeof m[""] === 'function';
@@ -559,7 +577,7 @@ nweb.utils = {
       };
 
       for (var member in obj) {
-        if (obj.hasOwnProperty(member) && member.indexOf('_N_') != 0) {
+        if (obj.hasOwnProperty(member) && member.indexOf('_N_') != 0 && excludedFields.indexOf(member) == -1) {
           if (typeof obj[member] === 'function' && member.indexOf("get_") === 0)
             result[member.substr(4)] = nweb.utils.normalizeObjectForServer(obj[member]());
           else if(!isFunction(obj[member]))

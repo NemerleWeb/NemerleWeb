@@ -23,17 +23,19 @@ namespace NemerleWeb.SC2Score
     
     public UpdateTourneyList() : void 
     {
-      server.Recent50(tourneys => {         
-        PinnedTourneys = tourneys.Take(3).ToList();
-        NormalTourneys = tourneys.Skip(3).ToList();
+      server.Recent50(result => {
+        def (pinned, recent) = result;
+        PinnedTourneys = pinned.ToList();
+        NormalTourneys = recent.ToList();
       });
     }
     
     public SelectTourney(tourney : TourneyShortInfo) : void
     {
-      server.GetTourney(tourney.Id, r => {
-        Selected = r;
-        r.SubscribeOnSave(() => UpdateTourneyList());
+      server.GetTourney(tourney.Id, result => {
+        Selected = result;
+        Selected.SubscribeOnUpdate(() => UpdateTourneyList());
+        Selected.IsPinned = PinnedTourneys.Any(p => p.Id == Selected.Id);
       });
     }
     
@@ -41,7 +43,7 @@ namespace NemerleWeb.SC2Score
     {
       Selected = Tourney();
       Selected.IsBeingEdited = true;
-      Selected.SubscribeOnSave(() => UpdateTourneyList());
+      Selected.SubscribeOnUpdate(() => UpdateTourneyList());
     }
     
     [Html]
@@ -68,7 +70,7 @@ namespace NemerleWeb.SC2Score
         
     public class Server
     { 
-      public Recent50() : IEnumerable[TourneyShortInfo]
+      public Recent50() : (IEnumerable[TourneyShortInfo] * IEnumerable[TourneyShortInfo])
       {
         Redis.Exec(_.GetRecent50());
       }

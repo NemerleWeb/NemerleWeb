@@ -267,10 +267,17 @@ namespace NemerleWeb
     public BuildJsAstForSplices(expr : TExpr, methodHeader : TFunHeader) : IEnumerable[JsAst.DefValue]
     {
       def ast = JsAstBuilder.Build(expr, [], methodHeader);
-      def ast = JsAstHelper.FlattenAndRemoveVoids(ast);
+      def ast = JsAstHelper.FlattenAndRemoveVoids(ast);      
+      def ast = JsAst.Recurse(ast, (a, _) => {
+        match(a : JsAst) {
+        | If(a, b, Label(_, Literal(JsLiteral.Bool(false)))) => JsAst.Call(JsAst.OpCode("&&"), [a, b])
+        | _ => a
+        }
+      });
+      
       JsAstHelper.IterateAST(ast)
-                  .Where(a => a is JsAst.DefValue || a is JsAst.Assign)
-                  .Select.[JsAst, JsAst.DefValue](j =>
+                 .Where(a => a is JsAst.DefValue || a is JsAst.Assign)
+                 .Select.[JsAst, JsAst.DefValue](j =>
                     match(j)
                     {                    
                     | JsAst.DefValue(name, Call(MethodRef(Method = "template") as template, [PropertyGet(l1, r1), PropertyGet as p2])) => 
@@ -279,7 +286,7 @@ namespace NemerleWeb
                     | JsAst.Assign(JsAst.FieldRef(_obj, name), r) => JsAst.DefValue(name, r)
                     | JsAst.DefValue => j :> JsAst.DefValue
                     | _ => Message.Error("Must not get here"); null
-                  });
+                 });
     }
       
     public BuildJsAst(expr : TExpr, shouldReturn : bool, methodHeader : TFunHeader) : JsAst

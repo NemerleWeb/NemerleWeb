@@ -20,12 +20,17 @@ namespace NemerleWeb.SC2Score
 
     [ClientOnly]
     public IsBeingEdited : bool { get; set; }
+
+    [ClientOnly]
+    public IsPinned : bool { get; set; }
     
     [ClientOnly]
-    private mutable _onSave : Action;   
+    private mutable _listUpdated : Action;
     
     [ClientOnly]
     private mutable _rendered : string;
+    
+    [ClientOnly]
     private Rendered : string {
       get
       {
@@ -58,17 +63,27 @@ namespace NemerleWeb.SC2Score
       IsBeingEdited = true;
     }
     
+    public Pin() : void
+    {
+      server.Pin(Id, _ => _listUpdated());
+    }
+    
+    public Unpin() : void
+    {
+      server.Unpin(Id, _ => _listUpdated());
+    }
+    
     public Save() : void
     {
       server.Save(this, _ => {
         IsBeingEdited = false;
-        _onSave();
+        _listUpdated();
       });
     }
     
-    public SubscribeOnSave(action : Action) : void
+    public SubscribeOnUpdate(action : Action) : void
     {
-      _onSave = action;
+      _listUpdated = action;
     }
     
     [Html]
@@ -84,7 +99,13 @@ namespace NemerleWeb.SC2Score
             <button click="$Save" class="btn btn-info">Save</button>
           </div>
           <div $when(!IsBeingEdited)>
-            <button click="$Edit">edit</button>
+            <button click="$Edit" class="btn btn-info">edit</button>
+          </div>
+          <div $when(IsPinned)>
+            <button click="$Unpin" class="btn btn-info">unpin</button>
+          </div>
+          <div $when(!IsPinned && Id != 0)>
+            <button click="$Pin" class="btn btn-info">pin</button>
           </div>
         </div>
       #>
@@ -104,6 +125,18 @@ namespace NemerleWeb.SC2Score
           Redis.Exec(_.AddTourney(tourney));
         else
           Redis.Exec(_.SaveTourney(tourney));
+      }
+      
+      public Pin(id : long) : long
+      {
+        Redis.Exec(_.PinTourney(id));
+        id
+      }
+      
+      public Unpin(id : long) : long
+      {
+        _ = Redis.Exec(_.UnpinTourney(id));
+        id
       }
     }
   }  
