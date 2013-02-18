@@ -37,6 +37,7 @@ body {
 
 .tourney-info .editor button {
     float: right;
+    margin-left: 5px;
 }
 
 .tourney-list {

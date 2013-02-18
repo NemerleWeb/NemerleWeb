@@ -46,6 +46,12 @@ namespace NemerleWeb.SC2Score
       }
     }
     
+    public Exec(action : RedisOperations -> void) : void {
+      using(client = GetClient()) {
+        action(RedisOperations(client));
+      }
+    }
+    
     public class RedisOperations
     {      
       private _client : IRedisClient;
@@ -59,9 +65,7 @@ namespace NemerleWeb.SC2Score
       {                
         tourney.Id = _client.As.[Tourney]().GetNextSequence();        
         
-        using(pipeline = _client.CreatePipeline()) {          
-          def shortInfo = TourneyShortInfo(tourney, tourney.Id);          
-          
+        using(pipeline = _client.CreatePipeline()) {
           //Add to common Tourney hash table
           pipeline.QueueCommand(cl : IRedisClient => {
             def tourneys = cl.As.[Tourney]();
@@ -70,22 +74,19 @@ namespace NemerleWeb.SC2Score
 
           //Add info to list of all tourneys
           pipeline.QueueCommand(cl : IRedisClient => {
-            cl.As.[TourneyShortInfo]()
-              .Lists["all"].Prepend(shortInfo);
+            cl.Lists["all"].Prepend(tourney.Id.ToString());
           });
 
           //Add to "most recent 50" list        
           pipeline.QueueCommand(cl : IRedisClient => {
-            cl.As.[TourneyShortInfo]()
-              .Lists["recent50"].Prepend(shortInfo);
+            cl.Lists["recent50"].Prepend(tourney.Id.ToString());
           });
 
           //Trim "most recent 50" list        
           pipeline.QueueCommand(cl : IRedisClient => {
-            cl.As.[TourneyShortInfo]()
-              .Lists["recent50"].Trim(0, 49);
+            cl.Lists["recent50"].Trim(0, 49);
           });
-          
+
           pipeline.Flush();
           
           return tourney.Id;
@@ -100,10 +101,23 @@ namespace NemerleWeb.SC2Score
         tourney.Id
       }
       
-      public GetRecent50() : IEnumerable[TourneyShortInfo]
+      public PinTourney(id : long) : void
       {
-        def infos = _client.As.[TourneyShortInfo]();
-        infos.Lists["recent50"].ToList();
+        _client.Hashes["pinned"].Add(id.ToString(), id.ToString());
+      }
+      
+      public UnpinTourney(id : long) : void
+      {
+        _ = _client.Hashes["pinned"].Remove(id.ToString());
+      }
+      
+      public GetRecent50() : (IEnumerable[TourneyShortInfo] * IEnumerable[TourneyShortInfo])
+      {
+        def recent = _client.GetValues.[Tourney](_client.Lists["recent50"].ToList())
+                            .Select(TourneyShortInfo);
+        def pinned = _client.GetValues.[Tourney](_client.Hashes["pinned"].Keys.ToList())
+                            .Select(TourneyShortInfo);
+        (pinned, recent)
       }
       
       public GetTourneyById(id : long) : Tourney
