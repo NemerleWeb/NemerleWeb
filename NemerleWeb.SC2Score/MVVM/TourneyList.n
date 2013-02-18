@@ -18,6 +18,11 @@ namespace NemerleWeb.SC2Score
     
     public this()
     {
+      UpdateTourneyList();
+    }
+    
+    public UpdateTourneyList() : void 
+    {
       server.Recent50(tourneys => {         
         PinnedTourneys = tourneys.Take(3).ToList();
         NormalTourneys = tourneys.Skip(3).ToList();
@@ -28,6 +33,7 @@ namespace NemerleWeb.SC2Score
     {
       server.GetTourney(tourney.Id, r => {
         Selected = r;
+        r.SubscribeOnSave(() => UpdateTourneyList());
       });
     }
     

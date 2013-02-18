@@ -27,8 +27,12 @@ namespace NemerleWeb.SC2Score
       def pass = mtch.Groups["pass"].Value;
       def host = mtch.Groups["host"].Value;
       def port = mtch.Groups["port"].Value;
-            
+      
       _pool = PooledRedisClientManager(10, 5, pass + "@" + "pub-" + host + ":" + port);
+      
+      using(client = GetClient()) {
+        client.FlushDb();
+      }
     }
     
     public GetClient() : IRedisClient
@@ -53,38 +57,38 @@ namespace NemerleWeb.SC2Score
       
       public AddTourney(tourney : Tourney) : long
       {                
-        def newId = _client.As.[Tourney]().GetNextSequence();
+        tourney.Id = _client.As.[Tourney]().GetNextSequence();        
         
         using(pipeline = _client.CreatePipeline()) {          
-          def shortInfo = TourneyShortInfo(tourney, newId);
+          def shortInfo = TourneyShortInfo(tourney, tourney.Id);          
           
           //Add to common Tourney hash table
-          pipeline.QueueCommand(cl : IRedisClient => { 
+          pipeline.QueueCommand(cl : IRedisClient => {
             def tourneys = cl.As.[Tourney]();
-            tourneys.SetEntry(newId.ToString(), tourney);
+            tourneys.SetEntry(tourney.Id.ToString(), tourney);
           });
 
           //Add info to list of all tourneys
-          pipeline.QueueCommand(cl : IRedisClient => { 
-            def shortInfos = cl.As.[TourneyShortInfo]();
-            shortInfos.Lists["all"].Prepend(shortInfo);
+          pipeline.QueueCommand(cl : IRedisClient => {
+            cl.As.[TourneyShortInfo]()
+              .Lists["all"].Prepend(shortInfo);
           });
 
           //Add to "most recent 50" list        
-          pipeline.QueueCommand(cl : IRedisClient => { 
-            def shortInfos = cl.As.[TourneyShortInfo](); 
-            shortInfos.Lists["recent50"].Prepend(shortInfo);
+          pipeline.QueueCommand(cl : IRedisClient => {
+            cl.As.[TourneyShortInfo]()
+              .Lists["recent50"].Prepend(shortInfo);
           });
 
           //Trim "most recent 50" list        
-          pipeline.QueueCommand(cl : IRedisClient => { 
-            def shortInfos = cl.As.[TourneyShortInfo](); 
-            shortInfos.Lists["recent50"].Trim(0, 49);
+          pipeline.QueueCommand(cl : IRedisClient => {
+            cl.As.[TourneyShortInfo]()
+              .Lists["recent50"].Trim(0, 49);
           });
           
           pipeline.Flush();
           
-          return newId;
+          return tourney.Id;
         }
         
         throw Exception("Couldn't add tourney due to database problems");

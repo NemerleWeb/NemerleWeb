@@ -96,6 +96,7 @@ namespace NemerleWeb
             def deserializedParams = method.GetParameters().Map(p => <[ parsedModel[$(p.Name : string)].ToObject.[$(p.ty : typed)]() ]>);
               
             _ = ctb.DefineWithSource(<[ decl: 
+              [System.Web.Mvc.HttpPost, System.Web.Mvc.ValidateInput(false)]
               public $(methodName : name) (model : string) : System.Web.Mvc.ActionResult
               {
                 def parsedModel = Newtonsoft.Json.Linq.JObject.Parse(model);
