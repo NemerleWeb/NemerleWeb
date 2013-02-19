@@ -100,7 +100,7 @@ namespace TypeScript
         
         #region Literals (7.8)
 
-        //Literal = NullLiteral / BooleanLiteral / NumericLiteral / StringLiteral / RegularExpressionLiteral;
+        Literal = NullLiteral / BooleanLiteral / NumericLiteral / StringLiteral / RegularExpressionLiteral;
 
         #endregion
         
@@ -163,11 +163,147 @@ namespace TypeScript
         UnicodeEscapeSequence = "u" HexDigit HexDigit HexDigit HexDigit;
         
         #endregion
-                
-        #if A
+        
+        #region Regular Expression Literals (7.8.5)
+        
+        RegularExpressionLiteral = '/'s RegularExpressionBody '/'s RegularExpressionFlags s;
+        RegularExpressionBody = RegularExpressionFirstChar RegularExpressionChars;
+        RegularExpressionChars = RegularExpressionChar*;
+        RegularExpressionFirstChar =
+          !'*' !'\\' !'/' !'[' RegularExpressionNonTerminator /
+          RegularExpressionBackslashSequence /
+          RegularExpressionClass;
+        RegularExpressionChar =
+          !'\\' !'/' !'[' RegularExpressionNonTerminator /
+          RegularExpressionBackslashSequence /
+          RegularExpressionClass;
+        RegularExpressionBackslashSequence = '\\'s RegularExpressionNonTerminator;
+        RegularExpressionNonTerminator = !LineTerminator SourceCharacter;
+        RegularExpressionClass = '['s RegularExpressionClassChars ']'s;
+        RegularExpressionClassChars = RegularExpressionClassChar*;
+        RegularExpressionClassChar = 
+          !']' !'\\' RegularExpressionNonTerminator /
+          RegularExpressionBackslashSequence;        
+        RegularExpressionFlags = IdentifierPart?;
+        
+        #endregion
+        
+        #region Primary Expressions (11.1)
+        
+        PrimaryExpression =
+          "this" /
+          Identifier /
+          Literal /
+          ArrayLiteral /
+          ObjectLiteral /
+          '('s Expression ')'s;
+          
+        #endregion
+        
+        #region Array Initialiser (11.1.4)
+        
+        ArrayLiteral = '['s (ElementList / ElementList ','s Elision? / Elision?) ']'s;
+        ElementList = Elision? AssignmentExpression (','s Elision? AssignmentExpression)*;
+        Elision = (','s)+;
+        
+        #endregion
+        
+        #region Object Initialiser (11.1.5)
+
+        ObjectLiteral =
+          '{'s '}'s /
+          '{'s PropertyNameAndValueList '}' /
+          '{'s PropertyNameAndValueList ','s '}'s;
+        PropertyNameAndValueList = PropertyAssignment (','s PropertyAssignment)*;
+        PropertyAssignment =
+          PropertyName ':'s AssignmentExpression /
+          "get"s PropertyName '('s ')'s '{'s FunctionBody '}'s /
+          "set"s PropertyName '('s PropertySetParameterList ')'s '{'s FunctionBody '}'s;
+        PropertyName = IdentifierName / StringLiteral / NumericLiteral;
+        PropertySetParameterList = Identifier;
+        
+        #endregion
+        
         #region Left-Hand-Side Expressions (11.2)
         
-        LeftHandSideExpression = NewExpression / CallExpressoin;
+        MemberExpression =
+          ("new"s)? (PrimaryExpression / FunctionExpression) ('['s Expression ']'s / '.'s IdentifierName)+ Arguments?;
+        NewExpression = MemberExpression / "new"s NewExpression;
+        CallExpression = MemberExpression (Arguments+ / '['s Expression ']'s / '.'s IdentifierName);
+        Arguments = '('s ArgumentList? ')'s;
+        ArgumentList = AssignmentExpression (','s AssignmentExpression)*;
+
+        LeftHandSideExpression = NewExpression / CallExpression;
+        
+        #endregion
+        
+        #region Postfix Expression
+        
+        PostfixExpression =
+          LeftHandSideExpression /
+          LeftHandSideExpression !LineTerminator "++" /
+          LeftHandSideExpression !LineTerminator  "--";
+        
+        #endregion
+        
+        #region Unary Operators (11.4)
+        
+        UnaryExpression =
+          PostfixExpression /
+          "delete"s UnaryExpression /
+          "void"s UnaryExpression /
+          "typeof"s UnaryExpression /
+          "++"s UnaryExpression /
+          "--"s UnaryExpression /
+          '+'s UnaryExpression /
+          '-'s UnaryExpression /
+          '~'s UnaryExpression /
+          '!'s UnaryExpression;
+        
+        #endregion
+        
+        #region Multiplicative Operators (11.5)
+        
+        MultiplicativeExpression = UnaryExpression (('*' / '/' / '%')s UnaryExpression)*;
+        
+        #endregion
+        
+        #region Additive Operators (11.6)
+        
+        AdditiveExpression = MultiplicativeExpression (('+' / '-')s MultiplicativeExpression)*;
+        
+        #endregion
+        
+        #region Bitwise Shift Operators (11.7)
+        
+        ShiftExpression = AdditiveExpression (("<<" / ">>" / ">>>")s AdditiveExpression)*;
+        
+        #endregion
+        
+        #region Relational Operators (11.8)
+        
+        RelationalExpression =
+          ShiftExpression (('<' / '>' / "<=" / ">=" / "instanceof" / "in")s ShiftExpression)*;        
+        #endregion
+        
+        #region Equality Operators (11.9)
+        
+        EqualityExpression = RelationalExpression (("==" / "!=" / "===" / "!==")s RelationalExpression)*;
+        
+        #endregion
+        
+        #region Binary Bitwise Operators (11.10)
+        
+        BitwiseANDExpression = EqualityExpression ('&'s EqualityExpression)*;        
+        BitwiseXORExpression = BitwiseANDExpression ('^'s BitwiseANDExpression)*;   
+        BitwiseORExpression = BitwiseXORExpression ('|'s BitwiseXORExpression)*;
+        
+        #endregion
+        
+        #region Binary Logical Expression (11.11)
+        
+        LogicalANDExpression = BitwiseORExpression ("&&"s BitwiseORExpression)*;        
+        LogicalORExpression = LogicalANDExpression ("||"s LogicalANDExpression)*;
         
         #endregion
         
@@ -175,9 +311,9 @@ namespace TypeScript
         
         ConditionalExpression =
           LogicalORExpression /
-          LogicalORExpression '?' AssignmentExpression ':' AssignmentExpression;
+          LogicalORExpression '?'s AssignmentExpression ':'s AssignmentExpression;
         
-        #endregion        
+        #endregion
         
         #region Assignement Operators (11.13)
         
@@ -189,15 +325,41 @@ namespace TypeScript
         AssignmentOperator = "*=" / "/=" / "%=" / "+=" / "-=" / "<<=" / ">>=" / ">>>=" / "&=" / "^=" / "|=";
         
         #endregion
-        #endif
+        
+        #region Comma Operator (11.14)
+        
+        Expression = AssignmentExpression (','s AssignmentExpression)*;
+        
+        #endregion
+
+        #region Statement (12)
+        
+        // TODO: Add other statements
+        Statement = VariableStatement;
+        
+        #endregion
+        
         #region Variable Statement (12.2)
         
         VariableStatement = "var"s VariableDeclarationList ';'S;
         VariableDeclarationList = VariableDeclaration (','s VariableDeclaration)*;
         // This rule is modified in TypeSript see: 5.1
         //VariableDeclaration = Identifier;
-        // TODO: Add initializer
-        Initialiser = '=' (!',' !')' !'}' [Any])* s;// '=' AssignmentExpression;
+        Initialiser = '=' AssignmentExpression;
+        
+        #endregion
+        
+        #region Function Definition (13)
+        
+        FunctionExpression = "function"s Identifier? '('s FormalParameterList? ')'s '{'s FunctionBody '}'s;
+        FormalParameterList = Identifier (','s Identifier)*;
+        FunctionBody = SourceElement*;
+        
+        #endregion
+        
+        #region Program (14)
+        
+        SourceElement = Statement / FunctionDeclaration;
         
         #endregion
         
@@ -344,8 +506,7 @@ namespace TypeScript
         
         SourceFile = DeclarationSourceFile;
         ModuleElement =
-          // TODO: Do we need it ?
-          // Statement /
+          Statement /
           FunctionDeclaration /
           ClassDeclaration /
           InterfaceDeclaration /
