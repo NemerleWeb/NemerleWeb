@@ -550,13 +550,37 @@ nweb.utils = {
     normalizeObjectForServer: function (obj) {
       if (typeof obj !== "object" || obj === null)
         return obj;
-      
+
+      var excludedFields = [];
+      var meta = obj["__nweb_meta"];
+      if (meta !== null && typeof meta !== 'undefined') {
+        for (var i = 0; i < meta.properties.length; i++) {
+          var property = meta.properties[i];
+          if (property.attrs.indexOf("ClientOnly") != -1)
+            excludedFields.push("get_" + property.name);
+        }
+        
+        for (var i = 0; i < meta.fields.length; i++) {
+          var field = meta.fields[i];
+          if (field.attrs.indexOf("ClientOnly") != -1)
+            excludedFields.push(field.name);
+        }
+
+        excludedFields.push("__nweb_meta");
+      }
+
       var result = {};
+      var isFunction = function (m) {
+        var isGeneratedMethod = typeof m === 'object' && typeof m[""] === 'function';
+        var isNormalFunction = typeof m === 'function';
+        return isGeneratedMethod || isNormalFunction;
+      };
+
       for (var member in obj) {
-        if (obj.hasOwnProperty(member)) {
+        if (obj.hasOwnProperty(member) && member.indexOf('_N_') != 0 && excludedFields.indexOf(member) == -1) {
           if (typeof obj[member] === 'function' && member.indexOf("get_") === 0)
             result[member.substr(4)] = nweb.utils.normalizeObjectForServer(obj[member]());
-          else 
+          else if(!isFunction(obj[member]))
             result[member] = nweb.utils.normalizeObjectForServer(obj[member]);
         }
       }
@@ -625,8 +649,7 @@ Array.prototype.dispose = Array.prototype.getEnumerator;
 Array.prototype.moveNext = function() {
     if (typeof this.__enumeratorIndex === 'undefined')
         this.__enumeratorIndex = -1;
-    this.__enumeratorIndex++;
-    this.Current = this[this.__enumeratorIndex];
+    this.Current = this[this.__enumeratorIndex++];
     return this.__enumeratorIndex < this.length;
 };
 
@@ -782,13 +805,13 @@ function System_Collections_Generic_Stack(arg) {
 
 function System_ArgumentNullException(paramName, message) {
     this.paramName = paramName;
-    this.message = messages;
+    this.message = message;
 }
 
 var System_Environment = {};
-System_Environment.get_NewLine = function () {
-    return "\n";
-}
+System_Environment.get_NewLine = function() {
+  return "\n";
+};
 
 nweb.collection = {
     areArrayEqual : function(arr1, arr2) {

@@ -15,10 +15,22 @@ namespace NemerleWeb.SC2Score
     public Id : long { get; set; }
     public Name : string { get; set; };
     public Source : string { get; set; };
-    public FromDate : DateTime { get; set; };
-    public ToDate : DateTime { get; set; };
+    public FromDate : DateTime? { get; set; };
+    public ToDate : DateTime? { get; set; };
+
+    [ClientOnly]
+    public IsBeingEdited : bool { get; set; }
+
+    [ClientOnly]
+    public IsPinned : bool { get; set; }
     
+    [ClientOnly]
+    private mutable _listUpdated : Action;
+    
+    [ClientOnly]
     private mutable _rendered : string;
+    
+    [ClientOnly]
     private Rendered : string {
       get
       {
@@ -31,8 +43,8 @@ namespace NemerleWeb.SC2Score
     public this() {}    
     public this(name : string)
     {
-      Name = name;
-      Source = <# This is a test source #>;
+      Name = name;      
+      Source = <# This is a test source #>;      
     }
     
     public RenderMarkdown() : void
@@ -46,11 +58,32 @@ namespace NemerleWeb.SC2Score
       RenderMarkdown();
     }
     
+    public Edit() : void
+    {
+      IsBeingEdited = true;
+    }
+    
+    public Pin() : void
+    {
+      server.Pin(Id, _ => _listUpdated());
+    }
+    
+    public Unpin() : void
+    {
+      server.Unpin(Id, _ => _listUpdated());
+    }
+    
     public Save() : void
     {
-      server.Save(this, r => {
-        js <# console.log(r) #>;
+      server.Save(this, _ => {
+        IsBeingEdited = false;
+        _listUpdated();
       });
+    }
+    
+    public SubscribeOnUpdate(action : Action) : void
+    {
+      _listUpdated = action;
     }
     
     [Html]
@@ -58,11 +91,22 @@ namespace NemerleWeb.SC2Score
     {
       <#
         <div class="editor">
-          <input type="text" value="$Name" />
-          <textarea event-keyup="$SourceChanged">$Source</textarea>
-          <input type="text" value="$FromDate" />
-          <input type="text" value="$ToDate" />
-          <button click="$Save" class="btn btn-info">Save</button>
+          <div $when(IsBeingEdited)>
+            <input type="text" value="$Name" />
+            <textarea event-keyup="$SourceChanged">$Source</textarea>
+            <input type="text" value="$FromDate" />
+            <input type="text" value="$ToDate" />
+            <button click="$Save" class="btn btn-info">Save</button>
+          </div>
+          <div $when(!IsBeingEdited)>
+            <button click="$Edit" class="btn btn-info">edit</button>
+          </div>
+          <div $when(IsPinned)>
+            <button click="$Unpin" class="btn btn-info">unpin</button>
+          </div>
+          <div $when(!IsPinned && Id != 0)>
+            <button click="$Pin" class="btn btn-info">pin</button>
+          </div>
         </div>
       #>
     }
@@ -81,6 +125,18 @@ namespace NemerleWeb.SC2Score
           Redis.Exec(_.AddTourney(tourney));
         else
           Redis.Exec(_.SaveTourney(tourney));
+      }
+      
+      public Pin(id : long) : long
+      {
+        Redis.Exec(_.PinTourney(id));
+        id
+      }
+      
+      public Unpin(id : long) : long
+      {
+        _ = Redis.Exec(_.UnpinTourney(id));
+        id
       }
     }
   }  
