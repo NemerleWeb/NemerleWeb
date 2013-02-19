@@ -226,12 +226,18 @@ namespace TypeScript
           PropertySignature;
         
         CallSignature = '('s ParameterList? ')'s ReturnTypeAnnotation?;
-        ConstructSignature = "new"s '('s ParameterList? ')'s TypeAnnotation?;        
+        ConstructSignature = "new"s '('s ParameterList? ')'s TypeAnnotation?;
         IndexSignature = '['s RequiredParameter ']'s TypeAnnotation?;
         PropertySignature = Identifier '?'?s TypeAnnotation?;
         FunctionSignature = Identifier '?'?s '('s ParameterList? ')'s ReturnTypeAnnotation?;
         
-        #endregion        
+        #endregion
+        
+        #region Array Type Literal (3.5.4)
+        
+        ArrayType = (PredefinedType / TypeName / TypeLiteral) ('['s ']'s)+;
+        
+        #endregion
         
         #region Function Type Literals (3.5.6)
         
@@ -265,7 +271,7 @@ namespace TypeScript
           RequiredParameterList ','s OptionalParameterList ','s RestParameter /
           OptionalParameterList ','s RestParameter /
           RequiredParameterList ','s OptionalParameterList /
-          RequiredParameterList ','s RestParameter /                    
+          RequiredParameterList ','s RestParameter /
           OptionalParameterList /
           RequiredParameterList /
           RestParameter;
@@ -273,9 +279,9 @@ namespace TypeScript
         RequiredParameter = PublicOrPrivate? Identifier !'?' TypeAnnotation?;
         PublicOrPrivate = ("public" / "private")s;
         OptionalParameterList = OptionalParameter (','s OptionalParameter)*;
-        OptionalParameter = 
-          PublicOrPrivate? Identifier ('?'s TypeAnnotation? / TypeAnnotation? Initialiser) s;
-        RestParameter = "..."s RequiredParameter;
+        // Optional parameter must not have Initialiser in declaration files.
+        OptionalParameter = PublicOrPrivate? Identifier ('?'s TypeAnnotation? / TypeAnnotation?) s;
+        RestParameter = "..."s Identifier !'?' ':'s ArrayType;
         ReturnTypeAnnotation = ':'s ReturnType s;
         ReturnType = ScriptType / "void";
         
@@ -357,11 +363,13 @@ namespace TypeScript
         
         #region Export Declarations (9.2.1)
         
+        // Allow export function();
+        ExportFunctionDeclaration = AmbientFunctionDeclaration;
         ExportDeclaration =
           "export"s
             (
               VariableStatement /
-              FunctionDeclaration /
+              ExportFunctionDeclaration /
               ClassDeclaration /
               InterfaceDeclaration /
               ModuleDeclaration /
@@ -401,7 +409,12 @@ namespace TypeScript
         
         #region Ambient Variable Declarations (10.1.2)
         
-        AmbientFunctionDeclaration = "function"s FunctionSignature S;
+        // This rule is not by specification, but TypeScript parses it correctly.
+        AmbientFunctionSignature = Identifier? '?'?s '('s ParameterList? ')'s ReturnTypeAnnotation?;
+        AmbientFunctionDeclaration = "function"s AmbientFunctionSignature S;
+        
+        // This rule is not by specification, but TypeScript parses it correctly.
+        AmbientConstructDeclaration = "function"s "new"s '('s ParameterList? ')'s ReturnTypeAnnotation? S;
         
         #endregion
         
@@ -427,6 +440,7 @@ namespace TypeScript
           "export"?s "declare"?s
             (
               AmbientVariableDeclaration /
+              AmbientConstructDeclaration /
               AmbientFunctionDeclaration /
               AmbientClassDeclaration /
               InterfaceDeclaration /

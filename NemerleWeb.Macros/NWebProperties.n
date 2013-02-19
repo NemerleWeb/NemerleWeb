@@ -20,7 +20,7 @@ module NemerleWebPropertiesImpl
     {
     | <[ (TypeScriptPath, $(path)) ]> => 
       def path = path.ToString();
-      def parser = TypeScriptInterfaceParser();
+      def parser = TypeScript.TSDeclarationParser();
       def dir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
       def tsFiles = Directory.EnumerateFiles(Path.Combine(dir, path), "*.d.ts", SearchOption.AllDirectories);
       //def globalJs = typer.Env.Define(<[ decl: public module javascript {} ]>);
