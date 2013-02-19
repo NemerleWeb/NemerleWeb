@@ -1,0 +1,15 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{  
+  // This attribute is applied to members of Unit, that aren't supposed to be sent to the server
+  public class ClientOnlyAttribute : Attribute
+  {}
+}

@@ -12,18 +12,14 @@ namespace NemerleWeb.SC2Score
   [Unit]
   public class TourneyShortInfo
   {
-    public Id : long;
-    public Name : string;
-    public FromDate : DateTime;
-    public ToDate : DateTime;
+    public Id : long { get; set; }
+    public Name : string { get; set; }
     
     public this() {}
-    public this(tourney : Tourney, id : long)
+    public this(tourney : Tourney)
     {
-      Id = id;
+      Id = tourney.Id;
       Name = tourney.Name;
-      FromDate = tourney.FromDate;
-      ToDate = tourney.ToDate;
     }
   }
 }

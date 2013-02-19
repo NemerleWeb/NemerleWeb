@@ -89,7 +89,7 @@ namespace NemerleWeb
     public TransformImpl([NotNull] xmlAst : XmlAst, [NotNull] splices : Dictionary[int, string], loopStack = null : list[string], topLevel = false : bool) : PExpr
     {
         _transformCounter++;
-        Debug.WriteLine(_transformCounter + ": " + xmlAst.ToString());
+        //Debug.WriteLine(_transformCounter + ": " + xmlAst.ToString());
         def loopStack = if(loopStack == null) [] else loopStack;
         
         def transformJsExpr(expr)
