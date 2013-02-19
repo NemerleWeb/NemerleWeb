@@ -430,7 +430,7 @@ namespace TypeScript
         AmbientConstructorDeclaration = "constructor"s '('s ParameterList? ')'s ';'S;
         AmbientMemberDeclaration = PublicOrPrivate? (FunctionSignature / Identifier TypeAnnotation?) ';'S;
         AmbientStaticDeclaration = PublicOrPrivate? "static"s (FunctionSignature / Identifier TypeAnnotation?) ';'S;
-        AmbientEnumDeclaration = "enum"s Identifier '{'s EnumBody '}'S;
+        AmbientEnumDeclaration = "enum"s Identifier '{'s EnumBody? '}'S;
         
         #endregion        
         
