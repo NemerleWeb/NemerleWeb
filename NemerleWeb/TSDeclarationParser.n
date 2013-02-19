@@ -56,6 +56,8 @@ namespace TypeScript
         ZWNJ = '\u200C';
         ZWJ = '\u200D';        
         
+        // Any name
+        AnyIdentifier = IdentifierName s;
         Identifier = !(ReservedWord Spacing+) IdentifierName s;
         IdentifierName = IdentifierStart+ IdentifierPart*;
         IdentifierStart = UnicodeLetter / '$' / '_' / '\\' UnicodeEscapeSequence;
@@ -192,7 +194,8 @@ namespace TypeScript
         
         VariableStatement = "var"s VariableDeclarationList ';'S;
         VariableDeclarationList = VariableDeclaration (','s VariableDeclaration)*;
-        VariableDeclaration = Identifier;
+        // This rule is modified in TypeSript see: 5.1
+        //VariableDeclaration = Identifier;
         // TODO: Add initializer
         Initialiser = '=' (!',' !')' !'}' [Any])* s;// '=' AssignmentExpression;
         
@@ -205,8 +208,8 @@ namespace TypeScript
         #region Specifying Types (3.5)
         
         // Array is specified here, because otherwise we have left recursion.
-        ScriptType = (PredefinedType / TypeName / TypeLiteral) ('['s ']'s)*;
-        PredefinedType = "any" / "number" / "bool" / "string";
+        ScriptType = (TypeLiteral / PredefinedType / TypeName) ('['s ']'s)*;
+        PredefinedType = ("any" / "number" / "bool" / "string") s !IdentifierPart;
         TypeName = Identifier ("." Identifier)*;
         ModuleName = TypeName;
         TypeLiteral = ObjectType / FunctionType / ConstructorType;
@@ -239,7 +242,7 @@ namespace TypeScript
         
         #endregion
         
-        #region Function Type Literals (3.5.6)
+        #region Function Type Literals (3.5.5)
         
         FunctionType = '('s ParameterList? ')'s "=>"s ReturnType s;
         
@@ -247,12 +250,13 @@ namespace TypeScript
         
         #region Constructor Type Literals (3.5.6)
         
-        ConstructorType = "new"s '('s ParameterList? ')'s "=>"s ScriptType S;
+        ConstructorType = "new"s '('s ParameterList? ')'s "=>"s ScriptType s;
 
         #endregion
         
         #region Variable Statements (5.1)
         
+        VariableDeclaration = Identifier TypeAnnotation?;
         TypeAnnotation = ':'s ScriptType s;
         
         #endregion
@@ -410,7 +414,7 @@ namespace TypeScript
         #region Ambient Variable Declarations (10.1.2)
         
         // This rule is not by specification, but TypeScript parses it correctly.
-        AmbientFunctionSignature = Identifier? '?'?s '('s ParameterList? ')'s ReturnTypeAnnotation?;
+        AmbientFunctionSignature = AnyIdentifier? '?'?s '('s ParameterList? ')'s ReturnTypeAnnotation?;
         AmbientFunctionDeclaration = "function"s AmbientFunctionSignature S;
         
         // This rule is not by specification, but TypeScript parses it correctly.
