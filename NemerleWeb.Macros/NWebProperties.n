@@ -2,7 +2,7 @@
 using System.Linq;
 using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
-using TypeScriptInterface;
+using TypeScript;
 using System.IO;
 
 [Nemerle.MacroUsage (Nemerle.MacroPhase.BeforeTypedMembers,
@@ -52,95 +52,95 @@ module NemerleWebPropertiesImpl
     }
   }
   
-  private CreateTypeScriptGlobalVar(tb : TypeBuilder, var : TypeScriptGlobalDeclaration.Var, typer : Typer) : void
-  {
-    _ = tb.DefineWithSource(<[ decl: public $(var.Name : usesite) {} ]>);
-    DefineMembers(tb, var.Members);
-  }
+  //private CreateTypeScriptGlobalVar(tb : TypeBuilder, var : TypeScriptGlobalDeclaration.Var, typer : Typer) : void
+  //{
+  //  _ = tb.DefineWithSource(<[ decl: public $(var.Name : usesite) {} ]>);
+  //  DefineMembers(tb, var.Members);
+  //}
   
-  private CreateTypeScriptGlobalVarType(tb : TypeBuilder, var : TypeScriptGlobalDeclaration.VarType, _typer : Typer) : void
-  {
-    _ = tb.DefineWithSource(<[ decl: public $(var.Name : usesite) : option[$(ConvertType(var.Type))] ]>)
-  }
+  //private CreateTypeScriptGlobalVarType(tb : TypeBuilder, var : TypeScriptGlobalDeclaration.VarType, _typer : Typer) : void
+  //{
+  //  _ = tb.DefineWithSource(<[ decl: public $(var.Name : usesite) : option[$(ConvertType(var.Type))] ]>)
+  //}
   
-  private CreateTypeScriptGlobalFunction(tb : TypeBuilder, function : TypeScriptGlobalDeclaration.Function, _typer : Typer) : void
-  {
-    def method = function.Method;
-    _ = tb.DefineWithSource(<[ decl: public $(method.Name : usesite)(..$(method.Parms.Map(ConvertParm))) : $(ConvertType(method.Type)) { throw System.Exception() }; ]>);
-  }
+  //private CreateTypeScriptGlobalFunction(tb : TypeBuilder, function : TypeScriptGlobalDeclaration.Function, _typer : Typer) : void
+  //{
+  //  def method = function.Method;
+  //  _ = tb.DefineWithSource(<[ decl: public $(method.Name : usesite)(..$(method.Parms.Map(ConvertParm))) : $(ConvertType(method.Type)) { throw System.Exception() }; ]>);
+  //}
   
-  private CreateTypeScriptInterface(inter : TypeScriptGlobalDeclaration.Interface, typer : Typer) : void
-  {    
-    def tb = match(inter.Extend)
-    {
-    | Some(extends) => 
-      def extends = extends.Map(e => <[ $(e : usesite) ]>);
-      typer.Env.Define(<[ decl: public class $(inter.Name : usesite) : ..$(extends) {} ]>);
-    | _ => typer.Env.Define(<[ decl: public class $(inter.Name : usesite) {} ]>);
-    }
+  //private CreateTypeScriptInterface(inter : TypeScriptGlobalDeclaration.Interface, typer : Typer) : void
+  //{    
+  //  def tb = match(inter.Extend)
+  //  {
+  //  | Some(extends) => 
+  //    def extends = extends.Map(e => <[ $(e : usesite) ]>);
+  //    typer.Env.Define(<[ decl: public class $(inter.Name : usesite) : ..$(extends) {} ]>);
+  //  | _ => typer.Env.Define(<[ decl: public class $(inter.Name : usesite) {} ]>);
+  //  }
     
-    DefineMembers(tb, inter.Members);
-  }
+  //  DefineMembers(tb, inter.Members);
+  //}
 
-  private DefineField(tb : TypeBuilder, name : string, isNullable : bool, type : PExpr) : void
-  {
-    if (isNullable)
-      _ = tb.DefineWithSource(<[ decl: public $(name : usesite) : option[$type] ]>)
-    else
-      _ = tb.DefineWithSource(<[ decl: public $(name : usesite) : $type ]>);
-  }
+  //private DefineField(tb : TypeBuilder, name : string, isNullable : bool, type : PExpr) : void
+  //{
+  //  if (isNullable)
+  //    _ = tb.DefineWithSource(<[ decl: public $(name : usesite) : option[$type] ]>)
+  //  else
+  //    _ = tb.DefineWithSource(<[ decl: public $(name : usesite) : $type ]>);
+  //}
   
-  private DefineMembers(tb : TypeBuilder, members : list[TypeScriptMember]) : void
-  {
-    foreach(m in members) 
-    {
-    | Property(name, isNullable, type) => DefineField(tb, name, isNullable, ConvertType(type))
-    | PropertyType(name, isNullable, members) =>
-      def newName = "_N_" + name;
-      def mb = tb.DefineWithSource(<[ decl: public $(newName : usesite) {} ]>);
-      DefineMembers(mb.DeclaringType, members);      
-      DefineField(tb, name, isNullable, <[ $(newName : usesite) ]>);
-    | Method(name, _isNullable, parms, type) =>
-      _ = tb.DefineWithSource(<[ decl: public $(name : usesite)(..$(parms.Map(ConvertParm))) : $(ConvertType(type)) { throw System.Exception() }; ]>);
-    | Call(Some(parms), type) => 
-      def parms = parms.Map(ConvertParm);
-      def parms = [<[parameter: this inst : this]>].Append(parms);
-      _ = tb.DefineWithSource(<[ decl: public static @()(..$(parms)) : $(ConvertType(type)) { throw System.Exception() }]>);
-    | _ => ()
-    /*| IndexCall(Some(parms), type) =>
-      def parms = parms.Map(p => <[ $(convertParm(p)) ]>).First();
-      tb.Define(<[ decl: public Item [$parms] : $(convertType(type)) 
-                         { 
-                           get { throw System.Exception() }
-                           set { throw System.Exception() }
-                         }]>);*/
-    }
-  }
+  //private DefineMembers(tb : TypeBuilder, members : list[TypeScriptMember]) : void
+  //{
+  //  foreach(m in members) 
+  //  {
+  //  | Property(name, isNullable, type) => DefineField(tb, name, isNullable, ConvertType(type))
+  //  | PropertyType(name, isNullable, members) =>
+  //    def newName = "_N_" + name;
+  //    def mb = tb.DefineWithSource(<[ decl: public $(newName : usesite) {} ]>);
+  //    DefineMembers(mb.DeclaringType, members);      
+  //    DefineField(tb, name, isNullable, <[ $(newName : usesite) ]>);
+  //  | Method(name, _isNullable, parms, type) =>
+  //    _ = tb.DefineWithSource(<[ decl: public $(name : usesite)(..$(parms.Map(ConvertParm))) : $(ConvertType(type)) { throw System.Exception() }; ]>);
+  //  | Call(Some(parms), type) => 
+  //    def parms = parms.Map(ConvertParm);
+  //    def parms = [<[parameter: this inst : this]>].Append(parms);
+  //    _ = tb.DefineWithSource(<[ decl: public static @()(..$(parms)) : $(ConvertType(type)) { throw System.Exception() }]>);
+  //  | _ => ()
+  //  /*| IndexCall(Some(parms), type) =>
+  //    def parms = parms.Map(p => <[ $(convertParm(p)) ]>).First();
+  //    tb.Define(<[ decl: public Item [$parms] : $(convertType(type)) 
+  //                       { 
+  //                         get { throw System.Exception() }
+  //                         set { throw System.Exception() }
+  //                       }]>);*/
+  //  }
+  //}
   
-  private ConvertParm(p : TypeScriptParameter) : Parsetree.PParameter
-  {
-      match((p.IsParams, p.IsOptional))
-      {
-      | (true, true) => <[ parameter: params $(p.Name : usesite) : option[$(ConvertType(p.Type))] ]>
-      | (false, true) => <[ parameter: $(p.Name : usesite) : option[$(ConvertType(p.Type))] ]>
-      | (true, false) => <[ parameter: params $(p.Name : usesite) : $(ConvertType(p.Type)) ]>
-      | (false, false) => <[ parameter: $(p.Name : usesite) : $(ConvertType(p.Type)) ]>
-      }
-    }  
+  //private ConvertParm(p : TypeScriptParameter) : Parsetree.PParameter
+  //{
+  //    match((p.IsParams, p.IsOptional))
+  //    {
+  //    | (true, true) => <[ parameter: params $(p.Name : usesite) : option[$(ConvertType(p.Type))] ]>
+  //    | (false, true) => <[ parameter: $(p.Name : usesite) : option[$(ConvertType(p.Type))] ]>
+  //    | (true, false) => <[ parameter: params $(p.Name : usesite) : $(ConvertType(p.Type)) ]>
+  //    | (false, false) => <[ parameter: $(p.Name : usesite) : $(ConvertType(p.Type)) ]>
+  //    }
+  //  }  
   
-  private ConvertType(t : TypeScriptType) : PExpr
-  {
-    | Object(_parms) => <[ object ]>
-    | Dictionary(key, val) => 
-      <[ System.Collections.Generic.Dictionary.[$(ConvertType(key)), $(ConvertType(val))] ]>
-    | Array(type, 0) => <[ $(ConvertType(type)) ]>
-    | Array(type, arity) => <[ array[$(ConvertType(TypeScriptType.Array(type, arity - 1)))] ]>
-    | Lambda(Some(parms), ret) => 
-        def parms = parms.Map(p => p.Type).Append([ret]).Map(ConvertType);
-        <[ System.Func.[{..$(parms)}] ]>
-    | Normal("any") => <[ object ]>
-    | Normal("number") => <[ float ]>
-    | Normal(name) => <[ $(name : usesite) ]> 
-    | _ => <[ object ]>
-  }
+  //private ConvertType(t : TypeScriptType) : PExpr
+  //{
+  //  | Object(_parms) => <[ object ]>
+  //  | Dictionary(key, val) => 
+  //    <[ System.Collections.Generic.Dictionary.[$(ConvertType(key)), $(ConvertType(val))] ]>
+  //  | Array(type, 0) => <[ $(ConvertType(type)) ]>
+  //  | Array(type, arity) => <[ array[$(ConvertType(TypeScriptType.Array(type, arity - 1)))] ]>
+  //  | Lambda(Some(parms), ret) => 
+  //      def parms = parms.Map(p => p.Type).Append([ret]).Map(ConvertType);
+  //      <[ System.Func.[{..$(parms)}] ]>
+  //  | Normal("any") => <[ object ]>
+  //  | Normal("number") => <[ float ]>
+  //  | Normal(name) => <[ $(name : usesite) ]> 
+  //  | _ => <[ object ]>
+  //}
 }
