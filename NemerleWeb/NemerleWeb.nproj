@@ -221,9 +221,6 @@
     <Compile Include="TSDeclarationParser.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="TypeScriptInterfaceParser.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="UnitAttribute.n">
       <SubType>Code</SubType>
     </Compile>

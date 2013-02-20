@@ -14,9 +14,22 @@ namespace TypeScript
       start,
       grammar
       {
+        // We create void rules to write less code in handler and even skip writing handler.
+        #region Literals
+        
         Spacing = WhiteSpace / LineTerminatorSequence / Comment;
         s : void = Spacing*;
         S : void = (Spacing / ';')*;
+        
+        import_s : void = "import"s;
+        export_s : void = "export"s;
+        module_s : void = "module"s;
+        declare_s : void = "declare"s;
+        var_s : void = "var"s;
+        function_s : void = "function"s;
+        new_s : void = "new"s;
+
+        #endregion
         
         #region EcmaScript
         
@@ -227,8 +240,8 @@ namespace TypeScript
         #region Left-Hand-Side Expressions (11.2)
         
         MemberExpression =
-          ("new"s)? (PrimaryExpression / FunctionExpression) ('['s Expression ']'s / '.'s IdentifierName)+ Arguments?;
-        NewExpression = MemberExpression / "new"s NewExpression;
+          (new_s)? (PrimaryExpression / FunctionExpression) ('['s Expression ']'s / '.'s IdentifierName)+ Arguments?;
+        NewExpression = MemberExpression / new_s NewExpression;
         CallExpression = MemberExpression (Arguments+ / '['s Expression ']'s / '.'s IdentifierName);
         Arguments = '('s ArgumentList? ')'s;
         ArgumentList = AssignmentExpression (','s AssignmentExpression)*;
@@ -341,7 +354,7 @@ namespace TypeScript
         
         #region Variable Statement (12.2)
         
-        VariableStatement = "var"s VariableDeclarationList ';'S;
+        VariableStatement = var_s VariableDeclarationList ';'S;
         VariableDeclarationList = VariableDeclaration (','s VariableDeclaration)*;
         // This rule is modified in TypeSript see: 5.1
         //VariableDeclaration = Identifier;
@@ -351,7 +364,7 @@ namespace TypeScript
         
         #region Function Definition (13)
         
-        FunctionExpression = "function"s Identifier? '('s FormalParameterList? ')'s '{'s FunctionBody '}'s;
+        FunctionExpression = function_s Identifier? '('s FormalParameterList? ')'s '{'s FunctionBody '}'s;
         FormalParameterList = Identifier (','s Identifier)*;
         FunctionBody = SourceElement*;
         
@@ -391,7 +404,7 @@ namespace TypeScript
           PropertySignature;
         
         CallSignature = '('s ParameterList? ')'s ReturnTypeAnnotation?;
-        ConstructSignature = "new"s '('s ParameterList? ')'s TypeAnnotation?;
+        ConstructSignature = new_s '('s ParameterList? ')'s TypeAnnotation?;
         IndexSignature = '['s RequiredParameter ']'s TypeAnnotation?;
         PropertySignature = Identifier '?'?s TypeAnnotation?;
         FunctionSignature = Identifier '?'?s '('s ParameterList? ')'s ReturnTypeAnnotation?;
@@ -412,7 +425,7 @@ namespace TypeScript
         
         #region Constructor Type Literals (3.5.6)
         
-        ConstructorType = "new"s '('s ParameterList? ')'s "=>"s ScriptType s;
+        ConstructorType = new_s '('s ParameterList? ')'s "=>"s ScriptType s;
 
         #endregion
         
@@ -427,7 +440,7 @@ namespace TypeScript
         
         // Modified
         FunctionDeclaration = FunctionOverload+;
-        FunctionOverload = "function"s FunctionSignature ';'S;
+        FunctionOverload = function_s FunctionSignature ';'S;
         
         #endregion
         
@@ -455,7 +468,7 @@ namespace TypeScript
         
         #region Interface Declarations (7.1)
         
-        InterfaceDeclaration = "interface"s Identifier InterfaceExtendsClause? ObjectType S;
+        InterfaceDeclaration : TSGlobal = "interface"s Identifier InterfaceExtendsClause? ObjectType S;
         InterfaceExtendsClause = "extends"s InterfaceNameList;
         InterfaceNameList = InterfaceName (','s InterfaceName)*;
         InterfaceName = TypeName;
@@ -531,7 +544,7 @@ namespace TypeScript
         // Allow export function();
         ExportFunctionDeclaration = AmbientFunctionDeclaration;
         ExportDeclaration =
-          "export"s
+          export_s
             (
               VariableStatement /
               ExportFunctionDeclaration /
@@ -546,16 +559,16 @@ namespace TypeScript
         
         #region Import Declarations (9.2.2)
         
-        ImportDeclaration = "import"s Identifier '='s ModuleReference s ';'S;
+        ImportDeclaration : TSGlobal = import_s Identifier '='s ModuleReference s ';'S;
         ModuleReference = ExternalModuleReference / ModuleName;
-        ExternalModuleReference = "module"s '('s StringLiteral s ')';
+        ExternalModuleReference = module_s '('s StringLiteral s ')';
         
         #endregion
         
         #region Ambient Declarations (10.1)
-        
+                
         AmbientDeclaration =
-          "declare"s
+          declare_s
            (
             AmbientVariableDeclaration /
             AmbientFunctionDeclaration /
@@ -568,7 +581,7 @@ namespace TypeScript
         
         #region Ambient Variable Declarations (10.1.1)
         
-        AmbientVariableDeclaration = "var"s Identifier TypeAnnotation? S;
+        AmbientVariableDeclaration : TSGlobal = var_s Identifier TypeAnnotation? S;
         
         #endregion
         
@@ -576,33 +589,33 @@ namespace TypeScript
         
         // This rule is not by specification, but TypeScript parses it correctly.
         AmbientFunctionSignature = AnyIdentifier? '?'?s '('s ParameterList? ')'s ReturnTypeAnnotation?;
-        AmbientFunctionDeclaration = "function"s AmbientFunctionSignature S;
+        AmbientFunctionDeclaration : TSGlobal = function_s AmbientFunctionSignature S;
         
         // This rule is not by specification, but TypeScript parses it correctly.
-        AmbientConstructDeclaration = "function"s "new"s '('s ParameterList? ')'s ReturnTypeAnnotation? S;
+        AmbientConstructDeclaration : TSGlobal  = function_s new_s '('s ParameterList? ')'s ReturnTypeAnnotation? S;
         
         #endregion
         
         #region Ambient Class Declarations (10.1.3)
         
-        AmbientClassDeclaration = "class"s Identifier ClassHeritage '{'s AmbientClassBody '}'S;
+        AmbientClassDeclaration : TSGlobal = "class"s Identifier ClassHeritage '{'s AmbientClassBody '}'S;
         AmbientClassBody = AmbientClassBodyElement*;
         AmbientClassBodyElement = AmbientConstructorDeclaration / AmbientStaticDeclaration / AmbientMemberDeclaration;
         AmbientConstructorDeclaration = "constructor"s '('s ParameterList? ')'s ';'S;
         AmbientMemberDeclaration = PublicOrPrivate? (FunctionSignature / Identifier TypeAnnotation?) ';'S;
         AmbientStaticDeclaration = PublicOrPrivate? "static"s (FunctionSignature / Identifier TypeAnnotation?) ';'S;
-        AmbientEnumDeclaration = "enum"s Identifier '{'s EnumBody? '}'S;
+        AmbientEnumDeclaration : TSGlobal = "enum"s Identifier '{'s EnumBody? '}'S;
         
         #endregion        
         
         #region Ambient Module Declarations (10.1.4)
         
-        AmbientModuleDeclaration = "module"s AmbientModuleIdentification s '{'s AmbientModuleBody '}'S;
+        AmbientModuleDeclaration : TSGlobal = module_s AmbientModuleIdentification s '{'s AmbientModuleBody '}'S;
         AmbientModuleIdentification = StringLiteral / IdentifierPath;
         AmbientModuleBody = AmbientElement*;
         
-        AmbientElement =
-          "export"?s "declare"?s
+        AmbientElementNotImport : TSGlobal =
+          export_s? declare_s?
             (
               AmbientVariableDeclaration /
               AmbientConstructDeclaration /
@@ -611,315 +624,74 @@ namespace TypeScript
               InterfaceDeclaration /
               AmbientModuleDeclaration /
               AmbientEnumDeclaration
-            ) /
-          ImportDeclaration;
+            );
+        AmbientElement : TSGlobal = AmbientElementNotImport / ImportDeclaration;
                   
         #endregion
                 
         #region Declaration Source Files (10.2)
         
-        DeclarationSourceFile = S AmbientElement*;
+        DeclarationSourceFile : List[TSGlobal] = S AmbientElement*;
         
         #endregion
         
         #endregion
         
-        start : string = DeclarationSourceFile;
+        start : List[TSGlobal] = DeclarationSourceFile;
       }
     )]
   public class TSDeclarationParser
   {
-    start(t : NToken) : string
+    AmbientVariableDeclaration( _ : NToken, _ : NToken) : TSGlobal
     {
-      GetText(t)
+      TSGlobal.Variable()
     }
     
-    /*
-    #region Identifier
-    identifier(idValue : NToken) : string 
+    AmbientConstructDeclaration(_ : NToken, _ : NToken, _ : NToken, _ : NToken) : TSGlobal
     {
-      GetText(idValue)
-    }
-
-    identifiers(id : string, tail : option[list[string]]) : list[string] 
-    {
-      match(tail)
-      {
-      | Some(tail) => id :: tail
-      | _ => [id]
-      }
-    }
-    #endregion
-
-    constructor(_ : NToken, _ : NToken, lst : option[list[TypeScriptParameter]], _ : NToken, _ : option[(NToken * TypeScriptType)], _ : NToken) : TypeScriptParameter
-    {
-      TypeScriptParameter("ctor", TypeScriptType.Normal("void"), false, false)
-    }
-
-
-    dictionaryType(_ : NToken, _ : NToken, _keyname : string, _ : NToken, key : TypeScriptType, _ : NToken, _ : NToken, value : TypeScriptType, _ : NToken, _ : NToken) : TypeScriptType
-    {
-      TypeScriptType.Dictionary(key, value)
-    }
-
-    objectType(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken) : TypeScriptType
-    {
-      TypeScriptType.Object(if(parms is Some(parms)) parms else [])
-    }
-
-    arrayType(type : TypeScriptType, arity : List[NToken * NToken]) : TypeScriptType
-    {
-      TypeScriptType.Array(type, arity.Count)
-    }
-
-    normalType(name : string) : TSType
-    {
-      | "any"    => TSType.Any()
-      | "number" => TSType.Number()
-      | "bool"   => TSType.Boolean()
-      | "string" => TSType.String()
-      | "void"   => TSType.Void()
-      | _        => TSType.Named(name)
-    }
-
-    enumType(_ : NToken, id : string, _ : NToken) : TSType
-    {
-      TSType.Enumeration(id)
-    }    
-
-    lambdaType(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypeScriptType) : TypeScriptType    
-    {
-      TypeScriptType.Lambda(parms, returnType)
-    }
-
-    nonOptionalParam(name : string, type : option[NToken * TypeScriptType]) : TypeScriptParameter
-    {
-      //System.Diagnostics.Debug.WriteLine("nonOptionalParm");
-      TypeScriptParameter(name, getType(type), false, false)
-    }
-
-    optionalParam(name : string, _ : NToken, type : option[NToken * TypeScriptType]) : TypeScriptParameter
-    {
-      //System.Diagnostics.Debug.WriteLine("optionalParm");
-      TypeScriptParameter(name, getType(type), true, false)
-    }
-
-    multipleParam(_ : NToken, parm : TypeScriptParameter) : TypeScriptParameter
-    {
-      TypeScriptParameter(parm.Name, parm.Type, parm.IsOptional, true)
-    }
-
-    parms(p : TypeScriptParameter, tail : option[(NToken * list[TypeScriptParameter])]) : list[TypeScriptParameter]
-    {
-      //System.Diagnostics.Debug.WriteLine("parms");
-      match(tail)
-      {
-      | Some((_, tail)) => p :: tail
-      | _ => [p]
-      }
-    }
-
-    parmsSemicolon(p : TypeScriptParameter, tail : option[(NToken * list[TypeScriptParameter])], _ : NToken) : list[TypeScriptParameter]
-    {
-      match(tail)
-      {
-      | Some((_, tail)) => p :: tail
-      | _ => [p]
-      }
-    }
-
-    methodDeclaration(name : string, isNullable : NToken, _ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, type : option[(NToken * TypeScriptType)],  _ : NToken) : TypeScriptMember.Method
-    {
-      //System.Diagnostics.Debug.WriteLine("method");
-      def type = if(type is Some((_, type))) type else null;
-      TypeScriptMember.Method(name, GetText(isNullable) == '?', if(parms is Some(parms)) parms else [], type)
-    }
-
-    propertyDeclaration(name : string, isNullable : NToken, _ : NToken, type : TypeScriptType, _ : NToken) : TypeScriptMember.Property
-    {
-      //System.Diagnostics.Debug.WriteLine("prop");
-      TypeScriptMember.Property(name, GetText(isNullable) == '?', type)
-    }
-
-    propertyTypeDeclaration(name : string, isNullable : NToken, _ : NToken, members : list[TypeScriptMember], _ : NToken) : TypeScriptMember.PropertyType
-    {
-      TypeScriptMember.PropertyType(name, GetText(isNullable) == '?', members)
-    }
-
-    callDeclaration(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypeScriptType, _ : NToken) : TypeScriptMember
-    {
-      TypeScriptMember.Call(parms, returnType)
-    }
-
-    indexCallDeclaration(_ : NToken, parms : option[list[TypeScriptParameter]], _ : NToken, _ : NToken, returnType : TypeScriptType, _ : NToken) : TypeScriptMember
-    {
-      TypeScriptMember.IndexCall(parms, returnType)
-    }
-
-    memberDeclaration(member : TypeScriptMember) : TypeScriptMember
-    {
-      //System.Diagnostics.Debug.WriteLine("decl");
-      member
-    }
-
-    interfaceBlock(_ : NToken, declarations : List[TypeScriptMember], _ : NToken) : list[TypeScriptMember]
-    {
-      //System.Diagnostics.Debug.WriteLine("block");
-      declarations.NToList()
-    }
-
-    extends_(_ : NToken, extendTypes : list[string]) : list[string]
-    {
-      //System.Diagnostics.Debug.WriteLine("extends");
-      extendTypes
-    }
-
-    _interface(_ : NToken, name : string, extends_ : option[list[string]], members : list[TypeScriptMember]) : TypeScriptGlobalDeclaration
-    {
-      //System.Diagnostics.Debug.WriteLine("interface: " + name);
-      TypeScriptGlobalDeclaration.Interface(name, extends_, members)
-    }
-
-    globalVarDeclaration(_ : NToken, _ : NToken, name : string, _ : NToken, members : list[TypeScriptMember], _ : NToken) : TypeScriptGlobalDeclaration
-    {
-      TypeScriptGlobalDeclaration.Var(name, members)
-    }
-
-    globalVarDeclarationType(_ : NToken, _ : NToken, name : string, _ : NToken, type : TypeScriptType, _ : NToken) : TypeScriptGlobalDeclaration
-    {
-      TypeScriptGlobalDeclaration.VarType(name, type)
-    }
-
-    globalFunctionDeclaration(_ : NToken, _ : NToken, method : TypeScriptMember) : TypeScriptGlobalDeclaration
-    {
-      TypeScriptGlobalDeclaration.Function(method :> TypeScriptMember.Method);
-    }
-
-    start(lst : List[TSType]) : list[TSType]
-    {
-      lst.NToList()
-    }
-
-    /*start(interfaces : List[TypeScriptGlobalDeclaration]) : List[TypeScriptGlobalDeclaration]
-    {
-      interfaces
+      TSGlobal.Construct()
     }
     
-
-    /// Return type if present or any.
-    static getType(type : option[NToken * TypeScriptType]) : TypeScriptType
+    AmbientFunctionDeclaration(_ : NToken) : TSGlobal
     {
-      | Some((_, t)) => t
-      | _ => TypeScriptType.Normal("any")
-    }*/
-  }
-
-  public variant TypeScriptGlobalDeclaration
-  {
-    | Interface { Name : string; Extend : option[list[string]]; Members : list[TypeScriptMember] }
-    | Var       { Name : string; Members : list[TypeScriptMember]; }
-    | VarType   { Name : string; Type : TypeScriptType; }
-    | Function  { Method : TypeScriptMember.Method  }
-  }
-
-  public variant TypeScriptMember : Located
-  {
-    | Property     { Name : string; IsNullable : bool; Type : TypeScriptType }
-    | PropertyType { Name : string; IsNullable : bool; Members : list[TypeScriptMember]; }
-    | Method       { Name : string; IsNullable : bool; Parms : list[TypeScriptParameter]; Type : TypeScriptType }
-    | Call         { Parms : option[list[TypeScriptParameter]]; ReturnType : TypeScriptType }
-    | IndexCall    { Parms : option[list[TypeScriptParameter]]; ReturnType : TypeScriptType }
-  }
-
-  [Record]
-  public class TypeScriptDeclaration : Located
-  {
-    public Member : TypeScriptMember;
-  }
-
-  [Record]
-  public class TypeScriptParameter
-  {
-    public Name : string;
-    public Type : TypeScriptType;
-    public IsOptional : bool;
-    public IsParams : bool;
-  }
-
-  public variant TypeScriptType
-  {
-    | Object     { Parms : list[TypeScriptParameter] }
-    | Dictionary { Key : TypeScriptType; Value : TypeScriptType }
-    | Array      { Type : TypeScriptType; Arity : int; }
-    | Lambda     { Parms : option[list[TypeScriptParameter]]; ReturnType : TypeScriptType }
-    | Normal     { Name : string }
-  }
-
-  public variant TSType
-  {
-    | Any
-    | Number
-    | Boolean
-    | String
-    | Void
-    | Named        { Name : string; }
-    | GlobalObject { Name : string; }
-    | Enumeration  { Name : string; }
-    | Class        { Name : string; }
-    | Interface    { Name : string; }
-    | Array        { Type : TSType; }
-    | Lambda       { Parms : list[TSParameter]; ReturnType : TSType; }
-    | Structural   { Member : list[TSObjectMember]; }
-  }
-
-  [Record]
-  public class TSVariable
-  {
-    Name : string;
-    Type : TSType;
-    IsOptional : bool;
-  }
-
-  [Record]
-  public class TSParameter
-  {
-    Var : TSVariable;
-    IsParamArray : bool;
-  }
-
-  [Record]
-  public class TSFunction
-  {
-    Name : string;
-    Type : TSType;
-    Parameters : list[TSParameter];
-    IsOptional : bool;
-  }
-
-  public variant TSObjectMember
-  {
-    | Property { Var : TSVariable; IsStatic : bool; }
-    | Method   { Var : TSFunction; IsStatic : bool; }
-    | Indexer  { Var : TSFunction; IsStatic : bool; }
-  }
-
-  [Record]
-  public class TSObject
-  {
-    Name : string;
-    Members : list[TSObjectMember];
-    SuperTypes : list[string];
+      TSGlobal.Function()
+    }
+    
+    AmbientClassDeclaration(_ : NToken, _ : NToken, _ : NToken, _ : NToken, _ : NToken, _ : NToken) : TSGlobal
+    {
+      TSGlobal.Class()
+    }
+    
+    InterfaceDeclaration(_ : NToken, _ : NToken, _ : NToken, _ : NToken) : TSGlobal
+    {
+      TSGlobal.Interface()
+    }
+    
+    AmbientModuleDeclaration(_ : NToken, _ : NToken, _ : NToken, _ : NToken) : TSGlobal
+    {
+      TSGlobal.Module()
+    }
+    
+    AmbientEnumDeclaration(_ : NToken, _ : NToken, _ : NToken, _ : NToken, _ : NToken) : TSGlobal
+    {
+      TSGlobal.Enum()
+    }
+    
+    ImportDeclaration(_ : NToken, _ : NToken, _ : NToken, _ : NToken) : TSGlobal
+    {
+      TSGlobal.Import()
+    }
   }
 
   public variant TSGlobal
   {
-    | DeclareVar       { Var : TSVariable; }
-    | DeclareFunction  { Function : TSFunction; }
-    | DeclareInterface { Interface : TSObject; }
-    | DeclareClass     { Class : TSObject; }
-    | DeclareObject    { Obj : TSObject; }
-    | DeclareModule    { Name : string; Members : list[TSGlobal]; }
-    | DeclareEnum      { Name : string; Members : list[string]; }
-    | ImportModule     { Alias : string; Module : string; }
+    | Variable 
+    | Construct
+    | Function
+    | Class
+    | Interface
+    | Module
+    | Enum
+    | Import
   }
 }

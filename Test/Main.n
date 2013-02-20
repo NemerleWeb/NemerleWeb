@@ -16,16 +16,6 @@ module Program
 {
   Main() : void
   {
-    /*def parser = TypeScriptInterfaceParser();
-    def res = parser.Parse(System.IO.File.ReadAllText("c:\\dev\\jquery.d.ts"));
-    _ = match(res)
-    {
-    | Some(interfaces) => 
-      def i = interfaces;
-      ""
-    | None => "fuck that"
-    }
-    */
     def result = nweb Test();
     
     foreach (s in NWebData.GetAllScriptNames())
@@ -39,14 +29,6 @@ module Program
 [Unit]
 public class Test
 {   
-  x  : list[string] = ["3", "4"];
-  
-  F() : void  { _ = x is ["3", "4"]; } 
-  More() : void {}
-  Less() : void {}
-  Letters : list[string];
-  OddLettersOnly : bool;
-  
   [Html]
   public View() : string
   {
