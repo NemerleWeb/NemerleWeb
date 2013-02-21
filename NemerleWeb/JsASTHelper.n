@@ -6,6 +6,7 @@ using Nemerle.Text;
 using Nemerle.Utility;
 using Nemerle.Extensions;
 using Nemerle.Compiler.Typedtree;
+using Nemerle.Imperative;
 
 using System;
 using System.Globalization;
@@ -85,11 +86,20 @@ namespace NemerleWeb
       def anyGotos = IterateAST(ast).OfType.[JsAst.Goto]().Any();
       if(anyGotos) 
       {
-        def exprList = List();
+        mutable exprList = [];
         def labelMap = Dictionary();
         def currentLabelVar = GetTemporaryVariableName();
         def loopName = "__gotoSwitchLoop";
-        mutable labelCounter = 0;
+        def labelIncomingCount = Dictionary.[string, int]();
+        def incrementIncoming(label, inc = 1) {
+          if(labelIncomingCount.ContainsKey(label))
+              labelIncomingCount[label]++;
+            else
+              labelIncomingCount.Add(label, inc)
+        }
+        
+        mutable labelCounter = 0;        
+        
         def getNewLabel() {
           ++labelCounter;
           $"__lbl__$labelCounter"
@@ -128,23 +138,24 @@ namespace NemerleWeb
             def elsLabel = f(els, next);
             def newExpr = JsAst.If(cond, getGotoToLabel(bdyLabel), getGotoToLabel(elsLabel));
             def newLabel = getNewLabel();
-            exprList.Add(new (label = newLabel, expr = newExpr, next = next));
+            exprList ::= new (label = newLabel, expr = newExpr, next = next, ifBlocks = Some(bdyLabel, elsLabel));
             newLabel;
           | Goto(id) =>
             def newLabel = getNewLabel();            
-            exprList.Add(new (label = newLabel, expr = getGotoToLabel(id), next = next));
-            newLabel;            
+            exprList ::= new (label = newLabel, expr = getGotoToLabel(id), next = next, ifBlocks = None());
+            incrementIncoming("__CHECK_LABEL__" + id);
+            newLabel;
           | TryFinally(body, _handler) => 
             f(body, next);            
           | _ =>
             def newLabel = getNewLabel();
-            exprList.Add(new (label = newLabel, expr = current, next = next));
+            exprList ::= new (label = newLabel, expr = current, next = next, ifBlocks = None());
             newLabel;
           }
         }
         
         _ = f(ast, None());
-        def reversedExprs = Enumerable.Reverse(exprList).ToList();
+                        
         def createSwitchCase(e) {
           match(e.next)
           {
@@ -159,13 +170,80 @@ namespace NemerleWeb
             ]);
           }
         }
-        def firstLabel = if(reversedExprs.Count > 0) reversedExprs[0].label else "";
+        def labelToExprMap = Dictionary();
+                
+        def getIncomingCount(label) {
+          mutable incomingCount = 0;
+          if(labelIncomingCount.TryGetValue(label, out incomingCount))
+            incomingCount
+          else 0
+        }
+        
+        foreach(a in exprList) {
+          match((a.expr, a.next, a.ifBlocks)) 
+          {
+          | (If, _, Some((ifLbl, elseLbl))) => 
+            //Always render 'if' cases
+            incrementIncoming(ifLbl, 2);
+            incrementIncoming(elseLbl, 2);         
+          | (_, Some(nextLabel), _) => incrementIncoming(nextLabel);
+          | _ => ()
+          }
+          labelToExprMap.Add(a.label, a);
+        }
+        
+        def kvps = labelIncomingCount.Select(kvp => (kvp.Key, kvp.Value)).ToList();
+        labelIncomingCount.Clear();
+        
+        def updateLabel(label)
+        {
+          if(label.StartsWith("__CHECK_LABEL__")) 
+          {
+            def label = label.Replace("__CHECK_LABEL__", "");
+            if(labelMap.ContainsKey(label)) labelMap[label] else label;
+          } else label;
+        }
+        
+        foreach((key, value) in kvps)
+          incrementIncoming(updateLabel(key), value);
+        
+        def divide(lst, first) {
+          match(lst) {
+          | [] => ([], [])
+          | [x] => if(getIncomingCount(x.label) == 1 || first) ([x], []) else ([], [x])
+          | x :: rest =>       
+            if(getIncomingCount(x.label) == 1 || first) {
+              def (l, r) = divide(rest, false);
+              (x :: l, r) 
+            } else {
+              ([], lst)
+            }
+          }
+        }    
+    
+        def combine(lst) {
+        | [] => []
+        | [x] => [x]
+        | xs => 
+          match(divide(xs, true))  {
+          | ([], r) => combine(r)
+          | ([l], r) => 
+            new (label = l.label, expr = l.expr, next = l.next, ifBlocks = None()) :: combine(r)          
+          | (l :: ls, r) => 
+            def last = ls.LastOrDefault();
+            new (label = l.label, expr = JsAst.Seq(l.expr :: ls.Map(x => x.expr)), next = last.next, ifBlocks = None()) :: combine(r)
+          }       
+        }
+             
+        def exprListCombined = combine(exprList).ToList();
+        def firstLabel = if(exprListCombined.Count > 0) exprListCombined[0].label else "";
+        
         def resultAst = JsAst.Seq([
           JsAst.DefValue(currentLabelVar, JsAst.Literal(JsLiteral.String(firstLabel))),
           JsAst.WhileNamed(JsAst.Literal(JsLiteral.Bool(true)), 
             JsAst.Switch(
               JsAst.LocalRef(currentLabelVar, None()),               
-              reversedExprs.Select(e => JsAst.SwitchCase(e.label, createSwitchCase(e))).NToList(),
+              exprListCombined.Select(e => JsAst.SwitchCase(e.label, createSwitchCase(e))).NToList(),
               JsAst.Void()),
             loopName)
         ]);
