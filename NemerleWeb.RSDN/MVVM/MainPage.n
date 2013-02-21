@@ -1,0 +1,45 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Extensions;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.Rsdn
+{  
+  [Unit]
+  public class MainPage
+  {
+    Root : TreeNode { get; set; }
+    Nodes : List[TreeNode] { get; set; }
+    
+    public this() {
+      server.GetTopNodes(nodes => {
+        Root = TreeNode() <- (
+          Children = nodes
+        );
+      });
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+        <div $when(Root != null) class="root">
+          <div template="$(template(Root))" />
+        </div>
+      #>
+    }
+    
+    public class Server
+    {
+      public GetTopNodes() : List[TreeNode]
+      {
+        TreeLoader.GetTopNodes()
+      }
+    }
+  }
+}

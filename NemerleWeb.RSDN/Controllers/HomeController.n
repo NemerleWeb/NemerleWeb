@@ -1,0 +1,19 @@
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Web;
+using System.Web.Mvc;
+
+using Nemerle;
+using NemerleWeb;
+
+namespace NemerleWeb.Rsdn.Controllers
+{
+  public class HomeController : Controller
+  {
+    public Index() : ActionResult
+    {
+      View((nweb MainPage()) : object);
+    }
+  }
+}
