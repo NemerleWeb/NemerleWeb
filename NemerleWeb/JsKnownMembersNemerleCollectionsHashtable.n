@@ -27,11 +27,11 @@ namespace NemerleWeb
       else ret;
     }
     
-    private InstanceHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private InstanceHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
       match (parms)
       {
-      | [arg1] =>
+      | [_] =>
         match (member.Name)
         {
         | _ => None()
