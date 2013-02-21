@@ -1,0 +1,81 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Extensions;
+
+using System;
+using System.Text;
+using System.IO;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Xml.Linq;
+using System.Web;
+
+namespace NemerleWeb.Rsdn
+{
+  module TreeLoader
+  {
+    mutable _tree : TreeNode;
+    mutable _childrenById : ConcurrentDictionary[string, List[TreeNode]];
+    
+    this()
+    {
+      def xml = File.ReadAllText(HttpContext.Current.Server.MapPath("~/App_Data/tree.xml"), Encoding.GetEncoding("windows-1251"));
+      def doc = XDocument.Parse(xml);
+      
+      _childrenById = ConcurrentDictionary();
+      
+      def readAttribute(element : XElement, attrName : string) {
+        element.Attribute(attrName)?.Value
+      }
+      
+      def readNodes(element, depth) : TreeNode {        
+        def childNodes = element.Elements("node").Select(e => readNodes(e, depth + 1)).ToList();
+        
+        if(element.Name.LocalName == "tree") 
+          TreeNode() <- ( Children = childNodes ) 
+        else {
+          def id = readAttribute(element, "id");
+          
+          _ = _childrenById.TryAdd(id, childNodes.Select(CloneNoChildren).ToList());
+          
+          TreeNode() <- (           
+            Id = id,
+            Caption = readAttribute(element, "caption"),
+            Href = readAttribute(element, "href"),
+            Icon = readAttribute(element, "icon"),
+            Hide = readAttribute(element, "hide") == "1",
+            Depth = depth,
+            Children = childNodes,
+          );
+        }
+      }
+      
+      _tree = readNodes(doc.Root, 0);
+    }
+        
+    public GetTopNodes() : List[TreeNode]
+    {      
+      _tree.Children.Select(CloneNoChildren).ToList()
+    }
+
+    public LoadNodeChildren(id : string) : List[TreeNode]
+    {
+      _childrenById.GetOrAdd(id, List());
+    }
+    
+    CloneNoChildren(node : TreeNode) : TreeNode
+    {
+      TreeNode() <- (
+        Id = node.Id,
+        Caption = node.Caption,
+        Href = node.Href,
+        Icon = node.Icon,
+        Hide = node.Hide,
+        Depth = node.Depth
+      )      
+    }
+  }
+}

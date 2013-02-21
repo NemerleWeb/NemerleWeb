@@ -1,0 +1,84 @@
+body {
+    width: 960px;
+    margin: 0 auto;
+}
+
+.login-info {
+    text-align: right;
+}
+
+.tourney-list-container {
+    width: 180px;
+    float: left;
+}
+
+.main-container {
+    overflow: hidden;
+    margin-top: 2px;
+}
+
+.tourney-info {
+    padding: 60px 10px 0 10px;
+    float: left;
+    width: 510px;
+}
+
+.tourney-info .editor {
+    overflow: hidden;
+}
+
+.tourney-info .editor textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+.tourney-info .editor button {
+    float: right;
+    margin-left: 5px;
+}
+
+.tourney-list {
+    margin: 0;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    overflow: hidden;
+}
+
+.tourney-list li {
+    margin: 1px 2px 1px 0;
+    font-size: 12px;
+    display: block;
+}
+
+.chat-container {
+    margin-top: 20px;
+    float: right;
+    width: 250px;
+}
+
+.chat-container .messages {
+    height: 500px;
+    background-color: #eee;
+    margin-bottom: 2px;
+    position: relative;
+    overflow-y: scroll;
+}
+
+.chat-container .messages .messages-container {
+    max-height: 500px;
+    position: absolute;
+    bottom: 0;
+}
+
+.chat-container .message  {
+    margin-left: 3px;
+}
+
+.chat-container .chat-new-message input {
+    width: 190px;
+}

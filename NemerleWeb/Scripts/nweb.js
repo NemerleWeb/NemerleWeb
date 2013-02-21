@@ -78,7 +78,7 @@ var nweb = {
       if(attrs[j].nodeName.indexOf("nw-") === 0)
         el.removeAttribute(attrs[j].nodeName);
     
-    if(el.__nw_is_template && !isInsideTemplate)
+    if(el.__nw_is_template /*&& !isInsideTemplate*/)
       return;
 
     for(var l = 0; l < el.childNodes.length; l++)

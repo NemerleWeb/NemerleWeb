@@ -1,0 +1,67 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.Rsdn
+{  
+  [Unit]
+  public class TreeNode
+  {
+    public Id : string { get; set; }
+    public Caption : string { get; set; }
+    public Href : string { get; set; }
+    public Icon : string { get; set; }
+    public Hide : bool { get; set; }
+    public Depth : int { get; set; }
+    public IsOpened : bool { get; set; }
+    public Children : List[TreeNode] { get; set; }    
+    
+    public LoadChildren() : void
+    {
+      server.LoadNodeChildren(Id, children => {
+        Children = children;
+      });
+    }
+    
+    public Toggle() : void
+    {
+      when(Children == null)
+        LoadChildren();
+        
+      IsOpened = !IsOpened;
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+        <div $foreach(c in Children)>   
+          <div style-margin-left="$(c.Depth * 10)">
+            <div>
+              <span click="$(c.Toggle())">+</span>
+              <a attr-href="$(c.Href)">
+                <span>$(c.Caption)</span>
+              </a>
+            </div>
+            <div $when(c.IsOpened && Children != null)>
+              <div template="$(template(c))" />
+            </div>          
+          </div>
+        </div>
+      #>
+    }
+    
+    public class Server
+    {
+      public LoadNodeChildren(id : string) : List[TreeNode]
+      {
+        TreeLoader.LoadNodeChildren(id)
+      }
+    }
+  }
+}
