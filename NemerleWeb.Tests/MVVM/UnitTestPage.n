@@ -958,6 +958,13 @@ namespace NemerleWeb.Tests
         l.Count == 0
       });
       
+      test("List Insert", () =>
+      {
+        def l = List();
+        l.Insert(0, 1);
+        l[0] == 1
+      });
+      
       test("members from macro", () =>
       {
         def m = MembersFromMacro();
@@ -1586,6 +1593,102 @@ namespace NemerleWeb.Tests
         def v2 = s.Pop();        
         
         v1 == v2 && v1 == 1
+      });
+      
+      test("Dictionary.Count", () =>
+      {
+        def d = Dictionary();
+        
+        def e = Dictionary();
+        e.Add(1, "");
+        
+        d.Count == 0 && e.Count == 1
+      });
+      
+      test("Dictionary.Keys", () =>
+      {
+        def d = Dictionary();
+        d.Add(1, 2);
+        d.Add(3, 4);
+        d.Add(5, 6);
+        
+        d.Keys.Count() == 3
+      });
+      
+      test("Dictionary.Item", () =>
+      {
+        def d = Dictionary();
+        d.Add("x", "y");
+        d.Add("a", "b");
+        
+        d["a"] = "q";
+        
+        d["x"] == "y" && d["a"] == "q"
+      });
+      
+      test("Dictionary.Contains.Key", () =>
+      {
+        def d = Dictionary();
+        d.Add(1, 2);
+        
+        d.ContainsKey(1) && !d.ContainsKey(2)
+      });
+      
+      test("Dictionary", () =>
+      {
+        def d = Dictionary();
+        d.Add(1, 2);
+        _ = d.Remove(1);
+        
+        !d.ContainsKey(1) && !d.ContainsKey(2)
+      });
+      
+      test("Nemerle.Collections.Hashtable.Count", () =>
+      {
+        def d = Nemerle.Collections.Hashtable();
+        
+        def e = Nemerle.Collections.Hashtable();
+        e.Add(1, "");
+        
+        d.Count == 0 && e.Count == 1
+      });
+      
+      test("Nemerle.Collections.Hashtable.Keys", () =>
+      {
+        def d = Nemerle.Collections.Hashtable();
+        d.Add(1, 2);
+        d.Add(3, 4);
+        d.Add(5, 6);
+        
+        d.Keys.Count() == 3
+      });
+      
+      test("Nemerle.Collections.Hashtable.Item", () =>
+      {
+        def d = Nemerle.Collections.Hashtable();
+        d.Add("x", "y");
+        d.Add("a", "b");
+        
+        d["a"] = "q";
+        
+        d["x"] == "y" && d["a"] == "q"
+      });
+      
+      test("Nemerle.Collections.Hashtable.Contains.Key", () =>
+      {
+        def d = Nemerle.Collections.Hashtable();
+        d.Add(1, 2);
+        
+        d.ContainsKey(1) && !d.ContainsKey(2)
+      });
+      
+      test("Nemerle.Collections.Hashtable", () =>
+      {
+        def d = Nemerle.Collections.Hashtable();
+        d.Add(1, 2);
+        _ = d.Remove(1);
+        
+        !d.ContainsKey(1) && !d.ContainsKey(2)
       });
     }    
     

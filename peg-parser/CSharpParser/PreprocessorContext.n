@@ -4,10 +4,11 @@ using SCG = System.Collections.Generic;
 using Nemerle.Assertions;
 using Nemerle.Collections;
 using Nemerle.Utility;
-using Nemerle.Peg; using NemerleWeb;
+using NemerleWeb.Peg; using NemerleWeb;
 
 namespace CSharpParser
 {
+  [Unit]
   internal sealed class PreprocessorContext
   {
     public this(writer : PreprocessorWriter, predefinedSymbols : SCG.IEnumerable[string], elements : SCG.IEnumerator[PreParseElement])

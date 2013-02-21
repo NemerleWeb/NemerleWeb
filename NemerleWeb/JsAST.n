@@ -330,6 +330,15 @@ $<#function $Name(..$(Parameters; ";"; p => p.Write(""))) { $(Body.Write("  ")) 
             }
           }            
         }
+        | Delete
+          {
+            Obj : JsAst;
+          
+            public override Write(indent = "" : string) : string
+            {
+              $"$(indent)delete $(Obj.Write())"
+            }
+          }
         | For            { ItName : string; Collection : JsAst; Body : JsAst;
             public override Write(_indent = "" : string) : string {
 $<#
@@ -832,6 +841,7 @@ $(indent)}
             | DefFunction(obj, ps, bdy)   => JsAst.DefFunction(recurse(obj), ps.Map(recurse), recurse(bdy))
             | DeclFunction(name, ps, bdy) => JsAst.DeclFunction(name, ps.Map(recurse), recurse(bdy))
             | DefValue(name, val)         => JsAst.DefValue(name, recurse(val))
+            | Delete                      => ast'
             | FieldRef(obj, parm)         => JsAst.FieldRef(recurse(obj), parm)
             | For(it, coll, body)         => JsAst.For(it, recurse(coll), recurse(body))
             | GlobalRef                   => ast'

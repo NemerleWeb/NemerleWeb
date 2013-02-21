@@ -11,17 +11,14 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  /// <summary>
-  /// Description of JsKnownMembersSCGList.
-  /// </summary>
-  module JsKnownMembersSCGList
+  module JsKnownMembersSCGDictionary
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(List[_]), Handler); 
+      JsKnownMembers.RegisterType(typeof(System.Collections.Generic.Dictionary[_, _]), Handler); 
     }
     
-    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    internal Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
     {
       (if (left is JsAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
     }
@@ -33,28 +30,27 @@ namespace NemerleWeb
       | [] =>
         match (member.Name)
         {
-        | "get_Count" => Some(JsAst.FieldRef(left, "length"))
-        | "Clear" =>
-          Some(JsAst.Assign(JsAst.FieldRef(left, "length"), JsAst.Literal(JsLiteral.Integer(0))))
+        | "get_Count" => Some("Object".JsStaticCall("keys", [left]).Field("length"))
+        | "get_Keys" => Some("Object".JsStaticCall("keys", [left]))
+        | "Clear" => Some(JsAst.Assign(left, JsAst.Object([])))
         | "GetEnumerator" => Some(left.JsMethodCall(member.Name, parms))
-        | "ToArray" => Some(left)
         | _ => None()
         }
-        
       | [arg] =>
         match (member.Name)
         {
         | "get_Item" => Some(JsAst.ArrayIndexer(left, arg))
-        | "Add" => Some(left.JsMethodCall("push", parms))
-        | "Remove" => Some(left.JsMethodCall("remove", parms))
+        | "ContainsKey" => Some(left.JsMethodCall("hasOwnProperty", parms))
+        | "Remove" => Some(JsAst.Delete(JsAst.ArrayIndexer(left, arg)))
         | _ => None()
         }
       | [arg1, arg2] =>
         match (member.Name)
         {
-        | "Insert" => Some(left.JsMethodCall("splice", [arg1, JsAst.Literal(JsLiteral.Integer(0)), arg2]))
+        | "set_Item" => Some(JsAst.Assign(JsAst.ArrayIndexer(left, arg1), arg2))
+        | "Add" => Some(JsAst.Assign(JsAst.ArrayIndexer(left, arg1), arg2))
         | _ => None()
-        }
+        }              
       | _ => None()
       }
     }
@@ -66,14 +62,7 @@ namespace NemerleWeb
       | [] =>
         match (member.Name)
         {
-        | ".ctor" => Some(JsAst.Array([]))
-        | _ => None()
-        }
-      | [arg] =>
-        match (member.Name)
-        {
-        | ".ctor" =>
-          Some(JsAst.Call(JsAst.GlobalRef("System_Collections_Generic_List"), [arg]))
+        | ".ctor" => Some(JsAst.Object([]))
         | _ => None()
         }
       | _ => None()

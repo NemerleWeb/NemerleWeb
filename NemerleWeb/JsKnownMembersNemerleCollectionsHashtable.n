@@ -1,0 +1,51 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  module JsKnownMembersNemerleCollectionsHashtable
+  {
+    public Register() : void
+    {
+      JsKnownMembers.RegisterType(typeof(Hashtable[_, _]), Handler);      
+    }
+    
+    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      def ret = (if (left is JsAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms);
+      
+      // Try base class if no handling here
+      if (ret is None()) JsKnownMembersSCGDictionary.Handler(left, member, parms)
+      else ret;
+    }
+    
+    private InstanceHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      match (parms)
+      {
+      | [arg1] =>
+        match (member.Name)
+        {
+        | _ => None()
+        }
+      | _ => None()
+      }
+    }
+    
+    private StaticHandler(_left : JsAst, _member : IMember, parms : list[JsAst]) : option[JsAst]
+    {
+      match(parms)
+      {
+      | _ => None()
+      }
+    }
+  }
+}

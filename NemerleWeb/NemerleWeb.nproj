@@ -173,6 +173,9 @@
     <Compile Include="JsKnownMembersMath.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JsKnownMembersNemerleCollectionsHashtable.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JsKnownMembersNemerleCollectionsNList.n">
       <SubType>Code</SubType>
     </Compile>
@@ -186,6 +189,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JsKnownMembersPage.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JsKnownMembersSCGDictionary.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JsKnownMembersSCGList.n">
