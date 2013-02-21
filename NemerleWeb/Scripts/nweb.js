@@ -544,11 +544,14 @@ nweb.utils = {
         }
         return obj;
     },
+    getObjectType: function(obj) {
+      return Object.prototype.toString.call(obj).match(/^\[object (.*)\]$/)[1];
+    },
     isTuple: function(obj) {
       return !!obj.$type && obj.$type.indexOf('Nemerle.Builtins.Tuple`') == 0;
     },
     normalizeObjectForServer: function (obj) {
-      if (typeof obj !== "object" || obj === null)
+      if (nweb.utils.getObjectType(obj) !== "Object" || obj === null)
         return obj;
 
       var excludedFields = [];
@@ -571,14 +574,14 @@ nweb.utils = {
 
       var result = {};
       var isFunction = function (m) {
-        var isGeneratedMethod = typeof m === 'object' && typeof m[""] === 'function';
-        var isNormalFunction = typeof m === 'function';
+        var isGeneratedMethod = nweb.utils.getObjectType(m) === 'Object' && nweb.utils.getObjectType(m[""]) === 'Function';
+        var isNormalFunction = nweb.utils.getObjectType(m) === 'Function';
         return isGeneratedMethod || isNormalFunction;
       };
 
       for (var member in obj) {
         if (obj.hasOwnProperty(member) && member.indexOf('_N_') != 0 && excludedFields.indexOf(member) == -1) {
-          if (typeof obj[member] === 'function' && member.indexOf("get_") === 0)
+          if (nweb.utils.getObjectType(obj[member]) === 'Function' && member.indexOf("get_") === 0)
             result[member.substr(4)] = nweb.utils.normalizeObjectForServer(obj[member]());
           else if(!isFunction(obj[member]))
             result[member] = nweb.utils.normalizeObjectForServer(obj[member]);
@@ -719,7 +722,6 @@ var Nemerle_Utility_Identity_$A$$B$_ = {
         return x;
     }
 };
-
 
 function Nemerle_Core_Some_$T$__$T$_(sig, val) {
   this.val = val;
