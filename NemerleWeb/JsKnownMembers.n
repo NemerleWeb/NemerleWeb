@@ -86,12 +86,13 @@ namespace NemerleWeb
       
       JsKnownMembersSCGList.Register();
       JsKnownMembersSCGStack.Register();
+      JsKnownMembersSCGDictionary.Register();
       JsKnownMembersIEnumerable.Register();
       JsKnownMembersEnumerator.Register();
       
       JsKnownMembersLinqEnumerable.Register();
       
-      JsKnownMembersNemerleList.Register();
+      JsKnownMembersNemerleList.Register();      
       JsKnownMembersNemerleNCollectionsExtensions.Register();
       JsKnownMembersEventsDSL.Register();
       JsKnownMembersPage.Register();
@@ -106,6 +107,7 @@ namespace NemerleWeb
       JsKnownMembersGlobalizationCutlureInfo.Register();
       JsKnownMembersCharEnumerator.Register();
       JsKnownMembersNemerleCollectionsNList.Register();
+      JsKnownMembersNemerleCollectionsHashtable.Register();
     }
     
     public Convert(
