@@ -275,7 +275,7 @@ $indent};#>);
           def type = field.GetMemType();
           def isArray = TypeIsArray(type);
           if(isArray) 
-            "[]" 
+            "null" 
           else
           {
             match(type.TypeInfo?.FullName)
