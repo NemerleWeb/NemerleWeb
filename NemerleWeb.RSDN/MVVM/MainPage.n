@@ -14,7 +14,6 @@ namespace NemerleWeb.Rsdn
   public class MainPage
   {
     Root : TreeNode { get; set; }
-    Nodes : List[TreeNode] { get; set; }
     
     public this() {
       server.GetTopNodes(nodes => {
