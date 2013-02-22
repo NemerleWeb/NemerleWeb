@@ -115,7 +115,7 @@ namespace TypeScript
         ZWJ = '\u200D';        
         
         // Any name
-        AnyIdentifier = IdentifierName s;
+        AnyIdentifier : string = IdentifierName s;
         Identifier : string = !(ReservedWord Spacing+) IdentifierName s;
         IdentifierName = IdentifierStart+ IdentifierPart*;
         IdentifierStart = UnicodeLetter / '$' / '_' / '\\' UnicodeEscapeSequence;
@@ -452,8 +452,8 @@ namespace TypeScript
         CallSignature = lparen_s ParameterList? rparen_s ReturnTypeAnnotation?;
         ConstructSignature = new_s lparen_s ParameterList? rparen_s TypeAnnotation?;
         IndexSignature = lbrack_s RequiredParameter rbrack_s TypeAnnotation?;
-        PropertySignature = Identifier ('?' s)? TypeAnnotation?;
-        FunctionSignature = Identifier ('?' s)? lparen_s ParameterList? rparen_s ReturnTypeAnnotation?;
+        PropertySignature = AnyIdentifier ('?' s)? TypeAnnotation?;
+        FunctionSignature = AnyIdentifier ('?' s)? lparen_s ParameterList? rparen_s ReturnTypeAnnotation?;
         
         #endregion
         
@@ -557,7 +557,7 @@ namespace TypeScript
         
         EnumDeclaration = enum_s Identifier lbrace_s EnumBody? rbrace_s;
         EnumBody = EnumElement (comma_s EnumElement)* ','?s;
-        EnumElement = Identifier Initialiser?;
+        EnumElement = AnyIdentifier Initialiser?;
         
         #endregion
         
@@ -693,11 +693,16 @@ namespace TypeScript
       GetText(s)
     }
     
+    AnyIdentifier(id : NToken) : string
+    {
+      GetText(id)
+    }    
+    
     Identifier(id : NToken) : string
     {
       GetText(id)
     }
-    
+        
     static Id(first : string, rest : List[string]) : string
     {
       if (rest.Count == 0) first else $<#$first...$(rest; ".")#>
