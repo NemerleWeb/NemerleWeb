@@ -157,7 +157,7 @@ namespace NemerleWeb
             JsAst.Code($"nweb.utils.getTemplateName(this.$model, '$view')")
           | _ => Message.FatalError("Invalid GetTemplateName call, use 'name' macro")
           }
-        | Call(MethodRef(_, meth, _, _), objName :: parms :: [], _) when meth.Name == "callJs" && parms.expr is TExpr.Array =>
+        | Call(MethodRef(_, meth, _, _), [objName, parms], _) when meth.Name == "callJs" && parms.expr is TExpr.Array =>
           def parmsFromArray = parms.expr :> TExpr.Array;          
           JsAst.Call(JsAst.Code(objName.expr.ToString().Trim('\"')), parmsFromArray.args.Map(p => JsAst.Code(p.ToString())))
         | Call(MethodRef(obj = o, meth = meth), parms, _) =>

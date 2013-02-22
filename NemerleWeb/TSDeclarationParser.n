@@ -635,7 +635,7 @@ namespace TypeScript
         
         // This rule is not by specification, but TypeScript parses it correctly.
         AmbientFunctionSignature = AnyIdentifier? '?'?s lparen_s ParameterList? rparen_s ReturnTypeAnnotation?;
-        AmbientFunctionDeclaration : TSGlobal = function_s AmbientFunctionSignature S;
+        AmbientFunctionDeclaration : TSGlobal = function_s AmbientFunctionSignature scS;
         
         // This rule is not by specification, but TypeScript parses it correctly.
         AmbientConstructDeclaration : TSGlobal  = function_s new_s lparen_s ParameterList? rparen_s ReturnTypeAnnotation? S;
@@ -644,19 +644,19 @@ namespace TypeScript
         
         #region Ambient Class Declarations (10.1.3)
         
-        AmbientClassDeclaration : TSGlobal = class_s Identifier ClassHeritage lbrace_s AmbientClassBody rbrace_s;
+        AmbientClassDeclaration : TSGlobal = class_s Identifier ClassHeritage lbrace_s AmbientClassBody rbrace_s S;
         AmbientClassBody = AmbientClassBodyElement*;
         AmbientClassBodyElement = AmbientConstructorDeclaration / AmbientStaticDeclaration / AmbientMemberDeclaration;
         AmbientConstructorDeclaration = constructor_s lparen_s ParameterList? rparen_s scS;
         AmbientMemberDeclaration = PublicOrPrivate? (FunctionSignature / Identifier TypeAnnotation?) scS;
         AmbientStaticDeclaration = PublicOrPrivate? static_s (FunctionSignature / Identifier TypeAnnotation?) scS;
-        AmbientEnumDeclaration : TSGlobal = enum_s Identifier lbrace_s EnumBody? rbrace_s;
+        AmbientEnumDeclaration : TSGlobal = enum_s Identifier lbrace_s EnumBody? rbrace_s S;
         
         #endregion        
         
         #region Ambient Module Declarations (10.1.4)
         
-        AmbientModuleDeclaration : TSGlobal = module_s AmbientModuleIdentification s lbrace_s AmbientModuleBody rbrace_s;
+        AmbientModuleDeclaration : TSGlobal = module_s AmbientModuleIdentification s lbrace_s AmbientModuleBody rbrace_s S;
         AmbientModuleIdentification : string = StringLiteral / IdentifierPath;
         AmbientModuleBody = AmbientElement*;
         
