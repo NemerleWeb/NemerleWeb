@@ -78,6 +78,7 @@
     <Folder Include="Properties\" />
     <Folder Include="TS\ace\" />
     <Folder Include="TS\ace\tests\" />
+    <Folder Include="TS\amcharts\" />
     <Folder Include="TS\angularjs\" />
     <Folder Include="TS\async\" />
     <Folder Include="TS\backbone\" />
@@ -102,11 +103,14 @@
     <Folder Include="TS\fabricjs\" />
     <Folder Include="TS\fabricjs\tests\" />
     <Folder Include="TS\fancybox\" />
+    <Folder Include="TS\filesystem\" />
+    <Folder Include="TS\filewriter\" />
     <Folder Include="TS\flexSlider\" />
     <Folder Include="TS\flot\" />
     <Folder Include="TS\foundation\" />
     <Folder Include="TS\gldatepicker\" />
     <Folder Include="TS\globalize\" />
+    <Folder Include="TS\google.analytics\" />
     <Folder Include="TS\google.feeds\" />
     <Folder Include="TS\googlemaps\" />
     <Folder Include="TS\greensock\" />
@@ -150,6 +154,7 @@
     <Folder Include="TS\knockout.validation\" />
     <Folder Include="TS\knockout.viewmodel\" />
     <Folder Include="TS\knockout\" />
+    <Folder Include="TS\knockout\tests\" />
     <Folder Include="TS\kolite\" />
     <Folder Include="TS\leaflet\" />
     <Folder Include="TS\libxmljs\" />
@@ -171,6 +176,7 @@
     <Folder Include="TS\pouchDB\" />
     <Folder Include="TS\preloadjs\" />
     <Folder Include="TS\qunit\" />
+    <Folder Include="TS\Q\" />
     <Folder Include="TS\raphael\" />
     <Folder Include="TS\requirejs\" />
     <Folder Include="TS\restify\" />
