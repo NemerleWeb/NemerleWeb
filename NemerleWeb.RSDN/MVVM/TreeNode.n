@@ -23,17 +23,18 @@ namespace NemerleWeb.Rsdn
     
     public LoadChildren() : void
     {
-      server.LoadNodeChildren(Id, children => {
-        Children = children;
-      });
     }
     
     public Toggle() : void
     {
-      when(Children == null)
-        LoadChildren();
-        
-      IsOpened = !IsOpened;
+      if(Children == null) {        
+        server.LoadNodeChildren(Id, children => {
+          Children = children;
+          IsOpened = !IsOpened;
+        });
+      } else {
+        IsOpened = !IsOpened;
+      }
     }
     
     [Html]

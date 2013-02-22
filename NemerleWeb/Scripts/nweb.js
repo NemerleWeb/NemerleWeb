@@ -1,8 +1,14 @@
 "use strict";
 
 var nweb = {
-  go: function (model) {
-    var body = $("#nweb-start").html($("#" + nweb.utils.getTemplateName(model, "View")).html())[0];
+  go: function (model, tpl, dest, fromDebugger) {
+    if (nweb.debugger && !fromDebugger)
+      nweb.debugger(model);
+    
+    var template = tpl ? tpl : nweb.utils.getTemplateName(model, "View");
+    var destination = dest ? dest : "#nweb-start";
+    var body = $(destination).html($("#" + template).html())[0];
+    
     nweb.applyBindings(model, body, nweb.bindings, []);
     nweb.invalidate(nweb.bindings);
   },
@@ -632,6 +638,34 @@ nweb.utils = {
             return expr + " = " + value + ";";
         else
             return setExpr + "(" + value + ");";
+    },
+    getFieldsAndProperties: function (model) {
+      var result = [];
+      var meta = model.__nweb_meta;
+      
+      if (meta) {
+        var usedProps = {};
+        for (var p = 0; p < meta.properties.length; p++) {
+          var val = model["get_" + meta.properties[p].name]();
+          
+          usedProps[meta.properties[p].name] = '';
+
+          result.push({ name: meta.properties[p].name, val: val });
+        }
+        for (var f = 0; f < meta.fields.length; f++) {
+          var m = meta.fields[f].name.match(/_N_(.+)_\d+/);
+          
+          if(!(m.length == 2 && usedProps[m[1]] === ''))
+            result.push({ name: meta.fields[f].name, val: model[meta.fields[f].name] });
+        }
+        
+      } else {
+        for (var k in model)
+          if(model.hasOwnProperty(k))
+            result.push({ name: k, val: model[k] });
+      }
+      
+      return result;
     },
     loadTemplate: function(modelName) {
       
