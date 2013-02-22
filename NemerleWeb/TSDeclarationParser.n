@@ -58,7 +58,7 @@ namespace TypeScript
         rbrace_s : void = rbrace s;
         lbrack : void = '[';
         lbrack_s : void = lbrack s;
-        rbrack : void = '[';
+        rbrack : void = ']';
         rbrack_s : void = rbrack s;
         lparen : void = '(';
         lparen_s : void = lparen s;
