@@ -429,7 +429,7 @@ namespace TypeScript
         #region Specifying Types (3.5)
         
         // Array is specified here, because otherwise we have left recursion.
-        ScriptType = (TypeLiteral / PredefinedType / TypeName) (lbrack_s rbrack_s)*;
+        ScriptType = (TypeLiteral / PredefinedType / TypeName) ('['s ']'s)*;
         PredefinedType = ("any" / "number" / "bool" / "string") s !IdentifierPart;
         TypeName : string = Identifier (dot Identifier)*;
         ModuleName : string = TypeName;
@@ -478,7 +478,7 @@ namespace TypeScript
         #region Variable Statements (5.1)
         
         VariableDeclaration = Identifier TypeAnnotation?;
-        TypeAnnotation = ':'s ScriptType s;
+        TypeAnnotation : TSType = colon_s ScriptType s;
         
         #endregion
         
@@ -672,7 +672,7 @@ namespace TypeScript
               AmbientEnumDeclaration
             );
         AmbientElement : TSGlobal = AmbientElementNotImport / ImportDeclaration;
-                  
+        
         #endregion
                 
         #region Declaration Source Files (10.2)
@@ -718,9 +718,14 @@ namespace TypeScript
       Id(first, rest)
     }
     
-    AmbientVariableDeclaration(id : string, typeAnnotation : NToken) : TSGlobal
+    TypeAnnotation(type : NToken) : TSType
     {
-      TSGlobal.Variable(id)
+      null
+    }
+    
+    AmbientVariableDeclaration(id : string, type : option[TSType]) : TSGlobal
+    {
+      TSGlobal.Variable(id, type)
     }
     
     AmbientConstructDeclaration(_ : NToken, _ : NToken) : TSGlobal
@@ -758,10 +763,14 @@ namespace TypeScript
       TSGlobal.Import(id, moduleRef)
     }
   }
+  
+  public variant TSType
+  {
+  }
 
   public variant TSGlobal
   {
-    | Variable { Name : string; }
+    | Variable { Name : string; Type : option[TSType]; }
     | Construct
     | Function
     | Class { Name : string; }

@@ -209,6 +209,10 @@
     <Folder Include="TS\webrtc\" />
     <Folder Include="TS\youtube\" />
     <Folder Include="TS\zeroclipboard\" />
+    <Folder Include="TS\_infrastructure\" />
+    <Folder Include="TS\_infrastructure\tests\" />
+    <Folder Include="TS\_infrastructure\tests\src\" />
+    <Folder Include="TS\_infrastructure\tests\typescript_0.8.2\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="TS\**\*.ts">
