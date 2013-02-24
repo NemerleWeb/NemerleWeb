@@ -429,11 +429,12 @@ namespace TypeScript
         #region Specifying Types (3.5)
         
         // Array is specified here, because otherwise we have left recursion.
-        ScriptType = (TypeLiteral / PredefinedType / TypeName) ('['s ']'s)*;
-        PredefinedType = ("any" / "number" / "bool" / "string") s !IdentifierPart;
+        ScriptType : TSType = (TypeLiteral / PredefinedType / TypeNameTS) ('['s ']'s)*;
+        PredefinedType : TSType = ("any" / "number" / "bool" / "string") s !IdentifierPart;
         TypeName : string = Identifier (dot Identifier)*;
+        TypeNameTS : TSType = TypeName;
         ModuleName : string = TypeName;
-        TypeLiteral = ObjectType / FunctionType / ConstructorType;
+        TypeLiteral : TSType = ObjectType / FunctionType / ConstructorType;
         
         #endregion
         
@@ -707,20 +708,42 @@ namespace TypeScript
     {
       if (rest.Count == 0) first else $<#$first...$(rest; ".")#>
     }
+
+    ScriptType(type : TSType, arrayType : List[NToken * NToken]) : TSType
+    {
+      if (arrayType.Count == 0) type else TSType.Array(type, arrayType.Count)
+    }
+    
+    PredefinedType(type : NToken) : TSType
+    {
+      match(GetText(type))
+      {
+      | "any" => TSType.Any()
+      | "number" => TSType.Number()
+      | "bool" => TSType.Bool()
+      | "string" => TSType.String()
+      | _ => assert(false);
+      }
+    }
+    
+    TypeNameTS(type : string) : TSType
+    {
+      TSType.Named(type)
+    }
     
     TypeName(first : string, rest : List[string]) : string
     {
       Id(first, rest)
     }
     
+    TypeLiteral(_ : NToken) : TSType
+    {
+      null
+    }
+    
     IdentifierPath(first : string, rest : List[string]) : string
     {
       Id(first, rest)
-    }
-    
-    TypeAnnotation(type : NToken) : TSType
-    {
-      null
     }
     
     AmbientVariableDeclaration(id : string, type : option[TSType]) : TSGlobal
@@ -766,6 +789,12 @@ namespace TypeScript
   
   public variant TSType
   {
+    | Any
+    | Number
+    | Bool
+    | String
+    | Named { Name : string; }
+    | Array { Type : TSType; Arity : int; }
   }
 
   public variant TSGlobal
