@@ -74,6 +74,9 @@ namespace TypeScript
         ellipsis : void = "...";
         ellipsis_s : void = ellipsis s;
         
+        arrow : void = "=>";
+        arrow_s : void = arrow s;
+        
         #endregion
         
         #region EcmaScript
@@ -440,7 +443,7 @@ namespace TypeScript
         
         #region Object Type Literals (3.5.3)
         
-        ObjectType = lbrace_s TypeBody rbrace_s;
+        ObjectType : TSType = lbrace_s TypeBody rbrace_s;
         TypeBody = TypeMemberList scS / TypeMemberList?;
         TypeMemberList = TypeMember (scS TypeMember)* S;
         TypeMember =
@@ -466,13 +469,13 @@ namespace TypeScript
         
         #region Function Type Literals (3.5.5)
         
-        FunctionType = lparen_s ParameterList? rparen_s "=>"s ReturnType s;
+        FunctionType : TSType = lparen_s ParameterList? rparen_s arrow_s ReturnType s;
         
         #endregion
         
         #region Constructor Type Literals (3.5.6)
         
-        ConstructorType = new_s lparen_s ParameterList? rparen_s "=>"s ScriptType s;
+        ConstructorType : TSType = new_s lparen_s ParameterList? rparen_s arrow_s ScriptType s;
 
         #endregion
         
@@ -503,13 +506,14 @@ namespace TypeScript
           RestParameter;
         RequiredParameterList = RequiredParameter (comma_s RequiredParameter)*;
         RequiredParameter = PublicOrPrivate? Identifier !'?' TypeAnnotation?;
-        PublicOrPrivate = (public_ / private_)s;
+        PublicOrPrivate = ("public" / "private")s;
         OptionalParameterList = OptionalParameter (comma_s OptionalParameter)*;
         // Optional parameter must not have Initialiser in declaration files.
         OptionalParameter = PublicOrPrivate? Identifier ('?'s TypeAnnotation? / TypeAnnotation?) s;
         RestParameter = ellipsis_s Identifier !'?' colon_s ArrayType;
-        ReturnTypeAnnotation = ':'s ReturnType s;
-        ReturnType = ScriptType / "void";
+        ReturnTypeAnnotation = colon_s ReturnType s;
+        VoidType : TSType = "void";
+        ReturnType : TSType = ScriptType / VoidType;
         
         #endregion
         
@@ -736,9 +740,24 @@ namespace TypeScript
       Id(first, rest)
     }
     
-    TypeLiteral(_ : NToken) : TSType
+    ObjectType(_ : NToken) : TSType
     {
-      null
+      TSType.Object()
+    }
+    
+    FunctionType(_ : NToken, returnType : TSType) : TSType
+    {
+      TSType.Lambda(returnType)
+    }
+    
+    ConstructorType(_ : NToken, returnType : TSType) : TSType
+    {
+      TSType.New(returnType)
+    }
+    
+    VoidType(_ : NToken) : TSType
+    {
+      TSType.Void()
     }
     
     IdentifierPath(first : string, rest : List[string]) : string
@@ -766,7 +785,7 @@ namespace TypeScript
       TSGlobal.Class(id)
     }
     
-    InterfaceDeclaration(id : string, _ : NToken, _ : NToken) : TSGlobal
+    InterfaceDeclaration(id : string, _ : NToken, _ : TSType) : TSGlobal
     {
       TSGlobal.Interface(id)
     }
@@ -793,8 +812,12 @@ namespace TypeScript
     | Number
     | Bool
     | String
+    | Void
     | Named { Name : string; }
     | Array { Type : TSType; Arity : int; }
+    | Object
+    | Lambda { ReturnType : TSType; }
+    | New { ReturnType : TSType; }
   }
 
   public variant TSGlobal
