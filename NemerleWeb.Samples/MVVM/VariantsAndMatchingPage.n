@@ -43,7 +43,7 @@ namespace NemerleWeb.Samples
   [Unit]
   public class VariantsAndMatchingPage
   { 
-    AvailableColors = [("0", "Red"), ("1", "Green"), ("2", "Blue"), ("3", "Other")];
+    AvailableColors : list[(string * string)] { get { [("0", "Red"), ("1", "Green"), ("2", "Blue"), ("3", "Other")] }  }
     CurrentColorId : string { get; set; }
     OtherColor : Color.Other;
         

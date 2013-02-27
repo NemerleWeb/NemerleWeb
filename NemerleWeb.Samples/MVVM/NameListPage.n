@@ -7,7 +7,7 @@ namespace NemerleWeb.Samples
   [Unit]
   class NameListPage
   {
-    Names = List.[string]();
+    mutable Names = List.[string]();
     SearchPattern : string { get; set; }    
     FilteredNames : List[string]
     {
