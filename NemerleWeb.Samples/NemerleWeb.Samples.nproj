@@ -201,7 +201,7 @@
     <Compile Include="MVVM\Peg\JSPage.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MVVM\Peg\TypeScriptInterfacePage.n">
+    <Compile Include="MVVM\Peg\TSDeclarationPage.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MVVM\Samples.n">

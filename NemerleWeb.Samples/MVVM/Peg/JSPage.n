@@ -9,7 +9,12 @@ namespace NemerleWeb.Samples
   [Unit]
   public class JSPage
   {
-    _parser : JSEngine.JSParser = JSEngine.JSParser();
+    _parser : JSEngine.JSParser;
+    
+    public this()
+    {
+      _parser = JSEngine.JSParser();
+    }
          
     ParserOutput : string
     {

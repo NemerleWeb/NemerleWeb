@@ -1,0 +1,838 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using NemerleWeb;
+using NemerleWeb.Peg;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace TypeScriptSample
+{
+  [PegGrammar(Options = EmitDebugSources,
+      start,
+      grammar
+      {
+        // We create void rules to write less code in handler and even skip writing handler.
+        #region Literals
+        
+        Spacing : void = WhiteSpace / LineTerminatorSequence / Comment;
+        s : void = Spacing*;
+        S : void = (Spacing / semicolon)*;
+        scS : void = semicolon S;
+        
+        import_s : void   = "import"s;
+        export_s : void   = "export"s;
+        module_s : void   = "module"s;
+        declare_s : void  = "declare"s;
+        var_s : void      = "var"s;
+        function_s : void = "function"s;
+        new_s : void      = "new"s;
+        public_ : void    = "public";
+        private_ : void   = "private";
+        delete_s : void = "delete"s;
+        void_s : void = "void"s;
+        typeof_s : void = "typeof"s;
+        constructor_s : void = "constructor"s;
+        static_s : void = "static"s;
+        enum_s : void = "enum"s;
+        class_s : void = "class"s;
+        implements_s : void = "implements"s;
+        extends_s : void = "extends"s;
+        get_s : void = "get"s;
+        set_s : void = "set"s;
+        interface_s : void = "interface"s;
+        
+        dot : void = '.';
+        dot_s : void = dot s;
+        comma : void = ',';
+        comma_s : void = comma s;
+        colon : void = ':';
+        colon_s : void = colon s;
+        semicolon : void = ';';
+        semicolon_s : void = semicolon s;
+        lbrace : void = '{';
+        lbrace_s : void = lbrace s;
+        rbrace : void = '}';
+        rbrace_s : void = rbrace s;
+        lbrack : void = '[';
+        lbrack_s : void = lbrack s;
+        rbrack : void = ']';
+        rbrack_s : void = rbrack s;
+        lparen : void = '(';
+        lparen_s : void = lparen s;
+        rparen : void = ')';
+        rparen_s : void = rparen s;
+        assign : void = '=';
+        assign_s : void = assign s;
+        squote : void = '\'';
+        squote_s : void = squote s;
+        dquote : void = '"';
+        dquote_s : void = dquote s;
+        
+        ellipsis : void = "...";
+        ellipsis_s : void = ellipsis s;
+        
+        arrow : void = "=>";
+        arrow_s : void = arrow s;
+        
+        #endregion
+        
+        #region EcmaScript
+        
+        #region SourceCharacter (6)
+
+        SourceCharacter = [Any];
+
+        #endregion
+
+        #region WhiteSpace (7.2)
+
+        NBSP = '\u00A0';
+        BOM = '\uFEFF';
+        WhiteSpace = [Zs] / '\t' / '\v' / '\f' / ' ' / NBSP / BOM;        
+
+        #endregion
+
+        #region Line terminators (7.3)
+
+        LineSeparator = '\u2028';
+        ParagraphSeparator = '\u2029';
+        LineTerminator = '\n' / '\r' / LineSeparator / ParagraphSeparator;
+        LineTerminatorSequence = "\r\n" / LineTerminator;
+
+        #endregion
+
+        #region Comment (7.4)
+        
+        Comment = MultiLineComment / SingleLineComment;
+        MultiLineComment = "/*" (!"*/" [Any])* "*/";
+        SingleLineComment = "//" (!LineTerminator [Any])*;
+
+        #endregion
+        
+        #region Identifier (7.6)
+        
+        ZWNJ = '\u200C';
+        ZWJ = '\u200D';        
+        
+        // Any name
+        AnyIdentifier : string = IdentifierName s;
+        Identifier : string = !(ReservedWord Spacing+) IdentifierName s;
+        IdentifierName = IdentifierStart+ IdentifierPart*;
+        IdentifierStart = UnicodeLetter / '$' / '_' / '\\' UnicodeEscapeSequence;
+        IdentifierPart =
+          IdentifierStart /
+          UnicodeCombiningMark /
+          UnicodeDigit /
+          UnicodeConnectorPunctuation /
+          ZWNJ /
+          ZWJ;
+          
+        UnicodeLetter = [Lu, Ll, Lt, Lm, Lo, Nl];
+        UnicodeCombiningMark = [Mn, Mc];
+        UnicodeDigit = [Nd];
+        UnicodeConnectorPunctuation = [Pc];        
+        
+        #endregion
+        
+        #region ReservedWord (7.6.1)
+        
+        ReservedWord = Keyword / FutureReservedWord / StrictReservedWord / NullLiteral / BooleanLiteral;
+        StrictModeReservedWord = ReservedWord / StrictReservedWord;
+        
+        Keyword =
+          "break" / "do" / "instanceof" / "typeof" / "case" / "else" / 
+          "new" / "var" / "catch" / "finally" / "return" / "void" / "continue" /
+          "for" / "switch" / "while" / "debugger" / "function" / "this" / "with" / 
+          "default" / "if" / "throw" / "delete" / "in" / "try";
+          
+        // 7.6.1.2          
+        FutureReservedWord =
+          "class" / "enum" / "extends" / "super" / "const" / "export" / "import";
+          
+        // 10.1.1  
+        StrictReservedWord =
+          "implements" / "let" / "private" / "public" / "yield" / "interface" /
+          "package" / "protected" / "static";
+        
+        #endregion
+        
+        #region Literals (7.8)
+
+        Literal = NullLiteral / BooleanLiteral / NumericLiteral / StringLiteral / RegularExpressionLiteral;
+
+        #endregion
+        
+        #region NullLiteral (7.8.1)
+        
+        NullLiteral = "null";
+        
+        #endregion
+        
+        #region BooleanLiteral (7.8.2)
+        
+        BooleanLiteral = "true" / "false";
+        
+        #endregion
+
+        #region NumericLiteral (7.8.3)
+
+        NumericLiteral = (DecimalLiteral / HexIntegerLiteral) !(IdentifierStart / DecimalDigit);
+
+        DecimalLiteral =
+          DecimalIntegerLiteral dot DecimalDigit* ExponentPart? /
+          dot DecimalDigit+ ExponentPart? /
+          DecimalIntegerLiteral ExponentPart?;
+
+        DecimalIntegerLiteral = '0' / NonZeroDigit DecimalDigit*;
+        DecimalDigit = ['0'..'9'];
+        NonZeroDigit = ['1'..'9'];        
+        ExponentPart = ExponentIndicator SignedInteger;
+        ExponentIndicator = 'e' / 'E';
+        SignedInteger = DecimalDigit+ / '+' DecimalDigit+ / '-' DecimalDigit+;
+        HexIntegerLiteral = ("0x" / "0X") HexDigit+;
+        HexDigit = ['0'..'9', 'a'..'f', 'A'..'F'];        
+
+        #endregion
+
+        #region StringLiteral (7.8.4)
+        
+        StringLiteral : string = dquote DoubleStringCharacter* dquote / squote SingleStringCharacter* squote;
+        DoubleStringCharacter = 
+          !('"' / '\\' / LineTerminator) SourceCharacter /
+          '\\' EscapeSequence /
+          LineContinuation;                 
+        SingleStringCharacter =
+          !('\'' / '\\' / LineTerminator) SourceCharacter /
+          '\\' EscapeSequence /
+          LineContinuation;
+        LineContinuation = '\\' LineTerminatorSequence ;
+        
+        EscapeSequence = 
+          CharacterEscapeSequence /
+          '0' !DecimalDigit /
+          HexEscapeSequence /
+          UnicodeEscapeSequence;
+        
+        CharacterEscapeSequence = SingleEscapeCharacter / NonEscapeCharacter;
+        SingleEscapeCharacter = '\'' / '\"' / '\\' / 'b' / 'f' / 'n' / 'r' / 't' / 'v';
+        NonEscapeCharacter = !(EscapeCharacter / LineTerminator) SourceCharacter;        
+        EscapeCharacter = SingleEscapeCharacter / DecimalDigit / 'x' / 'u';
+        HexEscapeSequence = 'x' HexDigit HexDigit;
+        UnicodeEscapeSequence = 'u' HexDigit HexDigit HexDigit HexDigit;
+        
+        #endregion
+        
+        #region Regular Expression Literals (7.8.5)
+        
+        RegularExpressionLiteral = '/'s RegularExpressionBody '/'s RegularExpressionFlags s;
+        RegularExpressionBody = RegularExpressionFirstChar RegularExpressionChars;
+        RegularExpressionChars = RegularExpressionChar*;
+        RegularExpressionFirstChar =
+          !'*' !'\\' !'/' !'[' RegularExpressionNonTerminator /
+          RegularExpressionBackslashSequence /
+          RegularExpressionClass;
+        RegularExpressionChar =
+          !'\\' !'/' !'[' RegularExpressionNonTerminator /
+          RegularExpressionBackslashSequence /
+          RegularExpressionClass;
+        RegularExpressionBackslashSequence = '\\'s RegularExpressionNonTerminator;
+        RegularExpressionNonTerminator = !LineTerminator SourceCharacter;
+        RegularExpressionClass = lbrack_s RegularExpressionClassChars rbrack_s;
+        RegularExpressionClassChars = RegularExpressionClassChar*;
+        RegularExpressionClassChar = 
+          !']' !'\\' RegularExpressionNonTerminator /
+          RegularExpressionBackslashSequence;        
+        RegularExpressionFlags = IdentifierPart?;
+        
+        #endregion
+        
+        #region Primary Expressions (11.1)
+        
+        PrimaryExpression =
+          "this" /
+          Identifier /
+          Literal /
+          ArrayLiteral /
+          ObjectLiteral /
+          lparen_s Expression rparen_s;
+          
+        #endregion
+        
+        #region Array Initialiser (11.1.4)
+        
+        ArrayLiteral = lbrack_s (ElementList / ElementList comma_s Elision? / Elision?) rbrack_s;
+        ElementList = Elision? AssignmentExpression (comma_s Elision? AssignmentExpression)*;
+        Elision = (comma_s)+;
+        
+        #endregion
+        
+        #region Object Initialiser (11.1.5)
+
+        ObjectLiteral =
+          lbrace_s rbrace_s /
+          lbrace_s PropertyNameAndValueList rbrace_s /
+          lbrace_s PropertyNameAndValueList comma_s rbrace_s;
+        PropertyNameAndValueList = PropertyAssignment (comma_s PropertyAssignment)*;
+        PropertyAssignment =
+          PropertyName colon_s AssignmentExpression /
+          get_s PropertyName lparen_s rparen_s lbrace_s FunctionBody rbrace_s /
+          set_s PropertyName lparen_s PropertySetParameterList rparen_s lbrace_s FunctionBody rbrace_s;
+        PropertyName = IdentifierName / StringLiteral / NumericLiteral;
+        PropertySetParameterList = Identifier;
+        
+        #endregion
+        
+        #region Left-Hand-Side Expressions (11.2)
+        
+        MemberExpression =
+          (new_s)? (PrimaryExpression / FunctionExpression) (lbrack_s Expression rbrack_s / dot_s IdentifierName)+ Arguments?;
+        NewExpression = MemberExpression / new_s NewExpression;
+        CallExpression = MemberExpression (Arguments+ / lbrack_s Expression rbrack_s / dot_s IdentifierName);
+        Arguments = lparen_s ArgumentList? rparen_s;
+        ArgumentList = AssignmentExpression (comma_s AssignmentExpression)*;
+
+        LeftHandSideExpression = NewExpression / CallExpression;
+        
+        #endregion
+        
+        #region Postfix Expression
+        
+        PostfixExpression =
+          LeftHandSideExpression /
+          LeftHandSideExpression !LineTerminator "++" /
+          LeftHandSideExpression !LineTerminator "--";
+        
+        #endregion
+        
+        #region Unary Operators (11.4)
+        
+        UnaryExpression =
+          PostfixExpression /
+          "delete"s UnaryExpression /
+          "void"s UnaryExpression /
+          "typeof"s UnaryExpression /
+          "++"s UnaryExpression /
+          "--"s UnaryExpression /
+          '+'s UnaryExpression /
+          '-'s UnaryExpression /
+          '~'s UnaryExpression /
+          '!'s UnaryExpression;
+        
+        #endregion
+        
+        #region Multiplicative Operators (11.5)
+        
+        MultiplicativeExpression = UnaryExpression (('*' / '/' / '%')s UnaryExpression)*;
+        
+        #endregion
+        
+        #region Additive Operators (11.6)
+        
+        AdditiveExpression = MultiplicativeExpression (('+' / '-')s MultiplicativeExpression)*;
+        
+        #endregion
+        
+        #region Bitwise Shift Operators (11.7)
+        
+        ShiftExpression = AdditiveExpression (("<<" / ">>" / ">>>")s AdditiveExpression)*;
+        
+        #endregion
+        
+        #region Relational Operators (11.8)
+        
+        RelationalExpression =
+          ShiftExpression (('<' / '>' / "<=" / ">=" / "instanceof" / "in")s ShiftExpression)*;
+        
+        #endregion
+        
+        #region Equality Operators (11.9)
+        
+        EqualityExpression = RelationalExpression (("==" / "!=" / "===" / "!==")s RelationalExpression)*;
+        
+        #endregion
+        
+        #region Binary Bitwise Operators (11.10)
+        
+        BitwiseANDExpression = EqualityExpression ('&'s EqualityExpression)*;        
+        BitwiseXORExpression = BitwiseANDExpression ('^'s BitwiseANDExpression)*;   
+        BitwiseORExpression = BitwiseXORExpression ('|'s BitwiseXORExpression)*;
+        
+        #endregion
+        
+        #region Binary Logical Expression (11.11)
+        
+        LogicalANDExpression = BitwiseORExpression ("&&"s BitwiseORExpression)*;        
+        LogicalORExpression = LogicalANDExpression ("||"s LogicalANDExpression)*;
+        
+        #endregion
+        
+        #region Conditional Operator (11.12)
+        
+        ConditionalExpression =
+          LogicalORExpression /
+          LogicalORExpression '?'s AssignmentExpression ':'s AssignmentExpression;
+        
+        #endregion
+        
+        #region Assignement Operators (11.13)
+        
+        AssignmentExpression =
+          ConditionalExpression /
+          LeftHandSideExpression assign AssignmentExpression /
+          LeftHandSideExpression AssignmentOperator AssignmentExpression;
+        
+        AssignmentOperator = "*=" / "/=" / "%=" / "+=" / "-=" / "<<=" / ">>=" / ">>>=" / "&=" / "^=" / "|=";
+        
+        #endregion
+        
+        #region Comma Operator (11.14)
+        
+        Expression = AssignmentExpression (comma_s AssignmentExpression)*;
+        
+        #endregion
+
+        #region Statement (12)
+        
+        // TODO: Add other statements
+        Statement = VariableStatement;
+        
+        #endregion
+        
+        #region Variable Statement (12.2)
+        
+        VariableStatement = var_s VariableDeclarationList scS;
+        VariableDeclarationList = VariableDeclaration (comma_s VariableDeclaration)*;
+        // This rule is modified in TypeSript see: 5.1
+        //VariableDeclaration = Identifier;
+        Initialiser = assign AssignmentExpression;
+        
+        #endregion
+        
+        #region Function Definition (13)
+        
+        FunctionExpression = function_s Identifier? lparen_s FormalParameterList? rparen_s lbrace_s FunctionBody rbrace_s;
+        FormalParameterList = Identifier (comma_s Identifier)*;
+        FunctionBody = SourceElement*;
+        
+        #endregion
+        
+        #region Program (14)
+        
+        SourceElement = Statement / FunctionDeclaration;
+        
+        #endregion
+        
+        #endregion
+        
+        #region TypeScript
+        
+        #region Specifying Types (3.5)
+        
+        // Array is specified here, because otherwise we have left recursion.
+        ScriptType : TSType = (TypeLiteral / PredefinedType / TypeNameTS) ('['s ']'s)*;
+        PredefinedType : TSType = ("any" / "number" / "bool" / "string") s !IdentifierPart;
+        TypeName : string = Identifier (dot Identifier)*;
+        TypeNameTS : TSType = TypeName;
+        ModuleName : string = TypeName;
+        TypeLiteral : TSType = ObjectType / FunctionType / ConstructorType;
+        
+        #endregion
+        
+        #region Object Type Literals (3.5.3)
+        
+        ObjectType : TSType = lbrace_s TypeBody rbrace_s;
+        TypeBody = TypeMemberList scS / TypeMemberList?;
+        TypeMemberList = TypeMember (scS TypeMember)* S;
+        TypeMember =
+          CallSignature /
+          ConstructSignature /
+          IndexSignature /
+          FunctionSignature /
+          PropertySignature;
+        
+        CallSignature = lparen_s ParameterList? rparen_s ReturnTypeAnnotation?;
+        ConstructSignature = new_s lparen_s ParameterList? rparen_s TypeAnnotation?;
+        IndexSignature = lbrack_s RequiredParameter rbrack_s TypeAnnotation?;
+        PropertySignature = AnyIdentifier ('?' s)? TypeAnnotation?;
+        FunctionSignature = AnyIdentifier ('?' s)? lparen_s ParameterList? rparen_s ReturnTypeAnnotation?;
+        
+        #endregion
+        
+        #region Array Type Literal (3.5.4)
+        
+        ArrayType = (PredefinedType / TypeName / TypeLiteral) (lbrack_s rbrack_s)+;
+        
+        #endregion
+        
+        #region Function Type Literals (3.5.5)
+        
+        FunctionType : TSType = lparen_s ParameterList? rparen_s arrow_s ReturnType s;
+        
+        #endregion
+        
+        #region Constructor Type Literals (3.5.6)
+        
+        ConstructorType : TSType = new_s lparen_s ParameterList? rparen_s arrow_s ScriptType s;
+
+        #endregion
+        
+        #region Variable Statements (5.1)
+        
+        VariableDeclaration = Identifier TypeAnnotation?;
+        TypeAnnotation : TSType = colon_s ScriptType s;
+        
+        #endregion
+        
+        #region Function Declarations
+        
+        // Modified
+        FunctionDeclaration = FunctionOverload+;
+        FunctionOverload = function_s FunctionSignature scS;
+        
+        #endregion
+        
+        #region Function Signatures (6.2)
+        
+        ParameterList =
+          RequiredParameterList comma_s OptionalParameterList comma_s RestParameter /
+          OptionalParameterList comma_s RestParameter /
+          RequiredParameterList comma_s OptionalParameterList /
+          RequiredParameterList comma_s RestParameter /
+          OptionalParameterList /
+          RequiredParameterList /
+          RestParameter;
+        RequiredParameterList = RequiredParameter (comma_s RequiredParameter)*;
+        RequiredParameter = PublicOrPrivate? Identifier !'?' TypeAnnotation?;
+        PublicOrPrivate = ("public" / "private")s;
+        OptionalParameterList = OptionalParameter (comma_s OptionalParameter)*;
+        // Optional parameter must not have Initialiser in declaration files.
+        OptionalParameter = PublicOrPrivate? Identifier ('?'s TypeAnnotation? / TypeAnnotation?) s;
+        RestParameter = ellipsis_s Identifier !'?' colon_s ArrayType;
+        ReturnTypeAnnotation = colon_s ReturnType s;
+        VoidType : TSType = "void";
+        ReturnType : TSType = ScriptType / VoidType;
+        
+        #endregion
+        
+        #region Interface Declarations (7.1)
+        
+        InterfaceDeclaration : TSGlobal = interface_s Identifier InterfaceExtendsClause? ObjectType S;
+        InterfaceExtendsClause = extends_s InterfaceNameList;
+        InterfaceNameList = InterfaceName (comma_s InterfaceName)*;
+        InterfaceName = TypeName;
+        
+        #endregion
+        
+        #region Class Declarations (8.1)
+        
+        ClassDeclaration = class_s Identifier ClassHeritage lbrace_s ClassBody rbrace_s;
+        
+        ClassHeritage = ClassExtendsClause? ImplementsClause?;
+        ClassExtendsClause = extends_s ClassName;
+        ClassName = TypeName;
+        ImplementsClause = implements_s InterfaceNameList;
+        
+        ClassBody = ClassElement*;
+        ClassElement = ConstructorDeclaration / MemberDeclaration;
+        
+        #endregion
+        
+        #region Constructor Declaration (8.3)
+        
+        ConstructorDeclaration = ConstructorOverload+;
+        ConstructorOverload = constructor_s lparen_s ParameterList? rparen_s scS;
+        
+        #endregion
+        
+        #region Member Declarations (8.4)
+        
+        MemberDeclaration = MemberFunctionDeclaration / MemberVariableDeclaration;
+        
+        MemberVariableDeclaration = PublicOrPrivate? static_s? VariableDeclaration scS;
+        
+        MemberFunctionDeclaration = MemberFunctionOverload+;
+        MemberFunctionOverload = PublicOrPrivate? static_s? FunctionSignature scS;
+                
+        #endregion
+        
+        #region Enum Declaration
+        
+        EnumDeclaration = enum_s Identifier lbrace_s EnumBody? rbrace_s;
+        EnumBody = EnumElement (comma_s EnumElement)* ','?s;
+        EnumElement = AnyIdentifier Initialiser?;
+        
+        #endregion
+        
+        #region Programs (9.1)
+        
+        SourceFile = DeclarationSourceFile;
+        ModuleElement =
+          Statement /
+          FunctionDeclaration /
+          ClassDeclaration /
+          InterfaceDeclaration /
+          ModuleDeclaration /
+          EnumDeclaration /
+          ImportDeclaration /
+          ExportDeclaration /
+          AmbientDeclaration;
+        
+        #endregion
+        
+        #region Module Declarations (9.2)
+        
+        ModuleDeclaration = module_s IdentifierPath? lbrace_s ModuleBody rbrace_s;
+        IdentifierPath : string = Identifier (dot Identifier)*;
+        ModuleBody = ModuleElement*;
+        
+        #endregion
+        
+        #region Export Declarations (9.2.1)
+        
+        // Allow export function();
+        ExportFunctionDeclaration = AmbientFunctionDeclaration;
+        ExportDeclaration =
+          export_s
+            (
+              VariableStatement /
+              ExportFunctionDeclaration /
+              ClassDeclaration /
+              InterfaceDeclaration /
+              ModuleDeclaration /
+              EnumDeclaration /
+              AmbientDeclaration
+            );
+            
+        #endregion 
+        
+        #region Import Declarations (9.2.2)
+        
+        ImportDeclaration : TSGlobal = import_s Identifier assign_s ModuleReference scS;
+        ModuleReference : string = ExternalModuleReference / ModuleName;
+        ExternalModuleReference : string = module_s lparen_s StringLiteral s rparen_s;
+        
+        #endregion
+        
+        #region Ambient Declarations (10.1)
+                
+        AmbientDeclaration =
+          declare_s
+           (
+            AmbientVariableDeclaration /
+            AmbientFunctionDeclaration /
+            AmbientClassDeclaration /
+            AmbientModuleDeclaration /
+            AmbientEnumDeclaration
+           );
+        
+        #endregion
+        
+        #region Ambient Variable Declarations (10.1.1)
+        
+        AmbientVariableDeclaration : TSGlobal = var_s Identifier TypeAnnotation? S;
+        
+        #endregion
+        
+        #region Ambient Variable Declarations (10.1.2)
+        
+        // This rule is not by specification, but TypeScript parses it correctly.
+        AmbientFunctionSignature = AnyIdentifier? '?'?s lparen_s ParameterList? rparen_s ReturnTypeAnnotation?;
+        AmbientFunctionDeclaration : TSGlobal = function_s AmbientFunctionSignature scS;
+        
+        // This rule is not by specification, but TypeScript parses it correctly.
+        AmbientConstructDeclaration : TSGlobal  = function_s new_s lparen_s ParameterList? rparen_s ReturnTypeAnnotation? S;
+        
+        #endregion
+        
+        #region Ambient Class Declarations (10.1.3)
+        
+        AmbientClassDeclaration : TSGlobal = class_s Identifier ClassHeritage lbrace_s AmbientClassBody rbrace_s S;
+        AmbientClassBody = AmbientClassBodyElement*;
+        AmbientClassBodyElement = AmbientConstructorDeclaration / AmbientStaticDeclaration / AmbientMemberDeclaration;
+        AmbientConstructorDeclaration = constructor_s lparen_s ParameterList? rparen_s scS;
+        AmbientMemberDeclaration = PublicOrPrivate? (FunctionSignature / Identifier TypeAnnotation?) scS;
+        AmbientStaticDeclaration = PublicOrPrivate? static_s (FunctionSignature / Identifier TypeAnnotation?) scS;
+        AmbientEnumDeclaration : TSGlobal = enum_s Identifier lbrace_s EnumBody? rbrace_s S;
+        
+        #endregion        
+        
+        #region Ambient Module Declarations (10.1.4)
+        
+        AmbientModuleDeclaration : TSGlobal = module_s AmbientModuleIdentification s lbrace_s AmbientModuleBody rbrace_s S;
+        AmbientModuleIdentification : string = StringLiteral / IdentifierPath;
+        AmbientModuleBody = AmbientElement*;
+        
+        AmbientElementNotImport : TSGlobal =
+          export_s? declare_s?
+            (
+              AmbientVariableDeclaration /
+              AmbientConstructDeclaration /
+              AmbientFunctionDeclaration /
+              AmbientClassDeclaration /
+              InterfaceDeclaration /
+              AmbientModuleDeclaration /
+              AmbientEnumDeclaration
+            );
+        AmbientElement : TSGlobal = AmbientElementNotImport / ImportDeclaration;
+        
+        #endregion
+                
+        #region Declaration Source Files (10.2)
+        
+        DeclarationSourceFile : List[TSGlobal] = S AmbientElement*;
+        
+        #endregion
+        
+        #endregion
+        
+        start : List[TSGlobal] = DeclarationSourceFile;
+      }
+    )]
+  [Unit]
+  public class TSDeclarationParser
+  {
+    StringLiteral(s : NToken) : string
+    {
+      GetText(s)
+    }
+    
+    AnyIdentifier(id : NToken) : string
+    {
+      GetText(id)
+    }    
+    
+    Identifier(id : NToken) : string
+    {
+      GetText(id)
+    }
+        
+    static Id(first : string, rest : List[string]) : string
+    {
+      if (rest.Count == 0) first else $<#$first...$(rest; ".")#>
+    }
+
+    ScriptType(type : TSType, arrayType : List[NToken * NToken]) : TSType
+    {
+      if (arrayType.Count == 0) type else TSType.Array(type, arrayType.Count)
+    }
+    
+    PredefinedType(type : NToken) : TSType
+    {
+      match(GetText(type))
+      {
+      | "any" => TSType.Any()
+      | "number" => TSType.Number()
+      | "bool" => TSType.Bool()
+      | "string" => TSType.String()
+      | _ => assert(false);
+      }
+    }
+    
+    TypeNameTS(type : string) : TSType
+    {
+      TSType.Named(type)
+    }
+    
+    TypeName(first : string, rest : List[string]) : string
+    {
+      Id(first, rest)
+    }
+    
+    ObjectType(_ : NToken) : TSType
+    {
+      TSType.Object()
+    }
+    
+    FunctionType(_ : NToken, returnType : TSType) : TSType
+    {
+      TSType.Lambda(returnType)
+    }
+    
+    ConstructorType(_ : NToken, returnType : TSType) : TSType
+    {
+      TSType.New(returnType)
+    }
+    
+    VoidType(_ : NToken) : TSType
+    {
+      TSType.Void()
+    }
+    
+    IdentifierPath(first : string, rest : List[string]) : string
+    {
+      Id(first, rest)
+    }
+    
+    AmbientVariableDeclaration(id : string, type : option[TSType]) : TSGlobal
+    {
+      TSGlobal.Variable(id, type)
+    }
+    
+    AmbientConstructDeclaration(_ : NToken, _ : NToken) : TSGlobal
+    {
+      TSGlobal.Construct()
+    }
+    
+    AmbientFunctionDeclaration(_ : NToken) : TSGlobal
+    {
+      TSGlobal.Function()
+    }
+    
+    AmbientClassDeclaration(id : string, _ : NToken, _ : NToken) : TSGlobal
+    {
+      TSGlobal.Class(id)
+    }
+    
+    InterfaceDeclaration(id : string, _ : NToken, _ : TSType) : TSGlobal
+    {
+      TSGlobal.Interface(id)
+    }
+    
+    AmbientModuleDeclaration(id :string , _ : NToken) : TSGlobal
+    {
+      TSGlobal.Module(id)
+    }
+    
+    AmbientEnumDeclaration(id : string, _ : NToken) : TSGlobal
+    {
+      TSGlobal.Enum(id)
+    }
+    
+    ImportDeclaration(id : string, moduleRef : string) : TSGlobal
+    {
+      TSGlobal.Import(id, moduleRef)
+    }
+  }
+  
+  [Unit]
+  public variant TSType
+  {
+    | Any
+    | Number
+    | Bool
+    | String
+    | Void
+    | Named { Name : string; }
+    | Array { Type : TSType; Arity : int; }
+    | Object
+    | Lambda { ReturnType : TSType; }
+    | New { ReturnType : TSType; }
+  }
+
+  [Unit]
+  public variant TSGlobal
+  {
+    | Variable { Name : string; Type : option[TSType]; }
+    | Construct
+    | Function
+    | Class { Name : string; }
+    | Interface { Name : string; }
+    | Module { Name : string; }
+    | Enum { Name : string; }
+    | Import { Name : string; ModuleReference : string; }
+  }
+}
