@@ -8,10 +8,10 @@ namespace NemerleWeb.Samples
   [Unit]
   class CompListPage
   {
-    Alphabet : array[string] { get; set; }
+    Alphabet : array[char] { get; set; }
     OddLettersOnly : bool { get; set; }
     LetterCount : int { get; set; }
-    Letters : list[string]
+    Letters : list[char]
     {
       get
       {
@@ -26,7 +26,7 @@ namespace NemerleWeb.Samples
     
     public this()
     {
-      Alphabet = array["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+      Alphabet = $['a'..'z'].ToArray();
       LetterCount = 3;
     } 
  

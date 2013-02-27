@@ -9,11 +9,7 @@ namespace NemerleWeb.Samples
   [Unit]
   public class CalculatorPage
   {
-    _calc : Calculator.CalcParser;
-    public this()
-    {
-      _calc = Calculator.CalcParser();
-    }
+    _calc : Calculator.CalcParser = Calculator.CalcParser();
          
     CalcOutput : string
     {

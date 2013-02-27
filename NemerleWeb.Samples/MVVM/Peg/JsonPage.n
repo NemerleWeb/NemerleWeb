@@ -9,12 +9,7 @@ namespace NemerleWeb.Samples
   [Unit]
   public class JsonPage
   {
-    _parser : Nemerle.Json.JsonParser;
-    
-    public this()
-    {
-      _parser = Nemerle.Json.JsonParser();
-    }
+    _parser : Nemerle.Json.JsonParser = Nemerle.Json.JsonParser();
          
     ParserOutput : string
     {

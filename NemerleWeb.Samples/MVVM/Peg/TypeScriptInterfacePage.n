@@ -10,12 +10,7 @@ namespace NemerleWeb.Samples
   [Unit]
   public class TypeScriptInterfacePage
   {
-    _parser : TS.TypeScriptInterfaceParser;
-    
-    public this()
-    {
-      _parser = TS.TypeScriptInterfaceParser();
-    }
+    _parser : TS.TypeScriptInterfaceParser = TS.TypeScriptInterfaceParser();
          
     ParserOutput : string
     {
