@@ -1,4 +1,4 @@
-using NemerleWeb;
+﻿using NemerleWeb;
 using Nemerle.Extensions;
 using System;
 using System.Collections.Generic;
@@ -7,13 +7,13 @@ using System.Linq;
 namespace NemerleWeb.Samples
 {
   [Unit]
-  public class JsonPage
+  public class TSDeclarationPage
   {
-    _parser : Nemerle.Json.JsonParser;
+    _parser : TypeScriptSample.TSDeclarationParser;
     
     public this()
     {
-      _parser = Nemerle.Json.JsonParser();
+       _parser = TypeScriptSample.TSDeclarationParser();
     }
          
     ParserOutput : string
@@ -37,14 +37,14 @@ namespace NemerleWeb.Samples
     {
       <#
         <div>
-          <span>This is demonstration of JSON parser</span><br />
-          <span>When you write JSON, the parser parses it and creates AST.</span><br />
-          <span>Afterwards this AST is converted to human readable string</span>
-          <div class="output">
-            <span class="output-text">$ParserOutput</span> 
-          </div>
+          <span>This is demonstration of TypeScript interface parser</span><br />
+          <div>Input:</div>
           <div class="parser-input">
             <textarea rows="6" cols="50" value="$ParserInput"/>
+          </div>
+          <div>AST:</div>
+          <div class="output">
+            <textarea rows="6" cols="50" value="$ParserOutput"/>
           </div>
         </div>
       #>

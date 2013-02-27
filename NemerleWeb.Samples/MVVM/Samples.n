@@ -45,7 +45,7 @@ namespace NemerleWeb.Samples
     Calculator : CalculatorPage { get; set; }
     Json : JsonPage { get; set; }
     JS : JSPage { get; set; }
-    TypeScript : TypeScriptInterfacePage { get; set; }
+    TypeScript : TSDeclarationPage { get; set; }
     
     Sources : List[string * string] { get; set; }
     ThisPageSource : string { get; set; }
@@ -64,7 +64,7 @@ namespace NemerleWeb.Samples
       Calculator = CalculatorPage();
       Json = JsonPage();
       JS = JSPage();
-      TypeScript = TypeScriptInterfacePage();
+      TypeScript = TSDeclarationPage();
             
       Samples = 
       [
