@@ -443,21 +443,22 @@ namespace TypeScript
         
         #region Object Type Literals (3.5.3)
         
-        ObjectType : TSType = lbrace_s TypeBody rbrace_s;
-        TypeBody = TypeMemberList scS / TypeMemberList?;
-        TypeMemberList = TypeMember (scS TypeMember)* S;
-        TypeMember =
+        ObjectType : TSType = lbrace_s TypeBody rbrace_s;       
+        TypeBody : list[TSObject] = TypeMemberList scS / TypeMemberListMaybe;
+        TypeMemberListMaybe : list[TSObject] = TypeMemberList?;
+        TypeMemberList : list[TSObject] = TypeMember (scS TypeMember)* S;
+        TypeMember : TSObject =
           CallSignature /
           ConstructSignature /
           IndexSignature /
           FunctionSignature /
           PropertySignature;
         
-        CallSignature = lparen_s ParameterList? rparen_s ReturnTypeAnnotation?;
-        ConstructSignature = new_s lparen_s ParameterList? rparen_s TypeAnnotation?;
-        IndexSignature = lbrack_s RequiredParameter rbrack_s TypeAnnotation?;
-        PropertySignature = AnyIdentifier ('?' s)? TypeAnnotation?;
-        FunctionSignature = AnyIdentifier ('?' s)? lparen_s ParameterList? rparen_s ReturnTypeAnnotation?;
+        CallSignature      : TSObject = lparen_s ParameterList? rparen_s ReturnTypeAnnotation?;
+        ConstructSignature : TSObject = new_s lparen_s ParameterList? rparen_s TypeAnnotation?;
+        IndexSignature     : TSObject = lbrack_s RequiredParameter rbrack_s TypeAnnotation?;
+        PropertySignature  : TSObject = AnyIdentifier ('?' s)? TypeAnnotation?;
+        FunctionSignature  : TSObject = AnyIdentifier ('?' s)? lparen_s ParameterList? rparen_s ReturnTypeAnnotation?;
         
         #endregion
         
@@ -511,7 +512,7 @@ namespace TypeScript
         // Optional parameter must not have Initialiser in declaration files.
         OptionalParameter = PublicOrPrivate? Identifier ('?'s TypeAnnotation? / TypeAnnotation?) s;
         RestParameter = ellipsis_s Identifier !'?' colon_s ArrayType;
-        ReturnTypeAnnotation = colon_s ReturnType s;
+        ReturnTypeAnnotation : TSType = colon_s ReturnType s;
         VoidType : TSType = "void";
         ReturnType : TSType = ScriptType / VoidType;
         
@@ -740,9 +741,44 @@ namespace TypeScript
       Id(first, rest)
     }
     
-    ObjectType(_ : NToken) : TSType
+    ObjectType(members : list[TSObject]) : TSType
     {
-      TSType.Object()
+      TSType.Object(members)
+    }
+    
+    TypeMemberListMaybe(members : option[list[TSObject]]) : list[TSObject]
+    {
+      members ?? []
+    }
+    
+    TypeMemberList(member : TSObject, rest : List[TSObject]) : list[TSObject]
+    {
+      member :: rest.NToList()
+    }
+    
+    CallSignature(_ : NToken, returnType : option[TSType]) : TSObject
+    {
+      TSObject.Call(returnType)
+    }
+
+    ConstructSignature(_ : NToken, type : option[TSType]) : TSObject
+    {
+      TSObject.Construct(type)
+    }
+    
+    IndexSignature(_ : NToken, type : option[TSType]) : TSObject
+    {
+      TSObject.Index(type)
+    }
+
+    PropertySignature(id : string, _ : NToken, type : option[TSType]) : TSObject
+    {
+      TSObject.Property(id, type)
+    }
+
+    FunctionSignature(id : string, _ : NToken, _ : NToken, returnType : option[TSType]) : TSObject
+    {
+      TSObject.Function(id, returnType)
     }
     
     FunctionType(_ : NToken, returnType : TSType) : TSType
@@ -770,9 +806,9 @@ namespace TypeScript
       TSGlobal.Variable(id, type)
     }
     
-    AmbientConstructDeclaration(_ : NToken, _ : NToken) : TSGlobal
+    AmbientConstructDeclaration(_ : NToken, returnType : option[TSType]) : TSGlobal
     {
-      TSGlobal.Construct()
+      TSGlobal.Construct(returnType)
     }
     
     AmbientFunctionDeclaration(_ : NToken) : TSGlobal
@@ -806,6 +842,15 @@ namespace TypeScript
     }
   }
   
+  public variant TSObject
+  {
+    | Call { ReturnType : option[TSType]; }
+    | Construct { Type : option[TSType]; }
+    | Index { Type : option[TSType]; }
+    | Property { Name : string; Type : option[TSType]; }
+    | Function { Name : string;  ReturnType : option[TSType]; }
+  }
+  
   public variant TSType
   {
     | Any
@@ -815,7 +860,7 @@ namespace TypeScript
     | Void
     | Named { Name : string; }
     | Array { Type : TSType; Arity : int; }
-    | Object
+    | Object { Members : list[TSObject]; }
     | Lambda { ReturnType : TSType; }
     | New { ReturnType : TSType; }
   }
@@ -823,7 +868,7 @@ namespace TypeScript
   public variant TSGlobal
   {
     | Variable { Name : string; Type : option[TSType]; }
-    | Construct
+    | Construct { ReturnType : option[TSType]; }
     | Function
     | Class { Name : string; }
     | Interface { Name : string; }
