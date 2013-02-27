@@ -21,9 +21,9 @@ namespace NemerleWeb.Samples
   {      
     SelectedSample : Sample { get; set; }
     
-    Samples : List[Sample] { get; set; }
-    KnockoutSamples : List[Sample] { get; set; }
-    PegSamples : List[Sample] { get; set; }
+    Samples = List.[Sample]();
+    KnockoutSamples = List.[Sample]();
+    PegSamples = List.[Sample]();
     AllSamples : array[Sample] 
     {
       get

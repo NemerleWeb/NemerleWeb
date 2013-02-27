@@ -22,7 +22,7 @@ namespace NemerleWeb.Samples
       public Timestamp : string;
     }
     
-    Messages : List[Message] { get; set; }
+    Messages = List.[Message]();
     Name : string { get; set; }
     CurrentMessage : string { get; set; }
     

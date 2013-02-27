@@ -16,7 +16,7 @@ namespace NemerleWeb.Samples
       public IsDestroyed : bool { get; set; }
     }
 
-    public Tasks : List[Task] { get; set; }
+    public Tasks : List[Task] { get; set; default List.[Task]() }
     public NewTaskText : string { get; set; }
     public IncompleteTasks : IEnumerable[Task]
     {
