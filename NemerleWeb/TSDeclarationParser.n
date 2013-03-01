@@ -29,8 +29,6 @@ namespace TypeScript
         var_s : void      = "var"s;
         function_s : void = "function"s;
         new_s : void      = "new"s;
-        public_ : void    = "public";
-        private_ : void   = "private";
         delete_s : void = "delete"s;
         void_s : void = "void"s;
         typeof_s : void = "typeof"s;
@@ -76,6 +74,13 @@ namespace TypeScript
         
         arrow : void = "=>";
         arrow_s : void = arrow s;
+        
+        #endregion
+        
+        #region Special rules
+        
+        required : void = !'?';
+        optional : bool = ('?' s)?;
         
         #endregion
         
@@ -413,8 +418,9 @@ namespace TypeScript
         
         #region Function Definition (13)
         
-        FunctionExpression = function_s Identifier? lparen_s FormalParameterList? rparen_s lbrace_s FunctionBody rbrace_s;
+        FunctionExpression = function_s Identifier? lparen_s FormalParameterListOpt rparen_s lbrace_s FunctionBody rbrace_s;
         FormalParameterList = Identifier (comma_s Identifier)*;
+        FormalParameterListOpt = FormalParameterList?;
         FunctionBody = SourceElement*;
         
         #endregion
@@ -444,8 +450,8 @@ namespace TypeScript
         #region Object Type Literals (3.5.3)
         
         ObjectType : TSType = lbrace_s TypeBody rbrace_s;       
-        TypeBody : list[TSObject] = TypeMemberList scS / TypeMemberListMaybe;
-        TypeMemberListMaybe : list[TSObject] = TypeMemberList?;
+        TypeBody : list[TSObject] = TypeMemberList scS / TypeMemberListOpt;
+        TypeMemberListOpt : list[TSObject] = TypeMemberList?;
         TypeMemberList : list[TSObject] = TypeMember (scS TypeMember)* S;
         TypeMember : TSObject =
           CallSignature /
@@ -454,29 +460,29 @@ namespace TypeScript
           FunctionSignature /
           PropertySignature;
         
-        CallSignature      : TSObject = lparen_s ParameterList? rparen_s ReturnTypeAnnotation?;
-        ConstructSignature : TSObject = new_s lparen_s ParameterList? rparen_s TypeAnnotation?;
+        CallSignature      : TSObject = lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation?;
+        ConstructSignature : TSObject = new_s lparen_s ParameterListOpt rparen_s TypeAnnotation?;
         IndexSignature     : TSObject = lbrack_s RequiredParameter rbrack_s TypeAnnotation?;
-        PropertySignature  : TSObject = AnyIdentifier ('?' s)? TypeAnnotation?;
-        FunctionSignature  : TSObject = AnyIdentifier ('?' s)? lparen_s ParameterList? rparen_s ReturnTypeAnnotation?;
+        PropertySignature  : TSObject = AnyIdentifier optional TypeAnnotation?;
+        FunctionSignature  : TSObject = AnyIdentifier optional lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation?;
         
         #endregion
         
         #region Array Type Literal (3.5.4)
         
-        ArrayType = (PredefinedType / TypeName / TypeLiteral) (lbrack_s rbrack_s)+;
+        ArrayType : TSType.Array = (PredefinedType / TypeNameTS / TypeLiteral) ('['s ']'s)+;
         
         #endregion
         
         #region Function Type Literals (3.5.5)
         
-        FunctionType : TSType = lparen_s ParameterList? rparen_s arrow_s ReturnType s;
+        FunctionType : TSType = lparen_s ParameterListOpt rparen_s arrow_s ReturnType s;
         
         #endregion
         
         #region Constructor Type Literals (3.5.6)
         
-        ConstructorType : TSType = new_s lparen_s ParameterList? rparen_s arrow_s ScriptType s;
+        ConstructorType : TSType = new_s lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
 
         #endregion
         
@@ -497,21 +503,32 @@ namespace TypeScript
         
         #region Function Signatures (6.2)
         
-        ParameterList =
-          RequiredParameterList comma_s OptionalParameterList comma_s RestParameter /
-          OptionalParameterList comma_s RestParameter /
-          RequiredParameterList comma_s OptionalParameterList /
-          RequiredParameterList comma_s RestParameter /
+        ParameterList : list[TSParam] =
+          ParameterListROR /
+          ParameterListOR /
+          ParameterListRO /
+          ParameterListRR /
           OptionalParameterList /
           RequiredParameterList /
           RestParameter;
-        RequiredParameterList = RequiredParameter (comma_s RequiredParameter)*;
-        RequiredParameter = PublicOrPrivate? Identifier !'?' TypeAnnotation?;
-        PublicOrPrivate = ("public" / "private")s;
-        OptionalParameterList = OptionalParameter (comma_s OptionalParameter)*;
+          
+        // Return empty list instead of option
+        ParameterListOpt : list[TSParam] = ParameterList?;
+        
+        ParameterListROR : list[TSParam] = RequiredParameterList comma_s OptionalParameterList comma_s RestParameter;
+        ParameterListOR  : list[TSParam] = OptionalParameterList comma_s RestParameter;
+        ParameterListRO  : list[TSParam] = RequiredParameterList comma_s OptionalParameterList;
+        ParameterListRR  : list[TSParam] = RequiredParameterList comma_s RestParameter;
+          
+        RequiredParameterList : list[TSParam] = RequiredParameter (comma_s RequiredParameter)*;
+        RequiredParameter : TSParam = PublicOrPrivate? Identifier required TypeAnnotation?;
+        Public : MemberAccess = "public";
+        Private : MemberAccess = "private";
+        PublicOrPrivate : MemberAccess = (Public/Private)s;
+        OptionalParameterList : list[TSParam] = OptionalParameter (comma_s OptionalParameter)*;
         // Optional parameter must not have Initialiser in declaration files.
-        OptionalParameter = PublicOrPrivate? Identifier ('?'s TypeAnnotation? / TypeAnnotation?) s;
-        RestParameter = ellipsis_s Identifier !'?' colon_s ArrayType;
+        OptionalParameter : TSParam = PublicOrPrivate? Identifier optional TypeAnnotation?;
+        RestParameter : list[TSParam] = ellipsis_s Identifier required colon_s ArrayType;
         ReturnTypeAnnotation : TSType = colon_s ReturnType s;
         VoidType : TSType = "void";
         ReturnType : TSType = ScriptType / VoidType;
@@ -544,7 +561,7 @@ namespace TypeScript
         #region Constructor Declaration (8.3)
         
         ConstructorDeclaration = ConstructorOverload+;
-        ConstructorOverload = constructor_s lparen_s ParameterList? rparen_s scS;
+        ConstructorOverload = constructor_s lparen_s ParameterListOpt rparen_s scS;
         
         #endregion
         
@@ -640,11 +657,11 @@ namespace TypeScript
         #region Ambient Variable Declarations (10.1.2)
         
         // This rule is not by specification, but TypeScript parses it correctly.
-        AmbientFunctionSignature = AnyIdentifier? '?'?s lparen_s ParameterList? rparen_s ReturnTypeAnnotation?;
+        AmbientFunctionSignature : TSGlobal= AnyIdentifier? optional lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation?;
         AmbientFunctionDeclaration : TSGlobal = function_s AmbientFunctionSignature scS;
         
         // This rule is not by specification, but TypeScript parses it correctly.
-        AmbientConstructDeclaration : TSGlobal  = function_s new_s lparen_s ParameterList? rparen_s ReturnTypeAnnotation? S;
+        AmbientConstructDeclaration : TSGlobal = function_s new_s lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation? S;
         
         #endregion
         
@@ -653,7 +670,7 @@ namespace TypeScript
         AmbientClassDeclaration : TSGlobal = class_s Identifier ClassHeritage lbrace_s AmbientClassBody rbrace_s S;
         AmbientClassBody = AmbientClassBodyElement*;
         AmbientClassBodyElement = AmbientConstructorDeclaration / AmbientStaticDeclaration / AmbientMemberDeclaration;
-        AmbientConstructorDeclaration = constructor_s lparen_s ParameterList? rparen_s scS;
+        AmbientConstructorDeclaration = constructor_s lparen_s ParameterListOpt rparen_s scS;
         AmbientMemberDeclaration = PublicOrPrivate? (FunctionSignature / Identifier TypeAnnotation?) scS;
         AmbientStaticDeclaration = PublicOrPrivate? static_s (FunctionSignature / Identifier TypeAnnotation?) scS;
         AmbientEnumDeclaration : TSGlobal = enum_s Identifier lbrace_s EnumBody? rbrace_s S;
@@ -694,6 +711,11 @@ namespace TypeScript
     )]
   public class TSDeclarationParser
   {
+    optional(n : NToken) : bool
+    {
+      !n.IsEmpty
+    }
+    
     StringLiteral(s : NToken) : string
     {
       GetText(s)
@@ -714,9 +736,9 @@ namespace TypeScript
       if (rest.Count == 0) first else $<#$first...$(rest; ".")#>
     }
 
-    ScriptType(type : TSType, arrayType : List[NToken * NToken]) : TSType
+    ScriptType(type : TSType, arrayArity : List[NToken * NToken]) : TSType
     {
-      if (arrayType.Count == 0) type else TSType.Array(type, arrayType.Count)
+      if (arrayArity.Count == 0) type else TSType.Array(type, arrayArity.Count)
     }
     
     PredefinedType(type : NToken) : TSType
@@ -746,7 +768,12 @@ namespace TypeScript
       TSType.Object(members)
     }
     
-    TypeMemberListMaybe(members : option[list[TSObject]]) : list[TSObject]
+    ArrayType(type : TSType, arrayArity : List[NToken * NToken]) : TSType.Array
+    {
+      TSType.Array(type, arrayArity.Count)
+    }
+    
+    TypeMemberListOpt(members : option[list[TSObject]]) : list[TSObject]
     {
       members ?? []
     }
@@ -756,39 +783,39 @@ namespace TypeScript
       member :: rest.NToList()
     }
     
-    CallSignature(_ : NToken, returnType : option[TSType]) : TSObject
+    CallSignature(parms : list[TSParam], returnType : option[TSType]) : TSObject
     {
-      TSObject.Call(returnType)
+      TSObject.Call(parms, returnType)
     }
 
-    ConstructSignature(_ : NToken, type : option[TSType]) : TSObject
+    ConstructSignature(parms : list[TSParam], type : option[TSType]) : TSObject
     {
-      TSObject.Construct(type)
+      TSObject.Construct(parms, type)
     }
     
-    IndexSignature(_ : NToken, type : option[TSType]) : TSObject
+    IndexSignature(parm : TSParam, type : option[TSType]) : TSObject
     {
-      TSObject.Index(type)
+      TSObject.Index(parm, type)
+    }
+    
+    PropertySignature(id : string, optional : bool, type : option[TSType]) : TSObject
+    {
+      TSObject.Property(id, optional, type)
     }
 
-    PropertySignature(id : string, _ : NToken, type : option[TSType]) : TSObject
+    FunctionSignature(id : string, optional : bool, parms : list[TSParam], returnType : option[TSType]) : TSObject
     {
-      TSObject.Property(id, type)
-    }
-
-    FunctionSignature(id : string, _ : NToken, _ : NToken, returnType : option[TSType]) : TSObject
-    {
-      TSObject.Function(id, returnType)
+      TSObject.Function(id, optional, parms, returnType)
     }
     
-    FunctionType(_ : NToken, returnType : TSType) : TSType
+    FunctionType(parms : list[TSParam], returnType : TSType) : TSType
     {
-      TSType.Lambda(returnType)
+      TSType.Lambda(parms, returnType)
     }
     
-    ConstructorType(_ : NToken, returnType : TSType) : TSType
+    ConstructorType(parms : list[TSParam], returnType : TSType) : TSType
     {
-      TSType.New(returnType)
+      TSType.New(parms, returnType)
     }
     
     VoidType(_ : NToken) : TSType
@@ -801,29 +828,89 @@ namespace TypeScript
       Id(first, rest)
     }
     
+    Public(_ : NToken) : MemberAccess
+    {
+      MemberAccess.Public
+    }
+    
+    Private(_ : NToken) : MemberAccess
+    {
+      MemberAccess.Private
+    }
+    
+    ParameterListOpt(parms : option[list[TSParam]]) : list[TSParam] 
+    {
+      parms ?? []
+    }
+    
+    ParameterListROR(required : list[TSParam], optional : list[TSParam], rest : list[TSParam]) : list[TSParam]
+    {
+      required.Append(optional).Append(rest)
+    }
+    
+    ParameterListOR(optional : list[TSParam], rest : list[TSParam]) : list[TSParam]
+    {
+      optional.Append(rest)
+    }
+    
+    ParameterListRO(required : list[TSParam], optional : list[TSParam]) : list[TSParam]
+    {
+      required.Append(optional)
+    }
+    
+    RequiredParameter(access : option[MemberAccess], id : string, type : option[TSType]) : TSParam
+    {
+      TSParam.Required(id, type, access)
+    }
+    
+    ParameterListRR(required : list[TSParam], rest : list[TSParam]) : list[TSParam]
+    {
+      required.Append(rest)
+    }
+    
+    OptionalParameter(access : option[MemberAccess], id : string, optional : bool, type : option[TSType]) : TSParam
+    {
+      TSParam.Option(id, optional, type, access)
+    }
+    
+    RequiredParameterList(first : TSParam, rest : List[TSParam]) : list[TSParam]
+    {
+      first :: rest.NToList()
+    }
+    
+    OptionalParameterList(first : TSParam, rest : List[TSParam]) : list[TSParam]
+    {
+      first :: rest.NToList()
+    }
+    
+    RestParameter(id : string, type : TSType.Array) : list[TSParam]
+    {
+      [TSParam.Rest(id, type)]
+    }
+
+    InterfaceDeclaration(id : string, _ : NToken, _ : TSType) : TSGlobal
+    {
+      TSGlobal.Interface(id)
+    }      
+    
     AmbientVariableDeclaration(id : string, type : option[TSType]) : TSGlobal
     {
       TSGlobal.Variable(id, type)
     }
     
-    AmbientConstructDeclaration(_ : NToken, returnType : option[TSType]) : TSGlobal
+    AmbientConstructDeclaration(parms : list[TSParam], returnType : option[TSType]) : TSGlobal
     {
-      TSGlobal.Construct(returnType)
+      TSGlobal.Construct(parms, returnType)
     }
     
-    AmbientFunctionDeclaration(_ : NToken) : TSGlobal
+    AmbientFunctionSignature(name : option[string], optional : bool, parms : list[TSParam], returnType : option[TSType]) : TSGlobal
     {
-      TSGlobal.Function()
+      TSGlobal.Function(name, optional, parms, returnType)
     }
     
     AmbientClassDeclaration(id : string, _ : NToken, _ : NToken) : TSGlobal
     {
       TSGlobal.Class(id)
-    }
-    
-    InterfaceDeclaration(id : string, _ : NToken, _ : TSType) : TSGlobal
-    {
-      TSGlobal.Interface(id)
     }
     
     AmbientModuleDeclaration(id :string , _ : NToken) : TSGlobal
@@ -842,13 +929,26 @@ namespace TypeScript
     }
   }
   
+  public enum MemberAccess
+  {
+    | Public
+    | Private
+  }
+  
+  public variant TSParam
+  {
+    | Required { Name : string; Type : option[TSType]; Access : option[MemberAccess]; }
+    | Option { Name : string; Optional : bool; Type : option[TSType]; Access : option[MemberAccess]; }
+    | Rest { Name : string; Type : TSType.Array; }
+  }
+  
   public variant TSObject
   {
-    | Call { ReturnType : option[TSType]; }
-    | Construct { Type : option[TSType]; }
-    | Index { Type : option[TSType]; }
-    | Property { Name : string; Type : option[TSType]; }
-    | Function { Name : string;  ReturnType : option[TSType]; }
+    | Call { Params : list[TSParam]; ReturnType : option[TSType]; }
+    | Construct { Params : list[TSParam]; Type : option[TSType]; }
+    | Index { Parm : TSParam; Type : option[TSType]; }
+    | Property { Name : string; Optional : bool; Type : option[TSType]; }
+    | Function { Name : string; Optional : bool; Params : list[TSParam]; ReturnType : option[TSType]; }
   }
   
   public variant TSType
@@ -861,15 +961,21 @@ namespace TypeScript
     | Named { Name : string; }
     | Array { Type : TSType; Arity : int; }
     | Object { Members : list[TSObject]; }
-    | Lambda { ReturnType : TSType; }
-    | New { ReturnType : TSType; }
+    | Lambda { Params : list[TSParam]; ReturnType : TSType; }
+    | New { Params : list[TSParam]; ReturnType : TSType; }
   }
 
   public variant TSGlobal
   {
     | Variable { Name : string; Type : option[TSType]; }
-    | Construct { ReturnType : option[TSType]; }
+    | Construct { Params : list[TSParam]; ReturnType : option[TSType]; }
     | Function
+      { 
+        Name : option[string];
+        Optional : bool;
+        Params : list[TSParam];
+        ReturnType : option[TSType];
+      }
     | Class { Name : string; }
     | Interface { Name : string; }
     | Module { Name : string; }
