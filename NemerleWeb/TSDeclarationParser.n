@@ -440,7 +440,7 @@ namespace TypeScript
         
         // Array is specified here, because otherwise we have left recursion.
         ScriptType : TSType = (TypeLiteral / PredefinedType / TypeNameTS) ('['s ']'s)*;
-        PredefinedType : TSType = ("any" / "number" / "bool" / "string") s !IdentifierPart;
+        PredefinedType : TSType = ("any" / "number" / "bool" / "string" / "void") s !IdentifierPart;
         TypeName : string = Identifier (dot Identifier)*;
         TypeNameTS : TSType = TypeName;
         ModuleName : string = TypeName;
@@ -615,16 +615,15 @@ namespace TypeScript
         // Allow export function();
         ExportFunctionDeclaration = AmbientFunctionDeclaration;
         ExportDeclaration =
-          export_s
-            (
-              VariableStatement /
-              ExportFunctionDeclaration /
-              ClassDeclaration /
-              InterfaceDeclaration /
-              ModuleDeclaration /
-              EnumDeclaration /
-              AmbientDeclaration
-            );
+          export_s VariableStatement /
+          export_s ExportFunctionDeclaration /
+          export_s ClassDeclaration /
+          export_s InterfaceDeclaration /
+          export_s ModuleDeclaration /
+          export_s EnumDeclaration /
+          export_s AmbientDeclaration /
+          ExportAssignment;
+        ExportAssignment : TSGlobal = export_s assign_s Identifier semicolon;
             
         #endregion 
         
@@ -699,7 +698,7 @@ namespace TypeScript
               AmbientModuleDeclaration /
               AmbientEnumDeclaration
             );
-        AmbientElement : TSGlobal = AmbientElementNotImport / ImportDeclaration;
+        AmbientElement : TSGlobal = AmbientElementNotImport / ImportDeclaration / ExportAssignment;
         
         #endregion
                 
@@ -764,6 +763,7 @@ namespace TypeScript
       | "number" => TSType.Number()
       | "bool" => TSType.Bool()
       | "string" => TSType.String()
+      | "void" => TSType.Void()
       | _ => assert(false);
       }
     }
@@ -988,6 +988,11 @@ namespace TypeScript
       TSEnumElement(id, initialiser)
     }
     
+    ExportAssignment(id : string) : TSGlobal
+    {
+      TSGlobal.Export(id)
+    }
+    
     ImportDeclaration(id : string, moduleRef : string) : TSGlobal
     {
       TSGlobal.Import(id, moduleRef)
@@ -1085,5 +1090,6 @@ namespace TypeScript
     | Module { Name : string; }
     | Enum { Name : string; Elements : list[TSEnumElement]; }
     | Import { Name : string; ModuleReference : string; }
+    | Export { Identifier : string; }
   }
 }
