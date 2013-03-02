@@ -33,7 +33,6 @@ namespace TypeScript
         void_s : void = "void"s;
         typeof_s : void = "typeof"s;
         constructor_s : void = "constructor"s;
-        static_s : void = "static"s;
         enum_s : void = "enum"s;
         class_s : void = "class"s;
         implements_s : void = "implements"s;
@@ -81,6 +80,8 @@ namespace TypeScript
         
         required : void = !'?';
         optional : bool = ('?' s)?;
+        static_ : bool = "static";
+        static_s : bool = static_ s;
         
         #endregion
         
@@ -449,7 +450,8 @@ namespace TypeScript
         
         #region Object Type Literals (3.5.3)
         
-        ObjectType : TSType = lbrace_s TypeBody rbrace_s;       
+        ObjectType : TSType = lbrace_s TypeBody rbrace_s;
+        ObjectTypeTS : TSType.Object = lbrace_s TypeBody rbrace_s;
         TypeBody : list[TSObject] = TypeMemberList scS / TypeMemberListOpt;
         TypeMemberListOpt : list[TSObject] = TypeMemberList?;
         TypeMemberList : list[TSObject] = TypeMember (scS TypeMember)* S;
@@ -537,10 +539,10 @@ namespace TypeScript
         
         #region Interface Declarations (7.1)
         
-        InterfaceDeclaration : TSGlobal = interface_s Identifier InterfaceExtendsClause? ObjectType S;
-        InterfaceExtendsClause = extends_s InterfaceNameList;
-        InterfaceNameList = InterfaceName (comma_s InterfaceName)*;
-        InterfaceName = TypeName;
+        InterfaceDeclaration : TSGlobal = interface_s Identifier InterfaceExtendsClause? ObjectTypeTS S;
+        InterfaceExtendsClause : list[string] = extends_s InterfaceNameList;
+        InterfaceNameList : list[string] = InterfaceName (comma_s InterfaceName)*;
+        InterfaceName : string = TypeName;
         
         #endregion
         
@@ -548,10 +550,10 @@ namespace TypeScript
         
         ClassDeclaration = class_s Identifier ClassHeritage lbrace_s ClassBody rbrace_s;
         
-        ClassHeritage = ClassExtendsClause? ImplementsClause?;
-        ClassExtendsClause = extends_s ClassName;
-        ClassName = TypeName;
-        ImplementsClause = implements_s InterfaceNameList;
+        ClassHeritage : ClassHeritage = ClassExtendsClause? ImplementsClause?;
+        ClassExtendsClause : string = extends_s ClassName;
+        ClassName : string = TypeName;
+        ImplementsClause : list[string] = implements_s InterfaceNameList;
         
         ClassBody = ClassElement*;
         ClassElement = ConstructorDeclaration / MemberDeclaration;
@@ -578,7 +580,7 @@ namespace TypeScript
         
         #region Enum Declaration
         
-        EnumDeclaration = enum_s Identifier lbrace_s EnumBody? rbrace_s;
+        EnumDeclaration = enum_s Identifier lbrace_s EnumBody? rbrace_s S;
         EnumBody = EnumElement (comma_s EnumElement)* ','?s;
         EnumElement = AnyIdentifier Initialiser?;
         
@@ -668,11 +670,14 @@ namespace TypeScript
         #region Ambient Class Declarations (10.1.3)
         
         AmbientClassDeclaration : TSGlobal = class_s Identifier ClassHeritage lbrace_s AmbientClassBody rbrace_s S;
-        AmbientClassBody = AmbientClassBodyElement*;
-        AmbientClassBodyElement = AmbientConstructorDeclaration / AmbientStaticDeclaration / AmbientMemberDeclaration;
-        AmbientConstructorDeclaration = constructor_s lparen_s ParameterListOpt rparen_s scS;
-        AmbientMemberDeclaration = PublicOrPrivate? (FunctionSignature / Identifier TypeAnnotation?) scS;
-        AmbientStaticDeclaration = PublicOrPrivate? static_s (FunctionSignature / Identifier TypeAnnotation?) scS;
+        AmbientClassBody : list[TSClassMember] = AmbientClassBodyElement*;
+        AmbientClassBodyElement : TSClassMember = AmbientConstructorDeclaration / AmbientMemberDeclaration;
+        AmbientConstructorDeclaration : TSClassMember = constructor_s lparen_s ParameterListOpt rparen_s scS;
+        AmbientMemberVariable : TSClassMemberPart = Identifier TypeAnnotation?;
+        // Same as FunctionSignature but with other type
+        ClassMemberFunctionSignature  : TSClassMemberPart = AnyIdentifier optional lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation?;
+        AmbientMemberDeclaration : TSClassMember = PublicOrPrivate? static_s? (ClassMemberFunctionSignature / AmbientMemberVariable) scS;
+        
         AmbientEnumDeclaration : TSGlobal = enum_s Identifier lbrace_s EnumBody? rbrace_s S;
         
         #endregion        
@@ -712,6 +717,11 @@ namespace TypeScript
   public class TSDeclarationParser
   {
     optional(n : NToken) : bool
+    {
+      !n.IsEmpty
+    }
+    
+    static_(n : NToken) : bool
     {
       !n.IsEmpty
     }
@@ -764,6 +774,11 @@ namespace TypeScript
     }
     
     ObjectType(members : list[TSObject]) : TSType
+    {
+      ObjectTypeTS(members)
+    }
+    
+    ObjectTypeTS(members : list[TSObject]) : TSType.Object
     {
       TSType.Object(members)
     }
@@ -888,19 +903,24 @@ namespace TypeScript
       [TSParam.Rest(id, type)]
     }
 
-    InterfaceDeclaration(id : string, _ : NToken, _ : TSType) : TSGlobal
+    InterfaceDeclaration(id : string, extends : option[list[string]], type : TSType.Object) : TSGlobal
     {
-      TSGlobal.Interface(id)
-    }      
+      TSGlobal.Interface(id, extends ?? [], type)
+    }
+    
+    InterfaceNameList(first : string, rest : List[string]) : list[string]
+    {
+      first :: rest.NToList()
+    }
+    
+    ClassHeritage(extends : option[string], implement : option[list[string]]) : ClassHeritage
+    {
+      (extends, implement ?? [])
+    }
     
     AmbientVariableDeclaration(id : string, type : option[TSType]) : TSGlobal
     {
       TSGlobal.Variable(id, type)
-    }
-    
-    AmbientConstructDeclaration(parms : list[TSParam], returnType : option[TSType]) : TSGlobal
-    {
-      TSGlobal.Construct(parms, returnType)
     }
     
     AmbientFunctionSignature(name : option[string], optional : bool, parms : list[TSParam], returnType : option[TSType]) : TSGlobal
@@ -908,9 +928,39 @@ namespace TypeScript
       TSGlobal.Function(name, optional, parms, returnType)
     }
     
-    AmbientClassDeclaration(id : string, _ : NToken, _ : NToken) : TSGlobal
+    AmbientConstructDeclaration(parms : list[TSParam], returnType : option[TSType]) : TSGlobal
     {
-      TSGlobal.Class(id)
+      TSGlobal.Construct(parms, returnType)
+    }
+    
+    AmbientClassDeclaration(id : string, classHeritage : ClassHeritage, members : list[TSClassMember]) : TSGlobal
+    {
+      TSGlobal.Class(id, classHeritage[0], classHeritage[1])
+    }
+    
+    AmbientClassBody(elements : List[TSClassMember]) : list[TSClassMember]
+    {
+      elements.NToList()
+    }
+    
+    AmbientConstructorDeclaration(parms : list[TSParam]) : TSClassMember
+    {
+      TSClassMember.Constructor(parms)
+    }
+    
+    AmbientMemberVariable(id : string, type : option[TSType]) : TSClassMemberPart
+    {
+      TSClassMemberPart.Variable(id, type)
+    }
+
+    ClassMemberFunctionSignature(id : string, optional : bool, parms : list[TSParam], returnType : option[TSType]) : TSClassMemberPart
+    {
+      TSClassMemberPart.Method(id, optional, parms, returnType)
+    }
+    
+    AmbientMemberDeclaration(access : option[MemberAccess], isStatic : option[bool], part : TSClassMemberPart) : TSClassMember
+    {
+      TSClassMember.Member(part, isStatic, access)
     }
     
     AmbientModuleDeclaration(id :string , _ : NToken) : TSGlobal
@@ -929,16 +979,42 @@ namespace TypeScript
     }
   }
   
+  type ClassHeritage = option[string] * list[string];
+  
   public enum MemberAccess
   {
     | Public
     | Private
   }
   
+  public variant TSClassMemberPart
+  {
+    | Variable { Name : string; Type : option[TSType]; }
+    | Method 
+      { 
+        Name : string;
+        Optional : bool;
+        Params : list[TSParam];
+        ReturnType : option[TSType];
+      }
+  }
+  
+  public variant TSClassMember
+  {
+    | Constructor { Params : list[TSParam]; }
+    | Member { Part : TSClassMemberPart; Static : option[bool]; Access : option[MemberAccess]; }
+  }
+  
   public variant TSParam
   {
     | Required { Name : string; Type : option[TSType]; Access : option[MemberAccess]; }
-    | Option { Name : string; Optional : bool; Type : option[TSType]; Access : option[MemberAccess]; }
+    | Option
+      { 
+        Name : string;
+        Optional : bool;
+        Type : option[TSType];
+        Access : option[MemberAccess];
+      }
     | Rest { Name : string; Type : TSType.Array; }
   }
   
@@ -976,8 +1052,8 @@ namespace TypeScript
         Params : list[TSParam];
         ReturnType : option[TSType];
       }
-    | Class { Name : string; }
-    | Interface { Name : string; }
+    | Class { Name : string; Extends : option[string]; Implements : list[string]; }
+    | Interface { Name : string; Extends : list[string]; Type : TSType.Object; }
     | Module { Name : string; }
     | Enum { Name : string; }
     | Import { Name : string; ModuleReference : string; }
