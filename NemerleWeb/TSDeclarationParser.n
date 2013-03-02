@@ -413,7 +413,7 @@ namespace TypeScript
         VariableDeclarationList = VariableDeclaration (comma_s VariableDeclaration)*;
         // This rule is modified in TypeSript see: 5.1
         //VariableDeclaration = Identifier;
-        Initialiser = assign AssignmentExpression;
+        Initialiser : string = assign AssignmentExpression;
         
         #endregion
         
@@ -581,8 +581,8 @@ namespace TypeScript
         #region Enum Declaration
         
         EnumDeclaration = enum_s Identifier lbrace_s EnumBody? rbrace_s S;
-        EnumBody = EnumElement (comma_s EnumElement)* ','?s;
-        EnumElement = AnyIdentifier Initialiser?;
+        EnumBody : list[TSEnumElement] = EnumElement (comma_s EnumElement)* comma?s;
+        EnumElement : TSEnumElement = AnyIdentifier Initialiser?;
         
         #endregion
         
@@ -740,10 +740,15 @@ namespace TypeScript
     {
       GetText(id)
     }
-        
+    
     static Id(first : string, rest : List[string]) : string
     {
       if (rest.Count == 0) first else $<#$first...$(rest; ".")#>
+    }
+    
+    Initialiser(assignmentExpr : NToken) : string
+    {
+      GetText(assignmentExpr)
     }
 
     ScriptType(type : TSType, arrayArity : List[NToken * NToken]) : TSType
@@ -935,7 +940,7 @@ namespace TypeScript
     
     AmbientClassDeclaration(id : string, classHeritage : ClassHeritage, members : list[TSClassMember]) : TSGlobal
     {
-      TSGlobal.Class(id, classHeritage[0], classHeritage[1])
+      TSGlobal.Class(id, classHeritage[0], classHeritage[1], members)
     }
     
     AmbientClassBody(elements : List[TSClassMember]) : list[TSClassMember]
@@ -968,9 +973,19 @@ namespace TypeScript
       TSGlobal.Module(id)
     }
     
-    AmbientEnumDeclaration(id : string, _ : NToken) : TSGlobal
+    AmbientEnumDeclaration(id : string, elements : option[list[TSEnumElement]]) : TSGlobal
     {
-      TSGlobal.Enum(id)
+      TSGlobal.Enum(id, elements ?? [])
+    }
+    
+    EnumBody(first : TSEnumElement, rest : List[TSEnumElement]) : list[TSEnumElement]
+    {
+      first :: rest.NToList()
+    }
+    
+    EnumElement(id : string, initialiser : option[string]) : TSEnumElement
+    {
+      TSEnumElement(id, initialiser)
     }
     
     ImportDeclaration(id : string, moduleRef : string) : TSGlobal
@@ -1027,6 +1042,13 @@ namespace TypeScript
     | Function { Name : string; Optional : bool; Params : list[TSParam]; ReturnType : option[TSType]; }
   }
   
+  [Record]
+  public class TSEnumElement
+  {
+    Name : string;
+    Initialiser : option[string];
+  }
+  
   public variant TSType
   {
     | Any
@@ -1052,10 +1074,16 @@ namespace TypeScript
         Params : list[TSParam];
         ReturnType : option[TSType];
       }
-    | Class { Name : string; Extends : option[string]; Implements : list[string]; }
+    | Class 
+      { 
+        Name : string;
+        Extends : option[string]; 
+        Implements : list[string];
+        Members : list[TSClassMember];
+      }
     | Interface { Name : string; Extends : list[string]; Type : TSType.Object; }
     | Module { Name : string; }
-    | Enum { Name : string; }
+    | Enum { Name : string; Elements : list[TSEnumElement]; }
     | Import { Name : string; ModuleReference : string; }
   }
 }
