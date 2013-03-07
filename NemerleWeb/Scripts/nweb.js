@@ -274,6 +274,9 @@ var nweb = {
         binding.generatedEls = [];
         binding.subBindings = [];
 
+        if (array == null)
+          return;
+
         for (var i = array.length - 1; i >= 0; i--) {
           var $newEl = $(html).removeAttr("nw-repeat");
           
