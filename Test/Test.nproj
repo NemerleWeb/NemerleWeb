@@ -93,9 +93,12 @@
     <Folder Include="TS\chosen\" />
     <Folder Include="TS\chrome\" />
     <Folder Include="TS\codemirror\" />
+    <Folder Include="TS\commander\" />
     <Folder Include="TS\d3\" />
     <Folder Include="TS\d3\plugins\" />
     <Folder Include="TS\domo\" />
+    <Folder Include="TS\durandal\" />
+    <Folder Include="TS\dustjs-linkedin\" />
     <Folder Include="TS\easeljs\" />
     <Folder Include="TS\ember\" />
     <Folder Include="TS\epiceditor\" />
@@ -108,10 +111,12 @@
     <Folder Include="TS\flexSlider\" />
     <Folder Include="TS\flot\" />
     <Folder Include="TS\foundation\" />
+    <Folder Include="TS\gamepad\" />
     <Folder Include="TS\gldatepicker\" />
     <Folder Include="TS\globalize\" />
     <Folder Include="TS\google.analytics\" />
     <Folder Include="TS\google.feeds\" />
+    <Folder Include="TS\google.geolocation\" />
     <Folder Include="TS\googlemaps\" />
     <Folder Include="TS\greensock\" />
     <Folder Include="TS\hammerjs\" />
@@ -124,6 +129,7 @@
     <Folder Include="TS\i18next\tests\" />
     <Folder Include="TS\impress\" />
     <Folder Include="TS\iscroll\" />
+    <Folder Include="TS\jake\" />
     <Folder Include="TS\jasmine\" />
     <Folder Include="TS\jqrangeslider\" />
     <Folder Include="TS\jquery.bbq\" />
@@ -135,6 +141,8 @@
     <Folder Include="TS\jquery.dynatree\" />
     <Folder Include="TS\jquery.form\" />
     <Folder Include="TS\jquery.jnotify\" />
+    <Folder Include="TS\jquery.livestampjs\" />
+    <Folder Include="TS\jquery.scrollTo\" />
     <Folder Include="TS\jquery.simplePagination\" />
     <Folder Include="TS\jquery.tagsmanager\" />
     <Folder Include="TS\jquery.timeago\" />
@@ -145,6 +153,7 @@
     <Folder Include="TS\jquerymobile\" />
     <Folder Include="TS\jqueryui\" />
     <Folder Include="TS\jquery\" />
+    <Folder Include="TS\jsdeferred\" />
     <Folder Include="TS\jsoneditoronline\" />
     <Folder Include="TS\keyboardjs\" />
     <Folder Include="TS\knockback\" />
@@ -213,6 +222,7 @@
     <Folder Include="TS\_infrastructure\tests\" />
     <Folder Include="TS\_infrastructure\tests\src\" />
     <Folder Include="TS\_infrastructure\tests\typescript_0.8.2\" />
+    <Folder Include="TS\_infrastructure\tests\typescript_0.8.3\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="TS\**\*.ts">
