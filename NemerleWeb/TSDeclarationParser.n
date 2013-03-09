@@ -1022,12 +1022,22 @@ namespace TypeScript
   public variant TSClassMember
   {
     | Constructor { Params : list[TSParam]; }
-    | Member { Part : TSClassMemberPart; Static : option[bool]; Access : option[MemberAccess]; }
+    | Member
+      {
+        Part : TSClassMemberPart;
+        Static : option[bool];
+        Access : option[MemberAccess];
+      }
   }
   
   public variant TSParam
   {
-    | Required { Name : string; Type : option[TSType]; Access : option[MemberAccess]; }
+    | Required
+      {
+        Name : string;
+        Type : option[TSType];
+        Access : option[MemberAccess];
+      }
     | Option
       { 
         Name : string;
@@ -1044,7 +1054,13 @@ namespace TypeScript
     | Construct { Params : list[TSParam]; Type : option[TSType]; }
     | Index { Parm : TSParam; Type : option[TSType]; }
     | Property { Name : string; Optional : bool; Type : option[TSType]; }
-    | Function { Name : string; Optional : bool; Params : list[TSParam]; ReturnType : option[TSType]; }
+    | Function
+      {
+        Name : string;
+        Optional : bool;
+        Params : list[TSParam];
+        ReturnType : option[TSType];
+      }
   }
   
   [Record]

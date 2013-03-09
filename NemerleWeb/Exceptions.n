@@ -1,0 +1,12 @@
+using System;
+
+namespace Nemerle.Web
+{
+  class ClientCodeCalledInServerException : Exception
+  {
+    public this()
+    {
+      base("Client code must not be called in server")
+    }
+  }
+}

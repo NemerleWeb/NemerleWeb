@@ -107,6 +107,9 @@
     <Compile Include="EventsDSL\Events.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Exceptions.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="HtmlMacro\Ext.n">
       <SubType>Code</SubType>
     </Compile>
