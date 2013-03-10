@@ -5,7 +5,7 @@ using Nemerle.Compiler.Parsetree;
 using System.IO;
 using TypeScript;
 
-[Nemerle.MacroUsage (Nemerle.MacroPhase.BeforeTypedMembers,
+[Nemerle.MacroUsage (Nemerle.MacroPhase.BeforeInheritance,
                      Nemerle.MacroTargets.Assembly)]
 macro NemerleWebProperties(params options : list[PExpr])
 {  
@@ -89,8 +89,7 @@ module NemerleWebPropertiesImpl
       | [] => typer.Env.Define(<[ decl: public partial interface $(@interface.Name : usesite) {} ]>);
       | _ =>
         def extends = @interface.Extends.Map(e => <[ $(e : usesite) ]>);
-        // TODO: Implement extends
-        typer.Env.Define(<[ decl: public partial interface $(@interface.Name : usesite) /*: ..$extends*/ {} ]>);
+        typer.Env.Define(<[ decl: public partial interface $(@interface.Name : usesite) : ..$extends {} ]>);
       };
     
     //  DefineMembers(tb, inter.Members);
