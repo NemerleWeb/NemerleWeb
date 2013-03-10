@@ -685,7 +685,7 @@ namespace TypeScript
         
         AmbientModuleDeclaration : TSGlobal = module_s AmbientModuleIdentification s lbrace_s AmbientModuleBody rbrace_s S;
         AmbientModuleIdentification : string = StringLiteral / IdentifierPath;
-        AmbientModuleBody = AmbientElement*;
+        AmbientModuleBody : list[TSGlobal] = AmbientElement*;
         
         AmbientElementNotImport : TSGlobal =
           export_s? declare_s?
@@ -968,9 +968,14 @@ namespace TypeScript
       TSClassMember.Member(part, isStatic, access)
     }
     
-    AmbientModuleDeclaration(id :string , _ : NToken) : TSGlobal
+    AmbientModuleDeclaration(id :string , elements : list[TSGlobal]) : TSGlobal
     {
-      TSGlobal.Module(id)
+      TSGlobal.Module(id, elements)
+    }
+    
+    AmbientModuleBody(elements : List[TSGlobal]) : list[TSGlobal]
+    {
+      elements.NToList()
     }
     
     AmbientEnumDeclaration(id : string, elements : option[list[TSEnumElement]]) : TSGlobal
@@ -1103,7 +1108,7 @@ namespace TypeScript
         Members : list[TSClassMember];
       }
     | Interface { Name : string; Extends : list[string]; Type : TSType.Object; }
-    | Module { Name : string; }
+    | Module { Name : string; Members : list[TSGlobal]; }
     | Enum { Name : string; Elements : list[TSEnumElement]; }
     | Import { Name : string; ModuleReference : string; }
     | Export { Identifier : string; }
