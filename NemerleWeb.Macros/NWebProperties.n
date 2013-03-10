@@ -4,180 +4,196 @@ using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
 using System.IO;
 using TypeScript;
+using Nemerle.Web;
 
-[Nemerle.MacroUsage (Nemerle.MacroPhase.BeforeInheritance,
-                     Nemerle.MacroTargets.Assembly)]
-macro NemerleWebProperties(params options : list[PExpr])
-{  
-  NemerleWebPropertiesImpl.Impl(Nemerle.Macros.ImplicitCTX(), options) 
-}
-
-module NemerleWebPropertiesImpl
+namespace Nemerle.Web.Macros
 {
-  public Impl(typer : Typer, options : list[PExpr]) : void
-  {
-    foreach(opt in options)
-    {
-    | <[ (TypeScriptPath, $(path)) ]> => 
-      def parser = TSDeclarationParser();
-      def path = path.ToString();      
-      def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
-      def tsDir = Path.Combine(projectDir, path);
-      def tsFiles = Directory.EnumerateFiles(tsDir, "*.d.ts", SearchOption.AllDirectories);
-      def globalJs = typer.Env.Define(<[ decl: public module javascript {} ]>);
+  [Nemerle.MacroUsage (Nemerle.MacroPhase.BeforeInheritance,
+                       Nemerle.MacroTargets.Assembly)]
+  macro NemerleWebProperties(params options : list[PExpr])
+  {  
+    NemerleWebPropertiesImpl.Impl(Nemerle.Macros.ImplicitCTX(), options) 
+  }
 
-      //assert2(false);  
-      
-      def parse(tsFile)
+  module NemerleWebPropertiesImpl
+  {
+    public Impl(typer : Typer, options : list[PExpr]) : void
+    {
+      foreach(opt in options)
       {
-        match(parser.TryParse(File.ReadAllText(tsFile)))
+      | <[ (TypeScriptPath, $(path)) ]> => 
+        def parser = TSDeclarationParser();
+        def path = path.ToString();      
+        def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
+        def tsDir = Path.Combine(projectDir, path);
+        def tsFiles = Directory.EnumerateFiles(tsDir, "*.d.ts", SearchOption.AllDirectories);
+      
+        def jsApi = typer.Env;
+        //assert2(false);  
+      
+        def parse(tsFile)
         {
-        | (pos, result) when pos == parser.ParsingSource.OriginalText.Length => 
-          foreach(r in result) 
+          match(parser.TryParse(File.ReadAllText(tsFile)))
           {
-          | Variable  as v => CreateTSGlobalVariable(v, globalJs, typer)
-          | Function  as f => CreateTSGlobalFunction(f, globalJs, typer)
-          | Interface as i => CreateTSGlobalInterface(i, globalJs, typer)
-          | Class     as c => CreateTSGlobalClass(c, globalJs, typer)
-          | Construct as c => CreateTSGlobalConstruct(c, globalJs, typer)
-          | Enum      as e => CreateTSGlobalEnum(e, globalJs, typer)
-          | Import    as i => CreateTSGlobalImport(i, globalJs, typer)
-          | Export    as e => CreateTSGlobalExport(e, globalJs, typer)
-          | Module    as m => CreateTSGlobalModule(m, globalJs, typer)
+          | (pos, result) when pos == parser.ParsingSource.OriginalText.Length =>           
+            foreach(r in result) 
+            {
+              def res =
+                match(r)
+                {
+                | Variable  as v => CreateTSGlobalVariable(v)
+                | Function  as f => CreateTSGlobalFunction(f)
+                | Interface as i => CreateTSGlobalInterface(i)
+                | Class     as c => CreateTSGlobalClass(c)
+                | Construct as c => CreateTSGlobalConstruct(c)
+                | Enum      as e => CreateTSGlobalEnum(e)
+                | Import    as i => CreateTSGlobalImport(i)
+                | Export    as e => CreateTSGlobalExport(e)
+                | Module    as m => CreateTSGlobalModule(m)
+                };
+              jsApi.Define(res).Compile();
+            }
+          | (pos, _) => 
+            def text = parser.ParsingSource.OriginalText;
+            Message.Error(Location(tsFile, pos, pos, pos, pos), $"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...")
           }
-        | (pos, _) => 
-          def text = parser.ParsingSource.OriginalText;
-          Message.Error(Location(tsFile, pos, pos, pos, pos), $"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...")
         }
+      
+        // Parse first the infrastructure file.
+        def infrastructure = Path.Combine(tsDir, @"_infrastructure\tests\typescript_0.8.3\lib.d.ts");
+        parse(infrastructure);
+      
+        // Parse other files
+        foreach(tsFile when !tsFile.Contains("_infrastructure") in tsFiles)
+          parse(tsFile);
+
+      | _ => Message.Error(<#Unrecognized option format, should be tuple of two strings: ("TypeScriptPath", "Typescripts") #>)
       }
-      
-      // Parse first the infrastructure file.
-      def infrastructure = Path.Combine(tsDir, @"_infrastructure\tests\typescript_0.8.3\lib.d.ts");
-      parse(infrastructure);
-      
-      // Parse other files
-      foreach(tsFile when !tsFile.Contains("_infrastructure") in tsFiles)
-        parse(tsFile);
-      
-      // Fixate global
-      globalJs.Compile();
-      
-    | _ => Message.Error(<#Unrecognized option format, should be tuple of two strings: ("TypeScriptPath", "Typescripts") #>)
     }
-  }
   
-  private static CreateTSGlobalVariable(var : TSGlobal.Variable, globalJs : TypeBuilder, typer : Typer) : void  
-  {
-    //def anonName = var.Name + "AnonymousClass";
-    //def anon = tb.DefineNestedType(<[ decl: public class $(anonName : usesite) {} ]>);
+    private static CreateTSGlobalVariable(var : TSGlobal.Variable) : ClassMember
+    {
+      //def anonName = var.Name + "AnonymousClass";
+      //def anon = tb.DefineNestedType(<[ decl: public class $(anonName : usesite) {} ]>);
       
-    //_ = tb.DefineWithSource(<[ decl: public $(var.Name : usesite) : $(anonName : usesite) ]>);
+      //_ = tb.DefineWithSource(<[ decl: public $(var.Name : usesite) : $(anonName : usesite) ]>);
     
-    // DefineMembers(anon, var.Members);
-    //anon.Compile();
-  }
+      // DefineMembers(anon, var.Members);
+      //anon.Compile();
+      <[ decl: partial class Dummy {} ]>
+    }
   
-  private static CreateTSGlobalFunction(function : TSGlobal.Function, globalJs : TypeBuilder, typer : Typer) : void
-  {
-    
-  }
+    //x : HashSet.[string] = HashSet();
   
-  private static CreateTSGlobalInterface(@interface : TSGlobal.Interface, globalJs : TypeBuilder, typer : Typer) : void  
-  {
-    def tb = match(@interface.Extends)
+    private static CreateTSGlobalFunction(function : TSGlobal.Function) : ClassMember
+    {
+      //if (function.Name is Some(fname))
+      //{
+      //  if (x.Contains(fname))
+      //    <[ decl: partial class Dummy {} ]>
+      //  else
+      //  {
+      //    x.Add(fname);
+      //    <[ decl: $(fname : usesite)() : $(ConvertType(function.ReturnType)) { throw ClientCodeCalledInServerException(); } ]>
+      //  }
+      //}
+      //else
+      //{
+        <[ decl: partial class Dummy {} ]>
+      //}
+    }
+  
+    private static CreateTSGlobalInterface(@interface : TSGlobal.Interface) : ClassMember
+    {
+      match (@interface.Extends)
       {
-      | [] => typer.Env.Define(<[ decl: public partial interface $(@interface.Name : usesite) {} ]>);
+      | [] => <[ decl: public partial interface $(@interface.Name : usesite) {} ]>
       | _ =>
         def extends = @interface.Extends.Map(e => <[ $(e : usesite) ]>);
-        typer.Env.Define(<[ decl: public partial interface $(@interface.Name : usesite) : ..$extends {} ]>);
-      };
-    
-    //  DefineMembers(tb, inter.Members);
-    tb.Compile();
-  }
+        <[ decl: public partial interface $(@interface.Name : usesite) : ..$extends {} ]>
+      }
+    }
   
-  private static CreateTSGlobalClass(@class : TSGlobal.Class, globalJs : TypeBuilder, typer : Typer) : void  
-  {
-    def tb = 
+    private static CreateTSGlobalClass(@class : TSGlobal.Class) : ClassMember
+    {
       match((@class.Extends, @class.Implements))
       {
-      | (None, []) => typer.Env.Define(<[ decl: public partial class $(@class.Name : usesite) {} ]>);
+      | (None, []) => <[ decl: public partial class $(@class.Name : usesite) {} ]>;
       | _ =>
         def extends = if (@class.Extends is Some(ex)) [<[ $(ex : usesite) ]>] else [];
         def implement = @class.Implements.Map(e => <[ $(e : usesite) ]>);
         def inherit = extends.Append(implement);
-        typer.Env.Define(<[ decl: public partial class $(@class.Name : usesite) : ..$inherit {} ]>);
+        <[ decl: public partial class $(@class.Name : usesite) : ..$inherit {} ]>;
       };
-    
-    //  DefineMembers(tb, inter.Members);
-    tb.Compile();
-  }
-  
-  private static CreateTSGlobalConstruct(c : TSGlobal.Construct, globalJs : TypeBuilder, typer : Typer) : void  
-  {
-  }
-  
-  private static CreateTSGlobalEnum(e : TSGlobal.Enum, globalJs : TypeBuilder, typer : Typer) : void  
-  {
-  }
-  
-  private static CreateTSGlobalImport(i : TSGlobal.Import, globalJs : TypeBuilder, typer : Typer) : void  
-  {
-  }
-  
-  private static CreateTSGlobalExport(e : TSGlobal.Export, globalJs : TypeBuilder, typer : Typer) : void  
-  {
-  }
-  
-  private static CreateTSGlobalModule(@module : TSGlobal.Module, globalJs : TypeBuilder, typer : Typer) : void  
-  {
-    def tb = typer.Env.Define(<[ decl: partial module $(@module.Name : usesite) {} ]>);
-    
-    //  DefineMembers(tb, inter.Members);
-    tb.Compile();
-  }
-  
-  private GetParamsType(parms : list[TSParam], additional : option[TSType]) : list[PExpr]
-  {
-    def convertParamsType(p : TSParam)
-    {
-      | Required(_, t, _)
-      | Option(_, _, t, _) => ConvertType(t)
-      | Rest(_, t) => ConvertType(t)
     }
-    
-    def ret = 
-      parms
-        .Map(convertParamsType)
-        .Append(if (additional is Some(t)) [ConvertType(t)] else []);
-    
-    ret
-  }
   
-  private ConvertType(inputType : option[TSType]) : PExpr
-  {
-    | Some(type) => ConvertType(type)
-    | None => <[ object ]>
-  }
+    private static CreateTSGlobalConstruct(c : TSGlobal.Construct) : ClassMember
+    {
+      <[ decl: partial class Dummy {} ]>
+    }
   
-  private ConvertType(inputType : TSType) : PExpr
-  {
-    | Array(type, 0) => <[ $(ConvertType(type)) ]>
-    | Array(type, arity) => <[ array[$(ConvertType(TSType.Array(type, arity - 1)))] ]>
-    | Bool => <[ bool ]>    
-    | Lambda(parms, ret) =>
-      def (type, additional) = 
-        if (ret is TSType.Void()) (<[ Action ]>, None())
-        else                      (<[ Func ]>, Some(ret));
+    private static CreateTSGlobalEnum(@enum : TSGlobal.Enum) : ClassMember
+    {
+      <[ decl: enum $(@enum.Name : usesite) { } ]>
+    }
+  
+    private static CreateTSGlobalImport(i : TSGlobal.Import) : ClassMember
+    {
+      <[ decl: partial class Dummy {} ]>
+    }
+  
+    private static CreateTSGlobalExport(e : TSGlobal.Export) : ClassMember
+    {
+      <[ decl: partial class Dummy {} ]>
+    }
+  
+    private static CreateTSGlobalModule(@module : TSGlobal.Module) : ClassMember
+    {
+      <[ decl: partial module $(@module.Name : usesite) {} ]>
+    }
+  
+    private GetParamsType(parms : list[TSParam], additional : option[TSType]) : list[PExpr]
+    {
+      def convertParamsType(p : TSParam)
+      {
+        | Required(_, t, _)
+        | Option(_, _, t, _) => ConvertType(t)
+        | Rest(_, t) => ConvertType(t)
+      }
+    
+      def ret = 
+        parms
+          .Map(convertParamsType)
+          .Append(if (additional is Some(t)) [ConvertType(t)] else []);
+    
+      ret
+    }
+  
+    private ConvertType(inputType : option[TSType]) : PExpr
+    {
+      | Some(type) => ConvertType(type)
+      | None => <[ object ]>
+    }
+  
+    private ConvertType(inputType : TSType) : PExpr
+    {
+      | Array(type, 0) => <[ $(ConvertType(type)) ]>
+      | Array(type, arity) => <[ array[$(ConvertType(TSType.Array(type, arity - 1)))] ]>
+      | Bool => <[ bool ]>    
+      | Lambda(parms, ret) =>
+        def (type, additional) = 
+          if (ret is TSType.Void()) (<[ Action ]>, None())
+          else                      (<[ Func ]>, Some(ret));
         
-      <[ $type.[{..$(GetParamsType(parms, additional))}] ]>
-    | Named
-    | New
-    | Number => <[ float ]>
-    | Object => Message.Hint("Object is not supported"); <[ ]>
-    | String => <[ void ]>
-    | Void => <[ void ]>
-    | Any
-    | _ => <[ object ]>
+        <[ $type.[{..$(GetParamsType(parms, additional))}] ]>
+      | Named
+      | New
+      | Number => <[ float ]>
+      | Object => Message.Hint("Object is not supported"); <[ ]>
+      | String => <[ void ]>
+      | Void => <[ void ]>
+      | Any
+      | _ => <[ object ]>
+    }
   }
 }

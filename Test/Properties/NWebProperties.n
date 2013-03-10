@@ -1,1 +1,3 @@
-﻿[assembly: NemerleWebProperties((TypeScriptPath, TS))]
+﻿using Nemerle.Web.Macros;
+
+[assembly: NemerleWebProperties((TypeScriptPath, TS))]
