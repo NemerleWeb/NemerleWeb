@@ -66,7 +66,7 @@ module NemerleWebPropertiesImpl
     }
   }
   
-  private static CreateTSGlobalVariable(var : TSGlobal.Variable, tb : TypeBuilder, typer : Typer) : void  
+  private static CreateTSGlobalVariable(var : TSGlobal.Variable, globalJs : TypeBuilder, typer : Typer) : void  
   {
     //def anonName = var.Name + "AnonymousClass";
     //def anon = tb.DefineNestedType(<[ decl: public class $(anonName : usesite) {} ]>);
@@ -77,12 +77,12 @@ module NemerleWebPropertiesImpl
     //anon.Compile();
   }
   
-  private static CreateTSGlobalFunction(function : TSGlobal.Function, tb : TypeBuilder, typer : Typer) : void
+  private static CreateTSGlobalFunction(function : TSGlobal.Function, globalJs : TypeBuilder, typer : Typer) : void
   {
     
   }
   
-  private static CreateTSGlobalInterface(@interface : TSGlobal.Interface, tb : TypeBuilder, typer : Typer) : void  
+  private static CreateTSGlobalInterface(@interface : TSGlobal.Interface, globalJs : TypeBuilder, typer : Typer) : void  
   {
     def tb = match(@interface.Extends)
       {
@@ -96,28 +96,45 @@ module NemerleWebPropertiesImpl
     tb.Compile();
   }
   
-  private static CreateTSGlobalClass(c : TSGlobal.Class, tb : TypeBuilder, typer : Typer) : void  
+  private static CreateTSGlobalClass(@class : TSGlobal.Class, globalJs : TypeBuilder, typer : Typer) : void  
+  {
+    def tb = 
+      match((@class.Extends, @class.Implements))
+      {
+      | (None, []) => typer.Env.Define(<[ decl: public partial class $(@class.Name : usesite) {} ]>);
+      | _ =>
+        def extends = if (@class.Extends is Some(ex)) [<[ $(ex : usesite) ]>] else [];
+        def implement = @class.Implements.Map(e => <[ $(e : usesite) ]>);
+        def inherit = extends.Append(implement);
+        typer.Env.Define(<[ decl: public partial class $(@class.Name : usesite) : ..$inherit {} ]>);
+      };
+    
+    //  DefineMembers(tb, inter.Members);
+    tb.Compile();
+  }
+  
+  private static CreateTSGlobalConstruct(c : TSGlobal.Construct, globalJs : TypeBuilder, typer : Typer) : void  
   {
   }
   
-  private static CreateTSGlobalConstruct(c : TSGlobal.Construct, tb : TypeBuilder, typer : Typer) : void  
+  private static CreateTSGlobalEnum(e : TSGlobal.Enum, globalJs : TypeBuilder, typer : Typer) : void  
   {
   }
   
-  private static CreateTSGlobalEnum(e : TSGlobal.Enum, tb : TypeBuilder, typer : Typer) : void  
+  private static CreateTSGlobalImport(i : TSGlobal.Import, globalJs : TypeBuilder, typer : Typer) : void  
   {
   }
   
-  private static CreateTSGlobalImport(i : TSGlobal.Import, tb : TypeBuilder, typer : Typer) : void  
+  private static CreateTSGlobalExport(e : TSGlobal.Export, globalJs : TypeBuilder, typer : Typer) : void  
   {
   }
   
-  private static CreateTSGlobalExport(e : TSGlobal.Export, tb : TypeBuilder, typer : Typer) : void  
+  private static CreateTSGlobalModule(@module : TSGlobal.Module, globalJs : TypeBuilder, typer : Typer) : void  
   {
-  }
-  
-  private static CreateTSGlobalModule(m : TSGlobal.Module, tb : TypeBuilder, typer : Typer) : void  
-  {
+    def tb = typer.Env.Define(<[ decl: partial module $(@module.Name : usesite) {} ]>);
+    
+    //  DefineMembers(tb, inter.Members);
+    tb.Compile();
   }
   
   private GetParamsType(parms : list[TSParam], additional : option[TSType]) : list[PExpr]
