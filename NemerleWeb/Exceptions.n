@@ -2,7 +2,7 @@ using System;
 
 namespace Nemerle.Web
 {
-  class ClientCodeCalledInServerException : Exception
+  public class ClientCodeCalledInServerException : Exception
   {
     public this()
     {
