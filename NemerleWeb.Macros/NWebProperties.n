@@ -28,8 +28,8 @@ namespace Nemerle.Web.Macros
         def tsDir = Path.Combine(projectDir, path);
         def tsFiles = Directory.EnumerateFiles(tsDir, "*.d.ts", SearchOption.AllDirectories);
       
-        def jsApi = typer.Env;
-        //assert2(false);  
+        def jsApi = typer.Env.Define(<[ decl: module JavaScriptApi {} ]>);
+        //assert2(false); 
       
         def parse(tsFile)
         {
@@ -38,20 +38,16 @@ namespace Nemerle.Web.Macros
           | (pos, result) when pos == parser.ParsingSource.OriginalText.Length =>           
             foreach(r in result) 
             {
-              def res =
-                match(r)
-                {
-                | Variable  as v => CreateTSGlobalVariable(v)
-                | Function  as f => CreateTSGlobalFunction(f)
-                | Interface as i => CreateTSGlobalInterface(i)
-                | Class     as c => CreateTSGlobalClass(c)
-                | Construct as c => CreateTSGlobalConstruct(c)
-                | Enum      as e => CreateTSGlobalEnum(e)
-                | Import    as i => CreateTSGlobalImport(i)
-                | Export    as e => CreateTSGlobalExport(e)
-                | Module    as m => CreateTSGlobalModule(m)
-                };
-              jsApi.Define(res).Compile();
+            | Variable  as v => CreateTSGlobalVariable(v, jsApi)
+            | Function  as f => CreateTSGlobalFunction(f, jsApi)
+            | Interface as i => CreateTSGlobalInterface(i, jsApi)
+            | Class     as c => CreateTSGlobalClass(c, jsApi)
+            | Construct as c => CreateTSGlobalConstruct(c, jsApi)
+            | Enum      as e => CreateTSGlobalEnum(e, jsApi)
+            | Import    as i => CreateTSGlobalImport(i, jsApi)
+            | Export    as e => CreateTSGlobalExport(e, jsApi)
+            | Module    as m => CreateTSGlobalModule(m, jsApi)
+            | _ => ()
             }
           | (pos, _) => 
             def text = parser.ParsingSource.OriginalText;
@@ -66,90 +62,113 @@ namespace Nemerle.Web.Macros
         // Parse other files
         foreach(tsFile when !tsFile.Contains("_infrastructure") in tsFiles)
           parse(tsFile);
+          
+        jsApi.Compile();
 
       | _ => Message.Error(<#Unrecognized option format, should be tuple of two strings: ("TypeScriptPath", "Typescripts") #>)
       }
     }
-  
-    private static CreateTSGlobalVariable(var : TSGlobal.Variable) : ClassMember
-    {
-      //def anonName = var.Name + "AnonymousClass";
-      //def anon = tb.DefineNestedType(<[ decl: public class $(anonName : usesite) {} ]>);
-      
-      //_ = tb.DefineWithSource(<[ decl: public $(var.Name : usesite) : $(anonName : usesite) ]>);
     
-      // DefineMembers(anon, var.Members);
-      //anon.Compile();
-      <[ decl: partial class Dummy {} ]>
-    }
+    globalVariables : HashSet.[string] = HashSet();
   
-    //x : HashSet.[string] = HashSet();
-  
-    private static CreateTSGlobalFunction(function : TSGlobal.Function) : ClassMember
+    private static CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder) : void
     {
-      //if (function.Name is Some(fname))
-      //{
-      //  if (x.Contains(fname))
-      //    <[ decl: partial class Dummy {} ]>
-      //  else
-      //  {
-      //    x.Add(fname);
-      //    <[ decl: $(fname : usesite)() : $(ConvertType(function.ReturnType)) { throw ClientCodeCalledInServerException(); } ]>
-      //  }
-      //}
-      //else
-      //{
-        <[ decl: partial class Dummy {} ]>
-      //}
-    }
-  
-    private static CreateTSGlobalInterface(@interface : TSGlobal.Interface) : ClassMember
-    {
-      match (@interface.Extends)
+      when (!globalVariables.Contains(var.Name))
       {
-      | [] => <[ decl: public partial interface $(@interface.Name : usesite) {} ]>
-      | _ =>
-        def extends = @interface.Extends.Map(e => <[ $(e : usesite) ]>);
-        <[ decl: public partial interface $(@interface.Name : usesite) : ..$extends {} ]>
+        _  = globalVariables.Add(var.Name);
+        def variableType = var.Name + "AnonymousClass";
+        jsApi.DefineNestedType(<[ decl: public partial class $(variableType : usesite) {} ]>).Compile();
+        
+        // DefineMembers(anon, var.Members);
+        
+        //_ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $(variableType : usesite) ]>);
       }
     }
   
-    private static CreateTSGlobalClass(@class : TSGlobal.Class) : ClassMember
+    globalFunctions : HashSet.[string] = HashSet();
+  
+    private static CreateTSGlobalFunction(function : TSGlobal.Function, jsApi : TypeBuilder) : void
     {
-      match((@class.Extends, @class.Implements))
+      if (function.Name is Some(fname))
       {
-      | (None, []) => <[ decl: public partial class $(@class.Name : usesite) {} ]>;
-      | _ =>
-        def extends = if (@class.Extends is Some(ex)) [<[ $(ex : usesite) ]>] else [];
-        def implement = @class.Implements.Map(e => <[ $(e : usesite) ]>);
-        def inherit = extends.Append(implement);
-        <[ decl: public partial class $(@class.Name : usesite) : ..$inherit {} ]>;
-      };
+        when (!globalFunctions.Contains(fname))
+        {
+          _ = globalFunctions.Add(fname);
+          jsApi.Define(<[ decl: 
+            $(fname : usesite)() : $(ConvertType(function.ReturnType))
+            {
+              throw ClientCodeCalledInServerException();
+            }
+          ]>);
+        }
+      }
+      else
+      {
+        Message.Error("Global functions must have name");
+      }
     }
   
-    private static CreateTSGlobalConstruct(c : TSGlobal.Construct) : ClassMember
+    private static CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, jsApi : TypeBuilder) : void
     {
-      <[ decl: partial class Dummy {} ]>
+      def type =
+        match (tsInterface.Extends)
+        {
+        | [] =>
+          <[ decl: public partial interface $(tsInterface.Name : usesite) {} ]>
+        | _ =>
+          def extends = tsInterface.Extends.Map(e => <[ $(e : usesite) ]>);
+          <[ decl: public partial interface $(tsInterface.Name : usesite) : ..$extends {} ]>
+        };
+      jsApi.DefineNestedType(type).Compile();
     }
   
-    private static CreateTSGlobalEnum(@enum : TSGlobal.Enum) : ClassMember
+    private static CreateTSGlobalClass(tsClass : TSGlobal.Class, jsApi : TypeBuilder) : void
     {
-      <[ decl: enum $(@enum.Name : usesite) { } ]>
+      def type = 
+        match((tsClass.Extends, tsClass.Implements))
+        {
+        | (None, []) =>
+          <[ decl: public partial class $(tsClass.Name : usesite) {} ]>
+        | _ =>
+          def extends = if (tsClass.Extends is Some(ex)) [<[ $(ex : usesite) ]>] else [];
+          def implement = tsClass.Implements.Map(e => <[ $(e : usesite) ]>);
+          def inherit = extends.Append(implement);
+          <[ decl: public partial class $(tsClass.Name : usesite) : ..$inherit {} ]>
+        };
+      jsApi.DefineNestedType(type).Compile();
     }
   
-    private static CreateTSGlobalImport(i : TSGlobal.Import) : ClassMember
+    private static CreateTSGlobalConstruct(c : TSGlobal.Construct, jsApi : TypeBuilder) : void
     {
-      <[ decl: partial class Dummy {} ]>
+      
+    }
+    
+    enums : HashSet.[string] = HashSet();
+  
+    private static CreateTSGlobalEnum(tsEnum : TSGlobal.Enum, jsApi : TypeBuilder) : void
+    {
+      when (!enums.Contains(tsEnum.Name))
+      {
+        _ = enums.Add(tsEnum.Name);
+        def type = <[ decl: enum $(tsEnum.Name : usesite) { } ]>;
+        jsApi.DefineNestedType(type).Compile();
+      }
     }
   
-    private static CreateTSGlobalExport(e : TSGlobal.Export) : ClassMember
+    private static CreateTSGlobalImport(i : TSGlobal.Import, jsApi : TypeBuilder) : void
     {
-      <[ decl: partial class Dummy {} ]>
+      
     }
   
-    private static CreateTSGlobalModule(@module : TSGlobal.Module) : ClassMember
+    private static CreateTSGlobalExport(e : TSGlobal.Export, jsApi : TypeBuilder) : void
     {
-      <[ decl: partial module $(@module.Name : usesite) {} ]>
+      
+    }
+  
+    private static CreateTSGlobalModule(tsModule : TSGlobal.Module, jsApi : TypeBuilder) : void
+    {
+      when (!tsModule.Name.Contains('.') && !tsModule.Name.Contains('/'))
+        jsApi.DefineNestedType(<[ decl: public partial module $(tsModule.Name : usesite) {} ]>).Compile();
     }
   
     private GetParamsType(parms : list[TSParam], additional : option[TSType]) : list[PExpr]
