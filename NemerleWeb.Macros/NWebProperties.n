@@ -2,11 +2,12 @@
 using System.Linq;
 using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
+using Nemerle.Collections;
 using System.IO;
 using TypeScript;
-using Nemerle.Web;
+using NemerleWeb;
 
-namespace Nemerle.Web.Macros
+namespace NemerleWeb.Macros
 {
   [Nemerle.MacroUsage (Nemerle.MacroPhase.BeforeInheritance,
                        Nemerle.MacroTargets.Assembly)]
@@ -19,6 +20,8 @@ namespace Nemerle.Web.Macros
   {
     public Impl(typer : Typer, options : list[PExpr]) : void
     {
+      def jsApi = typer.Env.Define(<[ decl: module JsApi {} ]>);
+      
       foreach(opt in options)
       {
       | <[ (TypeScriptPath, $(path)) ]> => 
@@ -27,28 +30,39 @@ namespace Nemerle.Web.Macros
         def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
         def tsDir = Path.Combine(projectDir, path);
         def tsFiles = Directory.EnumerateFiles(tsDir, "*.d.ts", SearchOption.AllDirectories);
-      
-        def jsApi = typer.Env.Define(<[ decl: module JavaScriptApi {} ]>);
+                     
         //assert2(false); 
-      
-        def parse(tsFile)
+        
+        def parse(tsFile, infrastructure)
         {
           match(parser.TryParse(File.ReadAllText(tsFile)))
           {
-          | (pos, result) when pos == parser.ParsingSource.OriginalText.Length =>           
+          | (pos, result) when pos == parser.ParsingSource.OriginalText.Length =>
+            
+            def jsApiModule =
+              if (infrastructure)
+                jsApi
+              else
+              {
+                def fileName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(tsFile));
+                CreateModule(fileName.Split('.').NToList(), jsApi)
+              };
+            
             foreach(r in result) 
             {
-            | Variable  as v => CreateTSGlobalVariable(v, jsApi)
-            | Function  as f => CreateTSGlobalFunction(f, jsApi)
-            | Interface as i => CreateTSGlobalInterface(i, jsApi)
-            | Class     as c => CreateTSGlobalClass(c, jsApi)
-            | Construct as c => CreateTSGlobalConstruct(c, jsApi)
-            | Enum      as e => CreateTSGlobalEnum(e, jsApi)
-            | Import    as i => CreateTSGlobalImport(i, jsApi)
-            | Export    as e => CreateTSGlobalExport(e, jsApi)
-            | Module    as m => CreateTSGlobalModule(m, jsApi)
+            //| Variable  as v => CreateTSGlobalVariable (v, jsApiModule)
+            //| Function  as f => CreateTSGlobalFunction (f, jsApiModule)
+            //| Interface as i => CreateTSGlobalInterface(i, jsApiModule)
+            //| Class     as c => CreateTSGlobalClass    (c, jsApiModule)
+            //| Construct as c => CreateTSGlobalConstruct(c, jsApiModule)
+            //| Enum      as e => CreateTSGlobalEnum     (e, jsApiModule)
+            //| Import    as i => CreateTSGlobalImport   (i, jsApiModule)
+            //| Export    as e => CreateTSGlobalExport   (e, jsApiModule)
+            //| Module    as m => CreateTSGlobalModule   (m, jsApiModule)
             | _ => ()
             }
+            
+            when (!infrastructure) jsApiModule.Compile();
           | (pos, _) => 
             def text = parser.ParsingSource.OriginalText;
             Message.Error(Location(tsFile, pos, pos, pos, pos), $"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...")
@@ -57,11 +71,11 @@ namespace Nemerle.Web.Macros
       
         // Parse first the infrastructure file.
         def infrastructure = Path.Combine(tsDir, @"_infrastructure\tests\typescript_0.8.3\lib.d.ts");
-        parse(infrastructure);
+        parse(infrastructure, true);
       
         // Parse other files
         foreach(tsFile when !tsFile.Contains("_infrastructure") in tsFiles)
-          parse(tsFile);
+          parse(tsFile, false);
           
         jsApi.Compile();
 
@@ -69,38 +83,26 @@ namespace Nemerle.Web.Macros
       }
     }
     
-    globalVariables : HashSet.[string] = HashSet();
-  
-    private static CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder) : void
+    private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder) : void
     {
-      when (!globalVariables.Contains(var.Name))
-      {
-        _  = globalVariables.Add(var.Name);
-        def variableType = var.Name + "AnonymousClass";
-        jsApi.DefineNestedType(<[ decl: public partial class $(variableType : usesite) {} ]>).Compile();
-        
-        // DefineMembers(anon, var.Members);
-        
-        //_ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $(variableType : usesite) ]>);
-      }
+      def variableType = var.Name + "AnonymousClass";
+      jsApi.DefineNestedType(<[ decl: public partial class $(variableType : usesite) {} ]>).Compile();
+      
+      // DefineMembers(anon, var.Members);
+      
+      //_ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $(variableType : usesite) ]>);
     }
   
-    globalFunctions : HashSet.[string] = HashSet();
-  
-    private static CreateTSGlobalFunction(function : TSGlobal.Function, jsApi : TypeBuilder) : void
+    private CreateTSGlobalFunction(function : TSGlobal.Function, jsApi : TypeBuilder) : void
     {
       if (function.Name is Some(fname))
       {
-        when (!globalFunctions.Contains(fname))
-        {
-          _ = globalFunctions.Add(fname);
-          jsApi.Define(<[ decl: 
-            $(fname : usesite)() : $(ConvertType(function.ReturnType))
-            {
-              throw ClientCodeCalledInServerException();
-            }
-          ]>);
-        }
+        jsApi.Define(<[ decl: 
+          $(fname : usesite)() : $(ConvertType(function.ReturnType))
+          {
+            throw ClientCodeCalledInServerException();
+          }
+        ]>);
       }
       else
       {
@@ -108,21 +110,20 @@ namespace Nemerle.Web.Macros
       }
     }
   
-    private static CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, jsApi : TypeBuilder) : void
+    private CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, jsApi : TypeBuilder) : void
     {
       def type =
-        match (tsInterface.Extends)
-        {
-        | [] =>
+        if (tsInterface.Extends is [])
           <[ decl: public partial interface $(tsInterface.Name : usesite) {} ]>
-        | _ =>
+        else
+        {
           def extends = tsInterface.Extends.Map(e => <[ $(e : usesite) ]>);
           <[ decl: public partial interface $(tsInterface.Name : usesite) : ..$extends {} ]>
         };
       jsApi.DefineNestedType(type).Compile();
     }
   
-    private static CreateTSGlobalClass(tsClass : TSGlobal.Class, jsApi : TypeBuilder) : void
+    private CreateTSGlobalClass(tsClass : TSGlobal.Class, jsApi : TypeBuilder) : void
     {
       def type = 
         match((tsClass.Extends, tsClass.Implements))
@@ -138,37 +139,50 @@ namespace Nemerle.Web.Macros
       jsApi.DefineNestedType(type).Compile();
     }
   
-    private static CreateTSGlobalConstruct(c : TSGlobal.Construct, jsApi : TypeBuilder) : void
+    private CreateTSGlobalConstruct(c : TSGlobal.Construct, jsApi : TypeBuilder) : void
     {
       
     }
     
-    enums : HashSet.[string] = HashSet();
-  
-    private static CreateTSGlobalEnum(tsEnum : TSGlobal.Enum, jsApi : TypeBuilder) : void
+    private CreateTSGlobalEnum(tsEnum : TSGlobal.Enum, jsApi : TypeBuilder) : void
     {
-      when (!enums.Contains(tsEnum.Name))
+      def type = <[ decl: public enum $(tsEnum.Name : usesite) { } ]>;
+      jsApi.DefineNestedType(type).Compile();
+    }
+  
+    private CreateTSGlobalImport(i : TSGlobal.Import, jsApi : TypeBuilder) : void
+    {
+      
+    }
+  
+    private CreateTSGlobalExport(e : TSGlobal.Export, jsApi : TypeBuilder) : void
+    {
+      
+    }
+    
+    private CreateModule(parts : list[string], outerModule : TypeBuilder) : TypeBuilder
+    {
+      match (parts)
       {
-        _ = enums.Add(tsEnum.Name);
-        def type = <[ decl: enum $(tsEnum.Name : usesite) { } ]>;
-        jsApi.DefineNestedType(type).Compile();
+      | [hd] =>
+        def t = outerModule.DefineNestedType(<[ decl: public partial module $(hd : usesite) {} ]>);
+        t.Compile();
+        t
+      | hd :: tl =>
+        def innerModule = outerModule.DefineNestedType(<[ decl: public partial module $(hd : usesite) {} ]>);
+        def t = CreateModule(tl, innerModule);
+        innerModule.Compile();
+        t
+      | _ => Message.Error("Must not get here"); null
       }
     }
   
-    private static CreateTSGlobalImport(i : TSGlobal.Import, jsApi : TypeBuilder) : void
+    private CreateTSGlobalModule(tsModule : TSGlobal.Module, jsApi : TypeBuilder) : void
     {
+      def moduleName = tsModule.Name.Replace('/', '.').Replace('\\', '.');
       
-    }
-  
-    private static CreateTSGlobalExport(e : TSGlobal.Export, jsApi : TypeBuilder) : void
-    {
-      
-    }
-  
-    private static CreateTSGlobalModule(tsModule : TSGlobal.Module, jsApi : TypeBuilder) : void
-    {
-      when (!tsModule.Name.Contains('.') && !tsModule.Name.Contains('/'))
-        jsApi.DefineNestedType(<[ decl: public partial module $(tsModule.Name : usesite) {} ]>).Compile();
+      // Create modules by splitting '.'
+      _ = CreateModule(moduleName.Split('.').NToList(), jsApi);
     }
   
     private GetParamsType(parms : list[TSParam], additional : option[TSType]) : list[PExpr]

@@ -1,6 +1,6 @@
 using System;
 
-namespace Nemerle.Web
+namespace NemerleWeb
 {
   public class ClientCodeCalledInServerException : Exception
   {
