@@ -141,6 +141,11 @@
       <Project>{b1635fea-c0cd-4c8e-a18e-d97d59f21b14}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\TSParser\TSParser.nproj">
+      <Name>TSParser</Name>
+      <Project>{abcbbbea-c0cd-4c8e-a18e-d97d59f21b14}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

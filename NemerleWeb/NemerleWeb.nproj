@@ -227,9 +227,6 @@
     <Compile Include="NWebData.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="TSDeclarationParser.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="UnitAttribute.n">
       <SubType>Code</SubType>
     </Compile>
@@ -293,8 +290,6 @@
     <EmbeddedResource Include="Scripts\jquery.signalR-1.0.0.min.js">
       <SubType>Content</SubType>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
