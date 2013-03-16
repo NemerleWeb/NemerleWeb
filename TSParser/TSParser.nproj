@@ -70,12 +70,6 @@
     <Compile Include="TSDeclarationParser_Ast.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="TSPreParser.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TSPreParser_Ast.n">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <!--

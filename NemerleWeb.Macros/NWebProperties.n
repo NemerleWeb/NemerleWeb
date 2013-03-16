@@ -59,6 +59,8 @@ namespace NemerleWeb.Macros
             //| Import    as i => CreateTSGlobalImport   (i, jsApiModule)
             //| Export    as e => CreateTSGlobalExport   (e, jsApiModule)
             //| Module    as m => CreateTSGlobalModule   (m, jsApiModule)
+            //| ReferencePath(path) => Message.Hint($"Reference $path");
+            //| ReferenceNoDefaultLib => Message.Hint("No default lib");
             | _ => ()
             }
             
