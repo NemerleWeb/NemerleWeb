@@ -118,5 +118,7 @@ namespace TSParser
     | Enum { Name : string; Elements : list[TSEnumElement]; }
     | Import { Name : string; ModuleReference : string; }
     | Export { Identifier : string; }
+    | ReferencePath { path : string; }
+    | ReferenceNoDefaultLib
   }
 }

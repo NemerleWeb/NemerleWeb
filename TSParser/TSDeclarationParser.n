@@ -22,6 +22,9 @@ namespace TSParser
         S : void = (Spacing / semicolon)*;
         scS : void = semicolon S;
         
+        GlobalSpacing : void = WhiteSpace / LineTerminatorSequence / GlobalComment;        
+        GS : void = (GlobalSpacing / semicolon)*;
+        
         import_s : void   = "import"s;
         export_s : void   = "export"s;
         module_s : void   = "module"s;
@@ -115,6 +118,10 @@ namespace TSParser
         Comment = MultiLineComment / SingleLineComment;
         MultiLineComment = "/*" (!"*/" [Any])* "*/";
         SingleLineComment = "//" (!LineTerminator [Any])*;
+        
+        // Support for /// <reference
+        GlobalComment = MultiLineComment / GlobalSingleLineComment;
+        GlobalSingleLineComment = "//" !('/'s ReferenceElement s) (!LineTerminator [Any])*;
 
         #endregion
         
@@ -698,13 +705,28 @@ namespace TSParser
               AmbientModuleDeclaration /
               AmbientEnumDeclaration
             );
-        AmbientElement : TSGlobal = AmbientElementNotImport / ImportDeclaration / ExportAssignment;
+        AmbientElement : TSGlobal =
+          Reference /
+          AmbientElementNotImport /
+          ImportDeclaration /
+          ExportAssignment;
         
         #endregion
                 
         #region Declaration Source Files (10.2)
         
-        DeclarationSourceFile : List[TSGlobal] = S AmbientElement*;
+        DeclarationSourceFile : List[TSGlobal] = GS AmbientElement*;
+        
+        #endregion
+        
+        #region Reference
+
+        /// <reference path="..." />
+        ReferencePath : TSGlobal = "path"s '='s StringLiteral;
+        ReferenceNoDefaultLib : TSGlobal = "no-default-lib"s '='s ("\"true\"" / "'true'");
+        ReferenceElement : TSGlobal = '<'s "reference"s (ReferencePath / ReferenceNoDefaultLib)s '/'s '>'s;
+        xmlComment : void = "///";
+        Reference : TSGlobal = xmlComment s ReferenceElement;
         
         #endregion
         
@@ -1001,6 +1023,21 @@ namespace TSParser
     ImportDeclaration(id : string, moduleRef : string) : TSGlobal
     {
       TSGlobal.Import(id, moduleRef)
+    }
+    
+    ReferencePath(_ : NToken, _ : NToken, path : string) : TSGlobal
+    {
+      TSGlobal.ReferencePath(path)
+    }
+    
+    ReferenceNoDefaultLib(_ : NToken, _ : NToken, _ : NToken) : TSGlobal
+    {
+      TSGlobal.ReferenceNoDefaultLib()
+    }
+    
+    ReferenceElement(_ : NToken, _ : NToken, reference : TSGlobal, _ : NToken, _ : NToken) : TSGlobal
+    {
+      reference
     }
   }  
 }
