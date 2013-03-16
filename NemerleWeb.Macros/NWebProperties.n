@@ -4,7 +4,7 @@ using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
 using Nemerle.Collections;
 using System.IO;
-using TypeScript;
+using TSParser;
 using NemerleWeb;
 
 namespace NemerleWeb.Macros
@@ -20,7 +20,7 @@ namespace NemerleWeb.Macros
   {
     public Impl(typer : Typer, options : list[PExpr]) : void
     {
-      def jsApi = typer.Env.Define(<[ decl: module JsApi {} ]>);
+      def jsApi = typer.Env.Define(<[ decl: public module JsApi {} ]>);
       
       foreach(opt in options)
       {

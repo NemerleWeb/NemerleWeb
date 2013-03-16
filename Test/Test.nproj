@@ -206,8 +206,10 @@
     <Folder Include="TS\teechart\" />
     <Folder Include="TS\threejs\" />
     <Folder Include="TS\toastr\" />
+    <Folder Include="TS\trunk8\" />
     <Folder Include="TS\tween.js\" />
     <Folder Include="TS\tweenjs\" />
+    <Folder Include="TS\underscore-ko\" />
     <Folder Include="TS\underscore\" />
     <Folder Include="TS\unity-webapi\" />
     <Folder Include="TS\urijs\" />

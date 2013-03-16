@@ -1,0 +1,122 @@
+using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Peg;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace TSParser
+{
+  type ClassHeritage = option[string] * list[string];
+  
+  public enum MemberAccess
+  {
+    | Public
+    | Private
+  }
+  
+  public variant TSClassMemberPart
+  {
+    | Variable { Name : string; Type : option[TSType]; }
+    | Method 
+      { 
+        Name : string;
+        Optional : bool;
+        Params : list[TSParam];
+        ReturnType : option[TSType];
+      }
+  }
+  
+  public variant TSClassMember
+  {
+    | Constructor { Params : list[TSParam]; }
+    | Member
+      {
+        Part : TSClassMemberPart;
+        Static : option[bool];
+        Access : option[MemberAccess];
+      }
+  }
+  
+  public variant TSParam
+  {
+    | Required
+      {
+        Name : string;
+        Type : option[TSType];
+        Access : option[MemberAccess];
+      }
+    | Option
+      { 
+        Name : string;
+        Optional : bool;
+        Type : option[TSType];
+        Access : option[MemberAccess];
+      }
+    | Rest { Name : string; Type : TSType.Array; }
+  }
+  
+  public variant TSObject
+  {
+    | Call { Params : list[TSParam]; ReturnType : option[TSType]; }
+    | Construct { Params : list[TSParam]; Type : option[TSType]; }
+    | Index { Parm : TSParam; Type : option[TSType]; }
+    | Property { Name : string; Optional : bool; Type : option[TSType]; }
+    | Function
+      {
+        Name : string;
+        Optional : bool;
+        Params : list[TSParam];
+        ReturnType : option[TSType];
+      }
+  }
+  
+  [Record]
+  public class TSEnumElement
+  {
+    Name : string;
+    Initialiser : option[string];
+  }
+  
+  public variant TSType
+  {
+    | Any
+    | Number
+    | Bool
+    | String
+    | Void
+    | Named { Name : string; }
+    | Array { Type : TSType; Arity : int; }
+    | Object { Members : list[TSObject]; }
+    | Lambda { Params : list[TSParam]; ReturnType : TSType; }
+    | New { Params : list[TSParam]; ReturnType : TSType; }
+  }
+
+  public variant TSGlobal
+  {
+    | Variable { Name : string; Type : option[TSType]; }
+    | Construct { Params : list[TSParam]; ReturnType : option[TSType]; }
+    | Function
+      { 
+        Name : option[string];
+        Optional : bool;
+        Params : list[TSParam];
+        ReturnType : option[TSType];
+      }
+    | Class 
+      { 
+        Name : string;
+        Extends : option[string]; 
+        Implements : list[string];
+        Members : list[TSClassMember];
+      }
+    | Interface { Name : string; Extends : list[string]; Type : TSType.Object; }
+    | Module { Name : string; Members : list[TSGlobal]; }
+    | Enum { Name : string; Elements : list[TSEnumElement]; }
+    | Import { Name : string; ModuleReference : string; }
+    | Export { Identifier : string; }
+  }
+}
