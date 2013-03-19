@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>
@@ -426,28 +427,28 @@
       <HintPath>$(Nemerle)\Nemerle.ComputationExpressions.Macros.dll</HintPath>
       <Private>False</Private>
     </MacroReference>
-    <MacroProjectReference Include="..\peg-parser\Nemerle.Peg.Macros\Nemerle.Peg.Macros-VS_2012.nproj">
-      <Name>Nemerle.Peg.Macros-VS_2012</Name>
+    <MacroProjectReference Include="..\peg-parser\Nemerle.Peg.Macros\Nemerle.Peg.Macros-VS_2010.nproj">
+      <Name>Nemerle.Peg.Macros-VS_2010</Name>
       <Project>{388424bd-c3a5-4c01-b84b-6c1bb9a9cc8e}</Project>
       <Private>False</Private>
     </MacroProjectReference>
-    <ProjectReference Include="..\peg-parser\Calculator\Calculator-VS_2012.nproj">
-      <Name>Calculator-VS_2012</Name>
+    <ProjectReference Include="..\peg-parser\Calculator\Calculator-VS_2010.nproj">
+      <Name>Calculator-VS_2010</Name>
       <Project>{dbabc305-af6e-40d6-8e79-1e3f36fbd879}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\peg-parser\Json\Nemerle.Json\Nemerle.Json-VS_2012.nproj">
-      <Name>Nemerle.Json-VS_2012</Name>
+    <ProjectReference Include="..\peg-parser\Json\Nemerle.Json\Nemerle.Json-VS_2010.nproj">
+      <Name>Nemerle.Json-VS_2010</Name>
       <Project>{5f0fee19-6857-47d6-b669-ee0a03e5d047}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\peg-parser\JSParser\JSParser-VS_2012.nproj">
-      <Name>JSParser-VS_2012</Name>
+    <ProjectReference Include="..\peg-parser\JSParser\JSParser-VS_2010.nproj">
+      <Name>JSParser-VS_2010</Name>
       <Project>{f440f161-d644-4004-b4f0-a9dfa001039e}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\peg-parser\Nemerle.Peg\Nemerle.Peg-VS_2012.nproj">
-      <Name>Nemerle.Peg-VS_2012</Name>
+    <ProjectReference Include="..\peg-parser\Nemerle.Peg\Nemerle.Peg-VS_2010.nproj">
+      <Name>Nemerle.Peg-VS_2010</Name>
       <Project>{76db8b13-a01a-47bd-98be-f2d3755770fe}</Project>
       <Private>True</Private>
     </ProjectReference>
@@ -493,8 +494,8 @@
     <CreateItem Include="$(YourSourceDirectory)\**\*.*">
       <Output TaskParameter="Include" ItemName="YourFilesToCopy" />
     </CreateItem>
-    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory2)\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy-&gt;'$(YourDestinationDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy-&gt;'$(YourDestinationDirectory2)\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />

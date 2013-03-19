@@ -40,16 +40,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
-    <Reference Include="Nemerle.Peg">
-      <Name>Nemerle.Peg</Name>
-      <AssemblyName>Nemerle.Peg.dll</AssemblyName>
-      <HintPath>$(Nemerle)\Nemerle.Peg.dll</HintPath>
-    </Reference>
-    <Reference Include="Nemerle.Peg.Macros">
-      <Name>Nemerle.Peg.Macros</Name>
-      <AssemblyName>Nemerle.Peg.Macros.dll</AssemblyName>
-      <HintPath>$(Nemerle)\Nemerle.Peg.Macros.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -73,6 +63,28 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <MacroProjectReference Include="..\..\Nemerle.Peg.Macros\Nemerle.Peg.Macros-VS_2010.nproj">
+      <Name>Nemerle.Peg.Macros</Name>
+      <Project>{388424bd-c3a5-4c01-b84b-6c1bb9a9cc8e}</Project>
+      <Private>False</Private>
+    </MacroProjectReference>
+    <MacroProjectReference Include="..\..\..\NemerleWeb.Macros\NemerleWeb.Macros.nproj">
+      <Name>NemerleWeb.Macros</Name>
+      <Project>{b1454534-cabd-4abe-cc8e-ddff34f51b14}</Project>
+      <Private>False</Private>
+    </MacroProjectReference>
+    <ProjectReference Include="..\..\..\NemerleWeb\NemerleWeb.nproj">
+      <Name>NemerleWeb</Name>
+      <Project>{b1635fea-c0cd-4c8e-a18e-d97d59f21b14}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Nemerle.Peg\Nemerle.Peg-VS_2010.nproj">
+      <Name>Nemerle.Peg</Name>
+      <Project>{76db8b13-a01a-47bd-98be-f2d3755770fe}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <!--

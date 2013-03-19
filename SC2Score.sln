@@ -14,6 +14,8 @@ Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Macros", "Nemerl
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.SC2Score", "NemerleWeb.SC2Score\NemerleWeb.SC2Score.nproj", "{528E84E5-86EE-4771-B8F9-EE3373629D93}"
 EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "TSParser", "TSParser\TSParser.nproj", "{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +48,14 @@ Global
 		{528E84E5-86EE-4771-B8F9-EE3373629D93}.Release|Any CPU.Build.0 = Release|Any CPU
 		{528E84E5-86EE-4771-B8F9-EE3373629D93}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{528E84E5-86EE-4771-B8F9-EE3373629D93}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
