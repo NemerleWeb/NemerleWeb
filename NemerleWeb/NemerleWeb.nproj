@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <NemerleVersion>Net-4.0</NemerleVersion>
     <NemerleBinPathRoot Condition=" '$(Configuration)' == 'Release' ">$(SolutionDir)\Nemerle</NemerleBinPathRoot>
     <NemerleBinPathRoot Condition=" '$(NemerleBinPathRoot)' == '' ">$(ProgramFiles)\Nemerle</NemerleBinPathRoot>
@@ -44,12 +44,12 @@
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>Microsoft.AspNet.SignalR.Core</Name>
       <AssemblyName>Microsoft.AspNet.SignalR.Core.dll</AssemblyName>
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.1.0.0\lib\net40\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.1.0.1\lib\net40\Microsoft.AspNet.SignalR.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>Microsoft.AspNet.SignalR.SystemWeb</Name>
       <AssemblyName>Microsoft.AspNet.SignalR.SystemWeb.dll</AssemblyName>
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.1.0.0\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.1.0.1\lib\net40\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>Microsoft.Web.Infrastructure</Name>
@@ -266,10 +266,10 @@
     <Content Include="Scripts\jquery-1.8.2-vsdoc.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery.signalR-1.0.0.js">
+    <Content Include="Scripts\jquery.signalR-1.0.1.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery.signalR-1.0.0.min.js">
+    <Content Include="Scripts\jquery.signalR-1.0.1.min.js">
       <SubType>Content</SubType>
     </Content>
     <EmbeddedResource Include="Scripts\linq.js">
@@ -284,10 +284,10 @@
     <EmbeddedResource Include="Scripts\jquery-1.8.2.min.js">
       <SubType>Content</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\jquery.signalR-1.0.0.js">
+    <EmbeddedResource Include="Scripts\jquery.signalR-1.0.1.js">
       <SubType>Content</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\jquery.signalR-1.0.0.min.js">
+    <EmbeddedResource Include="Scripts\jquery.signalR-1.0.1.min.js">
       <SubType>Content</SubType>
     </EmbeddedResource>
   </ItemGroup>
