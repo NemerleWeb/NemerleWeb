@@ -48,7 +48,7 @@
  </para></summary>
 
 </member>
-    <member name="M:Nemerle.Peg.AstUtils.TypeWalker._N_walkMembers_11523(Nemerle.Peg.AstUtils.TypeWalker._N_closureOf_BuildWalkHandler_11505,Nemerle.Compiler.TypeInfo,Nemerle.Compiler.FixedType)" />
+    <member name="M:Nemerle.Peg.AstUtils.TypeWalker._N_walkMembers_11484(Nemerle.Peg.AstUtils.TypeWalker._N_closureOf_BuildWalkHandler_11466,Nemerle.Compiler.TypeInfo,Nemerle.Compiler.FixedType)" />
     <member name="F:Nemerle.Peg.AstUtils.TypeWalker.defaultMemberSelector" />
     <member name="F:Nemerle.Peg.AstUtils.TypeWalker.defaultUserHandler" />
     <member name="F:Nemerle.Peg.AstUtils.TypeWalker.visitedTypes" />
@@ -73,13 +73,13 @@
       </summary>
 
 </member>
-    <member name="M:Nemerle.Peg.DFSMTransform._N_initalSplit_12615(Nemerle.Peg.DFSMTransform._N_closureOf_Minimize_12556,Nemerle.Collections.Set{System.Int32})" />
-    <member name="M:Nemerle.Peg.DFSMTransform._N_addStateSet_12572(Nemerle.Peg.DFSMTransform._N_closureOf_Minimize_12556,Nemerle.Core.list{System.Int32})" />
-    <member name="M:Nemerle.Peg.DFSMTransform._N_addSymbolTransition_12270(Nemerle.Peg.DFSMTransform._N_closureOf_loop_12254,Nemerle.Peg.DFSMTransform._N_closureOf_Do_12099,System.Int32,System.Int32,System.Int32)" />
-    <member name="M:Nemerle.Peg.DFSMTransform._N_addStateSet_12242(Nemerle.Peg.DFSMTransform._N_closureOf_Do_12099,Nemerle.Collections.Set{System.Int32})" />
-    <member name="M:Nemerle.Peg.DFSMTransform._N_epsilonMove_12191(Nemerle.Peg.DFSMTransform._N_closureOf_Do_12099,Nemerle.Collections.Set{System.Int32})" />
-    <member name="M:Nemerle.Peg.DFSMTransform._N_epsilonTransitions_12152(Nemerle.Peg.DFSMTransform._N_closureOf_Do_12099,System.Int32)" />
-    <member name="M:Nemerle.Peg.DFSMTransform._N_symbolTransitions_12113(Nemerle.Peg.DFSMTransform._N_closureOf_Do_12099,System.Int32)" />
+    <member name="M:Nemerle.Peg.DFSMTransform._N_initalSplit_12576(Nemerle.Peg.DFSMTransform._N_closureOf_Minimize_12517,Nemerle.Collections.Set{System.Int32})" />
+    <member name="M:Nemerle.Peg.DFSMTransform._N_addStateSet_12533(Nemerle.Peg.DFSMTransform._N_closureOf_Minimize_12517,Nemerle.Core.list{System.Int32})" />
+    <member name="M:Nemerle.Peg.DFSMTransform._N_addSymbolTransition_12231(Nemerle.Peg.DFSMTransform._N_closureOf_loop_12215,Nemerle.Peg.DFSMTransform._N_closureOf_Do_12060,System.Int32,System.Int32,System.Int32)" />
+    <member name="M:Nemerle.Peg.DFSMTransform._N_addStateSet_12203(Nemerle.Peg.DFSMTransform._N_closureOf_Do_12060,Nemerle.Collections.Set{System.Int32})" />
+    <member name="M:Nemerle.Peg.DFSMTransform._N_epsilonMove_12152(Nemerle.Peg.DFSMTransform._N_closureOf_Do_12060,Nemerle.Collections.Set{System.Int32})" />
+    <member name="M:Nemerle.Peg.DFSMTransform._N_epsilonTransitions_12113(Nemerle.Peg.DFSMTransform._N_closureOf_Do_12060,System.Int32)" />
+    <member name="M:Nemerle.Peg.DFSMTransform._N_symbolTransitions_12074(Nemerle.Peg.DFSMTransform._N_closureOf_Do_12060,System.Int32)" />
     <member name="M:Nemerle.Peg.DFSMTransform.Normalize(Nemerle.Peg.FSM)" />
     <member name="M:Nemerle.Peg.DFSMTransform.Do(Nemerle.Peg.FSM)" />
     <member name="M:Nemerle.Peg.DFSMTransform.Minimize(Nemerle.Peg.FSM)" />
@@ -137,7 +137,7 @@
     <member name="M:Nemerle.Peg.FSMBuilder.RepeatMinMax(System.Int32,System.Int32,Nemerle.Peg.FSM)" />
     <member name="M:Nemerle.Peg.FSMBuilder.Choice(Nemerle.Core.list{Nemerle.Peg.FSM})" />
     <member name="T:Nemerle.Peg.Grammar" />
-    <member name="M:Nemerle.Peg.Grammar._N_isOptionalImpl_14999(Nemerle.Peg.Grammar._N_closureOf_IsOptional_14991,Nemerle.Peg.Rule,System.Collections.Generic.HashSet{Nemerle.Peg.Rule})" />
+    <member name="M:Nemerle.Peg.Grammar._N_isOptionalImpl_14960(Nemerle.Peg.Grammar._N_closureOf_IsOptional_14952,Nemerle.Peg.Rule,System.Collections.Generic.HashSet{Nemerle.Peg.Rule})" />
     <member name="F:Nemerle.Peg.Grammar._grammar" />
     <member name="F:Nemerle.Peg.Grammar._grammarRefs" />
     <member name="F:Nemerle.Peg.Grammar._startRuleName" />
@@ -175,11 +175,11 @@
     <member name="T:Nemerle.Peg.GrammarRef.Alias" />
     <member name="T:Nemerle.Peg.GrammarRef.Ref" />
     <member name="T:Nemerle.Peg.GrammarTyper" />
-    <member name="M:Nemerle.Peg.GrammarTyper._N_hasLeftRecImpl_16439(Nemerle.Peg.GrammarTyper._N_closureOf_CheckLeftRec_16427,Nemerle.Peg.Rule,Nemerle.Collections.Set{Nemerle.Peg.NameRef},Nemerle.Core.list{Nemerle.Peg.NameRef})" />
-    <member name="M:Nemerle.Peg.GrammarTyper._N_addCaptures_15622(Nemerle.Peg.GrammarTyper._N_closureOf_AddArgumentCaptures_15561,Nemerle.Peg.Rule)" />
-    <member name="M:Nemerle.Peg.GrammarTyper._N_makeRes_15615(Nemerle.Peg.GrammarTyper._N_closureOf_AddArgumentCaptures_15561,Nemerle.Peg.Rule,Nemerle.Peg.RuleType)" />
-    <member name="M:Nemerle.Peg.GrammarTyper._N_getType_15603(Nemerle.Peg.GrammarTyper._N_closureOf_AddArgumentCaptures_15561,Nemerle.Peg.NameRef)" />
-    <member name="M:Nemerle.Peg.GrammarTyper._N_optimizeType_15572(Nemerle.Peg.RuleType)" />
+    <member name="M:Nemerle.Peg.GrammarTyper._N_hasLeftRecImpl_16400(Nemerle.Peg.GrammarTyper._N_closureOf_CheckLeftRec_16388,Nemerle.Peg.Rule,Nemerle.Collections.Set{Nemerle.Peg.NameRef},Nemerle.Core.list{Nemerle.Peg.NameRef})" />
+    <member name="M:Nemerle.Peg.GrammarTyper._N_addCaptures_15583(Nemerle.Peg.GrammarTyper._N_closureOf_AddArgumentCaptures_15522,Nemerle.Peg.Rule)" />
+    <member name="M:Nemerle.Peg.GrammarTyper._N_makeRes_15576(Nemerle.Peg.GrammarTyper._N_closureOf_AddArgumentCaptures_15522,Nemerle.Peg.Rule,Nemerle.Peg.RuleType)" />
+    <member name="M:Nemerle.Peg.GrammarTyper._N_getType_15564(Nemerle.Peg.GrammarTyper._N_closureOf_AddArgumentCaptures_15522,Nemerle.Peg.NameRef)" />
+    <member name="M:Nemerle.Peg.GrammarTyper._N_optimizeType_15533(Nemerle.Peg.RuleType)" />
     <member name="M:Nemerle.Peg.GrammarTyper.#cctor" />
     <member name="M:Nemerle.Peg.GrammarTyper.AddArgumentCaptures(Nemerle.Peg.Grammar,Nemerle.Compiler.Typer)" />
     <member name="M:Nemerle.Peg.GrammarTyper.IsOptimizableOptionType(Nemerle.Peg.RuleType)" />
@@ -191,7 +191,7 @@
     <member name="M:Nemerle.Peg.GrammarTyper.CheckLeftRec(Nemerle.Peg.Grammar)" />
     <member name="M:Nemerle.Peg.GrammarTyper.CheckLeftRecLiteralOrder(Nemerle.Peg.Grammar)" />
     <member name="T:Nemerle.Peg.IntelliSenseSupport" />
-    <member name="M:Nemerle.Peg.IntelliSenseSupport._N_makeGotoRuleDef_17089(Nemerle.Peg.IntelliSenseSupport._N_closureOf_MakeGotoInfos_17077,Nemerle.Peg.Rule)" />
+    <member name="M:Nemerle.Peg.IntelliSenseSupport._N_makeGotoRuleDef_17050(Nemerle.Peg.IntelliSenseSupport._N_closureOf_MakeGotoInfos_17038,Nemerle.Peg.Rule)" />
     <member name="M:Nemerle.Peg.IntelliSenseSupport.AddIntelliSenseSupport(Nemerle.Peg.GrammarCompiler,Nemerle.Peg.Grammar,Nemerle.Compiler.Typer,Nemerle.Compiler.TypeBuilder)" />
     <member name="M:Nemerle.Peg.IntelliSenseSupport.GetGotoMap(Nemerle.Compiler.TypeBuilder)" />
     <member name="M:Nemerle.Peg.IntelliSenseSupport.MakeGotoInfos(Nemerle.Peg.NameRef,Nemerle.Peg.Grammar,Nemerle.Compiler.TypeBuilder,Nemerle.Compiler.Typer)" />
@@ -207,10 +207,11 @@
     <member name="M:Nemerle.Peg.NameRef.#ctor(System.String)" />
     <member name="M:Nemerle.Peg.NameRef.#ctor(Nemerle.Compiler.Location,System.String)" />
     <member name="T:Nemerle.Peg.Optimizer" />
-    <member name="M:Nemerle.Peg.Optimizer._N_catFSM_17616(Nemerle.Peg.Optimizer._N_closureOf_optimize_17550,Nemerle.Core.list{Nemerle.Peg.Rule})" />
-    <member name="M:Nemerle.Peg.Optimizer._N_catFSM_17588(Nemerle.Peg.Optimizer._N_closureOf_optimize_17550,Nemerle.Core.list{Nemerle.Peg.Rule})" />
-    <member name="M:Nemerle.Peg.Optimizer._N_add_17333(Nemerle.Core.option{System.Int32},Nemerle.Core.option{System.Int32})" />
-    <member name="M:Nemerle.Peg.Optimizer._N_calc_17322(Nemerle.Peg.Optimizer._N_closureOf_calcRuleWeight_17314,Nemerle.Peg.Rule)" />
+    <member name="M:Nemerle.Peg.Optimizer._N_catFSM_17603(Nemerle.Peg.Optimizer._N_closureOf_optimize_17524,Nemerle.Core.list{Nemerle.Peg.Rule})" />
+    <member name="M:Nemerle.Peg.Optimizer._N_optimizeNot_17577(Nemerle.Peg.Optimizer._N_closureOf_optimize_17524,Nemerle.Core.list{Nemerle.Peg.Rule})" />
+    <member name="M:Nemerle.Peg.Optimizer._N_catFSM_17562(Nemerle.Peg.Optimizer._N_closureOf_optimize_17524,Nemerle.Core.list{Nemerle.Peg.Rule})" />
+    <member name="M:Nemerle.Peg.Optimizer._N_add_17294(Nemerle.Core.option{System.Int32},Nemerle.Core.option{System.Int32})" />
+    <member name="M:Nemerle.Peg.Optimizer._N_calc_17283(Nemerle.Peg.Optimizer._N_closureOf_calcRuleWeight_17275,Nemerle.Peg.Rule)" />
     <member name="M:Nemerle.Peg.Optimizer.#ctor" />
     <member name="M:Nemerle.Peg.Optimizer.CalcRulesWeights(Nemerle.Peg.Grammar)" />
     <member name="M:Nemerle.Peg.Optimizer.OptimizeGrammar(Nemerle.Peg.Grammar)" />
@@ -224,18 +225,18 @@
       </summary>
 
 </member>
-    <member name="M:Nemerle.Peg.Parsing._N_parseAttr_18621(Nemerle.Peg.Parsing._N_closureOf_parseAttrs_18608,Nemerle.Peg.Parsing._N_closureOf_parseRule_18545,Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18193,Nemerle.Compiler.Token)" />
-    <member name="M:Nemerle.Peg.Parsing._N_parseExtensible_18566(Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18193,Nemerle.Compiler.Token,System.String)" />
-    <member name="M:Nemerle.Peg.Parsing._N_getName_18550(Nemerle.Compiler.Token)" />
-    <member name="M:Nemerle.Peg.Parsing._N_parseRule_18539(Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18193,Nemerle.Compiler.Token,System.Int32)" />
-    <member name="M:Nemerle.Peg.Parsing._N_getIntValue_18407(Nemerle.Compiler.Token)" />
-    <member name="M:Nemerle.Peg.Parsing._N_parceRecoveryAttribute_18296(Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18193,Nemerle.Compiler.Token,Nemerle.Builtins.Function{Nemerle.Compiler.Location,Nemerle.Peg.NameRef,Nemerle.Peg.Rule,Nemerle.Peg.Rule,Nemerle.Peg.RuleAttribute})" />
-    <member name="M:Nemerle.Peg.Parsing._N_parseOrderedChoice_18290(Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18193,Nemerle.Compiler.Token)" />
-    <member name="M:Nemerle.Peg.Parsing._N_parseCardinalityRule_18268(Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18193,Nemerle.Compiler.Token)" />
-    <member name="M:Nemerle.Peg.Parsing._N_parseSimpleRule_18262(Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18193,Nemerle.Compiler.Token)" />
-    <member name="M:Nemerle.Peg.Parsing._N_parseRange_18257(Nemerle.Compiler.Token)" />
-    <member name="M:Nemerle.Peg.Parsing._N_parseOneOrMany_18248(Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18193,Nemerle.Compiler.Token,Nemerle.Builtins.Function{Nemerle.Compiler.Token,Nemerle.Compiler.Token},Nemerle.Builtins.Function{Nemerle.Compiler.Token,Nemerle.Builtins.Tuple{Nemerle.Peg.Rule,Nemerle.Compiler.Token}},System.String)" />
-    <member name="M:Nemerle.Peg.Parsing._N_parseZeroOrMany_18208(Nemerle.Compiler.Token,Nemerle.Builtins.Function{Nemerle.Compiler.Token,Nemerle.Compiler.Token},Nemerle.Builtins.Function{Nemerle.Compiler.Token,Nemerle.Builtins.Tuple{Nemerle.Peg.Rule,Nemerle.Compiler.Token}})" />
+    <member name="M:Nemerle.Peg.Parsing._N_parseAttr_18608(Nemerle.Peg.Parsing._N_closureOf_parseAttrs_18595,Nemerle.Peg.Parsing._N_closureOf_parseRule_18532,Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18180,Nemerle.Compiler.Token)" />
+    <member name="M:Nemerle.Peg.Parsing._N_parseExtensible_18553(Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18180,Nemerle.Compiler.Token,System.String)" />
+    <member name="M:Nemerle.Peg.Parsing._N_getName_18537(Nemerle.Compiler.Token)" />
+    <member name="M:Nemerle.Peg.Parsing._N_parseRule_18526(Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18180,Nemerle.Compiler.Token,System.Int32)" />
+    <member name="M:Nemerle.Peg.Parsing._N_getIntValue_18394(Nemerle.Compiler.Token)" />
+    <member name="M:Nemerle.Peg.Parsing._N_parceRecoveryAttribute_18283(Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18180,Nemerle.Compiler.Token,Nemerle.Builtins.Function{Nemerle.Compiler.Location,Nemerle.Peg.NameRef,Nemerle.Peg.Rule,Nemerle.Peg.Rule,Nemerle.Peg.RuleAttribute})" />
+    <member name="M:Nemerle.Peg.Parsing._N_parseOrderedChoice_18277(Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18180,Nemerle.Compiler.Token)" />
+    <member name="M:Nemerle.Peg.Parsing._N_parseCardinalityRule_18255(Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18180,Nemerle.Compiler.Token)" />
+    <member name="M:Nemerle.Peg.Parsing._N_parseSimpleRule_18249(Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18180,Nemerle.Compiler.Token)" />
+    <member name="M:Nemerle.Peg.Parsing._N_parseRange_18244(Nemerle.Compiler.Token)" />
+    <member name="M:Nemerle.Peg.Parsing._N_parseOneOrMany_18235(Nemerle.Peg.Parsing._N_closureOf_ParseEbnf_18180,Nemerle.Compiler.Token,Nemerle.Builtins.Function{Nemerle.Compiler.Token,Nemerle.Compiler.Token},Nemerle.Builtins.Function{Nemerle.Compiler.Token,Nemerle.Builtins.Tuple{Nemerle.Peg.Rule,Nemerle.Compiler.Token}},System.String)" />
+    <member name="M:Nemerle.Peg.Parsing._N_parseZeroOrMany_18195(Nemerle.Compiler.Token,Nemerle.Builtins.Function{Nemerle.Compiler.Token,Nemerle.Compiler.Token},Nemerle.Builtins.Function{Nemerle.Compiler.Token,Nemerle.Builtins.Tuple{Nemerle.Peg.Rule,Nemerle.Compiler.Token}})" />
     <member name="M:Nemerle.Peg.Parsing.#cctor">
       <summary>
         <para>Description of Parsing.
@@ -276,7 +277,7 @@
     <member name="M:Nemerle.Peg.GrammarScopeMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Peg.GrammarScopeMacro.SyntaxExtension" />
     <member name="T:Nemerle.Peg.PegGrammarOptions" />
-    <member name="F:Nemerle.Peg.PegGrammarOptions._N_EmitDebugSources_5522" />
+    <member name="F:Nemerle.Peg.PegGrammarOptions._N_EmitDebugSources_5520" />
     <member name="M:Nemerle.Peg.PegGrammarOptions.get_EmitDebugSources" />
     <member name="M:Nemerle.Peg.PegGrammarOptions.set_EmitDebugSources(System.Boolean)" />
     <member name="P:Nemerle.Peg.PegGrammarOptions.EmitDebugSources" />
@@ -306,38 +307,14 @@
     <member name="M:Nemerle.Peg.PegGrammar_type_preaddMacro.CallTransform(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
     <member name="M:Nemerle.Peg.PegGrammar_type_preaddMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Peg.PegGrammar_type_preaddMacro.SyntaxExtension" />
-    <member name="T:Nemerle.Peg.PegGrammar_type_postaddMacro" />
-    <member name="M:Nemerle.Peg.PegGrammar_type_postaddMacro.#ctor" />
-    <member name="F:Nemerle.Peg.PegGrammar_type_postaddMacro.my_usage" />
-    <member name="F:Nemerle.Peg.PegGrammar_type_postaddMacro.keywords" />
-    <member name="M:Nemerle.Peg.PegGrammar_type_postaddMacro.#cctor" />
-    <member name="M:Nemerle.Peg.PegGrammar_type_postaddMacro.get_Location" />
-    <member name="P:Nemerle.Peg.PegGrammar_type_postaddMacro.Location" />
-    <member name="M:Nemerle.Peg.PegGrammar_type_postaddMacro.get_IsInherited" />
-    <member name="P:Nemerle.Peg.PegGrammar_type_postaddMacro.IsInherited" />
-    <member name="M:Nemerle.Peg.PegGrammar_type_postaddMacro.get_Keywords" />
-    <member name="P:Nemerle.Peg.PegGrammar_type_postaddMacro.Keywords" />
-    <member name="M:Nemerle.Peg.PegGrammar_type_postaddMacro.GetName" />
-    <member name="M:Nemerle.Peg.PegGrammar_type_postaddMacro.get_Name" />
-    <member name="P:Nemerle.Peg.PegGrammar_type_postaddMacro.Name" />
-    <member name="M:Nemerle.Peg.PegGrammar_type_postaddMacro.get_Namespace" />
-    <member name="P:Nemerle.Peg.PegGrammar_type_postaddMacro.Namespace" />
-    <member name="M:Nemerle.Peg.PegGrammar_type_postaddMacro.GetNamespace" />
-    <member name="M:Nemerle.Peg.PegGrammar_type_postaddMacro.get_Usage" />
-    <member name="P:Nemerle.Peg.PegGrammar_type_postaddMacro.Usage" />
-    <member name="M:Nemerle.Peg.PegGrammar_type_postaddMacro.get_IsTailRecursionTransparent" />
-    <member name="P:Nemerle.Peg.PegGrammar_type_postaddMacro.IsTailRecursionTransparent" />
-    <member name="M:Nemerle.Peg.PegGrammar_type_postaddMacro.CallTransform(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Peg.PegGrammar_type_postaddMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
-    <member name="M:Nemerle.Peg.PegGrammar_type_postaddMacro.SyntaxExtension" />
     <member name="T:Nemerle.Peg.GrammarImpl" />
-    <member name="M:Nemerle.Peg.GrammarImpl._N_check_19209(Nemerle.Peg.GrammarImpl._N_closureOf_CheckRules_19201,Nemerle.Peg.Rule)" />
+    <member name="M:Nemerle.Peg.GrammarImpl._N_check_19103(Nemerle.Peg.GrammarImpl._N_closureOf_CheckRules_19095,Nemerle.Peg.Rule)" />
     <member name="M:Nemerle.Peg.GrammarImpl.CheckRules(Nemerle.Peg.Grammar)" />
     <member name="M:Nemerle.Peg.GrammarImpl.MakeParser(Nemerle.Compiler.Typer,Nemerle.Compiler.TypeBuilder,Nemerle.Peg.Grammar)" />
     <member name="T:Nemerle.Peg.RangeSet" />
-    <member name="M:Nemerle.Peg.RangeSet._N_cat_19568(System.Int32,System.Int32,Nemerle.Core.list{Nemerle.Peg.RangeSet.Range})" />
-    <member name="M:Nemerle.Peg.RangeSet._N_remove_19553(Nemerle.Peg.RangeSet._N_closureOf_RemoveRange_19542,Nemerle.Core.list{Nemerle.Peg.RangeSet.Range})" />
-    <member name="M:Nemerle.Peg.RangeSet._N_add_19504(Nemerle.Peg.RangeSet._N_closureOf_AddRange_19495,Nemerle.Core.list{Nemerle.Peg.RangeSet.Range},Nemerle.Peg.RangeSet.Range)" />
+    <member name="M:Nemerle.Peg.RangeSet._N_cat_19462(System.Int32,System.Int32,Nemerle.Core.list{Nemerle.Peg.RangeSet.Range})" />
+    <member name="M:Nemerle.Peg.RangeSet._N_remove_19447(Nemerle.Peg.RangeSet._N_closureOf_RemoveRange_19436,Nemerle.Core.list{Nemerle.Peg.RangeSet.Range})" />
+    <member name="M:Nemerle.Peg.RangeSet._N_add_19398(Nemerle.Peg.RangeSet._N_closureOf_AddRange_19389,Nemerle.Core.list{Nemerle.Peg.RangeSet.Range},Nemerle.Peg.RangeSet.Range)" />
     <member name="M:Nemerle.Peg.RangeSet.GetHashCode(System.Collections.IEqualityComparer)" />
     <member name="M:Nemerle.Peg.RangeSet.Equals(System.Object,System.Collections.IEqualityComparer)" />
     <member name="M:Nemerle.Peg.RangeSet.op_Inequality(Nemerle.Peg.RangeSet,Nemerle.Peg.RangeSet)" />
@@ -393,7 +370,7 @@
     <member name="T:Nemerle.Peg.Rule.Scope" />
     <member name="T:Nemerle.Peg.Rule.Cut" />
     <member name="T:Nemerle.Peg.Usage" />
-    <member name="F:Nemerle.Peg.Usage._N_Text_5789" />
+    <member name="F:Nemerle.Peg.Usage._N_Text_5750" />
     <member name="M:Nemerle.Peg.Usage.get_Text" />
     <member name="M:Nemerle.Peg.Usage.set_Text(System.String)" />
     <member name="P:Nemerle.Peg.Usage.Text" />
@@ -462,7 +439,7 @@
     <member name="T:Nemerle.Peg.RuleType.None" />
     <member name="T:Nemerle.Peg.RuleType.Void" />
     <member name="T:Nemerle.Peg.AstUtils.ValidateAstMacro" />
-    <member name="M:Nemerle.Peg.AstUtils.ValidateAstMacro._N_getFirstTypeFromPattern_20717(Nemerle.Peg.AstUtils.ValidateAstMacro._N_closureOf_Run_20704,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Peg.AstUtils.ValidateAstMacro._N_getFirstTypeFromPattern_20611(Nemerle.Peg.AstUtils.ValidateAstMacro._N_closureOf_Run_20598,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Peg.AstUtils.ValidateAstMacro.#ctor" />
     <member name="F:Nemerle.Peg.AstUtils.ValidateAstMacro.my_usage" />
     <member name="F:Nemerle.Peg.AstUtils.ValidateAstMacro.keywords" />
@@ -547,18 +524,18 @@
     <member name="M:Nemerle.Peg.Internal.EvalLocationEndMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Peg.Internal.EvalLocationEndMacro.SyntaxExtension" />
     <member name="T:Nemerle.Peg.Internal.EvalLocationXImpl" />
-    <member name="M:Nemerle.Peg.Internal.EvalLocationXImpl._N_makeResult_21117(Nemerle.Peg.Internal.EvalLocationXImpl._N_closureOf_EvalLocation_21101,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Peg.Internal.EvalLocationXImpl._N_makeResult_21011(Nemerle.Peg.Internal.EvalLocationXImpl._N_closureOf_EvalLocation_20995,Nemerle.Compiler.Typedtree.TExpr)" />
     <member name="M:Nemerle.Peg.Internal.EvalLocationXImpl.EvalLocation(Nemerle.Compiler.Typer,Nemerle.Compiler.Parsetree.Splicable,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="T:Nemerle.Peg.GrammarCompiler" />
-    <member name="M:Nemerle.Peg.GrammarCompiler._N_isPublicRule_22020(Nemerle.Peg.RuleDefinition)" />
-    <member name="M:Nemerle.Peg.GrammarCompiler._N_error_21696(Nemerle.Peg.GrammarCompiler._N_closureOf_foreach_loop_21651,Nemerle.Compiler.Location,System.String)" />
-    <member name="M:Nemerle.Peg.GrammarCompiler._N_foreach_loop_21645(Nemerle.Peg.GrammarCompiler._N_closureOf_GetHandlerMethods_21607,Nemerle.Core.list{Nemerle.Peg.RuleDefinition})" />
-    <member name="M:Nemerle.Peg.GrammarCompiler._N_getMethod_21435(Nemerle.Peg.GrammarCompiler._N_closureOf_GetScopeMethods_21415,System.String,Nemerle.Builtins.Function{Nemerle.Compiler.Parsetree.ClassMember.Function,System.Boolean})" />
-    <member name="F:Nemerle.Peg.GrammarCompiler._N_is_cached_6560" />
-    <member name="F:Nemerle.Peg.GrammarCompiler._N_cached_value_6559" />
-    <member name="F:Nemerle.Peg.GrammarCompiler._N_cache_6556" />
-    <member name="F:Nemerle.Peg.GrammarCompiler._N_is_cached_6529" />
-    <member name="F:Nemerle.Peg.GrammarCompiler._N_cached_value_6528" />
+    <member name="M:Nemerle.Peg.GrammarCompiler._N_isPublicRule_21914(Nemerle.Peg.RuleDefinition)" />
+    <member name="M:Nemerle.Peg.GrammarCompiler._N_error_21590(Nemerle.Peg.GrammarCompiler._N_closureOf_foreach_loop_21545,Nemerle.Compiler.Location,System.String)" />
+    <member name="M:Nemerle.Peg.GrammarCompiler._N_foreach_loop_21539(Nemerle.Peg.GrammarCompiler._N_closureOf_GetHandlerMethods_21501,Nemerle.Core.list{Nemerle.Peg.RuleDefinition})" />
+    <member name="M:Nemerle.Peg.GrammarCompiler._N_getMethod_21329(Nemerle.Peg.GrammarCompiler._N_closureOf_GetScopeMethods_21309,System.String,Nemerle.Builtins.Function{Nemerle.Compiler.Parsetree.ClassMember.Function,System.Boolean})" />
+    <member name="F:Nemerle.Peg.GrammarCompiler._N_is_cached_6521" />
+    <member name="F:Nemerle.Peg.GrammarCompiler._N_cached_value_6520" />
+    <member name="F:Nemerle.Peg.GrammarCompiler._N_cache_6517" />
+    <member name="F:Nemerle.Peg.GrammarCompiler._N_is_cached_6490" />
+    <member name="F:Nemerle.Peg.GrammarCompiler._N_cached_value_6489" />
     <member name="F:Nemerle.Peg.GrammarCompiler._calledRules" />
     <member name="F:Nemerle.Peg.GrammarCompiler._rulesToCall" />
     <member name="M:Nemerle.Peg.GrammarCompiler.CallRule(Nemerle.Peg.NameRef,System.Boolean)" />
@@ -597,19 +574,19 @@
     <member name="P:Nemerle.Peg.GrammarCompiler.UntypedGrammar" />
     <member name="T:Nemerle.Peg.GrammarCompiler.MemoizeNames" />
     <member name="T:Nemerle.Peg.RuleCompiler" />
-    <member name="M:Nemerle.Peg.RuleCompiler._N_generate_23465(Nemerle.Peg.RuleCompiler._N_closureOf_CompileRuleChars_23457,Nemerle.Core.list{Nemerle.Peg.RangeSet})" />
-    <member name="M:Nemerle.Peg.RuleCompiler._N_generate_23380(Nemerle.Peg.RuleCompiler._N_closureOf_CompileRuleChoice_23370,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Peg.RuleCompiler._N_label_23229(Nemerle.Peg.RuleCompiler._N_closureOf_CompileRuleFsm_23206,System.Int32)" />
-    <member name="M:Nemerle.Peg.RuleCompiler._N_goto_23222(Nemerle.Peg.RuleCompiler._N_closureOf_CompileRuleFsm_23206,System.Int32)" />
-    <member name="M:Nemerle.Peg.RuleCompiler._N_generateNoResult_22894(Nemerle.Peg.RuleCompiler._N_closureOf_CompileRuleSequence_22847,Nemerle.Core.list{Nemerle.Peg.Rule})" />
-    <member name="M:Nemerle.Peg.RuleCompiler._N_generate_22855(Nemerle.Peg.RuleCompiler._N_closureOf_CompileRuleSequence_22847,Nemerle.Core.list{Nemerle.Peg.Rule},Nemerle.Core.list{System.String})" />
-    <member name="M:Nemerle.Peg.RuleCompiler._N_updateFollow_22737(Nemerle.Peg.RuleCompiler._N_closureOf__FirstAndFollow_22670,Nemerle.Peg.Rule,Nemerle.Collections.Set{Nemerle.Peg.NameRef})" />
-    <member name="M:Nemerle.Peg.RuleCompiler._N_loop_22711(Nemerle.Peg.RuleCompiler._N_closureOf_getFirst_22686,Nemerle.Peg.RuleCompiler._N_closureOf__FirstAndFollow_22670,Nemerle.Core.list{Nemerle.Peg.Rule})" />
-    <member name="M:Nemerle.Peg.RuleCompiler._N_getFirst_22680(Nemerle.Peg.RuleCompiler._N_closureOf__FirstAndFollow_22670,Nemerle.Peg.Rule)" />
-    <member name="M:Nemerle.Peg.RuleCompiler._N_gen_22553(Nemerle.Peg.RuleCompiler._N_closureOf_makeCond_22505,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr.Call})" />
-    <member name="M:Nemerle.Peg.RuleCompiler._N_makeCond_22500(Nemerle.Peg.RangeSet)" />
-    <member name="M:Nemerle.Peg.RuleCompiler._N_rec_22488(Nemerle.Peg.RuleCompiler._N_closureOf_TestCharConditionCode_22473,System.Int32,System.Int32)" />
-    <member name="M:Nemerle.Peg.RuleCompiler._N_newVar_22243(Nemerle.Peg.RuleCompiler._N_closureOf_MakeVariablesForRule_22235)" />
+    <member name="M:Nemerle.Peg.RuleCompiler._N_generate_23359(Nemerle.Peg.RuleCompiler._N_closureOf_CompileRuleChars_23351,Nemerle.Core.list{Nemerle.Peg.RangeSet})" />
+    <member name="M:Nemerle.Peg.RuleCompiler._N_generate_23274(Nemerle.Peg.RuleCompiler._N_closureOf_CompileRuleChoice_23264,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Peg.RuleCompiler._N_label_23123(Nemerle.Peg.RuleCompiler._N_closureOf_CompileRuleFsm_23100,System.Int32)" />
+    <member name="M:Nemerle.Peg.RuleCompiler._N_goto_23116(Nemerle.Peg.RuleCompiler._N_closureOf_CompileRuleFsm_23100,System.Int32)" />
+    <member name="M:Nemerle.Peg.RuleCompiler._N_generateNoResult_22788(Nemerle.Peg.RuleCompiler._N_closureOf_CompileRuleSequence_22741,Nemerle.Core.list{Nemerle.Peg.Rule})" />
+    <member name="M:Nemerle.Peg.RuleCompiler._N_generate_22749(Nemerle.Peg.RuleCompiler._N_closureOf_CompileRuleSequence_22741,Nemerle.Core.list{Nemerle.Peg.Rule},Nemerle.Core.list{System.String})" />
+    <member name="M:Nemerle.Peg.RuleCompiler._N_updateFollow_22631(Nemerle.Peg.RuleCompiler._N_closureOf__FirstAndFollow_22564,Nemerle.Peg.Rule,Nemerle.Collections.Set{Nemerle.Peg.NameRef})" />
+    <member name="M:Nemerle.Peg.RuleCompiler._N_loop_22605(Nemerle.Peg.RuleCompiler._N_closureOf_getFirst_22580,Nemerle.Peg.RuleCompiler._N_closureOf__FirstAndFollow_22564,Nemerle.Core.list{Nemerle.Peg.Rule})" />
+    <member name="M:Nemerle.Peg.RuleCompiler._N_getFirst_22574(Nemerle.Peg.RuleCompiler._N_closureOf__FirstAndFollow_22564,Nemerle.Peg.Rule)" />
+    <member name="M:Nemerle.Peg.RuleCompiler._N_gen_22447(Nemerle.Peg.RuleCompiler._N_closureOf_makeCond_22399,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr.Call})" />
+    <member name="M:Nemerle.Peg.RuleCompiler._N_makeCond_22394(Nemerle.Peg.RangeSet)" />
+    <member name="M:Nemerle.Peg.RuleCompiler._N_rec_22382(Nemerle.Peg.RuleCompiler._N_closureOf_TestCharConditionCode_22367,System.Int32,System.Int32)" />
+    <member name="M:Nemerle.Peg.RuleCompiler._N_newVar_22137(Nemerle.Peg.RuleCompiler._N_closureOf_MakeVariablesForRule_22129)" />
     <member name="M:Nemerle.Peg.RuleCompiler.CompileRule(Nemerle.Peg.Rule,Nemerle.Core.list{System.String})" />
     <member name="M:Nemerle.Peg.RuleCompiler.CompileRule" />
     <member name="M:Nemerle.Peg.RuleCompiler.PrepandExprs(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Compiler.Parsetree.PExpr.Sequence)" />
