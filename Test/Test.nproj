@@ -69,167 +69,9 @@
   <ItemGroup>
     <Compile Include="Main.n" />
     <Compile Include="Properties\AssemblyInfo.n" />
-    <Compile Include="Properties\NWebProperties.n">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="TS" />
     <Folder Include="Properties\" />
-    <Folder Include="TS\ace\" />
-    <Folder Include="TS\ace\tests\" />
-    <Folder Include="TS\amcharts\" />
-    <Folder Include="TS\angularjs\" />
-    <Folder Include="TS\async\" />
-    <Folder Include="TS\backbone\" />
-    <Folder Include="TS\bootbox\" />
-    <Folder Include="TS\bootstrap-notify\" />
-    <Folder Include="TS\bootstrap.datepicker\" />
-    <Folder Include="TS\bootstrap\" />
-    <Folder Include="TS\box2d\" />
-    <Folder Include="TS\breeze\" />
-    <Folder Include="TS\casperjs\" />
-    <Folder Include="TS\cheerio\" />
-    <Folder Include="TS\chosen\" />
-    <Folder Include="TS\chrome\" />
-    <Folder Include="TS\codemirror\" />
-    <Folder Include="TS\commander\" />
-    <Folder Include="TS\d3\" />
-    <Folder Include="TS\d3\plugins\" />
-    <Folder Include="TS\domo\" />
-    <Folder Include="TS\durandal\" />
-    <Folder Include="TS\dustjs-linkedin\" />
-    <Folder Include="TS\easeljs\" />
-    <Folder Include="TS\ember\" />
-    <Folder Include="TS\epiceditor\" />
-    <Folder Include="TS\express\" />
-    <Folder Include="TS\fabricjs\" />
-    <Folder Include="TS\fabricjs\tests\" />
-    <Folder Include="TS\fancybox\" />
-    <Folder Include="TS\filesystem\" />
-    <Folder Include="TS\filewriter\" />
-    <Folder Include="TS\flexSlider\" />
-    <Folder Include="TS\flot\" />
-    <Folder Include="TS\foundation\" />
-    <Folder Include="TS\gamepad\" />
-    <Folder Include="TS\gldatepicker\" />
-    <Folder Include="TS\globalize\" />
-    <Folder Include="TS\google.analytics\" />
-    <Folder Include="TS\google.feeds\" />
-    <Folder Include="TS\google.geolocation\" />
-    <Folder Include="TS\googlemaps\" />
-    <Folder Include="TS\greensock\" />
-    <Folder Include="TS\hammerjs\" />
-    <Folder Include="TS\handlebars\" />
-    <Folder Include="TS\highcharts\" />
-    <Folder Include="TS\history\" />
-    <Folder Include="TS\humane\" />
-    <Folder Include="TS\i18next\" />
-    <Folder Include="TS\i18next\lib\" />
-    <Folder Include="TS\i18next\tests\" />
-    <Folder Include="TS\impress\" />
-    <Folder Include="TS\iscroll\" />
-    <Folder Include="TS\jake\" />
-    <Folder Include="TS\jasmine\" />
-    <Folder Include="TS\jqrangeslider\" />
-    <Folder Include="TS\jquery.bbq\" />
-    <Folder Include="TS\jquery.bootstrap.wizard\" />
-    <Folder Include="TS\jquery.clientSideLogging\" />
-    <Folder Include="TS\jquery.contextMenu\" />
-    <Folder Include="TS\jquery.cookie\" />
-    <Folder Include="TS\jquery.cycle\" />
-    <Folder Include="TS\jquery.dynatree\" />
-    <Folder Include="TS\jquery.form\" />
-    <Folder Include="TS\jquery.jnotify\" />
-    <Folder Include="TS\jquery.livestampjs\" />
-    <Folder Include="TS\jquery.scrollTo\" />
-    <Folder Include="TS\jquery.simplePagination\" />
-    <Folder Include="TS\jquery.tagsmanager\" />
-    <Folder Include="TS\jquery.timeago\" />
-    <Folder Include="TS\jquery.timepicker\" />
-    <Folder Include="TS\jquery.transit\" />
-    <Folder Include="TS\jquery.validation\" />
-    <Folder Include="TS\jquery.watermark\" />
-    <Folder Include="TS\jquerymobile\" />
-    <Folder Include="TS\jqueryui\" />
-    <Folder Include="TS\jquery\" />
-    <Folder Include="TS\jsdeferred\" />
-    <Folder Include="TS\jsoneditoronline\" />
-    <Folder Include="TS\keyboardjs\" />
-    <Folder Include="TS\knockback\" />
-    <Folder Include="TS\knockout.editables\" />
-    <Folder Include="TS\knockout.mapping\" />
-    <Folder Include="TS\knockout.postbox\" />
-    <Folder Include="TS\knockout.validation\" />
-    <Folder Include="TS\knockout.viewmodel\" />
-    <Folder Include="TS\knockout\" />
-    <Folder Include="TS\knockout\tests\" />
-    <Folder Include="TS\kolite\" />
-    <Folder Include="TS\leaflet\" />
-    <Folder Include="TS\libxmljs\" />
-    <Folder Include="TS\linq\" />
-    <Folder Include="TS\marked\" />
-    <Folder Include="TS\modernizr\" />
-    <Folder Include="TS\moment\" />
-    <Folder Include="TS\mousetrap\" />
-    <Folder Include="TS\msnodesql\" />
-    <Folder Include="TS\mustache\" />
-    <Folder Include="TS\nodemailer\" />
-    <Folder Include="TS\node\" />
-    <Folder Include="TS\node_redis\" />
-    <Folder Include="TS\noVNC\" />
-    <Folder Include="TS\numeraljs\" />
-    <Folder Include="TS\phantomjs\" />
-    <Folder Include="TS\phonegap\" />
-    <Folder Include="TS\platform\" />
-    <Folder Include="TS\pouchDB\" />
-    <Folder Include="TS\preloadjs\" />
-    <Folder Include="TS\qunit\" />
-    <Folder Include="TS\Q\" />
-    <Folder Include="TS\raphael\" />
-    <Folder Include="TS\requirejs\" />
-    <Folder Include="TS\restify\" />
-    <Folder Include="TS\rx.js\" />
-    <Folder Include="TS\sammyjs\" />
-    <Folder Include="TS\scroller\" />
-    <Folder Include="TS\select2\" />
-    <Folder Include="TS\signalr\" />
-    <Folder Include="TS\sinon\" />
-    <Folder Include="TS\socket.io\" />
-    <Folder Include="TS\sockjs\" />
-    <Folder Include="TS\soundjs\" />
-    <Folder Include="TS\spin\" />
-    <Folder Include="TS\state-machine\" />
-    <Folder Include="TS\storejs\" />
-    <Folder Include="TS\sugar\" />
-    <Folder Include="TS\swipeview\" />
-    <Folder Include="TS\teechart\" />
-    <Folder Include="TS\threejs\" />
-    <Folder Include="TS\toastr\" />
-    <Folder Include="TS\trunk8\" />
-    <Folder Include="TS\tween.js\" />
-    <Folder Include="TS\tweenjs\" />
-    <Folder Include="TS\underscore-ko\" />
-    <Folder Include="TS\underscore\" />
-    <Folder Include="TS\unity-webapi\" />
-    <Folder Include="TS\urijs\" />
-    <Folder Include="TS\videojs\" />
-    <Folder Include="TS\viewporter\" />
-    <Folder Include="TS\vimeo\" />
-    <Folder Include="TS\webaudioapi\" />
-    <Folder Include="TS\webrtc\" />
-    <Folder Include="TS\youtube\" />
-    <Folder Include="TS\zeroclipboard\" />
-    <Folder Include="TS\_infrastructure\" />
-    <Folder Include="TS\_infrastructure\tests\" />
-    <Folder Include="TS\_infrastructure\tests\src\" />
-    <Folder Include="TS\_infrastructure\tests\typescript_0.8.2\" />
-    <Folder Include="TS\_infrastructure\tests\typescript_0.8.3\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="TS\**\*.ts">
-      <SubType>None</SubType>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <MacroReference Include="Nemerle.ComputationExpressions.Macros">
@@ -258,6 +100,11 @@
       <Project>{b1454534-cabd-4abe-cc8e-ddff34f51b14}</Project>
       <Private>False</Private>
     </MacroProjectReference>
+    <ProjectReference Include="..\NemerleWeb.JsApi\NemerleWeb.JsApi.nproj">
+      <Name>NemerleWeb.JsApi</Name>
+      <Project>{65c01c91-f57a-4281-b09f-15baa5ac3cc6}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\NemerleWeb\NemerleWeb.nproj">
       <Name>NemerleWeb</Name>
       <Project>{b1635fea-c0cd-4c8e-a18e-d97d59f21b14}</Project>

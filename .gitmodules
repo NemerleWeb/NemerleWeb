@@ -1,3 +1,3 @@
-[submodule "Test/TS"]
-	path = Test/TS
+[submodule "NemerleWeb.JsApi/TS"]
+	path = NemerleWeb.JsApi/TS
 	url = https://github.com/borisyankov/DefinitelyTyped.git
