@@ -33,6 +33,8 @@ Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "TypeScriptInterfaceParser",
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "CSharpParser-VS_2010", "peg-parser\CSharpParser\CSharpParser-VS_2010.nproj", "{3965AF53-CE45-4E96-BC7F-0795F67382F4}"
 EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "TSParser", "TSParser\TSParser.nproj", "{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,10 @@ Global
 		{3965AF53-CE45-4E96-BC7F-0795F67382F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3965AF53-CE45-4E96-BC7F-0795F67382F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3965AF53-CE45-4E96-BC7F-0795F67382F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
