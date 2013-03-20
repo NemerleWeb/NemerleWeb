@@ -9,7 +9,6 @@
     <AssemblyName>CSharpParser</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <Nemerle Condition=" '$(Nemerle)' == '' ">$(ProgramFiles)\Nemerle</Nemerle>
-    <NoStdLib>True</NoStdLib>
     <SourceAnalysisOverrideSettingsFile>C:\Users\hc\AppData\Roaming\ICSharpCode/SharpDevelop3.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">

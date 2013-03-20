@@ -12,7 +12,6 @@
     <RootNamespace>NemerleWeb.Utils</RootNamespace>
     <AssemblyName>NemerleWeb.Utils</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <NoStdLib>true</NoStdLib>
     <NemerleVersion>Net-4.0</NemerleVersion>
     <NemerleBinPathRoot Condition=" '$(Configuration)' == 'Release' ">$(SolutionDir)\Nemerle</NemerleBinPathRoot>
     <NemerleBinPathRoot Condition=" '$(NemerleBinPathRoot)' == '' ">$(ProgramFiles)\Nemerle</NemerleBinPathRoot>
