@@ -20,12 +20,15 @@ namespace NemerleWeb.Macros
   module GenerateJSApiImpl
   {
     tsParser = TSDeclarationParser();
+    dtsExt = ".d.ts";
     
     public Impl(typer : Typer, options : list[PExpr]) : void
     {      
       match(options)
       {
       | [<[ Directory = $(directory : string) ]> ] with (libPath = "", exclude = "")
+      | [<[ Directory = $(directory : string) ]>,
+         <[ Exclude = $(exclude : string) ]> ] with libPath = ""
       | [<[ Lib = $(libPath : string) ]>,
          <[ Directory = $(directory : string) ]> ] with exclude = ""
       | [<[ Lib = $(libPath : string) ]>,
@@ -43,37 +46,31 @@ namespace NemerleWeb.Macros
       
       // Parse lib if present
       when (libPath != "")
-        ParseTSLibFile(typer, Path.Combine(projectDir, libPath));
+        ParseTSAndGenerate(typer, Path.Combine(projectDir, libPath), NormalizeName(directory));
       
       // Parse all files in directory
       def re = Regex(exclude);
       def isIncluded(s) { if (exclude == "") true else !re.IsMatch(s) }
       
       def fullDir = Path.Combine(projectDir, directory);
-      def tsFiles = Directory.EnumerateFiles(fullDir, "*.d.ts", SearchOption.AllDirectories);
+      def tsFiles = Directory.EnumerateFiles(fullDir, "*" + dtsExt, SearchOption.AllDirectories);
       
+      def prjDirLen = projectDir.Length + 1;
       foreach(tsFile when isIncluded(tsFile) in tsFiles)
-        ParseTSFile(typer, tsFile);
+      {
+        def fileName = tsFile.Substring(prjDirLen, tsFile.Length - prjDirLen - dtsExt.Length);
+        ParseTSAndGenerate(typer, tsFile, NormalizeName(fileName));
+      }
     }
     
-    private ParseTSLibFile(typer : Typer, tsFile : string) : void
-    {
-      ParseTSAndGenerate(typer, tsFile, "");
-    }
-    
-    private ParseTSFile(typer : Typer, tsFile : string) : void
-    {
-      ParseTSAndGenerate(typer, tsFile, "");
-    }
-    
-    private ParseTSAndGenerate(typer : Typer, tsFile : string, baseNamespace : string) : void
+    private ParseTSAndGenerate(typer : Typer, tsFile : string, apiNamespace : string) : void
     {
       match(tsParser.TryParse(File.ReadAllText(tsFile)))
       {
       | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>
         // Root JS API namespace
-        def jsApi = typer.Env.EnterIntoNamespace(["JSApi"]);
-        Message.Hint(tsFile);
+        def jsApi = typer.Env.EnterIntoNamespace("JSApi" :: apiNamespace.Split('.').NToList());
+        Message.Hint($"$(jsApi)");
       | (pos, _) =>
         // TODO: Add locations to parser and print here correct location in the file.
         def text = tsParser.ParsingSource.OriginalText;
