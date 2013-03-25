@@ -19,43 +19,43 @@ namespace NemerleWeb
     public static DoNotEscapeMarker = "\u0001";
   }
   
-    public variant JsAst
+    public variant JSAst
     {           
         | Assign
           {
-            Left : JsAst;
-            Right : JsAst;
+            Left : JSAst;
+            Right : JSAst;
             
             public override Write(indent = "" : string) : string
             {
               indent + $"$(Left.Write()) = $(Right.Write())";
             }
-            public override Transform() : JsAst
+            public override Transform() : JSAst
             {
               match(this) {
               | Assign(_, right) when !IsAllowedForAssignment(right) => 
-                def varName = JsAstHelper.GetTemporaryVariableName();                
-                JsAst.Seq([
-                  JsAst.DefValue(varName, JsAst.Void()),
-                  JsAstHelper.DelayAssignment(Right, JsAst.LocalRef(varName, None())),
-                  JsAst.Assign(Left, LocalRef(varName, None()))
+                def varName = JSAstHelper.GetTemporaryVariableName();                
+                JSAst.Seq([
+                  JSAst.DefValue(varName, JSAst.Void()),
+                  JSAstHelper.DelayAssignment(Right, JSAst.LocalRef(varName, None())),
+                  JSAst.Assign(Left, LocalRef(varName, None()))
                 ]);
               | _ => this
               }
             }
           }
-        | Array          { Values : list[JsAst];
+        | Array          { Values : list[JSAst];
             public override Write(_ = "" : string) : string {
                 def Write(el, ind) { el.Write(ind) }
                 $<#[..$(Values; ","; Write(_, ""))]#>
             }
-            public override Transform() : JsAst
+            public override Transform() : JSAst
             {
-              JsAst.Array(
+              JSAst.Array(
                 Values.SelectMany(
                     x => match(x)
                     {
-                    | JsAst.Array(xs2) => xs2
+                    | JSAst.Array(xs2) => xs2
                     | x => [x]
                     })
                   .Where(e => !(e is StaticRef("Nemerle_Core_Nil[T]", _)))
@@ -63,12 +63,12 @@ namespace NemerleWeb
             }
             
         }
-        | ArrayIndexer    { Obj : JsAst; Index : JsAst;
+        | ArrayIndexer    { Obj : JSAst; Index : JSAst;
             public override Write(_ = "" : string) : string {                
                 $<#$(Obj.Write())[$(Index.Write())]#>
             }
         }
-        | BinaryOperator { Op : string; Left : JsAst; Right : JsAst;
+        | BinaryOperator { Op : string; Left : JSAst; Right : JSAst;
             public override Write(_ = "" : string) : string {
                 $"$(Left.Write()) $Op $(Right.Write())"
             }
@@ -85,8 +85,8 @@ namespace NemerleWeb
         }
         | Call
           {
-            Fun : JsAst;
-            Parameters : list[JsAst];
+            Fun : JSAst;
+            Parameters : list[JSAst];
             
             public override Write(indent = "" : string) : string
             {
@@ -99,29 +99,29 @@ namespace NemerleWeb
                 
                 | Call(Constructor(type, None), parms) => $<#new $(type)(..$(parms; ", "; writeParam))#>
                 | Call(Constructor(type, Some(paramsType)), parms) => 
-                  def methodSignature = JsAstHelper.MethodSignature(paramsType);
+                  def methodSignature = JSAstHelper.MethodSignature(paramsType);
                   def comma = if (parms is []) "" else ", ";
                   $<#new $(type)($methodSignature$comma..$(parms; ", "; writeParam))#>
                 
                 | Call(ConstructorRef(type, None), parms) =>
-                  $<#$(type).call(..$(JsAst.This() :: parms; ", "; writeParam))#>
+                  $<#$(type).call(..$(JSAst.This() :: parms; ", "; writeParam))#>
                 | Call(ConstructorRef(type, Some(paramsType)), parms) =>
-                  def methodSignature = JsAstHelper.MethodSignature(paramsType);
+                  def methodSignature = JSAstHelper.MethodSignature(paramsType);
                   def comma = if (parms is []) "" else ", ";
-                  def astThis = JsAst.This().Write();
+                  def astThis = JSAst.This().Write();
                   $<#$(type).call($astThis, $methodSignature$comma..$(parms; ", "; writeParam))#>
                 
                 | Call(Indexer(obj), parms)          => $<#$(obj.Write())[..$(parms; ", "; writeParam)]#>                
                 | Call(MethodRef(obj, method, Some) as f, parms) when
-                  !JsAstHelper.IsSpecialMethod(method) =>
+                  !JSAstHelper.IsSpecialMethod(method) =>
                   $<#$(f.Write()).call(..$(obj :: parms; ", "; writeParam))#>
                 | Call(f, parms)                     => $<#$(f.Write())(..$(parms; ", "; writeParam))#>    
                 }
             }
             
-            static private Literal_Int1 : JsAst.Literal = JsAst.Literal(JsLiteral.Integer(1));
+            static private Literal_Int1 : JSAst.Literal = JSAst.Literal(JSLiteral.Integer(1));
             
-            public override Transform() : JsAst
+            public override Transform() : JSAst
             {
               // Compiler bug workaround
               def parametersNotAllowedForAssignment = Parameters.Any(p => !IsAllowedForAssignment(p));
@@ -130,78 +130,78 @@ namespace NemerleWeb
               | Call(OpCode("==="), something :: Literal(Bool(true)) :: []) 
               | Call(OpCode("==="), Literal(Bool(true)) :: something :: []) => something.Transform()
               | Call(OpCode as op, Call(MethodRef(Seq,  _, _), _) as call :: rest) => 
-                  def varName = JsAstHelper.GetTemporaryVariableName();
-                  JsAst.Seq(
+                  def varName = JSAstHelper.GetTemporaryVariableName();
+                  JSAst.Seq(
                     [
-                      JsAst.DefValue(varName, JsAst.Void()),
-                      JsAstHelper.DelayAssignment(call, JsAst.LocalRef(varName, None())),
-                      JsAst.Call(op, JsAst.LocalRef(varName, None()) :: rest)
+                      JSAst.DefValue(varName, JSAst.Void()),
+                      JSAstHelper.DelayAssignment(call, JSAst.LocalRef(varName, None())),
+                      JSAst.Call(op, JSAst.LocalRef(varName, None()) :: rest)
                     ]
                   ).Transform()
               | Call(OpCode as op, head :: (Call(MethodRef(Seq,  _, _), _) as call) :: []) => 
-                  def varName = JsAstHelper.GetTemporaryVariableName();
-                  JsAst.Seq(
+                  def varName = JSAstHelper.GetTemporaryVariableName();
+                  JSAst.Seq(
                     [
-                      JsAst.DefValue(varName, JsAst.Void()),
-                      JsAstHelper.DelayAssignment(call, JsAst.LocalRef(varName, None())),
-                      JsAst.Call(op, [head, JsAst.LocalRef(varName, None())])
+                      JSAst.DefValue(varName, JSAst.Void()),
+                      JSAstHelper.DelayAssignment(call, JSAst.LocalRef(varName, None())),
+                      JSAst.Call(op, [head, JSAst.LocalRef(varName, None())])
                     ]
                   ).Transform()
               | Call(OpCode("==="), something :: Literal(Null) :: []) 
               | Call(OpCode("==="), [Literal(Null), something]) => 
-                  JsAst.Call(
-                    JsAst.OpCode("||"), 
+                  JSAst.Call(
+                    JSAst.OpCode("||"), 
                     [
-                      JsAst.Call(JsAst.OpCode("==="), [something, JsAst.Literal(JsLiteral.Null())]), 
-                      JsAst.Call(
-                        JsAst.OpCode("==="),
+                      JSAst.Call(JSAst.OpCode("==="), [something, JSAst.Literal(JSLiteral.Null())]), 
+                      JSAst.Call(
+                        JSAst.OpCode("==="),
                         [
-                          JsAst.TypeOf(something),
-                          JsAst.Literal(JsLiteral.String("undefined"))
+                          JSAst.TypeOf(something),
+                          JSAst.Literal(JSLiteral.String("undefined"))
                         ])
                     ]
                   ).Transform()
                  
               // Empty list comparison
-              | Call(OpCode("===") as op, [something, JsAst.Array([])])
-              | Call(OpCode("===") as op, [JsAst.Array([]), something])
-              | Call(OpCode("!==") as op, [something, JsAst.Array([])])
-              | Call(OpCode("!==") as op, [JsAst.Array([]), something]) => 
-                JsAst.Call(op, [something.Field("length"), JsAst.Literal(JsLiteral.Integer(0))])
+              | Call(OpCode("===") as op, [something, JSAst.Array([])])
+              | Call(OpCode("===") as op, [JSAst.Array([]), something])
+              | Call(OpCode("!==") as op, [something, JSAst.Array([])])
+              | Call(OpCode("!==") as op, [JSAst.Array([]), something]) => 
+                JSAst.Call(op, [something.Field("length"), JSAst.Literal(JSLiteral.Integer(0))])
               
               | Call(OpCode("!=="), something :: Literal(Null) :: []) 
               | Call(OpCode("!=="), [Literal(Null), something]) => 
-                  JsAst.Call(
-                    JsAst.OpCode("&&"), 
+                  JSAst.Call(
+                    JSAst.OpCode("&&"), 
                     [
-                      JsAst.Call(JsAst.OpCode("!=="), [something, JsAst.Literal(JsLiteral.Null())]), 
-                      JsAst.Call(
-                        JsAst.OpCode("!=="),
+                      JSAst.Call(JSAst.OpCode("!=="), [something, JSAst.Literal(JSLiteral.Null())]), 
+                      JSAst.Call(
+                        JSAst.OpCode("!=="),
                         [
-                          JsAst.TypeOf(something),
-                          JsAst.Literal(JsLiteral.String("undefined"))
+                          JSAst.TypeOf(something),
+                          JSAst.Literal(JSLiteral.String("undefined"))
                         ])
                     ]
                   ).Transform()                 
                 
-              | Call(func, parms) when parms.OfType.[JsAst.Seq]().Any() =>
-                  def newParms = parms.Select(p : JsAst => {
-                      def varName = JsAstHelper.GetTemporaryVariableName();
+              | Call(func, parms) when parms.OfType.[JSAst.Seq]().Any() =>
+                  def newParms = parms.Select(p : JSAst => {
+                      def varName = JSAstHelper.GetTemporaryVariableName();
                       match(p)
                       {
                       | xs is Seq =>
-                        (JsAst.Seq(
+                        (JSAst.Seq(
                           [
-                            JsAst.DefValue(varName, JsAst.Void()),
-                            JsAstHelper.DelayAssignment(xs, JsAst.LocalRef(varName, None()))
+                            JSAst.DefValue(varName, JSAst.Void()),
+                            JSAstHelper.DelayAssignment(xs, JSAst.LocalRef(varName, None()))
                           ]),
-                        JsAst.LocalRef(varName, None()))
-                      | x => (JsAst.Void(), x)
+                        JSAst.LocalRef(varName, None()))
+                      | x => (JSAst.Void(), x)
                       }
                   }).NToList();
-                  def paramInits = JsAst.Seq(newParms.Filter((i, _)=> !(i is JsAst.Void)).Map((i, _) => i));
+                  def paramInits = JSAst.Seq(newParms.Filter((i, _)=> !(i is JSAst.Void)).Map((i, _) => i));
                   def newParms = newParms.Map((_, p) => p);
-                  JsAst.Seq([paramInits, JsAst.Call(func, newParms).Transform()])
+                  JSAst.Seq([paramInits, JSAst.Call(func, newParms).Transform()])
               | Call(OpCode("++" as opcode), [FieldRef as field])
               | Call(OpCode("--" as opcode), [FieldRef as field]) =>
                 Call(OpCode(opcode.Substring(1)), [field, Literal_Int1])
@@ -217,8 +217,8 @@ namespace NemerleWeb
                   parms.Map(p =>
                     if(!IsAllowedForAssignment(p))
                     {
-                      def varName = JsAstHelper.GetTemporaryVariableName();
-                      (Some(varName), [JsAst.DefValue(varName, JsAst.Void()), JsAstHelper.DelayAssignment(p, JsAst.LocalRef(varName, None()))])
+                      def varName = JSAstHelper.GetTemporaryVariableName();
+                      (Some(varName), [JSAst.DefValue(varName, JSAst.Void()), JSAstHelper.DelayAssignment(p, JSAst.LocalRef(varName, None()))])
                     }
                     else
                       (None(), [p]));
@@ -227,12 +227,12 @@ namespace NemerleWeb
                   v =>
                     match(v) 
                     { 
-                    | (Some(name), _) => JsAst.LocalRef(name, None()) 
+                    | (Some(name), _) => JSAst.LocalRef(name, None()) 
                     | (None, [p]) => p 
                     | _ => Message.FatalError("Shouldn't happen")
                     });
                 
-                JsAst.Seq(varInitializations
+                JSAst.Seq(varInitializations
                   .SelectMany(
                     v => 
                       match(v) 
@@ -240,18 +240,18 @@ namespace NemerleWeb
                       | (Some, seq) => seq 
                       | _ => [] 
                       })
-                 .Concat([JsAst.Call(func, varParams).Transform()])
+                 .Concat([JSAst.Call(func, varParams).Transform()])
                  .NToList())
               | Call(MethodRef(obj, meth, p), parms) when !IsAllowedForAssignment(obj) =>
-                def varName = JsAstHelper.GetTemporaryVariableName(); 
-                JsAst.Seq([
-                  JsAst.DefValue(varName, JsAst.Void()),
-                  JsAstHelper.DelayAssignment(obj, JsAst.LocalRef(varName, None())),
-                  JsAst.Call(JsAst.MethodRef(JsAst.LocalRef(varName, None()), meth, p), parms).Transform()
+                def varName = JSAstHelper.GetTemporaryVariableName(); 
+                JSAst.Seq([
+                  JSAst.DefValue(varName, JSAst.Void()),
+                  JSAstHelper.DelayAssignment(obj, JSAst.LocalRef(varName, None())),
+                  JSAst.Call(JSAst.MethodRef(JSAst.LocalRef(varName, None()), meth, p), parms).Transform()
                 ])
               // TODO: Improve this hack for -= , *= and other
               | Call(OpCode("+="), [Call(OpCode("+="), [l1, r1]), r2]) =>                                
-                  JsAst.Call(OpCode("+="), [l1, JsAst.Call(JsAst.OpCode("+"), [r1, r2])])
+                  JSAst.Call(OpCode("+="), [l1, JSAst.Call(JSAst.OpCode("+"), [r1, r2])])
               | _ => this
               }
             }
@@ -288,9 +288,9 @@ namespace NemerleWeb
           }
         | DefFunction
           {
-            Obj : JsAst;
-            Parameters : list[JsAst];
-            Body : JsAst;
+            Obj : JSAst;
+            Parameters : list[JSAst];
+            Body : JSAst;
             
             public override Write(indent = "" : string) : string
             {
@@ -301,15 +301,15 @@ $(indent)}#>
         }
         | DeclFunction {
           Name : string;
-          Parameters : list[JsAst];
-          Body : JsAst;
+          Parameters : list[JSAst];
+          Body : JSAst;
           
           public override Write(_indent = "" : string) : string
           {
 $<#function $Name(..$(Parameters; ";"; p => p.Write(""))) { $(Body.Write("  ")) }#>
           }
         }
-        | DefValue       { Name : string; Val : JsAst;
+        | DefValue       { Name : string; Val : JSAst;
           public override Write(indent = "" : string) : string {
             match(this)
             {
@@ -317,14 +317,14 @@ $<#function $Name(..$(Parameters; ";"; p => p.Write(""))) { $(Body.Write("  ")) 
             | DefValue(name, val)  => indent + $<#var $(name.Replace(".", "_")) = $(val.Write())#>
             }
           }
-          public override Transform() : JsAst
+          public override Transform() : JSAst
           {
             match(this)
             {
             | DefValue(l, r) when !IsAllowedForAssignment(r) =>
-              def res = JsAst.Seq([
-                JsAst.DefValue(l, JsAst.Void()),
-                JsAstHelper.DelayAssignment(r, JsAst.LocalRef(l, None()))]);
+              def res = JSAst.Seq([
+                JSAst.DefValue(l, JSAst.Void()),
+                JSAstHelper.DelayAssignment(r, JSAst.LocalRef(l, None()))]);
               res;
             | _ => this                
             }
@@ -332,14 +332,14 @@ $<#function $Name(..$(Parameters; ";"; p => p.Write(""))) { $(Body.Write("  ")) 
         }
         | Delete
           {
-            Obj : JsAst;
+            Obj : JSAst;
           
             public override Write(indent = "" : string) : string
             {
               $"$(indent)delete $(Obj.Write())"
             }
           }
-        | For            { ItName : string; Collection : JsAst; Body : JsAst;
+        | For            { ItName : string; Collection : JSAst; Body : JSAst;
             public override Write(_indent = "" : string) : string {
 $<#
 for(var $ItName in $(Collection.Write())) {
@@ -362,21 +362,21 @@ $(Body.Write("  "))
                 "/* No goto writer implementation */"
             }
         }
-        | HasType        { Obj : JsAst; TypeName : string;
+        | HasType        { Obj : JSAst; TypeName : string;
           public override Write(_indent = "" : string) : string {
             $"$(Obj.Write()).constructor === $TypeName"
           }
-          public override Transform() : JsAst {
+          public override Transform() : JSAst {
             match(this) {
             | HasType(l, "Nemerle_Core_Cons_$T$__$T$_")
             | HasType(l, "Nemerle_Core_Cons_$T$_") => 
-              JsAst.Call(JsAst.OpCode(">"),
-                        [JsAst.FieldRef(l, "length"), JsAst.Literal(JsLiteral.Integer(0))]);
+              JSAst.Call(JSAst.OpCode(">"),
+                        [JSAst.FieldRef(l, "length"), JSAst.Literal(JSLiteral.Integer(0))]);
             | _ => this                
             }
           }   
         }
-        | If             { Cond : JsAst; Body : JsAst; ElseBody : JsAst;
+        | If             { Cond : JSAst; Body : JSAst; ElseBody : JSAst;
             public override Write(indent = "" : string) : string {
 $<#
 $(indent)if($(Cond.Write())) { 
@@ -385,40 +385,40 @@ $indent} else {
 $(ElseBody.Write(indent + "  "))
 $indent}#>
             }
-            public override Transform() : JsAst {
+            public override Transform() : JSAst {
                 match(this) {
                 | If(If(c, t, e), tt, ee)    => 
-                  def varName = JsAstHelper.GetTemporaryVariableName();
-                  JsAst.Seq([
-                    JsAst.DefValue(varName, JsAst.If(c, t, e)).Transform(),
-                    JsAst.If(JsAst.LocalRef(varName, None()), tt, ee)
+                  def varName = JSAstHelper.GetTemporaryVariableName();
+                  JSAst.Seq([
+                    JSAst.DefValue(varName, JSAst.If(c, t, e)).Transform(),
+                    JSAst.If(JSAst.LocalRef(varName, None()), tt, ee)
                   ]).Transform();
                 | If(Call(func, [something, If(c, t, e)]), then, els) => 
-                  def varName = JsAstHelper.GetTemporaryVariableName();
-                  JsAst.Seq([
-                    JsAst.DefValue(varName, JsAst.If(c, t, e)).Transform(),
-                    JsAst.If(JsAst.Call(func, [something, JsAst.LocalRef(varName, None())]), then, els)
+                  def varName = JSAstHelper.GetTemporaryVariableName();
+                  JSAst.Seq([
+                    JSAst.DefValue(varName, JSAst.If(c, t, e)).Transform(),
+                    JSAst.If(JSAst.Call(func, [something, JSAst.LocalRef(varName, None())]), then, els)
                   ]).Transform();
                 | If(Call(func, [If(c, t, e), something]), then, els) => 
-                  def varName = JsAstHelper.GetTemporaryVariableName();
-                  JsAst.Seq([
-                    JsAst.DefValue(varName, JsAst.If(c, t, e)).Transform(),
-                    JsAst.If(JsAst.Call(func, [JsAst.LocalRef(varName, None()), something]), then, els)
+                  def varName = JSAstHelper.GetTemporaryVariableName();
+                  JSAst.Seq([
+                    JSAst.DefValue(varName, JSAst.If(c, t, e)).Transform(),
+                    JSAst.If(JSAst.Call(func, [JSAst.LocalRef(varName, None()), something]), then, els)
                   ]).Transform();
                 | If(Call(OpCode as op, [Seq as seq, rest]), then, els) =>
-                    def varName = JsAstHelper.GetTemporaryVariableName();
-                    JsAst.Seq([JsAst.DefValue(varName, JsAst.Void()), JsAstHelper.DelayAssignment(seq, JsAst.LocalRef(varName, None())), JsAst.If(JsAst.Call(op, [JsAst.LocalRef(varName, None()), rest]), then, els)]).Transform();                           
+                    def varName = JSAstHelper.GetTemporaryVariableName();
+                    JSAst.Seq([JSAst.DefValue(varName, JSAst.Void()), JSAstHelper.DelayAssignment(seq, JSAst.LocalRef(varName, None())), JSAst.If(JSAst.Call(op, [JSAst.LocalRef(varName, None()), rest]), then, els)]).Transform();                           
                 | If(Call(OpCode as op, [Call(MethodRef(Seq as seq, m, p), parms), rest]), then, els)  =>             
-                    def varName = JsAstHelper.GetTemporaryVariableName();
-                    JsAst.Seq(
+                    def varName = JSAstHelper.GetTemporaryVariableName();
+                    JSAst.Seq(
                       [
-                        JsAst.DefValue(varName, JsAst.Void()),
-                        JsAstHelper.DelayAssignment(seq, JsAst.LocalRef(varName, None())),
-                        JsAst.If(
-                          JsAst.Call(op, 
+                        JSAst.DefValue(varName, JSAst.Void()),
+                        JSAstHelper.DelayAssignment(seq, JSAst.LocalRef(varName, None())),
+                        JSAst.If(
+                          JSAst.Call(op, 
                             [
-                              JsAst.Call(
-                                JsAst.MethodRef(JsAst.LocalRef(varName, None()), m, p),
+                              JSAst.Call(
+                                JSAst.MethodRef(JSAst.LocalRef(varName, None()), m, p),
                                 parms),
                               rest
                             ]),
@@ -426,84 +426,84 @@ $indent}#>
                           els)])
                       .Transform();
                 | If(Call(OpCode as op, [Call as call, rest]), then, els) =>             
-                    def varName = JsAstHelper.GetTemporaryVariableName();
-                    JsAst.Seq([JsAst.DefValue(varName, call), JsAst.If(JsAst.Call(op, [JsAst.LocalRef(varName, None()), rest]), then, els)]).Transform()
+                    def varName = JSAstHelper.GetTemporaryVariableName();
+                    JSAst.Seq([JSAst.DefValue(varName, call), JSAst.If(JSAst.Call(op, [JSAst.LocalRef(varName, None()), rest]), then, els)]).Transform()
                 | If(Seq as seq, then, els) => 
-                    def varName = JsAstHelper.GetTemporaryVariableName();
-                    JsAst.Seq([JsAst.DefValue(varName, JsAst.Void()), 
-                               JsAstHelper.DelayAssignment(seq, JsAst.LocalRef(varName, None())), 
-                               JsAst.If(JsAst.Call(JsAst.OpCode("==="), 
-                                                   [JsAst.LocalRef(varName, None()), JsAst.Literal(JsLiteral.Bool(true))]), 
+                    def varName = JSAstHelper.GetTemporaryVariableName();
+                    JSAst.Seq([JSAst.DefValue(varName, JSAst.Void()), 
+                               JSAstHelper.DelayAssignment(seq, JSAst.LocalRef(varName, None())), 
+                               JSAst.If(JSAst.Call(JSAst.OpCode("==="), 
+                                                   [JSAst.LocalRef(varName, None()), JSAst.Literal(JSLiteral.Bool(true))]), 
                                         then, els)])
                           .Transform();   
                 | _ => this
                 }
             }
         }
-        | Indexer        { Obj : JsAst;
+        | Indexer        { Obj : JSAst;
             public override Write(_ = "" : string) : string {
                 "/* No Indexer writer implementation */"
             }
         }      
-        | JustIf         { Cond : JsAst; Body : JsAst;
+        | JustIf         { Cond : JSAst; Body : JSAst;
             public override Write(indent = "" : string) : string {
 $<# 
 $(indent)if($(Cond.Write())) { 
 $(Body.Write(indent + "  "))
 $(indent)}#>
             }
-            public override Transform() : JsAst {
+            public override Transform() : JSAst {
                 match(this) {
                 | JustIf(Call(func, [something, If(c, t, e)]), then) => 
-                  def varName = JsAstHelper.GetTemporaryVariableName();
-                  JsAst.Seq([
-                    JsAst.DefValue(varName, JsAst.If(c, t, e)).Transform(),
-                    JsAst.JustIf(JsAst.Call(func, [something, JsAst.LocalRef(varName, None())]), then)
+                  def varName = JSAstHelper.GetTemporaryVariableName();
+                  JSAst.Seq([
+                    JSAst.DefValue(varName, JSAst.If(c, t, e)).Transform(),
+                    JSAst.JustIf(JSAst.Call(func, [something, JSAst.LocalRef(varName, None())]), then)
                   ]).Transform();
                 | JustIf(Call(func, [If(c, t, e), something]), then) => 
-                  def varName = JsAstHelper.GetTemporaryVariableName();
-                  JsAst.Seq([
-                    JsAst.DefValue(varName, JsAst.If(c, t, e)).Transform(),
-                    JsAst.JustIf(JsAst.Call(func, [JsAst.LocalRef(varName, None()), something]), then)
+                  def varName = JSAstHelper.GetTemporaryVariableName();
+                  JSAst.Seq([
+                    JSAst.DefValue(varName, JSAst.If(c, t, e)).Transform(),
+                    JSAst.JustIf(JSAst.Call(func, [JSAst.LocalRef(varName, None()), something]), then)
                   ]).Transform();
                 | JustIf(Call(OpCode as op, Seq as seq :: rest), then) =>
-                    def varName = JsAstHelper.GetTemporaryVariableName();
-                    JsAst.Seq([JsAst.DefValue(varName, JsAst.Void()), JsAstHelper.DelayAssignment(seq, JsAst.LocalRef(varName, None())), JsAst.JustIf(JsAst.Call(op, JsAst.LocalRef(varName, None()) :: rest), then)]).Transform();                           
+                    def varName = JSAstHelper.GetTemporaryVariableName();
+                    JSAst.Seq([JSAst.DefValue(varName, JSAst.Void()), JSAstHelper.DelayAssignment(seq, JSAst.LocalRef(varName, None())), JSAst.JustIf(JSAst.Call(op, JSAst.LocalRef(varName, None()) :: rest), then)]).Transform();                           
                 | JustIf(Call(OpCode as op, Call(MethodRef(Seq as seq,  m, p), parms) :: rest), then)  =>             
-                    def varName = JsAstHelper.GetTemporaryVariableName();
-                    JsAst.Seq(
+                    def varName = JSAstHelper.GetTemporaryVariableName();
+                    JSAst.Seq(
                       [
-                        JsAst.DefValue(varName, JsAst.Void()),
-                        JsAstHelper.DelayAssignment(seq, JsAst.LocalRef(varName, None())),
-                        JsAst.JustIf(
-                          JsAst.Call(
+                        JSAst.DefValue(varName, JSAst.Void()),
+                        JSAstHelper.DelayAssignment(seq, JSAst.LocalRef(varName, None())),
+                        JSAst.JustIf(
+                          JSAst.Call(
                             op,
-                            JsAst.Call(
-                              JsAst.MethodRef(JsAst.LocalRef(varName, None()), m, p),
+                            JSAst.Call(
+                              JSAst.MethodRef(JSAst.LocalRef(varName, None()), m, p),
                               parms) :: rest),
                           then)
                       ]
                     ).Transform();
                 | JustIf(Call(OpCode as op, Call as call :: rest), then) =>             
-                    def varName = JsAstHelper.GetTemporaryVariableName();
-                    JsAst.Seq([JsAst.DefValue(varName, call), JsAst.JustIf(JsAst.Call(op, JsAst.LocalRef(varName, None()) :: rest), then)]).Transform()
+                    def varName = JSAstHelper.GetTemporaryVariableName();
+                    JSAst.Seq([JSAst.DefValue(varName, call), JSAst.JustIf(JSAst.Call(op, JSAst.LocalRef(varName, None()) :: rest), then)]).Transform()
                 | JustIf(Seq as seq, then) => 
-                    def varName = JsAstHelper.GetTemporaryVariableName();
-                    JsAst.Seq([JsAst.DefValue(varName, JsAst.Void()), 
-                               JsAstHelper.DelayAssignment(seq, JsAst.LocalRef(varName, None())), 
-                               JsAst.JustIf(JsAst.Call(JsAst.OpCode("==="), 
-                                                   [JsAst.LocalRef(varName, None()), JsAst.Literal(JsLiteral.Bool(true))]), then)])
+                    def varName = JSAstHelper.GetTemporaryVariableName();
+                    JSAst.Seq([JSAst.DefValue(varName, JSAst.Void()), 
+                               JSAstHelper.DelayAssignment(seq, JSAst.LocalRef(varName, None())), 
+                               JSAst.JustIf(JSAst.Call(JSAst.OpCode("==="), 
+                                                   [JSAst.LocalRef(varName, None()), JSAst.Literal(JSLiteral.Bool(true))]), then)])
                           .Transform();   
                 | _ => this
                 }
             }
         }               
-        | Label          { Id : int; Body : JsAst;
+        | Label          { Id : int; Body : JSAst;
           public override Write(indent = "" : string) : string {
             Body.Write(indent)
           }
         }
-        | Lambda         { Name : string; Parameters : list[string]; Body : JsAst;
+        | Lambda         { Name : string; Parameters : list[string]; Body : JSAst;
             public override Write(indent = "" : string) : string {
 $<#$(indent)function(..$Parameters) {
 $(Body.Write(indent + "  "))
@@ -512,7 +512,7 @@ $(Body.Write(indent + "  "))
         }
         | Literal        
           {
-            Value : JsLiteral;
+            Value : JSLiteral;
             
             public override Write(indent = "" : string) : string
             {
@@ -527,7 +527,7 @@ $(Body.Write(indent + "  "))
                   if(escaping != -1)
                     val.Substring(0, escaping)
                   else
-                    JsAstHelper.EscapeString(val);
+                    JSAstHelper.EscapeString(val);
                     
                 indent + str                
               | Literal(Bool(val))    => indent + $"$(val.ToString(CultureInfo.InvariantCulture).ToLower())"
@@ -547,18 +547,18 @@ $(Body.Write(indent + "  "))
         }
         | MethodRef
           { 
-            Obj : JsAst; 
+            Obj : JSAst; 
             Method : string;
             ParametersType : option[list[TParameter]];
             
             public override Write(_ = "" : string) : string
             {
-              def delimiter = if (Obj is Literal(JsLiteral.Integer)) " " else "";
+              def delimiter = if (Obj is Literal(JSLiteral.Integer)) " " else "";
               // HACK: Lambda support
               if (Method == "apply" || Method == "apply_void")
                 $"$(Obj.Write())"
               else
-                $"$(Obj.Write())$delimiter.$(JsAstHelper.Method(Method, ParametersType))"
+                $"$(Obj.Write())$delimiter.$(JSAstHelper.Method(Method, ParametersType))"
             }
           }    
         | StaticMethodRef
@@ -569,7 +569,7 @@ $(Body.Write(indent + "  "))
             
             public override Write(_ = "" : string) : string
             {
-              $"$Type.$(JsAstHelper.Method(Method, ParametersType))"
+              $"$Type.$(JSAstHelper.Method(Method, ParametersType))"
             }
         }
         | StaticRef
@@ -582,30 +582,30 @@ $(Body.Write(indent + "  "))
                 $"$Type.$Member"
             }
           }
-        | FieldRef       { Obj : JsAst; Parameter : string;
+        | FieldRef       { Obj : JSAst; Parameter : string;
             public override Write(_ = "" : string) : string {
                 $"$(Obj.Write()).$Parameter"
             }
         }
         | PropertySet    
           {
-            Obj : JsAst;
+            Obj : JSAst;
             PropertyName : string;
-            Value : JsAst;
+            Value : JSAst;
             
             public override Write(indent = "" : string) : string 
             {
               indent + $"$(Obj.Write()).set_$PropertyName($(Value.Write()))"
             }
             
-            public override Transform() : JsAst 
+            public override Transform() : JSAst 
             {
-              JsAst.Call(JsAst.MethodRef(Obj, "set_" + PropertyName, None()), [Value]).Transform()
+              JSAst.Call(JSAst.MethodRef(Obj, "set_" + PropertyName, None()), [Value]).Transform()
             }
           }
         | PropertyGet   
           {
-            Obj : JsAst;
+            Obj : JSAst;
             PropertyName : string;
             
             public override Write(_ = "" : string) : string 
@@ -618,7 +618,7 @@ $(Body.Write(indent + "  "))
                 $"$Name"
             }
         }
-        | Object         { Fields : list[(string * JsAst)];
+        | Object         { Fields : list[(string * JSAst)];
             public override Write(_ = "" : string) : string {
                 def fieldToObjectField((name, ast)) {
                     $"$name : $(ast.Write())"
@@ -626,26 +626,26 @@ $(Body.Write(indent + "  "))
                 $<#{ ..$(Fields; ", "; fieldToObjectField) }#>
             }
         }
-        | Return         { Expr : JsAst;
+        | Return         { Expr : JSAst;
             public override Write(indent = "" : string) : string {
                 indent + $<#return $(Expr.Write(""))#>
             }
         }
-        | Seq            { Items : list[JsAst];
+        | Seq            { Items : list[JSAst];
             public override Write(indent = "" : string) : string {                
-                def ss = Items.Where(i => !(i is JsAst.Void))
+                def ss = Items.Where(i => !(i is JSAst.Void))
                               .Select(i => i.Write(indent));                
                 $<#..$(ss; ";" + Environment.NewLine)#>
             }
-            public override Transform() : JsAst {
+            public override Transform() : JSAst {
                 match(Items) {
                 | x :: [] => x
-                //| xs => JsAst.Seq(xs.Map(x => x.Transform()))
+                //| xs => JSAst.Seq(xs.Map(x => x.Transform()))
                 | _ => this
                 }
             }
         }
-        | Switch         { Expr : JsAst; Cases : list[JsAst.SwitchCase]; DefaultExpr : JsAst;
+        | Switch         { Expr : JSAst; Cases : list[JSAst.SwitchCase]; DefaultExpr : JSAst;
             public override Write(indent = "" : string) : string {
 $<#
 $(indent)switch($(Expr.Write())) {
@@ -655,14 +655,14 @@ $(DefaultExpr.Write(indent + "  "))
 $(indent)}#>
             }
         }
-        | SwitchCase     { Id : string; Body : JsAst;
+        | SwitchCase     { Id : string; Body : JSAst;
             public override Write(indent = "" : string) : string {
 $<#$(indent)case "$Id":
 $(Body.Write(indent + "  "))
 $(indent)break;#>
             }
         }
-        | ServerCall     { MethodName : string; TypeName : string; Parameters : list[string * JsAst]; Callback : JsAst;
+        | ServerCall     { MethodName : string; TypeName : string; Parameters : list[string * JSAst]; Callback : JSAst;
             public override Write(indent = "" : string) : string {                            
               def jsparms = Parameters.Map((name, val) => $"$name: ' + JSON.stringify(nweb.utils.normalizeObjectForServer($(val.Write()))) + '");
               def callback = Callback.Write().TrimEnd(';');
@@ -685,7 +685,7 @@ $(indent)});
 #>
             }
         }    
-        | Ternary        { Cond : JsAst; Body : JsAst; ElseBody : JsAst;
+        | Ternary        { Cond : JSAst; Body : JSAst; ElseBody : JSAst;
             public override Write(_ : string) : string {
                 $"($(Cond.Write()) ? $(Body.Write()) : $(ElseBody.Write()))"
             }
@@ -695,12 +695,12 @@ $(indent)});
                 "self"
             }
         }
-        | Throw          { Obj : JsAst;
+        | Throw          { Obj : JSAst;
             public override Write(indent = "" : string) : string {
                 indent + $"throw $(Obj.Write())"
             }
         }
-        | Try            { Body : JsAst; Handler : JsAst;
+        | Try            { Body : JSAst; Handler : JSAst;
             public override Write(indent = "" : string) : string {
 $<#
 $(indent)try {
@@ -711,7 +711,7 @@ $(indent)}
 #>
             }
         }
-        | TryFinally     { Body : JsAst; Handler : JsAst;
+        | TryFinally     { Body : JSAst; Handler : JSAst;
             public override Write(indent = "" : string) : string {
 $<#
 $(indent)try {
@@ -722,18 +722,18 @@ $(indent)}
 #>
             }
         }
-        | Tuple          { Args : list[JsAst];
+        | Tuple          { Args : list[JSAst];
           public override Write(_indent = "" : string) : string {
             def values = Args.MapI((i, a) => $"$i: $(a.Write())");
             $<#{..$values}#>
           }
         }
-        | TupleIndexer          { Obj : JsAst; Pos : int;
+        | TupleIndexer          { Obj : JSAst; Pos : int;
           public override Write(_indent = "" : string) : string {            
             $<#$(Obj.Write())[$Pos]#>
           }
         }
-        | TypeOf         { Expr : JsAst;
+        | TypeOf         { Expr : JSAst;
             public override Write(_ = "" : string) : string {
                 $<#typeof $(Expr.Write())#>
             }
@@ -743,7 +743,7 @@ $(indent)}
                 <#"undefined"#>
             }
         }
-        | UnaryOperator  { Op : string; Obj : JsAst;
+        | UnaryOperator  { Op : string; Obj : JSAst;
             public override Write(_ = "" : string) : string {                
                 $"$Op$(Obj.Write())"
             }
@@ -754,7 +754,7 @@ $(indent)}
             }
         }
             
-        | While          { Cond : JsAst; Body : JsAst;
+        | While          { Cond : JSAst; Body : JSAst;
             public override Write(indent = "" : string) : string {
 $<#
 $(indent)while($(Cond.Write())) {
@@ -763,7 +763,7 @@ $(indent)}
 #>
             }
         }
-        | WhileNamed     { Cond : JsAst; Body : JsAst; Name : string;
+        | WhileNamed     { Cond : JSAst; Body : JSAst; Name : string;
             public override Write(indent = "" : string) : string {
 $<#
 $(indent)$Name: while($(Cond.Write())) {
@@ -772,14 +772,14 @@ $(indent)}
 #>  
             }
         }
-        | Pack     { Expr : JsAst; 
+        | Pack     { Expr : JSAst; 
           public override Write(indent = "" : string) : string {
-            JsAst.Assign(Expr, JsAst.Object([("value", Expr)])).Write(indent)
+            JSAst.Assign(Expr, JSAst.Object([("value", Expr)])).Write(indent)
           }
         }
-        | Unpack     { Expr : JsAst; 
+        | Unpack     { Expr : JSAst; 
           public override Write(indent = "" : string) : string {
-            JsAst.Assign(Expr, JsAst.FieldRef(Expr, "value")).Write(indent)
+            JSAst.Assign(Expr, JSAst.FieldRef(Expr, "value")).Write(indent)
           }
         }
         | NotImpl { 
@@ -793,94 +793,94 @@ $(indent)}
         }
         
         public abstract Write(_indent = "" : string) : string { string.Empty; };
-        public virtual Transform() : JsAst { this }        
+        public virtual Transform() : JSAst { this }        
         public static AllowedForAssignment : HashSet[Type] =
           HashSet([
-            typeof(JsAst.Call),
-            typeof(JsAst.MethodRef),
-            typeof(JsAst.LocalRef),            
-            typeof(JsAst.ParamRef),
-            typeof(JsAst.Literal), 
-            typeof(JsAst.Code),
-            typeof(JsAst.Void), 
-            typeof(JsAst.Ternary),
-            typeof(JsAst.NotImpl),
-            typeof(JsAst.Lambda),
-            typeof(JsAst.Array),
-            typeof(JsAst.StaticRef), 
-            typeof(JsAst.This), 
-            typeof(JsAst.Tuple),
-            typeof(JsAst.TupleIndexer), 
-            typeof(JsAst.FieldRef),
-            typeof(JsAst.PropertyGet),
-            typeof(JsAst.ArrayIndexer),
-            typeof(JsAst.Label),
-            typeof(JsAst.Object),
-            typeof(JsAst.Unpack),
-            typeof(JsAst.GlobalRef),
-            //typeof(JsAst.Goto),
+            typeof(JSAst.Call),
+            typeof(JSAst.MethodRef),
+            typeof(JSAst.LocalRef),            
+            typeof(JSAst.ParamRef),
+            typeof(JSAst.Literal), 
+            typeof(JSAst.Code),
+            typeof(JSAst.Void), 
+            typeof(JSAst.Ternary),
+            typeof(JSAst.NotImpl),
+            typeof(JSAst.Lambda),
+            typeof(JSAst.Array),
+            typeof(JSAst.StaticRef), 
+            typeof(JSAst.This), 
+            typeof(JSAst.Tuple),
+            typeof(JSAst.TupleIndexer), 
+            typeof(JSAst.FieldRef),
+            typeof(JSAst.PropertyGet),
+            typeof(JSAst.ArrayIndexer),
+            typeof(JSAst.Label),
+            typeof(JSAst.Object),
+            typeof(JSAst.Unpack),
+            typeof(JSAst.GlobalRef),
+            //typeof(JSAst.Goto),
           ]);
         
-        public static Recurse(ast : JsAst, selector : (JsAst * int) -> JsAst, currentDepth = 0 : int, topdown : bool = true) : JsAst 
+        public static Recurse(ast : JSAst, selector : (JSAst * int) -> JSAst, currentDepth = 0 : int, topdown : bool = true) : JSAst 
         {
             def recurse = Recurse(_, selector, currentDepth + 1, topdown);
             def ast' = if(topdown) selector(ast, currentDepth) else ast;
             
             def result = match(ast') {
-            | Assign(l, r)                => JsAst.Assign(recurse(l), recurse(r))
-            | Array(v)                    => JsAst.Array(v.Map(recurse))
-            | ArrayIndexer(o, v)          => JsAst.ArrayIndexer(recurse(o), recurse(v))
-            | BinaryOperator(o, l, r)     => JsAst.BinaryOperator(o, recurse(l), recurse(r))
+            | Assign(l, r)                => JSAst.Assign(recurse(l), recurse(r))
+            | Array(v)                    => JSAst.Array(v.Map(recurse))
+            | ArrayIndexer(o, v)          => JSAst.ArrayIndexer(recurse(o), recurse(v))
+            | BinaryOperator(o, l, r)     => JSAst.BinaryOperator(o, recurse(l), recurse(r))
             | Break                       => ast'
             | BreakNamed                  => ast'
-            | Call(func, parms)           => JsAst.Call(recurse(func), parms.Map(recurse))
+            | Call(func, parms)           => JSAst.Call(recurse(func), parms.Map(recurse))
             | Code                        => ast'
             | Constructor                 => ast'
             | ConstructorRef              => ast'
-            | Continue(loopname)          => JsAst.Continue(loopname)
-            | DefFunction(obj, ps, bdy)   => JsAst.DefFunction(recurse(obj), ps.Map(recurse), recurse(bdy))
-            | DeclFunction(name, ps, bdy) => JsAst.DeclFunction(name, ps.Map(recurse), recurse(bdy))
-            | DefValue(name, val)         => JsAst.DefValue(name, recurse(val))
+            | Continue(loopname)          => JSAst.Continue(loopname)
+            | DefFunction(obj, ps, bdy)   => JSAst.DefFunction(recurse(obj), ps.Map(recurse), recurse(bdy))
+            | DeclFunction(name, ps, bdy) => JSAst.DeclFunction(name, ps.Map(recurse), recurse(bdy))
+            | DefValue(name, val)         => JSAst.DefValue(name, recurse(val))
             | Delete                      => ast'
-            | FieldRef(obj, parm)         => JsAst.FieldRef(recurse(obj), parm)
-            | For(it, coll, body)         => JsAst.For(it, recurse(coll), recurse(body))
+            | FieldRef(obj, parm)         => JSAst.FieldRef(recurse(obj), parm)
+            | For(it, coll, body)         => JSAst.For(it, recurse(coll), recurse(body))
             | GlobalRef                   => ast'
             | Goto                        => ast'
-            | HasType(obj, type)          => JsAst.HasType(recurse(obj), type)
-            | If(cond, then, els)         => JsAst.If(recurse(cond), recurse(then), recurse(els))
-            | Indexer(obj)                => JsAst.Indexer(recurse(obj))
-            | JustIf(cond, then)          => JsAst.JustIf(recurse(cond), recurse(then))
-            | Label(id, body)             => JsAst.Label(id, recurse(body))
-            | Lambda(name, parms, body)   => JsAst.Lambda(name, parms, recurse(body))
+            | HasType(obj, type)          => JSAst.HasType(recurse(obj), type)
+            | If(cond, then, els)         => JSAst.If(recurse(cond), recurse(then), recurse(els))
+            | Indexer(obj)                => JSAst.Indexer(recurse(obj))
+            | JustIf(cond, then)          => JSAst.JustIf(recurse(cond), recurse(then))
+            | Label(id, body)             => JSAst.Label(id, recurse(body))
+            | Lambda(name, parms, body)   => JSAst.Lambda(name, parms, recurse(body))
             | Literal                     => ast'
             | LocalRef                    => ast'
-            | MethodRef(obj, meth, parms) => JsAst.MethodRef(recurse(obj), meth, parms)
+            | MethodRef(obj, meth, parms) => JSAst.MethodRef(recurse(obj), meth, parms)
             | NotImpl                     => ast'
             | OpCode                      => ast'
-            | Object(fields)              => JsAst.Object(fields.Map((name, body) => (name, recurse(body))))
+            | Object(fields)              => JSAst.Object(fields.Map((name, body) => (name, recurse(body))))
             | ParamRef                    => ast'
-            | PropertySet(obj, prop, val) => JsAst.PropertySet(recurse(obj), prop, recurse(val))
-            | PropertyGet(obj, prop)      => JsAst.PropertyGet(recurse(obj), prop)
-            | Return(expr)                => JsAst.Return(recurse(expr))
-            | Seq(items)                  => JsAst.Seq(items.Map(ast => Recurse(ast, selector, currentDepth, topdown)))
-            | ServerCall(meth, ty, parms, callback) => JsAst.ServerCall(meth, ty, parms.Map(p => (p[0], recurse(p[1]))), recurse(callback))
+            | PropertySet(obj, prop, val) => JSAst.PropertySet(recurse(obj), prop, recurse(val))
+            | PropertyGet(obj, prop)      => JSAst.PropertyGet(recurse(obj), prop)
+            | Return(expr)                => JSAst.Return(recurse(expr))
+            | Seq(items)                  => JSAst.Seq(items.Map(ast => Recurse(ast, selector, currentDepth, topdown)))
+            | ServerCall(meth, ty, parms, callback) => JSAst.ServerCall(meth, ty, parms.Map(p => (p[0], recurse(p[1]))), recurse(callback))
             | StaticRef as s              => s
             | StaticMethodRef as s        => s
-            | Switch(expr, cases, deflt)  => JsAst.Switch(recurse(expr), cases.Select(recurse).Cast.[JsAst.SwitchCase]().NToList(), recurse(deflt))
-            | SwitchCase(id, case)        => JsAst.SwitchCase(id, recurse(case))
-            | Ternary(cond, then, els)    => JsAst.Ternary(recurse(cond), recurse(then), recurse(els))
+            | Switch(expr, cases, deflt)  => JSAst.Switch(recurse(expr), cases.Select(recurse).Cast.[JSAst.SwitchCase]().NToList(), recurse(deflt))
+            | SwitchCase(id, case)        => JSAst.SwitchCase(id, recurse(case))
+            | Ternary(cond, then, els)    => JSAst.Ternary(recurse(cond), recurse(then), recurse(els))
             | This                        => ast'
-            | Throw(obj)                  => JsAst.Throw(recurse(obj))
-            | Try(body, handler)          => JsAst.Try(recurse(body), recurse(handler))
-            | TryFinally(body, handler)   => JsAst.TryFinally(recurse(body), recurse(handler))
-            | Tuple(args)                 => JsAst.Tuple(args.Map(recurse))
-            | TupleIndexer(o, pos)        => JsAst.TupleIndexer(recurse(o), pos)
-            | TypeOf(expr)                => JsAst.TypeOf(recurse(expr))
+            | Throw(obj)                  => JSAst.Throw(recurse(obj))
+            | Try(body, handler)          => JSAst.Try(recurse(body), recurse(handler))
+            | TryFinally(body, handler)   => JSAst.TryFinally(recurse(body), recurse(handler))
+            | Tuple(args)                 => JSAst.Tuple(args.Map(recurse))
+            | TupleIndexer(o, pos)        => JSAst.TupleIndexer(recurse(o), pos)
+            | TypeOf(expr)                => JSAst.TypeOf(recurse(expr))
             | Undefined                   => ast'            
-            | UnaryOperator(op, obj)      => JsAst.UnaryOperator(op, recurse(obj))
+            | UnaryOperator(op, obj)      => JSAst.UnaryOperator(op, recurse(obj))
             | Void                        => ast'        
-            | While(cond, body)           => JsAst.While(recurse(cond), recurse(body))
-            | WhileNamed(cnd, bdy, nme)   => JsAst.WhileNamed(recurse(cnd), recurse(bdy), nme)
+            | While(cond, body)           => JSAst.While(recurse(cond), recurse(body))
+            | WhileNamed(cnd, bdy, nme)   => JSAst.WhileNamed(recurse(cnd), recurse(bdy), nme)
             | Pack                        => ast'
             | Unpack                      => ast'
             }
@@ -888,7 +888,7 @@ $(indent)}
             if(topdown) result else selector(result, currentDepth)
         }
         
-        private IsAllowedForAssignment(ast : JsAst) : bool
+        private IsAllowedForAssignment(ast : JSAst) : bool
         {
           AllowedForAssignment.Contains(ast.GetType())
         }

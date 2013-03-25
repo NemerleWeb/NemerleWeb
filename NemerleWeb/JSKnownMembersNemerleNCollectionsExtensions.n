@@ -11,19 +11,19 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  module JsKnownMembersNemerleNCollectionsExtensions
+  module JSKnownMembersNemerleNCollectionsExtensions
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(NCollectionsExtensions), Handler);
+      JSKnownMembers.RegisterType(typeof(NCollectionsExtensions), Handler);
     }
     
-    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
-      if (left is JsAst.StaticMethodRef) StaticHandler(left, member, parms) else None()
+      if (left is JSAst.StaticMethodRef) StaticHandler(left, member, parms) else None()
     }
     
-    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private StaticHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match (parms)
       {
@@ -37,7 +37,7 @@ namespace NemerleWeb
         match (member.Name)
         {
         | "MapToArray" =>
-          Some(arg1.AsEnumerable().JsMethodCall("select", [arg2]).JsMethodCall("toArray", []))
+          Some(arg1.AsEnumerable().JSMethodCall("select", [arg2]).JSMethodCall("toArray", []))
         | _ => None()
         }
       | _ => None()

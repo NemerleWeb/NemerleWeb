@@ -11,33 +11,33 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  module JsKnownMembersFloats
+  module JSKnownMembersFloats
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(float), Handler); 
-      JsKnownMembers.RegisterType(typeof(double), Handler); 
+      JSKnownMembers.RegisterType(typeof(float), Handler); 
+      JSKnownMembers.RegisterType(typeof(double), Handler); 
     }
     
-    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
-      if (left is JsAst.StaticMethodRef) StaticHandler(left, member, parms) else None()
+      if (left is JSAst.StaticMethodRef) StaticHandler(left, member, parms) else None()
     }
     
-    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private StaticHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match (parms)
       {
       | [_] =>
         match (member.Name)
         {
-        | "Parse" => Some(JsAst.Call(JsAst.GlobalRef("parseFloat"), parms))
+        | "Parse" => Some(JSAst.Call(JSAst.GlobalRef("parseFloat"), parms))
         | _ => None()
         }
       | [arg1, _] =>
         match (member.Name)
         {
-        | "Parse" => Some(JsAst.Call(JsAst.GlobalRef("parseFloat"), [arg1]))
+        | "Parse" => Some(JSAst.Call(JSAst.GlobalRef("parseFloat"), [arg1]))
         | _ => None()
         }
       | _ => None()

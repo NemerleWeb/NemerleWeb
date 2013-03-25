@@ -12,41 +12,41 @@ using System.Linq;
 namespace NemerleWeb
 {
   /// <summary>
-  /// Description of JsKnownMembersInt.
+  /// Description of JSKnownMembersInt.
   /// </summary>
-  module JsKnownMembersIntegers
+  module JSKnownMembersIntegers
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(byte), Handler);
-      JsKnownMembers.RegisterType(typeof(sbyte), Handler);
-      JsKnownMembers.RegisterType(typeof(short), Handler);
-      JsKnownMembers.RegisterType(typeof(ushort), Handler);
-      JsKnownMembers.RegisterType(typeof(int), Handler);
-      JsKnownMembers.RegisterType(typeof(uint), Handler);
-      JsKnownMembers.RegisterType(typeof(long), Handler);
-      JsKnownMembers.RegisterType(typeof(ulong), Handler);
+      JSKnownMembers.RegisterType(typeof(byte), Handler);
+      JSKnownMembers.RegisterType(typeof(sbyte), Handler);
+      JSKnownMembers.RegisterType(typeof(short), Handler);
+      JSKnownMembers.RegisterType(typeof(ushort), Handler);
+      JSKnownMembers.RegisterType(typeof(int), Handler);
+      JSKnownMembers.RegisterType(typeof(uint), Handler);
+      JSKnownMembers.RegisterType(typeof(long), Handler);
+      JSKnownMembers.RegisterType(typeof(ulong), Handler);
     }
     
-    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
-      if (left is JsAst.StaticMethodRef) StaticHandler(left, member, parms) else None()
+      if (left is JSAst.StaticMethodRef) StaticHandler(left, member, parms) else None()
     }
     
-    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private StaticHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match (parms)
       {
       | [_] =>
         match (member.Name)
         {
-        | "Parse" => Some(JsAst.Call(JsAst.GlobalRef("parseInt"), parms))
+        | "Parse" => Some(JSAst.Call(JSAst.GlobalRef("parseInt"), parms))
         | _ => None()
         }
       | [arg1, _] =>
         match (member.Name)
         {
-        | "Parse" => Some(JsAst.Call(JsAst.GlobalRef("parseInt"), [arg1]))
+        | "Parse" => Some(JSAst.Call(JSAst.GlobalRef("parseInt"), [arg1]))
         | _ => None()
         }
       | _ => None()

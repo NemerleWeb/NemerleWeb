@@ -11,16 +11,16 @@ using System.Linq;
 namespace NemerleWeb
 {
   /// <summary>
-  /// Description of JsKnownMembersOperators
+  /// Description of JSKnownMembersOperators
   /// </summary>
-  module JsKnownMembersOperators
+  module JSKnownMembersOperators
   {
     public Register() : void
     {
-      def opcodeAst(opcode, parms) { JsAst.Call(JsAst.OpCode(opcode), parms) }
+      def opcodeAst(opcode, parms) { JSAst.Call(JSAst.OpCode(opcode), parms) }
       def registerOpcode(opcodeName, opcode)
       {
-        JsKnownMembers.RegisterMember(opcodeName, (_, _, _, parms) => Some(opcodeAst(opcode, parms)));
+        JSKnownMembers.RegisterMember(opcodeName, (_, _, _, parms) => Some(opcodeAst(opcode, parms)));
       }
       
       registerOpcode("op_Inequality", "!==");
@@ -66,7 +66,7 @@ namespace NemerleWeb
       
       def registerCastOpcode(opcodeName)
       {
-        JsKnownMembers.RegisterMember(
+        JSKnownMembers.RegisterMember(
           opcodeName,
           (typeInfo, left, member, parms) =>
           {
@@ -77,8 +77,8 @@ namespace NemerleWeb
               match(typeInfo.FullName)
               {
               | "System.Decimal" => Some(arg)
-              | "System.String" => Some(JsAstHelper.CallToString(typeInfo, left, member, parms))
-              | _ => Some(JsAst.Call(left, []))
+              | "System.String" => Some(JSAstHelper.CallToString(typeInfo, left, member, parms))
+              | _ => Some(JSAst.Call(left, []))
               }
             | _ => None()
             }

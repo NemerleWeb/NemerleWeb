@@ -31,7 +31,7 @@ namespace NemerleWeb
       def methods = tb.DeclaringType
                       .GetMembers(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic)
                       .OfType.[IMethod]();
-      def methods = JsClass.FilterMethods(methods)
+      def methods = JSClass.FilterMethods(methods)
                             .Select(m => (m.Name, $"..$(m.GetParameters().Select(p => p.Name))"))
                             .Select(((name, parms), _) => 
 $<#

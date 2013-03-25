@@ -11,40 +11,40 @@ using System.Globalization;
 
 namespace NemerleWeb
 {
-  module JsKnownMembersGlobalizationCutlureInfo
+  module JSKnownMembersGlobalizationCutlureInfo
   {    
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(CultureInfo), Handler);
+      JSKnownMembers.RegisterType(typeof(CultureInfo), Handler);
     }
   
-    public Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    public Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
-      (if (left is JsAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
+      (if (left is JSAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
     }
     
-    private InstanceHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private InstanceHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match(parms)
       {
       | [] =>
         match(member.Name)
         {
-        | "get_NumberFormat" => Some(JsAst.Literal(JsLiteral.Null()))
+        | "get_NumberFormat" => Some(JSAst.Literal(JSLiteral.Null()))
         | _ => None()
         }
       | _ => None()
       }
     }
      
-    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private StaticHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match(parms)
       {
       | [_] =>
         match(member.Name)
         {
-        | "CreateSpecificCulture" => Some(JsAst.Literal(JsLiteral.String("")))
+        | "CreateSpecificCulture" => Some(JSAst.Literal(JSLiteral.String("")))
         | _ => None()
         }
       | _ => None()

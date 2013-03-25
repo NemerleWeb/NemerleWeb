@@ -1,0 +1,12 @@
+using System;
+using Nemerle.Utility;
+
+namespace NemerleWeb
+{
+  [Record]
+  [AttributeUsage(AttributeTargets.Class)]
+  class JSApiAttribute : Attribute
+  {
+    public Module : string { get; }
+  }
+}

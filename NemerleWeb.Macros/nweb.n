@@ -29,9 +29,9 @@ namespace NemerleWeb
       | <[ $_unitName() ]> with parms = []
       | <[ $_unitName(..$parms) ]> =>             
         def typedParms = parms.Map(typer.TypeExpr);
-        def signature = JsAstHelper.MethodSignature(typedParms);
+        def signature = JSAstHelper.MethodSignature(typedParms);
         
-        def properName = JsClass.GetProperName(typer.TypeExpr(expr).Type.TypeInfo);        
+        def properName = JSClass.GetProperName(typer.TypeExpr(expr).Type.TypeInfo);        
         def serverParams = parms.Select(p => <[ paramList.Add("nweb.utils.toTypedObject(" + NWebUtils.ToJson($p) + ")") ]>);
         
         def res = <[

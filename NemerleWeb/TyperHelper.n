@@ -22,10 +22,10 @@ namespace NemerleWeb
           def method = BuildMethod(expr, typer);
           def oldBody = method.Header.body;
           def typedBody = GetTypedBody(method, typer, typer.CurrentTypeBuilder, false);
-          def defs = JsAstBuilder.BuildJsAstForSplices(typedBody, method.Header);
+          def defs = JSAstBuilder.BuildJSAstForSplices(typedBody, method.Header);
           method.Header.body = oldBody;
           def tt = GetTypedBody(method, typer, typer.CurrentTypeBuilder);
-          def defs2 = JsAstBuilder.BuildJsAstForSplices(tt, method.Header);
+          def defs2 = JSAstBuilder.BuildJSAstForSplices(tt, method.Header);
           
           defs.Concat(defs2)
               .SelectMany(j =>
@@ -38,10 +38,10 @@ namespace NemerleWeb
               .ToDictionary(g => g.Key, g => g.FirstOrDefault((_, v) => !string.IsNullOrEmpty(v))[1]);
         }
         
-        public GetMethodJsAst(method : IMethod, typer : Typer, tb : TypeBuilder) : JsAst 
+        public GetMethodJSAst(method : IMethod, typer : Typer, tb : TypeBuilder) : JSAst 
         {
           def texpr = GetTypedBody(method, typer, tb);
-          def jsast = JsAstBuilder.BuildJsAst(texpr, !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor, method.Header);
+          def jsast = JSAstBuilder.BuildJSAst(texpr, !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor, method.Header);
           /*def tempFileName = System.IO.Path.GetTempFileName();
           System.IO.File.WriteAllText(tempFileName, texpr.ToString());
           System.IO.File.AppendAllText(tempFileName, jsast.Write());

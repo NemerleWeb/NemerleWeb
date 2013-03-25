@@ -9,6 +9,6 @@ using System.Linq;
 
 namespace NemerleWeb
 {  
-  public class JsAstAttribute : Attribute
+  public class JSAstAttribute : Attribute
   {}
 }

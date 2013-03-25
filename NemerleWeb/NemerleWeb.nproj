@@ -115,6 +115,9 @@
     <Compile Include="IgnoreAttribute.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JSApiAttribute.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JSAstAttribute.n">
       <SubType>Code</SubType>
     </Compile>
