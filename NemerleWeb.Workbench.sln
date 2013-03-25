@@ -16,7 +16,7 @@ Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Macros", "Nemerl
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "TSParser", "TSParser\TSParser.nproj", "{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}"
 EndProject
-Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.JsApi", "NemerleWeb.JsApi\NemerleWeb.JsApi.nproj", "{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}"
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.JSApi", "NemerleWeb.JSApi\NemerleWeb.JSApi.nproj", "{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
