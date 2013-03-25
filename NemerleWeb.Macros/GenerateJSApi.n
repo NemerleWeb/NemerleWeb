@@ -1,89 +1,134 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Nemerle.Macros;
 using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
 using Nemerle.Collections;
 using System.IO;
+using System.Text.RegularExpressions;
 using TSParser;
 using NemerleWeb;
 
 namespace NemerleWeb.Macros
 {
-  [Nemerle.MacroUsage (Nemerle.MacroPhase.BeforeInheritance,
-                       Nemerle.MacroTargets.Assembly)]
-  macro NemerleWebProperties(params options : list[PExpr])
-  {  
-    NemerleWebPropertiesImpl.Impl(Nemerle.Macros.ImplicitCTX(), options) 
-  }
-
-  module NemerleWebPropertiesImpl
+  [Nemerle.MacroUsage(Nemerle.MacroPhase.BeforeInheritance, Nemerle.MacroTargets.Assembly)]
+  macro GenerateJSApi(params options : list[PExpr])
   {
+    GenerateJSApiImpl.Impl(ImplicitCTX(), options)
+  }
+  
+  module GenerateJSApiImpl
+  {
+    tsParser = TSDeclarationParser();
+    
     public Impl(typer : Typer, options : list[PExpr]) : void
-    {
-      def jsApi = typer.Env.Define(<[ decl: public module JsApi {} ]>);
-      
-      foreach(opt in options)
+    {      
+      match(options)
       {
-      | <[ (TypeScriptPath, $(path)) ]> => 
-        def parser = TSDeclarationParser();
-        def path = path.ToString();      
-        def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
-        def tsDir = Path.Combine(projectDir, path);
-        def tsFiles = Directory.EnumerateFiles(tsDir, "*.d.ts", SearchOption.AllDirectories);
-                     
-        //assert2(false); 
-        
-        def parse(tsFile, infrastructure)
-        {
-          match(parser.TryParse(File.ReadAllText(tsFile)))
-          {
-          | (pos, result) when pos == parser.ParsingSource.OriginalText.Length =>
-            
-            def jsApiModule =
-              if (infrastructure)
-                jsApi
-              else
-              {
-                def fileName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(tsFile));
-                CreateModule(fileName.Split('.').NToList(), jsApi)
-              };
-            
-            foreach(r in result) 
-            {
-            //| Variable  as v => CreateTSGlobalVariable (v, jsApiModule)
-            //| Function  as f => CreateTSGlobalFunction (f, jsApiModule)
-            //| Interface as i => CreateTSGlobalInterface(i, jsApiModule)
-            //| Class     as c => CreateTSGlobalClass    (c, jsApiModule)
-            //| Construct as c => CreateTSGlobalConstruct(c, jsApiModule)
-            //| Enum      as e => CreateTSGlobalEnum     (e, jsApiModule)
-            //| Import    as i => CreateTSGlobalImport   (i, jsApiModule)
-            //| Export    as e => CreateTSGlobalExport   (e, jsApiModule)
-            //| Module    as m => CreateTSGlobalModule   (m, jsApiModule)
-            //| ReferencePath(path) => Message.Hint($"Reference $path");
-            //| ReferenceNoDefaultLib => Message.Hint("No default lib");
-            | _ => ()
-            }
-            
-            when (!infrastructure) jsApiModule.Compile();
-          | (pos, _) => 
-            def text = parser.ParsingSource.OriginalText;
-            Message.Error(Location(tsFile, pos, pos, pos, pos), $"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...")
-          }
-        }
-      
-        // Parse first the infrastructure file.
-        def infrastructure = Path.Combine(tsDir, @"_infrastructure\tests\typescript_0.8.3\lib.d.ts");
-        parse(infrastructure, true);
-      
-        // Parse other files
-        foreach(tsFile when !tsFile.Contains("_infrastructure") in tsFiles)
-          parse(tsFile, false);
-          
-        jsApi.Compile();
-
-      | _ => Message.Error(<#Unrecognized option format, should be tuple of two strings: ("TypeScriptPath", "Typescripts") #>)
+      | [<[ Directory = $(directory : string) ]> ] with (libPath = "", exclude = "")
+      | [<[ Lib = $(libPath : string) ]>,
+         <[ Directory = $(directory : string) ]> ] with exclude = ""
+      | [<[ Lib = $(libPath : string) ]>,
+         <[ Directory = $(directory : string) ]>,
+         <[ Exclude = $(exclude : string) ]> ] =>
+        DoImpl(typer, libPath, directory, exclude)
+      | _ =>
+        Message.Error("Specify Directory parameter");
       }
     }
+    
+    private DoImpl(typer : Typer, libPath : string, directory : string, exclude : string) : void
+    {
+      def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
+      
+      // Parse lib if present
+      when (libPath != "")
+        ParseTSLibFile(typer, Path.Combine(projectDir, libPath));
+      
+      // Parse all files in directory
+      def re = Regex(exclude);
+      def isIncluded(s) { if (exclude == "") true else !re.IsMatch(s) }
+      
+      def fullDir = Path.Combine(projectDir, directory);
+      def tsFiles = Directory.EnumerateFiles(fullDir, "*.d.ts", SearchOption.AllDirectories);
+      
+      foreach(tsFile when isIncluded(tsFile) in tsFiles)
+        ParseTSFile(typer, tsFile);
+    }
+    
+    private ParseTSLibFile(typer : Typer, tsFile : string) : void
+    {
+      ParseTSAndGenerate(typer, tsFile, "");
+    }
+    
+    private ParseTSFile(typer : Typer, tsFile : string) : void
+    {
+      ParseTSAndGenerate(typer, tsFile, "");
+    }
+    
+    private ParseTSAndGenerate(typer : Typer, tsFile : string, baseNamespace : string) : void
+    {
+      match(tsParser.TryParse(File.ReadAllText(tsFile)))
+      {
+      | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>
+        // Root JS API namespace
+        def jsApi = typer.Env.EnterIntoNamespace(["JSApi"]);
+        Message.Hint(tsFile);
+      | (pos, _) =>
+        // TODO: Add locations to parser and print here correct location in the file.
+        def text = tsParser.ParsingSource.OriginalText;
+        Message.Error(Location(tsFile, 0, 0, 0, 0), $"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...")
+      }
+    }
+    
+ 
+      //      def jsApiModule =
+      //        if (infrastructure)
+      //          jsApi
+      //        else
+      //        {
+      //          def fileName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(tsFile));
+      //          CreateModule(fileName.Split('.').NToList(), jsApi)
+      //        };
+            
+      //      foreach(r in result) 
+      //      {
+      //      //| Variable  as v => CreateTSGlobalVariable (v, jsApiModule)
+      //      //| Function  as f => CreateTSGlobalFunction (f, jsApiModule)
+      //      //| Interface as i => CreateTSGlobalInterface(i, jsApiModule)
+      //      //| Class     as c => CreateTSGlobalClass    (c, jsApiModule)
+      //      //| Construct as c => CreateTSGlobalConstruct(c, jsApiModule)
+      //      //| Enum      as e => CreateTSGlobalEnum     (e, jsApiModule)
+      //      //| Import    as i => CreateTSGlobalImport   (i, jsApiModule)
+      //      //| Export    as e => CreateTSGlobalExport   (e, jsApiModule)
+      //      //| Module    as m => CreateTSGlobalModule   (m, jsApiModule)
+      //      //| ReferencePath(path) => Message.Hint($"Reference $path");
+      //      //| ReferenceNoDefaultLib => Message.Hint("No default lib");
+      //      | _ => ()
+      //      }
+            
+      //      when (!infrastructure) jsApiModule.Compile();
+      //    | (pos, _) => 
+      //      def text = parser.ParsingSource.OriginalText;
+      //      Message.Error(Location(tsFile, pos, pos, pos, pos), $"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...")
+      //    }
+      //  }
+      
+      //  // Parse first the infrastructure file.
+      //  def infrastructure = Path.Combine(tsDir, @"_infrastructure\tests\typescript_0.8.3\lib.d.ts");
+      //  parse(infrastructure, true);
+      
+      //  // Parse other files
+      //  foreach(tsFile when !tsFile.Contains("_infrastructure") in tsFiles)
+      //    parse(tsFile, false);
+          
+      //  jsApi.Compile();
+
+      
+      //  | _ => Message.Error(<#Unrecognized option format, should be tuple of two strings: ("
+      //  ", "Typescripts") #>)
+      //}
+    //}
     
     private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder) : void
     {
@@ -230,5 +275,11 @@ namespace NemerleWeb.Macros
       | Any
       | _ => <[ object ]>
     }
+        
+    /// Replace path separator with dots
+    private NormalizeName(path : string) : string
+    {
+      path.Replace('\\', '.').Replace('/', '.')
+    }    
   }
 }

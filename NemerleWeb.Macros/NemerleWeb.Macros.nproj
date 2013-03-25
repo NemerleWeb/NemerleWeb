@@ -111,7 +111,7 @@
     <Compile Include="nweb.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="NWebProperties.n">
+    <Compile Include="GenerateJSApi.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SignalR\SignalRMacro.n">
