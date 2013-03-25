@@ -60,7 +60,7 @@ namespace NemerleWeb.Peg
     }
   
     // TODO: Remove
-      [JsApi]
+      [JSApi]
   public class RegExp
   {
     public this(_pattern : string) 
