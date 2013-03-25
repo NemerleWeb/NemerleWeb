@@ -102,10 +102,10 @@
     <Compile Include="HtmlMacro\Html.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Js.n">
+    <Compile Include="JS.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsApi.n">
+    <Compile Include="JSApi.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="nweb.n">

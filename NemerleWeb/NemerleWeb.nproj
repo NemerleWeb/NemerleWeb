@@ -115,112 +115,112 @@
     <Compile Include="IgnoreAttribute.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsAstAttribute.n">
+    <Compile Include="JSAstAttribute.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IPage.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsAst.n">
+    <Compile Include="JSAst.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsAstBuilder.n">
+    <Compile Include="JSAstBuilder.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsAstHelper.n">
+    <Compile Include="JSAstHelper.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsClass.n">
+    <Compile Include="JSClass.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembers.n">
+    <Compile Include="JSKnownMembers.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersArray.n">
+    <Compile Include="JSKnownMembersArray.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersBase.n">
+    <Compile Include="JSKnownMembersBase.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersCharEnumerator.n">
+    <Compile Include="JSKnownMembersCharEnumerator.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersDelegate.n">
+    <Compile Include="JSKnownMembersDelegate.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersConsole.n">
+    <Compile Include="JSKnownMembersConsole.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersConvert.n">
+    <Compile Include="JSKnownMembersConvert.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersFloats.n">
+    <Compile Include="JSKnownMembersFloats.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersEventsDSL.n">
+    <Compile Include="JSKnownMembersEventsDSL.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersGlobalizationCultureInfo.n">
+    <Compile Include="JSKnownMembersGlobalizationCultureInfo.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersIDisposable.n">
+    <Compile Include="JSKnownMembersIDisposable.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersIEnumerable.n">
+    <Compile Include="JSKnownMembersIEnumerable.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersIntegers.n">
+    <Compile Include="JSKnownMembersIntegers.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersMath.n">
+    <Compile Include="JSKnownMembersMath.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersNemerleCollectionsHashtable.n">
+    <Compile Include="JSKnownMembersNemerleCollectionsHashtable.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersNemerleCollectionsNList.n">
+    <Compile Include="JSKnownMembersNemerleCollectionsNList.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersNemerleNCollectionsExtensions.n">
+    <Compile Include="JSKnownMembersNemerleNCollectionsExtensions.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersEnumerator.n">
+    <Compile Include="JSKnownMembersEnumerator.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersNemerleOption.n">
+    <Compile Include="JSKnownMembersNemerleOption.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersPage.n">
+    <Compile Include="JSKnownMembersPage.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersSCGDictionary.n">
+    <Compile Include="JSKnownMembersSCGDictionary.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersSCGList.n">
+    <Compile Include="JSKnownMembersSCGList.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersSCGStack.n">
+    <Compile Include="JSKnownMembersSCGStack.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersString.n">
+    <Compile Include="JSKnownMembersString.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersLinqEnumerable.n">
+    <Compile Include="JSKnownMembersLinqEnumerable.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersNemerleList.n">
+    <Compile Include="JSKnownMembersNemerleList.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersObject.n">
+    <Compile Include="JSKnownMembersObject.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersOperators.n">
+    <Compile Include="JSKnownMembersOperators.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsKnownMembersTextStringBuilder.n">
+    <Compile Include="JSKnownMembersTextStringBuilder.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JsLiteral.n">
+    <Compile Include="JSLiteral.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="NWebData.n">
