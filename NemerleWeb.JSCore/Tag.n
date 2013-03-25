@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace NemerleWeb.JSCore
 {  
-  [JsApi]
+  [JSApi]
   public class Tag
   {
   }
