@@ -12,30 +12,30 @@ using System.Linq;
 namespace NemerleWeb
 {
   /// <summary>
-  /// Description of JsKnownMembersConvert
+  /// Description of JSKnownMembersConvert
   /// </summary>
-  module JsKnownMembersConvert
+  module JSKnownMembersConvert
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(Convert), Handler);
+      JSKnownMembers.RegisterType(typeof(Convert), Handler);
     }
     
-    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
-      if (left is JsAst.StaticMethodRef) StaticHandler(left, member, parms) else None()
+      if (left is JSAst.StaticMethodRef) StaticHandler(left, member, parms) else None()
     }
     
-    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private StaticHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match (parms)
       {
       | [arg1] =>
         match(member.Name)
         {
-        | "ToString" => Some(arg1.JsMethodCall("toString", []))
+        | "ToString" => Some(arg1.JSMethodCall("toString", []))
         | "ToDouble"
-        | "ToSingle" => Some(JsAst.Call(JsAst.GlobalRef("parseFloat"), parms))
+        | "ToSingle" => Some(JSAst.Call(JSAst.GlobalRef("parseFloat"), parms))
         | "ToByte"
         | "ToInt16"
         | "ToInt32"
@@ -43,7 +43,7 @@ namespace NemerleWeb
         | "ToSByte"
         | "ToUInt16"
         | "ToUInt32"
-        | "ToUInt64" => Some(JsAst.Call(JsAst.GlobalRef("parseInt"), parms))
+        | "ToUInt64" => Some(JSAst.Call(JSAst.GlobalRef("parseInt"), parms))
         | _ => None()
         }
       | _ => None()

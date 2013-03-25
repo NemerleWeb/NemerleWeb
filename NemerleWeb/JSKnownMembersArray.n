@@ -10,27 +10,27 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  module JsKnownMembersArray
+  module JSKnownMembersArray
   {    
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(Array), Handler);
+      JSKnownMembers.RegisterType(typeof(Array), Handler);
     }
   
-    public Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    public Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
-      (if (left is JsAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
+      (if (left is JSAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
     }
     
-    private InstanceHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private InstanceHandler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     { 
       match (parms)
       {
       | [] =>
         match (member.Name)
         {
-        | "get_Length" => Some(JsAst.FieldRef(left, "length"))
-        | "get_LongLength" => Some(JsAst.FieldRef(left, "length"))
+        | "get_Length" => Some(JSAst.FieldRef(left, "length"))
+        | "get_LongLength" => Some(JSAst.FieldRef(left, "length"))
         | _ => None()
         }
         
@@ -44,7 +44,7 @@ namespace NemerleWeb
       }
     }
      
-    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private StaticHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match (parms)
       {
@@ -52,7 +52,7 @@ namespace NemerleWeb
         match (member.Name)
         {
         // TODO: Implement real binary search
-        | "BinarySearch" => Some(arg1.JsMethodCall("indexOf", [arg2]))
+        | "BinarySearch" => Some(arg1.JSMethodCall("indexOf", [arg2]))
         | _ => None()
         }
       | _ => None()

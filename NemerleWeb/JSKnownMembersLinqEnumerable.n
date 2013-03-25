@@ -11,27 +11,27 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  internal module JsLinqExtensions
+  internal module JSLinqExtensions
   {
-    public static AsEnumerable(this seq : JsAst) : JsAst
+    public static AsEnumerable(this seq : JSAst) : JSAst
     {
-      JsAst.Call(JsAst.StaticRef("Enumerable", "from"), [seq])
+      JSAst.Call(JSAst.StaticRef("Enumerable", "from"), [seq])
     }
   }
   
-  module JsKnownMembersLinqEnumerable
+  module JSKnownMembersLinqEnumerable
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(Enumerable), Handler); 
+      JSKnownMembers.RegisterType(typeof(Enumerable), Handler); 
     }
     
-    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
-      if (left is JsAst.StaticMethodRef) StaticHandler(left, member, parms) else None()
+      if (left is JSAst.StaticMethodRef) StaticHandler(left, member, parms) else None()
     }
     
-    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private StaticHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match (parms)
       {
@@ -55,10 +55,10 @@ namespace NemerleWeb
         | "Single"
         | "SingleOrDefault"
         | "Sum"        
-        | "ToArray" => Some(seq.AsEnumerable().JsMethodCall(member.Name, []))        
+        | "ToArray" => Some(seq.AsEnumerable().JSMethodCall(member.Name, []))        
         | "ToList" => Some(seq)        
         | "FirstOrDefault"
-        | "LastOrDefault" =>  Some(seq.AsEnumerable().JsMethodCall(member.Name, [JsAst.Literal(JsLiteral.Null())]))
+        | "LastOrDefault" =>  Some(seq.AsEnumerable().JSMethodCall(member.Name, [JSAst.Literal(JSLiteral.Null())]))
         | _ => None()
         }
        
@@ -100,13 +100,13 @@ namespace NemerleWeb
         | "ToDictionary"          
         | "ToLookup"
         | "Union"
-        | "Where" => Some(seq.AsEnumerable().JsMethodCall(member.Name, [arg1]))
+        | "Where" => Some(seq.AsEnumerable().JSMethodCall(member.Name, [arg1]))
         
         | "FirstOrDefault"
-        | "LastOrDefault" =>  Some(seq.AsEnumerable().JsMethodCall(member.Name, [JsAst.Literal(JsLiteral.Null()), arg1]))
+        | "LastOrDefault" =>  Some(seq.AsEnumerable().JSMethodCall(member.Name, [JSAst.Literal(JSLiteral.Null()), arg1]))
                               
         // Special method
-        | "Range" => Some(JsAst.Call(JsAst.StaticRef("Enumerable", "range"), [seq, arg1]))
+        | "Range" => Some(JSAst.Call(JSAst.StaticRef("Enumerable", "range"), [seq, arg1]))
         | _ => None()
         }
           
@@ -127,7 +127,7 @@ namespace NemerleWeb
         | "ToDictionary"
         | "ToLookup"
         | "Union"
-        | "Zip" => Some(seq.AsEnumerable().JsMethodCall(member.Name, [arg1, arg2]))
+        | "Zip" => Some(seq.AsEnumerable().JSMethodCall(member.Name, [arg1, arg2]))
         | _ => None()
         }
         
@@ -137,7 +137,7 @@ namespace NemerleWeb
         | "Aggregate"
         | "GroupBy"
         | "ToDictionary"
-        | "ToLookup" => Some(seq.AsEnumerable().JsMethodCall(member.Name, [arg1, arg2, arg3]))
+        | "ToLookup" => Some(seq.AsEnumerable().JSMethodCall(member.Name, [arg1, arg2, arg3]))
         | _ => None()
         }
         
@@ -146,7 +146,7 @@ namespace NemerleWeb
         {
         | "GroupBy"
         | "GroupJoin"
-        | "Join" => Some(seq.AsEnumerable().JsMethodCall(member.Name, [arg1, arg2, arg3, arg4]))
+        | "Join" => Some(seq.AsEnumerable().JSMethodCall(member.Name, [arg1, arg2, arg3, arg4]))
         | _ => None()
         }
         
@@ -154,7 +154,7 @@ namespace NemerleWeb
         match (member.Name)
         {
         | "GroupJoin"
-        | "Join" => Some(seq.AsEnumerable().JsMethodCall(member.Name, [arg1, arg2, arg3, arg4, arg5]))
+        | "Join" => Some(seq.AsEnumerable().JSMethodCall(member.Name, [arg1, arg2, arg3, arg4, arg5]))
         | _ => None()
         }
       | _ => None()

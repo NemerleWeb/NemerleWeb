@@ -11,30 +11,30 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  module JsKnownMembersEventsDSL
+  module JSKnownMembersEventsDSL
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(NemerleWeb.Events), Handler);      
+      JSKnownMembers.RegisterType(typeof(NemerleWeb.Events), Handler);      
     }
     
-    private Handler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private Handler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match (parms)
       {
-      | [eventName, JsAst.Literal(JsLiteral.String(context)), callback] =>
+      | [eventName, JSAst.Literal(JSLiteral.String(context)), callback] =>
         match (member.Name)
         {
         | "Handle" => 
           def cb = CreateCallback(callback);
           def context = GetContext(context);
           def code = $<#$$($context).bind($(eventName.Write()), (($(cb.Write())))())#>;
-          Some(JsAst.Code(code))
+          Some(JSAst.Code(code))
         | "HandleOnce" => 
-          def tempVarName = JsAstHelper.GetTemporaryVariableName();
+          def tempVarName = JSAstHelper.GetTemporaryVariableName();
           def context = GetContext(context);
           def cb = CreateCallback(callback);
-          Some(JsAst.Code($<#
+          Some(JSAst.Code($<#
             var $tempVarName = ($(cb.Write()))();
             $$($context).bind($(eventName.Write()), function(a) {
               $tempVarName(a);
@@ -43,15 +43,15 @@ namespace NemerleWeb
           #>))
         | _ => None()
         }
-      | [eventName, JsAst.Literal(JsLiteral.String(context)), untilName, callback] =>
+      | [eventName, JSAst.Literal(JSLiteral.String(context)), untilName, callback] =>
         match(member.Name)
         {
         | "HandleUntil" =>
-          def tempVarName = JsAstHelper.GetTemporaryVariableName();
+          def tempVarName = JSAstHelper.GetTemporaryVariableName();
           def eventName = eventName.Write();
           def context = GetContext(context);
           def cb = CreateCallback(callback);
-          Some(JsAst.Code($<#
+          Some(JSAst.Code($<#
             var $tempVarName = ($(cb.Write()))();
             $$($context).bind($eventName, $tempVarName)
                     .bind($(untilName.Write()), function() {
@@ -63,16 +63,16 @@ namespace NemerleWeb
       | [] =>
         match(member.Name)
         {
-        | "Invalidate" => Some(JsAst.Code("nweb.invalidate()"))
+        | "Invalidate" => Some(JSAst.Code("nweb.invalidate()"))
         | _ => None();
         }
       | _ => Message.FatalError("Unknown Events expression")
       }
     }
     
-    private CreateCallback(ast : JsAst) : JsAst
+    private CreateCallback(ast : JSAst) : JSAst
     {
-      JsAstHelper.MakeReturningFunction(ast);
+      JSAstHelper.MakeReturningFunction(ast);
     }
     
     private GetContext(context : string) : string

@@ -15,7 +15,7 @@ using System.Text;
 
 namespace NemerleWeb
 {
-  module JsClassHelper
+  module JSClassHelper
   {
     public HasBase(ti : TypeInfo) : bool 
     {
@@ -28,7 +28,7 @@ namespace NemerleWeb
   }
   
   [Record(NotNull = [".*"])]
-  public class JsClass
+  public class JSClass
   {
       public ClassType : TypeBuilder { get; }
       public Indent : string    { get; }      
@@ -68,7 +68,7 @@ namespace NemerleWeb
                    .Where(prop =>
                      {
                        // Filter out properties not belonging to this class
-                       if (!JsClassHelper.HasBase(ClassType)) true
+                       if (!JSClassHelper.HasBase(ClassType)) true
                        else
                        {                          
                          def declaringType =
@@ -110,14 +110,14 @@ namespace NemerleWeb
         }
       }
       
-      NestedClasses : IEnumerable[JsClass]
+      NestedClasses : IEnumerable[JSClass]
       {            
         get
         {
           def nested = ClassType.DeclaredNestedTypes
                                 .Where(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server
                                 .Where(c => !c.Name.StartsWith("_N__N_")) //Not generated class
-                                .Select(c => JsClass(c, Indent, Typer));
+                                .Select(c => JSClass(c, Indent, Typer));
           nested
         }
       }
@@ -135,7 +135,7 @@ namespace NemerleWeb
         
       public Write() : string 
       {
-        def meta = JsClassMeta();
+        def meta = JSClassMeta();
         def properTypeName = GetProperName(ClassType);
         def parentPtr = "this";
         def bodyIndent = Indent + "  ";
@@ -180,7 +180,7 @@ $callConstrutor
 $properties
 $methods
 {{{SignalR}}}
-$(meta.WriteToJs(Indent))
+$(meta.WriteToJS(Indent))
 $returning
 $(Indent)}
 $staticFields
@@ -190,14 +190,14 @@ $staticConstructorBody
 #>
       }
       
-      GenerateProperties(indent : string, parentPtr : string, properties : IEnumerable[IProperty], meta : JsClassMeta) : string 
+      GenerateProperties(indent : string, parentPtr : string, properties : IEnumerable[IProperty], meta : JSClassMeta) : string 
       {
         def propStrings = properties.Select(p =>
           {
             when (p.IsIndexer)
               Message.Error(p.Location, $"Indexed properties are not supported, $p");
             
-            meta.Properties.Add(JsClassMemberMeta(p.Name, p.GetModifiers()
+            meta.Properties.Add(JSClassMemberMeta(p.Name, p.GetModifiers()
                                                            .CustomAttributes
                                                            .Select(a => a.ToString())
                                                            .ToList()));
@@ -230,12 +230,12 @@ $indent};#>);
         $<#..$(propStrings; "\n")#>;
       }
       
-      GetProperties(indent : string, parentPtr : string, meta : JsClassMeta) : string
+      GetProperties(indent : string, parentPtr : string, meta : JSClassMeta) : string
       {
         GenerateProperties(indent, parentPtr, Properties, meta)
       }
       
-      GetStaticProperties(indent : string, meta : JsClassMeta) : string 
+      GetStaticProperties(indent : string, meta : JSClassMeta) : string 
       {
         GenerateProperties(indent, GetProperName(ClassType), StaticProperties, meta)
       }
@@ -262,7 +262,7 @@ $indent};#>);
           | PExpr.Literal(Literal.Enum(Integer as i, _, _)) => integer(i)
           | PExpr.Literal(Literal.Float(val)) => val.ToString(CultureInfo.InvariantCulture)
           | PExpr.Literal(Literal.Integer as i) => integer(i)
-          | PExpr.Literal(Literal.String(val)) => JsAstHelper.EscapeString(val)
+          | PExpr.Literal(Literal.String(val)) => JSAstHelper.EscapeString(val)
           | PExpr.ListLiteral(elements) => $<#[..$(elements; ", "; makeInitializer)]#>
           | PExpr.Tuple(elements) => $<#[..$(elements; ", "; makeInitializer)]#>
           | PExpr.Literal(Literal.Void)          
@@ -300,10 +300,10 @@ $indent};#>);
         }
       }
       
-      GenerateFields(indent : string, parentPtr : string, fields: IEnumerable[IField], meta : JsClassMeta) : string
+      GenerateFields(indent : string, parentPtr : string, fields: IEnumerable[IField], meta : JSClassMeta) : string
       {
         def fieldStrings = fields.Select(f => {
-          meta.Fields.Add(JsClassMemberMeta(f.Name, f.GetModifiers()
+          meta.Fields.Add(JSClassMemberMeta(f.Name, f.GetModifiers()
                                                      .GetCustomAttributes()
                                                      .Select(a => a.ToString())
                                                      .ToList()));
@@ -313,7 +313,7 @@ $indent};#>);
         $<#..$(fieldStrings; ";\n")#>;
       }
         
-      GetFields(indent : string, parentPtr : string, meta : JsClassMeta) : string 
+      GetFields(indent : string, parentPtr : string, meta : JSClassMeta) : string 
       {
         GenerateFields(indent, parentPtr, Fields, meta)
       }
@@ -338,7 +338,7 @@ $indent};#>);
             {
               def ctorBody = TranslateMethodBody(ctor, bodyIndent);              
               def ctorParameters = ctor.GetParameters().Select(p => p.Name);
-              def signature = JsAstHelper.Method("", Some(ctor.Header.Parameters));
+              def signature = JSAstHelper.Method("", Some(ctor.Header.Parameters));
               
               def makeBody(body)
               {
@@ -352,7 +352,7 @@ $indent#>
                 if(ctorBody.Trim().Length == 0)
                 {
                   // Call empty base constructor if exists
-                  if (ctor.Header.Parameters is [] && JsClassHelper.HasBase(ClassType))
+                  if (ctor.Header.Parameters is [] && JSClassHelper.HasBase(ClassType))
                   {
                     def baseName = GetProperName(ClassType.BaseType.FullName);
                     makeBody($<#$bodyIndent$baseName.call(self, "");#>)
@@ -403,7 +403,7 @@ $indent#>
             else
               $<#$(indent)$parentPtr.$(m.Name) = {};#>;
           
-          def methodWithSignature = JsAstHelper.Method(m.Name, Some(m.Header.Parameters));
+          def methodWithSignature = JSAstHelper.Method(m.Name, Some(m.Header.Parameters));
           
           if (generatedMethods.ContainsKey(m.Name))
           {
@@ -451,7 +451,7 @@ $(indent)}#>
         GenerateMethods(indent, GetProperName(ClassType), false, StaticMethods)
       }
       
-      GenerateNestedClasses(nested : IEnumerable[JsClass]) : string
+      GenerateNestedClasses(nested : IEnumerable[JSClass]) : string
       {
         $"..$(nested; Environment.NewLine; _.Write())"
       }
@@ -465,7 +465,7 @@ $(indent)}#>
                 
       public TranslateMethodBody([NotNull] meth : IMethod, [NotNull] indent = "" : string) : string
       {
-        def ast = TyperHelper.GetMethodJsAst(meth, Typer, ClassType);
+        def ast = TyperHelper.GetMethodJSAst(meth, Typer, ClassType);
         ast.Write(indent);
       }
       
@@ -507,11 +507,11 @@ $(indent)}#>
                .Where(m => !(m.Name.StartsWith("_N__") && m.Name.EndsWith("____")))
       }
       
-      public class JsClassMeta
+      public class JSClassMeta
       {
-        public Properties : List[JsClassMemberMeta];
-        public Fields : List[JsClassMemberMeta];
-        public Methods : List[JsClassMemberMeta];
+        public Properties : List[JSClassMemberMeta];
+        public Fields : List[JSClassMemberMeta];
+        public Methods : List[JSClassMemberMeta];
         
         public this() 
         {
@@ -520,7 +520,7 @@ $(indent)}#>
           Methods = List();
         }
         
-        public WriteToJs(indent : string) : string
+        public WriteToJS(indent : string) : string
         {
 $<#$(indent)  this.__nweb_meta = {
 $(indent)    properties: [..$(Properties; ","; _.Write())],
@@ -531,7 +531,7 @@ $(indent)  };#>;
       }
         
       [Record]
-      public class JsClassMemberMeta
+      public class JSClassMemberMeta
       {
         Name : string { get; set; }
         Attributes : List[string] { get; set; }

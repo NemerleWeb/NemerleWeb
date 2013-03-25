@@ -138,18 +138,18 @@ namespace NemerleWeb
       else
         _ = tb.DefineNestedType(<[ decl: public class Server {} ]>).Compile();
           
-      JsClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
-      JsClass.StringType = <[ ttype : System.String ]>;
-      JsClass.IPageType = <[ ttype: IPage ]>;
-      JsClass.ObjectType = <[ ttype: System.Object ]>;
+      JSClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
+      JSClass.StringType = <[ ttype : System.String ]>;
+      JSClass.IPageType = <[ ttype: IPage ]>;
+      JSClass.ObjectType = <[ ttype: System.Object ]>;
       
-      def result = JsClass(tb, "  ", typer).Write();
+      def result = JSClass(tb, "  ", typer).Write();
       AddMainData(tb, result);
       
       tb.Manager.TypeTreeBuildFinish += _ => {
           def lambdas = tb.DeclaredNestedTypes
                           .Where(t => t.Name.StartsWith("_N__N_"))
-                          .Select(t => JsClass(t, "  ", typer).Write());
+                          .Select(t => JSClass(t, "  ", typer).Write());
           def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");
           AddLambdasData(tb, lambdas);
       };
@@ -180,7 +180,7 @@ namespace NemerleWeb
       
       ctor.Body = <[ 
         $(ctor.Body);
-        AddUnitMainDefinition($(JsClass.GetProperName(tb) : string), $(data : string));
+        AddUnitMainDefinition($(JSClass.GetProperName(tb) : string), $(data : string));
       ]>;
     }
     
@@ -190,7 +190,7 @@ namespace NemerleWeb
       
       ctor.Body = <[ 
         $(ctor.Body);
-        AddUnitLambdas($(JsClass.GetProperName(tb) : string), $(data : string));
+        AddUnitLambdas($(JSClass.GetProperName(tb) : string), $(data : string));
       ]>;
     }
     
@@ -200,7 +200,7 @@ namespace NemerleWeb
       
       ctor.Body = <[ 
         $(ctor.Body);
-        AddUnitSignalRDefinition($(JsClass.GetProperName(tb) : string), $(data : string));
+        AddUnitSignalRDefinition($(JSClass.GetProperName(tb) : string), $(data : string));
       ]>;
     }
     
@@ -209,7 +209,7 @@ namespace NemerleWeb
       def ctor = GetNWebDataConstructor(tb);      
       ctor.Body = <[ 
         $(ctor.Body);
-        AddUnitTemplate($(JsClass.GetProperName(tb) : string), $(template : string), NWebUtils.GetHtml($data));
+        AddUnitTemplate($(JSClass.GetProperName(tb) : string), $(template : string), NWebUtils.GetHtml($data));
       ]>;
     }
     
@@ -264,7 +264,7 @@ namespace NemerleWeb
               
               def sb = System.Text.StringBuilder();
               foreach(file in scripts)
-                using(stream = typeof(NemerleWeb.JsAst).Assembly.GetManifestResourceStream(file))
+                using(stream = typeof(NemerleWeb.JSAst).Assembly.GetManifestResourceStream(file))
                 using(reader = System.IO.StreamReader(stream))
                   _ = sb.Append(reader.ReadToEnd());
               Content(sb.ToString(), "text/javascript");

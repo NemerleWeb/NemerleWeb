@@ -31,10 +31,10 @@ namespace NemerleWeb
     {
       Macros.DefineCTX(typer);
        
-      JsClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
-      JsClass.StringType = <[ ttype : System.String ]>;
-      JsClass.IPageType = <[ ttype: IPage ]>;
-      JsClass.ObjectType = <[ ttype: System.Object ]>;
+      JSClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
+      JSClass.StringType = <[ ttype : System.String ]>;
+      JSClass.IPageType = <[ ttype: IPage ]>;
+      JSClass.ObjectType = <[ ttype: System.Object ]>;
       
       match (mb.Header.body)
       {
@@ -64,7 +64,7 @@ namespace NemerleWeb
           | Some(result) => 
             def transformer = XmlAstToXLinq(typer, parser);
             def res = transformer.Transform(result);
-            UnitImpl.AddTemplateData(mb.DeclaringType, JsClass.GetProperName(mb.DeclaringType) + "_" + mb.Name, res);
+            UnitImpl.AddTemplateData(mb.DeclaringType, JSClass.GetProperName(mb.DeclaringType) + "_" + mb.Name, res);
           | _ =>
             def (pos, expected) = parser.GetMaxRollbackPosAndNames();
           

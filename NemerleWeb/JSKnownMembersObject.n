@@ -12,16 +12,16 @@ using System.Linq;
 namespace NemerleWeb
 {
   /// <summary>
-  /// Description of JsKnownMembersObject.
+  /// Description of JSKnownMembersObject.
   /// </summary>
-  module JsKnownMembersObject
+  module JSKnownMembersObject
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(object), Handler); 
+      JSKnownMembers.RegisterType(typeof(object), Handler); 
     }
     
-    private Handler(_left : JsAst, _member : IMember, _parms : list[JsAst]) : option[JsAst]
+    private Handler(_left : JSAst, _member : IMember, _parms : list[JSAst]) : option[JSAst]
     {
       None()
     }

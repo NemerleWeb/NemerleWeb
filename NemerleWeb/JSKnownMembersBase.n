@@ -11,27 +11,27 @@ using System.Linq;
 namespace NemerleWeb
 {
   /// <summary>
-  /// Description of JsKnownMembersBase.
+  /// Description of JSKnownMembersBase.
   /// </summary>
-  module JsKnownMembersBase
+  module JSKnownMembersBase
   {
     public Register() : void
     {      
       // Constructor case
-      JsKnownMembers.RegisterDefaultMember(
+      JSKnownMembers.RegisterDefaultMember(
         ".ctor",
         (typeInfo, _, m, parms) =>
           Some(
-            JsAst.Call(
-              JsAst.Constructor(
-                JsClass.GetProperName(typeInfo),
-                JsAstHelper.MethodParameters(m :> IMethod)),
+            JSAst.Call(
+              JSAst.Constructor(
+                JSClass.GetProperName(typeInfo),
+                JSAstHelper.MethodParameters(m :> IMethod)),
               parms))
       );
       
-      def toString(t, l, m, p) { Some(JsAstHelper.CallToString(t, l, m, p)) }
+      def toString(t, l, m, p) { Some(JSAstHelper.CallToString(t, l, m, p)) }
         
-      JsKnownMembers.RegisterDefaultMember("ToString", toString);
+      JSKnownMembers.RegisterDefaultMember("ToString", toString);
     }
   }
 }

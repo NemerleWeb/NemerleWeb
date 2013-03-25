@@ -11,38 +11,38 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  module JsKnownMembersString
+  module JSKnownMembersString
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(string), Handler);
+      JSKnownMembers.RegisterType(typeof(string), Handler);
     }
         
-    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
-      (if (left is JsAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
+      (if (left is JSAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
     }
     
-    private InstanceHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private InstanceHandler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match (parms)
       {
       | [] =>
         match (member.Name)
         {        
-        | "get_Length" => Some(JsAst.FieldRef(left, "length"))
+        | "get_Length" => Some(JSAst.FieldRef(left, "length"))
         | "Clone" => Some(left)        
-        | "GetEnumerator" => Some(left.JsMethodCall(member.Name, parms))
+        | "GetEnumerator" => Some(left.JSMethodCall(member.Name, parms))
         | "GetHashCode"
         | "GetType"
         | "GetTypeCode"        
         | "IsNormalized"
         | "Normalize"
         | "ToCharArray" => None()
-        | "ToLower" => Some(left.JsMethodCall("toLowerCase", []))
+        | "ToLower" => Some(left.JSMethodCall("toLowerCase", []))
         | "ToLowerInvariant" => None()
-        | "ToString" => Some(JsAstHelper.JsToString(left))
-        | "ToUpper" => Some(left.JsMethodCall("toUpperCase", []))
+        | "ToString" => Some(JSAstHelper.JSToString(left))
+        | "ToUpper" => Some(left.JSMethodCall("toUpperCase", []))
         | "ToUpperInvariant"
         | "Trim"
         | "TrimEnd"
@@ -53,22 +53,22 @@ namespace NemerleWeb
       | [arg1] =>
         match (member.Name)
         {
-        | "get_Chars" => Some(JsAst.ArrayIndexer(left, arg1))
+        | "get_Chars" => Some(JSAst.ArrayIndexer(left, arg1))
         | "Compare"
         | "CompareOrdinal"
         | "CompareTo" => None()
         | "Contains" =>
-          Some(JsAst.Call(
-            JsAst.OpCode("!=="),
+          Some(JSAst.Call(
+            JSAst.OpCode("!=="),
             [
-              left.JsMethodCall("indexOf", parms),
-              JsAst.Literal(JsLiteral.Integer(-1))
+              left.JSMethodCall("indexOf", parms),
+              JSAst.Literal(JSLiteral.Integer(-1))
             ]))
             
         | "EndsWith" => None()       
-        | "Equals" => Some(JsAst.Call(JsAst.OpCode("==="), [left, arg1]))
+        | "Equals" => Some(JSAst.Call(JSAst.OpCode("==="), [left, arg1]))
         | "Format" => None()
-        | "IndexOf" => Some(left.JsMethodCall("indexOf", parms))
+        | "IndexOf" => Some(left.JSMethodCall("indexOf", parms))
         | "IndexOfAny"
         | "IsNormalized"        
         | "LastIndexOf"
@@ -79,11 +79,11 @@ namespace NemerleWeb
         | "Remove"
         | "Split"
         | "StartsWith" => None()
-        | "Substring" => Some(left.JsMethodCall("substr", parms))
+        | "Substring" => Some(left.JSMethodCall("substr", parms))
         | "ToLower"
         | "ToUpper"
         | "Trim" => None()        
-        | "ToString" => Some(JsAstHelper.JsToString(left))
+        | "ToString" => Some(JSAstHelper.JSToString(left))
         | _ => None()
         }
           
@@ -105,7 +105,7 @@ namespace NemerleWeb
         | "Replace"
         | "Split"
         | "StartsWith" => None()
-        | "Substring" => Some(left.JsMethodCall("substr", parms))
+        | "Substring" => Some(left.JSMethodCall("substr", parms))
         | "ToCharArray"
         | _ => None()
         }
@@ -152,9 +152,9 @@ namespace NemerleWeb
       }
     }
     
-    EmptyString : JsAst.Literal = JsAst.Literal(JsLiteral.String(""));
+    EmptyString : JSAst.Literal = JSAst.Literal(JSLiteral.String(""));
     
-    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private StaticHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match (parms)
       {
@@ -167,53 +167,53 @@ namespace NemerleWeb
       | [arg1] =>
         match (member.Name)
         {
-        | ".ctor" => Some(JsAst.Call(JsAst.GlobalRef("System_String"), parms))
+        | ".ctor" => Some(JSAst.Call(JSAst.GlobalRef("System_String"), parms))
         | "Concat" =>
           match (arg1)
           {
-          | JsAst.Array(Values = values) =>
+          | JSAst.Array(Values = values) =>
             match (values)
             {
             | [] => None()
-            | [v] => Some(JsAstHelper.JsToString(v))
-            | _ => Some(JsAstHelper.JsToString(values.Head).JsMethodCall("concat", values.Tail))
+            | [v] => Some(JSAstHelper.JSToString(v))
+            | _ => Some(JSAstHelper.JSToString(values.Head).JSMethodCall("concat", values.Tail))
             }
-          | LocalRef(_, Some(type)) when JsClass.TypeIsArray(type) =>
-            Some(arg1.JsMethodCall("join", [JsAst.Literal(JsLiteral.String(""))]))
-          | _ => Some(JsAstHelper.JsToString(arg1))
+          | LocalRef(_, Some(type)) when JSClass.TypeIsArray(type) =>
+            Some(arg1.JSMethodCall("join", [JSAst.Literal(JSLiteral.String(""))]))
+          | _ => Some(JSAstHelper.JSToString(arg1))
           }
         | "Copy"
         | "Intern"
         | "IsInterned" => None()
         | "IsNullOrEmpty" =>
-          Some(JsAst.Call(JsAst.OpCode("||"),
-              [JsAst.Call(JsAst.OpCode("==="), [arg1, JsAst.Literal(JsLiteral.Null())]),
-                JsAst.Call(JsAst.OpCode("==="), [arg1, JsAst.Literal(JsLiteral.String(""))])]))                 
+          Some(JSAst.Call(JSAst.OpCode("||"),
+              [JSAst.Call(JSAst.OpCode("==="), [arg1, JSAst.Literal(JSLiteral.Null())]),
+                JSAst.Call(JSAst.OpCode("==="), [arg1, JSAst.Literal(JSLiteral.String(""))])]))                 
         | "IsNullOrWhiteSpace" => //TODO: add regex AST for / / syntax, then we can compare arg.replace(/\s/g, "") and ""
-          Some(JsAst.Call(JsAst.OpCode("||"),
-              [JsAst.Call(JsAst.OpCode("==="), [arg1, JsAst.Literal(JsLiteral.Null())]),
-                JsAst.Call(JsAst.OpCode("==="), [arg1, JsAst.Literal(JsLiteral.String(""))])]))
+          Some(JSAst.Call(JSAst.OpCode("||"),
+              [JSAst.Call(JSAst.OpCode("==="), [arg1, JSAst.Literal(JSLiteral.Null())]),
+                JSAst.Call(JSAst.OpCode("==="), [arg1, JSAst.Literal(JSLiteral.String(""))])]))
         | _ => None()
         }
       | [arg1, arg2] =>
         match (member.Name)
         {
-        | "Concat" => Some(JsAstHelper.JsToString(arg1).JsMethodCall("concat", [arg2]))
+        | "Concat" => Some(JSAstHelper.JSToString(arg1).JSMethodCall("concat", [arg2]))
         | "Equals" => None()
-        | "Join" => Some(arg2.JsMethodCall("join", [arg1]))
+        | "Join" => Some(arg2.JSMethodCall("join", [arg1]))
         | _ => None()
         }
       | [arg1, arg2, arg3] =>
         match (member.Name)
         {
-        | "Concat" => Some(JsAstHelper.JsToString(arg1).JsMethodCall("concat", [arg2, arg3]))
+        | "Concat" => Some(JSAstHelper.JSToString(arg1).JSMethodCall("concat", [arg2, arg3]))
         | "Equals"
         | _ => None()
         }
       | [arg1, arg2, arg3, arg4] =>
         match (member.Name)
         {
-        | "Concat" => Some(JsAstHelper.JsToString(arg1).JsMethodCall("concat", [arg2, arg3, arg4]))
+        | "Concat" => Some(JSAstHelper.JSToString(arg1).JSMethodCall("concat", [arg2, arg3, arg4]))
         | "Equals"
         | "Join"
         | _ => None()

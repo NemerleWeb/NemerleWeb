@@ -11,22 +11,22 @@ using System.Linq;
 namespace NemerleWeb
 {
   /// <summary>
-  /// Description of JsKnownMembersDelegate
+  /// Description of JSKnownMembersDelegate
   /// </summary>
-  module JsKnownMembersDelegate
+  module JSKnownMembersDelegate
   {
     public Register() : void
     {
       def register(name)
       {
-        JsKnownMembers.RegisterType(
+        JSKnownMembers.RegisterType(
           name,
           (left, m, parms) =>
           {
             match (parms)
             {
             | [lambda, _] => Some(lambda)
-            | [] when m.Name == "Invoke" => Some(JsAst.Call(left, []));
+            | [] when m.Name == "Invoke" => Some(JSAst.Call(left, []));
             | _ => None();
           }});
       }

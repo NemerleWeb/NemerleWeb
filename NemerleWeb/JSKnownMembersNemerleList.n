@@ -11,19 +11,19 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  module JsKnownMembersNemerleList
+  module JSKnownMembersNemerleList
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(list[_].Cons), Handler);      
+      JSKnownMembers.RegisterType(typeof(list[_].Cons), Handler);      
     }
     
-    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
-      (if (left is JsAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
+      (if (left is JSAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
     }
     
-    private InstanceHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private InstanceHandler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match (parms)
       {
@@ -32,25 +32,25 @@ namespace NemerleWeb
         {
         | "Equals" =>
           Some(
-            JsAst.Call(
-              JsAst.StaticMethodRef("nweb.collection", "areArrayEqual", None()),
+            JSAst.Call(
+              JSAst.StaticMethodRef("nweb.collection", "areArrayEqual", None()),
               [left, arg1]))
         | "MapToArray" => 
-          Some(left.AsEnumerable().JsMethodCall("select", [arg1]).JsMethodCall("toArray", []))
+          Some(left.AsEnumerable().JSMethodCall("select", [arg1]).JSMethodCall("toArray", []))
         | _ => None()
         }
       | _ => None()
       }
     }
     
-    private StaticHandler(_left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private StaticHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match(parms)
       {
       | [arg1, arg2] =>
         match(member.Name)
         {
-        | ".ctor" => Some(JsAst.Array([arg1]).JsMethodCall("concat", [arg2]))
+        | ".ctor" => Some(JSAst.Array([arg1]).JSMethodCall("concat", [arg2]))
         | _ => None()
         }
       | _ => None()

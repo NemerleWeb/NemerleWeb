@@ -11,33 +11,33 @@ using System.Text;
 
 namespace NemerleWeb
 {
-  module JsKnownMembersTextStringBuilder
+  module JSKnownMembersTextStringBuilder
   {    
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(StringBuilder), Handler);
+      JSKnownMembers.RegisterType(typeof(StringBuilder), Handler);
     }
   
-    public Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    public Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
-      (if (left is JsAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
+      (if (left is JSAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
     }
     
-    static NewLine : JsAst.Literal = JsAst.Literal(JsLiteral.String("\n"));
+    static NewLine : JSAst.Literal = JSAst.Literal(JSLiteral.String("\n"));
     
-    private InstanceHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private InstanceHandler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match(parms)
       {
       | [arg1]
         when member.Name == "Append" &&
-             (member :> IMethod).GetParameters().Nth(0).Type.Equals(JsClass.ObjectType) =>
+             (member :> IMethod).GetParameters().Nth(0).Type.Equals(JSClass.ObjectType) =>
         Some(left.ExternalMethodCall(member.Name, [arg1]))
       | _ => Some(left.ExternalMethodCall(member.Name, parms))
       }
     }
      
-    private StaticHandler(_left : JsAst, _member : IMember, _parms : list[JsAst]) : option[JsAst]
+    private StaticHandler(_left : JSAst, _member : IMember, _parms : list[JSAst]) : option[JSAst]
     {
       None()
     }

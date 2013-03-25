@@ -12,21 +12,21 @@ using System.Linq;
 namespace NemerleWeb
 {
   /// <summary>
-  /// Description of JsKnownMembersIDisposable.
+  /// Description of JSKnownMembersIDisposable.
   /// </summary>
-  module JsKnownMembersIDisposable
+  module JSKnownMembersIDisposable
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(IDisposable), Handler);
+      JSKnownMembers.RegisterType(typeof(IDisposable), Handler);
     }
     
-    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
-      if (left is JsAst.StaticMethodRef) None() else InstanceHandler(left, member, parms)
+      if (left is JSAst.StaticMethodRef) None() else InstanceHandler(left, member, parms)
     }
     
-    private InstanceHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private InstanceHandler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match (parms)
       {
@@ -36,24 +36,24 @@ namespace NemerleWeb
       // else left.Dispose();
       
         Some(
-          JsAst.If
+          JSAst.If
           (
-            JsAst.Call
+            JSAst.Call
             (
-              JsAst.OpCode("&&"),
+              JSAst.OpCode("&&"),
               [
-                JsAst.FieldRef(left, "dispose"),              
-                JsAst.Call
+                JSAst.FieldRef(left, "dispose"),              
+                JSAst.Call
                 (
-                  JsAst.OpCode("==="),
+                  JSAst.OpCode("==="),
                   [
-                    JsAst.TypeOf(JsAst.FieldRef(left, "dispose")),
-                    JsAst.Literal(JsLiteral.String("function"))
+                    JSAst.TypeOf(JSAst.FieldRef(left, "dispose")),
+                    JSAst.Literal(JSLiteral.String("function"))
                   ]
                 )
               ]
             ),
-            left.JsMethodCall("dispose", parms),
+            left.JSMethodCall("dispose", parms),
             left.ExternalMethodCall(<#Dispose[""]#>, parms)
           ))
       

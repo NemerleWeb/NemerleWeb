@@ -10,18 +10,18 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  public variant JsLiteral : System.IEquatable[JsLiteral]
+  public variant JSLiteral : System.IEquatable[JSLiteral]
   {
     | Integer { val : int }
     | Float { val : double }
     | Bool { val : bool; }
     | String { val : string; }
-    | Regexp { pattern : JsAst; modifiers : JsAst }
+    | Regexp { pattern : JSAst; modifiers : JSAst }
     | Null
     
     [OverrideObjectEquals]
-    public Equals (lit : JsLiteral) : bool
-      implements System.IEquatable[JsLiteral].Equals
+    public Equals (lit : JSLiteral) : bool
+      implements System.IEquatable[JSLiteral].Equals
     {
       match ((this, lit))
       {

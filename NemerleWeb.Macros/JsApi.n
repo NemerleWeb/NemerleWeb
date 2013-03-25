@@ -13,17 +13,17 @@ using System.Linq;
 namespace NemerleWeb
 {
   [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
-  macro JsApi(tb : TypeBuilder) 
+  macro JSApi(tb : TypeBuilder) 
   {
-    JsApiImpl.DoTransform(tb, Macros.ImplicitCTX())
+    JSApiImpl.DoTransform(tb, Macros.ImplicitCTX())
   }
       
-  module JsApiImpl
+  module JSApiImpl
   {       
     public DoTransform(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);                  
-      tb.Ast.AddCustomAttribute(<[ NemerleWeb.JsAstAttribute ]>);
+      tb.Ast.AddCustomAttribute(<[ NemerleWeb.JSAstAttribute ]>);
     }
   }
 }

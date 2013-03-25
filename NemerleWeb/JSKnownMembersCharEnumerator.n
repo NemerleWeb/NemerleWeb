@@ -11,19 +11,19 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  module JsKnownMembersCharEnumerator
+  module JSKnownMembersCharEnumerator
   {
     public Register() : void
     {
-      JsKnownMembers.RegisterType(typeof(CharEnumerator), Handler);
+      JSKnownMembers.RegisterType(typeof(CharEnumerator), Handler);
     }
     
-    private Handler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
-      (if (left is JsAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
+      (if (left is JSAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
     }
     
-    private InstanceHandler(left : JsAst, member : IMember, parms : list[JsAst]) : option[JsAst]
+    private InstanceHandler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match (parms)
       {
@@ -31,14 +31,14 @@ namespace NemerleWeb
         match(member.Name)
         {
         | "get_Current"
-        | "MoveNext" => Some(left.JsMethodCall(member.Name, parms))
+        | "MoveNext" => Some(left.JSMethodCall(member.Name, parms))
         | _ => None()
         }
       | _ => None()
       }
     }
     
-    private StaticHandler(_left : JsAst, _member : IMember, _parms : list[JsAst]) : option[JsAst]
+    private StaticHandler(_left : JSAst, _member : IMember, _parms : list[JSAst]) : option[JSAst]
     {
       None()
     }
