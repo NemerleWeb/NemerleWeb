@@ -1,3 +1,7 @@
 ﻿using NemerleWeb.Macros;
 
-[assembly: NemerleWebProperties((TypeScriptPath, TS))]
+[assembly: GenerateJSApi(
+  Lib = @"TS\_infrastructure\tests\typescript_0.8.3\lib.d.ts",
+  Directory = "TS",
+  Exclude = @"TS\\_infrastructure\\"
+)]
