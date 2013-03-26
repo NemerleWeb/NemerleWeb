@@ -43,40 +43,76 @@ namespace NemerleWeb.Macros
     {
       def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
       
-      // Parse lib if present
-      when (libPath != "")
-        ParseTSAndGenerate(typer, Path.Combine(projectDir, libPath), NormalizeName(directory), "");
-      
-      // Parse all files in directory
+      // PreParse
+      // Resolve all references
       def re = Regex(exclude);
       def isIncluded(s) { if (exclude == "") true else !re.IsMatch(s) }
       
       def fullDir = Path.Combine(projectDir, directory);
       def tsFiles = Directory.EnumerateFiles(fullDir, "*.d.ts", SearchOption.AllDirectories);
+
+      // TODO: Resolve recursive references
+      def tsFilesToParse = HashSet(tsFiles.Where(isIncluded).SelectMany(PreParseTS));
       
-      foreach(tsFile when isIncluded(tsFile) in tsFiles)
+      // Parsing
+      
+      // Parse lib if present
+      when (libPath != "")
+        ParseTS(typer, Path.Combine(projectDir, libPath), NormalizeName(directory), "");
+            
+      foreach(tsFile in tsFilesToParse)
       {
-        def baseNamespace = Path.GetDirectoryName(tsFile).Substring(projectDir.Length + 1);
+        // TODO: Support references outside our directoyr
+        when (tsFile.Length < fullDir.Length || tsFile.Substring(0, fullDir.Length) != fullDir)
+          Message.Error($"File $tsFile is outside directory $directory");
+        
+        def baseNamespace = Path.GetDirectoryName(tsFile).Substring(fullDir.Length + 1);
         def fileName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(tsFile));
-        ParseTSAndGenerate(typer, tsFile, NormalizeName(baseNamespace), fileName);
+        
+        ParseTS(typer, tsFile, baseNamespace, fileName);
       }
     }
-    
-    private ParseTSAndGenerate(typer : Typer, tsFile : string, baseNamespace : string, fileName : string) : void
+     
+    /// Parse all references
+    private PreParseTS(tsFile : string) : IEnumerable[string]
     {
       match(tsParser.TryParse(File.ReadAllText(tsFile)))
       {
       | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>
+        yield tsFile;
+        
+        // Parse all references
+        foreach(TSGlobal.ReferencePath(path) in result)
+        {
+          def reference = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(tsFile), path));
+          yield reference;
+          
+          foreach(f in PreParseTS(reference))
+            yield f;
+        }
+      | (pos, _) =>
+        // TODO: Add locations to parser and print here correct location in the file.
+        def text = tsParser.ParsingSource.OriginalText;
+        Message.Error(Location(tsFile, 0, 0, 0, 0), $"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...");
+        yield "";
+      }
+    }
+    
+    private ParseTS(typer : Typer, tsFile : string, baseNamespace : string, fileName : string) : void
+    {
+       match(tsParser.TryParse(File.ReadAllText(tsFile)))
+      {
+      | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>       
         // Root JS API namespace
         def jsApiRoot = typer.Env.EnterIntoNamespace("JSApi" :: baseNamespace.Split('.').NToList());
         
         // Create module and namespace
-        def jsApiNS = jsApiRoot.EnterIntoNamespace(fileName.Split('.').NToList());
-        jsApiNS.Define(<[ decl: public class Dummy {} ]>).Compile();
+        def jsApiNamespace = jsApiRoot.EnterIntoNamespace(fileName.Split('.').NToList());
+        jsApiNamespace.Define(<[ decl: public class Dummy {} ]>).Compile();
         
         def jsApiModule = CreateModule(fileName, jsApiRoot);
         
-        Message.Hint($"$(jsApiNS)");
+        Message.Hint($"$(jsApiNamespace)");
         Message.Hint($"$(jsApiModule)");
         
       | (pos, _) =>
@@ -85,7 +121,6 @@ namespace NemerleWeb.Macros
         Message.Error(Location(tsFile, 0, 0, 0, 0), $"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...")
       }
     }
-    
  
       //      def jsApiModule =
       //        if (infrastructure)
@@ -284,6 +319,7 @@ namespace NemerleWeb.Macros
         def t = CreateModule(tl, innerModule);
         innerModule.Compile();
         t
+      | _ => Message.Error("Must not get there"); null
       }
     }
     
@@ -298,14 +334,15 @@ namespace NemerleWeb.Macros
       match (parts)
       {
       | [hd] =>
-          def t = outer.Define(<[ decl: public partial module $(hd : usesite) {} ]>);
-          t.Compile();
-          t
+        def t = outer.Define(<[ decl: public partial module $(hd : usesite) {} ]>);
+        t.Compile();
+        t
       | hd :: tl =>
-          def innerModule = outer.Define(<[ decl: public partial module $(hd : usesite) {} ]>);
-          def t = CreateModule(tl, innerModule);
-          innerModule.Compile();
-          t
+        def innerModule = outer.Define(<[ decl: public partial module $(hd : usesite) {} ]>);
+        def t = CreateModule(tl, innerModule);
+        innerModule.Compile();
+        t
+      | _ => Message.Error("Must not get there"); null
       }
     }
     
