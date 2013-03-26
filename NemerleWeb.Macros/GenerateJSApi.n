@@ -20,7 +20,6 @@ namespace NemerleWeb.Macros
   module GenerateJSApiImpl
   {
     tsParser = TSDeclarationParser();
-    dtsExt = ".d.ts";
     
     public Impl(typer : Typer, options : list[PExpr]) : void
     {      
@@ -46,31 +45,40 @@ namespace NemerleWeb.Macros
       
       // Parse lib if present
       when (libPath != "")
-        ParseTSAndGenerate(typer, Path.Combine(projectDir, libPath), NormalizeName(directory));
+        ParseTSAndGenerate(typer, Path.Combine(projectDir, libPath), NormalizeName(directory), "");
       
       // Parse all files in directory
       def re = Regex(exclude);
       def isIncluded(s) { if (exclude == "") true else !re.IsMatch(s) }
       
       def fullDir = Path.Combine(projectDir, directory);
-      def tsFiles = Directory.EnumerateFiles(fullDir, "*" + dtsExt, SearchOption.AllDirectories);
+      def tsFiles = Directory.EnumerateFiles(fullDir, "*.d.ts", SearchOption.AllDirectories);
       
-      def prjDirLen = projectDir.Length + 1;
       foreach(tsFile when isIncluded(tsFile) in tsFiles)
       {
-        def fileName = tsFile.Substring(prjDirLen, tsFile.Length - prjDirLen - dtsExt.Length);
-        ParseTSAndGenerate(typer, tsFile, NormalizeName(fileName));
+        def baseNamespace = Path.GetDirectoryName(tsFile).Substring(projectDir.Length + 1);
+        def fileName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(tsFile));
+        ParseTSAndGenerate(typer, tsFile, NormalizeName(baseNamespace), fileName);
       }
     }
     
-    private ParseTSAndGenerate(typer : Typer, tsFile : string, apiNamespace : string) : void
+    private ParseTSAndGenerate(typer : Typer, tsFile : string, baseNamespace : string, fileName : string) : void
     {
       match(tsParser.TryParse(File.ReadAllText(tsFile)))
       {
       | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>
         // Root JS API namespace
-        def jsApi = typer.Env.EnterIntoNamespace("JSApi" :: apiNamespace.Split('.').NToList());
-        Message.Hint($"$(jsApi)");
+        def jsApiRoot = typer.Env.EnterIntoNamespace("JSApi" :: baseNamespace.Split('.').NToList());
+        
+        // Create module and namespace
+        def jsApiNS = jsApiRoot.EnterIntoNamespace(fileName.Split('.').NToList());
+        jsApiNS.Define(<[ decl: public class Dummy {} ]>).Compile();
+        
+        def jsApiModule = CreateModule(fileName, jsApiRoot);
+        
+        Message.Hint($"$(jsApiNS)");
+        Message.Hint($"$(jsApiModule)");
+        
       | (pos, _) =>
         // TODO: Add locations to parser and print here correct location in the file.
         def text = tsParser.ParsingSource.OriginalText;
@@ -203,32 +211,16 @@ namespace NemerleWeb.Macros
     {
       
     }
-    
-    private CreateModule(parts : list[string], outerModule : TypeBuilder) : TypeBuilder
-    {
-      match (parts)
-      {
-      | [hd] =>
-        def t = outerModule.DefineNestedType(<[ decl: public partial module $(hd : usesite) {} ]>);
-        t.Compile();
-        t
-      | hd :: tl =>
-        def innerModule = outerModule.DefineNestedType(<[ decl: public partial module $(hd : usesite) {} ]>);
-        def t = CreateModule(tl, innerModule);
-        innerModule.Compile();
-        t
-      | _ => Message.Error("Must not get here"); null
-      }
-    }
   
     private CreateTSGlobalModule(tsModule : TSGlobal.Module, jsApi : TypeBuilder) : void
     {
       def moduleName = tsModule.Name.Replace('/', '.').Replace('\\', '.');
       
       // Create modules by splitting '.'
-      _ = CreateModule(moduleName.Split('.').NToList(), jsApi);
+      _ = CreateModule(moduleName, jsApi);
     }
-  
+
+    #region Helpers
     private GetParamsType(parms : list[TSParam], additional : option[TSType]) : list[PExpr]
     {
       def convertParamsType(p : TSParam)
@@ -277,6 +269,46 @@ namespace NemerleWeb.Macros
     private NormalizeName(path : string) : string
     {
       path.Replace('\\', '.').Replace('/', '.')
-    }    
+    }
+    
+    private CreateModule(parts : list[string], outer : TypeBuilder) : TypeBuilder
+    {
+      match (parts)
+      {
+      | [hd] =>
+        def t = outer.DefineNestedType(<[ decl: public partial module $(hd : usesite) {} ]>);
+        t.Compile();
+        t
+      | hd :: tl =>
+        def innerModule = outer.DefineNestedType(<[ decl: public partial module $(hd : usesite) {} ]>);
+        def t = CreateModule(tl, innerModule);
+        innerModule.Compile();
+        t
+      }
+    }
+    
+    private CreateModule(moduleName : string, outer : TypeBuilder) : TypeBuilder
+    {
+      CreateModule(moduleName.Split('.').NToList(), outer)
+    }
+    
+    private CreateModule(moduleName : string, outer : GlobalEnv) : TypeBuilder
+    {
+      def parts = moduleName.Split('.').NToList();
+      match (parts)
+      {
+      | [hd] =>
+          def t = outer.Define(<[ decl: public partial module $(hd : usesite) {} ]>);
+          t.Compile();
+          t
+      | hd :: tl =>
+          def innerModule = outer.Define(<[ decl: public partial module $(hd : usesite) {} ]>);
+          def t = CreateModule(tl, innerModule);
+          innerModule.Compile();
+          t
+      }
+    }
+    
+    #endregion
   }
 }
