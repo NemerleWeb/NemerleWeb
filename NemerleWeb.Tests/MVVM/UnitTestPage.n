@@ -1708,7 +1708,7 @@ namespace NemerleWeb.Tests
     }
   }
   
-  [JsApi]
+  [JSApi]
   public class RegExp
   {
     public this(_pattern : string) 
