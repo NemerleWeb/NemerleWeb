@@ -59,18 +59,18 @@ namespace NemerleWeb.Macros
       
       // Parse lib if present
       when (libPath != "")
-        ParseTS(typer, Path.Combine(projectDir, libPath), NormalizeName(directory), "");
-            
+        ParseTS(typer, Path.Combine(projectDir, libPath), GetNamespaceName(directory), "");
+      
       foreach(tsFile in tsFilesToParse)
       {
-        // TODO: Support references outside our directoyr
+        // TODO: Support references outside our directory
         when (tsFile.Length < fullDir.Length || tsFile.Substring(0, fullDir.Length) != fullDir)
           Message.Error($"File $tsFile is outside directory $directory");
         
-        def baseNamespace = Path.GetDirectoryName(tsFile).Substring(fullDir.Length + 1);
+        def baseNamespace = GetNamespaceName(Path.GetDirectoryName(tsFile).Substring(fullDir.Length + 1));
         def fileName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(tsFile));
         
-        ParseTS(typer, tsFile, baseNamespace, fileName);
+        //ParseTS(typer, tsFile, baseNamespace, fileName);
       }
     }
      
@@ -102,20 +102,33 @@ namespace NemerleWeb.Macros
     
     private ParseTS(typer : Typer, tsFile : string, baseNamespace : string, fileName : string) : void
     {
-       match(tsParser.TryParse(File.ReadAllText(tsFile)))
+      match(tsParser.TryParse(File.ReadAllText(tsFile)))
       {
       | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>       
         // Root JS API namespace
-        def jsApiRoot = typer.Env.EnterIntoNamespace("JSApi" :: baseNamespace.SplitDot());
+        def jsApiRoot = typer.Env.EnterIntoNamespace(["JSApi"]);
         
         // Create module and namespace
-        def jsApiNamespace = jsApiRoot.EnterIntoNamespace(fileName.SplitDot());
-        jsApiNamespace.Define(<[ decl: public class Dummy {} ]>).Compile();
-        
-        def jsApiModule = CreateModule(fileName, jsApiRoot);
-        
-        Message.Hint($"$(jsApiNamespace)");
-        Message.Hint($"$(jsApiModule)");
+        def fullRelativeApi = $"$baseNamespace.$fileName".TrimEnd('.');
+        def jsApiNamespace = jsApiRoot.EnterIntoNamespace(fullRelativeApi.SplitDot());
+        def jsApiModule = CreateModule(fullRelativeApi, jsApiRoot);
+    
+        // Generate members
+        foreach(r in result) 
+        {
+        | Variable  as v => CreateTSGlobalVariable (v, jsApiModule)
+        | Function  as f => CreateTSGlobalFunction (f, jsApiModule)
+        | Interface as i => CreateTSGlobalInterface(i, jsApiNamespace)
+        | Class     as c => CreateTSGlobalClass    (c, jsApiNamespace)
+        | Construct as c => CreateTSGlobalConstruct(c, jsApiModule)
+        | Enum      as e => CreateTSGlobalEnum     (e, jsApiNamespace)
+        | Import    as i => CreateTSGlobalImport   (i, jsApiNamespace)
+        | Export    as e => CreateTSGlobalExport   (e, jsApiNamespace)
+        | Module    as m => CreateTSGlobalModule   (m, jsApiNamespace)
+        | _ => ()
+        }
+    
+        when(fileName != "") jsApiModule.Compile();
         
       | (pos, _) =>
         // TODO: Add locations to parser and print here correct location in the file.
@@ -124,54 +137,6 @@ namespace NemerleWeb.Macros
       }
     }
  
-      //      def jsApiModule =
-      //        if (infrastructure)
-      //          jsApi
-      //        else
-      //        {
-      //          def fileName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(tsFile));
-      //          CreateModule(fileName.DotSplit(), jsApi)
-      //        };
-            
-      //      foreach(r in result) 
-      //      {
-      //      //| Variable  as v => CreateTSGlobalVariable (v, jsApiModule)
-      //      //| Function  as f => CreateTSGlobalFunction (f, jsApiModule)
-      //      //| Interface as i => CreateTSGlobalInterface(i, jsApiModule)
-      //      //| Class     as c => CreateTSGlobalClass    (c, jsApiModule)
-      //      //| Construct as c => CreateTSGlobalConstruct(c, jsApiModule)
-      //      //| Enum      as e => CreateTSGlobalEnum     (e, jsApiModule)
-      //      //| Import    as i => CreateTSGlobalImport   (i, jsApiModule)
-      //      //| Export    as e => CreateTSGlobalExport   (e, jsApiModule)
-      //      //| Module    as m => CreateTSGlobalModule   (m, jsApiModule)
-      //      //| ReferencePath(path) => Message.Hint($"Reference $path");
-      //      //| ReferenceNoDefaultLib => Message.Hint("No default lib");
-      //      | _ => ()
-      //      }
-            
-      //      when (!infrastructure) jsApiModule.Compile();
-      //    | (pos, _) => 
-      //      def text = parser.ParsingSource.OriginalText;
-      //      Message.Error(Location(tsFile, pos, pos, pos, pos), $"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...")
-      //    }
-      //  }
-      
-      //  // Parse first the infrastructure file.
-      //  def infrastructure = Path.Combine(tsDir, @"_infrastructure\tests\typescript_0.8.3\lib.d.ts");
-      //  parse(infrastructure, true);
-      
-      //  // Parse other files
-      //  foreach(tsFile when !tsFile.Contains("_infrastructure") in tsFiles)
-      //    parse(tsFile, false);
-          
-      //  jsApi.Compile();
-
-      
-      //  | _ => Message.Error(<#Unrecognized option format, should be tuple of two strings: ("
-      //  ", "Typescripts") #>)
-      //}
-    //}
-    
     private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder) : void
     {
       def variableType = var.Name + "AnonymousClass";
@@ -199,7 +164,7 @@ namespace NemerleWeb.Macros
       }
     }
   
-    private CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, jsApi : TypeBuilder) : void
+    private CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, jsApiNamespace : GlobalEnv) : void
     {
       def type =
         if (tsInterface.Extends is [])
@@ -209,10 +174,10 @@ namespace NemerleWeb.Macros
           def extends = tsInterface.Extends.Map(e => <[ $(e : usesite) ]>);
           <[ decl: public partial interface $(tsInterface.Name : usesite) : ..$extends {} ]>
         };
-      jsApi.DefineNestedType(type).Compile();
+      jsApiNamespace.Define(type).Compile();
     }
   
-    private CreateTSGlobalClass(tsClass : TSGlobal.Class, jsApi : TypeBuilder) : void
+    private CreateTSGlobalClass(tsClass : TSGlobal.Class, jsApiNamespace : GlobalEnv) : void
     {
       def type = 
         match((tsClass.Extends, tsClass.Implements))
@@ -225,7 +190,7 @@ namespace NemerleWeb.Macros
           def inherit = extends.Append(implement);
           <[ decl: public partial class $(tsClass.Name : usesite) : ..$inherit {} ]>
         };
-      jsApi.DefineNestedType(type).Compile();
+      jsApiNamespace.Define(type).Compile();
     }
   
     private CreateTSGlobalConstruct(c : TSGlobal.Construct, jsApi : TypeBuilder) : void
@@ -233,28 +198,28 @@ namespace NemerleWeb.Macros
       
     }
     
-    private CreateTSGlobalEnum(tsEnum : TSGlobal.Enum, jsApi : TypeBuilder) : void
+    private CreateTSGlobalEnum(tsEnum : TSGlobal.Enum, jsApiNamespace : GlobalEnv) : void
     {
       def type = <[ decl: public enum $(tsEnum.Name : usesite) { } ]>;
-      jsApi.DefineNestedType(type).Compile();
+      jsApiNamespace.Define(type).Compile();
     }
   
-    private CreateTSGlobalImport(i : TSGlobal.Import, jsApi : TypeBuilder) : void
+    private CreateTSGlobalImport(i : TSGlobal.Import, jsApiNamespace : GlobalEnv) : void
     {
       
     }
   
-    private CreateTSGlobalExport(e : TSGlobal.Export, jsApi : TypeBuilder) : void
+    private CreateTSGlobalExport(e : TSGlobal.Export, jsApiNamespace : GlobalEnv) : void
     {
       
     }
   
-    private CreateTSGlobalModule(tsModule : TSGlobal.Module, jsApi : TypeBuilder) : void
+    private CreateTSGlobalModule(tsModule : TSGlobal.Module, jsApiNamespace : GlobalEnv) : void
     {
       def moduleName = tsModule.Name.Replace('/', '.').Replace('\\', '.');
       
       // Create modules by splitting '.'
-      _ = CreateModule(moduleName, jsApi);
+      _ = CreateModule(moduleName, jsApiNamespace);
     }
 
     #region Helpers
@@ -303,15 +268,16 @@ namespace NemerleWeb.Macros
     }
         
     /// Replace path separator with dots
-    private NormalizeName(path : string) : string
+    private GetNamespaceName(path : string) : string
     {
-      path.Replace('\\', '.').Replace('/', '.')
+      path.Replace('\\', '.').Replace('/', '.').TrimEnd('.')
     }
     
     private CreateModule(parts : list[string], outer : TypeBuilder) : TypeBuilder
     {
       match (parts)
       {
+      | [] => outer
       | [hd] =>
         def t = outer.DefineNestedType(<[ decl: public partial module $(hd : usesite) {} ]>);
         t.Compile();
@@ -335,6 +301,7 @@ namespace NemerleWeb.Macros
       def parts = moduleName.SplitDot();
       match (parts)
       {
+      | [] => Message.Error("Empty list"); null
       | [hd] =>
         def t = outer.Define(<[ decl: public partial module $(hd : usesite) {} ]>);
         t.Compile();
