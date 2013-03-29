@@ -8,10 +8,10 @@ namespace NemerleWeb
 {
     public static class RegisterHubs
     {
-        public static void Start()
+        public static Start() : void
         {
             // Register the default hubs route: ~/signalr/hubs
-            RouteTable.Routes.MapHubs();
+            _ = RouteTable.Routes.MapHubs();
         }
     }
 }

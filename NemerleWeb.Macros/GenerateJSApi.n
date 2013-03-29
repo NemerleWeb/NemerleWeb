@@ -4,6 +4,8 @@ using Nemerle.Macros;
 using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
 using Nemerle.Collections;
+using Nemerle.Utility;
+using Nemerle.Assertions;
 using System.IO;
 using System.Text.RegularExpressions;
 using TSParser;
@@ -16,7 +18,7 @@ namespace NemerleWeb.Macros
   {
     GenerateJSApiImpl.Impl(ImplicitCTX(), options)
   }
-  
+   
   module GenerateJSApiImpl
   {
     tsParser = TSDeclarationParser();
@@ -110,25 +112,25 @@ namespace NemerleWeb.Macros
         
         // Create module and namespace
         def fullRelativeApi = $"$baseNamespace.$fileName".TrimEnd('.');
-        def jsApiNamespace = jsApiRoot.EnterIntoNamespace(fullRelativeApi.SplitDot());
-        def jsApiModule = CreateModule(fullRelativeApi, jsApiRoot);
+        //def jsApiNamespace = jsApiRoot.EnterIntoNamespace(fullRelativeApi.SplitDot());
+        //def jsApiModule = CreateModule(fullRelativeApi, jsApiRoot);
+        
+        //// Generate members
+        //foreach(r in result) 
+        //{
+        //| Variable  as v => CreateTSGlobalVariable (v, jsApiModule, jsApiNamespace)
+        //| Function  as f => CreateTSGlobalFunction (f, jsApiModule)
+        //| Interface as i => CreateTSGlobalInterface(i, jsApiNamespace)
+        //| Class     as c => CreateTSGlobalClass    (c, jsApiNamespace)
+        //| Construct as c => CreateTSGlobalConstruct(c, jsApiModule)
+        //| Enum      as e => CreateTSGlobalEnum     (e, jsApiNamespace)
+        //| Import    as i => CreateTSGlobalImport   (i, jsApiNamespace)
+        //| Export    as e => CreateTSGlobalExport   (e, jsApiNamespace)
+        //| Module    as m => CreateTSGlobalModule   (m, jsApiNamespace)
+        //| _ => ()
+        //}
     
-        // Generate members
-        foreach(r in result) 
-        {
-        | Variable  as v => CreateTSGlobalVariable (v, jsApiModule)
-        | Function  as f => CreateTSGlobalFunction (f, jsApiModule)
-        | Interface as i => CreateTSGlobalInterface(i, jsApiNamespace)
-        | Class     as c => CreateTSGlobalClass    (c, jsApiNamespace)
-        | Construct as c => CreateTSGlobalConstruct(c, jsApiModule)
-        | Enum      as e => CreateTSGlobalEnum     (e, jsApiNamespace)
-        | Import    as i => CreateTSGlobalImport   (i, jsApiNamespace)
-        | Export    as e => CreateTSGlobalExport   (e, jsApiNamespace)
-        | Module    as m => CreateTSGlobalModule   (m, jsApiNamespace)
-        | _ => ()
-        }
-    
-        when(fileName != "") jsApiModule.Compile();
+        //when(fileName != "") jsApiModule.Compile();
         
       | (pos, _) =>
         // TODO: Add locations to parser and print here correct location in the file.
@@ -137,31 +139,36 @@ namespace NemerleWeb.Macros
       }
     }
  
-    private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder) : void
+    private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
-      def variableType = var.Name + "AnonymousClass";
-      jsApi.DefineNestedType(<[ decl: public partial class $(variableType : usesite) {} ]>).Compile();
+      def varType = ConvertType(var.Type, jsApiNamespace);
+        
+      _ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $varType ]>);
+      
+      //def anonymousClassName = var.Name + "AnonymousClass";
+      //def anonymousClass = jsApiNamespace.Define(<[ decl: public sealed class $(anonymousClassName : usesite) {} ]>);
+      //anonymousClass.Compile();
       
       // DefineMembers(anon, var.Members);
       
-      //_ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $(variableType : usesite) ]>);
+      //_ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $(anonymousClass.FullName : usesite) ]>);
     }
   
     private CreateTSGlobalFunction(function : TSGlobal.Function, jsApi : TypeBuilder) : void
     {
-      if (function.Name is Some(fname))
-      {
-        jsApi.Define(<[ decl: 
-          $(fname : usesite)() : $(ConvertType(function.ReturnType))
-          {
-            throw ClientCodeCalledInServerException();
-          }
-        ]>);
-      }
-      else
-      {
-        Message.Error("Global functions must have name");
-      }
+      //if (function.Name is Some(fname))
+      //{
+      //  jsApi.Define(<[ decl: 
+      //    $(fname : usesite)() : $(ConvertType(function.ReturnType, Scope(jsApi)))
+      //    {
+      //      throw ClientCodeCalledInServerException();
+      //    }
+      //  ]>);
+      //}
+      //else
+      //{
+      //  Message.Error("Global functions must have name");
+      //}
     }
   
     private CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, jsApiNamespace : GlobalEnv) : void
@@ -219,96 +226,86 @@ namespace NemerleWeb.Macros
       def moduleName = tsModule.Name.Replace('/', '.').Replace('\\', '.');
       
       // Create modules by splitting '.'
-      _ = CreateModule(moduleName, jsApiNamespace);
+      //_ = CreateModule(moduleName, jsApiNamespace);
     }
 
     #region Helpers
+    
     private GetParamsType(parms : list[TSParam], additional : option[TSType]) : list[PExpr]
     {
-      def convertParamsType(p : TSParam)
-      {
-        | Required(_, t, _)
-        | Option(_, _, t, _) => ConvertType(t)
-        | Rest(_, t) => ConvertType(t)
-      }
+      //def convertParamsType(p : TSParam)
+      //{
+      //  | Required(_, type, _)
+      //  | Option(_, _, type, _) => ConvertType(type)
+      //  | Rest(_, type) => ConvertType(type)
+      //}
     
-      def ret = 
-        parms
-          .Map(convertParamsType)
-          .Append(if (additional is Some(t)) [ConvertType(t)] else []);
+      //def ret = 
+      //  parms
+      //    .Map(convertParamsType)
+      //    .Append(if (additional is Some(type)) [ConvertType(type)] else []);
     
-      ret
+      //ret
+      []
     }
   
-    private ConvertType(inputType : option[TSType]) : PExpr
+    private ConvertType(inputType : option[TSType], jsApiNamespace : GlobalEnv) : PExpr
     {
-      | Some(type) => ConvertType(type)
-      | None => <[ object ]>
+      //| Some(type) => ConvertType(type, jsApiNamespace)
+      //| None => <[ object ]>
+      <[]>
     }
   
-    private ConvertType(inputType : TSType) : PExpr
+    private ConvertType(inputType : TSType, jsApiNamespace : GlobalEnv) : PExpr
     {
-      | Array(type, 0) => <[ $(ConvertType(type)) ]>
-      | Array(type, arity) => <[ array[$(ConvertType(TSType.Array(type, arity - 1)))] ]>
-      | Bool => <[ bool ]>    
-      | Lambda(parms, ret) =>
-        def (type, additional) = 
-          if (ret is TSType.Void()) (<[ Action ]>, None())
-          else                      (<[ Func ]>, Some(ret));
+      //| Array(type, 0) => <[ $(ConvertType(type, jsApiNamespace)) ]>
+      //| Array(type, arity) => <[ array[$(ConvertType(TSType.Array(type, arity - 1), jsApiNamespace))] ]>
+      //| Bool => <[ bool ]>    
+      //| Lambda(parms, ret) =>
+      //  def (type, additional) = 
+      //    if (ret is TSType.Void()) (<[ Action ]>, None())
+      //    else                      (<[ Func ]>, Some(ret));
         
-        <[ $type.[{..$(GetParamsType(parms, additional))}] ]>
-      | Named
-      | New
-      | Number => <[ float ]>
-      | Object => Message.Hint("Object is not supported"); <[ ]>
-      | String => <[ void ]>
-      | Void => <[ void ]>
-      | Any
+      //  <[ $type.[{..$(GetParamsType(parms, additional))}] ]>
+      //| Named(name) => <[ $(name : usesite) ]>
+      //| New
+      //| Number => <[ float ]>
+      //| Object => Message.Hint("Object is not supported"); <[ ]>
+      //| String => <[ string ]>
+      //| Void => <[ void ]>
+      //| Any
       | _ => <[ object ]>
     }
-        
+         
     /// Replace path separator with dots
     private GetNamespaceName(path : string) : string
     {
       path.Replace('\\', '.').Replace('/', '.').TrimEnd('.')
     }
     
-    private CreateModule(parts : list[string], outer : TypeBuilder) : TypeBuilder
-    {
-      match (parts)
-      {
-      | [] => outer
-      | [hd] =>
-        def t = outer.DefineNestedType(<[ decl: public partial module $(hd : usesite) {} ]>);
-        t.Compile();
-        t
-      | hd :: tl =>
-        def innerModule = outer.DefineNestedType(<[ decl: public partial module $(hd : usesite) {} ]>);
-        def t = CreateModule(tl, innerModule);
-        innerModule.Compile();
-        t
-      | _ => Message.Error("Must not get there"); null
-      }
-    }
-    
-    private CreateModule(moduleName : string, outer : TypeBuilder) : TypeBuilder
+    private CreateModule(moduleName : string, outer : Scope) : TypeBuilder
     {
       CreateModule(moduleName.SplitDot(), outer)
-    }
+    }    
     
-    private CreateModule(moduleName : string, outer : GlobalEnv) : TypeBuilder
+    private CreateModule(parts : list[string], outer : Scope) : TypeBuilder
     {
-      def parts = moduleName.SplitDot();
       match (parts)
       {
-      | [] => Message.Error("Empty list"); null
+      | [] => 
+        if(outer.TypeBuilder != null) outer.TypeBuilder 
+        else
+        {
+          Message.Error("List must not be empty");
+          null
+        }
       | [hd] =>
         def t = outer.Define(<[ decl: public partial module $(hd : usesite) {} ]>);
         t.Compile();
         t
       | hd :: tl =>
         def innerModule = outer.Define(<[ decl: public partial module $(hd : usesite) {} ]>);
-        def t = CreateModule(tl, innerModule);
+        def t = CreateModule(tl, Scope(innerModule));
         innerModule.Compile();
         t
       | _ => Message.Error("Must not get there"); null
@@ -316,13 +313,36 @@ namespace NemerleWeb.Macros
     }
     
     #endregion
-  }
+  }    
   
   module StringExt
   {
     public SplitDot(this s : string) : list[string]
     {
       s.Split('.').NToList()
+    }
+  }
+  
+  /// Wraps GlobalEnv or TypeBuilder for type creation
+  internal sealed class Scope
+  {
+    public GlobalEnv : GlobalEnv { get; }
+    public TypeBuilder : TypeBuilder { get; }
+    
+    public this([NotNull] globalEnv : GlobalEnv)
+    {
+      GlobalEnv = globalEnv;
+    }
+    
+    public this([NotNull] typeBuilder : TypeBuilder)
+    {
+      TypeBuilder = typeBuilder;
+    }
+    
+    public Define(typeDeclaration : ClassMember.TypeDeclaration) : TypeBuilder
+    {
+      if(GlobalEnv != null) GlobalEnv.Define(typeDeclaration)
+      else                  TypeBuilder.DefineNestedType(typeDeclaration)
     }
   }
 }

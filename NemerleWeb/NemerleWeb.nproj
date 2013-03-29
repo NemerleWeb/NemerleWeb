@@ -259,7 +259,7 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Start\RegisterHubs.cs">
+    <Compile Include="App_Start\RegisterHubs.n">
       <SubType>Content</SubType>
     </Compile>
     <Content Include="packages.config">
