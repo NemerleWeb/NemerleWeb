@@ -112,25 +112,30 @@ namespace NemerleWeb.Macros
         
         // Create module and namespace
         def fullRelativeApi = $"$baseNamespace.$fileName".TrimEnd('.');
-        //def jsApiNamespace = jsApiRoot.EnterIntoNamespace(fullRelativeApi.SplitDot());
-        //def jsApiModule = CreateModule(fullRelativeApi, jsApiRoot);
+        def jsApiNamespace = jsApiRoot.EnterIntoNamespace(fullRelativeApi.SplitDot());
+        def jsApiModule = CreateModule(fullRelativeApi, Scope(jsApiRoot));
         
-        //// Generate members
-        //foreach(r in result) 
-        //{
-        //| Variable  as v => CreateTSGlobalVariable (v, jsApiModule, jsApiNamespace)
-        //| Function  as f => CreateTSGlobalFunction (f, jsApiModule)
-        //| Interface as i => CreateTSGlobalInterface(i, jsApiNamespace)
-        //| Class     as c => CreateTSGlobalClass    (c, jsApiNamespace)
-        //| Construct as c => CreateTSGlobalConstruct(c, jsApiModule)
-        //| Enum      as e => CreateTSGlobalEnum     (e, jsApiNamespace)
-        //| Import    as i => CreateTSGlobalImport   (i, jsApiNamespace)
-        //| Export    as e => CreateTSGlobalExport   (e, jsApiNamespace)
-        //| Module    as m => CreateTSGlobalModule   (m, jsApiNamespace)
-        //| _ => ()
-        //}
+        // Generate members
+        foreach(r in result) 
+        {
+        | Interface as i => CreateTSGlobalInterface(i, jsApiNamespace)
+        | Class     as c => CreateTSGlobalClass    (c, jsApiNamespace)
+        | Enum      as e => CreateTSGlobalEnum     (e, jsApiNamespace)
+        | Import    as i => CreateTSGlobalImport   (i, jsApiNamespace)
+        | Export    as e => CreateTSGlobalExport   (e, jsApiNamespace)
+        | Module    as m => CreateTSGlobalModule   (m, jsApiNamespace)
+        | _ => ()
+        }
+        
+        foreach(r in result) 
+        {
+        | Variable  as v => CreateTSGlobalVariable (v, jsApiModule, jsApiNamespace)
+        | Function  as f => CreateTSGlobalFunction (f, jsApiModule, jsApiNamespace)
+        | Construct as c => CreateTSGlobalConstruct(c, jsApiModule)
+        | _ => ()
+        }
     
-        //when(fileName != "") jsApiModule.Compile();
+        when(fileName != "") jsApiModule.Compile();
         
       | (pos, _) =>
         // TODO: Add locations to parser and print here correct location in the file.
@@ -154,21 +159,21 @@ namespace NemerleWeb.Macros
       //_ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $(anonymousClass.FullName : usesite) ]>);
     }
   
-    private CreateTSGlobalFunction(function : TSGlobal.Function, jsApi : TypeBuilder) : void
+    private CreateTSGlobalFunction(function : TSGlobal.Function, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
-      //if (function.Name is Some(fname))
-      //{
-      //  jsApi.Define(<[ decl: 
-      //    $(fname : usesite)() : $(ConvertType(function.ReturnType, Scope(jsApi)))
-      //    {
-      //      throw ClientCodeCalledInServerException();
-      //    }
-      //  ]>);
-      //}
-      //else
-      //{
-      //  Message.Error("Global functions must have name");
-      //}
+      if (function.Name is Some(fname))
+      {
+        jsApi.Define(<[ decl: 
+          $(fname : usesite)() : $(ConvertType(function.ReturnType, jsApiNamespace))
+          {
+            throw ClientCodeCalledInServerException();
+          }
+        ]>);
+      }
+      else
+      {
+        Message.Error("Global functions must have name");
+      }
     }
   
     private CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, jsApiNamespace : GlobalEnv) : void
@@ -226,55 +231,60 @@ namespace NemerleWeb.Macros
       def moduleName = tsModule.Name.Replace('/', '.').Replace('\\', '.');
       
       // Create modules by splitting '.'
-      //_ = CreateModule(moduleName, jsApiNamespace);
+      _ = CreateModule(moduleName, Scope(jsApiNamespace));
     }
 
     #region Helpers
     
-    private GetParamsType(parms : list[TSParam], additional : option[TSType]) : list[PExpr]
+    private GetParamsType(parms : IEnumerable[TSParam], jsApiNamespace : GlobalEnv) : IEnumerable[PExpr]
     {
-      //def convertParamsType(p : TSParam)
-      //{
-      //  | Required(_, type, _)
-      //  | Option(_, _, type, _) => ConvertType(type)
-      //  | Rest(_, type) => ConvertType(type)
-      //}
+      def convertParamsType(p : TSParam)
+      {
+        | Required(_, type, _)
+        | Option(_, _, type, _) => ConvertType(type, jsApiNamespace)
+        | Rest(_, type) => ConvertType(type, jsApiNamespace)
+      }
     
-      //def ret = 
-      //  parms
-      //    .Map(convertParamsType)
-      //    .Append(if (additional is Some(type)) [ConvertType(type)] else []);
-    
-      //ret
-      []
+      def ret = parms.Select(convertParamsType);
+      ret
     }
   
     private ConvertType(inputType : option[TSType], jsApiNamespace : GlobalEnv) : PExpr
     {
-      //| Some(type) => ConvertType(type, jsApiNamespace)
-      //| None => <[ object ]>
-      <[]>
+      match(inputType)
+      {
+      | Some(type) => ConvertType(type, jsApiNamespace)
+      | None => <[ object ]>
+      }
     }
   
     private ConvertType(inputType : TSType, jsApiNamespace : GlobalEnv) : PExpr
     {
-      //| Array(type, 0) => <[ $(ConvertType(type, jsApiNamespace)) ]>
-      //| Array(type, arity) => <[ array[$(ConvertType(TSType.Array(type, arity - 1), jsApiNamespace))] ]>
-      //| Bool => <[ bool ]>    
-      //| Lambda(parms, ret) =>
-      //  def (type, additional) = 
-      //    if (ret is TSType.Void()) (<[ Action ]>, None())
-      //    else                      (<[ Func ]>, Some(ret));
+      match(inputType)
+      {
+      | Array(type, 0) => <[ $(ConvertType(type, jsApiNamespace)) ]>
+      | Array(type, arity) => <[ array[$(ConvertType(TSType.Array(type, arity - 1), jsApiNamespace))] ]>
+      | Bool => <[ bool ]>   
+      | Lambda(parms, ret) =>
+        mutable lambdaParams = GetParamsType(parms, jsApiNamespace);
+        def type =
+          if(ret is TSType.Void())
+            <[ System.Action ]>
+          else
+          {
+            lambdaParams = lambdaParams.Concat([ConvertType(ret, jsApiNamespace)]);
+            <[ System.Func ]>
+          };
         
-      //  <[ $type.[{..$(GetParamsType(parms, additional))}] ]>
-      //| Named(name) => <[ $(name : usesite) ]>
-      //| New
-      //| Number => <[ float ]>
-      //| Object => Message.Hint("Object is not supported"); <[ ]>
-      //| String => <[ string ]>
-      //| Void => <[ void ]>
-      //| Any
-      | _ => <[ object ]>
+        <[ $type.[..$lambdaParams] ]>
+      | Named(name) => <[ object ]> //<[ $(name : usesite) ]>
+      | New
+      | Number => <[ float ]>
+      | Object(members) => <[ object ]>
+      | String => <[ string ]>
+      | Void => <[ void ]>
+      | Any => <[ object ]>
+      }
     }
          
     /// Replace path separator with dots
