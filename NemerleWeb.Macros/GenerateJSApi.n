@@ -65,11 +65,11 @@ namespace NemerleWeb.Macros
       
       foreach(tsFile in tsFilesToParse)
       {
-        // TODO: Support references outside our directory
-        when (tsFile.Length < fullDir.Length || tsFile.Substring(0, fullDir.Length) != fullDir)
+        // TODO: Support references outside project directory
+        when (tsFile.Length < projectDir.Length || tsFile.Substring(0, projectDir.Length) != projectDir)
           Message.Error($"File $tsFile is outside directory $directory");
         
-        def baseNamespace = GetNamespaceName(Path.GetDirectoryName(tsFile).Substring(fullDir.Length + 1));
+        def baseNamespace = GetNamespaceName(Path.GetDirectoryName(tsFile).Substring(projectDir.Length + 1));
         def fileName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(tsFile));
         
         //ParseTS(typer, tsFile, baseNamespace, fileName);
@@ -147,23 +147,17 @@ namespace NemerleWeb.Macros
     private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
       def varType = ConvertType(var.Type, jsApiNamespace);
+      
+
         
-      _ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $varType ]>);
-      
-      //def anonymousClassName = var.Name + "AnonymousClass";
-      //def anonymousClass = jsApiNamespace.Define(<[ decl: public sealed class $(anonymousClassName : usesite) {} ]>);
-      //anonymousClass.Compile();
-      
-      // DefineMembers(anon, var.Members);
-      
-      //_ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $(anonymousClass.FullName : usesite) ]>);
+      _ = jsApi.DefineWithSource(<[ decl: public $(var.Name : usesite) : $varType ]>);
     }
   
     private CreateTSGlobalFunction(function : TSGlobal.Function, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
       if (function.Name is Some(fname))
       {
-        jsApi.Define(<[ decl: 
+        _ = jsApi.DefineWithSource(<[ decl: 
           $(fname : usesite)() : $(ConvertType(function.ReturnType, jsApiNamespace))
           {
             throw ClientCodeCalledInServerException();
@@ -278,9 +272,17 @@ namespace NemerleWeb.Macros
         
         <[ $type.[..$lambdaParams] ]>
       | Named(name) => <[ $(name : usesite) ]>
-      | New
+      | New => Message.Hint("new() is not supported yet"); <[ object ]>
       | Number => <[ float ]>
-      | Object(members) => <[ object ]>
+      | Object(members) => 
+        //def anonymousClassName = var.Name + "AnonymousClass";
+        //def anonymousClass = jsApiNamespace.Define(<[ decl: public sealed class $(anonymousClassName : usesite) {} ]>);
+        //anonymousClass.Compile();
+        
+        // DefineMembers(anon, var.Members);
+        
+        //_ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $(anonymousClass.FullName : usesite) ]>);
+        <[ object ]>
       | String => <[ string ]>
       | Void => <[ void ]>
       | Any => <[ object ]>
