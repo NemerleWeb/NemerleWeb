@@ -75,6 +75,7 @@
     <Folder Include="TS\amcharts\" />
     <Folder Include="TS\angularjs\" />
     <Folder Include="TS\async\" />
+    <Folder Include="TS\AzureMobileServicesClient\" />
     <Folder Include="TS\backbone\" />
     <Folder Include="TS\bgiframe\" />
     <Folder Include="TS\bootbox\" />
