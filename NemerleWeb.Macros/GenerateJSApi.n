@@ -277,7 +277,7 @@ namespace NemerleWeb.Macros
           };
         
         <[ $type.[..$lambdaParams] ]>
-      | Named(name) => <[ object ]> //<[ $(name : usesite) ]>
+      | Named(name) => <[ $(name : usesite) ]>
       | New
       | Number => <[ float ]>
       | Object(members) => <[ object ]>
