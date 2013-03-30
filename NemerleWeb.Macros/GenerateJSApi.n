@@ -13,6 +13,51 @@ using NemerleWeb;
 
 namespace NemerleWeb.Macros
 {
+  /// <summary>
+  /// Parses d.ts files and creates an appropriate Nemerle types and variables.
+  ///
+  /// Macro parameters
+  ///   Directory: Where to look for files. This parameter is relative to the project directory.
+  ///   Lib (optional): Where lib.d.ts file exists.
+  ///   Exclude (optional): Do not look for this files. Specified by regular expression.
+  ///
+  /// The convertion:
+  /// All types are generated in namespace JSApi with the following scheme:
+  ///  JSApi.<relative directory>.<file name>
+  /// Library file is generated to JSApi.<relative directory> , there is no file name.
+  /// For each file there is a namespace and module names are created.  
+  /// This allows to have one 'using' for global JS functions and types.
+  ///
+  /// Generated sample: assuming we have file jquery\jquery.d.ts
+  /// namespace JSApi
+  /// {
+  ///   namespace jquery // relative directory
+  ///   {
+  ///     namespace jquery // file name
+  ///     {
+  ///       // All types are declared here
+  ///     }
+  ///     module jquery
+  ///     {
+  ///       // Global functions and variables are declared here
+  ///     }
+  ///   }
+  /// }
+  ///
+  /// First all files are preparsed to resolve all referenced files.
+  /// Then all files are parsed and code is generated.
+  /// Types (classes, interfaces, modules) are generated before variables and functions.
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  /// </summary>
   [Nemerle.MacroUsage(Nemerle.MacroPhase.BeforeInheritance, Nemerle.MacroTargets.Assembly)]
   macro GenerateJSApi(params options : list[PExpr])
   {
@@ -127,15 +172,15 @@ namespace NemerleWeb.Macros
         | _ => ()
         }
         
-        foreach(r in result) 
+        foreach(r in result)
         {
         | Variable  as v => CreateTSGlobalVariable (v, jsApiModule, jsApiNamespace)
         | Function  as f => CreateTSGlobalFunction (f, jsApiModule, jsApiNamespace)
         | Construct as c => CreateTSGlobalConstruct(c, jsApiModule)
         | _ => ()
         }
-    
-        when(fileName != "") jsApiModule.Compile();
+        
+        jsApiModule.Compile();
         
       | (pos, _) =>
         // TODO: Add locations to parser and print here correct location in the file.
@@ -147,9 +192,6 @@ namespace NemerleWeb.Macros
     private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
       def varType = ConvertType(var.Type, jsApiNamespace);
-      
-
-        
       _ = jsApi.DefineWithSource(<[ decl: public $(var.Name : usesite) : $varType ]>);
     }
   
@@ -271,7 +313,7 @@ namespace NemerleWeb.Macros
           };
         
         <[ $type.[..$lambdaParams] ]>
-      | Named(name) => <[ $(name : usesite) ]>
+      | Named(name) => <[ $(name : usesite) ]>//<[ $(GetFullyQualifiedName(name, jsApiNamespace) : usesite) ]>
       | New => Message.Hint("new() is not supported yet"); <[ object ]>
       | Number => <[ float ]>
       | Object(members) => 
@@ -287,6 +329,44 @@ namespace NemerleWeb.Macros
       | Void => <[ void ]>
       | Any => <[ object ]>
       }
+    }
+    
+    /// <summary>
+    /// This method is needed because of bug in Nemerle compiler which cannot choose nearest symbol.
+    /// To workaround this behaviour we always specify fully qualified name by searching namespaces.
+    ///
+    /// namespace A
+    /// {
+    ///    class X{}
+    ///    namespace B
+    ///    {
+    ///       class X{}
+    ///       class Q
+    ///       {
+    ///           x : X; // Ambibguity
+    ///       }
+    ///    }
+    /// }
+    /// </summary>
+    GetFullyQualifiedName(name : string, jsApiNamespace : GlobalEnv) : string
+    {
+      def lookupType(name, node)
+      {
+        match(node.LookupType(name.SplitDot(), 0))
+        {
+        | Some(t) => t.FullName
+        | _ =>
+          if(!node.Parent.GetDisplayName().EndsWith("JSApi"))
+            lookupType(name, node.Parent)
+          else
+          {
+            Message.Error($"Cannot find type $name");
+            null
+          }
+        }
+      }
+      
+      lookupType(name, jsApiNamespace.CurrentNamespace);
     }
          
     /// Replace path separator with dots
