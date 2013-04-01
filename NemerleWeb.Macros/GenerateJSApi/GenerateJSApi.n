@@ -102,8 +102,7 @@ namespace NemerleWeb.Macros
       def tsAsts = tsFilesToParse.SelectMany(ParseTS);
       
       // Step 3: Generate
-      foreach(tsAst in tsAsts)
-        Message.Hint($"$tsAst");
+      GenerateCode(typer, tsAsts);
     }
     
     private ParseArgs(options : list[PExpr]) : GenerateArgs
@@ -206,6 +205,10 @@ namespace NemerleWeb.Macros
     #endregion
     
     #region Generate
+    
+    GenerateCode(typer : Typer, tsAsts : IEnumerable[TSGlobal]) : void
+    {
+    }
     
     private ParseTS2(typer : Typer, tsFile : string) : void
     {
