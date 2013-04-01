@@ -16,10 +16,22 @@ namespace NemerleWeb.Macros
   /// <summary>
   /// Parses d.ts files and creates an appropriate Nemerle types and variables.
   ///
-  /// Macro parameters
-  ///   Directory: Where to look for files. This parameter is relative to the project directory.
+  /// Macro parameters:
   ///   Lib (optional): Where lib.d.ts file exists.
-  ///   Exclude (optional): Do not look for this files. Specified by regular expression.
+  ///   Files:
+  ///     First: Directory.
+  ///     Second: Exclude (optional). Do not look for this files. Specified by regular expression.  
+  /// Path is relative to the project directory.
+  ///
+  /// Example, assuming we have all files in TS directory:
+  ///   [assembly: GenerateJSApi(
+  ///     Lib = @"TS\_infrastructure\0.9\lib.d.ts",
+  ///     Files =
+  ///     [
+  ///       ("TS", @"TS\\_infrastructure\\"),
+  ///       ("UserTSD")
+  ///     ]
+  ///   )]
   ///
   /// The convertion:
   /// All types are generated in namespace JSApi with the following scheme:
@@ -59,7 +71,16 @@ namespace NemerleWeb.Macros
   {
     GenerateJSApiImpl.Impl(ImplicitCTX(), options)
   }
-   
+  
+  [Record]
+  class GenerateArgs
+  {
+    public Lib : string { get; }
+    public Directory : string { get; }
+    public Exclude : string { get; }
+  }
+  
+  
   module GenerateJSApiImpl
   {
     tsParser = TSDeclarationParser();
@@ -76,44 +97,49 @@ namespace NemerleWeb.Macros
       | [<[ Lib = $(libPath : string) ]>,
          <[ Directory = $(directory : string) ]>,
          <[ Exclude = $(exclude : string) ]> ] =>
-        DoImpl(typer, libPath, directory, exclude)
+        DoImpl(typer, GenerateArgs(libPath, directory, exclude))
       | _ =>
         Message.Error("Specify Directory parameter and optional Lib, Exclude parameters");
       }
     }
     
-    private DoImpl(typer : Typer, libPath : string, directory : string, exclude : string) : void
+    private DoImpl(typer : Typer, args : GenerateArgs) : void
     {
       def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
       
-      // PreParse
+      // Step 1: PreParse
       // Resolve all references
-      def re = Regex(exclude);
-      def isIncluded(s) { if (exclude == "") true else !re.IsMatch(s) }
+      def re = Regex(args.Exclude);
+      def isIncluded(s) { if (args.Exclude == "") true else !re.IsMatch(s) }
       
-      def fullDir = Path.Combine(projectDir, directory);
+      def fullDir = Path.Combine(projectDir, args.Directory);
       def tsFiles = Directory.EnumerateFiles(fullDir, "*.d.ts", SearchOption.AllDirectories);
 
-      def tsFilesToParse = HashSet();
-      foreach(tsFile when isIncluded(tsFile) in tsFiles)
-        PreParseTS(tsFile, tsFilesToParse);
+      def tsFilesToParse = PreParseTS(tsFiles.Where(isIncluded));
       
-      // Parsing
+      // Step 2: Parse
+      // Parse lib if present
+      def tsAsts = if(args.Lib != "") ParseTS(Path.Combine(projectDir, args.Lib)) else [];
+      def tsAsts = tsAsts.Concat(tsFilesToParse.SelectMany(ParseTS));
       
-      // First, parse lib if present
-      when (libPath != "")
-        ParseTS(typer, Path.Combine(projectDir, libPath));
-      
-      // Then, parse all files
-      //foreach(tsFile in tsFilesToParse)
-      //  ParseTS(typer, tsFile);
+      // Step 3: Generate
+      foreach(tsAst in tsAsts)
+        Message.Hint("A");
     }
      
-    /// Parse all references
+    #region PreParse
+    
+    private PreParseTS(tsFiles : IEnumerable[string]) : HashSet[string]
+    {
+      def tsFilesToParse = HashSet();
+      foreach(tsFile in tsFiles) PreParseTS(tsFile, tsFilesToParse);
+      
+      tsFilesToParse;
+    }
+    
     private PreParseTS(tsFile : string, tsFilesToParse : HashSet[string]) : void
     {
-      if(tsFilesToParse.Contains(tsFile)) ()
-      else
+      when (tsFilesToParse.Add(tsFile))
         match(tsParser.TryParse(File.ReadAllText(tsFile)))
         {
         | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>
@@ -135,7 +161,29 @@ namespace NemerleWeb.Macros
         }
     }
     
-    private ParseTS(typer : Typer, tsFile : string) : void
+    #endregion
+    
+    #region Parse
+    
+    private ParseTS(tsFile : string) : IEnumerable[TSGlobal]
+    {
+      match(tsParser.TryParse(File.ReadAllText(tsFile)))
+      {
+      | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>
+        result
+      | (pos, _) =>
+        // TODO: Add locations to parser and print here correct location in the file.
+        def text = tsParser.ParsingSource.OriginalText;
+        Message.Error(Location(tsFile, 0, 0, 0, 0), $"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...");
+        null
+      }
+    }
+    
+    #endregion
+    
+    #region Generate
+    
+    private ParseTS2(typer : Typer, tsFile : string) : void
     {
       match(tsParser.TryParse(File.ReadAllText(tsFile)))
       {
@@ -171,6 +219,8 @@ namespace NemerleWeb.Macros
         Message.Error(Location(tsFile, 0, 0, 0, 0), $"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...")
       }
     }
+    
+    
  
     private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
@@ -268,6 +318,8 @@ namespace NemerleWeb.Macros
       // Create modules by splitting '.'
       _ = CreateModule(moduleName, Scope(jsApiNamespace));
     }
+    
+    #endregion
 
     #region Helpers
     
@@ -400,14 +452,6 @@ namespace NemerleWeb.Macros
       }
     }
     
-    #endregion
-  }    
-  
-  module StringExt
-  {
-    public SplitDot(this s : string) : list[string]
-    {
-      s.Split('.').NToList()
-    }
-  } 
+    #endregion     
+  }
 }

@@ -94,8 +94,14 @@ namespace TSParser
     | Lambda { Params : list[TSParam]; ReturnType : TSType; }
     | New { Params : list[TSParam]; ReturnType : TSType; }
   }
+  
+  [Record]
+  public class TSGlobalBase
+  {
+    public Name : string { get; }
+  }
 
-  public variant TSGlobal
+  public variant TSGlobal //: TSGlobalBase
   {
     | Variable { Name : string; Type : option[TSType]; }
     | Construct { Params : list[TSParam]; ReturnType : option[TSType]; }
