@@ -95,7 +95,7 @@ namespace NemerleWeb.Macros
       match(options)
       {
       | [<[ Files = {..$files} ]> ] with lib = ""
-      | [<[ Lib = $(lib : string) ]>, <[ Files = $(PExpr.ListLiteral(files)) ]>] =>
+      | [<[ Lib = $(lib : string) ]>, <[ Files = [..$files] ]>] =>
         // Convert PExpr sequence to regular type
         def filesArg = files.Select(
           f => match(f)
