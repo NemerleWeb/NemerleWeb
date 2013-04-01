@@ -90,6 +90,15 @@
     <Compile Include="EventsDSL\EventsMacros.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="GenerateJSApi\GenerateJSApi.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GenerateJSApi\Scope.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GenerateJSApi\StringExtensions.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="HtmlMacro\XmlAst.n">
       <SubType>Code</SubType>
     </Compile>
@@ -111,9 +120,6 @@
     <Compile Include="nweb.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GenerateJSApi.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="SignalR\SignalRMacro.n">
       <SubType>Code</SubType>
     </Compile>
@@ -127,6 +133,7 @@
   <ItemGroup>
     <Folder Include="HtmlMacro\" />
     <Folder Include="EventsDSL" />
+    <Folder Include="GenerateJSApi" />
     <Folder Include="SignalR" />
   </ItemGroup>
   <ItemGroup>
