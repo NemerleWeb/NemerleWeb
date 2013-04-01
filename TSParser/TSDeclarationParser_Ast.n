@@ -94,21 +94,18 @@ namespace TSParser
     | Lambda { Params : list[TSParam]; ReturnType : TSType; }
     | New { Params : list[TSParam]; ReturnType : TSType; }
   }
-  
-  [Record]
-  public class TSGlobalBase
-  {
-    public Name : string { get; }
-  }
 
-  public variant TSGlobal //: TSGlobalBase
+  /// <summary>
+  /// Global scope members.
+  /// Note: names are never empty.
+  /// </summary>
+  public variant TSGlobal
   {
     | Variable { Name : string; Type : option[TSType]; }
     | Construct { Params : list[TSParam]; ReturnType : option[TSType]; }
     | Function
-      { 
+      {
         Name : option[string];
-        Optional : bool;
         Params : list[TSParam];
         ReturnType : option[TSType];
       }

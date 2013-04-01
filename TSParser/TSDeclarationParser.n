@@ -632,7 +632,7 @@ namespace TSParser
           ExportAssignment;
         ExportAssignment : TSGlobal = export_s assign_s Identifier semicolon;
             
-        #endregion 
+        #endregion
         
         #region Import Declarations (9.2.2)
         
@@ -664,9 +664,7 @@ namespace TSParser
         
         #region Ambient Variable Declarations (10.1.2)
         
-        // This rule is not by specification, but TypeScript parses it correctly.
-        AmbientFunctionSignature : TSGlobal= AnyIdentifier? optional lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation?;
-        AmbientFunctionDeclaration : TSGlobal = function_s AmbientFunctionSignature scS;
+        AmbientFunctionDeclaration : TSGlobal = function_s AnyIdentifier? lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation? S;
         
         // This rule is not by specification, but TypeScript parses it correctly.
         AmbientConstructDeclaration : TSGlobal = function_s new_s lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation? S;
@@ -950,9 +948,9 @@ namespace TSParser
       TSGlobal.Variable(id, type)
     }
     
-    AmbientFunctionSignature(name : option[string], optional : bool, parms : list[TSParam], returnType : option[TSType]) : TSGlobal
+    AmbientFunctionDeclaration(name : option[string], parms : list[TSParam], returnType : option[TSType]) : TSGlobal
     {
-      TSGlobal.Function(name, optional, parms, returnType)
+      TSGlobal.Function(name, parms, returnType)
     }
     
     AmbientConstructDeclaration(parms : list[TSParam], returnType : option[TSType]) : TSGlobal
