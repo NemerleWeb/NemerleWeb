@@ -92,6 +92,22 @@ namespace NemerleWeb.Macros
     
     public Impl(typer : Typer, options : list[PExpr]) : void
     {
+      def args = ParseArgs(options);
+      
+      // Step 1: PreParse
+      def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
+      def tsFilesToParse = PreParseTSAll(projectDir, args.Lib, args.Args);
+      
+      // Step 2: Parse
+      def tsAsts = tsFilesToParse.SelectMany(ParseTS);
+      
+      // Step 3: Generate
+      foreach(tsAst in tsAsts)
+        Message.Hint($"$tsAst");
+    }
+    
+    private ParseArgs(options : list[PExpr]) : GenerateArgs
+    {
       match(options)
       {
       | [<[ Files = {..$files} ]> ] with lib = ""
@@ -106,24 +122,11 @@ namespace NemerleWeb.Macros
             Message.Error("You must specify at most 2 arguments: directory and exclude pattern");
             null
           });
-        DoImpl(typer, GenerateArgs(lib, filesArg))
+        GenerateArgs(lib, filesArg)
       | _ =>
         Message.Error("Specify Files parameter and optional Lib");
+        null
       }
-    }
-    
-    private DoImpl(typer : Typer, args : GenerateArgs) : void
-    {
-      // Step 1: PreParse
-      def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
-      def tsFilesToParse = PreParseTSAll(projectDir, args.Lib, args.Args);
-      
-      // Step 2: Parse
-      def tsAsts = tsFilesToParse.SelectMany(ParseTS);
-      
-      // Step 3: Generate
-      foreach(tsAst in tsAsts)
-        Message.Hint($"$tsAst");
     }
      
     #region PreParse
