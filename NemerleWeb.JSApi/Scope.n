@@ -1,0 +1,36 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.JSApi
+{
+  /// <summary>
+  /// Wraps GlobalEnv or TypeBuilder for type creation
+  /// </summary>
+  internal sealed class Scope
+  {
+    public GlobalEnv : GlobalEnv { get; }
+    public TypeBuilder : TypeBuilder { get; }
+    
+    public this([NotNull] globalEnv : GlobalEnv)
+    {
+      GlobalEnv = globalEnv;
+    }
+    
+    public this([NotNull] typeBuilder : TypeBuilder)
+    {
+      TypeBuilder = typeBuilder;
+    }
+    
+    public Define(typeDeclaration : ClassMember.TypeDeclaration) : TypeBuilder
+    {
+      if(GlobalEnv != null) GlobalEnv.Define(typeDeclaration)
+      else                  TypeBuilder.DefineNestedType(typeDeclaration)
+    }
+  }
+}

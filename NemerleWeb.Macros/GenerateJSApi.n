@@ -23,24 +23,20 @@ namespace NemerleWeb.Macros
   ///
   /// The convertion:
   /// All types are generated in namespace JSApi with the following scheme:
-  ///  JSApi.<relative directory>.<file name>
-  /// Library file is generated to JSApi.<relative directory> , there is no file name.
-  /// For each file there is a namespace and module names are created.  
+  ///  JSApi.<relative directory>
+  /// The namespace and module with corresponding name are created.  
   /// This allows to have one 'using' for global JS functions and types.
   ///
   /// Generated sample: assuming we have file jquery\jquery.d.ts
   /// namespace JSApi
   /// {
-  ///   namespace jquery // relative directory
+  ///   namespace TS // relative directory
   ///   {
-  ///     namespace jquery // file name
-  ///     {
-  ///       // All types are declared here
-  ///     }
-  ///     module jquery
-  ///     {
-  ///       // Global functions and variables are declared here
-  ///     }
+  ///     // All types are declared here
+  ///   }
+  ///   module TS
+  ///   {
+  ///     // Global functions and variables are declared here
   ///   }
   /// }
   ///
@@ -69,7 +65,7 @@ namespace NemerleWeb.Macros
     tsParser = TSDeclarationParser();
     
     public Impl(typer : Typer, options : list[PExpr]) : void
-    {      
+    {
       match(options)
       {
       | [<[ Directory = $(directory : string) ]> ] with (libPath = "", exclude = "")
@@ -104,21 +100,13 @@ namespace NemerleWeb.Macros
       
       // Parsing
       
-      // Parse lib if present
+      // First, parse lib if present
       when (libPath != "")
-        ParseTS(typer, Path.Combine(projectDir, libPath), GetNamespaceName(directory), "");
+        ParseTS(typer, Path.Combine(projectDir, libPath));
       
-      foreach(tsFile in tsFilesToParse)
-      {
-        // TODO: Support references outside project directory
-        when (tsFile.Length < projectDir.Length || tsFile.Substring(0, projectDir.Length) != projectDir)
-          Message.Error($"File $tsFile is outside directory $directory");
-        
-        def baseNamespace = GetNamespaceName(Path.GetDirectoryName(tsFile).Substring(projectDir.Length + 1));
-        def fileName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(tsFile));
-        
-        //ParseTS(typer, tsFile, baseNamespace, fileName);
-      }
+      // Then, parse all files
+      //foreach(tsFile in tsFilesToParse)
+      //  ParseTS(typer, tsFile);
     }
      
     /// Parse all references
@@ -147,18 +135,13 @@ namespace NemerleWeb.Macros
         }
     }
     
-    private ParseTS(typer : Typer, tsFile : string, baseNamespace : string, fileName : string) : void
+    private ParseTS(typer : Typer, tsFile : string) : void
     {
       match(tsParser.TryParse(File.ReadAllText(tsFile)))
       {
       | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>       
-        // Root JS API namespace
-        def jsApiRoot = typer.Env.EnterIntoNamespace(["JSApi"]);
-        
-        // Create module and namespace
-        def fullRelativeApi = $"$baseNamespace.$fileName".TrimEnd('.');
-        def jsApiNamespace = jsApiRoot.EnterIntoNamespace(fullRelativeApi.SplitDot());
-        def jsApiModule = CreateModule(fullRelativeApi, Scope(jsApiRoot));
+        def jsApiNamespace = typer.Env.EnterIntoNamespace(["JSApi"]);
+        def jsApiModule = CreateModule("JSApi", Scope(typer.Env));
         
         // Generate members
         foreach(r in result) 
@@ -191,8 +174,24 @@ namespace NemerleWeb.Macros
  
     private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
-      def varType = ConvertType(var.Type, jsApiNamespace);
-      _ = jsApi.DefineWithSource(<[ decl: public $(var.Name : usesite) : $varType ]>);
+      def createVariable()
+      {
+        def varType = ConvertType(var.Type, jsApiNamespace);
+          _ = jsApi.DefineWithSource(<[ decl: public $(var.Name : usesite) : $varType ]>);
+      }
+      
+      // If we don't check it, we get NRE inside compiler !
+      if(jsApi.LookupMemberAvailable)
+      {
+        // Search field with same name
+        def members = jsApi.LookupMember(var.Name, false);
+        if(!members.Any(m => m.MemberKind == System.Reflection.MemberTypes.Field))
+          createVariable()
+        else
+          Message.Hint($"$(var.Name) has been already created");
+      }
+      else
+        createVariable();
     }
   
     private CreateTSGlobalFunction(function : TSGlobal.Function, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
@@ -211,7 +210,7 @@ namespace NemerleWeb.Macros
         Message.Error("Global functions must have name");
       }
     }
-  
+    
     private CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, jsApiNamespace : GlobalEnv) : void
     {
       def type =
@@ -219,7 +218,7 @@ namespace NemerleWeb.Macros
           <[ decl: public partial interface $(tsInterface.Name : usesite) {} ]>
         else
         {
-          def extends = tsInterface.Extends.Map(e => <[ $(e : usesite) ]>);
+          def extends = tsInterface.Extends.Select(e => <[ $(e : usesite) ]>);
           <[ decl: public partial interface $(tsInterface.Name : usesite) : ..$extends {} ]>
         };
       jsApiNamespace.Define(type).Compile();
@@ -234,8 +233,8 @@ namespace NemerleWeb.Macros
           <[ decl: public partial class $(tsClass.Name : usesite) {} ]>
         | _ =>
           def extends = if (tsClass.Extends is Some(ex)) [<[ $(ex : usesite) ]>] else [];
-          def implement = tsClass.Implements.Map(e => <[ $(e : usesite) ]>);
-          def inherit = extends.Append(implement);
+          def implement = tsClass.Implements.Select(e => <[ $(e : usesite) ]>);
+          def inherit = extends.Concat(implement);
           <[ decl: public partial class $(tsClass.Name : usesite) : ..$inherit {} ]>
         };
       jsApiNamespace.Define(type).Compile();
@@ -313,7 +312,7 @@ namespace NemerleWeb.Macros
           };
         
         <[ $type.[..$lambdaParams] ]>
-      | Named(name) => <[ $(name : usesite) ]>//<[ $(GetFullyQualifiedName(name, jsApiNamespace) : usesite) ]>
+      | Named(name) => <[ $(name : usesite) ]>
       | New => Message.Hint("new() is not supported yet"); <[ object ]>
       | Number => <[ float ]>
       | Object(members) => 
@@ -333,12 +332,12 @@ namespace NemerleWeb.Macros
     
     /// <summary>
     /// This method is needed because of bug in Nemerle compiler which cannot choose nearest symbol.
-    /// To workaround this behaviour we always specify fully qualified name by searching namespaces.
+    /// To workaround this behaviour we always specify fully qualified name.    
     ///
-    /// namespace A
+    /// module A
     /// {
     ///    class X{}
-    ///    namespace B
+    ///    module B
     ///    {
     ///       class X{}
     ///       class Q
@@ -356,13 +355,10 @@ namespace NemerleWeb.Macros
         {
         | Some(t) => t.FullName
         | _ =>
-          if(!node.Parent.GetDisplayName().EndsWith("JSApi"))
-            lookupType(name, node.Parent)
+          if(node.GetDisplayName() == "JSApi")
+            name
           else
-          {
-            Message.Error($"Cannot find type $name");
-            null
-          }
+            lookupType(name, node.Parent)
         }
       }
       
@@ -413,28 +409,5 @@ namespace NemerleWeb.Macros
     {
       s.Split('.').NToList()
     }
-  }
-  
-  /// Wraps GlobalEnv or TypeBuilder for type creation
-  internal sealed class Scope
-  {
-    public GlobalEnv : GlobalEnv { get; }
-    public TypeBuilder : TypeBuilder { get; }
-    
-    public this([NotNull] globalEnv : GlobalEnv)
-    {
-      GlobalEnv = globalEnv;
-    }
-    
-    public this([NotNull] typeBuilder : TypeBuilder)
-    {
-      TypeBuilder = typeBuilder;
-    }
-    
-    public Define(typeDeclaration : ClassMember.TypeDeclaration) : TypeBuilder
-    {
-      if(GlobalEnv != null) GlobalEnv.Define(typeDeclaration)
-      else                  TypeBuilder.DefineNestedType(typeDeclaration)
-    }
-  }
+  } 
 }
