@@ -73,13 +73,18 @@ namespace NemerleWeb.Macros
   }
   
   [Record]
-  class GenerateArgs
+  class DirectoryArg
   {
-    public Lib : string { get; }
     public Directory : string { get; }
     public Exclude : string { get; }
   }
   
+  [Record]
+  class GenerateArgs
+  {
+    public Lib : string { get; }
+    public Args : IEnumerable[DirectoryArg] { get; }
+  }
   
   module GenerateJSApiImpl
   {
@@ -89,53 +94,69 @@ namespace NemerleWeb.Macros
     {
       match(options)
       {
-      | [<[ Directory = $(directory : string) ]> ] with (libPath = "", exclude = "")
-      | [<[ Directory = $(directory : string) ]>,
-         <[ Exclude = $(exclude : string) ]> ] with libPath = ""
-      | [<[ Lib = $(libPath : string) ]>,
-         <[ Directory = $(directory : string) ]> ] with exclude = ""
-      | [<[ Lib = $(libPath : string) ]>,
-         <[ Directory = $(directory : string) ]>,
-         <[ Exclude = $(exclude : string) ]> ] =>
-        DoImpl(typer, GenerateArgs(libPath, directory, exclude))
+      | [<[ Files = {..$files} ]> ] with lib = ""
+      | [<[ Lib = $(lib : string) ]>, <[ Files = $(PExpr.ListLiteral(files)) ]>] =>
+        // Convert PExpr sequence to regular type
+        def filesArg = files.Select(
+          f => match(f)
+          {
+          | <[ $(dir : string) ]> with exclude = ""
+          | <[ ($(dir : string), $(exclude : string)) ]> => DirectoryArg(dir, exclude)
+          | _ =>
+            Message.Error("You must specify at most 2 arguments: directory and exclude pattern");
+            null
+          });
+        DoImpl(typer, GenerateArgs(lib, filesArg))
       | _ =>
-        Message.Error("Specify Directory parameter and optional Lib, Exclude parameters");
+        Message.Error("Specify Files parameter and optional Lib");
       }
     }
     
     private DoImpl(typer : Typer, args : GenerateArgs) : void
     {
-      def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
-      
       // Step 1: PreParse
-      // Resolve all references
-      def re = Regex(args.Exclude);
-      def isIncluded(s) { if (args.Exclude == "") true else !re.IsMatch(s) }
-      
-      def fullDir = Path.Combine(projectDir, args.Directory);
-      def tsFiles = Directory.EnumerateFiles(fullDir, "*.d.ts", SearchOption.AllDirectories);
-
-      def tsFilesToParse = PreParseTS(tsFiles.Where(isIncluded));
+      def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
+      def tsFilesToParse = PreParseTSAll(projectDir, args.Lib, args.Args);
       
       // Step 2: Parse
-      // Parse lib if present
-      def tsAsts = if(args.Lib != "") ParseTS(Path.Combine(projectDir, args.Lib)) else [];
-      def tsAsts = tsAsts.Concat(tsFilesToParse.SelectMany(ParseTS));
+      def tsAsts = tsFilesToParse.SelectMany(ParseTS);
       
       // Step 3: Generate
       foreach(tsAst in tsAsts)
-        Message.Hint("A");
+        Message.Hint($"$tsAst");
     }
      
     #region PreParse
     
-    private PreParseTS(tsFiles : IEnumerable[string]) : HashSet[string]
-    {
+    private PreParseTSAll(projectDir : string, lib : string, args : IEnumerable[DirectoryArg]) : HashSet[string]
+    {      
       def tsFilesToParse = HashSet();
-      foreach(tsFile in tsFiles) PreParseTS(tsFile, tsFilesToParse);
       
-      tsFilesToParse;
-    }
+      // Add lib if exists
+      when(lib != "") _ = tsFilesToParse.Add(Path.Combine(projectDir, lib));
+      
+      // Resolve all references        
+      foreach(arg in args)
+      {
+        def re = Regex(arg.Exclude);
+        def isIncluded(s) { if (arg.Exclude == "") true else !re.IsMatch(s) }
+      
+        def fullDir = Path.Combine(projectDir, arg.Directory);          
+        try
+        {
+          def tsFiles = Directory.EnumerateFiles(fullDir, "*.d.ts", SearchOption.AllDirectories);
+
+          foreach(tsFile when isIncluded(tsFile) in tsFiles)
+            PreParseTS(tsFile, tsFilesToParse);
+        }
+        catch
+        {
+          | _ => Message.Hint($"Directory \"$fullDir\" doesn't exist. Skipping.");
+        }
+      }
+      
+      tsFilesToParse
+    } 
     
     private PreParseTS(tsFile : string, tsFilesToParse : HashSet[string]) : void
     {
