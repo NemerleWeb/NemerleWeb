@@ -102,8 +102,11 @@ namespace NemerleWeb.Macros
       // Step 2: Parse
       def tsAsts = tsFilesToParse.SelectMany(ParseTS);
       
-      // Step 3: Generate
-      GenerateCode(typer, tsAsts);
+      // Step 3: Analyze
+      def finalAst = AnalyzeTSAst(tsAsts);
+      
+      // Step 4: Generate
+      GenerateCode(typer, finalAst);
     }
     
     private ParseArgs(options : list[PExpr]) : GenerateArgs
@@ -205,11 +208,14 @@ namespace NemerleWeb.Macros
     
     #endregion
     
-    #region Generate
+    #region Analyze
     
-    GenerateCode(typer : Typer, tsAsts : IEnumerable[TSGlobal]) : void
+    /// <summary>
+    /// Take all elements and remove duplicates
+    /// </summary>
+    private AnalyzeTSAst(tsAsts : IEnumerable[TSGlobal]) : IEnumerable[TSGlobal]
     {
-      def groups = tsAsts
+      tsAsts
         .Where(ast =>
           match(ast)
           {
@@ -235,14 +241,22 @@ namespace NemerleWeb.Macros
           | TSGlobal.Module    as m => m.Name
           | TSGlobal.Enum      as e => e.Name
           | _ => throw Exception(); ""
-          });
-          
-      foreach(group in groups)
+          })
+        .SelectMany(e => 
+          {
+            e.Select(x => x)
+          })
+    }
+    
+    #endregion
+    
+    #region Generate
+    
+    GenerateCode(typer : Typer, tsAst : IEnumerable[TSGlobal]) : void
+    {
+      foreach(e in tsAst)
       {
-        match(group.Key)
-        {
-        | _ => Message.Hint($"$(group.Key)")
-        }
+        Message.Hint($"$(e)")
       }
     }
     
