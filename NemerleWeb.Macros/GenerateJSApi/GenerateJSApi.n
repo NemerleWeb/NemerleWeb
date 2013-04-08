@@ -89,6 +89,8 @@ namespace NemerleWeb.Macros
   
   module GenerateJSApiImpl
   {
+    #region Impl
+    
     tsParser = TSDeclarationParser();
     
     public Impl(typer : Typer, options : list[PExpr]) : void
@@ -131,6 +133,8 @@ namespace NemerleWeb.Macros
         null
       }
     }
+    
+    #endregion
      
     #region PreParse
     
@@ -231,24 +235,25 @@ namespace NemerleWeb.Macros
           | _ => false
           })
         .GroupBy(ast =>
-          match(ast)
           {
-          | TSGlobal.Variable  as v => v.Name
-          | TSGlobal.Construct      => ""
-          | TSGlobal.Function  as f => f.Name ?? ""
-          | TSGlobal.Class     as c => c.Name
-          | TSGlobal.Interface as i => i.Name
-          | TSGlobal.Module    as m => m.Name
-          | TSGlobal.Enum      as e => e.Name
-          | _ => throw Exception(); ""
+            def name =
+              match(ast)
+              {
+              | TSGlobal.Variable  as v => v.Name
+              | TSGlobal.Construct      => ""
+              | TSGlobal.Function  as f => f.Name ?? ""
+              | TSGlobal.Class     as c => c.Name
+              | TSGlobal.Interface as i => i.Name
+              | TSGlobal.Module    as m => m.Name
+              | TSGlobal.Enum      as e => e.Name
+              | _ => throw Exception(); ""
+              };
+            (ast.GetType(), name)
           })
-        .SelectMany(e => 
-          {
-            e.Select(x => x)
-          })
+        .Select(typeAndName => typeAndName.First())
     }
     
-    #endregion
+     #endregion
     
     #region Generate
     
@@ -256,7 +261,8 @@ namespace NemerleWeb.Macros
     {
       foreach(e in tsAst)
       {
-        Message.Hint($"$(e)")
+      | TSGlobal.Variable as v => Message.Hint($"$(v.Name)")
+      | _ => ()
       }
     }
     
