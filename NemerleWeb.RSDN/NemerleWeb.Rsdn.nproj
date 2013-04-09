@@ -297,11 +297,6 @@
       <Project>{b1635fea-c0cd-4c8e-a18e-d97d59f21b14}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <MacroReference Include="..\NemerleWeb.Macros\NemerleWeb.Macros.nproj">
-      <Name>NemerleWeb</Name>
-      <Project>{b1454534-cabd-4abe-cc8e-ddff34f51b14}</Project>
-      <Private>True</Private>
-    </MacroReference>
   </ItemGroup>
   <ItemGroup>
     <MacroReference Include="Nemerle.ComputationExpressions.Macros">
@@ -328,7 +323,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>63042</DevelopmentServerPort>
+          <DevelopmentServerPort>49919</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>
