@@ -17,43 +17,38 @@ namespace NemerleWeb.Rsdn
 {
   module TreeLoader
   {
-    mutable _tree : TreeNode;
-    mutable _childrenById : ConcurrentDictionary[string, List[TreeNode]];
+    _tree : TreeNode;
+    _childrenById : ConcurrentDictionary[string, List[TreeNode]] = ConcurrentDictionary();
+    _searchTerms : SortedDictionary[string, int] = SortedDictionary();
+    _searchTermResults : ConcurrentDictionary[string, List[TreeNode]] = ConcurrentDictionary();
     
     this()
     {
       def xml = File.ReadAllText(HttpContext.Current.Server.MapPath("~/App_Data/tree.xml"), Encoding.GetEncoding("windows-1251"));
-      def doc = XDocument.Parse(xml);
-      
-      _childrenById = ConcurrentDictionary();
-      
-      def readAttribute(element : XElement, attrName : string) {
-        element.Attribute(attrName)?.Value
-      }
-      
       def readNodes(element, depth) : TreeNode {        
         def childNodes = element.Elements("node").Select(e => readNodes(e, depth + 1)).ToList();
         
         if(element.Name.LocalName == "tree") 
           TreeNode() <- ( Children = childNodes ) 
         else {
-          def id = readAttribute(element, "id");
+          def id = element.Attribute("id")?.Value;
           
           _ = _childrenById.TryAdd(id, childNodes.Select(CloneNoChildren).ToList());
           
           TreeNode() <- (           
             Id = id,
-            Caption = readAttribute(element, "caption"),
-            Href = readAttribute(element, "href"),
-            Icon = readAttribute(element, "icon"),
-            Hide = readAttribute(element, "hide") == "1",
+            Caption = element.Attribute("caption")?.Value,
+            Href = element.Attribute("href")?.Value,
+            Icon = element.Attribute("icon")?.Value,
+            Hide = element.Attribute("hide")?.Value == "1",
+            HasChildren = childNodes.Count > 0,
             Depth = depth,
             Children = childNodes,
           );
         }
       }
       
-      _tree = readNodes(doc.Root, 0);
+      _tree = readNodes(XDocument.Parse(xml).Root, 0);
     }
         
     public GetTopNodes() : List[TreeNode]
@@ -66,6 +61,37 @@ namespace NemerleWeb.Rsdn
       _childrenById.GetOrAdd(id, List());
     }
     
+    public Search(term : string) : List[TreeNode]
+    {
+      lock(_searchTerms) {
+        if(_searchTerms.ContainsKey(term))
+          _searchTerms[term]++;
+        else
+          _searchTerms.Add(term, 0);
+      }
+      
+      lock(_searchTermResults) {
+        _searchTermResults.GetOrAdd(term, _ => {
+          _tree.Children.Select(c => CreateTreeBySearchTerm(term, c)).ToList();
+        });
+      }
+    }
+    
+    CreateTreeBySearchTerm(term : string, node : TreeNode) : TreeNode
+    {     
+      mutable nodeChildren;
+      
+      if(_childrenById.TryGetValue(node.Id, out nodeChildren) && nodeChildren.Count > 0) {        
+        def result = CloneNoChildren(node);
+        def children = nodeChildren.Select(c => CreateTreeBySearchTerm(term, c)).ToList();
+        result.IsOpened = children.Any(_.IsOpened) || node.Caption.Contains(term);
+        result.Children = if(result.IsOpened) children else null;
+        result
+      }
+      else 
+        CloneNoChildren(node)
+    }
+    
     CloneNoChildren(node : TreeNode) : TreeNode
     {
       TreeNode() <- (
@@ -74,7 +100,8 @@ namespace NemerleWeb.Rsdn
         Href = node.Href,
         Icon = node.Icon,
         Hide = node.Hide,
-        Depth = node.Depth
+        Depth = node.Depth,
+        HasChildren = node.HasChildren        
       )      
     }
   }

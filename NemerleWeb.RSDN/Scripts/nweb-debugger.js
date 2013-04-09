@@ -66,15 +66,23 @@
   
   nweb.go(wrap('', { Main: model }, 0), "nweb_debugger_template", ".nweb-debug-container", true);
 
-  togglePanel();
+  hidePanel();
   
   function togglePanel() {
     if(!panelHidden) {
-      panel.offset({ left: -panel.width() + 10, top: 0 });
-      panelHidden = true;
+      hidePanel();
     } else {
-      panel.offset({ left: 0, top: 0 });
-      panelHidden = false;
+      showPanel();
     }
+  }
+  
+  function hidePanel() {
+    panel.offset({ left: -panel.width() + 10, top: 0 });
+    panelHidden = true;
+  }
+
+  function showPanel() {
+    panel.offset({ left: 0, top: 0 });
+    panelHidden = false;
   }
 };
