@@ -250,7 +250,25 @@ namespace NemerleWeb.Macros
               };
             (ast.GetType(), name)
           })
-        .Select(typeAndName => typeAndName.First())
+        .Select(typeAndName =>
+          {
+            // TODO: Either compiler should support for type matching or add support in ExtensionPattern
+            if(typeAndName.Key[0].Equals(typeof(TSGlobal.Variable)))
+            {
+              // Return first variable and skip other
+              typeAndName.First()
+            }
+            else
+            if(typeAndName.Key[0].Equals(typeof(TSGlobal.Function)))
+            {
+              // Return first function with unique signature and skip other
+              null
+            }
+            else
+            {
+              null
+            }
+          })
     }
     
      #endregion
