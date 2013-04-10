@@ -14,8 +14,14 @@ namespace NemerleWeb.Rsdn
   public class MainPage
   {
     Root : TreeNode { get; set; }
+    SearchTerm : string { get; set; }
     
     public this() {
+      LoadTopNodes();
+    }
+    
+    public LoadTopNodes() : void
+    {
       server.GetTopNodes(nodes => {
         Root = TreeNode() <- (
           Children = nodes
@@ -23,11 +29,26 @@ namespace NemerleWeb.Rsdn
       });
     }
     
+    public Search() : void
+    {
+      if(string.IsNullOrWhiteSpace(SearchTerm))
+        LoadTopNodes();
+      else 
+        server.Search(SearchTerm, nodes => {
+          Root = TreeNode() <- (
+            Children = nodes
+          );
+        });
+    }
+    
     [Html]
     public View() : string
     {
       <#
         <div $when(Root != null) class="root">
+          <div>
+            <input value="$SearchTerm" event-keyup="$Search" />
+          </div>
           <div template="$(template(Root))" />
         </div>
       #>
@@ -38,6 +59,11 @@ namespace NemerleWeb.Rsdn
       public GetTopNodes() : List[TreeNode]
       {
         TreeLoader.GetTopNodes()
+      }
+      
+      public Search(term : string) : List[TreeNode]
+      {
+        TreeLoader.Search(term)
       }
     }
   }
