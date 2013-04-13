@@ -512,13 +512,14 @@ namespace TSParser
         
         #region Function Signatures (6.2)
         
+        // According to spec, additional comma is forbiden, but TS compiler handles it.
         ParameterList : list[TSParam] =
           ParameterListROR /
-          ParameterListOR /
+          ParameterListOR comma_s? /
           ParameterListRO /
           ParameterListRR /
-          OptionalParameterList /
-          RequiredParameterList /
+          OptionalParameterList comma_s? /
+          RequiredParameterList comma_s? /
           RestParameter;
           
         // Return empty list instead of option

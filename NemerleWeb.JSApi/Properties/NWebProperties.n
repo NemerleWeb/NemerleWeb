@@ -2,5 +2,5 @@
 
 [assembly: GenerateJSApi(
   Lib = @"TS\_infrastructure\tests\typescript_0.8.3\lib.d.ts",
-  Files = [ ("TS", @"TS\\_infrastructure\\") ]
+  Files = [ ("TS", @"TS\\(_infrastructure|i18next\\lib)\\") ]
 )]
