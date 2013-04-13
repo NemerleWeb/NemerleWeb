@@ -89,7 +89,7 @@ namespace NemerleWeb.Macros
   
   module GenerateJSApiImpl
   {
-    #region Impl
+    #region Implementation
     
     tsParser = TSDeclarationParser();
     
@@ -262,90 +262,62 @@ namespace NemerleWeb.Macros
             if(typeAndName.Key[0].Equals(typeof(TSGlobal.Function)))
             {
               // Return first function with unique signature and skip other
-              null
+              typeAndName.First()
             }
             else
             {
-              null
+              typeAndName.First()
             }
           })
     }
     
-     #endregion
+    #endregion
     
     #region Generate
     
     GenerateCode(typer : Typer, tsAst : IEnumerable[TSGlobal]) : void
     {
-      foreach(e in tsAst)
+      def jsApiNamespace = typer.Env.EnterIntoNamespace(["JSApi"]);
+      def jsApiModule = CreateModule("JSApi", Scope(typer.Env));
+      
+      // Generate members
+      foreach(e in tsAst) 
       {
-      | TSGlobal.Variable as v => Message.Hint($"$(v.Name)")
+      | Interface as i => CreateTSGlobalInterface(i, jsApiNamespace)
+      | Class     as c => CreateTSGlobalClass    (c, jsApiNamespace)
+      | Enum      as e => CreateTSGlobalEnum     (e, jsApiNamespace)
+      | Import    as i => CreateTSGlobalImport   (i, jsApiNamespace)
+      | Export    as e => CreateTSGlobalExport   (e, jsApiNamespace)
+      | Module    as m => CreateTSGlobalModule   (m, jsApiNamespace)
       | _ => ()
       }
-    }
-    
-    private ParseTS2(typer : Typer, tsFile : string) : void
-    {
-      match(tsParser.TryParse(File.ReadAllText(tsFile)))
+      
+      foreach(e in tsAst)
       {
-      | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>       
-        def jsApiNamespace = typer.Env.EnterIntoNamespace(["JSApi"]);
-        def jsApiModule = CreateModule("JSApi", Scope(typer.Env));
-        
-        // Generate members
-        foreach(r in result) 
-        {
-        | Interface as i => CreateTSGlobalInterface(i, jsApiNamespace)
-        | Class     as c => CreateTSGlobalClass    (c, jsApiNamespace)
-        | Enum      as e => CreateTSGlobalEnum     (e, jsApiNamespace)
-        | Import    as i => CreateTSGlobalImport   (i, jsApiNamespace)
-        | Export    as e => CreateTSGlobalExport   (e, jsApiNamespace)
-        | Module    as m => CreateTSGlobalModule   (m, jsApiNamespace)
-        | _ => ()
-        }
-        
-        foreach(r in result)
-        {
-        | Variable  as v => CreateTSGlobalVariable (v, jsApiModule, jsApiNamespace)
-        | Function  as f => CreateTSGlobalFunction (f, jsApiModule, jsApiNamespace)
-        | Construct as c => CreateTSGlobalConstruct(c, jsApiModule)
-        | _ => ()
-        }
-        
-        jsApiModule.Compile();
-        
-      | (pos, _) =>
-        // TODO: Add locations to parser and print here correct location in the file.
-        def text = tsParser.ParsingSource.OriginalText;
-        Message.Error(Location(tsFile, 0, 0, 0, 0), $"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...")
+      | Variable  as v => CreateTSGlobalVariable (v, jsApiModule, jsApiNamespace)
+      | Function  as f => CreateTSGlobalFunction (f, jsApiModule, jsApiNamespace)
+      | Construct as c => CreateTSGlobalConstruct(c, jsApiModule)
+      | _ => ()
       }
+      
+      jsApiModule.Compile();
     }
-    
-    
  
     private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
-      def createVariable()
-      {
-        def varType = ConvertType(var.Type, jsApiNamespace);
-          _ = jsApi.DefineWithSource(<[ decl: public $(var.Name : usesite) : $varType ]>);
-      }
-      
-      // If we don't check it, we get NRE inside compiler !
-      if(jsApi.LookupMemberAvailable)
-      {
-        // Search field with same name
-        def members = jsApi.LookupMember(var.Name, false);
-        if(!members.Any(m => m.MemberKind == System.Reflection.MemberTypes.Field))
-          createVariable()
-        else
-          Message.Hint($"$(var.Name) has been already created");
-      }
-      else
-        createVariable();
+      def varType = ConvertType(var.Type, jsApiNamespace);
+      _ = jsApi.DefineWithSource(<[ decl: public $(var.Name : usesite) : $varType ]>);
     }
   
     private CreateTSGlobalFunction(function : TSGlobal.Function, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
+    {
+      if (function.Name.IsSome)
+        CreateTSGlobalFunctionInModule(function, jsApi, jsApiNamespace)
+      else
+        Message.Error("Global functions must have name");
+    }
+    
+    private CreateTSGlobalFunctionInModule(function : TSGlobal.Function, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
       if (function.Name is Some(fname))
       {
@@ -358,7 +330,8 @@ namespace NemerleWeb.Macros
       }
       else
       {
-        Message.Error("Global functions must have name");
+        // Create @() operator
+        // TODO: <[ decl: public static @()(this obj_ : this, ...)
       }
     }
     
@@ -372,6 +345,7 @@ namespace NemerleWeb.Macros
           def extends = tsInterface.Extends.Select(e => <[ $(e : usesite) ]>);
           <[ decl: public partial interface $(tsInterface.Name : usesite) : ..$extends {} ]>
         };
+        
       jsApiNamespace.Define(type).Compile();
     }
   
@@ -388,6 +362,7 @@ namespace NemerleWeb.Macros
           def inherit = extends.Concat(implement);
           <[ decl: public partial class $(tsClass.Name : usesite) : ..$inherit {} ]>
         };
+        
       jsApiNamespace.Define(type).Compile();
     }
   
