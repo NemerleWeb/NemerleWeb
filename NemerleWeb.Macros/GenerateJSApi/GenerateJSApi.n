@@ -306,7 +306,9 @@ namespace NemerleWeb.Macros
     private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
       def varType = ConvertType(var.Type, jsApiNamespace);
-      _ = jsApi.DefineWithSource(<[ decl: public $(var.Name : usesite) : $varType ]>);
+      // TODO: Remove check
+      when(!varType.ToString().Contains("."))
+        _ = jsApi.DefineWithSource(<[ decl: public $(var.Name : usesite) : $varType ]>);
     }
   
     private CreateTSGlobalFunction(function : TSGlobal.Function, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
@@ -321,12 +323,17 @@ namespace NemerleWeb.Macros
     {
       if (function.Name is Some(fname))
       {
+        // TODO: Remove check
+        // TODO: Add parameters
+        when(!function.ReturnType.ToString().Contains("."))
+        {
         _ = jsApi.DefineWithSource(<[ decl: 
           $(fname : usesite)() : $(ConvertType(function.ReturnType, jsApiNamespace))
           {
             throw ClientCodeCalledInServerException();
           }
         ]>);
+        }
       }
       else
       {
@@ -516,11 +523,11 @@ namespace NemerleWeb.Macros
           null
         }
       | [hd] =>
-        def t = outer.Define(<[ decl: public partial module $(hd : usesite) {} ]>);
+        def t = outer.Define(<[ decl: public partial class $(hd : usesite) {} ]>);
         t.Compile();
         t
       | hd :: tl =>
-        def innerModule = outer.Define(<[ decl: public partial module $(hd : usesite) {} ]>);
+        def innerModule = outer.Define(<[ decl: public partial class $(hd : usesite) {} ]>);
         def t = CreateModule(tl, Scope(innerModule));
         innerModule.Compile();
         t
