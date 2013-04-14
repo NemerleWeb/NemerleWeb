@@ -420,10 +420,17 @@ var nweb = {
     code();
     nweb.invalidate(nweb.bindings);
   },
-  invalidate: function(bindings) {
+  invalidationCount: 0,
+  invalidate: function(bindings, indent, selfCall) {
     if(typeof bindings === 'undefined')
       bindings = nweb.bindings;
+
+    indent = !!indent ? indent : "";
+    if(true)
+      console.log(indent + nweb.invalidationCount++);
+
     var changeFound;
+
     do {
       changeFound = false;
       for (var i = bindings.length - 1; i >= 0; i--) {
@@ -438,25 +445,23 @@ var nweb = {
             changeFound = true;
             binding.apply(newValue);
           }
-
-          //We need to nudge GC into freeing memory from old instance
-          //In theory, this shouldn't be needed, but somehow memory is not freed without this line
-          //delete binding.oldValue; 
           binding.oldValue = newValue.slice();
         } else {
           if(binding.oldValue !== newValue) {
             changeFound = true;
             binding.apply(newValue);
-
-            //delete binding.oldValue;
             binding.oldValue = newValue;
           }
         }
 
-        if (binding.subBindings)
-          nweb.invalidate(binding.subBindings);
+        if (binding.subBindings) {
+          changeFound |= nweb.invalidate(binding.subBindings, indent + "  ", true);
+        }
       }
-    } while(changeFound)
+      //Repeat only on top level, so every binding will be invalidated exactly once per invalidation cycle
+    } while (changeFound && !selfCall) 
+
+    return changeFound;
   },
   savePosition: function($el) {
       $el[0].__nw_prev = $el.prev();
