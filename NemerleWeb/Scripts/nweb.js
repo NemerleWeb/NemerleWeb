@@ -249,7 +249,8 @@ var nweb = {
     var html = el.outerHTML;    
     var expr = nweb.parseExpression(model, repeat[2], loopStack);    
 
-    $el = nweb.utils.replaceWith($el, $("<!-- repeat " + expr + " -->"));
+    //$el = nweb.utils.replaceWith($el, $("<!-- repeat " + expr + " -->"));
+    $el.html("<!-- repeat " + expr + " -->");
     el.__nw_is_template = true;
     el.__nw_is_repeat = true;
 
@@ -306,15 +307,17 @@ var nweb = {
     el.__nw_is_template = true;
 
     var binding = {
-      el: el,
+      el: $el,
       subBindings: [],
       getValue: function() {
         return nweb.getParsedValue(model, parsedVal, loopStack);
       },
       apply: function(value) {
         $el = nweb.utils.replaceWith($el, $(html).removeAttr("nw-template"));
+                
+        nweb.eraseGeneratedElements(binding);
 
-        jQuery.each($el, function(i, e) {
+        jQuery.each($el, function (i, e) {
           nweb.applyBindings(value, e, binding.subBindings = [], loopStack, true);
         });
       }
@@ -416,6 +419,14 @@ var nweb = {
       }
     }
   },
+  eraseGeneratedElements: function (binding) {
+    if(!!binding.generatedEls)
+      for (var j = 0; j < binding.generatedEls.length; j++)
+        binding.generatedEls[j].remove();
+    if (!!binding.subBindings)
+      for (var j = 0; j < binding.subBindings.length; j++)
+        nweb.eraseGeneratedElements(binding.subBindings[j]);
+  },
   execute: function(code) {
     code();
     nweb.invalidate(nweb.bindings);
@@ -426,7 +437,7 @@ var nweb = {
       bindings = nweb.bindings;
 
     indent = !!indent ? indent : "";
-    if(true)
+    if(false)
       console.log(indent + nweb.invalidationCount++);
 
     var changeFound;
