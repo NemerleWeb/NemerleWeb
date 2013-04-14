@@ -531,7 +531,9 @@ nweb.utils = {
     isArray: function(obj) {
         return Object.prototype.toString.call(obj) === '[object Array]';
     },
-    areArraysEqual: function(a1, a2) {
+    areArraysEqual: function (a1, a2) {
+        if (a1.length != a2.length)
+          return false;
         return JSON.stringify(a1) == JSON.stringify(a2);
     },
     isFunction: function(obj) {
