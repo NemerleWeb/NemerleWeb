@@ -401,12 +401,23 @@ var nweb = {
     var e = nweb.applyLoopStackToExpr(expr, loopStack);
     return e.replace(/self\./g, "model.");
   },
+  parsedValueCache: {},
   getParsedValue: function(model, parsedExpr, loopStack, returnFunction) {
     if(parsedExpr.length === 0)
       return null;
     else {      
       try {
-        var val = eval(parsedExpr);
+        var cachedFunc = nweb.parsedValueCache[parsedExpr];
+        var val;
+
+        if (!cachedFunc) {
+          var newFunc = eval("(function(model, loopStack) { return " + parsedExpr + "; } )");
+          nweb.parsedValueCache[parsedExpr] = newFunc;
+          val = newFunc(model, loopStack);
+        } else {
+          val = cachedFunc(model, loopStack);
+        }
+
         if(nweb.utils.isFunction(val) && !returnFunction) {
           if(loopStack.length > 0)
             return val(loopStack[loopStack.length - 1].val);
@@ -415,7 +426,7 @@ var nweb = {
         else
           return val;
       } catch(e) {
-        throw "Error evaluating: " + parsedExpr + " " + e;
+        return "Error evaluating: " + parsedExpr + " " + e;
       }
     }
   },
@@ -435,7 +446,8 @@ var nweb = {
   invalidate: function(bindings, indent, selfCall) {
     if(typeof bindings === 'undefined')
       bindings = nweb.bindings;
-
+    nweb.invalidationCount++;
+    
     indent = !!indent ? indent : "";
     if(false)
       console.log(indent + nweb.invalidationCount++);
@@ -471,6 +483,9 @@ var nweb = {
       }
       //Repeat only on top level, so every binding will be invalidated exactly once per invalidation cycle
     } while (changeFound && !selfCall) 
+
+    if (!selfCall)
+      console.log(nweb.invalidationCount);
 
     return changeFound;
   },
