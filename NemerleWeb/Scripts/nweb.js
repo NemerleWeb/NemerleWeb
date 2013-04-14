@@ -52,10 +52,10 @@ var nweb = {
     for(var i = 0; i < attrs.length; i++) {
       var attrName = attrs[i].nodeName;
         
-      if (attrName == "nw-text" && el.tagName.toUpperCase() == "TEXTAREA")
+      if (attrName === "nw-text" && el.tagName.toUpperCase() === "TEXTAREA")
           attrName = "nw-value";
         
-      if(attrName.indexOf("nw-") == 0) {
+      if(attrName.indexOf("nw-") === 0) {
         var binder = nweb.binds(attrName);
         
         if(typeof binder === 'undefined')
@@ -195,7 +195,7 @@ var nweb = {
             eval(nweb.utils.makeAssignExpression(expr, "$el.val()"));
         });
       });
-    } else if(el.tagName.toUpperCase() == "TEXTAREA") {
+    } else if(el.tagName.toUpperCase() === "TEXTAREA") {
       $(el).keyup(function () {
         var val = this.value;
         nweb.execute(function () {
@@ -500,7 +500,7 @@ var nweb = {
         $el[0].__nw_parent.prepend($el);
   },
   getValue: function(el) {
-    if(el.tagName == "SELECT") {
+    if(el.tagName === "SELECT") {
       var selected = $("option:selected", el)[0];
       if(selected)
         return selected[nweb.dataKey];
@@ -510,12 +510,12 @@ var nweb = {
     }
   },
   setValue: function(el, val) {
-    if(el.tagName == "SELECT") {
+    if(el.tagName === "SELECT") {
       var toSelect = $("option", el).filter(function() {
         return this[nweb.dataKey] == val;
       }).prop("selected", false);
       toSelect.prop("selected", true);
-    } else if(el.tagName == "OPTION") {
+    } else if(el.tagName === "OPTION") {
       el[nweb.dataKey] = val;
     } else {
       var $el = $(el);
@@ -530,14 +530,9 @@ var nweb = {
 nweb.utils = {
     isArray: function(obj) {
         return Object.prototype.toString.call(obj) === '[object Array]';
-    },
-    areArraysEqual: function (a1, a2) {
-        if (a1.length != a2.length)
-          return false;
-        return JSON.stringify(a1) == JSON.stringify(a2);
-    },
+    },    
     isFunction: function(obj) {
-        return obj && { }.toString.call(obj) == '[object Function]';
+        return obj && { }.toString.call(obj) === '[object Function]';
     },
     firstProperty: function(obj) {
         for(var v in obj) return v;
@@ -590,7 +585,7 @@ nweb.utils = {
       return Object.prototype.toString.call(obj).match(/^\[object (.*)\]$/)[1];
     },
     isTuple: function(obj) {
-      return !!obj.$type && obj.$type.indexOf('Nemerle.Builtins.Tuple`') == 0;
+      return !!obj.$type && obj.$type.indexOf('Nemerle.Builtins.Tuple`') === 0;
     },
     normalizeObjectForServer: function (obj) {
       if (nweb.utils.getObjectType(obj) !== "Object" || obj === null)
@@ -622,7 +617,7 @@ nweb.utils = {
       };
 
       for (var member in obj) {
-        if (obj.hasOwnProperty(member) && member.indexOf('_N_') != 0 && excludedFields.indexOf(member) == -1) {
+        if (obj.hasOwnProperty(member) && member.indexOf('_N_') != 0 && excludedFields.indexOf(member) === -1) {
           if (nweb.utils.getObjectType(obj[member]) === 'Function' && member.indexOf("get_") === 0)
             result[member.substr(4)] = nweb.utils.normalizeObjectForServer(obj[member]());
           else if(!isFunction(obj[member]))
@@ -654,9 +649,9 @@ nweb.utils = {
             arr.push(attrs[i]);
         }
         arr.sort(function (a, b) {
-          if (a.nodeName == "nw-repeat")
+          if (a.nodeName === "nw-repeat")
             return -2;
-          if (a.nodeName == "nw-when" || a.nodeName == "nw-unless")
+          if (a.nodeName === "nw-when" || a.nodeName === "nw-unless")
             return -1;
           return 1;
         });
@@ -691,7 +686,7 @@ nweb.utils = {
         for (var f = 0; f < meta.fields.length; f++) {
           var m = meta.fields[f].name.match(/_N_(.+)_\d+/);
           
-          if(!(m.length == 2 && usedProps[m[1]] === ''))
+          if(!(m.length === 2 && usedProps[m[1]] === ''))
             result.push({ name: meta.fields[f].name, val: model[meta.fields[f].name] });
         }
         
@@ -707,6 +702,23 @@ nweb.utils = {
       
     }
 };
+
+if (nweb.debugger) {
+    nweb.utils.areArraysEqual = function(l, r) {
+        if (l.length != r.length)
+            return false;
+        return JSON.stringify(l) === JSON.stringify(r);
+    };
+} else {
+    nweb.utils.areArraysEqual = function(l, r) {
+        if (r.length !== l.length)
+            return false;
+        for (var i = 0, len = l.length; i < len; i++)
+            if (l[i] !== r[i])
+                return false;
+        return true;
+    };
+}
 
 Array.prototype.getEnumerator = function() {
     this.__enumeratorIndex = -1;
@@ -763,7 +775,7 @@ if (!Array.prototype.indexOf) {
     };
 }
 
-// Implement Object.keys for browser which doens't support
+// Implement Object.keys for browser which doesn't support
 Object.keys = Object.keys || (function () {
     var hasOwnProperty = Object.prototype.hasOwnProperty,
         hasDontEnumBug = !{toString:null}.propertyIsEnumerable("toString"),
@@ -774,7 +786,7 @@ Object.keys = Object.keys || (function () {
         DontEnumsLength = DontEnums.length;
 
     return function (o) {
-        if (typeof o != "object" && typeof o != "function" || o === null)
+        if (typeof o !== "object" && typeof o !== "function" || o === null)
             throw new TypeError("Object.keys called on a non-object");
 
         var result = [];
@@ -858,8 +870,8 @@ function System_Text_StringBuilder() {
     };
 
     this.Append = function (s) {
-        if (typeof s == "object" && ("ToString" in s) &&
-            typeof s.ToString == "object" && nweb.utils.isFunction(s.ToString[""]))
+        if (typeof s === "object" && ("ToString" in s) &&
+            typeof s.ToString === "object" && nweb.utils.isFunction(s.ToString[""]))
             this.string += s.ToString[""].call(s);
         else
             this.string += s;
