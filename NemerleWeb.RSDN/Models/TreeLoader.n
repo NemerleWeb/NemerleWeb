@@ -86,11 +86,14 @@ namespace NemerleWeb.Rsdn
         def result = CloneNoChildren(node);
         def children = nodeChildren.Select(c => CreateTreeBySearchTerm(term, c)).ToList();
         result.IsOpened = children.Any(_.IsOpened) || node.Caption.Contains(term);
-        result.Children = if(result.IsOpened) children else null;
+        result.Children = if(result.IsOpened) children.Where(c => c.IsOpened).ToList() else null;
         result
       }
-      else 
-        CloneNoChildren(node)
+      else {
+        def result = CloneNoChildren(node);
+        result.IsOpened = node.Caption.Contains(term);
+        result;
+      }
     }
     
     CloneNoChildren(node : TreeNode) : TreeNode
