@@ -13,8 +13,16 @@ namespace NemerleWeb.Rsdn
   [Unit]
   public class MainPage
   {
-    Root : TreeNode { get; set; }
-    SearchTerm : string { get; set; }
+    mutable _searchTerm : string;
+    
+    Root : TreeNode { get; set; }    
+    SearchTerm : string { 
+      get { _searchTerm; }
+      set {
+          _searchTerm = value;
+          Search(value);
+      }; 
+    }
     
     public this() {
       LoadTopNodes();
@@ -22,23 +30,24 @@ namespace NemerleWeb.Rsdn
     
     public LoadTopNodes() : void
     {
-      server.Search("n", nodes => {
+      server.GetTopNodes(nodes => {
         Root = TreeNode() <- (
           Children = nodes
         );
       });
     }
     
-    public Search() : void
+    public Search(term : string) : void
     {
-      if(string.IsNullOrWhiteSpace(SearchTerm))
+      if(string.IsNullOrWhiteSpace(term))
         LoadTopNodes();
-      else 
-        server.Search(SearchTerm, nodes => {
+      else {        
+        server.Search(term, nodes => {
           Root = TreeNode() <- (
             Children = nodes
           );
         });
+      }
     }
     
     [Html]
@@ -47,7 +56,7 @@ namespace NemerleWeb.Rsdn
       <#
         <div $when(Root != null) class="root">
           <div>
-            <input value="$SearchTerm" event-keyup="$Search" />
+            <input value="$SearchTerm" />
           </div>
           <div template="$(template(Root))" />
         </div>
