@@ -22,7 +22,7 @@ namespace NemerleWeb.Rsdn
     
     public LoadTopNodes() : void
     {
-      server.GetTopNodes(nodes => {
+      server.Search("n", nodes => {
         Root = TreeNode() <- (
           Children = nodes
         );
