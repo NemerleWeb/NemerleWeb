@@ -552,16 +552,10 @@ nweb.utils = {
             
             return tuple;
           }
-
-          // HACK: Support constructor's signature
+          
           var typenameCtor = typename + '$ctor';
-          var hasTypenameCtor = eval('typeof ' +  typenameCtor + '!== "undefined"');
-
-          var newObjectExpr =
-              'new ' + typename + '("' +
-                  (hasTypenameCtor ? nweb.utils.firstProperty(eval(typenameCtor)) : '') +
-              '")';
-          var newObj = eval(newObjectExpr);
+          var hasTypenameCtor = typeof window[typenameCtor] !== "undefined";
+          var newObj = new window[typename](hasTypenameCtor ? nweb.utils.firstProperty(window[typenameCtor]) : '');
 
           for (var p in obj) {
             var propSetter = "set_" + p;
