@@ -219,56 +219,58 @@ namespace NemerleWeb.Macros
     /// </summary>
     private AnalyzeTSAst(tsAsts : IEnumerable[TSGlobal]) : IEnumerable[TSGlobal]
     {
-      tsAsts
-        .Where(ast =>
+      def filter(ast)
+      {
+        | TSGlobal.Variable 
+        | TSGlobal.Construct
+        | TSGlobal.Function
+        | TSGlobal.Class 
+        | TSGlobal.Interface
+        | TSGlobal.Module
+        | TSGlobal.Enum => true
+        | TSGlobal.Import 
+        | TSGlobal.Export
+        | _ => false
+      }     
+      def group(ast)
+      {
+        def name =
           match(ast)
           {
-          | TSGlobal.Variable 
-          | TSGlobal.Construct
-          | TSGlobal.Function
-          | TSGlobal.Class 
-          | TSGlobal.Interface
-          | TSGlobal.Module
-          | TSGlobal.Enum => true
-          | TSGlobal.Import 
-          | TSGlobal.Export
-          | _ => false
-          })
-        .GroupBy(ast =>
-          {
-            def name =
-              match(ast)
-              {
-              | TSGlobal.Variable  as v => v.Name
-              | TSGlobal.Construct      => ""
-              | TSGlobal.Function  as f => f.Name ?? ""
-              | TSGlobal.Class     as c => c.Name
-              | TSGlobal.Interface as i => i.Name
-              | TSGlobal.Module    as m => m.Name
-              | TSGlobal.Enum      as e => e.Name
-              | _ => throw Exception(); ""
-              };
-            (ast.GetType(), name)
-          })
-        .Select(typeAndName =>
-          {
-            // TODO: Either compiler should support for type matching or add support in ExtensionPattern
-            if(typeAndName.Key[0].Equals(typeof(TSGlobal.Variable)))
-            {
-              // Return first variable and skip other
-              typeAndName.First()
-            }
-            else
-            if(typeAndName.Key[0].Equals(typeof(TSGlobal.Function)))
-            {
-              // Return first function with unique signature and skip other
-              typeAndName.First()
-            }
-            else
-            {
-              typeAndName.First()
-            }
-          })
+          | TSGlobal.Variable  as v => v.Name
+          | TSGlobal.Construct      => ""
+          | TSGlobal.Function  as f => f.Name ?? ""
+          | TSGlobal.Class     as c => c.Name
+          | TSGlobal.Interface as i => i.Name
+          | TSGlobal.Module    as m => m.Name
+          | TSGlobal.Enum      as e => e.Name
+          | _ => throw Exception(); ""
+          };
+        // Group by type and name
+        (ast.GetType(), name)
+      }
+      def select(typeAndNameGroup)
+      {
+        def type = typeAndNameGroup.Key[0];
+        
+        // TODO: Either compiler should support for type matching or add support in ExtensionPattern
+        if(type.Equals(typeof(TSGlobal.Variable)))
+        {
+          // Return first variable and skip other
+          [typeAndNameGroup.First()]
+        }
+        else
+        if(type.Equals(typeof(TSGlobal.Function)))
+        {
+          [typeAndNameGroup.First()]
+        }
+        else
+        {
+          [typeAndNameGroup.First()]
+        }
+      }
+      
+      tsAsts.Where(filter).GroupBy(group).SelectMany(select)
     }
     
     #endregion
