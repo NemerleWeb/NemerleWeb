@@ -184,6 +184,7 @@
     <Folder Include="TS\nodemailer\" />
     <Folder Include="TS\node\" />
     <Folder Include="TS\node_redis\" />
+    <Folder Include="TS\node_zeromq\" />
     <Folder Include="TS\noVNC\" />
     <Folder Include="TS\numeraljs\" />
     <Folder Include="TS\phantomjs\" />
