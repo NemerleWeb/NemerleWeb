@@ -15,7 +15,9 @@ namespace NemerleWeb.Rsdn
   {
     mutable _searchTerm : string;
     
-    Root : TreeNode { get; set; }    
+    Root : TreeNode { get; set; }
+    SearchResults : IEnumerable[(TreeNode * list[string])] { get; set; }
+    
     SearchTerm : string { 
       get { _searchTerm; }
       set {
@@ -43,9 +45,7 @@ namespace NemerleWeb.Rsdn
         LoadTopNodes();
       else {        
         server.Search(term, nodes => {
-          Root = TreeNode() <- (
-            Children = nodes
-          );
+          SearchResults = nodes
         });
       }
     }
@@ -58,7 +58,12 @@ namespace NemerleWeb.Rsdn
           <div>
             <input value="$SearchTerm" />
           </div>
-          <div template="$(template(Root))" />
+          <div $foreach((node, path) in SearchResults)>
+            <span>$(node.Caption)</span>
+          </div>
+          <div $when(string.IsNullOrEmpty(SearchTerm))>
+            <div template="$(template(Root))" />
+          </div>
         </div>
       #>
     }
@@ -70,7 +75,7 @@ namespace NemerleWeb.Rsdn
         TreeLoader.GetTopNodes()
       }
       
-      public Search(term : string) : List[TreeNode]
+      public Search(term : string) : IEnumerable[(TreeNode * list[string])]
       {
         TreeLoader.Search(term)
       }

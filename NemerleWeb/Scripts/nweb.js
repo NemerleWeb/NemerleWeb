@@ -247,7 +247,17 @@ var nweb = {
     var $el = $(el);
     var repeat = /(.+)\sin\s(.+)/.exec(attrVal);
     var html = el.outerHTML;    
-    var expr = nweb.parseExpression(model, repeat[2], loopStack);    
+    var expr = nweb.parseExpression(model, repeat[2], loopStack);
+    var isExprTuple = false;
+    var tupleDecls = [];
+    
+    if (repeat[1].indexOf("{") == 0) {
+      isExprTuple = true;
+      var tupleObj = JSON.parse(repeat[1]);
+      for (var k in tupleObj)
+        if (tupleObj.hasOwnProperty(k))
+          tupleDecls.push(tupleObj[k]);
+    }
 
     //$el = nweb.utils.replaceWith($el, $("<!-- repeat " + expr + " -->"));
     $el.html("<!-- repeat " + expr + " -->");
@@ -283,7 +293,16 @@ var nweb = {
           
           $newEl.insertAfter($el);
 
-          nweb.applyBindings(model, $newEl[0], binding.subBindings, loopStack.concat({ name: repeat[1], val: array[i] }), true);
+          if (isExprTuple) {
+            var tupleLoopStack = loopStack;
+            for (var t = 0; t < tupleDecls.length; t++)
+              tupleLoopStack = tupleLoopStack.concat({ name: tupleDecls[t], val: array[i][t] });
+            nweb.applyBindings(model, $newEl[0], binding.subBindings, tupleLoopStack, true);
+          } else {
+            nweb.applyBindings(model, $newEl[0], binding.subBindings, loopStack.concat({ name: repeat[1], val: array[i] }), true);
+          }
+          
+          
           binding.generatedEls.push($newEl);
         };
       }
@@ -438,7 +457,7 @@ var nweb = {
   getParsedValue: function(model, parsedExpr, loopStack, returnFunction) {
     if(parsedExpr.length === 0)
       return null;
-    else {      
+    else {
       try {
         var cachedFunc = nweb.parsedValueCache[parsedExpr];
         var val;
