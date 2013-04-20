@@ -387,11 +387,44 @@ var nweb = {
     var method = nweb.getParsedValue(model, methodString, loopStack, el);
     $(el).bind(event[1], function (e) { nweb.invalidate(); method(e); nweb.invalidate(); });
   },
+  isWordCharacter: function(chr) {
+    return (chr >= 'a' && chr <= 'z') || (chr >= 'A' && chr <= 'Z') || chr === '_';
+  },
+  /// Replace all loopStack[i].name identifiers to loopStack[<index>]
   applyLoopStackToExpr: function(expr, loopStack) {
     for (var i = loopStack.length - 1; i >= 0; i--) {
       var loop = loopStack[i];
-      var re = new RegExp("(\\W|^)" + loop.name + "(\\W|$)", "g");
-      expr = expr.replace(re, "$1loopStack[" + i + "].val$2");
+
+      // The code below does this
+      //var re = new RegExp("(\\W|^)" + loop.name + "(\\W|$)", "g");
+      //expr = expr.replace(re, "$1loopStack[" + i + "].val$2");
+      
+      var loopName = loop.name;
+      var loopNameLen = loopName.length;
+      
+      for (var index = 0, exprLen = expr.length; index < exprLen;) {
+        // Find loopName
+        index = expr.indexOf(loopName, index);
+        if (index === -1) {
+          break;
+        }
+
+        // Check if we found identifier
+        var indexEnd = index + loopNameLen;
+        if ((index === 0 || !nweb.isWordCharacter(expr[index - 1])) &&
+          (indexEnd === exprLen || !nweb.isWordCharacter(expr[indexEnd]))) {
+
+          // Replace
+          var replaceString = "loopStack[" + i + "].val";
+          expr = expr.substring(0, index) + replaceString + expr.substring(indexEnd);
+          
+          // Update index and exprLen
+          index += replaceString.length;
+          exprLen = expr.length;
+        } else {
+          index = indexEnd;
+        }
+      }
     };
     return expr;
   },
@@ -449,6 +482,7 @@ var nweb = {
     nweb.invalidationCount++;
     
     indent = !!indent ? indent : "";
+    // TODO: Remove
     if(false)
       console.log(indent + nweb.invalidationCount++);
 
@@ -484,6 +518,7 @@ var nweb = {
       //Repeat only on top level, so every binding will be invalidated exactly once per invalidation cycle
     } while (changeFound && !selfCall) 
 
+    // TODO: Remove
     if (!selfCall)
       console.log(nweb.invalidationCount);
 
