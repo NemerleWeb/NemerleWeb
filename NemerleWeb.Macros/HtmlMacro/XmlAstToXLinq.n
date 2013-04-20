@@ -78,8 +78,9 @@ namespace NemerleWeb
     }
     
     public Transform([NotNull] xmlAsts : XmlAst.Seq) : PExpr
-    {          
-      def splicedMethod = CleanupCallRefs(<[ $(GetMethodWithSplicesOnly(xmlAsts)) ]>);
+    { 
+      //assert2(false);
+      def splicedMethod = CleanupCallRefs(<[ $(GetMethodWithSplicesOnly(xmlAsts)) ]>);      
       def splices = TyperHelper.GetSplices(splicedMethod, _typer);
       _typer.CurrentTypeBuilder.Compile();      
       def res = Util.locate(ToLocation(xmlAsts), TransformImpl(xmlAsts, splices, [], true));
@@ -87,7 +88,7 @@ namespace NemerleWeb
     }
     
     public TransformImpl([NotNull] xmlAst : XmlAst, [NotNull] splices : Dictionary[int, string], loopStack = null : list[string], topLevel = false : bool) : PExpr
-    {
+    {      
         _transformCounter++;
         //Debug.WriteLine(_transformCounter + ": " + xmlAst.ToString());
         def loopStack = if(loopStack == null) [] else loopStack;

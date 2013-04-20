@@ -20,7 +20,8 @@ namespace NemerleWeb.Rsdn
     _tree : TreeNode;
     _childrenById : ConcurrentDictionary[string, List[TreeNode]] = ConcurrentDictionary();
     _searchTerms : SortedDictionary[string, int] = SortedDictionary();
-    _searchTermResults : ConcurrentDictionary[string, List[TreeNode]] = ConcurrentDictionary();
+    _searchTermResults : ConcurrentDictionary[string, IEnumerable[(TreeNode * list[string])]] = ConcurrentDictionary();
+    _leaves : IEnumerable[(TreeNode * list[string])];
     
     this()
     {
@@ -28,9 +29,9 @@ namespace NemerleWeb.Rsdn
       def readNodes(element, depth) : TreeNode {        
         def childNodes = element.Elements("node").Select(e => readNodes(e, depth + 1)).ToList();
         
-        if(element.Name.LocalName == "tree") 
-          TreeNode() <- ( Children = childNodes ) 
-        else {
+        if(element.Name.LocalName == "tree") {
+          TreeNode() <- ( Id = "", Children = childNodes ) 
+        } else {
           def id = element.Attribute("id")?.Value;
           
           _ = _childrenById.TryAdd(id, childNodes.Select(CloneNoChildren).ToList());
@@ -49,6 +50,7 @@ namespace NemerleWeb.Rsdn
       }
       
       _tree = readNodes(XDocument.Parse(xml).Root, 0);
+      _leaves = _tree.Children.SelectMany(c => GetLeaves(c, [])).ToArray();
     }
         
     public GetTopNodes() : List[TreeNode]
@@ -61,7 +63,7 @@ namespace NemerleWeb.Rsdn
       _childrenById.GetOrAdd(id, List());
     }
     
-    public Search(term : string) : List[TreeNode]
+    public Search(term : string) : IEnumerable[(TreeNode * list[string])]
     {
       lock(_searchTerms) {
         if(_searchTerms.ContainsKey(term))
@@ -72,27 +74,25 @@ namespace NemerleWeb.Rsdn
       
       lock(_searchTermResults) {
         _searchTermResults.GetOrAdd(term, _ => {
-          _tree.Children.Select(c => CreateTreeBySearchTerm(term, c)).ToList();
+          SearchLeavesForTerm(term).ToArray()
         });
       }
     }
-    
-    CreateTreeBySearchTerm(term : string, node : TreeNode) : TreeNode
-    {     
+        
+    GetLeaves(node : TreeNode, path : list[string]) : IEnumerable[(TreeNode * list[string])]
+    {
       mutable nodeChildren;
       
-      if(_childrenById.TryGetValue(node.Id, out nodeChildren) && nodeChildren.Count > 0) {        
-        def result = CloneNoChildren(node);
-        def children = nodeChildren.Select(c => CreateTreeBySearchTerm(term, c)).ToList();
-        result.IsOpened = children.Any(_.IsOpened) || node.Caption.Contains(term);
-        result.Children = if(result.IsOpened) children.Where(c => c.IsOpened).ToList() else null;
-        result
+      if(_childrenById.TryGetValue(node.Id, out nodeChildren) && nodeChildren.Count > 0) {
+        nodeChildren.Select(c => GetLeaves(c, node.Caption :: path)).SelectMany(r => r)
+      } else {
+        [(node, path)]
       }
-      else {
-        def result = CloneNoChildren(node);
-        result.IsOpened = node.Caption.Contains(term);
-        result;
-      }
+    }
+    
+    SearchLeavesForTerm(term : string) : IEnumerable[(TreeNode * list[string])]
+    {
+      _leaves.Where((node : TreeNode, _) => node.Caption?.Contains(term))
     }
     
     CloneNoChildren(node : TreeNode) : TreeNode
