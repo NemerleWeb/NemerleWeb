@@ -1,8 +1,3 @@
-body {
-    width: 960px;
-    margin: 0 auto;
-}
-
 .node {
     cursor: pointer;   
     color: #1e90ff;
@@ -12,4 +7,26 @@ body {
     color: #2f4f4f;
 }
 
+.search-results span {
+    font-size: 12px;
+}
 
+.page {
+    overflow: auto;
+}
+
+.left {
+    width: 20%;
+    float: left;
+}
+
+.right {
+    width: 80%;
+    float: right;
+}
+
+.right iframe {
+    border: 0;
+    width: 100%;
+    height: 1000px;
+}

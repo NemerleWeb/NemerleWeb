@@ -415,9 +415,9 @@ var nweb = {
       var loop = loopStack[i];
 
       // The code below does this
-      //var re = new RegExp("(\\W|^)" + loop.name + "(\\W|$)", "g");
-      //expr = expr.replace(re, "$1loopStack[" + i + "].val$2");
-      
+      var re = new RegExp("(\\W|^)" + loop.name + "(\\W|$)", "g");
+      expr = expr.replace(re, "$1loopStack[" + i + "].val$2");
+      /*
       var loopName = loop.name;
       var loopNameLen = loopName.length;
       
@@ -443,7 +443,7 @@ var nweb = {
         } else {
           index = indexEnd;
         }
-      }
+      }*/
     };
     return expr;
   },

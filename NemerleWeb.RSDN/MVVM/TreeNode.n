@@ -21,11 +21,7 @@ namespace NemerleWeb.Rsdn
     public IsOpened : bool { get; set; }
     public Children : List[TreeNode] { get; set; }    
     public HasChildren : bool { get; set; }
-    
-    public LoadChildren() : void
-    {
-    }
-    
+        
     public Toggle() : void
     {
       if(Children == null) {        
@@ -36,6 +32,11 @@ namespace NemerleWeb.Rsdn
       } else {
         IsOpened = !IsOpened;
       }
+    }
+    
+    public SelectNode() : void
+    {
+      MainPage.SelectedUrl = Href;
     }
     
     [Html]
@@ -49,7 +50,7 @@ namespace NemerleWeb.Rsdn
               <span $when(!c.IsOpened)>+</span>
               <span>$(c.Caption)</span>
             </a>
-            <a $when(!c.HasChildren) attr-href="$(c.Href)" class="node">
+            <a $when(!c.HasChildren) click="$SelectNode" class="node">
               <span>$(c.Caption)</span>
             </a>            
             <div $when(c.IsOpened && Children != null)>
