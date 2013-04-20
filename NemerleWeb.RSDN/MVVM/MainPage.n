@@ -15,8 +15,10 @@ namespace NemerleWeb.Rsdn
   {
     mutable _searchTerm : string;
     
+    public mutable static SelectedUrl : string;
+    
     Root : TreeNode { get; set; }
-    SearchResults : IEnumerable[(TreeNode * list[string])] { get; set; }
+    SearchResults : IEnumerable[(TreeNode * list[string])] { get; set; }    
     
     SearchTerm : string { 
       get { _searchTerm; }
@@ -45,24 +47,40 @@ namespace NemerleWeb.Rsdn
         LoadTopNodes();
       else {        
         server.Search(term, nodes => {
-          SearchResults = nodes
+          SearchResults = nodes;
         });
       }
+    }
+    
+    public static SelectNode(node : TreeNode) : void
+    {
+      SelectedUrl = node.Href;
     }
     
     [Html]
     public View() : string
     {
       <#
-        <div $when(Root != null) class="root">
-          <div>
-            <input value="$SearchTerm" />
+        <div class="page">
+          <div class="left">
+            <div $when(Root != null) class="root">
+              <div>
+                <input value="$SearchTerm" />
+              </div>
+              <div $when(!string.IsNullOrEmpty(SearchTerm)) class="search-results">
+                <div $foreach((node, path) in SearchResults)>                       
+                  <a click="$(SelectNode(node))">
+                    $(node.Caption)
+                  </a>              
+                </div>
+              </div>
+              <div $when(string.IsNullOrEmpty(SearchTerm))>
+                <div template="$(template(Root))" />
+              </div>
+            </div>
           </div>
-          <div $foreach((node, path) in SearchResults)>
-            <span>$(node.Caption)</span>
-          </div>
-          <div $when(string.IsNullOrEmpty(SearchTerm))>
-            <div template="$(template(Root))" />
+          <div class="right">
+            <iframe attr-src="$SelectedUrl" />
           </div>
         </div>
       #>
