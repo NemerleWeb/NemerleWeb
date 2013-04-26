@@ -1,0 +1,64 @@
+﻿using Nemerle;
+using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+using Nemerle.Imperative;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  /// <summary>
+  /// Mini lifting
+  /// </summary>
+  internal module JSAstExtensions
+  {
+    public static JSMethodCall(this self : JSAst, [NotNull] method : string, [NotNull] parms : list[JSAst]) : JSAst
+    {
+      JSAst.Call(JSAst.MethodRef(self, method.FirstCharacterToLower(), None()), parms)
+    }
+    
+    public static MethodCall(this self : JSAst, [NotNull] method : IMember, [NotNull] parms : list[JSAst]) : JSAst
+    {
+      JSAst.Call(
+        JSAst.MethodRef(
+          self,
+          method.Name,
+          JSAstHelper.MethodParameters(method :> IMethod)),
+       parms)
+    }
+    
+    public static ExternalMethodCall(this self : JSAst, [NotNull] method : string, [NotNull] parms : list[JSAst]) : JSAst
+    {
+      JSAst.Call(JSAst.MethodRef(self, method, None()), parms)
+    }
+    
+    public static JSStaticCall(this type : string, [NotNull] method : IMember, [NotNull] parms : list[JSAst]) : JSAst
+    {
+      JSAst.Call(JSAst.StaticMethodRef(type, method.Name.FirstCharacterToLower(), None()), parms)
+    }
+    
+    public static JSStaticCall(this type : string, [NotNull] methodName : string, [NotNull] parms : list[JSAst]) : JSAst
+    {
+      JSAst.Call(JSAst.StaticMethodRef(type, methodName, None()), parms)
+    }
+    
+    public static StaticCall(this type : string, [NotNull] method : IMember, [NotNull] parms : list[JSAst]) : JSAst
+    {
+      JSAst.Call(
+        JSAst.StaticMethodRef(
+          type,
+          method.Name,
+          JSAstHelper.MethodParameters(method :> IMethod)),
+        parms)
+    }
+    
+    public static Field(this self : JSAst, [NotNull] field : string) : JSAst
+    {
+      JSAst.FieldRef(self, field)
+    }
+  }  
+}

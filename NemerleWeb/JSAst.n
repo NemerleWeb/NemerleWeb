@@ -558,7 +558,12 @@ $(Body.Write(indent + "  "))
               if (Method == "apply" || Method == "apply_void")
                 $"$(Obj.Write())"
               else
-                $"$(Obj.Write())$delimiter.$(JSAstHelper.Method(Method, ParametersType))"
+              {
+                // Handle empty method name
+                def call = if(Method != "") "." else "";
+
+                $"$(Obj.Write())$delimiter$call$(JSAstHelper.Method(Method, ParametersType))"
+              }
             }
           }    
         | StaticMethodRef

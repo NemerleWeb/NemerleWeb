@@ -11,66 +11,6 @@ using System.Linq;
 
 namespace NemerleWeb
 { 
-  internal module StringExtensions
-  {
-    public static FirstCharacterToLower([NotNull] this str : string) : string 
-    {
-      if (str.Length == 0 || Char.IsLower(str, 0))
-        str
-      else
-        Char.ToLowerInvariant(str[0]).ToString() + str.Substring(1);
-    }
-  }
-  
-  // Mini lifting
-  internal module JSAstExtensions
-  {
-    public static JSMethodCall(this self : JSAst, [NotNull] method : string, [NotNull] parms : list[JSAst]) : JSAst
-    {
-      JSAst.Call(JSAst.MethodRef(self, method.FirstCharacterToLower(), None()), parms)
-    }
-    
-    public static MethodCall(this self : JSAst, [NotNull] method : IMember, [NotNull] parms : list[JSAst]) : JSAst
-    {
-      JSAst.Call(
-        JSAst.MethodRef(
-          self,
-          method.Name,
-          JSAstHelper.MethodParameters(method :> IMethod)),
-       parms)
-    }
-    
-    public static ExternalMethodCall(this self : JSAst, [NotNull] method : string, [NotNull] parms : list[JSAst]) : JSAst
-    {
-      JSAst.Call(JSAst.MethodRef(self, method, None()), parms)
-    }
-    
-    public static JSStaticCall(this type : string, [NotNull] method : IMember, [NotNull] parms : list[JSAst]) : JSAst
-    {
-      JSAst.Call(JSAst.StaticMethodRef(type, method.Name.FirstCharacterToLower(), None()), parms)
-    }
-    
-    public static JSStaticCall(this type : string, [NotNull] methodName : string, [NotNull] parms : list[JSAst]) : JSAst
-    {
-      JSAst.Call(JSAst.StaticMethodRef(type, methodName, None()), parms)
-    }
-    
-    public static StaticCall(this type : string, [NotNull] method : IMember, [NotNull] parms : list[JSAst]) : JSAst
-    {
-      JSAst.Call(
-        JSAst.StaticMethodRef(
-          type,
-          method.Name,
-          JSAstHelper.MethodParameters(method :> IMethod)),
-        parms)
-    }
-    
-    public static Field(this self : JSAst, [NotNull] field : string) : JSAst
-    {
-      JSAst.FieldRef(self, field)
-    }
-  }
-  
   public module JSKnownMembers
   {
     static this()
@@ -252,12 +192,19 @@ namespace NemerleWeb
             when (typeHandler(left, member, parms) is Some(ast))
               return ast;
             
+      // Handle JS native calls
       when(typeInfo?.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
       {
+        // Constructor
         if(member.IsConstructor)
           return JSAst.Call(JSAst.Constructor(typeInfo.Name, None()), parms);
-        else if (left is JSAst.StaticMethodRef)
+        // @() operator
+        else if(left is JSAst.StaticMethodRef && member.Name == "()")
+          return parms.Head.ExternalMethodCall("", parms.Tail);
+        // Static method
+        else if(left is JSAst.StaticMethodRef)
           return typeInfo.Name.StaticCall(member, parms);
+        // Instance method
         else
           return left.MethodCall(member, parms);
       }
@@ -351,8 +298,8 @@ namespace NemerleWeb
         JSAst.FieldRef(builder(obj), field.Name) 
     }
     
-    #region Helper methods
-        
+    #region Private helper methods
+    
     private InternalTypeName(type : TypeInfo) : string
     {
       if (type.SystemType != null) type.SystemType.FullName else type.FrameworkTypeName;
