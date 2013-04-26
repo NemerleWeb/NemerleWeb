@@ -131,7 +131,8 @@ namespace NemerleWeb
         | _ => JSAst.LocalRef(name, type)
         }
       | MacroEnvelope(expanded = ex, original = org, the_macro = _) => 
-          match(org) { 
+          match(org)
+          { 
           /*| <[ foreach($it in $coll) $body  ]> => 
               def it = it.ToString();
               def coll = if(coll.TypedObject is TExpr) Build(coll.TypedObject :> TExpr) else JSAst.LocalRef(coll.ToString());
@@ -142,7 +143,8 @@ namespace NemerleWeb
                     
               JSAst.For(it, coll, body);      */              
           | MacroCall(Name(Id = "js"), _, p :: []) => 
-              match(p) {
+              match(p)
+              {
               | SyntaxElement.Expression(Literal(Literal.String(val))) => JSAst.Code(val)
               | _ => JSAst.Code(p.ToString().Trim('\"'));
               }                    
@@ -167,13 +169,10 @@ namespace NemerleWeb
         if (typeName == typeof(Nemerle.Core.list[_].Nil).FullName)
           JSAst.Array([])
         else
-          match (mem)
-          {
-          | m is IMethod =>
+          if(mem is IMethod as m)
             JSAst.StaticMethodRef(JSClass.GetProperName(from.TypeInfo), mem.Name, JSAstHelper.MethodParameters(m))
-          | _ =>
+          else
             JSAst.StaticRef(JSClass.GetProperName(from.TypeInfo), mem.Name);
-          }
       | Switch(expr, defCase, cases)      =>
         JSAst.Switch(
           build(expr),

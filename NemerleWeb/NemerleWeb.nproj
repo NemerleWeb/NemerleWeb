@@ -127,6 +127,9 @@
     <Compile Include="JSAstBuilder.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JSAstExtensions.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JSAstHelper.n">
       <SubType>Code</SubType>
     </Compile>
@@ -224,6 +227,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="NWebData.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="StringExtensions.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UnitAttribute.n">
