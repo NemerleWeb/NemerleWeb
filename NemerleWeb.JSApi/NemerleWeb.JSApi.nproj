@@ -197,6 +197,7 @@
     <Folder Include="TS\raphael\" />
     <Folder Include="TS\requirejs\" />
     <Folder Include="TS\restify\" />
+    <Folder Include="TS\routie\" />
     <Folder Include="TS\rx.js\" />
     <Folder Include="TS\sammyjs\" />
     <Folder Include="TS\scroller\" />

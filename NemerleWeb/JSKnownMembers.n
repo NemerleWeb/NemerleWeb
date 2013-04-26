@@ -252,7 +252,7 @@ namespace NemerleWeb
             when (typeHandler(left, member, parms) is Some(ast))
               return ast;
             
-      when(typeInfo?.IsCustomAttributeDefined("NemerleWeb.JSAstAttribute"))
+      when(typeInfo?.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
       {
         if(member.IsConstructor)
           return JSAst.Call(JSAst.Constructor(typeInfo.Name, None()), parms);

@@ -441,12 +441,8 @@ namespace NemerleWeb
     public MethodParameters(m : IMethod) : option[list[TParameter]]
     {
       if (IsFrameworkAssembly(m.DeclaringType) ||
-        m.GetModifiers()
-         .CustomAttributes
-         .Any(a => a.ToString() == "NemerleWeb.IgnoreAttribute") ||
-        m.DeclaringType.GetModifiers()
-         .CustomAttributes
-         .Any(a => a.ToString() == "NemerleWeb.JSAstAttribute"))
+        m.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute") ||
+        m.DeclaringType.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
         None()
       else
         Some(m.Header.Parameters)
