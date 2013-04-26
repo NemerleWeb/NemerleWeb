@@ -3,10 +3,8 @@ using Nemerle.Utility;
 
 namespace NemerleWeb
 {
-  [Record]
   [AttributeUsage(AttributeTargets.Class)]
-  class JSApiAttribute : Attribute
+  public class JSApiAttribute : Attribute
   {
-    public Module : string { get; }
   }
 }
