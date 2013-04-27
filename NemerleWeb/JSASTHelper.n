@@ -438,16 +438,14 @@ namespace NemerleWeb
         $<#"$functionSignature"#>
     }
     
-    public NoMethodParameters(m : IMethod) : bool
-    {
-      IsFrameworkAssembly(m.DeclaringType) ||
-      m.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute") ||
-      m.DeclaringType.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute")
-    }
-    
     public MethodParameters(m : IMethod) : option[list[TParameter]]
     {
-      if (NoMethodParameters(m)) None() else Some(m.Header.Parameters)
+      if (IsFrameworkAssembly(m.DeclaringType) ||
+          m.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute") ||
+          m.DeclaringType.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
+        None()
+      else
+        Some(m.Header.Parameters)
     }
     
     public EscapeString(val : string) : string
