@@ -32,8 +32,8 @@ namespace NemerleWeb
                       .GetMembers(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic)
                       .OfType.[IMethod]();
       def methods = JSClass.FilterMethods(methods)
-                            .Select(m => (m.Name, $"..$(m.GetParameters().Select(p => p.Name))"))
-                            .Select(((name, parms), _) => 
+                           .Select(m => (m.Name, $"..$(m.GetParameters().Select(p => p.Name))"))
+                           .Select(((name, parms), _) => 
 $<#
 $jsHubName.client.$name = function($parms) {
 self.$name[""]($parms);
@@ -44,6 +44,7 @@ nweb.invalidate();
       def script = $<#
 var $jsHubName = $$.connection.$jsHubName;
 $methods
+
 setTimeout(function() {
 $$.connection.hub.start({}, function() {
   $$.get('$(declaringType.Name)/__SetSignalRConnectionId', {id: this.id});

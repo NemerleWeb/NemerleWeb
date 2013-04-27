@@ -2,11 +2,15 @@ using System;
 
 namespace NemerleWeb
 {
+  /// <summary>
+  /// Every JavaScript Api generated method throws this exception
+  /// to prevent accidentally running client code on the server.
+  /// </summary>
   public class ClientCodeCalledInServerException : Exception
   {
     public this()
     {
-      base("Client code must not be called in server")
+      base("Client code must not be called on server")
     }
   }
 }

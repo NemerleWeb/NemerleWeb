@@ -364,12 +364,12 @@ namespace NemerleWeb.Macros
         match((tsClass.Extends, tsClass.Implements))
         {
         | (None, []) =>
-          <[ decl: public partial class $(tsClass.Name : usesite) {} ]>
+          <[ decl: [JSApi] public partial class $(tsClass.Name : usesite) {} ]>
         | _ =>
           def extends = if (tsClass.Extends is Some(ex)) [<[ $(ex : usesite) ]>] else [];
           def implement = tsClass.Implements.Select(e => <[ $(e : usesite) ]>);
           def inherit = extends.Concat(implement);
-          <[ decl: public partial class $(tsClass.Name : usesite) : ..$inherit {} ]>
+          <[ decl: [JSApi] public partial class $(tsClass.Name : usesite) : ..$inherit {} ]>
         };
         
       jsApiNamespace.Define(type).Compile();

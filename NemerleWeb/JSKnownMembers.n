@@ -35,7 +35,6 @@ namespace NemerleWeb
       JSKnownMembersNemerleList.Register();      
       JSKnownMembersNemerleNCollectionsExtensions.Register();
       JSKnownMembersEventsDSL.Register();
-      JSKnownMembersPage.Register();
       
       JSKnownMembersIntegers.Register();
       JSKnownMembersFloats.Register();
@@ -97,9 +96,6 @@ namespace NemerleWeb
             JSAst.Code($"nweb.utils.getTemplateName(this.$model, '$view')")
           | _ => Message.FatalError("Invalid GetTemplateName call, use 'name' macro")
           }
-        | Call(MethodRef(_, meth, _, _), [objName, parms], _) when meth.Name == "callJs" && parms.expr is TExpr.Array =>
-          def parmsFromArray = parms.expr :> TExpr.Array;          
-          JSAst.Call(JSAst.Code(objName.expr.ToString().Trim('\"')), parmsFromArray.args.Map(p => JSAst.Code(p.ToString())))
         | Call(MethodRef(obj = o, meth = meth), parms, _) =>
           if(o.Type.TypeInfo != null)
             ConvertMethod(o.Type.TypeInfo, builder'(o), meth, parms.Map(paramBuilder));
@@ -197,7 +193,7 @@ namespace NemerleWeb
       {
         // Constructor
         if(member.IsConstructor)
-          return JSAst.Call(JSAst.Constructor(typeInfo.Name, None()), parms);
+          return JSAst.Call(JSAst.Constructor(JSClass.GetProperNameForJS(typeInfo), None()), parms);
         // @() operator
         else if(left is JSAst.StaticMethodRef && member.Name == "()")
           return parms.Head.ExternalMethodCall("", parms.Tail);

@@ -193,9 +193,6 @@
     <Compile Include="JSKnownMembersNemerleOption.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JSKnownMembersPage.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="JSKnownMembersSCGDictionary.n">
       <SubType>Code</SubType>
     </Compile>
