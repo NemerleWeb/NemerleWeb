@@ -25,8 +25,6 @@ Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "Nemerle.Json-VS_2010", "peg
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "Nemerle.Json.Macros-VS_2010", "peg-parser\Json\Nemerle.Json.Macros\Nemerle.Json.Macros-VS_2010.nproj", "{E5E664D3-29A2-41A9-A4DC-A44AC0C386A3}"
 EndProject
-Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.JSCore", "NemerleWeb.JSCore\NemerleWeb.JSCore.nproj", "{41019DDB-3F91-4F8F-A830-787AA7E0B5B1}"
-EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Utils", "NemerleWeb.Utils\NemerleWeb.Utils.nproj", "{54145AF8-809D-4EB8-B957-A0E9368FC698}"
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "TypeScriptInterfaceParser", "peg-parser\TypeScriptInterfaceParser\TypeScriptInterfaceParser.nproj", "{24499101-E8DE-4A70-87EE-0787577B7327}"
@@ -77,10 +75,6 @@ Global
 		{E5E664D3-29A2-41A9-A4DC-A44AC0C386A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5E664D3-29A2-41A9-A4DC-A44AC0C386A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5E664D3-29A2-41A9-A4DC-A44AC0C386A3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{41019DDB-3F91-4F8F-A830-787AA7E0B5B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{41019DDB-3F91-4F8F-A830-787AA7E0B5B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{41019DDB-3F91-4F8F-A830-787AA7E0B5B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{41019DDB-3F91-4F8F-A830-787AA7E0B5B1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{54145AF8-809D-4EB8-B957-A0E9368FC698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{54145AF8-809D-4EB8-B957-A0E9368FC698}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54145AF8-809D-4EB8-B957-A0E9368FC698}.Release|Any CPU.ActiveCfg = Release|Any CPU
