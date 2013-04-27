@@ -574,7 +574,8 @@ $(Body.Write(indent + "  "))
             
             public override Write(_ = "" : string) : string
             {
-              $"$Type.$(JSAstHelper.Method(Method, ParametersType))"
+              def type = if (Type.IsEmpty()) "" else $"$Type.";
+              $"$type$(JSAstHelper.Method(Method, ParametersType))"
             }
         }
         | StaticRef
@@ -583,8 +584,9 @@ $(Body.Write(indent + "  "))
             Member : string;            
             
             public override Write(_ = "" : string) : string 
-            {              
-                $"$Type.$Member"
+            {
+              def type = if (Type.IsEmpty()) "" else $"$Type.";
+              $"$type$Member"
             }
           }
         | FieldRef       { Obj : JSAst; Parameter : string;

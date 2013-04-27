@@ -48,7 +48,10 @@ namespace NemerleWeb
         public GetMethodJSAst(method : IMethod, typer : Typer, tb : TypeBuilder) : JSAst 
         {
           def texpr = GetTypedBody(method, typer, tb);
-          def jsast = JSAstBuilder.BuildJSAst(texpr, !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor, method.Header);
+          def jsast = JSAstBuilder.BuildJSAst(
+            texpr,
+            !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor,
+            method.Header);
           /*def tempFileName = System.IO.Path.GetTempFileName();
           System.IO.File.WriteAllText(tempFileName, texpr.ToString());
           System.IO.File.AppendAllText(tempFileName, jsast.Write());

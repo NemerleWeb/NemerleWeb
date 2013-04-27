@@ -456,13 +456,6 @@ $(indent)}#>
         $"..$(nested; Environment.NewLine; _.Write())"
       }
       
-      ApplyAttributesToGeneratedClasses() : void
-      {
-          ClassType.DeclaredNestedTypes
-                   .Where(t => t.Name.StartsWith("_N__N_"))
-                   .Iter(t => t.Ast.AddCustomAttribute(<[ NemerleWeb.GeneratedClass ]>));
-      }
-                
       public TranslateMethodBody([NotNull] meth : IMethod, [NotNull] indent = "" : string) : string
       {
         def ast = TyperHelper.GetMethodJSAst(meth, Typer, ClassType);
@@ -474,11 +467,27 @@ $(indent)}#>
         typeVar.TryRequire(IEnumerableType) && !typeVar.TryRequire(StringType);
       }
       
+      public static GetProperNameForJS([NotNull] typeInfo : TypeInfo) : string
+      {
+        def name = typeInfo.FullName;
+        def root = name.IndexOf('.');
+        if(root != -1) name.Substring(root + 1) else ""
+      }
+      
       public static GetProperName([NotNull] typeInfo : TypeInfo) : string 
-      {          
+      {
+        // If type or declaring has JSApi attribute, remove root namespace.
+        // In case there is no root namespace, report error.
+        def fullName = 
+          if(typeInfo.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute") ||
+             typeInfo.DeclaringType?.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
+            GetProperNameForJS(typeInfo)
+          else
+            typeInfo.FullName;
+        
         def typeParams = if(typeInfo.Typarms.IsEmpty) "";
                          else $"[..$(typeInfo.Typarms.Select(_.ToString()))]";
-        GetProperName(typeInfo.FullName + typeParams)
+        GetProperName(fullName + typeParams)
       }
         
       public static GetProperName([NotNull] type : Type) : string 
