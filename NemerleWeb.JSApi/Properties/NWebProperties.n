@@ -1,6 +1,7 @@
 ﻿using NemerleWeb.Macros;
 
 [assembly: GenerateJSApi(
+  Namespace = "NemerleWeb.JSApi",
   Lib = @"TS\_infrastructure\tests\typescript_0.8.3\lib.d.ts",
   Files = [ ("TS", @"TS\\(_infrastructure|i18next\\lib)\\") ]
 )]

@@ -18,6 +18,7 @@ namespace NemerleWeb.Macros
   /// Parses d.ts files and creates an appropriate Nemerle types and variables.
   ///
   /// Macro parameters:
+  ///   Namespace: Required argument, where all classes will be generated.
   ///   Lib (optional): Where lib.d.ts file exists.
   ///   Files:
   ///     First: Directory.
@@ -26,7 +27,8 @@ namespace NemerleWeb.Macros
   ///
   /// Example, assuming we have all files in TS directory:
   ///   [assembly: GenerateJSApi(
-  ///     Lib = @"TS\_infrastructure\0.9\lib.d.ts",
+  ///     Namespace = "JSApi"
+  ///     Lib = @"TS\_infrastructure\1.0\lib.d.ts",
   ///     Files =
   ///     [
   ///       ("TS", @"TS\\_infrastructure\\"),
@@ -35,23 +37,9 @@ namespace NemerleWeb.Macros
   ///   )]
   ///
   /// The convertion:
-  /// All types are generated in namespace JSApi with the following scheme:
-  ///  JSApi.<relative directory>
+  /// All types are generated in the given namespace.
   /// The namespace and module with corresponding name are created.  
   /// This allows to have one 'using' for global JS functions and types.
-  ///
-  /// Generated sample: assuming we have file jquery\jquery.d.ts
-  /// namespace JSApi
-  /// {
-  ///   namespace TS // relative directory
-  ///   {
-  ///     // All types are declared here
-  ///   }
-  ///   module TS
-  ///   {
-  ///     // Global functions and variables are declared here
-  ///   }
-  /// }
   ///
   /// First all files are preparsed to resolve all referenced files.
   /// Then all files are parsed and code is generated.
@@ -75,7 +63,7 @@ namespace NemerleWeb.Macros
   
   [Record]
   class DirectoryArg
-  {
+  {    
     public Directory : string { get; }
     public Exclude : string { get; }
   }
@@ -83,6 +71,7 @@ namespace NemerleWeb.Macros
   [Record]
   class GenerateArgs
   {
+    public Namespace : string { get; }
     public Lib : string { get; }
     public Args : IEnumerable[DirectoryArg] { get; }
   }
@@ -108,15 +97,15 @@ namespace NemerleWeb.Macros
       def finalAst = AnalyzeTSAst(tsAsts);
       
       // Step 4: Generate
-      GenerateCode(typer, finalAst);
+      GenerateCode(typer, args.Namespace, finalAst);
     }
     
     private ParseArgs(options : list[PExpr]) : GenerateArgs
     {
       match(options)
       {
-      | [<[ Files = {..$files} ]> ] with lib = ""
-      | [<[ Lib = $(lib : string) ]>, <[ Files = [..$files] ]>] =>
+      | [<[ Namespace = $(ns : string) ]>, <[ Files = {..$files} ]> ] with lib = ""
+      | [<[ Namespace = $(ns : string) ]>, <[ Lib = $(lib : string) ]>, <[ Files = [..$files] ]>] =>
         // Convert PExpr sequence to regular type
         def filesArg = files.Select(
           f => match(f)
@@ -127,9 +116,9 @@ namespace NemerleWeb.Macros
             Message.Error("You must specify at most 2 arguments: directory and exclude pattern");
             null
           });
-        GenerateArgs(lib, filesArg)
+        GenerateArgs(ns, lib, filesArg)
       | _ =>
-        Message.Error("Specify Files parameter and optional Lib");
+        Message.Error("Specify Namespace, Files parameter and optional Lib");
         null
       }
     }
@@ -277,10 +266,10 @@ namespace NemerleWeb.Macros
     
     #region Generate
     
-    GenerateCode(typer : Typer, tsAst : IEnumerable[TSGlobal]) : void
+    GenerateCode(typer : Typer, ns : string, tsAst : IEnumerable[TSGlobal]) : void
     {
-      def jsApiNamespace = typer.Env.EnterIntoNamespace(["JSApi"]);
-      def jsApiModule = CreateModule("JSApi", Scope(typer.Env));
+      def jsApiNamespace = typer.Env.EnterIntoNamespace(ns.Split('.').NToList());
+      def jsApiModule = CreateModule(ns, Scope(typer.Env));
       
       // Generate members
       foreach(e in tsAst) 
