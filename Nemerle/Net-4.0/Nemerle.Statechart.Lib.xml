@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>C:\TeamCity\buildAgent\work\b8caae985926e367\bin\Release\net-4.5\\PowerPack\\Nemerle.Statechart.Lib.xml</name>
+    <name>D:\MyProjects\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.Statechart.Lib.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.Statechart.ListUtils">
@@ -148,8 +148,8 @@
     <member name="M:Nemerle.Statechart._N_operator911097836_3914Macro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Statechart._N_operator911097836_3914Macro.SyntaxExtension" />
     <member name="T:Nemerle.Statechart.MapHelper" />
-    <member name="M:Nemerle.Statechart.MapHelper._N_wild_find_9172(Nemerle.Statechart.MapHelper._N_closureOf_loop_9164)" />
-    <member name="M:Nemerle.Statechart.MapHelper._N_is_first_9127(Nemerle.Compiler.TraverseContext)" />
+    <member name="M:Nemerle.Statechart.MapHelper._N_wild_find_9174(Nemerle.Statechart.MapHelper._N_closureOf_loop_9166)" />
+    <member name="M:Nemerle.Statechart.MapHelper._N_is_first_9129(Nemerle.Compiler.TraverseContext)" />
     <member name="M:Nemerle.Statechart.MapHelper.GetParam(System.Int32)" />
     <member name="M:Nemerle.Statechart.MapHelper.GetParams(System.Int32)" />
     <member name="M:Nemerle.Statechart.MapHelper.MapCreate(Nemerle.Compiler.Parsetree.PExpr)" />

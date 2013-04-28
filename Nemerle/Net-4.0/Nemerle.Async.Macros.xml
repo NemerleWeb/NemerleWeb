@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>C:\TeamCity\buildAgent\work\b8caae985926e367\bin\Release\net-4.5\\PowerPack\\Nemerle.Async.Macros.xml</name>
+    <name>D:\MyProjects\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.Async.Macros.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.Async.Internal.AsyncBuilderMacro">
@@ -35,12 +35,12 @@
       </summary>
 
 </member>
-    <member name="M:Nemerle.Async.Internal.AsyncExpander._N_transformUsing_7155(Nemerle.Async.Internal.AsyncExpander._N_closureOf_Expand_7117,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.MatchCase},Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Async.Internal.AsyncExpander._N_transformTry_7149(Nemerle.Async.Internal.AsyncExpander._N_closureOf_Expand_7117,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.TryCase})" />
-    <member name="M:Nemerle.Async.Internal.AsyncExpander._N_transform2_7143(Nemerle.Async.Internal.AsyncExpander._N_closureOf_Expand_7117,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.Async.Internal.AsyncExpander._N_transformList2_7137(Nemerle.Async.Internal.AsyncExpander._N_closureOf_Expand_7117,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Async.Internal.AsyncExpander._N_transformList_7131(Nemerle.Async.Internal.AsyncExpander._N_closureOf_Expand_7117,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Async.Internal.AsyncExpander._N_transform_7125(Nemerle.Async.Internal.AsyncExpander._N_closureOf_Expand_7117,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Async.Internal.AsyncExpander._N_transformUsing_7157(Nemerle.Async.Internal.AsyncExpander._N_closureOf_Expand_7119,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.MatchCase},Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Async.Internal.AsyncExpander._N_transformTry_7151(Nemerle.Async.Internal.AsyncExpander._N_closureOf_Expand_7119,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.TryCase})" />
+    <member name="M:Nemerle.Async.Internal.AsyncExpander._N_transform2_7145(Nemerle.Async.Internal.AsyncExpander._N_closureOf_Expand_7119,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Async.Internal.AsyncExpander._N_transformList2_7139(Nemerle.Async.Internal.AsyncExpander._N_closureOf_Expand_7119,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Async.Internal.AsyncExpander._N_transformList_7133(Nemerle.Async.Internal.AsyncExpander._N_closureOf_Expand_7119,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Async.Internal.AsyncExpander._N_transform_7127(Nemerle.Async.Internal.AsyncExpander._N_closureOf_Expand_7119,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Async.Internal.AsyncExpander.Expand(Nemerle.Async.Internal.AsyncBuilderMacro,Nemerle.Compiler.Parsetree.PExpr)">
       <summary>
         <para>Expands the expression using the specified computation builder.

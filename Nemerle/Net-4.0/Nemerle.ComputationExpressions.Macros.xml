@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>C:\TeamCity\buildAgent\work\b8caae985926e367\bin\Release\net-4.5\\PowerPack\\Nemerle.ComputationExpressions.Macros.xml</name>
+    <name>D:\MyProjects\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.ComputationExpressions.Macros.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.ComputationExpressions.Extensions.ArrayBuilder">
@@ -161,13 +161,13 @@
       </summary>
 
 </member>
-    <member name="M:Nemerle.ComputationExpressions.ComputationExpander._N_transformUsing_7681(Nemerle.ComputationExpressions.ComputationExpander._N_closureOf_Expand_7637,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.MatchCase},Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.ComputationExpressions.ComputationExpander._N_transformTry_7675(Nemerle.ComputationExpressions.ComputationExpander._N_closureOf_Expand_7637,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.TryCase})" />
-    <member name="M:Nemerle.ComputationExpressions.ComputationExpander._N_transform3_7669(Nemerle.ComputationExpressions.ComputationExpander._N_closureOf_Expand_7637,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.ComputationExpressions.ComputationExpander._N_transformList2_7663(Nemerle.ComputationExpressions.ComputationExpander._N_closureOf_Expand_7637,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},System.Boolean)" />
-    <member name="M:Nemerle.ComputationExpressions.ComputationExpander._N_transform2_7657(Nemerle.ComputationExpressions.ComputationExpander._N_closureOf_Expand_7637,Nemerle.Compiler.Parsetree.PExpr,System.Boolean)" />
-    <member name="M:Nemerle.ComputationExpressions.ComputationExpander._N_transformList_7651(Nemerle.ComputationExpressions.ComputationExpander._N_closureOf_Expand_7637,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},System.Boolean)" />
-    <member name="M:Nemerle.ComputationExpressions.ComputationExpander._N_transform_7645(Nemerle.ComputationExpressions.ComputationExpander._N_closureOf_Expand_7637,Nemerle.Compiler.Parsetree.PExpr,System.Boolean)" />
+    <member name="M:Nemerle.ComputationExpressions.ComputationExpander._N_transformUsing_7683(Nemerle.ComputationExpressions.ComputationExpander._N_closureOf_Expand_7639,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.MatchCase},Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.ComputationExpressions.ComputationExpander._N_transformTry_7677(Nemerle.ComputationExpressions.ComputationExpander._N_closureOf_Expand_7639,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.TryCase})" />
+    <member name="M:Nemerle.ComputationExpressions.ComputationExpander._N_transform3_7671(Nemerle.ComputationExpressions.ComputationExpander._N_closureOf_Expand_7639,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.ComputationExpressions.ComputationExpander._N_transformList2_7665(Nemerle.ComputationExpressions.ComputationExpander._N_closureOf_Expand_7639,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},System.Boolean)" />
+    <member name="M:Nemerle.ComputationExpressions.ComputationExpander._N_transform2_7659(Nemerle.ComputationExpressions.ComputationExpander._N_closureOf_Expand_7639,Nemerle.Compiler.Parsetree.PExpr,System.Boolean)" />
+    <member name="M:Nemerle.ComputationExpressions.ComputationExpander._N_transformList_7653(Nemerle.ComputationExpressions.ComputationExpander._N_closureOf_Expand_7639,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},System.Boolean)" />
+    <member name="M:Nemerle.ComputationExpressions.ComputationExpander._N_transform_7647(Nemerle.ComputationExpressions.ComputationExpander._N_closureOf_Expand_7639,Nemerle.Compiler.Parsetree.PExpr,System.Boolean)" />
     <member name="M:Nemerle.ComputationExpressions.ComputationExpander.Expand(Nemerle.ComputationExpressions.ComputationBuilder,Nemerle.Compiler.Parsetree.PExpr)">
       <summary>
         <para>Expands the expression using the specified computation builder.
@@ -182,8 +182,8 @@
       </summary>
 
 </member>
-    <member name="M:Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_run_10607(Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_closureOf_Run_10578,Nemerle.Compiler.TypeInfo,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_delay_10595(Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_closureOf_Run_10578,Nemerle.Compiler.TypeInfo,Nemerle.Compiler.Parsetree.PExpr.Typed)" />
+    <member name="M:Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_run_10609(Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_closureOf_Run_10580,Nemerle.Compiler.TypeInfo,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_delay_10597(Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro._N_closureOf_Run_10580,Nemerle.Compiler.TypeInfo,Nemerle.Compiler.Parsetree.PExpr.Typed)" />
     <member name="M:Nemerle.ComputationExpressions.InternalMacros.ComputationRunMacro.#ctor">
       <summary>
         <para>Wraps the F#-like computation expression in the result at the final step.

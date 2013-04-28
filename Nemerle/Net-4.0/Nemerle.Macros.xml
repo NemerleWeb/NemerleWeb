@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>C:\TeamCity\buildAgent\work\b8caae985926e367\bin\Release\net-4.5\\Stage4\\Nemerle.Macros.xml</name>
+    <name>D:\MyProjects\nemerle\bin\Release\net-4.5\\Stage4\\Nemerle.Macros.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.Alias_method_postaddMacro">
@@ -90,7 +90,7 @@
  </example>
 
 </member>
-    <member name="M:Nemerle.Alias_method_postaddMacro._N_make_non_static_20004(Nemerle.Compiler.NemerleModifiers)" />
+    <member name="M:Nemerle.Alias_method_postaddMacro._N_make_non_static_20006(Nemerle.Compiler.NemerleModifiers)" />
     <member name="M:Nemerle.Alias_method_postaddMacro.#ctor">
       <summary>
         <para>The Alias macro creates aliases for methods with alternative
@@ -224,7 +224,7 @@
     <member name="M:Nemerle.Extensions.AnonymousClassNormalCtorMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Extensions.AnonymousClassNormalCtorMacro.SyntaxExtension" />
     <member name="T:Nemerle.Extensions.AnonymousClassTupleCtorMacro" />
-    <member name="M:Nemerle.Extensions.AnonymousClassTupleCtorMacro._N_decorate_20429(Nemerle.Extensions.AnonymousClassTupleCtorMacro._N_closureOf_Run_20420,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Extensions.AnonymousClassTupleCtorMacro._N_decorate_20431(Nemerle.Extensions.AnonymousClassTupleCtorMacro._N_closureOf_Run_20422,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Extensions.AnonymousClassTupleCtorMacro.#ctor" />
     <member name="F:Nemerle.Extensions.AnonymousClassTupleCtorMacro.my_usage" />
     <member name="F:Nemerle.Extensions.AnonymousClassTupleCtorMacro.keywords" />
@@ -279,7 +279,7 @@
     <member name="M:Nemerle.Extensions._N_operator_293769306_4207Macro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Extensions._N_operator_293769306_4207Macro.SyntaxExtension" />
     <member name="T:Nemerle.Extensions.AnonymousClassOptions_assembly_postscanMacro" />
-    <member name="M:Nemerle.Extensions.AnonymousClassOptions_assembly_postscanMacro._N_set_visibility_20641(Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Extensions.AnonymousClassOptions_assembly_postscanMacro._N_set_visibility_20643(Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Extensions.AnonymousClassOptions_assembly_postscanMacro.#ctor" />
     <member name="F:Nemerle.Extensions.AnonymousClassOptions_assembly_postscanMacro.my_usage" />
     <member name="F:Nemerle.Extensions.AnonymousClassOptions_assembly_postscanMacro.keywords" />
@@ -304,12 +304,12 @@
     <member name="M:Nemerle.Extensions.AnonymousClassOptions_assembly_postscanMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Extensions.AnonymousClassOptions_assembly_postscanMacro.SyntaxExtension" />
     <member name="T:Nemerle.Extensions.AnonymousClassImpl" />
-    <member name="M:Nemerle.Extensions.AnonymousClassImpl._N_define_eq_b_21611(Nemerle.Extensions.AnonymousClassImpl._N_closureOf_BuildClass_21449,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.Extensions.AnonymousClassImpl._N_define_eq_21604(Nemerle.Extensions.AnonymousClassImpl._N_closureOf_BuildClass_21449,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr.Call)" />
-    <member name="M:Nemerle.Extensions.AnonymousClassImpl._N_can_be_tuple_21532(Nemerle.Core.list{Nemerle.Extensions.AnonymousClassImpl.FieldInfo})" />
-    <member name="M:Nemerle.Extensions.AnonymousClassImpl._N_equality_comparer_21471(Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.Extensions.AnonymousClassImpl._N_append_field_info_20778(Nemerle.Extensions.AnonymousClassImpl._N_closureOf__N_lambda__20738_20768,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.Extensions.AnonymousClassImpl._N_append_field_info_20709(Nemerle.Extensions.AnonymousClassImpl._N_closureOf__N_lambda__20665_20699,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Extensions.AnonymousClassImpl._N_define_eq_b_21613(Nemerle.Extensions.AnonymousClassImpl._N_closureOf_BuildClass_21451,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Extensions.AnonymousClassImpl._N_define_eq_21606(Nemerle.Extensions.AnonymousClassImpl._N_closureOf_BuildClass_21451,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr.Call)" />
+    <member name="M:Nemerle.Extensions.AnonymousClassImpl._N_can_be_tuple_21534(Nemerle.Core.list{Nemerle.Extensions.AnonymousClassImpl.FieldInfo})" />
+    <member name="M:Nemerle.Extensions.AnonymousClassImpl._N_equality_comparer_21473(Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Extensions.AnonymousClassImpl._N_append_field_info_20780(Nemerle.Extensions.AnonymousClassImpl._N_closureOf__N_lambda__20740_20770,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Extensions.AnonymousClassImpl._N_append_field_info_20711(Nemerle.Extensions.AnonymousClassImpl._N_closureOf__N_lambda__20667_20701,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Extensions.AnonymousClassImpl.#cctor" />
     <member name="F:Nemerle.Extensions.AnonymousClassImpl.AnonymousClassNamespace" />
     <member name="M:Nemerle.Extensions.AnonymousClassImpl.MakeNormalCtor(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
@@ -772,10 +772,10 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_isAccepted_23703(Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_closureOf_Run_23620,Nemerle.Compiler.Parsetree.ClassMember.Field)" />
-    <member name="M:Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_isTypedInstanceField_23689(Nemerle.Compiler.Parsetree.ClassMember.Field)" />
-    <member name="M:Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_equalsAny_23668(Nemerle.Compiler.TypeBuilder,Nemerle.Core.Cons[T]{Nemerle.Compiler.TypeInfo})" />
-    <member name="M:Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_isStepInto_23654(Nemerle.Compiler.TypeBuilder)">
+    <member name="M:Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_isAccepted_23705(Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_closureOf_Run_23622,Nemerle.Compiler.Parsetree.ClassMember.Field)" />
+    <member name="M:Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_isTypedInstanceField_23691(Nemerle.Compiler.Parsetree.ClassMember.Field)" />
+    <member name="M:Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_equalsAny_23670(Nemerle.Compiler.TypeBuilder,Nemerle.Core.Cons[T]{Nemerle.Compiler.TypeInfo})" />
+    <member name="M:Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_isStepInto_23656(Nemerle.Compiler.TypeBuilder)">
       <summary>
         <para>True if we need visite property of this type
  (ignore: Alias, Delegate, ValueType and Static types).
@@ -783,9 +783,9 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_isMutable_23649(Nemerle.Compiler.Parsetree.ClassMember.Field)" />
-    <member name="M:Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_errorLocationFieldCanNotBeImmutable_23643(Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_closureOf_Run_23620,Nemerle.Compiler.Parsetree.ClassMember.Field)" />
-    <member name="M:Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_error_23633(Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_closureOf_Run_23620,Nemerle.Compiler.Location,System.String)">
+    <member name="M:Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_isMutable_23651(Nemerle.Compiler.Parsetree.ClassMember.Field)" />
+    <member name="M:Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_errorLocationFieldCanNotBeImmutable_23645(Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_closureOf_Run_23622,Nemerle.Compiler.Parsetree.ClassMember.Field)" />
+    <member name="M:Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_error_23635(Nemerle.Compiler.SupportRelocation_type_preaddMacro._N_closureOf_Run_23622,Nemerle.Compiler.Location,System.String)">
       <summary>
         <para>//////////////////////////////////////////////////////////////////////
 
@@ -942,7 +942,7 @@
     <member name="M:Nemerle.Compiler.SolverMacros.PossiblyLooping_method_postscanMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Compiler.SolverMacros.PossiblyLooping_method_postscanMacro.SyntaxExtension" />
     <member name="T:Nemerle.Concurrency.Helper" />
-    <member name="M:Nemerle.Concurrency.Helper._N_is_in_current_24377(Nemerle.Concurrency.Helper._N_closureOf_CreateChordCommonMembers_24369,Nemerle.Core.list{Nemerle.Compiler.IMember})" />
+    <member name="M:Nemerle.Concurrency.Helper._N_is_in_current_24379(Nemerle.Concurrency.Helper._N_closureOf_CreateChordCommonMembers_24371,Nemerle.Core.list{Nemerle.Compiler.IMember})" />
     <member name="M:Nemerle.Concurrency.Helper.MakeAsyncVoid(Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Concurrency.Helper.MakeAsync(Nemerle.Compiler.Typer,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Concurrency.Helper.MakeAsync(Nemerle.Compiler.Typer,Nemerle.Compiler.Parsetree.ClassMember.Function)" />
@@ -1720,13 +1720,13 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Core.foreachMacro._N_build_loops_27813(Nemerle.Core.foreachMacro._N_closureOf_multi_dim_case_27786,Nemerle.Core.foreachMacro._N_closureOf_Run_27587,System.Int32)" />
-    <member name="M:Nemerle.Core.foreachMacro._N_make_for_array_27772(Nemerle.Core.foreachMacro._N_closureOf_Run_27587,System.Int32)" />
-    <member name="M:Nemerle.Core.foreachMacro._N_make_for_list_27762(Nemerle.Core.foreachMacro._N_closureOf_Run_27587,Nemerle.Core.list{Nemerle.Compiler.TypeVar})" />
-    <member name="M:Nemerle.Core.foreachMacro._N_make_for_enumerator_27714(Nemerle.Core.foreachMacro._N_closureOf_Run_27587,Nemerle.Compiler.TypeInfo)" />
-    <member name="M:Nemerle.Core.foreachMacro._N_error_27701(Nemerle.Core.foreachMacro._N_closureOf_afterObtainCollectionType_27693,Nemerle.Core.option{Nemerle.Compiler.FixedType})" />
-    <member name="M:Nemerle.Core.foreachMacro._N_decide_enumerator_pattern_27643(Nemerle.Core.foreachMacro._N_closureOf_Run_27587,Nemerle.Compiler.TypeInfo)" />
-    <member name="M:Nemerle.Core.foreachMacro._N_build_definition_27617(Nemerle.Core.foreachMacro._N_closureOf_Run_27587,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Core.foreachMacro._N_build_loops_27815(Nemerle.Core.foreachMacro._N_closureOf_multi_dim_case_27788,Nemerle.Core.foreachMacro._N_closureOf_Run_27589,System.Int32)" />
+    <member name="M:Nemerle.Core.foreachMacro._N_make_for_array_27774(Nemerle.Core.foreachMacro._N_closureOf_Run_27589,System.Int32)" />
+    <member name="M:Nemerle.Core.foreachMacro._N_make_for_list_27764(Nemerle.Core.foreachMacro._N_closureOf_Run_27589,Nemerle.Core.list{Nemerle.Compiler.TypeVar})" />
+    <member name="M:Nemerle.Core.foreachMacro._N_make_for_enumerator_27716(Nemerle.Core.foreachMacro._N_closureOf_Run_27589,Nemerle.Compiler.TypeInfo)" />
+    <member name="M:Nemerle.Core.foreachMacro._N_error_27703(Nemerle.Core.foreachMacro._N_closureOf_afterObtainCollectionType_27695,Nemerle.Core.option{Nemerle.Compiler.FixedType})" />
+    <member name="M:Nemerle.Core.foreachMacro._N_decide_enumerator_pattern_27645(Nemerle.Core.foreachMacro._N_closureOf_Run_27589,Nemerle.Compiler.TypeInfo)" />
+    <member name="M:Nemerle.Core.foreachMacro._N_build_definition_27619(Nemerle.Core.foreachMacro._N_closureOf_Run_27589,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Core.foreachMacro.#ctor">
       <summary>
         <para>The 'foreach' macro introduces a construction equivalent
@@ -1962,9 +1962,9 @@
     <member name="M:Nemerle.Core.Record_type_preaddMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Core.Record_type_preaddMacro.SyntaxExtension" />
     <member name="T:Nemerle.Core.MacrosHelper" />
-    <member name="M:Nemerle.Core.MacrosHelper._N_matchNotNull_29041(Nemerle.Core.MacrosHelper._N_closureOf_CollectFields_28999,System.String)" />
-    <member name="M:Nemerle.Core.MacrosHelper._N_isIgnored_29011(Nemerle.Core.MacrosHelper._N_closureOf_CollectFields_28999,Nemerle.Compiler.Parsetree.ClassMember)" />
-    <member name="M:Nemerle.Core.MacrosHelper._N_getNewName_28584(Nemerle.Compiler.Parsetree.ClassMember.Field)" />
+    <member name="M:Nemerle.Core.MacrosHelper._N_matchNotNull_29043(Nemerle.Core.MacrosHelper._N_closureOf_CollectFields_29001,System.String)" />
+    <member name="M:Nemerle.Core.MacrosHelper._N_isIgnored_29013(Nemerle.Core.MacrosHelper._N_closureOf_CollectFields_29001,Nemerle.Compiler.Parsetree.ClassMember)" />
+    <member name="M:Nemerle.Core.MacrosHelper._N_getNewName_28586(Nemerle.Compiler.Parsetree.ClassMember.Field)" />
     <member name="F:Nemerle.Core.MacrosHelper.InstanceFlags" />
     <member name="F:Nemerle.Core.MacrosHelper.IgnoreMapKey" />
     <member name="M:Nemerle.Core.MacrosHelper.MakeRecord(Nemerle.Compiler.TypeBuilder,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
@@ -2024,7 +2024,7 @@
     <member name="M:Nemerle.Core._N_ExtensionMethodOnThisParameter_param_postscanMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Core._N_ExtensionMethodOnThisParameter_param_postscanMacro.SyntaxExtension" />
     <member name="T:Nemerle.Core._N_ExtensionMethodOnThisParameter_param_postaddMacro" />
-    <member name="M:Nemerle.Core._N_ExtensionMethodOnThisParameter_param_postaddMacro._N_add_attr_30039(Nemerle.Compiler.AttributesAndModifiers)" />
+    <member name="M:Nemerle.Core._N_ExtensionMethodOnThisParameter_param_postaddMacro._N_add_attr_30041(Nemerle.Compiler.AttributesAndModifiers)" />
     <member name="M:Nemerle.Core._N_ExtensionMethodOnThisParameter_param_postaddMacro.#ctor" />
     <member name="F:Nemerle.Core._N_ExtensionMethodOnThisParameter_param_postaddMacro.my_usage" />
     <member name="F:Nemerle.Core._N_ExtensionMethodOnThisParameter_param_postaddMacro.keywords" />
@@ -2318,7 +2318,7 @@
     <member name="M:Nemerle.Extensions.DisableImplicitConstructor_type_postscanMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Extensions.DisableImplicitConstructor_type_postscanMacro.SyntaxExtension" />
     <member name="T:Nemerle.Extensions.LexicographicCompareTo_type_postaddMacro" />
-    <member name="M:Nemerle.Extensions.LexicographicCompareTo_type_postaddMacro._N_compareField_30995(Nemerle.Compiler.IField)" />
+    <member name="M:Nemerle.Extensions.LexicographicCompareTo_type_postaddMacro._N_compareField_30997(Nemerle.Compiler.IField)" />
     <member name="M:Nemerle.Extensions.LexicographicCompareTo_type_postaddMacro.#ctor" />
     <member name="F:Nemerle.Extensions.LexicographicCompareTo_type_postaddMacro.my_usage" />
     <member name="F:Nemerle.Extensions.LexicographicCompareTo_type_postaddMacro.keywords" />
@@ -2876,9 +2876,9 @@
     <member name="M:Nemerle.DesignPatterns.ProxyPublicMembers_field_postaddMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.DesignPatterns.ProxyPublicMembers_field_postaddMacro.SyntaxExtension" />
     <member name="T:Nemerle.DesignPatterns.AbstractFactory_type_preaddMacro" />
-    <member name="M:Nemerle.DesignPatterns.AbstractFactory_type_preaddMacro._N_get_simple_name_36510(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.DesignPatterns.AbstractFactory_type_preaddMacro._N_interpret_expr_36470(Nemerle.DesignPatterns.AbstractFactory_type_preaddMacro._N_closureOf_Run_36442,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.DesignPatterns.AbstractFactory_type_preaddMacro._N_interpret_generics_36460(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Builtins.Tuple{Nemerle.Core.list{Nemerle.Compiler.Parsetree.Splicable},Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr}})" />
+    <member name="M:Nemerle.DesignPatterns.AbstractFactory_type_preaddMacro._N_get_simple_name_36512(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.DesignPatterns.AbstractFactory_type_preaddMacro._N_interpret_expr_36472(Nemerle.DesignPatterns.AbstractFactory_type_preaddMacro._N_closureOf_Run_36444,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.DesignPatterns.AbstractFactory_type_preaddMacro._N_interpret_generics_36462(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Builtins.Tuple{Nemerle.Core.list{Nemerle.Compiler.Parsetree.Splicable},Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr}})" />
     <member name="M:Nemerle.DesignPatterns.AbstractFactory_type_preaddMacro.#ctor" />
     <member name="F:Nemerle.DesignPatterns.AbstractFactory_type_preaddMacro.my_usage" />
     <member name="F:Nemerle.DesignPatterns.AbstractFactory_type_preaddMacro.keywords" />
@@ -3085,7 +3085,7 @@
     <member name="M:Nemerle.InternalMacros.StaticInitializer_field_preaddMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.InternalMacros.StaticInitializer_field_preaddMacro.SyntaxExtension" />
     <member name="T:Nemerle.InternalMacros.StaticInitializer_field_postaddMacro" />
-    <member name="M:Nemerle.InternalMacros.StaticInitializer_field_postaddMacro._N_fetch_inits_37503(Nemerle.InternalMacros.StaticInitializer_field_postaddMacro._N_closureOf_Run_37436,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.InternalMacros.StaticInitializer_field_postaddMacro._N_fetch_inits_37505(Nemerle.InternalMacros.StaticInitializer_field_postaddMacro._N_closureOf_Run_37438,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
     <member name="M:Nemerle.InternalMacros.StaticInitializer_field_postaddMacro.#ctor" />
     <member name="F:Nemerle.InternalMacros.StaticInitializer_field_postaddMacro.my_usage" />
     <member name="F:Nemerle.InternalMacros.StaticInitializer_field_postaddMacro.keywords" />
@@ -3110,7 +3110,7 @@
     <member name="M:Nemerle.InternalMacros.StaticInitializer_field_postaddMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.InternalMacros.StaticInitializer_field_postaddMacro.SyntaxExtension" />
     <member name="T:Nemerle.InternalMacros.PropertyEmbeddedField_property_postscanMacro" />
-    <member name="M:Nemerle.InternalMacros.PropertyEmbeddedField_property_postscanMacro._N_redirect_37653(Nemerle.InternalMacros.PropertyEmbeddedField_property_postscanMacro._N_closureOf_Run_37637,Nemerle.Core.option{Nemerle.Compiler.Parsetree.ClassMember.Function})" />
+    <member name="M:Nemerle.InternalMacros.PropertyEmbeddedField_property_postscanMacro._N_redirect_37655(Nemerle.InternalMacros.PropertyEmbeddedField_property_postscanMacro._N_closureOf_Run_37639,Nemerle.Core.option{Nemerle.Compiler.Parsetree.ClassMember.Function})" />
     <member name="M:Nemerle.InternalMacros.PropertyEmbeddedField_property_postscanMacro.#ctor" />
     <member name="F:Nemerle.InternalMacros.PropertyEmbeddedField_property_postscanMacro.my_usage" />
     <member name="F:Nemerle.InternalMacros.PropertyEmbeddedField_property_postscanMacro.keywords" />
@@ -3388,9 +3388,9 @@
     <member name="M:Nemerle.IO.printMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.IO.printMacro.SyntaxExtension" />
     <member name="T:Nemerle.IO.Helper" />
-    <member name="M:Nemerle.IO.Helper._N_continue_38905(Nemerle.IO.Helper._N_closureOf_make_expressions_38892,Nemerle.IO.Helper._N_closureOf_make_evaluation_exprs_38878,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.IO.Helper.FormatToken})" />
-    <member name="M:Nemerle.IO.Helper._N_make_expressions_38886(Nemerle.IO.Helper._N_closureOf_make_evaluation_exprs_38878,Nemerle.Core.list{Nemerle.IO.Helper.FormatToken},System.Int32,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.IO.Helper._N_append_text_38805(Nemerle.IO.Helper._N_closureOf_parse_format_38795)" />
+    <member name="M:Nemerle.IO.Helper._N_continue_38907(Nemerle.IO.Helper._N_closureOf_make_expressions_38894,Nemerle.IO.Helper._N_closureOf_make_evaluation_exprs_38880,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.IO.Helper.FormatToken})" />
+    <member name="M:Nemerle.IO.Helper._N_make_expressions_38888(Nemerle.IO.Helper._N_closureOf_make_evaluation_exprs_38880,Nemerle.Core.list{Nemerle.IO.Helper.FormatToken},System.Int32,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.IO.Helper._N_append_text_38807(Nemerle.IO.Helper._N_closureOf_parse_format_38797)" />
     <member name="M:Nemerle.IO.Helper.PrintfHelper(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.GlobalEnv,Nemerle.Builtins.Function{System.String,Nemerle.Compiler.Parsetree.PExpr})" />
     <member name="M:Nemerle.IO.Helper.parse_format(System.String,System.Boolean)">
       <summary>
@@ -3405,9 +3405,9 @@
     <member name="M:Nemerle.IO.Helper.make_scan_expressions(System.String,Nemerle.Compiler.Parsetree.PExpr[],Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="T:Nemerle.IO.Helper.FormatToken" />
     <member name="T:Nemerle.Late.LateMacro" />
-    <member name="M:Nemerle.Late.LateMacro._N_call_expr_39314(Nemerle.Late.LateMacro._N_closureOf_invoke_located_39237,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.Late.LateMacro._N_transform_39267(Nemerle.Late.LateMacro._N_closureOf_array_literal_39259,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Core.list{System.Boolean},Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Late.LateMacro._N_array_literal_39254(Nemerle.Compiler.Parsetree.PExpr.Ref,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Core.list{System.Boolean})" />
+    <member name="M:Nemerle.Late.LateMacro._N_call_expr_39316(Nemerle.Late.LateMacro._N_closureOf_invoke_located_39239,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Late.LateMacro._N_transform_39269(Nemerle.Late.LateMacro._N_closureOf_array_literal_39261,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Core.list{System.Boolean},Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Late.LateMacro._N_array_literal_39256(Nemerle.Compiler.Parsetree.PExpr.Ref,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Core.list{System.Boolean})" />
     <member name="F:Nemerle.Late.LateMacro.env" />
     <member name="M:Nemerle.Late.LateMacro.invoke(Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Location,Nemerle.Late.LateMacro.CallInfo,System.Reflection.BindingFlags,System.Boolean)" />
     <member name="M:Nemerle.Late.LateMacro.invoke_located(Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Late.LateMacro.CallInfo,System.Reflection.BindingFlags,System.Boolean)" />
@@ -3735,7 +3735,7 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Memoize_method_postaddMacro._N_doCachedCheck_41245(Nemerle.Memoize_method_postaddMacro._N_closureOf_Run_41192,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Memoize_method_postaddMacro._N_doCachedCheck_41256(Nemerle.Memoize_method_postaddMacro._N_closureOf_Run_41197,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Memoize_method_postaddMacro.#ctor">
       <summary>
         <para>This macro implements memoization (with the default option Scope = Instance
@@ -3902,8 +3902,8 @@
     <member name="M:Nemerle.Extensions._N_operator1214590017_4372Macro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Extensions._N_operator1214590017_4372Macro.SyntaxExtension" />
     <member name="T:Nemerle.Extensions.WithMacroImpl" />
-    <member name="M:Nemerle.Extensions.WithMacroImpl._N_createAssignment_41787(Nemerle.Extensions.WithMacroImpl._N_closureOf_MakeCollectionInitializers_41779,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.Extensions.WithMacroImpl._N_createAssignment_41724(Nemerle.Extensions.WithMacroImpl._N_closureOf_MakePropertyInitializers_41716,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Extensions.WithMacroImpl._N_createAssignment_41799(Nemerle.Extensions.WithMacroImpl._N_closureOf_MakeCollectionInitializers_41791,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Extensions.WithMacroImpl._N_createAssignment_41736(Nemerle.Extensions.WithMacroImpl._N_closureOf_MakePropertyInitializers_41728,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Extensions.WithMacroImpl.Run(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Extensions.WithMacroImpl.MakePropertyInitializers(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Extensions.WithMacroImpl.MakeCollectionInitializers(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Compiler.Parsetree.PExpr)" />
@@ -4391,7 +4391,7 @@
     <member name="M:Nemerle.Core._N_operator905413823_4414Macro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Core._N_operator905413823_4414Macro.SyntaxExtension" />
     <member name="T:Nemerle.Core._N_operator_660670116_4416Macro" />
-    <member name="M:Nemerle.Core._N_operator_660670116_4416Macro._N_resolve_43817(Nemerle.Core._N_operator_660670116_4416Macro._N_closureOf_Run_43768,Nemerle.Builtins.Function{Nemerle.Compiler.TypeInfo,System.Boolean},System.Boolean)" />
+    <member name="M:Nemerle.Core._N_operator_660670116_4416Macro._N_resolve_43829(Nemerle.Core._N_operator_660670116_4416Macro._N_closureOf_Run_43780,Nemerle.Builtins.Function{Nemerle.Compiler.TypeInfo,System.Boolean},System.Boolean)" />
     <member name="M:Nemerle.Core._N_operator_660670116_4416Macro.#ctor" />
     <member name="F:Nemerle.Core._N_operator_660670116_4416Macro.my_usage" />
     <member name="F:Nemerle.Core._N_operator_660670116_4416Macro.keywords" />
@@ -4440,8 +4440,8 @@
     <member name="M:Nemerle.Core._N_operator_707724294_4418Macro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Core._N_operator_707724294_4418Macro.SyntaxExtension" />
     <member name="T:Nemerle.Core._N_operator1617874545_4420Macro" />
-    <member name="M:Nemerle.Core._N_operator1617874545_4420Macro._N_makeComplation_44027(Nemerle.Compiler.Location,Nemerle.Compiler.Parsetree.Name)" />
-    <member name="M:Nemerle.Core._N_operator1617874545_4420Macro._N_makeMemberAccess_44022(Nemerle.Compiler.Location,Nemerle.Compiler.Parsetree.Name)" />
+    <member name="M:Nemerle.Core._N_operator1617874545_4420Macro._N_makeComplation_44039(Nemerle.Compiler.Location,Nemerle.Compiler.Parsetree.Name)" />
+    <member name="M:Nemerle.Core._N_operator1617874545_4420Macro._N_makeMemberAccess_44034(Nemerle.Compiler.Location,Nemerle.Compiler.Parsetree.Name)" />
     <member name="M:Nemerle.Core._N_operator1617874545_4420Macro.#ctor" />
     <member name="F:Nemerle.Core._N_operator1617874545_4420Macro.my_usage" />
     <member name="F:Nemerle.Core._N_operator1617874545_4420Macro.keywords" />
@@ -4621,7 +4621,7 @@
     <member name="M:Nemerle.Macro.Resource_assembly_postscanMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Macro.Resource_assembly_postscanMacro.SyntaxExtension" />
     <member name="T:Nemerle.Macro.ResourceImpl" />
-    <member name="M:Nemerle.Macro.ResourceImpl._N_getType_45076(Nemerle.Macro.ResourceImpl._N_closureOf_Build_45060,System.String)" />
+    <member name="M:Nemerle.Macro.ResourceImpl._N_getType_45088(Nemerle.Macro.ResourceImpl._N_closureOf_Build_45072,System.String)" />
     <member name="M:Nemerle.Macro.ResourceImpl.Build(System.String,Nemerle.Compiler.Typer)" />
     <member name="T:Nemerle.Macro.Settings_assembly_postscanMacro">
       <summary>
@@ -4654,8 +4654,8 @@
     <member name="M:Nemerle.Macro.Settings_assembly_postscanMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Macro.Settings_assembly_postscanMacro.SyntaxExtension" />
     <member name="T:Nemerle.Macro.SettingsHelper" />
-    <member name="M:Nemerle.Macro.SettingsHelper._N_defineProperty_46061(Nemerle.Macro.SettingsHelper._N_closureOf_Settings_46022,Nemerle.Compiler.TypeBuilder,System.Xml.Linq.XElement)" />
-    <member name="M:Nemerle.Macro.SettingsHelper._N_getType_46036(Nemerle.Macro.SettingsHelper._N_closureOf_Settings_46022,System.String)" />
+    <member name="M:Nemerle.Macro.SettingsHelper._N_defineProperty_46073(Nemerle.Macro.SettingsHelper._N_closureOf_Settings_46034,Nemerle.Compiler.TypeBuilder,System.Xml.Linq.XElement)" />
+    <member name="M:Nemerle.Macro.SettingsHelper._N_getType_46048(Nemerle.Macro.SettingsHelper._N_closureOf_Settings_46034,System.String)" />
     <member name="F:Nemerle.Macro.SettingsHelper._xmlNamespace" />
     <member name="M:Nemerle.Macro.SettingsHelper.Settings(System.String,System.Boolean,Nemerle.Compiler.Typer)" />
     <member name="T:Nemerle.Core.sizeofMacro" />
@@ -4797,9 +4797,9 @@
     <member name="M:StringTemplate.StringTemplateGroup_type_postaddMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:StringTemplate.StringTemplateGroup_type_postaddMacro.SyntaxExtension" />
     <member name="T:StringTemplate.Helper2" />
-    <member name="M:StringTemplate.Helper2._N_makeExpr_47467(StringTemplate.Helper2._N_closureOf_makeSplaceExpr_47459,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:StringTemplate.Helper2._N_isTypeString_46894(StringTemplate.Helper2._N_closureOf_StringTemplateGroupWithTypedMembers_46881,Nemerle.Compiler.FixedType)" />
-    <member name="M:StringTemplate.Helper2._N_testAbstract_46736(Nemerle.Compiler.Parsetree.ClassMember.Function)" />
+    <member name="M:StringTemplate.Helper2._N_makeExpr_47479(StringTemplate.Helper2._N_closureOf_makeSplaceExpr_47471,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:StringTemplate.Helper2._N_isTypeString_46906(StringTemplate.Helper2._N_closureOf_StringTemplateGroupWithTypedMembers_46893,Nemerle.Compiler.FixedType)" />
+    <member name="M:StringTemplate.Helper2._N_testAbstract_46748(Nemerle.Compiler.Parsetree.ClassMember.Function)" />
     <member name="M:StringTemplate.Helper2.#cctor" />
     <member name="F:StringTemplate.Helper2.StSuffix" />
     <member name="F:StringTemplate.Helper2._inherMap" />
@@ -4821,14 +4821,14 @@
     <member name="T:StringTemplate.StrPart.NewLine" />
     <member name="T:StringTemplate.StrPart.IndentedExpr" />
     <member name="T:StringTemplate.Helper" />
-    <member name="M:StringTemplate.Helper._N_rtyIndent_48639(Nemerle.Core.list{StringTemplate.StrPart},Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:StringTemplate.Helper._N_processNewLine_48605(StringTemplate.Helper._N_closureOf_loop_48571,StringTemplate.Helper._N_closureOf_make_splice_distribution2_48370)" />
-    <member name="M:StringTemplate.Helper._N_isNextDollar_48591(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48370,System.Int32)" />
-    <member name="M:StringTemplate.Helper._N_endLiteral_48580(StringTemplate.Helper._N_closureOf_loop_48571,StringTemplate.Helper._N_closureOf_make_splice_distribution2_48370)" />
-    <member name="M:StringTemplate.Helper._N_parceSpliceEx_48565(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48370,Nemerle.Core.list{StringTemplate.StrPart},System.Boolean)" />
-    <member name="M:StringTemplate.Helper._N_loop_48559(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48370,Nemerle.Core.list{StringTemplate.StrPart})" />
-    <member name="M:StringTemplate.Helper._N_parseIdentifier_48542(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48370)" />
-    <member name="M:StringTemplate.Helper._N_parseExpressionStr_48510(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48370)">
+    <member name="M:StringTemplate.Helper._N_rtyIndent_48651(Nemerle.Core.list{StringTemplate.StrPart},Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:StringTemplate.Helper._N_processNewLine_48617(StringTemplate.Helper._N_closureOf_loop_48583,StringTemplate.Helper._N_closureOf_make_splice_distribution2_48382)" />
+    <member name="M:StringTemplate.Helper._N_isNextDollar_48603(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48382,System.Int32)" />
+    <member name="M:StringTemplate.Helper._N_endLiteral_48592(StringTemplate.Helper._N_closureOf_loop_48583,StringTemplate.Helper._N_closureOf_make_splice_distribution2_48382)" />
+    <member name="M:StringTemplate.Helper._N_parceSpliceEx_48577(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48382,Nemerle.Core.list{StringTemplate.StrPart},System.Boolean)" />
+    <member name="M:StringTemplate.Helper._N_loop_48571(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48382,Nemerle.Core.list{StringTemplate.StrPart})" />
+    <member name="M:StringTemplate.Helper._N_parseIdentifier_48554(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48382)" />
+    <member name="M:StringTemplate.Helper._N_parseExpressionStr_48522(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48382)">
       <summary>
         <para>~~~Parse expression based on nested brackets.
  Разбирает строку производя поиск закрывающей скобки.
@@ -4840,13 +4840,13 @@
 </para>
       </summary>
     </member>
-    <member name="M:StringTemplate.Helper._N_currLoc_48503(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48370,System.String)" />
-    <member name="M:StringTemplate.Helper._N_tryUnescape_48481(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48370,System.Char)" />
-    <member name="M:StringTemplate.Helper._N_appendToBuilder_48474(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48370,System.Char)" />
-    <member name="M:StringTemplate.Helper._N_getStrFromBuilder_48467(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48370)" />
-    <member name="M:StringTemplate.Helper._N_peekN_48409(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48370,System.Int32)" />
-    <member name="M:StringTemplate.Helper._N_makeSeqExpr_48179(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:StringTemplate.Helper._N_calcStrBounds_47731(StringTemplate.Helper._N_closureOf_ExtractStringBody_47721,System.Int32,System.Int32,StringTemplate.StringType)">
+    <member name="M:StringTemplate.Helper._N_currLoc_48515(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48382,System.String)" />
+    <member name="M:StringTemplate.Helper._N_tryUnescape_48493(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48382,System.Char)" />
+    <member name="M:StringTemplate.Helper._N_appendToBuilder_48486(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48382,System.Char)" />
+    <member name="M:StringTemplate.Helper._N_getStrFromBuilder_48479(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48382)" />
+    <member name="M:StringTemplate.Helper._N_peekN_48421(StringTemplate.Helper._N_closureOf_make_splice_distribution2_48382,System.Int32)" />
+    <member name="M:StringTemplate.Helper._N_makeSeqExpr_48191(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:StringTemplate.Helper._N_calcStrBounds_47743(StringTemplate.Helper._N_closureOf_ExtractStringBody_47733,System.Int32,System.Int32,StringTemplate.StringType)">
       <summary>
         <para>Calc string value and location from raw literal data
 
@@ -4987,8 +4987,8 @@
     <member name="M:Nemerle.Extensions.EqualsIgnore_property_postscanMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Extensions.EqualsIgnore_property_postscanMacro.SyntaxExtension" />
     <member name="T:Nemerle.Extensions.StructuralEqualityImpl" />
-    <member name="M:Nemerle.Extensions.StructuralEqualityImpl._N_invokeEquals_49577(Nemerle.Extensions.StructuralEqualityImpl._N_closureOf_DefineEquality_49554,Nemerle.Compiler.IField)" />
-    <member name="M:Nemerle.Extensions.StructuralEqualityImpl._N_defineMember_49567(Nemerle.Extensions.StructuralEqualityImpl._N_closureOf_DefineEquality_49554,Nemerle.Compiler.Parsetree.ClassMember)" />
+    <member name="M:Nemerle.Extensions.StructuralEqualityImpl._N_invokeEquals_49589(Nemerle.Extensions.StructuralEqualityImpl._N_closureOf_DefineEquality_49566,Nemerle.Compiler.IField)" />
+    <member name="M:Nemerle.Extensions.StructuralEqualityImpl._N_defineMember_49579(Nemerle.Extensions.StructuralEqualityImpl._N_closureOf_DefineEquality_49566,Nemerle.Compiler.Parsetree.ClassMember)" />
     <member name="M:Nemerle.Extensions.StructuralEqualityImpl.IndexOf``1(Nemerle.Core.list{``0},``0)" />
     <member name="M:Nemerle.Extensions.StructuralEqualityImpl.NOfTypeRev``2(Nemerle.Core.list{``0})" />
     <member name="F:Nemerle.Extensions.StructuralEqualityImpl.IgnoredFieldsLabel" />
@@ -5035,7 +5035,7 @@
     <member name="M:Nemerle.Surround.DefineSurround_assembly_postscanMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Surround.DefineSurround_assembly_postscanMacro.SyntaxExtension" />
     <member name="T:Nemerle.Surround.SurroundWithMacro" />
-    <member name="M:Nemerle.Surround.SurroundWithMacro._N_makeSurroundWith_50121(Nemerle.Surround.SurroundWithMacro._N_closureOf_Run_50094,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Surround.SurroundWithMacro._N_makeSurroundWith_50133(Nemerle.Surround.SurroundWithMacro._N_closureOf_Run_50106,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Surround.SurroundWithMacro.#ctor" />
     <member name="F:Nemerle.Surround.SurroundWithMacro.my_usage" />
     <member name="F:Nemerle.Surround.SurroundWithMacro.keywords" />
@@ -5095,9 +5095,9 @@
     <member name="M:Nemerle.Text.regexpMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Text.regexpMacro.SyntaxExtension" />
     <member name="T:Nemerle.Text.RegexpImpl" />
-    <member name="M:Nemerle.Text.RegexpImpl._N_build_bindings_50455(Nemerle.Text.RegexpImpl._N_closureOf_Impl_50354,Nemerle.Core.list{Nemerle.Builtins.Tuple{System.String,System.Boolean,Nemerle.Core.option{System.String}}},Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Text.RegexpImpl._N_build_alts_50443(Nemerle.Text.RegexpImpl._N_closureOf_build_checking_50437,Nemerle.Core.list{System.String})" />
-    <member name="M:Nemerle.Text.RegexpImpl._N_build_checking_50431(Nemerle.Text.RegexpImpl._N_closureOf_Impl_50354,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Core.list{System.String},Nemerle.Core.list{Nemerle.Builtins.Tuple{System.String,System.Boolean,Nemerle.Core.option{System.String}}},Nemerle.Compiler.Parsetree.PExpr}})" />
+    <member name="M:Nemerle.Text.RegexpImpl._N_build_bindings_50467(Nemerle.Text.RegexpImpl._N_closureOf_Impl_50366,Nemerle.Core.list{Nemerle.Builtins.Tuple{System.String,System.Boolean,Nemerle.Core.option{System.String}}},Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Text.RegexpImpl._N_build_alts_50455(Nemerle.Text.RegexpImpl._N_closureOf_build_checking_50449,Nemerle.Core.list{System.String})" />
+    <member name="M:Nemerle.Text.RegexpImpl._N_build_checking_50443(Nemerle.Text.RegexpImpl._N_closureOf_Impl_50366,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Core.list{System.String},Nemerle.Core.list{Nemerle.Builtins.Tuple{System.String,System.Boolean,Nemerle.Core.option{System.String}}},Nemerle.Compiler.Parsetree.PExpr}})" />
     <member name="M:Nemerle.Text.RegexpImpl.Impl(Nemerle.Compiler.Typer,Nemerle.Compiler.ManagerClass,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Text.RegexpImpl.FixGroupName(System.String)">
       <summary>
@@ -5143,8 +5143,8 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Utility.Accessor_field_postscanMacro._N_take_minimum_access_50784(Nemerle.Compiler.NemerleModifiers)" />
-    <member name="M:Nemerle.Utility.Accessor_field_postscanMacro._N_parse_opts_50732(Nemerle.Utility.Accessor_field_postscanMacro._N_closureOf_Run_50711,Nemerle.Compiler.Parsetree.PExpr,System.Boolean)" />
+    <member name="M:Nemerle.Utility.Accessor_field_postscanMacro._N_take_minimum_access_50796(Nemerle.Compiler.NemerleModifiers)" />
+    <member name="M:Nemerle.Utility.Accessor_field_postscanMacro._N_parse_opts_50744(Nemerle.Utility.Accessor_field_postscanMacro._N_closureOf_Run_50723,Nemerle.Compiler.Parsetree.PExpr,System.Boolean)" />
     <member name="M:Nemerle.Utility.Accessor_field_postscanMacro.#ctor">
       <summary>
         <para>Adds property accessor for field.
@@ -5180,7 +5180,7 @@
     <member name="M:Nemerle.Utility.Accessor_field_postscanMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Utility.Accessor_field_postscanMacro.SyntaxExtension" />
     <member name="T:Nemerle.Utility.FlagAccessor_field_postscanMacro" />
-    <member name="M:Nemerle.Utility.FlagAccessor_field_postscanMacro._N_parse_opts_50992(Nemerle.Utility.FlagAccessor_field_postscanMacro._N_closureOf_Run_50947,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Utility.FlagAccessor_field_postscanMacro._N_parse_opts_51004(Nemerle.Utility.FlagAccessor_field_postscanMacro._N_closureOf_Run_50959,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Utility.FlagAccessor_field_postscanMacro.#ctor" />
     <member name="F:Nemerle.Utility.FlagAccessor_field_postscanMacro.my_usage" />
     <member name="F:Nemerle.Utility.FlagAccessor_field_postscanMacro.keywords" />
@@ -5291,14 +5291,14 @@
     <member name="M:Nemerle.Utility.ExpandEnvMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Utility.ExpandEnvMacro.SyntaxExtension" />
     <member name="T:Nemerle.Utility.ExpandEnvHelper" />
-    <member name="M:Nemerle.Utility.ExpandEnvHelper._N_getEnvironment_52965(Nemerle.Utility.ExpandEnvHelper._N_closureOf_evaluateVar_52934)" />
-    <member name="M:Nemerle.Utility.ExpandEnvHelper._N_getSpecial_52943(Nemerle.Utility.ExpandEnvHelper._N_closureOf_evaluateVar_52934,Nemerle.Utility.ExpandEnvHelper._N_closureOf_Expand_52869)" />
-    <member name="M:Nemerle.Utility.ExpandEnvHelper._N_evaluateVar_52928(Nemerle.Utility.ExpandEnvHelper._N_closureOf_Expand_52869,System.String)" />
+    <member name="M:Nemerle.Utility.ExpandEnvHelper._N_getEnvironment_52977(Nemerle.Utility.ExpandEnvHelper._N_closureOf_evaluateVar_52946)" />
+    <member name="M:Nemerle.Utility.ExpandEnvHelper._N_getSpecial_52955(Nemerle.Utility.ExpandEnvHelper._N_closureOf_evaluateVar_52946,Nemerle.Utility.ExpandEnvHelper._N_closureOf_Expand_52881)" />
+    <member name="M:Nemerle.Utility.ExpandEnvHelper._N_evaluateVar_52940(Nemerle.Utility.ExpandEnvHelper._N_closureOf_Expand_52881,System.String)" />
     <member name="M:Nemerle.Utility.ExpandEnvHelper.#cctor" />
     <member name="F:Nemerle.Utility.ExpandEnvHelper.VarRegex" />
     <member name="M:Nemerle.Utility.ExpandEnvHelper.Expand(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="T:Nemerle.Utility.GitRevisionHelper" />
-    <member name="M:Nemerle.Utility.GitRevisionHelper._N_execGit_53046(Nemerle.Utility.GitRevisionHelper._N_closureOf_GetRevisionGeneric_53030,Nemerle.Builtins.FunctionVoid{System.Diagnostics.ProcessStartInfo})" />
+    <member name="M:Nemerle.Utility.GitRevisionHelper._N_execGit_53059(Nemerle.Utility.GitRevisionHelper._N_closureOf_GetRevisionGeneric_53043,Nemerle.Builtins.FunctionVoid{System.Diagnostics.ProcessStartInfo})" />
     <member name="F:Nemerle.Utility.GitRevisionHelper._N_cache_14064" />
     <member name="M:Nemerle.Utility.GitRevisionHelper.GetRevisionGeneric(System.String)" />
     <member name="T:Nemerle.Utility.ExtensionPattern_type_postaddMacro" />
@@ -5379,14 +5379,14 @@
     <member name="M:Nemerle.Utility.ExpandListComprehensionMacro.Run(Nemerle.Compiler.Typer,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement})" />
     <member name="M:Nemerle.Utility.ExpandListComprehensionMacro.SyntaxExtension" />
     <member name="T:Nemerle.Xml.Serialization.XmlMultidimensionalArray_field_postscanMacro" />
-    <member name="M:Nemerle.Xml.Serialization.XmlMultidimensionalArray_field_postscanMacro._N_build_type_53709(Nemerle.Xml.Serialization.XmlMultidimensionalArray_field_postscanMacro._N_closureOf_Run_53647,System.Int32)">
+    <member name="M:Nemerle.Xml.Serialization.XmlMultidimensionalArray_field_postscanMacro._N_build_type_53722(Nemerle.Xml.Serialization.XmlMultidimensionalArray_field_postscanMacro._N_closureOf_Run_53660,System.Int32)">
       <summary>
         <para>build property used to serialize and deserialize our field
 
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Xml.Serialization.XmlMultidimensionalArray_field_postscanMacro._N_nest_53699(Nemerle.Xml.Serialization.XmlMultidimensionalArray_field_postscanMacro._N_closureOf_Run_53647,System.Int32,Nemerle.Compiler.Parsetree.PExpr)">
+    <member name="M:Nemerle.Xml.Serialization.XmlMultidimensionalArray_field_postscanMacro._N_nest_53712(Nemerle.Xml.Serialization.XmlMultidimensionalArray_field_postscanMacro._N_closureOf_Run_53660,System.Int32,Nemerle.Compiler.Parsetree.PExpr)">
       <summary>
         <para>we will create general body of setter similar to:
        for (mutable i = 0; i &lt; value.Length; ++i)
@@ -5398,7 +5398,7 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Xml.Serialization.XmlMultidimensionalArray_field_postscanMacro._N_nest_53689(Nemerle.Xml.Serialization.XmlMultidimensionalArray_field_postscanMacro._N_closureOf_Run_53647,System.Int32,Nemerle.Compiler.Parsetree.PExpr.Indexer,Nemerle.Core.Cons[T]{Nemerle.Compiler.Parsetree.PExpr})">
+    <member name="M:Nemerle.Xml.Serialization.XmlMultidimensionalArray_field_postscanMacro._N_nest_53702(Nemerle.Xml.Serialization.XmlMultidimensionalArray_field_postscanMacro._N_closureOf_Run_53660,System.Int32,Nemerle.Compiler.Parsetree.PExpr.Indexer,Nemerle.Core.Cons[T]{Nemerle.Compiler.Parsetree.PExpr})">
       <summary>
         <para>recursively define [for] loops iterating through nested arrays
 
