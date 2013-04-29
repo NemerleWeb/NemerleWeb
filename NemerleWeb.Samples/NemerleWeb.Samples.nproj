@@ -201,9 +201,6 @@
     <Compile Include="MVVM\Peg\JSPage.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MVVM\Peg\TSDeclarationPage.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MVVM\Samples.n">
       <SubType>Code</SubType>
     </Compile>
@@ -494,8 +491,8 @@
     <CreateItem Include="$(YourSourceDirectory)\**\*.*">
       <Output TaskParameter="Include" ItemName="YourFilesToCopy" />
     </CreateItem>
-    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy-&gt;'$(YourDestinationDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy-&gt;'$(YourDestinationDirectory2)\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(YourFilesToCopy)" DestinationFiles="@(YourFilesToCopy->'$(YourDestinationDirectory2)\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />

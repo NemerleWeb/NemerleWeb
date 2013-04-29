@@ -62,8 +62,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="nweb.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
     <Compile Include="Properties\NWebProperties.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="window.n">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

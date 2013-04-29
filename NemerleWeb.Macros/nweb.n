@@ -9,10 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NemerleWeb
+namespace NemerleWeb.Macros
 {
-  macro nweb_macro(expr) 
-  syntax("nweb", expr)
+  macro NWebMacro(expr) 
+  syntax("NWeb", expr)
   {
     def ctx = Macros.ImplicitCTX();
     NwebImpl.TransformNweb(expr, ctx);
@@ -69,7 +69,7 @@ $$(function() {
 #>
       ]>;
       res
-      | _ => Message.Error("Correct usage: nweb ClassName(arguments)"); <[ ]>
+      | _ => Message.Error("Correct usage: NWeb ClassName(arguments)"); <[ ]>
       }      
     }
     

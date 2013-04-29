@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NemerleWeb
+namespace NemerleWeb.Macros
 {      
   macro HandleOnce(eventName, eventArgs, context : string, body)   
   syntax ("handle", eventName, eventArgs, context, "once", body) 
@@ -64,7 +64,7 @@ namespace NemerleWeb
     {
       if(throttleDelay > 0) 
         <[
-          setTimeout(() => {
+          NemerleWeb.JSApi.setTimeout(() => {
             $body;
             NemerleWeb.Events.Invalidate();
           }, $throttleDelay);

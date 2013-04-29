@@ -6,7 +6,7 @@ namespace NemerleWeb
   /// Every JavaScript Api generated method throws this exception
   /// to prevent accidentally running client code on the server.
   /// </summary>
-  public class ClientCodeCalledInServerException : Exception
+  public class ClientCodeCalledInServerException : NotImplementedException
   {
     public this()
     {

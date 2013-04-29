@@ -9,6 +9,9 @@ using System.Linq;
 
 using NemerleWeb;
 
+// Not externally visible and has never been referenced
+#pragma warning disable 10003
+
 namespace Nemerle.Json
 {
   /// <summary>
