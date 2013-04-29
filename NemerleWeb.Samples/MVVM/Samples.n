@@ -45,7 +45,6 @@ namespace NemerleWeb.Samples
     Calculator : CalculatorPage { get; set; }
     Json : JsonPage { get; set; }
     JS : JSPage { get; set; }
-    TypeScript : TSDeclarationPage { get; set; }
     
     Sources : List[string * string] { get; set; }
     ThisPageSource : string { get; set; }
@@ -63,8 +62,7 @@ namespace NemerleWeb.Samples
       SinglePageApps = SPAPage();
       Calculator = CalculatorPage();
       Json = JsonPage();
-      JS = JSPage();
-      TypeScript = TSDeclarationPage();
+      JS = JSPage();      
             
       Samples = 
       [
@@ -88,7 +86,6 @@ namespace NemerleWeb.Samples
         Sample("Calculator", ["MVVM/Peg/CalculatorParser/CalcParser.n", "MVVM/Peg/CalculatorPage.n"], "", Calculator),
         Sample("Json", ["MVVM/Peg/JsonParser/JsonParser.n", "MVVM/Peg/JsonPage.n", "MVVM/Peg/JsonParser/Ast.n", "MVVM/Peg/JsonParser/JsonUtils.n"], "", Json),
         Sample("JavaScript", ["MVVM/Peg/JSParser/JSParser.n", "MVVM/Peg/JSPage.n", "MVVM/Peg/JSParser/Ast.n"], "", JS),
-        Sample("TypeScript", ["MVVM/Peg/TypeScriptInterfaceParser/TypeScriptInterfaceParser.n", "MVVM/Peg/TypeScriptInterfacePage.n"], "", TypeScript),
       ].ToList();
                  
       SelectedSample = Samples[2];

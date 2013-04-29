@@ -9,7 +9,7 @@ using System.Linq;
 using System.Xml;
 using System.Collections.Generic;
 
-namespace NemerleWeb
+namespace NemerleWeb.Macros
 {
   //tb.GetModifiers().AddCustomAttribute(<[ NemerleWeb.UnitAttribute ]>);
   

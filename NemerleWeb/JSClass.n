@@ -484,7 +484,7 @@ $(indent)}#>
       public static GetProperNameForJS([NotNull] typeInfo : TypeInfo) : string
       {
         def fullName = typeInfo.FullName;
-        
+       Message.Hint(fullName); 
         // Check default, if doesn't fit, check other roots.
         if(fullName.StartsWith(JSClassSettings.Default))
           fullName.Substring(JSClassSettings.Default.Length + 1)

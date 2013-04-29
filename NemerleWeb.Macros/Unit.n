@@ -18,7 +18,7 @@ using System.Text.RegularExpressions;
 using BF = System.Reflection.BindingFlags;
 using TExpr = Nemerle.Compiler.Typedtree.TExpr;
 
-namespace NemerleWeb
+namespace NemerleWeb.Macros
 {
   [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
   macro Unit(tb : TypeBuilder)
@@ -319,12 +319,6 @@ namespace NemerleWeb
       tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM, _view : TM -> string) : string { "" } ]>);
       tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM, _view : TM -> void -> string) : string { "" }]>);
       tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public GetTemplateName([NotNull] _modelName : string, [NotNull] _viewName : string) : string { "" } ]>);
-      
-      // TODO: Move out to JSApi
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public setTimeout(_callback : void -> void, _timeoutMilliseconds : int) : int { 0 } ]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public clearTimeout(_id : int) : void {} ]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public setInterval(_callback : void -> void, _timeoutMilliseconds : int) : int { 0 } ]> );
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public clearInterval(_id : int) : void {} ]>);
     }
   }
 }

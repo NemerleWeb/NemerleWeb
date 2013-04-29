@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 
-namespace NemerleWeb
+namespace NemerleWeb.Macros
 {
   macro JS(parameters : PExpr)
   syntax ("js", parameters)
