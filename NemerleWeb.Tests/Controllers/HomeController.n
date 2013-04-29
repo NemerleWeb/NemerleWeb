@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 using Nemerle;
 using NemerleWeb;
+using NemerleWeb.Macros;
 
 namespace NemerleWeb.Tests.Controllers
 {
@@ -13,17 +14,17 @@ namespace NemerleWeb.Tests.Controllers
   {
     public Index() : ActionResult
     {      
-      View((nweb UnitTestPage()) : object);
+      View((NWeb UnitTestPage()) : object);
     }
     
     public TemplateTests() : ActionResult
     {
-      View("Index", (nweb TemplateTestsPage()) : object);
+      View("Index", (NWeb TemplateTestsPage()) : object);
     }
     
     public ServerTests() : ActionResult
     {
-      View("Index", (nweb ServerTestPage()) : object);
+      View("Index", (NWeb ServerTestPage()) : object);
     }
   }
 }

@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 using Nemerle;
 using NemerleWeb;
+using NemerleWeb.Macros;
 
 namespace NemerleWeb.Samples.Controllers
 {
