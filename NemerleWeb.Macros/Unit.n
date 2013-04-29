@@ -38,7 +38,7 @@ namespace NemerleWeb.Macros
     UnitImpl.DoTransform(tb, Macros.ImplicitCTX())
   }
   
-  public module UnitImpl
+  module UnitImpl
   {    
     public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
     {
