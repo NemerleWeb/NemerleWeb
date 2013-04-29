@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using Nemerle;
 using NemerleWeb;
+using NemerleWeb.Macros;
 using System.Collections.Concurrent;
 
 namespace NemerleWeb.Samples
