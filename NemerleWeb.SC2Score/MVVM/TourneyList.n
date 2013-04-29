@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using NemerleWeb.Macros;
+
 namespace NemerleWeb.SC2Score
 { 
   [Unit]

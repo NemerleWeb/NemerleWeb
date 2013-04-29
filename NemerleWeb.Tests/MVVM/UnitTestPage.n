@@ -9,6 +9,7 @@ using Nemerle;
 using Nemerle.Utility;
 
 using Nemerle.Peg;
+using NemerleWeb.Macros;
 using NemerleWeb.Tests.Macro;
 
 namespace NemerleWeb.Tests
