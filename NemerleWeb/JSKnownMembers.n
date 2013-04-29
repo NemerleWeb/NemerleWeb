@@ -102,7 +102,7 @@ namespace NemerleWeb
           else
             ConvertFixedTypeMethod(o.Type.FixedValue, builder'(o), meth, parms.Map(paramBuilder))
         | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) =>
-            ConvertMethod(fromType.TypeInfo, builder'(left), meth, parms.Map(paramBuilder))
+          ConvertMethod(fromType.TypeInfo, builder'(left), meth, parms.Map(paramBuilder))
         | Call(OpCode as op, parms, _) => JSAst.Call(builder'(op), parms.Map(paramBuilder))
         | Call(Base(baseCtor), parms, _) =>
           // Call base constructor for Unit bases
@@ -199,7 +199,7 @@ namespace NemerleWeb
           return parms.Head.ExternalMethodCall("", parms.Tail);
         // Static method
         else if(left is JSAst.StaticMethodRef)
-          return typeInfo.Name.StaticCall(member, parms);
+          return typeInfo.FullName.StaticCall(member, parms);
         // Instance method
         else
           return left.MethodCall(member, parms);

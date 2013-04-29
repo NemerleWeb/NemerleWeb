@@ -484,7 +484,7 @@ $(indent)}#>
       public static GetProperNameForJS([NotNull] typeInfo : TypeInfo) : string
       {
         def fullName = typeInfo.FullName;
-       Message.Hint(fullName); 
+        
         // Check default, if doesn't fit, check other roots.
         if(fullName.StartsWith(JSClassSettings.Default))
           fullName.Substring(JSClassSettings.Default.Length + 1)
@@ -500,17 +500,18 @@ $(indent)}#>
       
       public static GetProperName([NotNull] typeInfo : TypeInfo) : string 
       {
-        // If type or declaring has JSApi attribute, get proper name
-        def fullName = 
-          if(typeInfo.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute") ||
-             typeInfo.DeclaringType?.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
-            GetProperNameForJS(typeInfo)
-          else
-            typeInfo.FullName;
-        
-        def typeParams = if(typeInfo.Typarms.IsEmpty) "";
-                         else $"[..$(typeInfo.Typarms.Select(_.ToString()))]";
-        GetProperName(fullName + typeParams)
+        // If type or declaring has JSApi attribute, get proper name using special method
+        if(typeInfo.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute") ||
+           typeInfo.DeclaringType?.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
+        {
+          GetProperNameForJS(typeInfo)
+        }
+        else
+        {
+          def typeParams = if(typeInfo.Typarms.IsEmpty) "";
+                           else $"[..$(typeInfo.Typarms.Select(_.ToString()))]";
+          GetProperName(typeInfo.FullName + typeParams)
+        }
       }
         
       public static GetProperName([NotNull] type : Type) : string 
