@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 using Nemerle;
 using NemerleWeb;
+using NemerleWeb.Macros;
 
 namespace NemerleWeb.Rsdn.Controllers
 {
@@ -13,7 +14,7 @@ namespace NemerleWeb.Rsdn.Controllers
   {
     public Index() : ActionResult
     {
-      View((nweb MainPage()) : object);
+      View((NWeb MainPage()) : object);
     }
   }
 }

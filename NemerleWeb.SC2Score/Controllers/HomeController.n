@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 using Nemerle;
 using NemerleWeb;
+using NemerleWeb.Macros;
 
 namespace NemerleWeb.SC2Score.Controllers
 {
@@ -13,7 +14,7 @@ namespace NemerleWeb.SC2Score.Controllers
   {
     public Index() : ActionResult
     {
-      View((nweb MainPage(User(GetUserId()))) : object);
+      View((NWeb MainPage(User(GetUserId()))) : object);
     }
     
     private GetUserId() : string

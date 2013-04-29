@@ -199,7 +199,7 @@ namespace NemerleWeb
           return parms.Head.ExternalMethodCall("", parms.Tail);
         // Static method
         else if(left is JSAst.StaticMethodRef)
-          return typeInfo.FullName.StaticCall(member, parms);
+          return JSClass.GetProperNameForJS(typeInfo).StaticCall(member, parms);
         // Instance method
         else
           return left.MethodCall(member, parms);
