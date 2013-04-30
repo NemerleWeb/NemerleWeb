@@ -14,8 +14,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-[assembly: InternalsVisibleTo("NemerleWeb.Macros")]
-
 namespace NemerleWeb
 {
   module JSClassHelper
@@ -29,13 +27,11 @@ namespace NemerleWeb
       !ti.BaseType.IsInterface
     }
   }
-  
+    
   /// Defines settings for JSclass 
   internal module JSClassSettings
   {
-    public JSRoots : SortedSet[string] = SortedSet();
-    
-    public Default : string = "NemerleWeb.TypedJS";
+    public JSRoots : SortedSet[string] = SortedSet(["NemerleWeb.TypedJS"]);
   }
   
   [Record(NotNull = [".*"])]
@@ -486,16 +482,15 @@ $(indent)}#>
         def fullName = typeInfo.FullName;
         
         // Check default, if doesn't fit, check other roots.
-        if(fullName.StartsWith(JSClassSettings.Default))
-          fullName.Substring(JSClassSettings.Default.Length + 1)
-        else
-        {
-          def r = JSClassSettings.JSRoots.FirstOrDefault(root => fullName.StartsWith(root));
-          if(r != null)
-            fullName.Substring(r.Length + 1)
+        def root = JSClassSettings.JSRoots.FirstOrDefault(root => fullName.StartsWith(root));
+        
+        if(root != null)
+          if(fullName.Length == root.Length)
+            ""
           else
-            fullName
-        }
+            fullName.Substring(root.Length + 1)
+        else
+          fullName
       }
       
       public static GetProperName([NotNull] typeInfo : TypeInfo) : string 
