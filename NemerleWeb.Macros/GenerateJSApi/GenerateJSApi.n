@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 using TSParser;
 using NemerleWeb;
 
-namespace NemerleWeb.Macros
+namespace NemerleWeb
 {
   /// <summary>
   /// Parses d.ts files and creates an appropriate Nemerle types and variables.

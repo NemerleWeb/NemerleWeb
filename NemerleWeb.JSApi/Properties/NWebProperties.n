@@ -1,4 +1,4 @@
-﻿using NemerleWeb.Macros;
+﻿using NemerleWeb;
 
 [assembly: GenerateJSApi(
   Namespace = "NemerleWeb.JSApi",

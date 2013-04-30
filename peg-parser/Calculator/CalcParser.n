@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using NemerleWeb.Peg;
-using NemerleWeb.Macros;
 
 namespace Calculator
 {

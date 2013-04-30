@@ -1,5 +1,5 @@
 ﻿using NemerleWeb;
-using NemerleWeb.Macros;
+
 
 namespace NemerleWeb.Samples
 {

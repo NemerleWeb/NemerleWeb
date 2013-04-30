@@ -22,5 +22,10 @@ namespace NemerleWeb
       else
         Char.ToLowerInvariant(str[0]).ToString() + str.Substring(1);
     }
+    
+    public SplitDot(this s : string) : list[string]
+    {
+      s.Split('.').NToList()
+    }
   }
 }

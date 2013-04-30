@@ -7,8 +7,7 @@ using Nemerle.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using NemerleWeb.Macros;
+using NemerleWeb;
 
 namespace NemerleWeb.Tests
 {
