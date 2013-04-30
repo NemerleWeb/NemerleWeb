@@ -8,10 +8,10 @@ using NemerleWeb;
 namespace NemerleWeb.TypedJS
 {
   [JSApi]
-  public module nweb
+  public partial module nweb
   {
     [JSApi]
-    public module utils
+    public partial module utils
     {
       public areArraysEqual[TL, TR](l : array[TL], r : array[TR]) : bool { throw ClientCodeCalledInServerException(); }
     }

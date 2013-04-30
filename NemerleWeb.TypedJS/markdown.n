@@ -11,7 +11,7 @@ namespace NemerleWeb.TypedJS
   /// Description of markdown.
   /// </summary>
   [JSApi]
-  public module markdown
+  public partial module markdown
   {
     public toHTML(s : string) : string { throw ClientCodeCalledInServerException(); }
   }

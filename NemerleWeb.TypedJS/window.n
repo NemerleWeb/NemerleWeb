@@ -8,7 +8,7 @@ using NemerleWeb;
 namespace NemerleWeb.TypedJS
 {
   [JSApi]
-  public module window
+  public partial module window
   {
     
   }
@@ -17,7 +17,7 @@ namespace NemerleWeb.TypedJS
 namespace NemerleWeb
 {
   [JSApi]
-  public module TypedJS
+  public partial module TypedJS
   {
     public clearTimeout(@handle : float) : void { throw ClientCodeCalledInServerException(); }
     public setTimeout(expression : void -> void): float { throw ClientCodeCalledInServerException(); }
