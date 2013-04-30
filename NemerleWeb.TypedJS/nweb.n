@@ -5,7 +5,7 @@ using NemerleWeb;
 // method is not externally visible and has never been referenced
 #pragma warning disable 10003
 
-namespace NemerleWeb.JS
+namespace NemerleWeb.TypedJS
 {
   [JSApi]
   public module nweb

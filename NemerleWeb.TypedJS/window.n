@@ -5,7 +5,7 @@ using NemerleWeb;
 // method is not externally visible and has never been referenced
 #pragma warning disable 10003
 
-namespace NemerleWeb.JS
+namespace NemerleWeb.TypedJS
 {
   [JSApi]
   public module window
@@ -17,7 +17,7 @@ namespace NemerleWeb.JS
 namespace NemerleWeb
 {
   [JSApi]
-  public module JS
+  public module TypedJS
   {
     public clearTimeout(@handle : float) : void { throw ClientCodeCalledInServerException(); }
     public setTimeout(expression : void -> void): float { throw ClientCodeCalledInServerException(); }
