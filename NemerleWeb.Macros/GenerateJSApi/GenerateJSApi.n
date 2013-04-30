@@ -526,6 +526,11 @@ namespace NemerleWeb
       }
     }
     
-    #endregion     
+    #endregion
+	
+	public SplitDot(this s : string) : list[string]
+    {
+      s.Split('.').NToList()
+    }
   }
 }

@@ -1,0 +1,31 @@
+using NemerleWeb;
+
+// a function parameter was never used
+#pragma warning disable 168
+// method is not externally visible and has never been referenced
+#pragma warning disable 10003
+
+namespace NemerleWeb.JS
+{
+  [JSApi]
+  public module window
+  {
+    
+  }
+}
+
+namespace NemerleWeb
+{
+  [JSApi]
+  public module JS
+  {
+    public clearTimeout(@handle : float) : void { throw ClientCodeCalledInServerException(); }
+    public setTimeout(expression : void -> void): float { throw ClientCodeCalledInServerException(); }
+    public setTimeout(expression : void -> void, msec : float): float { throw ClientCodeCalledInServerException(); }
+    public setTimeout(expression : void -> void, msec : float, language : string): float { throw ClientCodeCalledInServerException(); }
+    public clearInterval(@handle : float): void { throw ClientCodeCalledInServerException(); }
+    public setInterval(expression : void -> void): float { throw ClientCodeCalledInServerException(); }
+    public setInterval(expression : void -> void, msec : float): float { throw ClientCodeCalledInServerException(); }
+    public setInterval(expression : void -> void, msec : float, language : string): float { throw ClientCodeCalledInServerException(); }
+  }
+}
