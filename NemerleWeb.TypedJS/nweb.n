@@ -7,13 +7,13 @@ using NemerleWeb;
 
 namespace NemerleWeb.TypedJS
 {
-  [JSApi]
+  [JSApi][JSApiImpl]
   public partial module nweb
   {
-    [JSApi]
+    [JSApi][JSApiImpl]
     public partial module utils
     {
-      public areArraysEqual[TL, TR](l : array[TL], r : array[TR]) : bool { throw ClientCodeCalledInServerException(); }
+      public areArraysEqual[TL, TR](l : array[TL], r : array[TR]) : bool;
     }
   }
 }

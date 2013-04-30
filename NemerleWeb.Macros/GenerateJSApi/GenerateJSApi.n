@@ -527,8 +527,8 @@ namespace NemerleWeb
     }
     
     #endregion
-	
-	public SplitDot(this s : string) : list[string]
+  
+  public SplitDot(this s : string) : list[string]
     {
       s.Split('.').NToList()
     }
