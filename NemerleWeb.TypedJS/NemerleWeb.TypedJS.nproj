@@ -281,7 +281,13 @@
 		To modify your build process, add your task inside one of the targets below and uncomment it. 
 		Other similar extension points exist, see Microsoft.Common.targets. -->
 	<Target Name="BeforeBuild">
-	  <Exec Condition="!Exists('TS')" Command="git clone https://github.com/borisyankov/DefinitelyTyped.git TS" />
+      <PropertyGroup>
+        <TSFiles>$(MSBuildProjectDirectory)TS\*.*</TSFiles>
+      </PropertyGroup>
+      <ItemGroup>
+        <TSFiles Include="$(TSFiles)" />
+      </ItemGroup>	  
+	  <Exec Condition="'@(TSFiles)' == ''" Command="git submodule update --init --recursive" WorkingDirectory="$(SolutionDir)" />
 	</Target>
 	<Target Name="AfterBuild">
 	</Target>
