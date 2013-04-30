@@ -101,25 +101,25 @@
       <AssemblyName>Owin.dll</AssemblyName>
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
-    <Reference Include="ServiceStack.Common, Version=3.9.35.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="ServiceStack.Common, Version=3.9.43.0, Culture=neutral, PublicKeyToken=null">
       <Name>ServiceStack.Common</Name>
       <AssemblyName>ServiceStack.Common.dll</AssemblyName>
-      <HintPath>..\packages\ServiceStack.Common.3.9.35\lib\net35\ServiceStack.Common.dll</HintPath>
+      <HintPath>..\packages\ServiceStack.Common.3.9.43\lib\net35\ServiceStack.Common.dll</HintPath>
     </Reference>
-    <Reference Include="ServiceStack.Interfaces, Version=3.9.35.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="ServiceStack.Interfaces, Version=3.9.43.0, Culture=neutral, PublicKeyToken=null">
       <Name>ServiceStack.Interfaces</Name>
       <AssemblyName>ServiceStack.Interfaces.dll</AssemblyName>
-      <HintPath>..\packages\ServiceStack.Common.3.9.35\lib\net35\ServiceStack.Interfaces.dll</HintPath>
+      <HintPath>..\packages\ServiceStack.Common.3.9.43\lib\net35\ServiceStack.Interfaces.dll</HintPath>
     </Reference>
-    <Reference Include="ServiceStack.Redis, Version=3.9.35.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="ServiceStack.Redis, Version=3.9.43.0, Culture=neutral, PublicKeyToken=null">
       <Name>ServiceStack.Redis</Name>
       <AssemblyName>ServiceStack.Redis.dll</AssemblyName>
-      <HintPath>..\packages\ServiceStack.Redis.3.9.35\lib\net35\ServiceStack.Redis.dll</HintPath>
+      <HintPath>..\packages\ServiceStack.Redis.3.9.43\lib\net35\ServiceStack.Redis.dll</HintPath>
     </Reference>
-    <Reference Include="ServiceStack.Text, Version=3.9.35.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="ServiceStack.Text, Version=3.9.43.0, Culture=neutral, PublicKeyToken=null">
       <Name>ServiceStack.Text</Name>
       <AssemblyName>ServiceStack.Text.dll</AssemblyName>
-      <HintPath>..\packages\ServiceStack.Text.3.9.35\lib\net35\ServiceStack.Text.dll</HintPath>
+      <HintPath>..\packages\ServiceStack.Text.3.9.43\lib\net35\ServiceStack.Text.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

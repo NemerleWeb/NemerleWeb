@@ -16,6 +16,8 @@ Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.SC2Score", "Neme
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "TSParser", "TSParser\TSParser.nproj", "{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}"
 EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.JSApi", "NemerleWeb.JSApi\NemerleWeb.JSApi.nproj", "{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,14 @@ Global
 		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

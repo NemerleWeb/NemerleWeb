@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NemerleWeb;
+using NemerleWeb.JS;
 
 namespace NemerleWeb.SC2Score
 {
@@ -51,7 +52,7 @@ namespace NemerleWeb.SC2Score
     public RenderMarkdown() : void
     {
       when(Source != null)
-        _rendered = callJs.[string]("markdown.toHTML", Source);
+        _rendered = markdown.toHTML(Source);
     }
     
     public SourceChanged() : void
