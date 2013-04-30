@@ -7,7 +7,7 @@ using NemerleWeb;
 
 namespace NemerleWeb.TypedJS
 {
-  [JSApi]
+  [JSApi][JSApiImpl]
   public partial module window
   {
     
@@ -16,16 +16,16 @@ namespace NemerleWeb.TypedJS
 
 namespace NemerleWeb
 {
-  [JSApi]
+  [JSApi][JSApiImpl]
   public partial module TypedJS
   {
-    public clearTimeout(@handle : float) : void { throw ClientCodeCalledInServerException(); }
-    public setTimeout(expression : void -> void): float { throw ClientCodeCalledInServerException(); }
-    public setTimeout(expression : void -> void, msec : float): float { throw ClientCodeCalledInServerException(); }
-    public setTimeout(expression : void -> void, msec : float, language : string): float { throw ClientCodeCalledInServerException(); }
-    public clearInterval(@handle : float): void { throw ClientCodeCalledInServerException(); }
-    public setInterval(expression : void -> void): float { throw ClientCodeCalledInServerException(); }
-    public setInterval(expression : void -> void, msec : float): float { throw ClientCodeCalledInServerException(); }
-    public setInterval(expression : void -> void, msec : float, language : string): float { throw ClientCodeCalledInServerException(); }
+    public clearTimeout(@handle : float) : void;
+    public setTimeout(expression : void -> void) : float;
+    public setTimeout(expression : void -> void, msec : float) : float;
+    public setTimeout(expression : void -> void, msec : float, language : string) : float;
+    public clearInterval(@handle : float) : void;
+    public setInterval(expression : void -> void) : float;
+    public setInterval(expression : void -> void, msec : float) : float;
+    public setInterval(expression : void -> void, msec : float, language : string) : float;
   }
 }
