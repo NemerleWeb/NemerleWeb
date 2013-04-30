@@ -1,0 +1,3 @@
+[submodule "NemerleWeb.TypedJS/TS"]
+	path = NemerleWeb.TypedJS/TS
+	url = https://github.com/borisyankov/DefinitelyTyped.git
