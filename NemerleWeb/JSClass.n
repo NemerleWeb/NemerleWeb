@@ -35,7 +35,7 @@ namespace NemerleWeb
   {
     public JSRoots : SortedSet[string] = SortedSet();
     
-    public Default : string = "NemerleWeb.JS";
+    public Default : string = "NemerleWeb.TypedJS";
   }
   
   [Record(NotNull = [".*"])]

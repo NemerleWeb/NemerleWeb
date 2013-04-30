@@ -64,7 +64,7 @@ namespace NemerleWeb
     {
       if(throttleDelay > 0) 
         <[
-          NemerleWeb.JSApi.setTimeout(() => {
+          NemerleWeb.TypedJS.setTimeout(() => {
             $body;
             NemerleWeb.Events.Invalidate();
           }, $throttleDelay);
