@@ -62,6 +62,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="markdown.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="nweb.n">
       <SubType>Code</SubType>
     </Compile>
