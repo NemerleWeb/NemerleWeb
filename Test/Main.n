@@ -16,7 +16,7 @@ module Program
 {
   Main() : void
   {
-    def result = nweb Test();
+    def result = NWeb Test();
     
     foreach (s in NWebData.GetAllScriptNames())
       WriteLine(NWebData.GetScript(s));
