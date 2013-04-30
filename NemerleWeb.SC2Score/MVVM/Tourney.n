@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NemerleWeb;
-using NemerleWeb.JS;
+using NemerleWeb.TypedJS;
 
 namespace NemerleWeb.SC2Score
 {
