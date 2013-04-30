@@ -18,7 +18,7 @@ using TExpr = Nemerle.Compiler.Typedtree.TExpr;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 
-namespace NemerleWeb.Macros
+namespace NemerleWeb
 {
   macro signal_macro(expr) 
   syntax("signal", expr)

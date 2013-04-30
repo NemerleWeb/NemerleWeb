@@ -7,7 +7,6 @@ using Nemerle.Utility;
 
 using NemerleWeb.Peg;
 using NemerleWeb;
-using NemerleWeb.Macros;
 
 namespace JSEngine {
 
