@@ -6,7 +6,7 @@
     <NemerleBinPathRoot Condition=" '$(Configuration)' == 'Release' ">$(SolutionDir)\Nemerle</NemerleBinPathRoot>
     <NemerleBinPathRoot Condition=" '$(NemerleBinPathRoot)' == '' ">$(ProgramFiles)\Nemerle</NemerleBinPathRoot>
     <Nemerle Condition=" '$(Nemerle)' == '' ">$(NemerleBinPathRoot)\$(NemerleVersion)</Nemerle>
-    <Name>NemerleWeb.JSApi</Name>
+    <Name>NemerleWeb.TypedJS</Name>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
@@ -18,8 +18,8 @@
     <ProjectGuid>{65c01c91-f57a-4281-b09f-15baa5ac3cc6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NemerleWeb.JSApi</RootNamespace>
-    <AssemblyName>NemerleWeb.JSApi</AssemblyName>
+    <RootNamespace>NemerleWeb.TypedJS</RootNamespace>
+    <AssemblyName>NemerleWeb.TypedJS</AssemblyName>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

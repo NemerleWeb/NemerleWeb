@@ -12,13 +12,13 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  macro JSMacro(parameters : PExpr)
+  macro JS(parameters : PExpr)
   syntax ("js", parameters)
   {
-    JSMacroImpl.DoTransform(Macros.ImplicitCTX(), parameters)
+    JSImpl.DoTransform(Macros.ImplicitCTX(), parameters)
   }
   
-  module JSMacroImpl
+  module JSImpl
   {
     public DoTransform(typer : Typer, _parameters : PExpr) : PExpr
     {
