@@ -480,7 +480,7 @@ $(indent)}#>
       
       /// <summary>
       /// Take full name, remove prefix specified in JSClassSettings.JSRoots.
-      /// </summary
+      /// </summary>
       public static GetProperNameForJS([NotNull] typeInfo : TypeInfo) : string
       {
         def fullName = typeInfo.FullName;
