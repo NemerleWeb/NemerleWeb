@@ -39,7 +39,7 @@ namespace NemerleWeb
   }
   
   module UnitImpl
-  {    
+  {
     public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);
@@ -58,9 +58,18 @@ namespace NemerleWeb
       CreateResourceController(tb, typer);
     }
     
+    static mutable collectedJSApiRoots : bool = false;
+    
     public DoTransform(tb : TypeBuilder, typer : Typer) : void
     {            
       Macros.DefineCTX(typer);
+      
+      // Do not collect JS roots twice
+      when(!collectedJSApiRoots)
+      {
+        CollectJSApiRoots(typer);
+        collectedJSApiRoots = true;
+      }
       
       def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");
       def serverMethods = Dictionary();
@@ -153,6 +162,29 @@ namespace NemerleWeb
           def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");
           AddLambdasData(tb, lambdas);
       };
+    }
+
+    private CollectJSApiRoots(typer : Typer) : void
+    {
+      def collect(assembly)
+      {
+        when(assembly != null)
+        {
+          def jsApiRoots = assembly
+            .GetCustomAttributes(typeof(NemerleWeb.JSApiRootAttribute), false)
+            .Cast.[NemerleWeb.JSApiRootAttribute]();        
+          
+          foreach(r in jsApiRoots)
+            when(!string.IsNullOrEmpty(r.Root) && !string.IsNullOrWhiteSpace(r.Root))
+              _ = JSClassSettings.JSApiRoots.Add(r.Root);
+        }
+      }
+      
+      // Collect from current and referenced assemblies
+      collect(typer.Env.Manager.GeneratedAssembly);
+      
+      foreach(lib in typer.Env.Manager.ReferencedAssemblies)
+        collect(lib.Assembly);
     }
     
     public SaveUnitDataToFile(typer : Typer, filename : string, data : string) : string

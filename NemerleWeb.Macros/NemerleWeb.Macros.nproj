@@ -96,9 +96,6 @@
     <Compile Include="GenerateJSApi\JSApiImpl.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GenerateJSApi\JSApiRoot.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="GenerateJSApi\Scope.n">
       <SubType>Code</SubType>
     </Compile>
