@@ -1,7 +1,10 @@
 ﻿using NemerleWeb;
 
-[assembly: GenerateJSApi(
-  Namespace = "NemerleWeb.TypedJS",
+[assembly: GenerateTypedJS(
+  Root = "NemerleWeb.TypedJS",
   Lib = @"TS\_infrastructure\tests\typescript_0.8.3\lib.d.ts",
   Files = [ ("TS", @"TS\\(_infrastructure|i18next\\lib)\\") ]
 )]
+
+// TODO: Remove after we know how to add assembly macro attribute automatically
+[assembly: JSApiRoot("NemerleWeb.TypedJS")]
