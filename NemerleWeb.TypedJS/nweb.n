@@ -7,10 +7,10 @@ using NemerleWeb;
 
 namespace NemerleWeb.TypedJS
 {
-  [JSApi][JSApiImpl]
+  [JSApiImpl]
   public partial module nweb
   {
-    [JSApi][JSApiImpl]
+    [JSApiImpl]
     public partial module utils
     {
       public areArraysEqual[TL, TR](l : array[TL], r : array[TR]) : bool;

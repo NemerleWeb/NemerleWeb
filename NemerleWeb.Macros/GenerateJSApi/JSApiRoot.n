@@ -16,17 +16,17 @@ using NemerleWeb;
 namespace NemerleWeb
 {
   [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Assembly)]
-  macro JSRoot([NotNull] root : string)
+  macro JSApiRoot([NotNull] root : string)
   {
-    JSRootImpl.DoTransform(Macros.ImplicitCTX(), root)
+    JSApiRootImpl.DoTransform(Macros.ImplicitCTX(), root)
   }
   
-  module JSRootImpl
+  module JSApiRootImpl
   {
     public DoTransform(typer : Typer, root : string) : void
-    {
+    {assert2(false);
       Macros.DefineCTX(typer);
-      _ = JSClassSettings.JSRoots.Add(root);
+      _ = JSClassSettings.JSApiRoots.Add(root);
     }
   }
 }

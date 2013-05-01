@@ -27,7 +27,7 @@ namespace NemerleWeb
   ///
   /// Example, assuming we have all files in TS directory:
   ///   [assembly: GenerateJSApi(
-  ///     Namespace = "JSApi"
+  ///     Namespace = "TypedJS"
   ///     Lib = @"TS\_infrastructure\1.0\lib.d.ts",
   ///     Files =
   ///     [
@@ -56,9 +56,9 @@ namespace NemerleWeb
   ///
   /// </summary>
   [Nemerle.MacroUsage(Nemerle.MacroPhase.BeforeInheritance, Nemerle.MacroTargets.Assembly)]
-  macro GenerateJSApi(params options : list[PExpr])
+  macro GenerateTypedJS(params options : list[PExpr])
   {
-    GenerateJSApiImpl.Impl(ImplicitCTX(), options)
+    GenerateTypedJSImpl.Impl(ImplicitCTX(), options)
   }
   
   [Record]
@@ -71,12 +71,12 @@ namespace NemerleWeb
   [Record]
   class GenerateArgs
   {
-    public Namespace : string { get; }
+    public Root : string { get; }
     public Lib : string { get; }
     public Args : IEnumerable[DirectoryArg] { get; }
   }
   
-  module GenerateJSApiImpl
+  module GenerateTypedJSImpl
   {
     #region Implementation
     
@@ -97,15 +97,15 @@ namespace NemerleWeb
       def finalAst = AnalyzeTSAst(tsAsts);
       
       // Step 4: Generate
-      GenerateCode(typer, args.Namespace, finalAst);
+      GenerateCode(typer, args.Root, finalAst);
     }
     
     private ParseArgs(options : list[PExpr]) : GenerateArgs
     {
       match(options)
       {
-      | [<[ Namespace = $(ns : string) ]>, <[ Files = {..$files} ]> ] with lib = ""
-      | [<[ Namespace = $(ns : string) ]>, <[ Lib = $(lib : string) ]>, <[ Files = [..$files] ]>] =>
+      | [<[ Root = $(root : string) ]>, <[ Files = {..$files} ]> ] with lib = ""
+      | [<[ Root = $(root : string) ]>, <[ Lib = $(lib : string) ]>, <[ Files = [..$files] ]>] =>
         // Convert PExpr sequence to regular type
         def filesArg = files.Select(
           f => match(f)
@@ -116,15 +116,15 @@ namespace NemerleWeb
             Message.Error("You must specify at most 2 arguments: directory and exclude pattern");
             null
           });
-        GenerateArgs(ns, lib, filesArg)
+        GenerateArgs(root, lib, filesArg)
       | _ =>
-        Message.Error("Specify Namespace, Files parameter and optional Lib");
+        Message.Error("Specify Root, Files parameter and optional Lib");
         null
       }
     }
     
     #endregion
-     
+    
     #region PreParse
     
     private PreParseTSAll(projectDir : string, lib : string, args : IEnumerable[DirectoryArg]) : HashSet[string]
@@ -266,10 +266,10 @@ namespace NemerleWeb
     
     #region Generate
     
-    GenerateCode(typer : Typer, ns : string, tsAst : IEnumerable[TSGlobal]) : void
+    GenerateCode(typer : Typer, root : string, tsAst : IEnumerable[TSGlobal]) : void
     {
-      def jsApiNamespace = typer.Env.EnterIntoNamespace(ns.Split('.').NToList());
-      def jsApiModule = CreateModule(ns, Scope(typer.Env));
+      def jsApiNamespace = typer.Env.EnterIntoNamespace(root.SplitDot());
+      def jsApiModule = CreateModule(root, Scope(typer.Env));
       
       // Generate members
       foreach(e in tsAst) 
@@ -318,12 +318,12 @@ namespace NemerleWeb
         // TODO: Add parameters
         when(!function.ReturnType.ToString().Contains("."))
         {
-        _ = jsApi.DefineWithSource(<[ decl: 
-          $(fname : usesite)() : $(ConvertType(function.ReturnType, jsApiNamespace))
-          {
-            throw ClientCodeCalledInServerException();
-          }
-        ]>);
+          _ = jsApi.DefineWithSource(<[ decl: 
+            $(fname : usesite)() : $(ConvertType(function.ReturnType, jsApiNamespace))
+            {
+              throw ClientCodeCalledInServerException();
+            }
+          ]>);
         }
       }
       else
@@ -528,7 +528,7 @@ namespace NemerleWeb
     
     #endregion
   
-  public SplitDot(this s : string) : list[string]
+    public SplitDot(this s : string) : list[string]
     {
       s.Split('.').NToList()
     }

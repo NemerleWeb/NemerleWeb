@@ -31,7 +31,7 @@ namespace NemerleWeb
   /// Defines settings for JSclass 
   internal module JSClassSettings
   {
-    public JSRoots : SortedSet[string] = SortedSet(["NemerleWeb.TypedJS"]);
+    public JSApiRoots : SortedSet[string] = SortedSet();
   }
   
   [Record(NotNull = [".*"])]
@@ -475,14 +475,14 @@ $(indent)}#>
       }
       
       /// <summary>
-      /// Take full name, remove prefix specified in JSClassSettings.JSRoots.
+      /// Take full name, remove prefix specified in JSClassSettings.JSApiRoots.
       /// </summary>
       public static GetProperNameForJS([NotNull] typeInfo : TypeInfo) : string
       {
         def fullName = typeInfo.FullName;
         
         // Check default, if doesn't fit, check other roots.
-        def root = JSClassSettings.JSRoots.FirstOrDefault(root => fullName.StartsWith(root));
+        def root = JSClassSettings.JSApiRoots.FirstOrDefault(root => fullName.StartsWith(root));
         
         if(root != null)
           if(fullName.Length == root.Length)

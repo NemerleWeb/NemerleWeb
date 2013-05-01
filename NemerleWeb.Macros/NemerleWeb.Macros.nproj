@@ -90,13 +90,13 @@
     <Compile Include="EventsDSL\EventsMacros.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GenerateJSApi\GenerateJSApi.n">
+    <Compile Include="GenerateJSApi\GenerateTypedJS.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GenerateJSApi\JSApiImpl.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GenerateJSApi\JSRoot.n">
+    <Compile Include="GenerateJSApi\JSApiRoot.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GenerateJSApi\Scope.n">

@@ -16,7 +16,7 @@ namespace NemerleWeb
   /// <summary>
   /// Automatically implement JSApi classes.
   /// </summary>
-  [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
+  [MacroUsage(MacroPhase.BeforeTypedMembers, MacroTargets.Class)]
   macro JSApiImpl(typeBuilder : TypeBuilder)
   {
     JSApiImplImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder)
@@ -28,9 +28,15 @@ namespace NemerleWeb
     {
       Macros.DefineCTX(typer);
       
-      foreach (ast is TopDeclaration.Class in typeBuilder.AstParts)
-        foreach (function is ClassMember.Function in ast.decls)
-          function.Body = <[ throw NemerleWeb.ClientCodeCalledInServerException(); ]>;
+      // Iterate all functions, add default implementation only to not implemented functions.
+      foreach(ast is TopDeclaration.Class in typeBuilder.AstParts)
+        foreach(function is ClassMember.Function in ast.decls)
+           when(function.Body is <[]> || function.Body is <[ () ]>)
+            function.Body = <[ throw NemerleWeb.ClientCodeCalledInServerException(); ]>;
+      
+      // Addd JSApi attribute if it hasn't been added
+      when(!typeBuilder.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
+        typeBuilder.Ast.AddCustomAttribute(<[ NemerleWeb.JSApiAttribute ]>);
     }
   }
 }
