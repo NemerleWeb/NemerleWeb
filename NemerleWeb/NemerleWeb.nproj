@@ -121,6 +121,9 @@
     <Compile Include="IPage.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JSApiRootAttribute.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JSAst.n">
       <SubType>Code</SubType>
     </Compile>

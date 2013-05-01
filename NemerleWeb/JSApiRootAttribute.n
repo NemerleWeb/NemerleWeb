@@ -1,0 +1,23 @@
+﻿using Nemerle;
+using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  /// <summary>
+  /// Root name for JS API.
+  /// This prefix is automatically excluded while generating JS.
+  /// </summary>
+  [AttributeUsage(AttributeTargets.Assembly)]
+  [Record(NotNull = ".*")]
+  public class JSApiRootAttribute : Attribute
+  {
+    public Root : string { get; }
+  }
+}
