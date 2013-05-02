@@ -14,7 +14,7 @@ namespace NemerleWeb
   /// Root name for JS API.
   /// This prefix is automatically excluded while generating JS.
   /// </summary>
-  [AttributeUsage(AttributeTargets.Assembly)]
+  [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
   [Record(NotNull = ".*")]
   public class JSApiRootAttribute : Attribute
   {

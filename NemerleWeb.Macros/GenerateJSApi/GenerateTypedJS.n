@@ -84,7 +84,14 @@ namespace NemerleWeb
     
     public Impl(typer : Typer, options : list[PExpr]) : void
     {
+      DefineCTX(typer);
+      
       def args = ParseArgs(options);
+      
+      // Add assembly level attribute
+      Manager().Hierarchy.AddAssemblyAttribute(
+        Manager().CoreEnv,
+        <[ NemerleWeb.JSApiRootAttribute($(args.Root : string)) ]>);
       
       // Step 1: PreParse
       def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
