@@ -2,7 +2,7 @@
 [Dd]ebug*/
 [Oo]bj*/
 [Rr]elease*/
-Scripts/typings/
+NemerleWeb.TypedJS/Scripts/typings/
 
 *.ReSharper
 _ReSharper.*
