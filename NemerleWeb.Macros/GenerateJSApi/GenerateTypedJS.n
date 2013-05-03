@@ -521,11 +521,11 @@ namespace NemerleWeb
           null
         }
       | [hd] =>
-        def t = outer.Define(<[ decl: public partial class $(hd : usesite) {} ]>);
+        def t = outer.Define(<[ decl: public partial module $(hd : usesite) {} ]>);
         t.Compile();
         t
       | hd :: tl =>
-        def innerModule = outer.Define(<[ decl: public partial class $(hd : usesite) {} ]>);
+        def innerModule = outer.Define(<[ decl: public partial module $(hd : usesite) {} ]>);
         def t = CreateModule(tl, Scope(innerModule));
         innerModule.Compile();
         t
