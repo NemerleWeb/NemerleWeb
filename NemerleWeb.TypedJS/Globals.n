@@ -5,10 +5,12 @@
 // method is not externally visible and has never been referenced
 #pragma warning disable 10003
 
+[assembly: NemerleWeb.JSApiRoot("NemerleWeb.TypedJSManual")]
+
 namespace NemerleWeb
 {
   [JSApiImpl]
-  public partial module TypedJS
+  public partial module TypedJSManual
   {
     public clearTimeout(@handle : float) : void;
     public setTimeout(expression : void -> void) : float;
@@ -18,5 +20,19 @@ namespace NemerleWeb
     public setInterval(expression : void -> void) : float;
     public setInterval(expression : void -> void, msec : float) : float;
     public setInterval(expression : void -> void, msec : float, language : string) : float;
+  }
+}
+
+namespace NemerleWeb.TypedJSManual
+{
+  [JSApiImpl]
+  public partial class RegExp
+  {
+    public this(pattern : string);
+    public compile() : void;
+    public compile(pattern : string) : void;
+    public compile(pattern : string, modifier : string) : void;
+    public exec(input : string) : array[string];
+    public test(input : string) : bool;
   }
 }
