@@ -62,6 +62,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Globals.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="markdown.n">
       <SubType>Code</SubType>
     </Compile>
@@ -280,15 +283,15 @@
   <!--
 		To modify your build process, add your task inside one of the targets below and uncomment it. 
 		Other similar extension points exist, see Microsoft.Common.targets. -->
-	<Target Name="BeforeBuild">
-      <PropertyGroup>
-        <TSFiles>$(MSBuildProjectDirectory)TS\*.*</TSFiles>
-      </PropertyGroup>
-      <ItemGroup>
-        <TSFiles Include="$(TSFiles)" />
-      </ItemGroup>	  
-	  <Exec Condition="'@(TSFiles)' == ''" Command="git submodule update --init --recursive" WorkingDirectory="$(SolutionDir)" />
-	</Target>
-	<Target Name="AfterBuild">
-	</Target>
+  <Target Name="BeforeBuild">
+    <PropertyGroup>
+      <TSFiles>$(MSBuildProjectDirectory)TS\*.*</TSFiles>
+    </PropertyGroup>
+    <ItemGroup>
+      <TSFiles Include="$(TSFiles)" />
+    </ItemGroup>
+    <Exec Condition="'@(TSFiles)' == ''" Command="git submodule update --init --recursive" WorkingDirectory="$(SolutionDir)" />
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
 </Project>

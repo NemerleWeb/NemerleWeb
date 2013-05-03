@@ -13,19 +13,3 @@ namespace NemerleWeb.TypedJS
     
   }
 }
-
-namespace NemerleWeb
-{
-  [JSApiImpl]
-  public partial module TypedJS
-  {
-    public clearTimeout(@handle : float) : void;
-    public setTimeout(expression : void -> void) : float;
-    public setTimeout(expression : void -> void, msec : float) : float;
-    public setTimeout(expression : void -> void, msec : float, language : string) : float;
-    public clearInterval(@handle : float) : void;
-    public setInterval(expression : void -> void) : float;
-    public setInterval(expression : void -> void, msec : float) : float;
-    public setInterval(expression : void -> void, msec : float, language : string) : float;
-  }
-}
