@@ -6,6 +6,7 @@ using Nemerle.Assertions;
 using Nemerle.Utility;
 using Nemerle.Imperative;
 using NemerleWeb;
+using NemerleWeb.TypedJSManual;
 
 namespace NemerleWeb.Peg
 {
@@ -58,28 +59,5 @@ namespace NemerleWeb.Peg
       def len = Location.EndPos - Location.StartPos;
       $"$(Location.Source.FileName)$(Location.StartLineColumn.ToString()):[$pos:$len]: $msg"
     }
-  
-    // TODO: Remove
-      [JSApi]
-  public class RegExp
-  {
-    public this(_pattern : string) 
-    {}
-      
-    public compile() : void
-    {}
-    
-    public compile(_pattern : string) : void
-    {}
-    
-    public compile(_pattern : string, _modifier : string) : void
-    {}
-    
-    public exec(_input : string) : array[string]
-    {array(0)}
-    
-    public test(_input : string) : bool
-    {false}
-  }
   }
 }
