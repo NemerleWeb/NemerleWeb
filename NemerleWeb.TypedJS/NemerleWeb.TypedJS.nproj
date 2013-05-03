@@ -81,57 +81,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
-    <Folder Include="Scripts\" />
-    <Folder Include="Scripts\typings\" />
-    <Folder Include="Scripts\typings\bootstrap\" />
-    <Folder Include="Scripts\typings\jquery.validation\" />
-    <Folder Include="Scripts\typings\jqueryui\" />
-    <Folder Include="Scripts\typings\jquery\" />
-    <Folder Include="Scripts\typings\knockout.mapping\" />
-    <Folder Include="Scripts\typings\knockout.validation\" />
-    <Folder Include="Scripts\typings\knockout\" />
-    <Folder Include="Scripts\typings\modernizr\" />
-    <Folder Include="Scripts\typings\moment\" />
-    <Folder Include="Scripts\typings\requirejs\" />
-    <Folder Include="Scripts\typings\signalr\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Scripts\typings\bootstrap\bootstrap.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\typings\jquery.validation\jquery.validation.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\typings\jqueryui\jqueryui.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\typings\jquery\jquery.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\typings\knockout.mapping\knockout.mapping.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\typings\knockout.validation\knockout.validation.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\typings\knockout\knockout.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\typings\modernizr\modernizr.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\typings\moment\moment.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\typings\requirejs\require.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\typings\signalr\signalr.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="TS\**\*.ts">
-      <SubType>None</SubType>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <MacroReference Include="Nemerle.Linq">
@@ -143,6 +94,9 @@
     </MacroReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="lib.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
