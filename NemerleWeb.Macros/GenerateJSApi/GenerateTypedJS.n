@@ -303,7 +303,8 @@ namespace NemerleWeb
  
     private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
-      def varType = ConvertType(var.Name, var.Type, jsApiNamespace);
+      def typePrefix = var.Name + "_Variable";
+      def varType = ConvertType(typePrefix, var.Type, jsApiNamespace);
       // TODO: Remove check
       when(!varType.ToString().Contains("."))
         _ = jsApi.DefineWithSource(<[ decl: public $(var.Name : usesite) : $varType ]>);
@@ -319,8 +320,10 @@ namespace NemerleWeb
       // TODO: Add parameters
       when(!function.ReturnType.ToString().Contains("."))
       {
+        def typePrefix = function.Name + "_Return";
+        
         _ = jsApi.DefineWithSource(<[ decl: 
-          $(function.Name : usesite)() : $(ConvertType(function.Name, function.ReturnType, jsApiNamespace))
+          $(function.Name : usesite)() : $(ConvertType(typePrefix, function.ReturnType, jsApiNamespace))
           {
             throw ClientCodeCalledInServerException();
           }
@@ -392,13 +395,17 @@ namespace NemerleWeb
 
     #region Helpers
     
-    private GetParamsType(parms : IEnumerable[TSParam], jsApiNamespace : GlobalEnv) : IEnumerable[PExpr]
+    private GetParamsType(prefix : string, parms : IEnumerable[TSParam], jsApiNamespace : GlobalEnv) : IEnumerable[PExpr]
     {
+      def makePrefix(name)
+      {
+        $"$(prefix)_$(name)_Parameter"
+      }
       def convertParamsType(p : TSParam)
       {
         | Required(name, type, _access)
-        | Option(name, _, type, _access) => ConvertType(name, type, jsApiNamespace)
-        | Rest(name, type) => ConvertType(name, type, jsApiNamespace)
+        | Option(name, _, type, _access) => ConvertType(makePrefix(name), type, jsApiNamespace)
+        | Rest(name, type) => ConvertType(makePrefix(name), type, jsApiNamespace)
       }
     
       def ret = parms.Select(convertParamsType);
@@ -407,7 +414,7 @@ namespace NemerleWeb
     
     private CreateAnonymousType(prefix : string, members : list[TSObject], jsApiNamespace : GlobalEnv) : PExpr
     {
-      def className = $"$(prefix)AnonymousType";
+      def className = $"$(prefix)_AnonymousType";
       def anonClass = jsApiNamespace.Define(<[ decl: 
         public sealed class $(className : usesite)
         {
@@ -438,7 +445,7 @@ namespace NemerleWeb
       | Array(type, arity) => <[ array[$(ConvertType(prefix, TSType.Array(type, arity - 1), jsApiNamespace))] ]>
       | Bool => <[ bool ]>   
       | Lambda(parms, ret) =>
-        mutable lambdaParams = GetParamsType(parms, jsApiNamespace);
+        mutable lambdaParams = GetParamsType(prefix, parms, jsApiNamespace);
         def type =
           if(ret is TSType.Void())
             <[ System.Action ]>
