@@ -470,7 +470,7 @@ namespace TSParser
           PropertySignature;
         
         CallSignature      : TSObject = lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation?;
-        ConstructSignature : TSObject = new_s lparen_s ParameterListOpt rparen_s TypeAnnotation?;        
+        ConstructSignature : TSObject = new_s lparen_s ParameterListOpt rparen_s TypeAnnotation?;
         IndexSignature     : TSObject =
           lbrack_s Identifier required colon_s ("number" / "string") s rbrack_s TypeAnnotation;
         PropertySignature  : TSObject = AnyIdentifier optional TypeAnnotation?;
