@@ -59,11 +59,24 @@ namespace TSParser
     | Rest { Name : string; Type : TSType.Array; }
   }
   
+  // Index parameter type either number or string.
+  // Nothing else is allowed.
+  public variant TSIndexParamType
+  {
+    | Number
+    | String
+  }
+  
   public variant TSObject
   {
     | Call { Params : list[TSParam]; ReturnType : option[TSType]; }
     | Construct { Params : list[TSParam]; Type : option[TSType]; }
-    | Index { Parm : TSParam; Type : option[TSType]; }
+    | Index
+      { 
+        ParamName : string;
+        ParamType : TSIndexParamType;
+        ReturnType : TSType;
+      }
     | Property { Name : string; Optional : bool; Type : option[TSType]; }
     | Function
       {
