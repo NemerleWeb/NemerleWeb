@@ -105,7 +105,7 @@ namespace TSParser
     | Construct { Params : list[TSParam]; ReturnType : option[TSType]; }
     | Function
       {
-        Name : option[string];
+        Name : string;
         Params : list[TSParam];
         ReturnType : option[TSType];
       }

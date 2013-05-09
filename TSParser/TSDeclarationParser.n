@@ -665,7 +665,7 @@ namespace TSParser
         
         #region Ambient Variable Declarations (10.1.2)
         
-        AmbientFunctionDeclaration : TSGlobal = function_s AnyIdentifier? lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation? S;
+        AmbientFunctionDeclaration : TSGlobal = function_s Identifier lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation? S;
         
         // This rule is not by specification, but TypeScript parses it correctly.
         AmbientConstructDeclaration : TSGlobal = function_s new_s lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation? S;
@@ -949,7 +949,7 @@ namespace TSParser
       TSGlobal.Variable(id, type)
     }
     
-    AmbientFunctionDeclaration(name : option[string], parms : list[TSParam], returnType : option[TSType]) : TSGlobal
+    AmbientFunctionDeclaration(name : string, parms : list[TSParam], returnType : option[TSType]) : TSGlobal
     {
       TSGlobal.Function(name, parms, returnType)
     }
