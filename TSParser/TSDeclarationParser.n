@@ -470,10 +470,12 @@ namespace TSParser
           PropertySignature;
         
         CallSignature      : TSObject = lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation?;
-        ConstructSignature : TSObject = new_s lparen_s ParameterListOpt rparen_s TypeAnnotation?;
-        IndexSignature     : TSObject = lbrack_s RequiredParameter rbrack_s TypeAnnotation?;
+        ConstructSignature : TSObject = new_s lparen_s ParameterListOpt rparen_s TypeAnnotation?;        
+        IndexSignature     : TSObject =
+          lbrack_s Identifier required colon_s ("number" / "string") s rbrack_s TypeAnnotation;
         PropertySignature  : TSObject = AnyIdentifier optional TypeAnnotation?;
-        FunctionSignature  : TSObject = AnyIdentifier optional lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation?;
+        FunctionSignature  : TSObject =
+          AnyIdentifier optional lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation?;
         
         #endregion
         
@@ -834,9 +836,17 @@ namespace TSParser
       TSObject.Construct(parms, type)
     }
     
-    IndexSignature(parm : TSParam, type : option[TSType]) : TSObject
+    IndexSignature(paramName : string, paramType : NToken, returnType : TSType) : TSObject
     {
-      TSObject.Index(parm, type)
+      def indexParamType = 
+        match(GetText(paramType))
+        {
+        | "number" => TSIndexParamType.Number()
+        | "string" => TSIndexParamType.String()
+        | _ => assert(false);
+        };
+      
+      TSObject.Index(paramName, indexParamType, returnType)
     }
     
     PropertySignature(id : string, optional : bool, type : option[TSType]) : TSObject

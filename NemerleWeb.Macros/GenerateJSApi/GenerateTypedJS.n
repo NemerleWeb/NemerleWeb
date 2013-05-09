@@ -307,7 +307,7 @@ namespace NemerleWeb
       def varType = ConvertType(typePrefix, var.Type, jsApiNamespace);
       // TODO: Remove check
       when(!varType.ToString().Contains("."))
-        _ = jsApi.DefineWithSource(<[ decl: public $(var.Name : usesite) : $varType ]>);
+        _ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $varType ]>);
     }
   
     /// <summary>
@@ -322,7 +322,7 @@ namespace NemerleWeb
       {
         def typePrefix = function.Name + "_Return";
         
-        _ = jsApi.DefineWithSource(<[ decl: 
+        _ = jsApi.Define(<[ decl: 
           $(function.Name : usesite)() : $(ConvertType(typePrefix, function.ReturnType, jsApiNamespace))
           {
             throw ClientCodeCalledInServerException();
@@ -422,10 +422,48 @@ namespace NemerleWeb
       ]>);
       
       // Add members
+      foreach(member in members)
+      {
+      | Call      => ()
+      | Construct => ()
+      | Index(paramName, paramType, returnType) =>
+        def (realParamType, typeName) =
+          match(paramType)
+          {
+          | Number => (<[ float ]>, "Number")
+          | String => (<[ string ]>, "String")
+          };
+        
+        def returnTypePrefix = $"$(prefix)_$(typeName)_Index_Return";
+        def indexReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
+        
+        _ = anonClass.Define(
+          <[ decl:
+            public Item[$(paramName : usesite) : $realParamType] : $indexReturnType
+            {
+              get
+              {
+                throw ClientCodeCalledInServerException();
+              }
+              set
+              {
+                throw ClientCodeCalledInServerException();
+              }
+            }
+          ]>);
+      
+      | Property(name, _optional, type)  =>
+        // Don't pay attention to optional, always generate property      
+        def typePrefix = $"$(prefix)_$(name)_Property";
+        def propertyType = ConvertType(typePrefix, type, jsApiNamespace);
+        
+        _ = anonClass.Define(<[ decl: public mutable $(name : usesite) : $propertyType; ]>);
+      | Function  => ()
+      }
       
       // Finilize
-      anonClass.Compile();      
-      <[ $(anonClass.FullName) ]>
+      anonClass.Compile();
+      <[ $(anonClass.Name : usesite) ]>
     }
   
     private ConvertType(prefix : string, inputType : option[TSType], jsApiNamespace : GlobalEnv) : PExpr
