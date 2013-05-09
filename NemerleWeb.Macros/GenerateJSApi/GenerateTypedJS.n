@@ -303,41 +303,29 @@ namespace NemerleWeb
  
     private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
-      def varType = ConvertType(var.Type, jsApiNamespace);
+      def varType = ConvertType(var.Name, var.Type, jsApiNamespace);
       // TODO: Remove check
       when(!varType.ToString().Contains("."))
         _ = jsApi.DefineWithSource(<[ decl: public $(var.Name : usesite) : $varType ]>);
     }
   
+    /// <summary>
+    /// Creates function in module.
+    /// Global function can be without a name.
+    /// </summary>
     private CreateTSGlobalFunction(function : TSGlobal.Function, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
-      if (function.Name.IsSome)
-        CreateTSGlobalFunctionInModule(function, jsApi, jsApiNamespace)
-      else
-        Message.Error("Global functions must have name");
-    }
-    
-    private CreateTSGlobalFunctionInModule(function : TSGlobal.Function, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
-    {
-      if (function.Name is Some(fname))
+      // TODO: Remove check
+      // TODO: Add parameters
+      when(!function.ReturnType.ToString().Contains("."))
       {
-        // TODO: Remove check
-        // TODO: Add parameters
-        when(!function.ReturnType.ToString().Contains("."))
-        {
-          _ = jsApi.DefineWithSource(<[ decl: 
-            $(fname : usesite)() : $(ConvertType(function.ReturnType, jsApiNamespace))
-            {
-              throw ClientCodeCalledInServerException();
-            }
-          ]>);
-        }
-      }
-      else
-      {
-        // Create @() operator
-        // TODO: <[ decl: public static @()(this obj_ : this, ...)
-      }
+        _ = jsApi.DefineWithSource(<[ decl: 
+          $(function.Name : usesite)() : $(ConvertType(function.Name, function.ReturnType, jsApiNamespace))
+          {
+            throw ClientCodeCalledInServerException();
+          }
+        ]>);
+      }      
     }
     
     private CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, jsApiNamespace : GlobalEnv) : void
@@ -408,30 +396,46 @@ namespace NemerleWeb
     {
       def convertParamsType(p : TSParam)
       {
-        | Required(_, type, _)
-        | Option(_, _, type, _) => ConvertType(type, jsApiNamespace)
-        | Rest(_, type) => ConvertType(type, jsApiNamespace)
+        | Required(name, type, _access)
+        | Option(name, _, type, _access) => ConvertType(name, type, jsApiNamespace)
+        | Rest(name, type) => ConvertType(name, type, jsApiNamespace)
       }
     
       def ret = parms.Select(convertParamsType);
       ret
     }
+    
+    private CreateAnonymousType(prefix : string, members : list[TSObject], jsApiNamespace : GlobalEnv) : PExpr
+    {
+      def className = $"$(prefix)AnonymousType";
+      def anonClass = jsApiNamespace.Define(<[ decl: 
+        public sealed class $(className : usesite)
+        {
+        }
+      ]>);
+      
+      // Add members
+      
+      // Finilize
+      anonClass.Compile();      
+      <[ $(anonClass.FullName) ]>
+    }
   
-    private ConvertType(inputType : option[TSType], jsApiNamespace : GlobalEnv) : PExpr
+    private ConvertType(prefix : string, inputType : option[TSType], jsApiNamespace : GlobalEnv) : PExpr
     {
       match(inputType)
       {
-      | Some(type) => ConvertType(type, jsApiNamespace)
+      | Some(type) => ConvertType(prefix, type, jsApiNamespace)
       | None => <[ object ]>
       }
     }
   
-    private ConvertType(inputType : TSType, jsApiNamespace : GlobalEnv) : PExpr
+    private ConvertType(prefix : string, inputType : TSType, jsApiNamespace : GlobalEnv) : PExpr
     {
       match(inputType)
       {
-      | Array(type, 0) => <[ $(ConvertType(type, jsApiNamespace)) ]>
-      | Array(type, arity) => <[ array[$(ConvertType(TSType.Array(type, arity - 1), jsApiNamespace))] ]>
+      | Array(type, 0) => <[ $(ConvertType(prefix, type, jsApiNamespace)) ]>
+      | Array(type, arity) => <[ array[$(ConvertType(prefix, TSType.Array(type, arity - 1), jsApiNamespace))] ]>
       | Bool => <[ bool ]>   
       | Lambda(parms, ret) =>
         mutable lambdaParams = GetParamsType(parms, jsApiNamespace);
@@ -440,7 +444,7 @@ namespace NemerleWeb
             <[ System.Action ]>
           else
           {
-            lambdaParams = lambdaParams.Concat([ConvertType(ret, jsApiNamespace)]);
+            lambdaParams = lambdaParams.Concat([ConvertType(prefix, ret, jsApiNamespace)]);
             <[ System.Func ]>
           };
         
@@ -448,15 +452,7 @@ namespace NemerleWeb
       | Named(name) => <[ $(name : usesite) ]>
       | New => Message.Hint("new() is not supported yet"); <[ object ]>
       | Number => <[ float ]>
-      | Object(members) => 
-        //def anonymousClassName = var.Name + "AnonymousClass";
-        //def anonymousClass = jsApiNamespace.Define(<[ decl: public sealed class $(anonymousClassName : usesite) {} ]>);
-        //anonymousClass.Compile();
-        
-        // DefineMembers(anon, var.Members);
-        
-        //_ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $(anonymousClass.FullName : usesite) ]>);
-        <[ object ]>
+      | Object(members) => CreateAnonymousType(prefix, members, jsApiNamespace)
       | String => <[ string ]>
       | Void => <[ void ]>
       | Any => <[ object ]>
