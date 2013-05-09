@@ -321,9 +321,10 @@ namespace NemerleWeb
       when(!function.ReturnType.ToString().Contains("."))
       {
         def typePrefix = function.Name + "_Return";
+        def returnType = ConvertType(typePrefix, function.ReturnType, jsApiNamespace);
         
         _ = jsApi.Define(<[ decl: 
-          $(function.Name : usesite)() : $(ConvertType(typePrefix, function.ReturnType, jsApiNamespace))
+          $(function.Name : usesite)() : $returnType
           {
             throw ClientCodeCalledInServerException();
           }
@@ -424,8 +425,28 @@ namespace NemerleWeb
       // Add members
       foreach(member in members)
       {
-      | Call      => ()
-      | Construct => ()
+      | Call(parms, returnType) =>
+        def returnTypePrefix = $"$(prefix)_Call_Return";
+        def realReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
+
+        if(parms is [])        
+        _ = anonClass.Define(
+          <[ decl:
+            public static @()(this _ : this) : $realReturnType
+            {
+              throw ClientCodeCalledInServerException();
+            }
+          ]>);
+        else
+        _ = anonClass.Define(
+          <[ decl:
+            public static @()(this _ : this, _ : object) : $realReturnType
+            {
+              throw ClientCodeCalledInServerException();
+            }
+          ]>);
+      | Construct(parms, type) =>
+        ()
       | Index(paramName, paramType, returnType) =>
         def (realParamType, typeName) =
           match(paramType)
@@ -435,11 +456,11 @@ namespace NemerleWeb
           };
         
         def returnTypePrefix = $"$(prefix)_$(typeName)_Index_Return";
-        def indexReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
+        def realReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
         
         _ = anonClass.Define(
           <[ decl:
-            public Item[$(paramName : usesite) : $realParamType] : $indexReturnType
+            public Item[$(paramName : usesite) : $realParamType] : $realReturnType
             {
               get
               {
@@ -458,10 +479,22 @@ namespace NemerleWeb
         def propertyType = ConvertType(typePrefix, type, jsApiNamespace);
         
         _ = anonClass.Define(<[ decl: public mutable $(name : usesite) : $propertyType; ]>);
-      | Function  => ()
+      
+      | Function(name, _optional, parms, returnType) =>
+        // Don't pay attention to optional, always generate property      
+        def returnTypePrefix = $"$(prefix)_$(name)_Return";
+        def returnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
+        
+        _ = anonClass.Define(
+          <[ decl: 
+            $(name : usesite)() : $returnType
+            {
+              throw ClientCodeCalledInServerException();
+            }
+          ]>);
       }
       
-      // Finilize
+      // Finalize
       anonClass.Compile();
       <[ $(anonClass.Name : usesite) ]>
     }
