@@ -422,19 +422,81 @@ namespace NemerleWeb
   
     private CreateTSGlobalClass(tsClass : TSGlobal.Class, jsApiNamespace : GlobalEnv) : void
     {
-      def type = 
+      def classType = 
         match((tsClass.Extends, tsClass.Implements))
         {
         | (None, []) =>
-          <[ decl: [JSApi] public partial class $(tsClass.Name : usesite) {} ]>
+          jsApiNamespace.Define(<[ decl: [JSApi] public partial class $(tsClass.Name : usesite) {} ]>)
         | _ =>
           def extends = if (tsClass.Extends is Some(ex)) [<[ $(ex : usesite) ]>] else [];
           def implement = tsClass.Implements.Select(e => <[ $(e : usesite) ]>);
           def inherit = extends.Concat(implement);
-          <[ decl: [JSApi] public partial class $(tsClass.Name : usesite) : ..$inherit {} ]>
+          
+          jsApiNamespace.Define(
+            <[ decl:
+              [JSApi] public partial class $(tsClass.Name : usesite) : ..$inherit {}
+            ]>)
         };
+        assert2(false);
+      foreach(member in tsClass.Members)
+      {
+      | Constructor(parms) =>
+        def fullPrefix = $"$(tsClass.Name)_Constructor";
+        def functionParams = ConvertParameters(fullPrefix, parms, jsApiNamespace);
         
-      jsApiNamespace.Define(type).Compile();
+        _ = classType.DefineWithSource(
+          <[ decl:
+            public this(..$functionParams)
+            {
+              throw ClientCodeCalledInServerException();
+            }
+          ]>);
+      
+      | Member(part, isStatic, _access) =>
+        // Access is ignored.      
+        // Generate private as public ones.
+        match(part)
+        {
+        | Variable(name, type) =>
+          def fullPrefix = $"$(tsClass.Name)_$(name)";
+          def typePrefix = $"$(fullPrefix)_Variable";
+          def variableType = ConvertType(typePrefix, type, jsApiNamespace);
+          
+          if(isStatic is Some(true))
+            _ = classType.DefineWithSource(
+              <[ decl: public static mutable $(name : usesite) : $variableType; ]>);
+          else
+            _ = classType.DefineWithSource(
+              <[ decl: public mutable $(name : usesite) : $variableType; ]>);
+          
+        | Method(name, _optional, parms, returnType) =>
+          // Don't pay attention to optional, always generate property
+          def fullPrefix = $"$(tsClass.Name)_$(name)";
+          def returnTypePrefix = $"$(fullPrefix)_Return";
+          def realReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
+            
+          def functionParams = ConvertParameters(fullPrefix, parms, jsApiNamespace);
+            
+          if(isStatic is Some(true))
+            _ = classType.DefineWithSource(
+              <[ decl: 
+                public static $(name : usesite)(..$functionParams) : $realReturnType
+                {
+                  throw ClientCodeCalledInServerException();
+                }
+              ]>);
+          else
+            _ = classType.DefineWithSource(
+              <[ decl: 
+                public $(name : usesite)(..$functionParams) : $realReturnType
+                {
+                  throw ClientCodeCalledInServerException();
+                }
+              ]>);
+        }
+      }
+        
+      classType.Compile();
     }
   
     private CreateTSGlobalConstruct(c : TSGlobal.Construct, jsApi : TypeBuilder) : void
