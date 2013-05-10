@@ -255,7 +255,6 @@ namespace NemerleWeb
       {
         def type = typeAndNameGroup.Key[0];
         
-        // TODO: Either compiler should support for type matching or add support in ExtensionPattern
         if(type.Equals(typeof(TSGlobal.Variable)))
         {
           // Return first variable and skip other
@@ -309,11 +308,10 @@ namespace NemerleWeb
  
     private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
-      def typePrefix = var.Name + "_Variable";
+      def typePrefix = $"$(var.Name)_Variable";
       def varType = ConvertType(typePrefix, var.Type, jsApiNamespace);
-      // TODO: Remove check
-      when(!varType.ToString().Contains("."))
-        _ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $varType ]>);
+      
+      _ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $varType ]>);
     }
   
     /// <summary>
@@ -322,21 +320,17 @@ namespace NemerleWeb
     /// </summary>
     private CreateTSGlobalFunction(function : TSGlobal.Function, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
-      // TODO: Remove check
-      when(!function.ReturnType.ToString().Contains("."))
-      {
-        def typePrefix = $"$(function.Name)_Return";
-        def returnType = ConvertType(typePrefix, function.ReturnType, jsApiNamespace);
+      def typePrefix = $"$(function.Name)_Return";
+      def returnType = ConvertType(typePrefix, function.ReturnType, jsApiNamespace);
         
-        def functionParams = ConvertParameters(function.Name, function.Params, jsApiNamespace);
+      def functionParams = ConvertParameters(function.Name, function.Params, jsApiNamespace);
         
-        _ = jsApi.Define(<[ decl: 
-          $(function.Name : usesite)(..$functionParams) : $returnType
-          {
-            throw ClientCodeCalledInServerException();
-          }
-        ]>);
-      }      
+      _ = jsApi.Define(<[ decl: 
+        $(function.Name : usesite)(..$functionParams) : $returnType
+        {
+          throw ClientCodeCalledInServerException();
+        }
+      ]>);   
     }
     
     private CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, jsApiNamespace : GlobalEnv) : void
@@ -479,7 +473,7 @@ namespace NemerleWeb
     /// <summary>
     /// Return parameter types
     /// </summary>
-    private GetParamsType(prefix : string, parms : IEnumerable[TSParam], jsApiNamespace : GlobalEnv) : IEnumerable[PExpr]
+    private GetParamsType(prefix : string, parms : list[TSParam], jsApiNamespace : GlobalEnv) : list[PExpr]
     {
       def makePrefix(name)
       {
@@ -492,7 +486,7 @@ namespace NemerleWeb
         | Rest(name, type) => ConvertType(makePrefix(name), type, jsApiNamespace)
       }
     
-      def ret = parms.Select(convertParamsType);
+      def ret = parms.Map(convertParamsType);
       ret
     }
 
@@ -673,7 +667,7 @@ namespace NemerleWeb
     ///    }
     /// }
     /// </summary>
-    GetFullyQualifiedName(name : string, jsApiNamespace : GlobalEnv) : string
+    private GetFullyQualifiedName(name : string, jsApiNamespace : GlobalEnv) : string
     {
       def lookupType(name, node)
       {
@@ -729,7 +723,10 @@ namespace NemerleWeb
     }
     
     #endregion
+  }
   
+  internal module TypedJSStringExtensions
+  {
     public SplitDot(this s : string) : list[string]
     {
       s.Split('.').NToList()
