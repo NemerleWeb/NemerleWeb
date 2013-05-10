@@ -35,5 +35,15 @@ namespace NemerleWeb
       if(GlobalEnv != null) GlobalEnv.Define(typeDeclaration)
       else                  TypeBuilder.DefineNestedType(typeDeclaration)
     }
+    
+    public FullName : string
+    {
+      [Memoize]
+      get
+      {
+        if(GlobalEnv != null) string.Join(".", GlobalEnv.CurrentNamespace.FullName);
+        else                  TypeBuilder.FullName
+      }
+    }
   }
 }

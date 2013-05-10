@@ -235,7 +235,7 @@ namespace NemerleWeb
         | TSGlobal.Import 
         | TSGlobal.Export
         | _ => false
-      }     
+      }
       def group(ast)
       {
         def name =
@@ -283,70 +283,79 @@ namespace NemerleWeb
     GenerateCode(typer : Typer, root : string, tsAst : IEnumerable[TSGlobal]) : void
     {
       def jsApiNamespace = typer.Env.EnterIntoNamespace(root.SplitDot());
-      def jsApiModule = CreateModule(root, Scope(typer.Env));
+      def jsApiModule = CreateModule(root.SplitDot(), Scope(typer.Env), []);
       
-      // Generate members
-      foreach(e in tsAst) 
-      {
-      | Interface as i => CreateTSGlobalInterface(i, jsApiNamespace)
-      | Class     as c => CreateTSGlobalClass    (c, jsApiNamespace)
-      | Enum      as e => CreateTSGlobalEnum     (e, jsApiNamespace)
-      | Import    as i => CreateTSGlobalImport   (i, jsApiNamespace)
-      | Export    as e => CreateTSGlobalExport   (e, jsApiNamespace)
-      | Module    as m => CreateTSGlobalModule   (m, jsApiNamespace)
-      | _ => ()
-      }
-      
-      foreach(e in tsAst)
-      {
-      | Variable  as v => CreateTSGlobalVariable (v, jsApiModule, jsApiNamespace)
-      | Function  as f => CreateTSGlobalFunction (f, jsApiModule, jsApiNamespace)
-      | Construct as c => CreateTSGlobalConstruct(c, jsApiModule)
-      | _ => ()
-      }
+      GenerateGlobalElements(Scope(jsApiNamespace), jsApiModule, tsAst);
       
       jsApiModule.Compile();
     }
+    
+    private GenerateGlobalElements(
+      typesScope : Scope,
+      othersScope : TypeBuilder,
+      members : IEnumerable[TSGlobal]) : void
+    {
+      // Generate members
+      foreach(mem in members) 
+      {
+      | Interface as i => CreateTSGlobalInterface(i, typesScope)
+      | Class     as c => CreateTSGlobalClass    (c, typesScope)
+      | Enum      as e => CreateTSGlobalEnum     (e, typesScope)
+      | Import    as i => CreateTSGlobalImport   (i, typesScope)
+      | Export    as e => CreateTSGlobalExport   (e, typesScope)
+      | Module    as m => CreateTSGlobalModule   (m, typesScope)
+      | _ => ()
+      }
+      
+      foreach(mem in members)
+      {
+      | Variable  as v => CreateTSGlobalVariable (v, othersScope, typesScope)
+      | Function  as f => CreateTSGlobalFunction (f, othersScope, typesScope)
+      | Construct as c => CreateTSGlobalConstruct(c, typesScope)
+      | _ => ()
+      }
+    }
+    
  
-    private CreateTSGlobalVariable(var : TSGlobal.Variable, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
+    private CreateTSGlobalVariable(var : TSGlobal.Variable, othersScope : TypeBuilder, typesScope : Scope) : void
     {
       def typePrefix = $"$(var.Name)_Variable";
-      def varType = ConvertType(typePrefix, var.Type, jsApiNamespace);
+      def varType = ConvertType(typePrefix, var.Type, typesScope);
       
-      _ = jsApi.Define(<[ decl: public $(var.Name : usesite) : $varType ]>);
+      _ = othersScope.Define(<[ decl: public mutable $(var.Name : usesite) : $varType; ]>);
     }
   
     /// <summary>
     /// Creates function in module.
     /// Global function can be without a name.
     /// </summary>
-    private CreateTSGlobalFunction(function : TSGlobal.Function, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
+    private CreateTSGlobalFunction(function : TSGlobal.Function, othersScope : TypeBuilder, typesScope : Scope) : void
     {
       def typePrefix = $"$(function.Name)_Return";
-      def returnType = ConvertType(typePrefix, function.ReturnType, jsApiNamespace);
+      def returnType = ConvertType(typePrefix, function.ReturnType, typesScope);
         
-      def functionParams = ConvertParameters(function.Name, function.Params, jsApiNamespace);
+      def functionParams = ConvertParameters(function.Name, function.Params, typesScope);
         
-      _ = jsApi.Define(<[ decl: 
+      _ = othersScope.Define(<[ decl: 
         $(function.Name : usesite)(..$functionParams) : $returnType
           $DefaultImplementation
       ]>);   
     }
     
-    private CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, jsApiNamespace : GlobalEnv) : void
+    private CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, typesScope : Scope) : void
     {
       def interfaceType =
         if (tsInterface.Extends is [])
-          jsApiNamespace.Define(
+          typesScope.Define(
             <[ decl: 
-              public partial interface $(tsInterface.Name : usesite) {}
+              public interface $(tsInterface.Name : usesite) {}
             ]>)
         else
         {
           def extends = tsInterface.Extends.Select(e => <[ $(e : usesite) ]>);
-          jsApiNamespace.Define(
+          typesScope.Define(
             <[ decl:
-              public partial interface $(tsInterface.Name : usesite) : ..$extends {}
+              public interface $(tsInterface.Name : usesite) : ..$extends {}
             ]>)
         };
         
@@ -355,9 +364,9 @@ namespace NemerleWeb
        | Call(parms, returnType) =>
         def fullPrefix = $"$(tsInterface.Name)_Call";
         def returnTypePrefix = $"$(fullPrefix)_Return";
-        def realReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
+        def realReturnType = ConvertType(returnTypePrefix, returnType, typesScope);
         
-        def functionParams = ConvertParameters(fullPrefix, parms, jsApiNamespace);
+        def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
        
         _ = interfaceType.DefineWithSource(
           <[ decl:
@@ -369,9 +378,9 @@ namespace NemerleWeb
         // We use special method 'New' for miming this.
         def fullPrefix = $"$(tsInterface.Name)_New";
         def typePrefix = $"$(fullPrefix)_Return";
-        def realType = ConvertType(typePrefix, type, jsApiNamespace);
+        def realType = ConvertType(typePrefix, type, typesScope);
         
-        def functionParams = ConvertParameters(fullPrefix, parms, jsApiNamespace);
+        def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
           
         _ = interfaceType.DefineWithSource(
           <[ decl:
@@ -387,7 +396,7 @@ namespace NemerleWeb
         
         def fullPrefix = $"$(tsInterface.Name)_$(typeName)_Index";
         def returnTypePrefix = $"$(fullPrefix)_Return";
-        def realReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
+        def realReturnType = ConvertType(returnTypePrefix, returnType, typesScope);
         
           _ = interfaceType.DefineWithSource(
           <[ decl:
@@ -402,7 +411,7 @@ namespace NemerleWeb
         // Don't pay attention to optional, always generate property
         def fullPrefix = $"$(tsInterface.Name)_$(name)";
         def typePrefix = $"$(fullPrefix)_Property";
-        def propertyType = ConvertType(typePrefix, type, jsApiNamespace);
+        def propertyType = ConvertType(typePrefix, type, typesScope);
         
         _ = interfaceType.DefineWithSource(<[ decl: $(name : usesite) : $propertyType { get; set; }; ]>);
         
@@ -410,9 +419,9 @@ namespace NemerleWeb
         // Don't pay attention to optional, always generate property
         def fullPrefix = $"$(tsInterface.Name)_$(name)";
         def returnTypePrefix = $"$(fullPrefix)_Return";
-        def realReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
+        def realReturnType = ConvertType(returnTypePrefix, returnType, typesScope);
         
-        def functionParams = ConvertParameters(fullPrefix, parms, jsApiNamespace);
+        def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
         
         _ = interfaceType.DefineWithSource(<[ decl: $(name : usesite)(..$functionParams) : $realReturnType; ]>);
       }
@@ -420,21 +429,21 @@ namespace NemerleWeb
       interfaceType.Compile();
     }
   
-    private CreateTSGlobalClass(tsClass : TSGlobal.Class, jsApiNamespace : GlobalEnv) : void
+    private CreateTSGlobalClass(tsClass : TSGlobal.Class, typesScope : Scope) : void
     {
       def classType = 
         match((tsClass.Extends, tsClass.Implements))
         {
         | (None, []) =>
-          jsApiNamespace.Define(<[ decl: [JSApi] public partial class $(tsClass.Name : usesite) {} ]>)
+          typesScope.Define(<[ decl: [JSApi] public class $(tsClass.Name : usesite) {} ]>)
         | _ =>
           def extends = if (tsClass.Extends is Some(ex)) [<[ $(ex : usesite) ]>] else [];
           def implement = tsClass.Implements.Select(e => <[ $(e : usesite) ]>);
           def inherit = extends.Concat(implement);
           
-          jsApiNamespace.Define(
+          typesScope.Define(
             <[ decl:
-              [JSApi] public partial class $(tsClass.Name : usesite) : ..$inherit {}
+              [JSApi] public class $(tsClass.Name : usesite) : ..$inherit {}
             ]>)
         };
       
@@ -442,7 +451,7 @@ namespace NemerleWeb
       {
       | Constructor(parms) =>
         def fullPrefix = $"$(tsClass.Name)_Constructor";
-        def functionParams = ConvertParameters(fullPrefix, parms, jsApiNamespace);
+        def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
         
         _ = classType.DefineWithSource(
           <[ decl:
@@ -458,7 +467,7 @@ namespace NemerleWeb
         | Variable(name, type) =>
           def fullPrefix = $"$(tsClass.Name)_$(name)";
           def typePrefix = $"$(fullPrefix)_Variable";
-          def variableType = ConvertType(typePrefix, type, jsApiNamespace);
+          def variableType = ConvertType(typePrefix, type, typesScope);
           
           if(isStatic is Some(true))
             _ = classType.DefineWithSource(
@@ -471,11 +480,9 @@ namespace NemerleWeb
           // Don't pay attention to optional, always generate property
           def fullPrefix = $"$(tsClass.Name)_$(name)";
           def returnTypePrefix = $"$(fullPrefix)_Return";
-          def realReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
+          def realReturnType = ConvertType(returnTypePrefix, returnType, typesScope);
             
-          def functionParams = ConvertParameters(fullPrefix, parms, jsApiNamespace);
-          
-          
+          def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
           
           if(isStatic is Some(true))
             _ = classType.DefineWithSource(
@@ -495,33 +502,34 @@ namespace NemerleWeb
       classType.Compile();
     }
   
-    private CreateTSGlobalConstruct(c : TSGlobal.Construct, jsApi : TypeBuilder) : void
+    private CreateTSGlobalConstruct(_c : TSGlobal.Construct, _typesScope : Scope) : void
     {
-      
+      Message.Hint("TSGlobal.Construct is not supported");
     }
     
-    private CreateTSGlobalEnum(tsEnum : TSGlobal.Enum, jsApiNamespace : GlobalEnv) : void
+    private CreateTSGlobalEnum(tsEnum : TSGlobal.Enum, typesScope : Scope) : void
     {
       def type = <[ decl: public enum $(tsEnum.Name : usesite) { } ]>;
-      jsApiNamespace.Define(type).Compile();
+      typesScope.Define(type).Compile();
     }
   
-    private CreateTSGlobalImport(i : TSGlobal.Import, jsApiNamespace : GlobalEnv) : void
+    private CreateTSGlobalImport(_i : TSGlobal.Import, _typesScope : Scope) : void
     {
-      
+      Message.Hint("TSGlobal.Import is not supported");
     }
   
-    private CreateTSGlobalExport(e : TSGlobal.Export, jsApiNamespace : GlobalEnv) : void
+    private CreateTSGlobalExport(_e : TSGlobal.Export, _typesScope : Scope) : void
     {
-      
+      Message.Hint("TSGlobal.Export is not supported");
     }
   
-    private CreateTSGlobalModule(tsModule : TSGlobal.Module, jsApiNamespace : GlobalEnv) : void
+    private CreateTSGlobalModule(tsModule : TSGlobal.Module, typesScope : Scope) : void
     {
       def moduleName = tsModule.Name.Replace('/', '.').Replace('\\', '.');
-      
+
       // Create modules by splitting '.'
-      _ = CreateModule(moduleName, Scope(jsApiNamespace));
+      def moduleType = CreateModule(moduleName.SplitDot(), typesScope, tsModule.Members);
+      moduleType.Compile()
     }
     
     #endregion
@@ -531,7 +539,7 @@ namespace NemerleWeb
     /// <summary>
     /// Return parameter types
     /// </summary>
-    private GetParamsType(prefix : string, parms : list[TSParam], jsApiNamespace : GlobalEnv) : list[PExpr]
+    private GetParamsType(prefix : string, parms : list[TSParam], typesScope : Scope) : list[PExpr]
     {
       def makePrefix(name)
       {
@@ -540,8 +548,8 @@ namespace NemerleWeb
       def convertParamsType(p : TSParam)
       {
         | Required(name, type, _access)
-        | Option(name, _, type, _access) => ConvertType(makePrefix(name), type, jsApiNamespace)
-        | Rest(name, type) => ConvertType(makePrefix(name), type, jsApiNamespace)
+        | Option(name, _, type, _access) => ConvertType(makePrefix(name), type, typesScope)
+        | Rest(name, type) => ConvertType(makePrefix(name), type, typesScope)
       }
     
       def ret = parms.Map(convertParamsType);
@@ -551,7 +559,7 @@ namespace NemerleWeb
     /// <summary>
     /// Convert function parameters
     /// </summary>
-    private ConvertParameters(prefix : string, parms : IEnumerable[TSParam], jsApiNamespace : GlobalEnv) : IEnumerable[PParameter]
+    private ConvertParameters(prefix : string, parms : IEnumerable[TSParam], typesScope : Scope) : IEnumerable[PParameter]
     {
       def makePrefix(name)
       {
@@ -561,10 +569,10 @@ namespace NemerleWeb
       {
         | Required(name, type, _access)
         | Option(name, _optional, type, _access) =>
-          def realType = ConvertType(makePrefix(name), type, jsApiNamespace);
+          def realType = ConvertType(makePrefix(name), type, typesScope);
           <[ parameter: $(name : usesite) : $realType ]>          
         | Rest(name, type) =>
-          def realType = ConvertType(makePrefix(name), type, jsApiNamespace);
+          def realType = ConvertType(makePrefix(name), type, typesScope);
           <[ parameter: params $(name : usesite) : $realType ]>
       }
     
@@ -572,10 +580,10 @@ namespace NemerleWeb
       ret
     }
     
-    private CreateAnonymousType(prefix : string, members : list[TSObject], jsApiNamespace : GlobalEnv) : PExpr
+    private CreateAnonymousType(prefix : string, members : list[TSObject], typesScope : Scope) : PExpr
     {
       def className = $"$(prefix)_AnonymousType";
-      def anonClass = jsApiNamespace.Define(<[ decl:
+      def anonClass = typesScope.Define(<[ decl:
         [JSApi] public sealed class $(className : usesite) { }
       ]>);
       
@@ -585,9 +593,9 @@ namespace NemerleWeb
       | Call(parms, returnType) =>
         def fullPrefix = $"$(className)_Call";
         def returnTypePrefix = $"$(fullPrefix)_Return";
-        def realReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
+        def realReturnType = ConvertType(returnTypePrefix, returnType, typesScope);
 
-        def functionParams = ConvertParameters(fullPrefix, parms, jsApiNamespace);
+        def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
         
         _ = anonClass.DefineWithSource(
           <[ decl:
@@ -600,9 +608,9 @@ namespace NemerleWeb
         // We use special method 'New' for miming this.
         def fullPrefix = $"$(className)_New";
         def typePrefix = $"$(fullPrefix)_Return";
-        def realType = ConvertType(typePrefix, type, jsApiNamespace);
+        def realType = ConvertType(typePrefix, type, typesScope);
         
-        def functionParams = ConvertParameters(fullPrefix, parms, jsApiNamespace);
+        def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
           
         _ = anonClass.DefineWithSource(
           <[ decl:
@@ -619,7 +627,7 @@ namespace NemerleWeb
         
         def fullPrefix = $"$(className)_$(typeName)_Index";
         def returnTypePrefix = $"$(fullPrefix)_Return";
-        def realReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
+        def realReturnType = ConvertType(returnTypePrefix, returnType, typesScope);
         
         _ = anonClass.DefineWithSource(
           <[ decl:
@@ -636,7 +644,7 @@ namespace NemerleWeb
         // Don't pay attention to optional, always generate property
         def fullPrefix = $"$(className)_$(name)";
         def typePrefix = $"$(fullPrefix)_Property";
-        def propertyType = ConvertType(typePrefix, type, jsApiNamespace);
+        def propertyType = ConvertType(typePrefix, type, typesScope);
         
         _ = anonClass.DefineWithSource(<[ decl: public mutable $(name : usesite) : $propertyType; ]>);
       
@@ -644,9 +652,9 @@ namespace NemerleWeb
         // Don't pay attention to optional, always generate property
         def fullPrefix = $"$(className)_$(name)";
         def returnTypePrefix = $"$(fullPrefix)_Return";
-        def realReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
+        def realReturnType = ConvertType(returnTypePrefix, returnType, typesScope);
         
-        def functionParams = ConvertParameters(fullPrefix, parms, jsApiNamespace);
+        def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
         
         _ = anonClass.DefineWithSource(
           <[ decl: 
@@ -660,39 +668,42 @@ namespace NemerleWeb
       <[ $(anonClass.Name : usesite) ]>
     }
   
-    private ConvertType(prefix : string, inputType : option[TSType], jsApiNamespace : GlobalEnv) : PExpr
+    private ConvertType(prefix : string, inputType : option[TSType], typesScope : Scope) : PExpr
     {
       match(inputType)
       {
-      | Some(type) => ConvertType(prefix, type, jsApiNamespace)
+      | Some(type) => ConvertType(prefix, type, typesScope)
       | None => <[ object ]>
       }
     }
   
-    private ConvertType(prefix : string, inputType : TSType, jsApiNamespace : GlobalEnv) : PExpr
+    private ConvertType(prefix : string, inputType : TSType, typesScope : Scope) : PExpr
     {
       match(inputType)
       {
-      | Array(type, 0) => <[ $(ConvertType(prefix, type, jsApiNamespace)) ]>
-      | Array(type, arity) => <[ array[$(ConvertType(prefix, TSType.Array(type, arity - 1), jsApiNamespace))] ]>
+      | Array(type, 0) => <[ $(ConvertType(prefix, type, typesScope)) ]>
+      | Array(type, arity) => <[ array[$(ConvertType(prefix, TSType.Array(type, arity - 1), typesScope))] ]>
       | Bool => <[ bool ]>   
       | Lambda(parms, ret) =>
-        mutable lambdaParams = GetParamsType(prefix, parms, jsApiNamespace);
+        mutable lambdaParams = GetParamsType(prefix, parms, typesScope);
         def type =
           if(ret is TSType.Void())
             <[ System.Action ]>
           else
           {
-            lambdaParams = lambdaParams.Concat([ConvertType(prefix, ret, jsApiNamespace)]);
+            lambdaParams = lambdaParams.Concat([ConvertType(prefix, ret, typesScope)]);
             <[ System.Func ]>
           };
         
         <[ $type.[..$lambdaParams] ]>
-      | Named(name) => <[ $(name : usesite) ]>
+      | Named(name) => 
+        // We must use fully qualified name, otherwise Nemerle compiler cannot find the type
+        def fullName = $"$(typesScope.FullName).$name";
+        <[ $(fullName : usesite) ]>
       | New(parms, returnType) =>
-        CreateAnonymousType(prefix, [TSObject.Construct(parms, Some(returnType))], jsApiNamespace)
+        CreateAnonymousType(prefix, [TSObject.Construct(parms, Some(returnType))], typesScope)
       | Number => <[ float ]>
-      | Object(members) => CreateAnonymousType(prefix, members, jsApiNamespace)
+      | Object(members) => CreateAnonymousType(prefix, members, typesScope)
       | String => <[ string ]>
       | Void => <[ void ]>
       | Any => <[ object ]>
@@ -716,36 +727,25 @@ namespace NemerleWeb
     ///    }
     /// }
     /// </summary>
-    private GetFullyQualifiedName(name : string, jsApiNamespace : GlobalEnv) : string
-    {
-      def lookupType(name, node)
-      {
-        match(node.LookupType(name.SplitDot(), 0))
-        {
-        | Some(t) => t.FullName
-        | _ =>
-          if(node.GetDisplayName() == "JSApi")
-            name
-          else
-            lookupType(name, node.Parent)
-        }
-      }
-      
-      lookupType(name, jsApiNamespace.CurrentNamespace);
-    }
-         
-    /// Replace path separator with dots
-    private GetNamespaceName(path : string) : string
-    {
-      path.Replace('\\', '.').Replace('/', '.').TrimEnd('.')
-    }
+    //private GetFullyQualifiedName(name : string, typesScope : Scope) : string
+    //{
+    //  def lookupType(name, node)
+    //  {
+    //    match(node.LookupType(name.SplitDot(), 0))
+    //    {
+    //    | Some(t) => t.FullName
+    //    | _ =>
+    //      if(node.GetDisplayName() == "JSApi")
+    //        name
+    //      else
+    //        lookupType(name, node.Parent)
+    //    }
+    //  }
+    //  
+    //  lookupType(name, typesScope.CurrentNamespace);
+    //}
     
-    private CreateModule(moduleName : string, outer : Scope) : TypeBuilder
-    {
-      CreateModule(moduleName.SplitDot(), outer)
-    }    
-    
-    private CreateModule(parts : list[string], outer : Scope) : TypeBuilder
+    private CreateModule(parts : list[string], outer : Scope, members : list[TSGlobal]) : TypeBuilder
     {
       match (parts)
       {
@@ -757,19 +757,24 @@ namespace NemerleWeb
           null
         }
       | [hd] =>
-        def t = outer.Define(
-          <[ decl: [JSApi] public partial module $(hd : usesite) {} ]>);
-        t.Compile();
-        t
+        // One part means we generate members
+        def moduleType = outer.Define(<[ decl: [JSApi] public module $(hd : usesite) {} ]>);
+        //moduleType.Compile();
+          
+        // Define members
+        GenerateGlobalElements(Scope(moduleType), moduleType, members);
+        moduleType
+      
       | hd :: tl =>
-        def innerModule = outer.Define(
-          <[ decl: [JSApi] public partial module $(hd : usesite) {} ]>);
-        def t = CreateModule(tl, Scope(innerModule));
+        // If module consist from more than one part, first create all needed parts,
+        // and then generate all members      
+        def innerModule = outer.Define(<[ decl: [JSApi] public module $(hd : usesite) {} ]>);
+        def t = CreateModule(tl, Scope(innerModule), []);
         innerModule.Compile();
         t
-      | _ => Message.Error("Must not get there"); null
       }
     }
+    
     
     #endregion
   }

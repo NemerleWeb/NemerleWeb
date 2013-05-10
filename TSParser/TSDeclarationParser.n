@@ -499,7 +499,7 @@ namespace TSParser
         
         #region Variable Statements (5.1)
         
-        VariableDeclaration = Identifier TypeAnnotation?;
+        VariableDeclaration = AnyIdentifier TypeAnnotation?;
         TypeAnnotation : TSType = colon_s ScriptType s;
         
         #endregion
