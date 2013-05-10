@@ -317,14 +317,15 @@ namespace NemerleWeb
     private CreateTSGlobalFunction(function : TSGlobal.Function, jsApi : TypeBuilder, jsApiNamespace : GlobalEnv) : void
     {
       // TODO: Remove check
-      // TODO: Add parameters
       when(!function.ReturnType.ToString().Contains("."))
       {
-        def typePrefix = function.Name + "_Return";
+        def typePrefix = $"$(function.Name)_Return";
         def returnType = ConvertType(typePrefix, function.ReturnType, jsApiNamespace);
         
+        def functionParams = ConvertParameters(function.Name, function.Params, jsApiNamespace);
+        
         _ = jsApi.Define(<[ decl: 
-          $(function.Name : usesite)() : $returnType
+          $(function.Name : usesite)(..$functionParams) : $returnType
           {
             throw ClientCodeCalledInServerException();
           }
@@ -342,6 +343,15 @@ namespace NemerleWeb
           def extends = tsInterface.Extends.Select(e => <[ $(e : usesite) ]>);
           <[ decl: public partial interface $(tsInterface.Name : usesite) : ..$extends {} ]>
         };
+        
+      foreach(member in tsInterface.Type.Members)
+      {
+      | Call
+      | Construct
+      | Index
+      | Property
+      | Function => ()
+      }
         
       jsApiNamespace.Define(type).Compile();
     }
@@ -396,6 +406,9 @@ namespace NemerleWeb
 
     #region Helpers
     
+    /// <summary>
+    /// Return parameter types
+    /// </summary>
     private GetParamsType(prefix : string, parms : IEnumerable[TSParam], jsApiNamespace : GlobalEnv) : IEnumerable[PExpr]
     {
       def makePrefix(name)
@@ -412,11 +425,36 @@ namespace NemerleWeb
       def ret = parms.Select(convertParamsType);
       ret
     }
+
+    /// <summary>
+    /// Convert function parameters
+    /// </summary>
+    private ConvertParameters(prefix : string, parms : IEnumerable[TSParam], jsApiNamespace : GlobalEnv) : IEnumerable[PParameter]
+    {
+      def makePrefix(name)
+      {
+        $"$(prefix)_$(name)_Parameter"
+      }
+      def convertParamsType(p : TSParam)
+      {
+        | Required(name, type, _access)
+        | Option(name, _optional, type, _access) =>
+          def realType = ConvertType(makePrefix(name), type, jsApiNamespace);
+          <[ parameter: $(name : usesite) : $realType ]>          
+        | Rest(name, type) =>
+          def realType = ConvertType(makePrefix(name), type, jsApiNamespace);
+          <[ parameter: params $(name : usesite) : array[$realType] ]>
+      }
+    
+      def ret = parms.Select(convertParamsType);
+      ret
+    }
     
     private CreateAnonymousType(prefix : string, members : list[TSObject], jsApiNamespace : GlobalEnv) : PExpr
     {
       def className = $"$(prefix)_AnonymousType";
-      def anonClass = jsApiNamespace.Define(<[ decl: 
+      def anonClass = jsApiNamespace.Define(<[ decl:
+        [NemerleWeb.JSApiAttribute]
         public sealed class $(className : usesite)
         {
         }
@@ -426,27 +464,37 @@ namespace NemerleWeb
       foreach(member in members)
       {
       | Call(parms, returnType) =>
-        def returnTypePrefix = $"$(prefix)_Call_Return";
+        def returnTypePrefix = $"$(className)_Call_Return";
         def realReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
 
-        if(parms is [])        
+        def functionParams = [<[ parameter: this _ : this ]>]
+          .Concat(ConvertParameters(className, parms, jsApiNamespace));
+        
         _ = anonClass.Define(
           <[ decl:
-            public static @()(this _ : this) : $realReturnType
-            {
-              throw ClientCodeCalledInServerException();
-            }
-          ]>);
-        else
-        _ = anonClass.Define(
-          <[ decl:
-            public static @()(this _ : this, _ : object) : $realReturnType
+            public static @()(..$functionParams) : $realReturnType
             {
               throw ClientCodeCalledInServerException();
             }
           ]>);
       | Construct(parms, type) =>
-        ()
+        // Since Nemerle doesn't support creating different type using constructor.
+        // Unlike JavaScript where function can return anything.
+        // We use special operator '~' for miming this.
+        def typePrefix = $"$(className)_New_Return";
+        def realType = ConvertType(typePrefix, type, jsApiNamespace);
+        
+        def functionParams = [<[ parameter: this _ : this ]>]
+          .Concat(ConvertParameters(className, parms, jsApiNamespace));
+        def constructMethodName = "<>New";
+          
+        _ = anonClass.Define(
+          <[ decl:
+            public static $(constructMethodName : usesite)(..$functionParams) : $realType
+            {
+              throw ClientCodeCalledInServerException();
+            }
+          ]>);
       | Index(paramName, paramType, returnType) =>
         def (realParamType, typeName) =
           match(paramType)
@@ -455,7 +503,7 @@ namespace NemerleWeb
           | String => (<[ string ]>, "String")
           };
         
-        def returnTypePrefix = $"$(prefix)_$(typeName)_Index_Return";
+        def returnTypePrefix = $"$(className)_$(typeName)_Index_Return";
         def realReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
         
         _ = anonClass.Define(
@@ -475,19 +523,21 @@ namespace NemerleWeb
       
       | Property(name, _optional, type)  =>
         // Don't pay attention to optional, always generate property      
-        def typePrefix = $"$(prefix)_$(name)_Property";
+        def typePrefix = $"$(className)_$(name)_Property";
         def propertyType = ConvertType(typePrefix, type, jsApiNamespace);
         
         _ = anonClass.Define(<[ decl: public mutable $(name : usesite) : $propertyType; ]>);
       
       | Function(name, _optional, parms, returnType) =>
         // Don't pay attention to optional, always generate property      
-        def returnTypePrefix = $"$(prefix)_$(name)_Return";
+        def returnTypePrefix = $"$(className)_$(name)_Return";
         def returnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
+        
+        def functionParams = ConvertParameters(className, parms, jsApiNamespace);
         
         _ = anonClass.Define(
           <[ decl: 
-            $(name : usesite)() : $returnType
+            $(name : usesite)(..$functionParams) : $returnType
             {
               throw ClientCodeCalledInServerException();
             }
