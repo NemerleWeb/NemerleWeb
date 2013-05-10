@@ -82,8 +82,10 @@ namespace NemerleWeb
     
     tsParser = TSDeclarationParser();
     
-    CallMethodName : string = "<>Call";
-    NewMethodName : string = "<>New";
+    CallMethodName : string = "Call";
+    NewMethodName : string = "New";
+    
+    DefaultImplementation : PExpr = <[ { throw ClientCodeCalledInServerException(); } ]>;
     
     public Impl(typer : Typer, options : list[PExpr]) : void
     {
@@ -327,9 +329,7 @@ namespace NemerleWeb
         
       _ = jsApi.Define(<[ decl: 
         $(function.Name : usesite)(..$functionParams) : $returnType
-        {
-          throw ClientCodeCalledInServerException();
-        }
+          $DefaultImplementation
       ]>);   
     }
     
@@ -366,7 +366,7 @@ namespace NemerleWeb
       | Construct(parms, type) =>
         // Since Nemerle doesn't support creating different type using constructor.
         // Unlike JavaScript where function can return anything.
-        // We use special method '<>New' for miming this.
+        // We use special method 'New' for miming this.
         def fullPrefix = $"$(tsInterface.Name)_New";
         def typePrefix = $"$(fullPrefix)_Return";
         def realType = ConvertType(typePrefix, type, jsApiNamespace);
@@ -437,7 +437,7 @@ namespace NemerleWeb
               [JSApi] public partial class $(tsClass.Name : usesite) : ..$inherit {}
             ]>)
         };
-        assert2(false);
+      
       foreach(member in tsClass.Members)
       {
       | Constructor(parms) =>
@@ -447,9 +447,7 @@ namespace NemerleWeb
         _ = classType.DefineWithSource(
           <[ decl:
             public this(..$functionParams)
-            {
-              throw ClientCodeCalledInServerException();
-            }
+              $DefaultImplementation
           ]>);
       
       | Member(part, isStatic, _access) =>
@@ -476,22 +474,20 @@ namespace NemerleWeb
           def realReturnType = ConvertType(returnTypePrefix, returnType, jsApiNamespace);
             
           def functionParams = ConvertParameters(fullPrefix, parms, jsApiNamespace);
-            
+          
+          
+          
           if(isStatic is Some(true))
             _ = classType.DefineWithSource(
               <[ decl: 
                 public static $(name : usesite)(..$functionParams) : $realReturnType
-                {
-                  throw ClientCodeCalledInServerException();
-                }
+                  $DefaultImplementation
               ]>);
           else
             _ = classType.DefineWithSource(
               <[ decl: 
                 public $(name : usesite)(..$functionParams) : $realReturnType
-                {
-                  throw ClientCodeCalledInServerException();
-                }
+                  $DefaultImplementation
               ]>);
         }
       }
@@ -596,14 +592,12 @@ namespace NemerleWeb
         _ = anonClass.DefineWithSource(
           <[ decl:
             public $(CallMethodName : usesite)(..$functionParams) : $realReturnType
-            {
-              throw ClientCodeCalledInServerException();
-            }
+              $DefaultImplementation
           ]>);
       | Construct(parms, type) =>
         // Since Nemerle doesn't support creating different type using constructor.
         // Unlike JavaScript where function can return anything.
-        // We use special method '<>New' for miming this.
+        // We use special method 'New' for miming this.
         def fullPrefix = $"$(className)_New";
         def typePrefix = $"$(fullPrefix)_Return";
         def realType = ConvertType(typePrefix, type, jsApiNamespace);
@@ -613,9 +607,7 @@ namespace NemerleWeb
         _ = anonClass.DefineWithSource(
           <[ decl:
             public $(NewMethodName : usesite)(..$functionParams) : $realType
-            {
-              throw ClientCodeCalledInServerException();
-            }
+              $DefaultImplementation
           ]>);
       | Index(paramName, paramType, returnType) =>
         def (realParamType, typeName) =
@@ -634,13 +626,9 @@ namespace NemerleWeb
             public Item[$(paramName : usesite) : $realParamType] : $realReturnType
             {
               get
-              {
-                throw ClientCodeCalledInServerException();
-              }
+                $DefaultImplementation;
               set
-              {
-                throw ClientCodeCalledInServerException();
-              }
+                $DefaultImplementation;
             }
           ]>);
       
@@ -663,9 +651,7 @@ namespace NemerleWeb
         _ = anonClass.DefineWithSource(
           <[ decl: 
             $(name : usesite)(..$functionParams) : $realReturnType
-            {
-              throw ClientCodeCalledInServerException();
-            }
+              $DefaultImplementation
           ]>);
       }
       
@@ -703,7 +689,8 @@ namespace NemerleWeb
         
         <[ $type.[..$lambdaParams] ]>
       | Named(name) => <[ $(name : usesite) ]>
-      | New => Message.Hint("new() is not supported yet"); <[ object ]>
+      | New(parms, returnType) =>
+        CreateAnonymousType(prefix, [TSObject.Construct(parms, Some(returnType))], jsApiNamespace)
       | Number => <[ float ]>
       | Object(members) => CreateAnonymousType(prefix, members, jsApiNamespace)
       | String => <[ string ]>

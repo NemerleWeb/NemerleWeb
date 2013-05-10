@@ -35,7 +35,7 @@ namespace NemerleWeb
   }
   
   [Record(NotNull = [".*"])]
-  public class JSClass
+  internal class JSClass
   {
       public ClassType : TypeBuilder { get; }
       public Indent : string    { get; }      
