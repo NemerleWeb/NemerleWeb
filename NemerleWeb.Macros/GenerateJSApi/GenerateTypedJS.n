@@ -316,7 +316,6 @@ namespace NemerleWeb
       }
     }
     
- 
     private CreateTSGlobalVariable(var : TSGlobal.Variable, othersScope : TypeBuilder, typesScope : Scope) : void
     {
       def typePrefix = $"$(var.Name)_Variable";
@@ -697,14 +696,24 @@ namespace NemerleWeb
         
         <[ $type.[..$lambdaParams] ]>
       | Named(name) => 
-        // We must use fully qualified name, otherwise Nemerle compiler cannot find the type
-        // TODO: We need to shorten fullName according to long of name
-        // For instance having name "A.B" and scope.FullName is "X.Y"
-        // The result should be A.X.Y and not A.B.X.Y !
-        def fullName = $"$(typesScope.FullName).$name";        
-        PExpr.FromQualifiedIdentifier(typesScope.Manager, fullName);
+        // TODO: There must be a complex algorithm with type lookup
+        // We cannot simply put type as is because it leads to compilation problems.
+        // Assumy following siutation:
+        // module A { export module B { export class C { y : number; } } }
+        //
+        // module X {
+        //  export module A { export module B { export class C { x : number; } } }
+        //	
+        //  export var c : A.B.C;
+        //}
+        //
+        // TypeScript behaves like C# and allows this code with choosing internal module.
+        // We must do same lookup and find out all types starting from the current scope.
+
+        <[ $(name : usesite) ]>
       | New(parms, returnType) =>
         CreateAnonymousType(prefix, [TSObject.Construct(parms, Some(returnType))], typesScope)
+        
       | Number => <[ float ]>
       | Object(members) => CreateAnonymousType(prefix, members, typesScope)
       | String => <[ string ]>

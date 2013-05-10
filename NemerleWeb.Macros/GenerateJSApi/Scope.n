@@ -36,13 +36,13 @@ namespace NemerleWeb
       else                  TypeBuilder.DefineNestedType(typeDeclaration)
     }
     
-    public FullName : string
+    public FullName : array[string]
     {
       [Memoize]
       get
       {
-        if(GlobalEnv != null) string.Join(".", GlobalEnv.CurrentNamespace.FullName);
-        else                  TypeBuilder.FullName
+        if(GlobalEnv != null) GlobalEnv.CurrentNamespace.FullName.ToArray()
+        else                  TypeBuilder.FullName.Split('.')
       }
     }
     
