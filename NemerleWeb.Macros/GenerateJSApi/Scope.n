@@ -45,5 +45,14 @@ namespace NemerleWeb
         else                  TypeBuilder.FullName
       }
     }
+    
+    public Manager : ManagerClass
+    {
+      get
+      {
+        if(GlobalEnv != null) GlobalEnv.Manager
+        else                  TypeBuilder.Manager
+      }
+    }
   }
 }
