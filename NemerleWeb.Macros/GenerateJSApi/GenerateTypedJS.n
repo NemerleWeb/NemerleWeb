@@ -98,9 +98,6 @@ namespace NemerleWeb
         Manager().CoreEnv,
         <[ NemerleWeb.JSApiRootAttribute($(args.Root : string)) ]>);
         
-      // HACK for supporting Array typing in TypeScript 0.8
-      typer.Env.Define(<[ decl: type _element = object; ]>).Compile();
-      
       // Step 1: PreParse
       def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
       def tsFilesToParse = PreParseTSAll(projectDir, args.Lib, args.Args);
@@ -284,6 +281,9 @@ namespace NemerleWeb
     {
       def jsApiNamespace = typer.Env.EnterIntoNamespace(root.SplitDot());
       def jsApiModule = CreateModule(root.SplitDot(), Scope(typer.Env), []);
+      
+      // HACK for supporting Array typing in TypeScript 0.8
+      jsApiNamespace.Define(<[ decl: type _element = object; ]>).Compile();
       
       GenerateGlobalElements(Scope(jsApiNamespace), jsApiModule, tsAst);
       
@@ -698,8 +698,11 @@ namespace NemerleWeb
         <[ $type.[..$lambdaParams] ]>
       | Named(name) => 
         // We must use fully qualified name, otherwise Nemerle compiler cannot find the type
-        def fullName = $"$(typesScope.FullName).$name";
-        <[ $(fullName : usesite) ]>
+        // TODO: We need to shorten fullName according to long of name
+        // For instance having name "A.B" and scope.FullName is "X.Y"
+        // The result should be A.X.Y and not A.B.X.Y !
+        def fullName = $"$(typesScope.FullName).$name";        
+        PExpr.FromQualifiedIdentifier(typesScope.Manager, fullName);
       | New(parms, returnType) =>
         CreateAnonymousType(prefix, [TSObject.Construct(parms, Some(returnType))], typesScope)
       | Number => <[ float ]>
