@@ -282,22 +282,23 @@ namespace NemerleWeb
     GenerateCode(typer : Typer, root : string, tsAst : IEnumerable[TSGlobal]) : void
     {
       def jsApiNamespace = typer.Env.EnterIntoNamespace(root.SplitDot());
-      def jsApiModule = CreateModule(root.SplitDot(), Scope(typer.Env), []);
+      def jsApiModule = CreateModule(root.SplitDot(), Scope(typer.Env), [], true);
       
       // HACK for supporting Array typing in TypeScript 0.8
       jsApiNamespace.Define(<[ decl: type _element = object; ]>).Compile();
       
-      GenerateGlobalElements(Scope(jsApiNamespace), jsApiModule, tsAst);
+      // First generate all types
+      GenerateTypes(Scope(jsApiNamespace), tsAst);
       
+      // Then generate everything else
+      GenerateOthers(Scope(jsApiNamespace), jsApiModule, tsAst);
+      
+      // Finalize
       jsApiModule.Compile();
     }
     
-    private GenerateGlobalElements(
-      typesScope : Scope,
-      othersScope : TypeBuilder,
-      members : IEnumerable[TSGlobal]) : void
+    private GenerateTypes(typesScope : Scope, members : IEnumerable[TSGlobal]) : void
     {
-      // Generate members
       foreach(mem in members) 
       {
       | Interface as i => CreateTSGlobalInterface(i, typesScope)
@@ -305,12 +306,19 @@ namespace NemerleWeb
       | Enum      as e => CreateTSGlobalEnum     (e, typesScope)
       | Import    as i => CreateTSGlobalImport   (i, typesScope)
       | Export    as e => CreateTSGlobalExport   (e, typesScope)
-      | Module    as m => CreateTSGlobalModule   (m, typesScope)
+      | Module    as m => CreateTSGlobalModule   (m, typesScope, true)
       | _ => ()
       }
-      
+    }
+    
+    private GenerateOthers(
+      typesScope : Scope,
+      othersScope : TypeBuilder,
+      members : IEnumerable[TSGlobal]) : void
+    {
       foreach(mem in members)
       {
+      | Module    as m => CreateTSGlobalModule   (m, typesScope, false)
       | Variable  as v => CreateTSGlobalVariable (v, othersScope, typesScope)
       | Function  as f => CreateTSGlobalFunction (f, othersScope, typesScope)
       | Construct as c => CreateTSGlobalConstruct(c, typesScope)
@@ -524,12 +532,12 @@ namespace NemerleWeb
       Message.Hint("TSGlobal.Export is not supported");
     }
   
-    private CreateTSGlobalModule(tsModule : TSGlobal.Module, typesScope : Scope) : void
+    private CreateTSGlobalModule(tsModule : TSGlobal.Module, typesScope : Scope, types : bool) : void
     {
       def moduleName = tsModule.Name.Replace('/', '.').Replace('\\', '.');
 
       // Create modules by splitting '.'
-      def moduleType = CreateModule(moduleName.SplitDot(), typesScope, tsModule.Members);
+      def moduleType = CreateModule(moduleName.SplitDot(), typesScope, tsModule.Members, types);
       moduleType.Compile()
     }
     
@@ -739,7 +747,11 @@ namespace NemerleWeb
       <[ $(name : usesite) ]>
     }
     
-    private CreateModule(parts : list[string], outer : Scope, members : list[TSGlobal]) : TypeBuilder
+    private CreateModule(
+      parts : list[string],
+      outer : Scope,
+      members : list[TSGlobal],
+      types : bool) : TypeBuilder
     {
       match (parts)
       {
@@ -753,20 +765,24 @@ namespace NemerleWeb
         
       | [hd] =>
         // One part means we generate members
-        def moduleType = outer.Define(<[ decl: [JSApi] public module $(hd : usesite) {} ]>);         
-        GenerateGlobalElements(Scope(moduleType), moduleType, members);
+        def moduleType = outer.Define(<[ decl: [JSApi] public partial module $(hd : usesite) {} ]>);
+        
+        if(types)
+          GenerateTypes(Scope(moduleType), members);
+        else
+          GenerateOthers(Scope(moduleType), moduleType, members);
+        
         moduleType
       
       | hd :: tl =>
         // If module consist from more than one part, first create all needed parts,
         // and then generate all members      
-        def innerModule = outer.Define(<[ decl: [JSApi] public module $(hd : usesite) {} ]>);
-        def t = CreateModule(tl, Scope(innerModule), []);
+        def innerModule = outer.Define(<[ decl: [JSApi] public partial module $(hd : usesite) {} ]>);
+        def t = CreateModule(tl, Scope(innerModule), [], types);
         innerModule.Compile();
         t
       }
     }
-    
     
     #endregion
   }
