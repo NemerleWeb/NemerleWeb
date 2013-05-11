@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using Nemerle.Imperative;
 using Nemerle.Macros;
 using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
@@ -695,22 +697,7 @@ namespace NemerleWeb
           };
         
         <[ $type.[..$lambdaParams] ]>
-      | Named(name) => 
-        // TODO: There must be a complex algorithm with type lookup
-        // We cannot simply put type as is because it leads to compilation problems.
-        // Assumy following siutation:
-        // module A { export module B { export class C { y : number; } } }
-        //
-        // module X {
-        //  export module A { export module B { export class C { x : number; } } }
-        //	
-        //  export var c : A.B.C;
-        //}
-        //
-        // TypeScript behaves like C# and allows this code with choosing internal module.
-        // We must do same lookup and find out all types starting from the current scope.
-
-        <[ $(name : usesite) ]>
+      | Named(name) => LookupType(name, typesScope)
       | New(parms, returnType) =>
         CreateAnonymousType(prefix, [TSObject.Construct(parms, Some(returnType))], typesScope)
         
@@ -722,40 +709,35 @@ namespace NemerleWeb
       }
     }
     
-    /// <summary>
-    /// This method is needed because of bug in Nemerle compiler which cannot choose nearest symbol.
-    /// To workaround this behaviour we always specify fully qualified name.    
-    ///
-    /// module A
-    /// {
-    ///    class X{}
-    ///    module B
-    ///    {
-    ///       class X{}
-    ///       class Q
-    ///       {
-    ///           x : X; // Ambibguity
-    ///       }
-    ///    }
-    /// }
-    /// </summary>
-    //private GetFullyQualifiedName(name : string, typesScope : Scope) : string
-    //{
-    //  def lookupType(name, node)
-    //  {
-    //    match(node.LookupType(name.SplitDot(), 0))
-    //    {
-    //    | Some(t) => t.FullName
-    //    | _ =>
-    //      if(node.GetDisplayName() == "JSApi")
-    //        name
-    //      else
-    //        lookupType(name, node.Parent)
-    //    }
-    //  }
-    //  
-    //  lookupType(name, typesScope.CurrentNamespace);
+    // <summary>
+    // We cannot simply put type as is because it leads to compilation problems.
+    // Assume following situation:
+    // module A { export module B { export class C { y : number; } } }
+    //
+    // module X {
+    //  export module A { export module B { export class C { x : number; } } }
+    //	
+    //  export var c : A.B.C;
     //}
+    //
+    // TypeScript behaves like C# and allows this code with choosing internal module.
+    // We must do same lookup and find out all types starting from the current scope.
+    // </summary>
+    private LookupType(name : string, scope : Scope) : PExpr
+    {
+      // Try finding type going up in hierarcy of scope.
+      // TODO: Think about functional solution :)
+      def scopeFullName = scope.FullNameParts.ToArray();
+      for(mutable i = 0; i < scopeFullName.Length - 1; i++)
+      {
+        def qid = scopeFullName.Take(scopeFullName.Length - i).JoinDot() + "." + name;
+        when(scope.LookupType(qid) is Some(type))
+          return type;
+      }
+      
+      // If type has not been found use name
+      <[ $(name : usesite) ]>
+    }
     
     private CreateModule(parts : list[string], outer : Scope, members : list[TSGlobal]) : TypeBuilder
     {
@@ -768,12 +750,10 @@ namespace NemerleWeb
           Message.Error("List must not be empty");
           null
         }
+        
       | [hd] =>
         // One part means we generate members
-        def moduleType = outer.Define(<[ decl: [JSApi] public module $(hd : usesite) {} ]>);
-        //moduleType.Compile();
-          
-        // Define members
+        def moduleType = outer.Define(<[ decl: [JSApi] public module $(hd : usesite) {} ]>);         
         GenerateGlobalElements(Scope(moduleType), moduleType, members);
         moduleType
       
@@ -796,6 +776,11 @@ namespace NemerleWeb
     public SplitDot(this s : string) : list[string]
     {
       s.Split('.').NToList()
+    }
+    
+    public JoinDot(this seq : IEnumerable[string]) : string
+    {
+      string.Join(".", seq)
     }
   }
 }
