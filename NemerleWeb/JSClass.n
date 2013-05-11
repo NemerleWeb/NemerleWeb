@@ -31,7 +31,15 @@ namespace NemerleWeb
   /// Defines settings for JSclass 
   internal module JSClassSettings
   {
-    public JSApiRoots : SortedSet[string] = SortedSet();
+    public JSApiRoots : SortedSet[string] = SortedSet(InvertedComparer());
+    
+    private class InvertedComparer : IComparer[string]
+    {
+      public Compare(l : string, r : string) : int
+      {
+          r.CompareTo(l);
+      }
+    }
   }
   
   [Record(NotNull = [".*"])]

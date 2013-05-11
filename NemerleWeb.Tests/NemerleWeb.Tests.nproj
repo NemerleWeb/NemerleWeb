@@ -376,6 +376,11 @@
       <Project>{1d616985-5e18-44e1-8f74-d2ac69c3dc6f}</Project>
       <Private>False</Private>
     </MacroProjectReference>
+    <ProjectReference Include="..\NemerleWeb.TypedJS\NemerleWeb.TypedJS.nproj">
+      <Name>NemerleWeb.TypedJS</Name>
+      <Project>{65c01c91-f57a-4281-b09f-15baa5ac3cc6}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\NemerleWeb\NemerleWeb.nproj">
       <Name>NemerleWeb</Name>
       <Project>{b1635fea-c0cd-4c8e-a18e-d97d59f21b14}</Project>
