@@ -36,17 +36,33 @@ namespace NemerleWeb
       else                  TypeBuilder.DefineNestedType(typeDeclaration)
     }
     
-    public FullName : array[string]
+    public FullNameParts : list[string]
     {
       [Memoize]
       get
       {
-        if(GlobalEnv != null) GlobalEnv.CurrentNamespace.FullName.ToArray()
-        else                  TypeBuilder.FullName.Split('.')
+        if(GlobalEnv != null) GlobalEnv.CurrentNamespace.FullName
+        else                  TypeBuilder.FullName.SplitDot()
       }
     }
     
-    public Manager : ManagerClass
+    public LookupType(qid : string) : option[PExpr]
+    {
+      if(IsTypeExist(qid))
+        Some(PExpr.FromQualifiedIdentifier(Manager, qid))
+      else
+        None()
+    }
+    
+    private IsTypeExist(typeName : string) : bool
+    {
+      if(GlobalEnv != null)
+        GlobalEnv.LookupType(typeName.SplitDot()).HasValue
+      else
+        TypeBuilder.Manager.NameTree.LookupExactType(typeName.SplitDot()).HasValue
+    }
+    
+    private Manager : ManagerClass
     {
       get
       {
