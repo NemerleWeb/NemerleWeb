@@ -765,6 +765,8 @@ namespace NemerleWeb
         
       | [hd] =>
         // One part means we generate members
+        // Generate partial module to simplify the code
+        // Otherwise we need to lookup for type in case types == false
         def moduleType = outer.Define(<[ decl: [JSApi] public partial module $(hd : usesite) {} ]>);
         
         if(types)
@@ -776,7 +778,9 @@ namespace NemerleWeb
       
       | hd :: tl =>
         // If module consist from more than one part, first create all needed parts,
-        // and then generate all members      
+        // and then generate all members
+        // Generate partial module to simplify the code
+        // Otherwise we need to lookup for type in case types == false
         def innerModule = outer.Define(<[ decl: [JSApi] public partial module $(hd : usesite) {} ]>);
         def t = CreateModule(tl, Scope(innerModule), [], types);
         innerModule.Compile();
