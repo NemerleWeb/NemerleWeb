@@ -9,6 +9,8 @@ using Nemerle;
 using Nemerle.Utility;
 using Nemerle.Peg;
 using NemerleWeb.Tests.Macro;
+//using NemerleWeb.TypedJS;
+using NemerleWeb.TypedJSManual;
 
 namespace NemerleWeb.Tests
 {
@@ -885,18 +887,17 @@ namespace NemerleWeb.Tests
         a[0] == 1
       });
       
-      // TODO: Fix this
-      //test("regexp exec 1", () =>
-      //{
-      //  def res = re("pattern").exec("pattern");
-      //  res[0] == "pattern"
-      //});
+      test("regexp exec 1", () =>
+      {
+        def res = RegExp("pattern").exec("pattern");
+        res[0] == "pattern"
+      });
       
-      //test("regexp exec 2", () =>
-      //{
-      //  def res = re("pattern", "i").exec("pattern");
-      //  res[0] == "pattern"
-      //});
+      test("regexp exec 2", () =>
+      {
+        def res = RegExp("pattern", "i").exec("pattern");
+        res[0] == "pattern"
+      });
       
       test("regexp test", () =>
       {
@@ -1705,27 +1706,5 @@ namespace NemerleWeb.Tests
         </table>
       #>
     }
-  }
-  
-  [JSApi]
-  public class RegExp
-  {
-    public this(_pattern : string) 
-    {}
-      
-    public compile() : void
-    {}
-    
-    public compile(_pattern : string) : void
-    {}
-    
-    public compile(_pattern : string, _modifier : string) : void
-    {}
-    
-    public exec(_input : string) : array[string]
-    {[].ToArray()}
-    
-    public test(_input : string) : bool
-    {false}
   }
 }

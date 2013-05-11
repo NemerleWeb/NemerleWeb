@@ -29,6 +29,7 @@ namespace NemerleWeb.TypedJSManual
   public partial class RegExp
   {
     public this(pattern : string);
+    public this(pattern : string, flags : string);
     public compile() : void;
     public compile(pattern : string) : void;
     public compile(pattern : string, modifier : string) : void;

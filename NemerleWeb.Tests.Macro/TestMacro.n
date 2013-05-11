@@ -11,11 +11,9 @@ using System.Linq;
 namespace NemerleWeb.Tests.Macro
 {
   [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class, Inherited = true, AllowMultiple = false)]
-  macro AddSomeMembers(tb : TypeBuilder)
+  macro AddSomeMembers(tb : TypeBuilder) : void
   {
     tb.Define(<[decl: mutable _intVariable : int; ]>);
     tb.Define(<[decl: public IntVariable : int { get { _intVariable } }]>);
-    
-    <[ ]>
   }
 }
