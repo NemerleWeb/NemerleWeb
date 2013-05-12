@@ -32,14 +32,6 @@ namespace NemerleWeb
   internal module JSClassSettings
   {
     public JSApiRoots : SortedSet[string] = SortedSet(InvertedComparer());
-    
-    private class InvertedComparer : IComparer[string]
-    {
-      public Compare(l : string, r : string) : int
-      {
-          r.CompareTo(l);
-      }
-    }
   }
   
   [Record(NotNull = [".*"])]
@@ -49,10 +41,13 @@ namespace NemerleWeb
       public Indent : string    { get; }      
       public Typer : Typer { get; }
       
+      // HACK for using types from JSClass
+      #region Types
       public static StringType : TypeVar { get; set; }
       public static IEnumerableType : TypeVar { get; set; }        
       public static IPageType : TypeVar { get; set; }
       public static ObjectType : TypeVar { get; set; }
+      #endregion
                     
       public Fields : IEnumerable[IField]
       {
@@ -163,8 +158,7 @@ namespace NemerleWeb
         def staticConstructorBody = GetStaticConstructorBody(Indent);
         def methods = GetMethods(bodyIndent, parentPtr, true);
         def staticMethods = GetStaticMethods(Indent);
-        def nestedClasses = NestedClasses.ToList();
-        def nestedClassesString = GenerateNestedClasses(nestedClasses);
+        def nestedClassesString = GenerateNestedClasses();
         
         // This is needed to make labmda object behave as regular function
         def returning = match(ClassType.BaseType?.Name)
@@ -466,9 +460,9 @@ $(indent)}#>
         GenerateMethods(indent, GetProperName(ClassType), false, StaticMethods)
       }
       
-      GenerateNestedClasses(nested : IEnumerable[JSClass]) : string
+      GenerateNestedClasses() : string
       {
-        $"..$(nested; Environment.NewLine; _.Write())"
+        $"..$(NestedClasses; Environment.NewLine; _.Write())"
       }
       
       public TranslateMethodBody([NotNull] meth : IMethod, [NotNull] indent = "" : string) : string
@@ -560,8 +554,8 @@ $(indent)}#>
         {
 $<#$(indent)  this.__nweb_meta = {
 $(indent)    properties: [..$(Properties; ","; _.Write())],
-$(indent)    fields: [..$(Fields;         ","; _.Write())],
-$(indent)    methods: [..$(Methods;       ","; _.Write())]
+$(indent)    fields:     [..$(Fields;     ","; _.Write())],
+$(indent)    methods:    [..$(Methods;    ","; _.Write())]
 $(indent)  };#>;
         }
       }
@@ -569,8 +563,8 @@ $(indent)  };#>;
       [Record]
       public class JSClassMemberMeta
       {
-        Name : string { get; set; }
-        Attributes : List[string] { get; set; }
+        Name : string { get; }
+        Attributes : List[string] { get; }
                     
         public Write() : string
         {

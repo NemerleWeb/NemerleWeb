@@ -100,6 +100,9 @@
     <Compile Include="ClientOnlyAttribute.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Comparer.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="EventsDSL\EventData.n">
       <SubType>Code</SubType>
     </Compile>
@@ -224,6 +227,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JSLiteral.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JSApiMethods.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="NWebData.n">
