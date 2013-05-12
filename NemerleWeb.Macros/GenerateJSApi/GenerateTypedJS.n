@@ -84,9 +84,6 @@ namespace NemerleWeb
     
     tsParser = TSDeclarationParser();
     
-    CallMethodName : string = "Call";
-    NewMethodName : string = "New";
-    
     DefaultImplementation : PExpr = <[ { throw ClientCodeCalledInServerException(); } ]>;
     
     public Impl(typer : Typer, options : list[PExpr]) : void
@@ -379,7 +376,7 @@ namespace NemerleWeb
        
         _ = interfaceType.DefineWithSource(
           <[ decl:
-            $(CallMethodName : usesite)(..$functionParams) : $realReturnType;
+            $(JSApiMethods.Call : usesite)(..$functionParams) : $realReturnType;
           ]>);
       | Construct(parms, type) =>
         // Since Nemerle doesn't support creating different type using constructor.
@@ -393,7 +390,7 @@ namespace NemerleWeb
           
         _ = interfaceType.DefineWithSource(
           <[ decl:
-            $(NewMethodName : usesite)(..$functionParams) : $realType;
+            $(JSApiMethods.New : usesite)(..$functionParams) : $realType;
           ]>);
       | Index(paramName, paramType, returnType) =>
         def (realParamType, typeName) =
@@ -608,7 +605,7 @@ namespace NemerleWeb
         
         _ = anonClass.DefineWithSource(
           <[ decl:
-            public $(CallMethodName : usesite)(..$functionParams) : $realReturnType
+            public $(JSApiMethods.Call : usesite)(..$functionParams) : $realReturnType
               $DefaultImplementation
           ]>);
       | Construct(parms, type) =>
@@ -623,7 +620,7 @@ namespace NemerleWeb
           
         _ = anonClass.DefineWithSource(
           <[ decl:
-            public $(NewMethodName : usesite)(..$functionParams) : $realType
+            public $(JSApiMethods.New : usesite)(..$functionParams) : $realType
               $DefaultImplementation
           ]>);
       | Index(paramName, paramType, returnType) =>
