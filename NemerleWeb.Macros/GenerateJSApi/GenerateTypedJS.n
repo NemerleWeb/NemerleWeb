@@ -281,8 +281,7 @@ namespace NemerleWeb
       def jsApiNamespace = typer.Env.EnterIntoNamespace(root.SplitDot());
       def jsApiModule = CreateModule(root.SplitDot(), Scope(typer.Env), [], true);
       
-      // HACK for supporting Array typing in TypeScript 0.8
-      jsApiNamespace.Define(<[ decl: type _element = object; ]>).Compile();
+      GeneratePredefined(jsApiNamespace, jsApiModule);
       
       // First generate all types
       GenerateTypes(Scope(jsApiNamespace), tsAst);
@@ -293,6 +292,25 @@ namespace NemerleWeb
       // Finalize
       jsApiModule.Compile();
     }
+    
+    private GeneratePredefined(jsApiNamespace : GlobalEnv, jsApiModule : TypeBuilder) : void
+    {
+      // HACK for supporting Array typing in TypeScript 0.8
+      jsApiNamespace.Define(<[ decl: type _element = object; ]>).Compile();
+      
+      // Define 'undefined' variable using special class
+      jsApiNamespace.Define(
+        <[ decl:
+          [JSApi]
+          public sealed class $(JSApiSpecial.Undefined : usesite)
+          {
+            public static @:[T](_ : this) : T { default(T) }
+          }
+        ]>).Compile();
+        
+        _ = jsApiModule.DefineWithSource(
+          <[ decl: public static undefined : $(JSApiSpecial.Undefined : usesite); ]>);
+    }    
     
     private GenerateTypes(typesScope : Scope, members : IEnumerable[TSGlobal]) : void
     {
@@ -376,7 +394,7 @@ namespace NemerleWeb
        
         _ = interfaceType.DefineWithSource(
           <[ decl:
-            $(JSApiMethods.Call : usesite)(..$functionParams) : $realReturnType;
+            $(JSApiSpecial.Call : usesite)(..$functionParams) : $realReturnType;
           ]>);
       | Construct(parms, type) =>
         def fullPrefix = $"$(tsInterface.Name)_New";
@@ -387,7 +405,7 @@ namespace NemerleWeb
           
         _ = interfaceType.DefineWithSource(
           <[ decl:
-            $(JSApiMethods.New : usesite)(..$functionParams) : $realType;
+            $(JSApiSpecial.New : usesite)(..$functionParams) : $realType;
           ]>);
       | Index(paramName, paramType, returnType) =>
         def (realParamType, typeName) =
@@ -602,7 +620,7 @@ namespace NemerleWeb
         
         _ = anonClass.DefineWithSource(
           <[ decl:
-            public $(JSApiMethods.Call : usesite)(..$functionParams) : $realReturnType
+            public $(JSApiSpecial.Call : usesite)(..$functionParams) : $realReturnType
               $DefaultImplementation
           ]>);
       | Construct(parms, type) =>
@@ -614,7 +632,7 @@ namespace NemerleWeb
           
         _ = anonClass.DefineWithSource(
           <[ decl:
-            public $(JSApiMethods.New : usesite)(..$functionParams) : $realType
+            public $(JSApiSpecial.New : usesite)(..$functionParams) : $realType
               $DefaultImplementation
           ]>);
       | Index(paramName, paramType, returnType) =>
