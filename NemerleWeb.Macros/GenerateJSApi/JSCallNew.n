@@ -24,6 +24,13 @@ namespace NemerleWeb
     JSCallNewImpl.DoTransform(Macros.ImplicitCTX(), expr, JSApiSpecial.New, "jsnew")
   }
   
+  // TODO: Support calling without parentheses like C#/JS:
+  //
+  // Old: (jsnew RegExp("A")).exec("A");
+  // New: jsnew RegExp("A").exec("A");
+  //
+  // Old: (jsnew (jsnew A())()).F();
+  // New: jsnew jsnew A()().F();
   module JSCallNewImpl
   {
     public DoTransform(typer : Typer, expr : PExpr, jsMethodName : string, syntaxName : string) : PExpr
