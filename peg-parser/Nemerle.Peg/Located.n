@@ -6,7 +6,7 @@ using Nemerle.Assertions;
 using Nemerle.Utility;
 using Nemerle.Imperative;
 using NemerleWeb;
-using NemerleWeb.TypedJS;
+using TypedJS = NemerleWeb.TypedJS;
 
 namespace NemerleWeb.Peg
 {
@@ -31,8 +31,8 @@ namespace NemerleWeb.Peg
     
     public static ExtractPosAndLen(msg : string) : int * int
     {
-      def result = jsnew RegExp(@"\[(\d+):(\d+)]", undefined).exec(msg);
-      if (result != null && result.Length == 2)
+      def result = (jsnew TypedJS.RegExp(@"\[(\d+):(\d+)]", TypedJS.undefined)).exec(msg);
+      if (result != null && result.length == 2)
       {
         def errorPos = int.Parse(result[1]);
         def errorLen = int.Parse(result[2]);
