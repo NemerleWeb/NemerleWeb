@@ -26,10 +26,14 @@ namespace NemerleWeb
 namespace NemerleWeb.TypedJSManual
 {
   [JSApiImpl]
-  public partial class RegExp
+  public class RegExp
   {
-    public this(pattern : string);
-    public this(pattern : string, flags : string);
+    [JSNew]
+    public @_(pattern : string) : RegExp;
+    
+    [JSNew]
+    public @_(pattern : string, flags : string) : RegExp;
+    
     public compile() : void;
     public compile(pattern : string) : void;
     public compile(pattern : string, modifier : string) : void;

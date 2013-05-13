@@ -105,7 +105,7 @@ namespace NemerleWeb
       def tsAsts = tsFilesToParse.SelectMany(ParseTS);
       
       // Step 3: Analyze
-      def finalAst = AnalyzeTSAst(tsAsts);
+      def finalAst = AnalyzeTSAst(tsAsts).ToList();
       
       // Step 4: Generate
       GenerateCode(typer, args.Root, finalAst);
@@ -244,7 +244,7 @@ namespace NemerleWeb
           | TSGlobal.Interface as i => i.Name
           | TSGlobal.Module    as m => m.Name
           | TSGlobal.Enum      as e => e.Name
-          | _ => throw Exception(); ""
+          | _ => ""
           };
         // Group by type and name
         (ast.GetType(), name)
@@ -379,9 +379,6 @@ namespace NemerleWeb
             $(JSApiMethods.Call : usesite)(..$functionParams) : $realReturnType;
           ]>);
       | Construct(parms, type) =>
-        // Since Nemerle doesn't support creating different type using constructor.
-        // Unlike JavaScript where function can return anything.
-        // We use special method 'New' for miming this.
         def fullPrefix = $"$(tsInterface.Name)_New";
         def typePrefix = $"$(fullPrefix)_Return";
         def realType = ConvertType(typePrefix, type, typesScope);
@@ -609,9 +606,6 @@ namespace NemerleWeb
               $DefaultImplementation
           ]>);
       | Construct(parms, type) =>
-        // Since Nemerle doesn't support creating different type using constructor.
-        // Unlike JavaScript where function can return anything.
-        // We use special method 'New' for miming this.
         def fullPrefix = $"$(className)_New";
         def typePrefix = $"$(fullPrefix)_Return";
         def realType = ConvertType(typePrefix, type, typesScope);
