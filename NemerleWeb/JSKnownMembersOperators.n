@@ -74,12 +74,16 @@ namespace NemerleWeb
             {
             // HACK: Is there anything better ?
             | [arg] =>
-              match(typeInfo.FullName)
-              {
-              | "System.Decimal" => Some(arg)
-              | "System.String" => Some(JSAstHelper.CallToString(typeInfo, left, member, parms))
-              | _ => Some(JSAst.Call(left, []))
-              }
+              // If JSApi attribute is defined, return as is.
+              if(typeInfo.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
+                Some(arg)
+              else
+                match(typeInfo.FullName)
+                {
+                | "System.Decimal" => Some(arg)
+                | "System.String" => Some(JSAstHelper.CallToString(typeInfo, left, member, parms))
+                | _ => Some(JSAst.Call(left, []))
+                }
             | _ => None()
             }
           });

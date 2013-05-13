@@ -12,7 +12,7 @@ namespace NemerleWeb
   /// <summary>
   /// Special methods for typed JS.
   /// </summary>
-  public module JSApiMethods
+  public module JSApiSpecial
   {
     /// <summary>
     /// Used for calling object's "()".
@@ -32,5 +32,7 @@ namespace NemerleWeb
     /// b.A == 1
     /// </summary>
     public New  = "<>New";
+    
+    public Undefined = "<>Undefined";
   }
 }

@@ -15,13 +15,13 @@ namespace NemerleWeb
   macro JSCall(expr : PExpr)
   syntax("jscall", expr)
   {
-    JSCallNewImpl.DoTransform(Macros.ImplicitCTX(), expr, JSApiMethods.Call, "jscall")
+    JSCallNewImpl.DoTransform(Macros.ImplicitCTX(), expr, JSApiSpecial.Call, "jscall")
   }
   
   macro JSNew(expr : PExpr)
   syntax("jsnew", expr)
   {
-    JSCallNewImpl.DoTransform(Macros.ImplicitCTX(), expr, JSApiMethods.New, "jsnew")
+    JSCallNewImpl.DoTransform(Macros.ImplicitCTX(), expr, JSApiSpecial.New, "jsnew")
   }
   
   module JSCallNewImpl

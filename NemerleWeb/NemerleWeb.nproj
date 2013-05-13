@@ -229,7 +229,7 @@
     <Compile Include="JSLiteral.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JSApiMethods.n">
+    <Compile Include="JSApiSpecial.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="NWebData.n">

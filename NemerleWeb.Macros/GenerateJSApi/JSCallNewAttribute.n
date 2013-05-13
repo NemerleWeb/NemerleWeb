@@ -20,7 +20,7 @@ namespace NemerleWeb
   [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Method)]
   macro JSCall(typeBuilder : TypeBuilder, method : ClassMember.Function)
   {
-    JSCallNewAttributeImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder, method, JSApiMethods.Call)
+    JSCallNewAttributeImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder, method, JSApiSpecial.Call)
   }
   
   /// <summary>
@@ -31,7 +31,7 @@ namespace NemerleWeb
   [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Method)]
   macro JSNew(typeBuilder : TypeBuilder, method : ClassMember.Function)
   {
-    JSCallNewAttributeImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder, method, JSApiMethods.New)
+    JSCallNewAttributeImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder, method, JSApiSpecial.New)
   }
   
   module JSCallNewAttributeImpl

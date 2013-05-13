@@ -198,13 +198,13 @@ namespace NemerleWeb
         else
         if(left is JSAst.StaticMethodRef)
           return JSClass.GetProperNameForJS(typeInfo).StaticCall(member, parms);        
-        // JSApiMethods.Call
+        // JSApiSpecial.Call
         else
-        if(member.Name == JSApiMethods.Call)
+        if(member.Name == JSApiSpecial.Call)
             return left.ExternalMethodCall("", parms);
-        // JSApiMethods.New
+        // JSApiSpecial.New
         else
-        if(member.Name == JSApiMethods.New)
+        if(member.Name == JSApiSpecial.New)
           return JSAst.Call(JSAst.Constructor(left.Write(), None()), parms);        
         // Instance method
         else
