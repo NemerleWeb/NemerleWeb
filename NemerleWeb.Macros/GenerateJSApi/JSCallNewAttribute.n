@@ -1,0 +1,56 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
+using Nemerle.Compiler.Typedtree;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  /// <summary>
+  /// Usage:
+  /// [JSCall]
+  /// public _(...) : ...;
+  /// </summary>
+  [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Method)]
+  macro JSCall(typeBuilder : TypeBuilder, method : ClassMember.Function)
+  {
+    JSCallNewAttributeImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder, method, JSApiMethods.Call)
+  }
+  
+  /// <summary>
+  /// Usage:
+  /// [JSNew]
+  /// public _(...) : ...;
+  /// </summary>
+  [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Method)]
+  macro JSNew(typeBuilder : TypeBuilder, method : ClassMember.Function)
+  {
+    JSCallNewAttributeImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder, method, JSApiMethods.New)
+  }
+  
+  module JSCallNewAttributeImpl
+  {
+    public DoTransform(
+      typer : Typer,
+      _typeBuilder : TypeBuilder,
+      method : ClassMember.Function,
+      jsMethodName : string) : void
+    {
+      Macros.DefineCTX(typer);
+      
+      when(method.Name != "_")
+        Message.Error($"Method $(method.Name) must have name \"_\" (underscore)");
+      
+      when(method.Attributes %&& NemerleModifiers.Static)
+        Message.Error($"Method $(method.Name) must not be static");
+        
+      method.name = Splicable.Name(Name(jsMethodName));
+    }
+  }
+}

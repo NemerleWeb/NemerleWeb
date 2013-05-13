@@ -34,9 +34,11 @@ namespace NemerleWeb
            when(function.Body is <[]> || function.Body is <[ () ]>)
             function.Body = <[ throw NemerleWeb.ClientCodeCalledInServerException(); ]>;
       
-      // Addd JSApi attribute if it hasn't been added
+      // Add JSApi attribute if it hasn't been added
       when(!typeBuilder.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
         typeBuilder.Ast.AddCustomAttribute(<[ NemerleWeb.JSApiAttribute ]>);
+       
+      // Add empty protected constructor if doesn't exist
     }
   }
 }

@@ -1,0 +1,40 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
+using Nemerle.Compiler.Typedtree;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  macro JSCall(expr : PExpr)
+  syntax("jscall", expr)
+  {
+    JSCallNewImpl.DoTransform(Macros.ImplicitCTX(), expr, JSApiMethods.Call, "jscall")
+  }
+  
+  macro JSNew(expr : PExpr)
+  syntax("jsnew", expr)
+  {
+    JSCallNewImpl.DoTransform(Macros.ImplicitCTX(), expr, JSApiMethods.New, "jsnew")
+  }
+  
+  module JSCallNewImpl
+  {
+    public DoTransform(typer : Typer, expr : PExpr, jsMethodName : string, syntaxName : string) : PExpr
+    {
+      Macros.DefineCTX(typer);
+      
+      match(expr)
+      {
+      | <[ $obj(..$args) ]> => <[ $obj.$(jsMethodName : usesite)(..$args) ]>
+      | _ => Message.Error($"Use $syntaxName obj(args)"); <[ ]>
+      }
+    }
+  }
+}
