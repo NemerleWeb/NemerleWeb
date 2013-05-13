@@ -3,7 +3,7 @@ using Nemerle.Utility;
 
 namespace NemerleWeb
 {
-  [AttributeUsage(AttributeTargets.Class)]
+  [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
   public class JSApiAttribute : Attribute
   {
   }

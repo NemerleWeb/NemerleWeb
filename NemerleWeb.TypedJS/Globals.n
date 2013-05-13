@@ -22,22 +22,3 @@ namespace NemerleWeb
     public setInterval(expression : void -> void, msec : float, language : string) : float;
   }
 }
-
-namespace NemerleWeb.TypedJSManual
-{
-  [JSApiImpl]
-  public class RegExp
-  {
-    [JSNew]
-    public @_(pattern : string) : RegExp;
-    
-    [JSNew]
-    public @_(pattern : string, flags : string) : RegExp;
-    
-    public compile() : void;
-    public compile(pattern : string) : void;
-    public compile(pattern : string, modifier : string) : void;
-    public exec(input : string) : array[string];
-    public test(input : string) : bool;
-  }
-}
