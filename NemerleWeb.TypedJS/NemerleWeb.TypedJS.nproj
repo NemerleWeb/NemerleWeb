@@ -75,6 +75,9 @@
     <Compile Include="Properties\NWebProperties.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Undefined.n">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

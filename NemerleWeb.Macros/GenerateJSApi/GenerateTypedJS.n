@@ -296,20 +296,7 @@ namespace NemerleWeb
     private GeneratePredefined(jsApiNamespace : GlobalEnv, jsApiModule : TypeBuilder) : void
     {
       // HACK for supporting Array typing in TypeScript 0.8
-      jsApiNamespace.Define(<[ decl: type _element = object; ]>).Compile();
-      
-      // Define 'undefined' variable using special class
-      jsApiNamespace.Define(
-        <[ decl:
-          [JSApi]
-          public sealed class $(JSApiSpecial.Undefined : usesite)
-          {
-            public static @:[T](_ : this) : T { default(T) }
-          }
-        ]>).Compile();
-        
-        _ = jsApiModule.DefineWithSource(
-          <[ decl: public static undefined : $(JSApiSpecial.Undefined : usesite); ]>);
+      jsApiNamespace.Define(<[ decl: type _element = object; ]>).Compile();    
     }    
     
     private GenerateTypes(typesScope : Scope, members : IEnumerable[TSGlobal]) : void

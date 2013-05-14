@@ -32,7 +32,5 @@ namespace NemerleWeb
     /// b.A == 1
     /// </summary>
     public New  = "<>New";
-    
-    public Undefined = "<>Undefined";
   }
 }
