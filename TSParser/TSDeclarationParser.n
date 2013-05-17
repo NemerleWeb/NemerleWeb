@@ -517,11 +517,11 @@ namespace TSParser
         // According to spec, additional comma is forbiden, but TS compiler handles it.
         ParameterList : list[TSParam] =
           ParameterListROR /
-          ParameterListOR comma_s? /
-          ParameterListRO /
           ParameterListRR /
-          OptionalParameterList comma_s? /
-          RequiredParameterList comma_s? /
+          ParameterListRO /
+          ParameterListOR /
+          OptionalParameterList /
+          RequiredParameterList /
           RestParameter;
           
         // Return empty list instead of option
