@@ -92,7 +92,7 @@ namespace NemerleWeb.Rsdn
     
     SearchLeavesForTerm(term : string) : IEnumerable[(TreeNode * list[string])]
     {
-      _leaves.Where((node : TreeNode, _) => node.Caption?.Contains(term))
+      _leaves.Where((node : TreeNode, _) => node.Caption?.ToLower().Contains(term.ToLower()))
     }
     
     CloneNoChildren(node : TreeNode) : TreeNode
