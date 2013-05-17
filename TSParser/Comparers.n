@@ -65,13 +65,19 @@ namespace TSParser
       | (Required(_, xtype, _), Option(_, _, ytype, _))
       | (Option(_, _, xtype, _), Option(_, _, ytype, _))
       | (Option(_, _, xtype, _), Required(_, ytype, _)) =>
-        if(!xtype.HasValue && !ytype.HasValue)
-          true
-        else
-        if(xtype.HasValue || ytype.HasValue)
-          false
-        else
-          TSTypeEqualityComparer().Equals(xtype.Value, ytype.Value)
+        match((xtype, ytype))
+        {
+        | (None, None)
+        | (None, Some(TSType.Any))
+        | (Some(TSType.Any), None) => true          
+        | (Some, None)
+        | (None, Some) => false          
+        | (Some, Some) => TSTypeEqualityComparer().Equals(xtype.Value, ytype.Value)
+        }
+      | (Rest(_, xtype), Required(_, Some(TSType.Array as ytype), _))
+      | (Rest(_, xtype), Option(_, _, Some(TSType.Array as ytype), _))
+      | (Required(_, Some(TSType.Array as xtype), _), Rest(_, ytype))
+      | (Option(_, _, Some(TSType.Array as xtype), _), Rest(_, ytype))
       | (Rest(_, xtype), Rest(_, ytype)) =>
         TSTypeEqualityComparer().Equals(xtype, ytype)
       | _ => false
@@ -103,7 +109,7 @@ namespace TSParser
       | (Number, Number) => true
       | (String, String) => true
       | (Void, Void) => true
-      | (Named(xname), Named(yname)) => xname == yname
+      | (Named(xname), Named(yname)) => xname.Equals(yname)
       | (Array(xtype, xarity), Array(ytype, yarity)) =>
         TSTypeEqualityComparer().Equals(xtype, ytype) &&
         xarity == yarity
