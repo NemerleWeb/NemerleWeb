@@ -51,7 +51,7 @@ namespace NemerleWeb.Rsdn
               <span $when(!c.IsOpened)>+</span>
               <span>$(c.Caption)</span>
             </a>
-            <a $when(!c.HasChildren) click="$SelectNode" class="node">
+            <a $when(!c.HasChildren) click="$(c.SelectNode())" class="node">
               <span>$(c.Caption)</span>
             </a>            
             <div $when(c.IsOpened && Children != null)>
