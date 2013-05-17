@@ -63,6 +63,9 @@
     </MacroReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Comparers.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="TSDeclarationParser.n">
       <SubType>Code</SubType>
     </Compile>

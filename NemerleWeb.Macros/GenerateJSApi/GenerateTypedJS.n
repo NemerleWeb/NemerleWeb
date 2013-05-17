@@ -16,6 +16,8 @@ using NemerleWeb;
 
 namespace NemerleWeb
 {
+  #region GenerateTypedJS
+  
   /// <summary>
   /// Parses d.ts files and creates an appropriate Nemerle types and variables.
   ///
@@ -62,22 +64,7 @@ namespace NemerleWeb
   {
     GenerateTypedJSImpl.Impl(ImplicitCTX(), options)
   }
-  
-  [Record]
-  class DirectoryArg
-  {    
-    public Directory : string { get; }
-    public Exclude : string { get; }
-  }
-  
-  [Record]
-  class GenerateArgs
-  {
-    public Root : string { get; }
-    public Lib : string { get; }
-    public Args : IEnumerable[DirectoryArg] { get; }
-  }
-  
+
   module GenerateTypedJSImpl
   {
     #region Implementation
@@ -253,23 +240,98 @@ namespace NemerleWeb
       {
         def type = typeAndNameGroup.Key[0];
         
-        if(type.Equals(typeof(TSGlobal.Variable)))
+        if(type.Equals(typeof(TSGlobal.Class)))
         {
-          // Return first variable and skip other
-          [typeAndNameGroup.First()]
+          AnalyzeClass(typeAndNameGroup.Cast.[TSGlobal.Class]())
         }
         else
-        if(type.Equals(typeof(TSGlobal.Function)))
+        if(type.Equals(typeof(TSGlobal.Interface)))
         {
-          [typeAndNameGroup.First()]
+          AnalyzeInterface(typeAndNameGroup.Cast.[TSGlobal.Interface]())
         }
         else
+        if(type.Equals(typeof(TSGlobal.Module)))
         {
-          [typeAndNameGroup.First()]
+          AnalyzeModule(typeAndNameGroup.Cast.[TSGlobal.Module]())
+        }
+        else
+        if(type.Equals(typeof(TSGlobal.Enum)))
+        {
+          AnalyzeEnum(typeAndNameGroup :> IEnumerable[TSGlobal.Enum])
+        }
+        // By default take first and skip others
+        else
+        {
+          typeAndNameGroup.First()
         }
       }
       
-      tsAsts.Where(filter).GroupBy(group).SelectMany(select)
+      tsAsts.Where(filter).GroupBy(group).Select(select)
+    }
+    
+    /// <summary>
+    /// Unite
+    /// </summary>
+    private AnalyzeClass(ast : IEnumerable[TSGlobal.Class]) : TSGlobal
+    {
+      def name = ast.First().Name;
+      // Extends can be only once
+      def firstExtends = ast.FirstOrDefault(c => c.Extends.IsSome);
+      def extends = if(firstExtends != null) firstExtends.Extends else None();
+      // Implements is not limited
+      def @implements = ast.SelectMany(c => c.Implements).Distinct().NToList();
+      
+      def members = ast
+        .SelectMany(a => a.Members)
+        .Distinct(TSClassMemberEqualityComparer())
+        .NToList();
+      
+      def ret = TSGlobal.Class(name, extends, @implements, members);
+      ret
+    }
+    
+    /// <summary>
+    /// Unite
+    /// </summary>
+    private AnalyzeInterface(ast : IEnumerable[TSGlobal.Interface]) : TSGlobal
+    {
+      def name = ast.First().Name;
+      
+      // Extends is not limited
+      def extends = ast.SelectMany(_.Extends).Distinct().NToList();
+      
+      def members = ast
+        .SelectMany(a => a.Type.Members)
+        .Distinct(TSObjectEqualityComparer())
+        .NToList();
+      def @type = TSType.Object(members);
+      
+      def ret = TSGlobal.Interface(name, extends, @type);
+      ret
+    }
+    
+    /// <summary>
+    /// Unite
+    /// </summary>
+    private AnalyzeModule(ast : IEnumerable[TSGlobal.Module]) : TSGlobal
+    {
+      def name = ast.First().Name;      
+      def members = ast.SelectMany(a => AnalyzeTSAst(a.Members)).NToList();
+      
+      def ret = TSGlobal.Module(name, members);
+      ret
+    }
+    
+    /// <summary>
+    /// Unite
+    /// </summary>
+    private AnalyzeEnum(ast : IEnumerable[TSGlobal.Enum]) : TSGlobal
+    {
+      def name = ast.First().Name;
+      def elements = ast.SelectMany(a => a.Elements).NToList();
+      
+      def ret = TSGlobal.Enum(name, elements);
+      ret
     }
     
     #endregion
@@ -293,7 +355,7 @@ namespace NemerleWeb
       jsApiModule.Compile();
     }
     
-    private GeneratePredefined(jsApiNamespace : GlobalEnv, jsApiModule : TypeBuilder) : void
+    private GeneratePredefined(jsApiNamespace : GlobalEnv, _jsApiModule : TypeBuilder) : void
     {
       // HACK for supporting Array typing in TypeScript 0.8
       jsApiNamespace.Define(<[ decl: type _element = object; ]>).Compile();    
@@ -786,6 +848,27 @@ namespace NemerleWeb
     
     #endregion
   }
+  
+  #endregion
+
+  #region Data types
+  
+  [Record]
+  class DirectoryArg
+  {    
+    public Directory : string { get; }
+    public Exclude : string { get; }
+  }
+  
+  [Record]
+  class GenerateArgs
+  {
+    public Root : string { get; }
+    public Lib : string { get; }
+    public Args : IEnumerable[DirectoryArg] { get; }
+  }
+  
+  #endregion
   
   internal module TypedJSStringExtensions
   {

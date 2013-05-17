@@ -540,6 +540,7 @@ namespace TSParser
         OptionalParameterList : list[TSParam] = OptionalParameter (comma_s OptionalParameter)*;
         // Optional parameter must not have Initialiser in declaration files.
         OptionalParameter : TSParam = PublicOrPrivate? Identifier optional TypeAnnotation?;
+                                      //                        / TypeAnnotation? Initialiser;
         RestParameter : list[TSParam] = ellipsis_s Identifier required colon_s ArrayType;
         ReturnTypeAnnotation : TSType = colon_s ReturnType s;
         VoidType : TSType = "void";
@@ -919,6 +920,7 @@ namespace TSParser
       required.Append(rest)
     }
     
+    // _optional is always true in declaration files
     OptionalParameter(access : option[MemberAccess], id : string, optional : bool, type : option[TSType]) : TSParam
     {
       TSParam.Option(id, optional, type, access)
