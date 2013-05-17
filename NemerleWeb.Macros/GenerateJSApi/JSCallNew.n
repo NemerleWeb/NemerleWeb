@@ -40,6 +40,7 @@ namespace NemerleWeb
       match(expr)
       {
       | <[ $obj(..$args) ]> => <[ $obj.$(jsMethodName : usesite)(..$args) ]>
+      | <[ $obj(..$args) ..$next ]> => <[ $obj.$(jsMethodName : usesite)(..$args) ..$next ]>
       | _ => Message.Error($"Use $syntaxName obj(args)"); <[ ]>
       }
     }

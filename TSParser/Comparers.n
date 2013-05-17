@@ -1,0 +1,129 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+// It was better to generate it using StructuralEquality macro,
+// but it doesn't go well with variants.
+// So here some hack comes in play
+namespace TSParser
+{
+  public abstract class BaseEqualityComparer[T] : EqualityComparer[T] where T : class
+  {
+    public override GetHashCode(obj : T) : int
+    {
+      obj.GetHashCode()
+    }
+    
+    public override Equals(x : T, y : T) : bool
+    {
+      if(object.ReferenceEquals(x, y))
+        true
+      else
+      if(x == null || y == null)
+        false
+      else
+        EqualsImpl(x, y)
+    }
+    
+    protected abstract EqualsImpl(x : T, y : T) : bool;
+  }
+    
+  public class TSClassMemberPartEqualityComparer : BaseEqualityComparer[TSClassMemberPart]
+  {
+    protected override EqualsImpl(x : TSClassMemberPart, y : TSClassMemberPart) : bool
+    {
+      | (Variable(xname, _), Variable(yname, _)) => xname == yname
+      | (Method(xname, _, xparams, _), Method(yname, _, yparams, _)) =>
+        xname == yname &&
+        TSParamUtils.CompareParams(xparams, yparams)
+      | _ => false
+    }
+  }
+  
+  public class TSClassMemberEqualityComparer : BaseEqualityComparer[TSClassMember]
+  {
+    protected override EqualsImpl(x : TSClassMember, y : TSClassMember) : bool
+    {
+      | (Constructor(xparams), Constructor(yparams)) =>
+        TSParamUtils.CompareParams(xparams, yparams)
+      | (Member(xpart, _, _), Member(ypart, _, _)) =>
+        TSClassMemberPartEqualityComparer().Equals(xpart, ypart)
+      | _ => false
+    }
+  }
+  
+  public class TSParamEqualityComparer : BaseEqualityComparer[TSParam]
+  {
+    protected override EqualsImpl(x : TSParam, y : TSParam) : bool
+    {
+      | (Required(_, xtype, _), Required(_, ytype, _))
+      | (Required(_, xtype, _), Option(_, _, ytype, _))
+      | (Option(_, _, xtype, _), Option(_, _, ytype, _))
+      | (Option(_, _, xtype, _), Required(_, ytype, _)) =>
+        if(!xtype.HasValue && !ytype.HasValue)
+          true
+        else
+        if(xtype.HasValue || ytype.HasValue)
+          false
+        else
+          TSTypeEqualityComparer().Equals(xtype.Value, ytype.Value)
+      | (Rest(_, xtype), Rest(_, ytype)) =>
+        TSTypeEqualityComparer().Equals(xtype, ytype)
+      | _ => false
+    }
+  }
+  
+  public class TSObjectEqualityComparer : BaseEqualityComparer[TSObject]
+  {
+    protected override EqualsImpl(x : TSObject, y : TSObject) : bool
+    {
+      | (Call(xparms, _), Call(yparms, _)) => xparms.Equals(yparms)
+      | (Construct(xparams, _), Construct(yparams, _)) =>
+        TSParamUtils.CompareParams(xparams, yparams)
+      | (Index(_, TSIndexParamType.Number, _), Index(_, TSIndexParamType.Number, _)) => true
+      | (Index(_, TSIndexParamType.String, _), Index(_, TSIndexParamType.String, _)) => true
+      | (Property(xname, _, _), Property(yname, _, _)) => xname == yname
+      | (Function(xname, _, xparams, _), Function(yname, _, yparams, _)) =>
+        xname == yname &&
+        TSParamUtils.CompareParams(xparams, yparams)
+      | _ => false
+    }
+  }
+  
+  public class TSTypeEqualityComparer : BaseEqualityComparer[TSType]
+  {
+    protected override EqualsImpl(x : TSType, y : TSType) : bool
+    {
+      | (Any, Any) => true
+      | (Number, Number) => true
+      | (String, String) => true
+      | (Void, Void) => true
+      | (Named(xname), Named(yname)) => xname == yname
+      | (Array(xtype, xarity), Array(ytype, yarity)) =>
+        TSTypeEqualityComparer().Equals(xtype, ytype) &&
+        xarity == yarity
+      | (Object(xmembers), Object(ymembers)) =>
+        Enumerable.SequenceEqual(xmembers, ymembers, TSObjectEqualityComparer())
+      | (Lambda(xparams, xreturnType), Lambda(yparams, yreturnType)) 
+      | (New(xparams, xreturnType), New(yparams, yreturnType)) => 
+        TSParamUtils.CompareParams(xparams, yparams) &&
+        TSTypeEqualityComparer().Equals(xreturnType, yreturnType)
+      | _ => false
+    }
+  }
+  
+  public module TSParamUtils
+  {
+    public CompareParams(x : IEnumerable[TSParam], y : IEnumerable[TSParam]) : bool
+    {
+      // TODO: This naive implementation is not good at all.
+      // f(a, b?) > f(a)
+      Enumerable.SequenceEqual(x, y, TSParamEqualityComparer())
+    }
+  }
+}

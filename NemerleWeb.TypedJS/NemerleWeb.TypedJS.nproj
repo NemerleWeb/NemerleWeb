@@ -81,6 +81,18 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+    <Folder Include="Scripts\" />
+    <Folder Include="Scripts\typings\" />
+    <Folder Include="Scripts\typings\bootstrap\" />
+    <Folder Include="Scripts\typings\jquery.validation\" />
+    <Folder Include="Scripts\typings\jqueryui\" />
+    <Folder Include="Scripts\typings\jquery\" />
+    <Folder Include="Scripts\typings\knockout.mapping\" />
+    <Folder Include="Scripts\typings\knockout.validation\" />
+    <Folder Include="Scripts\typings\knockout\" />
+    <Folder Include="Scripts\typings\requirejs\" />
+    <Folder Include="Scripts\typings\signalr\" />
+    <Folder Include="Scripts\typings\underscore\" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
@@ -98,6 +110,45 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="packages.config">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\bootstrap\bootstrap.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.validation\jquery.validation.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jqueryui\jqueryui.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery\jquery.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\knockout.mapping\knockout.mapping.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\knockout.validation\knockout.validation.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\knockout\knockout.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\requirejs\require.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\signalr\signalr.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\underscore\underscore-typed-1.4.2.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\underscore\underscore-typed-1.4.3.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\underscore\underscore-typed.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\underscore\underscore.d.ts">
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>

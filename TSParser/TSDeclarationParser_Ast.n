@@ -1,4 +1,5 @@
 using Nemerle;
+using Nemerle.Extensions;
 using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
@@ -20,9 +21,12 @@ namespace TSParser
   
   public variant TSClassMemberPart
   {
+    [StructuralEquality(Ignore = [Type])]    
     | Variable { Name : string; Type : option[TSType]; }
+    
+    [StructuralEquality(Ignore = [Optional, ReturnType])]
     | Method 
-      { 
+      {
         Name : string;
         Optional : bool;
         Params : list[TSParam];
@@ -32,7 +36,10 @@ namespace TSParser
   
   public variant TSClassMember
   {
+    [StructuralEquality]    
     | Constructor { Params : list[TSParam]; }
+    
+    [StructuralEquality(Ignore = [Static, Access])]
     | Member
       {
         Part : TSClassMemberPart;
@@ -43,12 +50,15 @@ namespace TSParser
   
   public variant TSParam
   {
+    [StructuralEquality(Ignore = [Name, Access])]
     | Required
       {
         Name : string;
         Type : option[TSType];
         Access : option[MemberAccess];
       }
+     
+    [StructuralEquality(Ignore = [Name, Optional, Access])]
     | Option
       { 
         Name : string;
@@ -56,28 +66,40 @@ namespace TSParser
         Type : option[TSType];
         Access : option[MemberAccess];
       }
+      
+    [StructuralEquality(Ignore = [Name])]
     | Rest { Name : string; Type : TSType.Array; }
   }
   
   // Index parameter type either number or string.
   // Nothing else is allowed.
+  [StructuralEquality]
   public variant TSIndexParamType
   {
     | Number
     | String
   }
-  
+    
   public variant TSObject
   {
+    [StructuralEquality(Ignore = [ReturnType])]
     | Call { Params : list[TSParam]; ReturnType : option[TSType]; }
+    
+    [StructuralEquality]
     | Construct { Params : list[TSParam]; Type : option[TSType]; }
+    
+    [StructuralEquality(Ignore = [ParamName, ReturnType])]
     | Index
       { 
         ParamName : string;
         ParamType : TSIndexParamType;
         ReturnType : TSType;
       }
+      
+    [StructuralEquality(Ignore = [Optional, Type])]
     | Property { Name : string; Optional : bool; Type : option[TSType]; }
+    
+    [StructuralEquality(Ignore = [Optional, ReturnType])]
     | Function
       {
         Name : string;
@@ -88,12 +110,14 @@ namespace TSParser
   }
   
   [Record]
+  [StructuralEquality]
   public class TSEnumElement
   {
     Name : string;
     Initialiser : option[string];
   }
   
+  [StructuralEquality]
   public variant TSType
   {
     | Any
@@ -112,6 +136,7 @@ namespace TSParser
   /// Global scope members.
   /// Note: names are never empty.
   /// </summary>
+  [StructuralEquality]
   public variant TSGlobal
   {
     | Variable { Name : string; Type : option[TSType]; }
