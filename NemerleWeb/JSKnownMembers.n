@@ -194,6 +194,10 @@ namespace NemerleWeb
         // Constructor
         if(member.IsConstructor)
           return JSAst.Call(JSAst.Constructor(JSClass.GetProperNameForJS(typeInfo), None()), parms);
+        // @() operator
+        else
+        if(left is JSAst.StaticMethodRef && member.Name == "()")
+          return parms.Head.ExternalMethodCall("", parms.Tail);
         // Static method
         else
         if(left is JSAst.StaticMethodRef)
