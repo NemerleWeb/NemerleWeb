@@ -652,7 +652,16 @@ namespace NemerleWeb
     
     private CreateAnonymousType(prefix : string, members : list[TSObject], typesScope : Scope) : PExpr
     {
-      def className = $"$(prefix)_AnonymousType";
+      def classNamePrefix = $"$(prefix)_AnonymousType";
+      
+      // Find unused name for anonymous class
+      // This handles situation when two functions with same name have different anonymous types.
+      mutable i = 0;
+      while(typesScope.LookupType(classNamePrefix + i.ToString()).IsSome)
+        i++;
+      
+      def className = classNamePrefix + i.ToString();
+      
       def anonClass = typesScope.Define(<[ decl:
         [JSApi] public sealed class $(className : usesite) { }
       ]>);
