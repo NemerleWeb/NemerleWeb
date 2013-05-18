@@ -31,7 +31,7 @@ namespace NemerleWeb.Peg
     
     public static ExtractPosAndLen(msg : string) : int * int
     {
-      def result = (jsnew TypedJS.RegExp(@"\[(\d+):(\d+)]", TypedJS.undefined)).exec(msg);
+      def result = jsnew TypedJS.RegExp(@"\[(\d+):(\d+)]", TypedJS.undefined).exec(msg);
       if (result != null && result.length == 2)
       {
         def errorPos = int.Parse(result[1]);
