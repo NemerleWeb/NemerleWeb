@@ -23,26 +23,28 @@ namespace NemerleWeb
   {
     JSCallNewImpl.DoTransform(Macros.ImplicitCTX(), expr, JSApiSpecial.New, "jsnew")
   }
-  
-  // TODO: Support calling without parentheses like C#/JS:
-  //
-  // Old: (jsnew RegExp("A")).exec("A");
-  // New: jsnew RegExp("A").exec("A");
-  //
-  // Old: (jsnew (jsnew A())()).F();
-  // New: jsnew jsnew A()().F();
+   
   module JSCallNewImpl
   {
     public DoTransform(typer : Typer, expr : PExpr, jsMethodName : string, syntaxName : string) : PExpr
     {
       Macros.DefineCTX(typer);
       
-      match(expr)
+      // A(..).B(..) => A.Method(..).B(..)
+      // A(..) => A.Method(..)
+      def impl(ex)
       {
+      | <[ $obj.$method(..$args).$nextMethod(..$nextArgs) ]> =>
+        def extractObj = impl(<[$obj.$method(..$args)]>);
+        <[ $extractObj.$nextMethod(..$nextArgs) ]>
+      
       | <[ $obj(..$args) ]> => <[ $obj.$(jsMethodName : usesite)(..$args) ]>
-      | <[ $obj(..$args) ..$next ]> => <[ $obj.$(jsMethodName : usesite)(..$args) ..$next ]>
-      | _ => Message.Error($"Use $syntaxName obj(args)"); <[ ]>
+      
+      | _ => Message.Error($"$ex is incorect expression. Use $syntaxName obj(args)"); <[ ]>
       }
+      
+      def ret = impl(expr);
+      ret
     }
   }
 }

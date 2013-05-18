@@ -37,15 +37,13 @@ class R
   
   [JSCall]
   public @_() : R;
+  
+  public test() : R;
 }
 
 [Unit]
 public class Test
 {
-  public this() { 
-  
-}
-
   [Html]
   public View() : string
   {
