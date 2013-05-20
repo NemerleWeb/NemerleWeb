@@ -1,0 +1,51 @@
+using Nemerle;
+using Nemerle.Assertions;
+using Nemerle.Collections;
+using Nemerle.Compiler;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Extensions;
+using Nemerle.Compiler.Typedtree;
+using Nemerle.Imperative;
+
+using System;
+using System.Globalization;
+using System.Collections.Generic;
+using System.Linq;
+using SR = System.Reflection;
+
+namespace NemerleWeb
+{
+  public module AssemblyHelpers
+  {
+    /// <summary>
+    /// Checks for framework assembly using predefined token
+    /// </summary>
+    public IsFrameworkAssembly([NotNull] assembly : SR.Assembly) : bool
+    {
+      def token = assembly.GetName().GetPublicKeyToken();
+      
+      def checkTokens =
+        [
+          // CLR Token
+          array[0xb7 : byte, 0x7a, 0x5c, 0x56, 0x19, 0x34, 0xe0, 0x89],
+              
+          // Framework Token
+          array[0xb0 : byte, 0x3f, 0x5f, 0x7f, 0x11, 0xd5, 0x0a, 0x3a],
+              
+          // Presentation Token
+          array[0x31 : byte, 0xbf, 0x38, 0x56, 0xad, 0x36, 0x4e, 0x35],
+        ];
+       
+      checkTokens.Any(t => t.SequenceEqual(token))
+    }
+    
+    public IsFrameworkAssembly([NotNull] typeInfo : TypeInfo) : bool
+    {
+      if (typeInfo.SystemType == null)
+        false
+      else
+        IsFrameworkAssembly(typeInfo.SystemType.Assembly)
+    }
+  }
+}
