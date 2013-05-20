@@ -209,10 +209,12 @@ namespace NemerleWeb
         // JSApiSpecial.New
         else
         if(member.Name == JSApiSpecial.New)
-          return JSAst.Call(JSAst.Constructor(left.Write(), None()), parms);        
-        // Instance method
+          return JSAst.Call(JSAst.Constructor(left.Write(), None()), parms);                
+        else if(member.Attributes.HasFlag(NemerleModifiers.SpecialName) && (member.Name.StartsWith("get_") || member.Name.StartsWith("set_")))
+          return left.Field(member.Name.Substring(4));
+        // Instance method          
         else
-          return left.MethodCall(member, parms);
+          return left.MethodCall(member, parms);          
       }
               
       // Nothing found, try default dictionary
