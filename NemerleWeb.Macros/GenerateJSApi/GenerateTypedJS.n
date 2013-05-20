@@ -257,22 +257,27 @@ namespace NemerleWeb
         else
         if(type.Equals(typeof(TSGlobal.Enum)))
         {
-          AnalyzeEnum(typeAndNameGroup :> IEnumerable[TSGlobal.Enum])
+          AnalyzeEnum(typeAndNameGroup.Cast.[TSGlobal.Enum]())
         }
-        // By default take first and skip others
+        else
+        if(type.Equals(typeof(TSGlobal.Function)))
+        {
+          AnalyzeFunction(typeAndNameGroup.Cast.[TSGlobal.Function]())
+        }
+        // By default take first and skip others        
         else
         {
-          typeAndNameGroup.First()
+          [typeAndNameGroup.First()]
         }
       }
       
-      tsAsts.Where(filter).GroupBy(group).Select(select)
+      tsAsts.Where(filter).GroupBy(group).SelectMany(select)
     }
     
     /// <summary>
     /// Unite
     /// </summary>
-    private AnalyzeClass(ast : IEnumerable[TSGlobal.Class]) : TSGlobal
+    private AnalyzeClass(ast : IEnumerable[TSGlobal.Class]) : IEnumerable[TSGlobal]
     {
       def name = ast.First().Name;
       // Extends can be only once
@@ -287,13 +292,13 @@ namespace NemerleWeb
         .NToList();
       
       def ret = TSGlobal.Class(name, extends, @implements, members);
-      ret
+      [ret]
     }
     
     /// <summary>
     /// Unite
     /// </summary>
-    private AnalyzeInterface(ast : IEnumerable[TSGlobal.Interface]) : TSGlobal
+    private AnalyzeInterface(ast : IEnumerable[TSGlobal.Interface]) : IEnumerable[TSGlobal]
     {
       def name = ast.First().Name;
       
@@ -307,30 +312,48 @@ namespace NemerleWeb
       def @type = TSType.Object(members);
       
       def ret = TSGlobal.Interface(name, extends, @type);
-      ret
+      [ret]
     }
     
     /// <summary>
     /// Unite
     /// </summary>
-    private AnalyzeModule(ast : IEnumerable[TSGlobal.Module]) : TSGlobal
+    private AnalyzeModule(ast : IEnumerable[TSGlobal.Module]) : IEnumerable[TSGlobal]
     {
       def name = ast.First().Name;      
       def members = ast.SelectMany(a => AnalyzeTSAst(a.Members)).NToList();
       
       def ret = TSGlobal.Module(name, members);
-      ret
+      [ret]
     }
     
     /// <summary>
     /// Unite
     /// </summary>
-    private AnalyzeEnum(ast : IEnumerable[TSGlobal.Enum]) : TSGlobal
+    private AnalyzeEnum(ast : IEnumerable[TSGlobal.Enum]) : IEnumerable[TSGlobal]
     {
       def name = ast.First().Name;
       def elements = ast.SelectMany(a => a.Elements).NToList();
       
       def ret = TSGlobal.Enum(name, elements);
+      [ret]
+    }
+    
+    /// <summary>
+    /// Generate overloads
+    /// </summary>
+    private AnalyzeFunction(ast : IEnumerable[TSGlobal.Function]) : IEnumerable[TSGlobal]
+    {
+      def name = ast.First().Name;
+      def returnType = ast.First().ReturnType;
+      
+      def overloads(parms)
+      {
+        [parms]
+      }
+      
+      def functionOverloads = ast.SelectMany(f => overloads(f.Params));
+      def ret = functionOverloads.Select(o => TSGlobal.Function(name, o, returnType));
       ret
     }
     
