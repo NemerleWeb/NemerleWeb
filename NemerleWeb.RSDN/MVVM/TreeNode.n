@@ -22,7 +22,19 @@ namespace NemerleWeb.Rsdn
     public IsOpened : bool { get; set; }
     public Children : List[TreeNode] { get; set; }    
     public HasChildren : bool { get; set; }
-        
+    
+    public IconUrl : string 
+    {      
+      get {        
+        def suffix = match(IsOpened, HasChildren) {
+                      | (true, _) => "o.gif";
+                      | (false, true) => "c.gif" 
+                      | _ => "s.gif";
+                     };
+          "http://rsdn.ru/images/tree/" + Icon + suffix;
+      }
+    }
+    
     public Toggle() : void
     {
       if(Children == null) {        
@@ -40,15 +52,17 @@ namespace NemerleWeb.Rsdn
       MainPage.SelectedUrl = Href;
     }
     
+    //<span $when(c.IsOpened)>-</span>
+    //<span $when(!c.IsOpened)>+</span>              
     [Html]
     public View() : string
     {
       <#
         <div $foreach(c in Children)>   
-          <div style-margin-left="$(c.Depth * 10)">            
+          <div style-margin-left="$(c.Depth * 10)">
+            <img attr-src="$(c.IconUrl)" />
             <a $when(c.HasChildren) click="$(c.Toggle())" class="node with-children">
-              <span $when(c.IsOpened)>-</span>
-              <span $when(!c.IsOpened)>+</span>
+              
               <span>$(c.Caption)</span>
             </a>
             <a $when(!c.HasChildren) click="$(c.SelectNode())" class="node">
