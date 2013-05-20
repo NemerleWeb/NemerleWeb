@@ -161,7 +161,7 @@ namespace NemerleWeb
       | Sequence(e1, e2)                  => JSAst.Seq([build(e1), build(e2)])
       | StaticEventRef                    => Message.Error(expr.Location, "StaticEventRef not implemented"); JSAst.NotImpl("StaticEventRef")
       | StaticPropertyRef(from, prop)     => JSAst.PropertyGet(JSAst.LocalRef(from.tycon.Name, None()), prop.Name)
-      | StaticRef(from, mem, _)           =>
+      | StaticRef(from, mem, _)           =>        
         def typeName =
           if(from.tycon.SystemType != null) from.tycon.SystemType.FullName
           else                              from.tycon.FrameworkTypeName;              

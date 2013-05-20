@@ -27,50 +27,42 @@ namespace NemerleWeb.Rsdn
     {      
       get {        
         def suffix = match(IsOpened, HasChildren) {
-                      | (true, _) => "o.gif";
                       | (false, true) => "c.gif" 
+                      | (true, _) => "o.gif";
                       | _ => "s.gif";
                      };
-          "http://rsdn.ru/images/tree/" + Icon + suffix;
+        "http://rsdn.ru/images/tree/" + Icon + suffix;
       }
     }
-    
-    public Toggle() : void
+        
+    public CaptionClick() : void
     {
-      if(Children == null) {        
-        server.LoadNodeChildren(Id, children => {
-          Children = children;
+      if(HasChildren) {
+        if(Children == null) {
+          server.LoadNodeChildren(Id, children => {
+            Children = children;
+            IsOpened = !IsOpened;
+          });
+        } else
           IsOpened = !IsOpened;
-        });
-      } else {
-        IsOpened = !IsOpened;
       }
+      else
+        MainPage.SelectedUrl = Href;
     }
     
-    public SelectNode() : void
-    {
-      MainPage.SelectedUrl = Href;
-    }
-    
-    //<span $when(c.IsOpened)>-</span>
-    //<span $when(!c.IsOpened)>+</span>              
     [Html]
     public View() : string
     {
       <#
         <div $foreach(c in Children)>   
           <div style-margin-left="$(c.Depth * 10)">
-            <img attr-src="$(c.IconUrl)" />
-            <a $when(c.HasChildren) click="$(c.Toggle())" class="node with-children">
-              
-              <span>$(c.Caption)</span>
-            </a>
-            <a $when(!c.HasChildren) click="$(c.SelectNode())" class="node">
+            <a click="$(c.CaptionClick())" css-with-children="$(c.HasChildren)" class="node">
+              <img attr-src="$(c.IconUrl)" />
               <span>$(c.Caption)</span>
             </a>            
             <div $when(c.IsOpened && Children != null)>
               <div template="$(template(c))" />
-            </div>          
+            </div>
           </div>
         </div>
       #>
