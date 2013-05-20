@@ -1,6 +1,7 @@
 .node {
     cursor: pointer;   
     color: #1e90ff;
+    font-size: 12px;
 }
 
 .node.with-children {
