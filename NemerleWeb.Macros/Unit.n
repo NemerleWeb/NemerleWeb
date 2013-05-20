@@ -64,9 +64,10 @@ namespace NemerleWeb
     {            
       Macros.DefineCTX(typer);
       
+      def a = 1;
       // Do not collect JS roots twice
       when(!collectedJSApiRoots)
-      {
+      {        
         CollectJSApiRoots(typer);
         collectedJSApiRoots = true;
       }

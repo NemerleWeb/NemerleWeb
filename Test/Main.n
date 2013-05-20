@@ -44,6 +44,10 @@ class R
 [Unit]
 public class Test
 {
+  public this() {
+    def a = window.innerHeight;
+  }
+  
   [Html]
   public View() : string
   {

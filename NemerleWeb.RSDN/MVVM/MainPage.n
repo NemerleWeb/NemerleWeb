@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NemerleWeb;
+using NemerleWeb.TypedJS;
 
 namespace NemerleWeb.Rsdn
 {  
@@ -20,6 +21,7 @@ namespace NemerleWeb.Rsdn
     
     Root : TreeNode { get; set; }
     SearchResults : IEnumerable[(TreeNode * list[string])] { get; set; }    
+    MenuHeight : float { get { window.innerHeight } }
     
     SearchTerm : string { 
       get { _searchTerm; }
@@ -63,7 +65,7 @@ namespace NemerleWeb.Rsdn
     {
       <#
         <div class="page">
-          <div class="left">
+          <div class="left" style-height="$MenuHeight">
             <div $when(Root != null) class="root">
               <div>
                 <input value="$SearchTerm" />
