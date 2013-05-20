@@ -178,8 +178,8 @@ namespace NemerleWeb
               .Cast.[GuidAttribute]()
               .Any(at => at.Value == MscorlibGuid)))
       {
-        Message.Error(<#"You have forgotten to add all needed assembly references.
-Please add the following: ..$(tb.Manager.ReferencedAssemblies; ; a => a.Assembly.FullName)#>);
+        Message.Error($<#"You have forgotten to add all needed assembly references.
+Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembly.FullName)#>);
       }
     }
     
