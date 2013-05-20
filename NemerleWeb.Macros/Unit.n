@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 using BF = System.Reflection.BindingFlags;
 using TExpr = Nemerle.Compiler.Typedtree.TExpr;
 
@@ -64,10 +65,11 @@ namespace NemerleWeb
     {            
       Macros.DefineCTX(typer);
       
-      def a = 1;
       // Do not collect JS roots twice
       when(!collectedJSApiRoots)
-      {        
+      {
+        ValidateReferences(tb.Manager);
+        
         CollectJSApiRoots(typer);
         collectedJSApiRoots = true;
       }
@@ -165,27 +167,35 @@ namespace NemerleWeb
       };
     }
 
-    private CollectJSApiRoots(typer : Typer) : void
+    private MscorlibGuid = "BED7F4EA-1A96-11d2-8F08-00A0C9A6186D";
+    
+    private ValidateReferences(manager : ManagerClass) : void
     {
-      def collect(assembly)
+      // Check if developer didn't forget to add ALL needed reference to the project
+      // If we don't see mscorlib here, something wrong happened.
+      when (!manager.ReferencedAssemblies.Any(
+            a => a.Assembly.GetCustomAttributes(typeof(GuidAttribute), false)
+              .Cast.[GuidAttribute]()
+              .Any(at => at.Value == MscorlibGuid)))
       {
-        when(assembly != null)
-        {
-          def jsApiRoots = assembly
-            .GetCustomAttributes(typeof(NemerleWeb.JSApiRootAttribute), false)
-            .Cast.[NemerleWeb.JSApiRootAttribute]();        
-          
-          foreach(r in jsApiRoots)
-            when(!string.IsNullOrEmpty(r.Root) && !string.IsNullOrWhiteSpace(r.Root))
-              _ = JSClassSettings.JSApiRoots.Add(r.Root);
-        }
+        Message.Error(<#"You have forgotten to add all needed assembly references.
+Please add the following: ..$(tb.Manager.ReferencedAssemblies; ; a => a.Assembly.FullName)#>);
       }
-      
+    }
+    
+    private CollectJSApiRoots(typer : Typer) : void
+    { 
       // Collect from current and referenced assemblies
-      collect(typer.Env.Manager.GeneratedAssembly);
-      
       foreach(lib in typer.Env.Manager.ReferencedAssemblies)
-        collect(lib.Assembly);
+      {
+        def jsApiRoots = lib.Assembly
+          .GetCustomAttributes(typeof(NemerleWeb.JSApiRootAttribute), false)
+          .Cast.[NemerleWeb.JSApiRootAttribute]();        
+          
+        foreach(r in jsApiRoots)
+          when(!string.IsNullOrEmpty(r.Root) && !string.IsNullOrWhiteSpace(r.Root))
+            _ = JSClassSettings.JSApiRoots.Add(r.Root);
+      }
     }
     
     public SaveUnitDataToFile(typer : Typer, filename : string, data : string) : string

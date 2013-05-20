@@ -340,28 +340,7 @@ namespace NemerleWeb
       | _ => arg.JSMethodCall("toString", [])
     }
     
-    public IsFrameworkAssembly([NotNull] typeInfo : TypeInfo) : bool
-    {
-      if (typeInfo.SystemType == null) false
-      else
-      {
-        def token = typeInfo.SystemType.Assembly.GetName().GetPublicKeyToken();
-        
-        def checkTokens =
-          [
-            // CLR Token
-            array[0xb7 : byte, 0x7a, 0x5c, 0x56, 0x19, 0x34, 0xe0, 0x89],
-              
-            // Framework Token
-            array[0xb0 : byte, 0x3f, 0x5f, 0x7f, 0x11, 0xd5, 0x0a, 0x3a],
-              
-            // Presentation Token
-            array[0x31 : byte, 0xbf, 0x38, 0x56, 0xad, 0x36, 0x4e, 0x35],
-          ];
-       
-        checkTokens.Any(t => t.SequenceEqual(token))
-      }
-    }
+    
     
     /// Call user ToString if exist
     public CallToString(
@@ -371,7 +350,7 @@ namespace NemerleWeb
       [NotNull] parms : list[JSAst]) : JSAst
     {
       // If type has method ToString, use it
-      if (typeInfo != null && !IsFrameworkAssembly(typeInfo))
+      if (typeInfo != null && !AssemblyHelpers.IsFrameworkAssembly(typeInfo))
         left.MethodCall(method, parms);
       else
         JSAstHelper.JSToString(left)
@@ -440,7 +419,7 @@ namespace NemerleWeb
     
     public MethodParameters(m : IMethod) : option[list[TParameter]]
     {
-      if (IsFrameworkAssembly(m.DeclaringType) ||
+      if (AssemblyHelpers.IsFrameworkAssembly(m.DeclaringType) ||
           m.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute") ||
           m.DeclaringType.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
         None()
