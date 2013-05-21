@@ -320,7 +320,7 @@ namespace NemerleWeb
     /// </summary>
     private AnalyzeModule(ast : IEnumerable[TSGlobal.Module]) : IEnumerable[TSGlobal]
     {
-      def name = ast.First().Name;      
+      def name = ast.First().Name;
       def members = ast.SelectMany(a => AnalyzeTSAst(a.Members)).NToList();
       
       def ret = TSGlobal.Module(name, members);
@@ -900,12 +900,12 @@ namespace NemerleWeb
         moduleType
       
       | hd :: tl =>
-        // If module consist from more than one part, first create all needed parts,
+        // If module consists from more than one part, first create all needed parts,
         // and then generate all members
         // Generate partial module to simplify the code
         // Otherwise we need to lookup for type in case types == false
         def innerModule = outer.Define(<[ decl: [JSApi] public partial module $(hd : usesite) {} ]>);
-        def t = CreateModule(tl, Scope(innerModule), [], types, typeMembers);
+        def t = CreateModule(tl, Scope(innerModule), members, types, typeMembers);
         innerModule.Compile();
         t
       }
