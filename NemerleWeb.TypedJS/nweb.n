@@ -10,6 +10,8 @@ namespace NemerleWeb.TypedJS
   [JSApiImpl]
   public partial module nweb
   {
+    public invalidate() : void;
+  
     [JSApiImpl]
     public partial module utils
     {

@@ -33,22 +33,25 @@ namespace NemerleWeb.Rsdn
           }
       }; 
     }
+  
+    private static UpArrow = 38;
+    private static DownArrow = 40;
     
     public this() {
       LoadTopNodes();
       SearchResults = List();
       
-      _ = (jscall jQuery(window)).resize(_ => {
-        js <# nweb.invalidate() #>;
+      _ = jscall @$(window).resize(_ => {
+        nweb.invalidate();
         null
       });
       
-      (jscall jQuery("body")).on("keydown", "#search-input", e => {
+      _ = jscall @$("body").on("keydown", "#search-input", e => {
         def e = e :> KeyboardEvent;
         if(e.ctrlKey && SearchResults.Count > 0) {
-          when(e.keyCode == 40 && SelectedSearchResultIndex < SearchResults.Count - 2)
+          when(e.keyCode == DownArrow && SelectedSearchResultIndex < SearchResults.Count - 2)
             SelectedSearchResultIndex++;
-          when(e.keyCode == 38 && SelectedSearchResultIndex > 0)
+          when(e.keyCode == UpArrow && SelectedSearchResultIndex > 0)
             SelectedSearchResultIndex--;
           window.console.log(SelectedSearchResultIndex);
           false
