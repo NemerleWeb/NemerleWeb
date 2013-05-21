@@ -83,6 +83,7 @@
     <Folder Include="Properties\" />
     <Folder Include="Scripts\" />
     <Folder Include="Scripts\typings\" />
+    <Folder Include="Scripts\typings\angularjs\" />
     <Folder Include="Scripts\typings\bootbox\" />
     <Folder Include="Scripts\typings\bootstrap-notify\" />
     <Folder Include="Scripts\typings\bootstrap.datepicker\" />
@@ -124,6 +125,21 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="packages.config">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\angularjs\angular-cookies.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\angularjs\angular-mocks.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\angularjs\angular-resource.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\angularjs\angular-sanitize.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\angularjs\angular.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\bootbox\bootbox.d.ts">

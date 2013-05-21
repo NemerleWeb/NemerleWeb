@@ -43,7 +43,7 @@ namespace NemerleWeb
         <[ $extractObj.$nextMethod(..$nextArgs) ]>
         
       | <[ $obj.$method(..$args).$nextProp ]> =>
-        def extractObj = impl(<[$obj(..$args)]>);
+        def extractObj = impl(<[$obj.$method(..$args)]>);
         <[ $extractObj.$nextProp ]>
         
       | <[ $obj(..$args).$nextProp ]> =>
