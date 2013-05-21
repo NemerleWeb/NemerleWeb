@@ -20,24 +20,40 @@ namespace NemerleWeb.Rsdn
     public mutable static SelectedUrl : string;
     
     Root : TreeNode { get; set; }
-    SearchResults : IEnumerable[(TreeNode * list[string])] { get; set; }    
     MenuHeight : float { get { window.innerHeight } }
+    SearchResults : List[(TreeNode * list[string])] { get; set; }    
+    SelectedSearchResultIndex : int { get; set; }
     
     SearchTerm : string { 
       get { _searchTerm; }
       set {
-          _searchTerm = value;
-          Search(value);
+          when(_searchTerm != value) {
+            _searchTerm = value;
+            Search(value);
+          }
       }; 
     }
     
     public this() {
       LoadTopNodes();
-      js <#
-        jQuery(window).resize(function() {          
-          nweb.invalidate();
-        });
-      #>
+      SearchResults = List();
+      
+      _ = (jscall jQuery(window)).resize(_ => {
+        js <# nweb.invalidate() #>;
+        null
+      });
+      
+      (jscall jQuery("body")).on("keydown", "#search-input", e => {
+        def e = e :> KeyboardEvent;
+        if(e.ctrlKey && SearchResults.Count > 0) {
+          when(e.keyCode == 40 && SelectedSearchResultIndex < SearchResults.Count - 2)
+            SelectedSearchResultIndex++;
+          when(e.keyCode == 38 && SelectedSearchResultIndex > 0)
+            SelectedSearchResultIndex--;
+          window.console.log(SelectedSearchResultIndex);
+          false
+        } else true      
+      });
     }
     
     public LoadTopNodes() : void
@@ -51,13 +67,20 @@ namespace NemerleWeb.Rsdn
     
     public Search(term : string) : void
     {
-      if(string.IsNullOrWhiteSpace(term))
-        LoadTopNodes();
-      else {        
+      when(!string.IsNullOrWhiteSpace(term)) {        
         server.Search(term, nodes => {
-          SearchResults = nodes;
+          SelectedSearchResultIndex = -1;
+          SearchResults = nodes.ToList();
         });
       }
+    }
+    
+    public IsSelectedResult(node : TreeNode) : bool
+    {
+      false;
+      if(SelectedSearchResultIndex > -1 && SelectedSearchResultIndex < SearchResults.Count)
+        node.Id == SearchResults[SelectedSearchResultIndex][0].Id;
+      else false
     }
     
     public static SelectNode(node : TreeNode) : void
@@ -73,11 +96,11 @@ namespace NemerleWeb.Rsdn
           <div class="left" style-height="$MenuHeight">
             <div $when(Root != null) class="root">
               <div class="search-bar">
-                <input value="$SearchTerm" />
+                <input id="search-input" value="$SearchTerm" />
               </div>
               <div $when(!string.IsNullOrEmpty(SearchTerm)) class="search-results">
                 <div $foreach((node, path) in SearchResults)>
-                  <a click="$(SelectNode(node))" class="node">
+                  <a click="$(SelectNode(node))" class="node" css-selected-search-result="$(IsSelectedResult(node))" css-selected-2="$(IsSelectedResult(node))">
                     <img attr-src="$(node.IconUrl)" />
                     <span>$(node.Caption)</span>
                   </a>              
