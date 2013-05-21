@@ -101,7 +101,7 @@ namespace NemerleWeb
             ConvertMethod(o.Type.TypeInfo, builder'(o), meth, parms.Map(paramBuilder));
           else
             ConvertFixedTypeMethod(o.Type.FixedValue, builder'(o), meth, parms.Map(paramBuilder))
-        | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) =>
+        | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) =>          
           ConvertMethod(fromType.TypeInfo, builder'(left), meth, parms.Map(paramBuilder))
         | Call(OpCode as op, parms, _) => JSAst.Call(builder'(op), parms.Map(paramBuilder))
         | Call(Base(baseCtor), parms, _) =>
@@ -210,12 +210,15 @@ namespace NemerleWeb
         else
         if(member.Name == JSApiSpecial.New)
           return JSAst.Call(JSAst.Constructor(left.Write(), None()), parms);
-		// Properties
+		    // Properties
         else
-		if(member.Attributes.HasFlag(NemerleModifiers.SpecialName) &&
-		   (member.Name.StartsWith("get_") || member.Name.StartsWith("set_")))
+		    if(member.Attributes.HasFlag(NemerleModifiers.SpecialName) && member.Name.StartsWith("get_"))
           return left.Field(member.Name.Substring(4));
-        // Instance method          
+        else
+        if(member.Attributes.HasFlag(NemerleModifiers.SpecialName) && member.Name.StartsWith("set_")) {
+          return JSAst.Assign(left.Field(member.Name.Substring(4)), parms.FirstOrDefault());
+        }
+        // Instance method
         else
           return left.MethodCall(member, parms);          
       }
