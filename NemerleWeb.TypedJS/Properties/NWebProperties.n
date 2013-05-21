@@ -3,5 +3,5 @@
 [assembly: GenerateTypedJS(
   Root = "NemerleWeb.TypedJS",
   Lib = @"lib.d.ts",
-  Files = [ ("Scripts", @"typings\\underscore\\(underscore|underscore-typed-.*|breeze-1.0)\.d\.ts") ]
+  Files = [ ("Scripts", @"typings\\(underscore\\(underscore|underscore-typed-.*)|linq\\linq)\.d\.ts") ]
 )]
