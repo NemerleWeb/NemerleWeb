@@ -33,6 +33,11 @@ namespace NemerleWeb.Rsdn
     
     public this() {
       LoadTopNodes();
+      js <#
+        jQuery(window).resize(function() {          
+          nweb.invalidate();
+        });
+      #>
     }
     
     public LoadTopNodes() : void
