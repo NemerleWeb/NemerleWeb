@@ -12,12 +12,20 @@ body {
     color: #2f4f4f;
 }
 
-.node.selected-search-result {
-    background-color: #c0c0c0;
-}
-
 .search-results span {
     font-size: 12px;
+}
+
+.search-results img {
+    vertical-align: baseline;
+}
+
+.search-results > div {
+    padding: 3px 0;
+}
+
+.selected-search-result {
+    font-weight: bold;
 }
 
 .page {
