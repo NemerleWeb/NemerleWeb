@@ -675,6 +675,16 @@ namespace NemerleWeb
     
     private CreateAnonymousType(prefix : string, members : list[TSObject], typesScope : Scope) : PExpr
     {
+      if(members is [])
+        <[ object ]>
+      else
+        CreateAnonymousTypeAlways(prefix, members, typesScope)
+    }
+    
+    private CreateAnonymousTypeAlways(prefix : string, members : list[TSObject], typesScope : Scope) : PExpr
+    {
+      // Handle no members case
+      
       def classNamePrefix = $"$(prefix)_AnonymousType";
       
       // Find unused name for anonymous class
