@@ -65,9 +65,9 @@ var nweb = {
           var attrValue = attrs[i].nodeValue;
           
           if (nweb.doesAllowMultipleBindings(attrName)) {
-            var matches = attrValue.match(/[^\s,]([^,]+):\s([^,]+)/g);
+            var matches = attrValue.match(/<\[{.+?}\]>/g);
             for (var k = 0; k < matches.length; k++) {
-              var b = binder(model, el, bindings, loopStack, matches[k]);
+              var b = binder(model, el, bindings, loopStack, matches[k].substr(3, matches[k].length - 6));
               if (typeof b !== 'undefined')
                 bindings.push(b);
             }
