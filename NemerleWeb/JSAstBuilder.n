@@ -151,7 +151,7 @@ namespace NemerleWeb
           | _ => build(ex)
           }                
       | Match(_, _)                       => JSAst.NotImpl("Match")
-      | MethodAddress                     => JSAst.Literal(JSLiteral.String(""))
+      | MethodAddress(_, meth, _, _)      => JSAst.MethodRef(JSAst.This(), meth.Name, JSAstHelper.MethodParameters(meth))
       | MethodOf                          => Message.Error(expr.Location, "MethodOf not implemented"); JSAst.NotImpl("MethodOf")
       | MethodRef(obj, meth, _, _)        => JSAst.MethodRef(build(obj), meth.Name, JSAstHelper.MethodParameters(meth))
       | MultipleAssign(assigns)           => JSAst.Seq(assigns.Map((l, e) => JSAst.Assign(JSAst.LocalRef(getLocalValueName(l), None()), build(e))))

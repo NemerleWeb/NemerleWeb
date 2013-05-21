@@ -26,7 +26,7 @@ module Program
     _ = Console.ReadKey();
   }
 }
-
+/*
 [JSApiImpl]
 class R
 {
@@ -40,12 +40,17 @@ class R
   
   public test() : R;
 }
-
+*/
 [Unit]
 public class Test
 {
   public this() {
-    def a = window.innerHeight;
+    document.body.onkeydown = Handle;
+  }
+  
+  public Handle(e : KeyboardEvent) : object
+  {
+    null
   }
   
   [Html]
