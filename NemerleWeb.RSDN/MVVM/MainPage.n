@@ -67,13 +67,14 @@ namespace NemerleWeb.Rsdn
         <div class="page">
           <div class="left" style-height="$MenuHeight">
             <div $when(Root != null) class="root">
-              <div>
+              <div class="search-bar">
                 <input value="$SearchTerm" />
               </div>
               <div $when(!string.IsNullOrEmpty(SearchTerm)) class="search-results">
-                <div $foreach((node, path) in SearchResults)>                       
-                  <a click="$(SelectNode(node))">
-                    $(node.Caption)
+                <div $foreach((node, path) in SearchResults)>
+                  <a click="$(SelectNode(node))" class="node">
+                    <img attr-src="$(node.IconUrl)" />
+                    <span>$(node.Caption)</span>
                   </a>              
                 </div>
               </div>
