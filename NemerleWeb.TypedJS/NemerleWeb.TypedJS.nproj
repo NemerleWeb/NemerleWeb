@@ -83,18 +83,34 @@
     <Folder Include="Properties\" />
     <Folder Include="Scripts\" />
     <Folder Include="Scripts\typings\" />
+    <Folder Include="Scripts\typings\angularjs\" />
+    <Folder Include="Scripts\typings\bootbox\" />
+    <Folder Include="Scripts\typings\bootstrap-notify\" />
+    <Folder Include="Scripts\typings\bootstrap.datepicker\" />
     <Folder Include="Scripts\typings\bootstrap\" />
+    <Folder Include="Scripts\typings\breeze\" />
+    <Folder Include="Scripts\typings\durandal\" />
+    <Folder Include="Scripts\typings\handlebars\" />
+    <Folder Include="Scripts\typings\jasmine\" />
+    <Folder Include="Scripts\typings\jquery.scrollTo\" />
     <Folder Include="Scripts\typings\jquery.validation\" />
     <Folder Include="Scripts\typings\jqueryui\" />
     <Folder Include="Scripts\typings\jquery\" />
     <Folder Include="Scripts\typings\knockout.mapping\" />
+    <Folder Include="Scripts\typings\knockout.postbox\" />
     <Folder Include="Scripts\typings\knockout.validation\" />
     <Folder Include="Scripts\typings\knockout\" />
+    <Folder Include="Scripts\typings\kolite\" />
     <Folder Include="Scripts\typings\modernizr\" />
     <Folder Include="Scripts\typings\moment\" />
+    <Folder Include="Scripts\typings\numeraljs\" />
+    <Folder Include="Scripts\typings\qunit\" />
     <Folder Include="Scripts\typings\requirejs\" />
     <Folder Include="Scripts\typings\signalr\" />
+    <Folder Include="Scripts\typings\spin\" />
+    <Folder Include="Scripts\typings\toastr\" />
     <Folder Include="Scripts\typings\underscore\" />
+    <Folder Include="Scripts\typings\zeroclipboard\" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
@@ -114,7 +130,49 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\angularjs\angular-cookies.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\angularjs\angular-mocks.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\angularjs\angular-resource.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\angularjs\angular-sanitize.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\angularjs\angular.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\bootbox\bootbox.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\bootstrap-notify\bootstrap-notify.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\bootstrap.datepicker\bootstrap.datepicker.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\bootstrap\bootstrap.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\breeze\breeze-1.0.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\breeze\breeze.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\durandal\durandal.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\handlebars\handlebars.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jasmine\jasmine.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.scrollTo\jquery.scrollTo.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.validation\jquery.validation.d.ts">
@@ -129,10 +187,16 @@
     <Content Include="Scripts\typings\knockout.mapping\knockout.mapping.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\knockout.postbox\knockout-postbox.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\knockout.validation\knockout.validation.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\knockout\knockout.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\kolite\kolite.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\modernizr\modernizr.d.ts">
@@ -141,10 +205,22 @@
     <Content Include="Scripts\typings\moment\moment.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\numeraljs\numeraljs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\qunit\qunit.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\requirejs\require.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\signalr\signalr.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\spin\spin.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\toastr\toastr.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\underscore\underscore-typed-1.4.2.d.ts">
@@ -157,6 +233,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\underscore\underscore.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\zeroclipboard\zeroclipboard.d.ts">
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>

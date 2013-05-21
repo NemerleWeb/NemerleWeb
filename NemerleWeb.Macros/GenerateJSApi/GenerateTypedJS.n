@@ -444,20 +444,20 @@ namespace NemerleWeb
         if (tsInterface.Extends is [])
           typesScope.Define(
             <[ decl: 
-              [JSApi] public interface $(tsInterface.Name : usesite) {}
+              [JSApi] public partial interface $(tsInterface.Name : usesite) {}
             ]>)
         else
         {
           def extends = tsInterface.Extends.Select(e => <[ $(e : usesite) ]>);
           typesScope.Define(
             <[ decl:
-              [JSApi] public interface $(tsInterface.Name : usesite) : ..$extends {}
+              [JSApi] public partial interface $(tsInterface.Name : usesite) : ..$extends {}
             ]>)
         };
         
       foreach(member in tsInterface.Type.Members)
       {
-       | Call(parms, returnType) =>
+      | Call(parms, returnType) =>
         def fullPrefix = $"$(tsInterface.Name)_Call";
         def returnTypePrefix = $"$(fullPrefix)_Return";
         def realReturnType = ConvertType(returnTypePrefix, returnType, typesScope);
