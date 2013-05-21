@@ -43,14 +43,18 @@ namespace NemerleWeb.Rsdn
         null
       });
       
-      (jscall jQuery("body")).on("keydown", "#search-input", e => {
+      _ = jscall jQuery("body").on("keydown", "", e => {
         def e = e :> KeyboardEvent;
-        if(e.ctrlKey && SearchResults.Count > 0) {
-          when(e.keyCode == 40 && SelectedSearchResultIndex < SearchResults.Count - 2)
-            SelectedSearchResultIndex++;
-          when(e.keyCode == 38 && SelectedSearchResultIndex > 0)
+        if(e.altKey && SearchResults.Count > 0) {
+          when(e.keyCode == 40 && SelectedSearchResultIndex < SearchResults.Count - 2) {
+              SelectedSearchResultIndex++;
+              SelectNode(SearchResults[SelectedSearchResultIndex][0]);
+          }
+          when(e.keyCode == 38 && SelectedSearchResultIndex > 0) {
             SelectedSearchResultIndex--;
-          window.console.log(SelectedSearchResultIndex);
+            SelectNode(SearchResults[SelectedSearchResultIndex][0]);
+          }
+          window.console.log(e);
           false
         } else true      
       });
@@ -77,7 +81,6 @@ namespace NemerleWeb.Rsdn
     
     public IsSelectedResult(node : TreeNode) : bool
     {
-      false;
       if(SelectedSearchResultIndex > -1 && SelectedSearchResultIndex < SearchResults.Count)
         node.Id == SearchResults[SelectedSearchResultIndex][0].Id;
       else false
@@ -99,8 +102,8 @@ namespace NemerleWeb.Rsdn
                 <input id="search-input" value="$SearchTerm" />
               </div>
               <div $when(!string.IsNullOrEmpty(SearchTerm)) class="search-results">
-                <div $foreach((node, path) in SearchResults)>
-                  <a click="$(SelectNode(node))" class="node" css-selected-search-result="$(IsSelectedResult(node))" css-selected-2="$(IsSelectedResult(node))">
+                <div $foreach((node, path) in SearchResults) css-selected-search-result="$(IsSelectedResult(node))">
+                  <a click="$(SelectNode(node))" class="node">
                     <img attr-src="$(node.IconUrl)" />
                     <span>$(node.Caption)</span>
                   </a>              

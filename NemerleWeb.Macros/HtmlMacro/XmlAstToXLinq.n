@@ -160,10 +160,10 @@ namespace NemerleWeb
                 | _ => Message.FatalError($"Invalid patter expression: $pexpr")
               }
               <[ [L.XAttribute("nw-template", $binding)] ]>
-            | (Splicable.Value(v), _) when v.StartsWith("css-")   => <[ [L.XAttribute("nw-css", $(v.Substring(4)) + ": " + $(getSplice()))] ]>
-            | (Splicable.Value(v), _) when v.StartsWith("style-") => <[ [L.XAttribute("nw-style", $(v.Substring(6)) + ": " + $(getSplice()))] ]>
-            | (Splicable.Value(v), _) when v.StartsWith("event-") => <[ [L.XAttribute("nw-event", $(v.Substring(6)) + ": " + $(getSplice()))] ]>
-            | (Splicable.Value(v), _) when v.StartsWith("attr-") => <[ [L.XAttribute("nw-attr", $(v.Substring(5)) + ": " + $(getSplice()))] ]>
+              | (Splicable.Value(v), _) when v.StartsWith("css-")   => <[ [L.XAttribute("nw-css", "<[{" + $(v.Substring(4)) + ": " + $(getSplice()) + "}]>")] ]>
+            | (Splicable.Value(v), _) when v.StartsWith("style-") => <[ [L.XAttribute("nw-style", "<[{" + $(v.Substring(6)) + ": " + $(getSplice()) + "}]>")] ]>
+            | (Splicable.Value(v), _) when v.StartsWith("event-") => <[ [L.XAttribute("nw-event", "<[{" + $(v.Substring(6)) + ": " + $(getSplice()) + "}]>")] ]>
+            | (Splicable.Value(v), _) when v.StartsWith("attr-") => <[ [L.XAttribute("nw-attr", "<[{" + $(v.Substring(5)) + ": " + $(getSplice()) + "}]>")] ]>
             | _ => <[ [L.XAttribute($(SplicablePExprName(name)), $(SplicablePExprStr(value)))] ]>
             }          
         | Attr(name, value)             => 
