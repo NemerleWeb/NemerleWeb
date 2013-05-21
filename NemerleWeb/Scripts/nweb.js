@@ -55,7 +55,7 @@ var nweb = {
       if (attrName === "nw-text" && el.tagName.toUpperCase() === "TEXTAREA")
           attrName = "nw-value";
         
-      if(attrName.indexOf("nw-") === 0) {
+      if (attrName.indexOf("nw-") === 0) {
         var binder = nweb.binds(attrName);
         
         if(typeof binder === 'undefined')
@@ -477,8 +477,9 @@ var nweb = {
         }
         else
           return val;
-      } catch(e) {
-        return "Error evaluating: " + parsedExpr + " " + e;
+      } catch (e) {
+        console.error("Error evaluating: " + parsedExpr + " " + e);
+        return undefined;
       }
     }
   },
@@ -536,11 +537,7 @@ var nweb = {
       }
       //Repeat only on top level, so every binding will be invalidated exactly once per invalidation cycle
     } while (changeFound && !selfCall) 
-
-    // TODO: Remove
-    if (!selfCall)
-      console.log(nweb.invalidationCount);
-
+    
     return changeFound;
   },
   savePosition: function($el) {

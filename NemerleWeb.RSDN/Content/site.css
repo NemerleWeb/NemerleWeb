@@ -12,6 +12,10 @@ body {
     color: #2f4f4f;
 }
 
+.node.selected-search-result {
+    background-color: #c0c0c0;
+}
+
 .search-results span {
     font-size: 12px;
 }
