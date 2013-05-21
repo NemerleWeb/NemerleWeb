@@ -25,7 +25,7 @@ namespace NemerleWeb
           {
             match (parms)
             {
-            | [obj, JSAst.MethodRef(_, method, types)] => Some(JSAst.MethodRef(obj, method, types))
+            | [JSAst.This, JSAst.MethodRef(_, method, types)] => Some(JSAst.MethodRef(JSAst.This(), method, types))
             | [lambda, _] => Some(lambda)
             | [] when m.Name == "Invoke" => Some(JSAst.Call(left, []));
             | _ => None();
