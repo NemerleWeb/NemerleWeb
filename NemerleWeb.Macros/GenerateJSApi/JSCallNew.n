@@ -34,21 +34,21 @@ namespace NemerleWeb
       // A(..) => A.Method(..)
       def impl(ex)
       {
+      | <[ $obj.$method(..$args).$nextMethod(..$nextArgs) ]> =>
+        def extractObj = impl(<[$obj.$method(..$args)]>);
+        <[ $extractObj.$nextMethod(..$nextArgs) ]>
+      
       | <[ $obj(..$args).$nextMethod(..$nextArgs) ]> =>
         def extractObj = impl(<[$obj(..$args)]>);
         <[ $extractObj.$nextMethod(..$nextArgs) ]>
         
-      | <[ $obj.$method(..$args).$nextMethod(..$nextArgs) ]> =>
-        def extractObj = impl(<[$obj.$method(..$args)]>);
-        <[ $extractObj.$nextMethod(..$nextArgs) ]>
-        
-      | <[ $obj(..$args).$nextProp ]> =>
-        def extractObj = impl(<[$obj(..$args)]>);
-        <[ $extractObj.$nextProp ]>
-
       | <[ $obj.$method(..$args).$nextProp ]> =>
         def extractObj = impl(<[$obj(..$args)]>);
         <[ $extractObj.$nextProp ]>
+        
+      | <[ $obj(..$args).$nextProp ]> =>
+        def extractObj = impl(<[$obj(..$args)]>);
+        <[ $extractObj.$nextProp ]>      
       
       | <[ $obj(..$args) ]> => <[ $obj.$(jsMethodName : usesite)(..$args) ]>
       

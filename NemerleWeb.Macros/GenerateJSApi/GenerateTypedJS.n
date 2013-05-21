@@ -364,12 +364,15 @@ namespace NemerleWeb
     GenerateCode(typer : Typer, root : string, tsAst : IEnumerable[TSGlobal]) : void
     {
       def jsApiNamespace = typer.Env.EnterIntoNamespace(root.SplitDot());
-      def jsApiModule = CreateModule(root.SplitDot(), Scope(typer.Env), [], true);
+      def jsApiModule = CreateModule(root.SplitDot(), Scope(typer.Env), [], true, true);
       
       GeneratePredefined(jsApiNamespace, jsApiModule);
       
       // First generate all types
       GenerateTypes(Scope(jsApiNamespace), tsAst);
+      
+      // Generate types members
+      GenerateTypesMembers(Scope(jsApiNamespace), tsAst);
       
       // Then generate everything else
       GenerateOthers(Scope(jsApiNamespace), jsApiModule, tsAst);
@@ -388,12 +391,23 @@ namespace NemerleWeb
     {
       foreach(mem in members) 
       {
-      | Interface as i => CreateTSGlobalInterface(i, typesScope)
-      | Class     as c => CreateTSGlobalClass    (c, typesScope)
+      | Interface as i => CreateTSGlobalInterface(i, typesScope, false)
+      | Class     as c => CreateTSGlobalClass    (c, typesScope, false)
       | Enum      as e => CreateTSGlobalEnum     (e, typesScope)
       | Import    as i => CreateTSGlobalImport   (i, typesScope)
       | Export    as e => CreateTSGlobalExport   (e, typesScope)
-      | Module    as m => CreateTSGlobalModule   (m, typesScope, true)
+      | Module    as m => CreateTSGlobalModule   (m, typesScope, true, false)
+      | _ => ()
+      }
+    }
+    
+    private GenerateTypesMembers(typesScope : Scope, members : IEnumerable[TSGlobal]) : void
+    {
+      foreach(mem in members) 
+      {
+      | Interface as i => CreateTSGlobalInterface(i, typesScope, true)
+      | Class     as c => CreateTSGlobalClass    (c, typesScope, true)
+      | Module    as m => CreateTSGlobalModule   (m, typesScope, true, true)
       | _ => ()
       }
     }
@@ -405,7 +419,7 @@ namespace NemerleWeb
     {
       foreach(mem in members)
       {
-      | Module    as m => CreateTSGlobalModule   (m, typesScope, false)
+      | Module    as m => CreateTSGlobalModule   (m, typesScope, false, true)
       | Variable  as v => CreateTSGlobalVariable (v, othersScope, typesScope)
       | Function  as f => CreateTSGlobalFunction (f, othersScope, typesScope)
       | Construct as c => CreateTSGlobalConstruct(c, typesScope)
@@ -438,10 +452,10 @@ namespace NemerleWeb
       ]>);   
     }
     
-    private CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, typesScope : Scope) : void
+    private CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, typesScope : Scope, typeMembers : bool) : void
     {
       def interfaceType =
-        if (tsInterface.Extends is [])
+        if (typeMembers || tsInterface.Extends is [])
           typesScope.Define(
             <[ decl: 
               [JSApi] public partial interface $(tsInterface.Name : usesite) {}
@@ -454,95 +468,100 @@ namespace NemerleWeb
               [JSApi] public partial interface $(tsInterface.Name : usesite) : ..$extends {}
             ]>)
         };
+      
+      when(typeMembers)
+        foreach(member in tsInterface.Type.Members)
+        {
+        | Call(parms, returnType) =>
+          def fullPrefix = $"$(tsInterface.Name)_Call";
+          def returnTypePrefix = $"$(fullPrefix)_Return";
+          def realReturnType = ConvertType(returnTypePrefix, returnType, typesScope);
         
-      foreach(member in tsInterface.Type.Members)
-      {
-      | Call(parms, returnType) =>
-        def fullPrefix = $"$(tsInterface.Name)_Call";
-        def returnTypePrefix = $"$(fullPrefix)_Return";
-        def realReturnType = ConvertType(returnTypePrefix, returnType, typesScope);
-        
-        def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
+          def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
        
-        _ = interfaceType.DefineWithSource(
-          <[ decl:
-            $(JSApiSpecial.Call : usesite)(..$functionParams) : $realReturnType;
-          ]>);
-      | Construct(parms, type) =>
-        def fullPrefix = $"$(tsInterface.Name)_New";
-        def typePrefix = $"$(fullPrefix)_Return";
-        def realType = ConvertType(typePrefix, type, typesScope);
-        
-        def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
-          
-        _ = interfaceType.DefineWithSource(
-          <[ decl:
-            $(JSApiSpecial.New : usesite)(..$functionParams) : $realType;
-          ]>);
-      | Index(paramName, paramType, returnType) =>
-        def (realParamType, typeName) =
-          match(paramType)
-          {
-          | Number => (<[ float ]>, "Number")
-          | String => (<[ string ]>, "String")
-          };
-        
-        def fullPrefix = $"$(tsInterface.Name)_$(typeName)_Index";
-        def returnTypePrefix = $"$(fullPrefix)_Return";
-        def realReturnType = ConvertType(returnTypePrefix, returnType, typesScope);
-        
           _ = interfaceType.DefineWithSource(
-          <[ decl:
-            Item[$(paramName : usesite) : $realParamType] : $realReturnType
+            <[ decl:
+              $(JSApiSpecial.Call : usesite)(..$functionParams) : $realReturnType;
+            ]>);
+        | Construct(parms, type) =>
+          def fullPrefix = $"$(tsInterface.Name)_New";
+          def typePrefix = $"$(fullPrefix)_Return";
+          def realType = ConvertType(typePrefix, type, typesScope);
+        
+          def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
+          
+          _ = interfaceType.DefineWithSource(
+            <[ decl:
+              $(JSApiSpecial.New : usesite)(..$functionParams) : $realType;
+            ]>);
+        | Index(paramName, paramType, returnType) =>
+          def (realParamType, typeName) =
+            match(paramType)
             {
-              get;
-              set;
-            }
-          ]>);
+            | Number => (<[ float ]>, "Number")
+            | String => (<[ string ]>, "String")
+            };
         
-      | Property(name, _optional, type) =>
-        // Don't pay attention to optional, always generate property
-        def fullPrefix = $"$(tsInterface.Name)_$(name)";
-        def typePrefix = $"$(fullPrefix)_Property";
-        def propertyType = ConvertType(typePrefix, type, typesScope);
+          def fullPrefix = $"$(tsInterface.Name)_$(typeName)_Index";
+          def returnTypePrefix = $"$(fullPrefix)_Return";
+          def realReturnType = ConvertType(returnTypePrefix, returnType, typesScope);
         
-        _ = interfaceType.DefineWithSource(<[ decl: $(name : usesite) : $propertyType { get; set; }; ]>);
+            _ = interfaceType.DefineWithSource(
+            <[ decl:
+              Item[$(paramName : usesite) : $realParamType] : $realReturnType
+              {
+                get;
+                set;
+              }
+            ]>);
         
-      | Function(name, _optional, parms, returnType) =>
-        // Don't pay attention to optional, always generate property
-        def fullPrefix = $"$(tsInterface.Name)_$(name)";
-        def returnTypePrefix = $"$(fullPrefix)_Return";
-        def realReturnType = ConvertType(returnTypePrefix, returnType, typesScope);
+        | Property(name, _optional, type) =>
+          // Don't pay attention to optional, always generate property
+          def fullPrefix = $"$(tsInterface.Name)_$(name)";
+          def typePrefix = $"$(fullPrefix)_Property";
+          def propertyType = ConvertType(typePrefix, type, typesScope);
         
-        def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
+          _ = interfaceType.DefineWithSource(<[ decl: $(name : usesite) : $propertyType { get; set; }; ]>);
         
-        _ = interfaceType.DefineWithSource(<[ decl: $(name : usesite)(..$functionParams) : $realReturnType; ]>);
-      }
+        | Function(name, _optional, parms, returnType) =>
+          // Don't pay attention to optional, always generate property
+          def fullPrefix = $"$(tsInterface.Name)_$(name)";
+          def returnTypePrefix = $"$(fullPrefix)_Return";
+          def realReturnType = ConvertType(returnTypePrefix, returnType, typesScope);
+        
+          def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
+        
+          _ = interfaceType.DefineWithSource(<[ decl: $(name : usesite)(..$functionParams) : $realReturnType; ]>);
+        }
         
       interfaceType.Compile();
     }
   
-    private CreateTSGlobalClass(tsClass : TSGlobal.Class, typesScope : Scope) : void
+    private CreateTSGlobalClass(tsClass : TSGlobal.Class, typesScope : Scope, typeMembers : bool) : void
     {
       def classType = 
-        match((tsClass.Extends, tsClass.Implements))
-        {
-        | (None, []) =>
-          typesScope.Define(<[ decl: [JSApi] public class $(tsClass.Name : usesite) {} ]>)
-        | _ =>
-          def extends = if (tsClass.Extends is Some(ex)) [<[ $(ex : usesite) ]>] else [];
-          def implement = tsClass.Implements.Select(e => <[ $(e : usesite) ]>);
-          def inherit = extends.Concat(implement);
-          
-          typesScope.Define(
-            <[ decl:
-              [JSApi] public class $(tsClass.Name : usesite) : ..$inherit {}
-            ]>)
-        };
+        if(typeMembers)
+          typesScope.Define(<[ decl: [JSApi] public partial class $(tsClass.Name : usesite) {} ]>)
+        else
+          match((tsClass.Extends, tsClass.Implements))
+          {
+          | (None, []) =>
+            typesScope.Define(<[ decl: [JSApi] public partial class $(tsClass.Name : usesite) {} ]>)
+          | _ =>
+            def extends = if (tsClass.Extends is Some(ex)) [<[ $(ex : usesite) ]>] else [];
+            def implement = tsClass.Implements.Select(e => <[ $(e : usesite) ]>);
+            def inherit = extends.Concat(implement);
+            
+            typesScope.Define(
+              <[ decl:
+                [JSApi] public partial class $(tsClass.Name : usesite) : ..$inherit {}
+              ]>)
+          };
       
-      foreach(member in tsClass.Members)
-      {
-      | Constructor(parms) =>
+      when(typeMembers)
+        foreach(member in tsClass.Members)
+        {
+        | Constructor(parms) =>
         def fullPrefix = $"$(tsClass.Name)_Constructor";
         def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
         
@@ -552,7 +571,7 @@ namespace NemerleWeb
               $DefaultImplementation
           ]>);
       
-      | Member(part, isStatic, _access) =>
+        | Member(part, isStatic, _access) =>
         // Access is ignored.      
         // Generate private as public ones.
         match(part)
@@ -590,7 +609,7 @@ namespace NemerleWeb
                   $DefaultImplementation
               ]>);
         }
-      }
+        }
         
       classType.Compile();
     }
@@ -616,12 +635,12 @@ namespace NemerleWeb
       Message.Hint("TSGlobal.Export is not supported");
     }
   
-    private CreateTSGlobalModule(tsModule : TSGlobal.Module, typesScope : Scope, types : bool) : void
+    private CreateTSGlobalModule(tsModule : TSGlobal.Module, typesScope : Scope, types : bool, typeMembers : bool) : void
     {
       def moduleName = tsModule.Name.Replace('/', '.').Replace('\\', '.');
 
       // Create modules by splitting '.'
-      def moduleType = CreateModule(moduleName.SplitDot(), typesScope, tsModule.Members, types);
+      def moduleType = CreateModule(moduleName.SplitDot(), typesScope, tsModule.Members, types, typeMembers);
       moduleType.Compile()
     }
     
@@ -851,7 +870,8 @@ namespace NemerleWeb
       parts : list[string],
       outer : Scope,
       members : list[TSGlobal],
-      types : bool) : TypeBuilder
+      types : bool,
+      typeMembers : bool) : TypeBuilder
     {
       match (parts)
       {
@@ -870,7 +890,10 @@ namespace NemerleWeb
         def moduleType = outer.Define(<[ decl: [JSApi] public partial module $(hd : usesite) {} ]>);
         
         if(types)
-          GenerateTypes(Scope(moduleType), members);
+          if(!typeMembers)
+            GenerateTypes(Scope(moduleType), members);
+          else
+            GenerateTypesMembers(Scope(moduleType), members);            
         else
           GenerateOthers(Scope(moduleType), moduleType, members);
         
@@ -882,7 +905,7 @@ namespace NemerleWeb
         // Generate partial module to simplify the code
         // Otherwise we need to lookup for type in case types == false
         def innerModule = outer.Define(<[ decl: [JSApi] public partial module $(hd : usesite) {} ]>);
-        def t = CreateModule(tl, Scope(innerModule), [], types);
+        def t = CreateModule(tl, Scope(innerModule), [], types, typeMembers);
         innerModule.Compile();
         t
       }
