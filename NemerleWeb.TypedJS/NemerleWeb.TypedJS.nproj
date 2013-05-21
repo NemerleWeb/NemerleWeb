@@ -90,6 +90,8 @@
     <Folder Include="Scripts\typings\knockout.mapping\" />
     <Folder Include="Scripts\typings\knockout.validation\" />
     <Folder Include="Scripts\typings\knockout\" />
+    <Folder Include="Scripts\typings\modernizr\" />
+    <Folder Include="Scripts\typings\moment\" />
     <Folder Include="Scripts\typings\requirejs\" />
     <Folder Include="Scripts\typings\signalr\" />
     <Folder Include="Scripts\typings\underscore\" />
@@ -131,6 +133,12 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\knockout\knockout.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\modernizr\modernizr.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\moment\moment.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\requirejs\require.d.ts">
