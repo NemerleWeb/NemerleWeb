@@ -152,7 +152,11 @@ namespace NemerleWeb
           ctb.Compile();
       }
       else
-        _ = tb.DefineNestedType(<[ decl: public class Server {} ]>).Compile();
+      {
+        def server = tb.DefineNestedType(<[ decl: public class Server {} ]>);
+        server.HasBeenUsed = true;
+        server.Compile();
+      }
           
       JSClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
       JSClass.StringType = <[ ttype : System.String ]>;
