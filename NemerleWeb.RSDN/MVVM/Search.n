@@ -1,0 +1,104 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Extensions;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NemerleWeb;
+using NemerleWeb.TypedJS;
+
+namespace NemerleWeb.Rsdn
+{    
+  [Unit]
+  public class Search
+  {       
+    SearchResults : List[(TreeNode * list[string])] { get; set; }    
+    SelectedSearchResultIndex : int { get; set; }
+    
+    mutable _searchTerm : string;
+    public SearchTerm : string { 
+      get { _searchTerm; }
+      set {
+          when(_searchTerm != value) {
+            _searchTerm = value;
+            Search(value);
+          }
+      }; 
+    }
+  
+    private static UpArrow = 38;
+    private static DownArrow = 40;
+    
+    public this() {
+      SearchResults = List();
+      
+      _ = jscall @$("body").on("keydown", "", e => {
+        def e = e :> KeyboardEvent;
+        if(e.altKey && SearchResults.Count > 0) {
+          when(e.keyCode == DownArrow && SelectedSearchResultIndex < SearchResults.Count - 2) {
+              SelectedSearchResultIndex++;
+              SelectNode(SearchResults[SelectedSearchResultIndex][0]);
+          }          
+          when(e.keyCode == UpArrow && SelectedSearchResultIndex > 0) {
+            SelectedSearchResultIndex--;
+            SelectNode(SearchResults[SelectedSearchResultIndex][0]);
+          }
+          
+          window.console.log(e);
+          false
+        } else true
+      });
+    }
+        
+    public Search(term : string) : void
+    {
+      if(!string.IsNullOrWhiteSpace(term)) {        
+        server.Search(term, nodes => {
+          SelectedSearchResultIndex = -1;
+          SearchResults = nodes.ToList();
+        });
+      } else SearchResults.Clear();
+    }
+    
+    public IsSelectedResult(node : TreeNode) : bool
+    {
+      if(SelectedSearchResultIndex > -1 && SelectedSearchResultIndex < SearchResults.Count)
+        node.Id == SearchResults[SelectedSearchResultIndex][0].Id;
+      else false
+    }
+    
+    public static SelectNode(node : TreeNode) : void
+    {
+      MainPage.SelectedUrl = node.Href;
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+        <div class="search-bar">
+          <input id="search-input" value="$SearchTerm" />
+        </div>
+        <div $when(!string.IsNullOrEmpty(SearchTerm)) class="search-results">
+          <div $foreach((node, path) in SearchResults) css-selected-search-result="$(IsSelectedResult(node))" class="node">
+            <a click="$(SelectNode(node))" attr-href="$(node.Href)">
+              <img class="node-icon" attr-src="$(node.IconUrl)" />
+              <span class="node-caption">$(node.Caption)</span>
+            </a>
+          </div>
+        </div>
+      #>
+    }
+    
+    public class Server
+    {
+      public Search(term : string) : IEnumerable[(TreeNode * list[string])]
+      {
+        TreeLoader.Search(term)
+      }
+    }
+  }
+}

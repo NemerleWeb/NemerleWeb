@@ -55,7 +55,7 @@ namespace NemerleWeb.Rsdn
     {
       <#
         <div $foreach(c in Children) style-margin-left="$(c.Depth * 10)" class="node">   
-          <a click="$(c.CaptionClick())" css-with-children="$(c.HasChildren)">
+          <a click="$(c.CaptionClick())" attr-href="$(c.Href)" css-with-children="$(c.HasChildren)">
             <img class="node-icon" attr-src="$(c.IconUrl)" />
             <span class="node-caption">$(c.Caption)</span>
           </a>            

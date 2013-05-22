@@ -385,6 +385,7 @@ var nweb = {
       nweb.execute(function() {
         nweb.getParsedValue(model, parsed, loopStack);
       });
+      return false;
     });
   },
   getSubmitBinding: function(model, el, bindings, loopStack, attrVal) {
