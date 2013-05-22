@@ -201,6 +201,9 @@
     <Content Include="App_Data\tree.xml">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Content\Images\pin.png">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="packages.config">
@@ -280,6 +283,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="bin\" />
     <Folder Include="Content\" />
+    <Folder Include="Content\Images\" />
     <Folder Include="Controllers\" />
     <Folder Include="Models\" />
     <Folder Include="MVVM" />
