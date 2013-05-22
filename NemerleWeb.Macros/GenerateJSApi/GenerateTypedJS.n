@@ -481,7 +481,7 @@ namespace NemerleWeb
        
           _ = interfaceType.DefineWithSource(
             <[ decl:
-              $(JSApiSpecial.Call : usesite)(..$functionParams) : $realReturnType;
+              new $(JSApiSpecial.Call : usesite)(..$functionParams) : $realReturnType;
             ]>);
         | Construct(parms, type) =>
           def fullPrefix = $"$(tsInterface.Name)_New";
@@ -492,7 +492,7 @@ namespace NemerleWeb
           
           _ = interfaceType.DefineWithSource(
             <[ decl:
-              $(JSApiSpecial.New : usesite)(..$functionParams) : $realType;
+              new $(JSApiSpecial.New : usesite)(..$functionParams) : $realType;
             ]>);
         | Index(paramName, paramType, returnType) =>
           def (realParamType, typeName) =
@@ -508,7 +508,7 @@ namespace NemerleWeb
         
             _ = interfaceType.DefineWithSource(
             <[ decl:
-              Item[$(paramName : usesite) : $realParamType] : $realReturnType
+              new Item[$(paramName : usesite) : $realParamType] : $realReturnType
               {
                 get;
                 set;
@@ -521,7 +521,7 @@ namespace NemerleWeb
           def typePrefix = $"$(fullPrefix)_Property";
           def propertyType = ConvertType(typePrefix, type, typesScope);
         
-          _ = interfaceType.DefineWithSource(<[ decl: $(name : usesite) : $propertyType { get; set; }; ]>);
+          _ = interfaceType.DefineWithSource(<[ decl: new $(name : usesite) : $propertyType { get; set; }; ]>);
         
         | Function(name, _optional, parms, returnType) =>
           // Don't pay attention to optional, always generate property
@@ -531,7 +531,7 @@ namespace NemerleWeb
         
           def functionParams = ConvertParameters(fullPrefix, parms, typesScope);
         
-          _ = interfaceType.DefineWithSource(<[ decl: $(name : usesite)(..$functionParams) : $realReturnType; ]>);
+          _ = interfaceType.DefineWithSource(<[ decl: new $(name : usesite)(..$functionParams) : $realReturnType; ]>);
         }
         
       interfaceType.Compile();
@@ -599,13 +599,13 @@ namespace NemerleWeb
           if(isStatic is Some(true))
             _ = classType.DefineWithSource(
               <[ decl: 
-                public static $(name : usesite)(..$functionParams) : $realReturnType
+                public static new $(name : usesite)(..$functionParams) : $realReturnType
                   $DefaultImplementation
               ]>);
           else
             _ = classType.DefineWithSource(
               <[ decl: 
-                public $(name : usesite)(..$functionParams) : $realReturnType
+                public new $(name : usesite)(..$functionParams) : $realReturnType
                   $DefaultImplementation
               ]>);
         }
