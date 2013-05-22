@@ -1,0 +1,107 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Extensions;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NemerleWeb;
+using NemerleWeb.TypedJS;
+
+namespace NemerleWeb.Rsdn
+{    
+  [Unit]
+  public class Search
+  {       
+    SearchResults : TreeNode;
+    
+    mutable _selectedSearchResultIndex : int;    
+    SelectedSearchResultIndex : int { 
+      get { _selectedSearchResultIndex }
+      set {
+        when(_selectedSearchResultIndex != value) {
+          when(_selectedSearchResultIndex < SearchResults.Children.Count && _selectedSearchResultIndex > -1)
+            SearchResults.Children[_selectedSearchResultIndex].IsSelected = false;
+            
+          when(value < SearchResults.Children.Count && value > -1)   
+            SearchResults.Children[value].IsSelected = true;
+            
+          _selectedSearchResultIndex = value;          
+        }
+      }
+    }
+    
+    mutable _searchTerm : string;
+    public SearchTerm : string { 
+      get { _searchTerm; }
+      set {
+          when(_searchTerm != value) {
+            _searchTerm = value;
+            Search(value);
+          }
+      }; 
+    }
+  
+    private static UpArrow = 38;
+    private static DownArrow = 40;
+    
+    public this() {
+      SearchResults = TreeNode() <- ( Children = List() );      
+      
+      _ = jscall @$("body").on("keydown", "", e => {
+        def e = e :> KeyboardEvent;
+        if(e.altKey && SearchResults.Children.Count > 0) {
+          when(e.keyCode == DownArrow && SelectedSearchResultIndex < SearchResults.Children.Count - 2) {
+              SelectedSearchResultIndex++;
+              SelectNode(SearchResults.Children[SelectedSearchResultIndex]);
+          }          
+          when(e.keyCode == UpArrow && SelectedSearchResultIndex > 0) {
+            SelectedSearchResultIndex--;
+            SelectNode(SearchResults.Children[SelectedSearchResultIndex]);
+          }
+          
+          window.console.log(e);
+          false
+        } else true
+      });
+    }
+        
+    public Search(term : string) : void
+    {
+      if(!string.IsNullOrWhiteSpace(term)) {        
+        server.Search(term, nodes => {
+          SearchResults.Children = nodes.ToList();
+          SelectedSearchResultIndex = -1;
+        });
+      } else SearchResults.Children.Clear();
+    }
+    
+    public static SelectNode(node : TreeNode) : void
+    {
+      MainPage.SelectedUrl = node.Href;
+    }
+        
+    [Html]
+    public View() : string
+    {
+      <#
+        <div class="search-bar">
+          <input id="search-input" value="$SearchTerm" />
+        </div>
+        <div $when(!string.IsNullOrEmpty(SearchTerm)) class="search-results">          
+          <div template="$(template(SearchResults))" />
+        </div>
+      #>
+    }
+    
+    public class Server
+    {
+      public Search(term : string) : IEnumerable[TreeNode]
+      {
+        TreeLoader.Search(term)
+      }
+    }
+  }
+}

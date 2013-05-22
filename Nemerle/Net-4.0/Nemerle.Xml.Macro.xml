@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>D:\MyProjects\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.Xml.Macro.xml</name>
+    <name>C:\dev\open-source\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.Xml.Macro.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.Xml.DefineXmlns_assembly_postscanMacro" />
@@ -148,8 +148,8 @@
     <member name="M:Nemerle.Xml.XmlAstToXLinq.Transform(Nemerle.Xml.XmlAst,Nemerle.Collections.Set{System.String},System.String)" />
     <member name="M:Nemerle.Xml.XmlAstToXLinq.TransformImpl(Nemerle.Xml.XmlAst,Nemerle.Collections.Set{System.String},System.String)" />
     <member name="T:Nemerle.Xml.XmlQuotParser" />
-    <member name="M:Nemerle.Xml.XmlQuotParser._N_testSpaces_12605(Nemerle.Xml.XmlQuotParser._N_closureOf_prefixedName_12597,Nemerle.Peg.NToken)" />
-    <member name="M:Nemerle.Xml.XmlQuotParser._N_getTextPoint_12552(Nemerle.Xml.XmlQuotParser._N_closureOf_ToLocation_12544,System.Int32)" />
+    <member name="M:Nemerle.Xml.XmlQuotParser._N_testSpaces_12607(Nemerle.Xml.XmlQuotParser._N_closureOf_prefixedName_12599,Nemerle.Peg.NToken)" />
+    <member name="M:Nemerle.Xml.XmlQuotParser._N_getTextPoint_12554(Nemerle.Xml.XmlQuotParser._N_closureOf_ToLocation_12546,System.Int32)" />
     <member name="F:Nemerle.Xml.XmlQuotParser._location" />
     <member name="F:Nemerle.Xml.XmlQuotParser._lineOffsetMap" />
     <member name="M:Nemerle.Xml.XmlQuotParser.#ctor(Nemerle.Compiler.Location,System.String)" />
