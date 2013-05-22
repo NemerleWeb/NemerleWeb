@@ -190,38 +190,7 @@ namespace NemerleWeb
             
       // Handle JS native calls
       when(typeInfo?.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
-      {
-        // Constructor
-        if(member.IsConstructor)
-          return JSAst.Call(JSAst.Constructor(JSClass.GetProperNameForJS(typeInfo), None()), parms);
-        // @() operator
-        else
-        if(left is JSAst.StaticMethodRef && member.Name == "()")
-          return parms.Head.ExternalMethodCall("", parms.Tail);
-        // Static method
-        else
-        if(left is JSAst.StaticMethodRef)
-          return JSClass.GetProperNameForJS(typeInfo).StaticCall(member, parms);        
-        // JSApiSpecial.Call
-        else
-        if(member.Name == JSApiSpecial.Call)
-            return left.ExternalMethodCall("", parms);
-        // JSApiSpecial.New
-        else
-        if(member.Name == JSApiSpecial.New)
-          return JSAst.Call(JSAst.Constructor(left.Write(), None()), parms);
-		    // Properties
-        else
-		    if(member.Attributes.HasFlag(NemerleModifiers.SpecialName) && member.Name.StartsWith("get_"))
-          return left.Field(member.Name.Substring(4));
-        else
-        if(member.Attributes.HasFlag(NemerleModifiers.SpecialName) && member.Name.StartsWith("set_")) {
-          return JSAst.Assign(left.Field(member.Name.Substring(4)), parms.FirstOrDefault());
-        }
-        // Instance method
-        else
-          return left.MethodCall(member, parms);          
-      }
+        return ConvertJSApiMethod(typeInfo, left, member, parms);
               
       // Nothing found, try default dictionary
       mutable defaultMemberHandler;
@@ -231,6 +200,56 @@ namespace NemerleWeb
           
       // Process low level naming
       DefaultConvertMethod(typeInfo, left, member, parms)
+    }
+    
+    private ConvertJSApiMethod(
+      typeInfo : TypeInfo,
+      [NotNull] left : JSAst,
+      [NotNull] member : IMember,
+      [NotNull] parms : list[JSAst]) : JSAst
+    {
+      def defaultMethod() { left.MethodCall(member, parms); }
+      
+      // Constructor
+      if(member.IsConstructor)
+        JSAst.Call(JSAst.Constructor(JSClass.GetProperNameForJS(typeInfo), None()), parms);
+      // @() operator
+      else
+      if(left is JSAst.StaticMethodRef && member.Name == "()")
+        parms.Head.ExternalMethodCall("", parms.Tail);
+      // Static method
+      else
+      if(left is JSAst.StaticMethodRef)
+        JSClass.GetProperNameForJS(typeInfo).StaticCall(member, parms);        
+      // JSApiSpecial.Call
+      else
+      if(member.Name == JSApiSpecial.Call)
+        left.ExternalMethodCall("", parms);
+      // JSApiSpecial.New
+      else
+      if(member.Name == JSApiSpecial.New)
+        JSAst.Call(JSAst.Constructor(left.Write(), None()), parms);
+      // Special members
+      else
+      if(member.Attributes.HasFlag(NemerleModifiers.SpecialName))
+      {
+        // Indexer
+        if(member.Name == "get_Item" || member.Name == "set_Item")
+          JSAst.ArrayIndexer(left, parms.First())
+        // Get property
+        else
+        if(member.Name.StartsWith("get_"))
+          left.Field(member.Name.Substring(4));
+        // Set property
+        else
+        if(member.Name.StartsWith("set_"))
+          JSAst.Assign(left.Field(member.Name.Substring(4)), parms.FirstOrDefault());
+        else
+          defaultMethod();
+      }      
+      // Instance method
+      else
+        defaultMethod();
     }
     
     private ConvertFixedTypeMethod(type : FixedType, left : JSAst, member : IMember, parms : list[JSAst]) : JSAst

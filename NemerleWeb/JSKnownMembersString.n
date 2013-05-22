@@ -155,7 +155,7 @@ namespace NemerleWeb
     
     EmptyString : JSAst.Literal = JSAst.Literal(JSLiteral.String(""));
     
-    private StaticHandler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
+    private StaticHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match (parms)
       {
