@@ -2,14 +2,30 @@ body {
     font-family: Tahoma, Geneva, sans-serif;
 }
 
+.search-bar {
+    padding: 10px;
+}
+
 .node {
     cursor: pointer;   
     color: #1e90ff;
     font-size: 12px;
+    clear: both;
 }
 
 .node.with-children {
     color: #2f4f4f;
+}
+
+.node .node-icon {
+    display: block;
+    float: left;
+    width: 32px;
+}
+
+.node .node-caption {
+    display: block;
+    margin-left: 35px;
 }
 
 .search-results span {
@@ -28,9 +44,6 @@ body {
     font-weight: bold;
 }
 
-.page {
-}
-
 .left {
     width: 25%;
     float: left;
@@ -46,8 +59,4 @@ body {
     border: 0;
     width: 100%;
     height: 1000px;
-}
-
-.search-bar {
-    padding: 10px;
 }

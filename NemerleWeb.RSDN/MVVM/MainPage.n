@@ -11,7 +11,7 @@ using NemerleWeb;
 using NemerleWeb.TypedJS;
 
 namespace NemerleWeb.Rsdn
-{  
+{    
   [Unit]
   public class MainPage
   {
@@ -52,14 +52,15 @@ namespace NemerleWeb.Rsdn
           when(e.keyCode == DownArrow && SelectedSearchResultIndex < SearchResults.Count - 2) {
               SelectedSearchResultIndex++;
               SelectNode(SearchResults[SelectedSearchResultIndex][0]);
-          }
+          }          
           when(e.keyCode == UpArrow && SelectedSearchResultIndex > 0) {
             SelectedSearchResultIndex--;
             SelectNode(SearchResults[SelectedSearchResultIndex][0]);
           }
+          
           window.console.log(e);
           false
-        } else true      
+        } else true
       });
     }
     
@@ -74,12 +75,12 @@ namespace NemerleWeb.Rsdn
     
     public Search(term : string) : void
     {
-      when(!string.IsNullOrWhiteSpace(term)) {        
+      if(!string.IsNullOrWhiteSpace(term)) {        
         server.Search(term, nodes => {
           SelectedSearchResultIndex = -1;
           SearchResults = nodes.ToList();
         });
-      }
+      } else SearchResults.Clear();
     }
     
     public IsSelectedResult(node : TreeNode) : bool
@@ -109,7 +110,7 @@ namespace NemerleWeb.Rsdn
                   <a click="$(SelectNode(node))" class="node">
                     <img attr-src="$(node.IconUrl)" />
                     <span>$(node.Caption)</span>
-                  </a>              
+                  </a>
                 </div>
               </div>
               <div $when(string.IsNullOrEmpty(SearchTerm))>

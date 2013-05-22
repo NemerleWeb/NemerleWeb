@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>C:\TeamCity\buildAgent\work\b8caae985926e367\bin\Release\net-4.5\\TestFramework\\Nemerle.Compiler.Test.xml</name>
+    <name>C:\dev\open-source\nemerle\bin\Release\net-4.5\\TestFramework\\Nemerle.Compiler.Test.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.Compiler.Test.DefaultProcessStartInfoFactory" />
@@ -71,7 +71,7 @@
     <member name="M:Nemerle.Compiler.Test.Ncc.#ctor" />
     <member name="M:Nemerle.Compiler.Test.Ncc.Compile(Nemerle.Core.list{System.String},Nemerle.Core.list{System.String},Nemerle.Compiler.Test.NccTestOutputWriter)" />
     <member name="T:Program" />
-    <member name="M:Program._N_parseArguments_13673(System.String)" />
+    <member name="M:Program._N_parseArguments_13675(System.String)" />
     <member name="M:Program.Main(System.String[])" />
     <member name="T:Program.SortCriteria" />
     <member name="T:Program.ColorSet" />
@@ -96,13 +96,13 @@
     <member name="P:Nemerle.Compiler.Test.NccResult.Output" />
     <member name="M:Nemerle.Compiler.Test.NccResult.#ctor(System.Int32,System.Collections.Generic.IList{System.String})" />
     <member name="T:Nemerle.Compiler.Test.NccTest" />
-    <member name="M:Nemerle.Compiler.Test.NccTest._N_lookupPattern_14866(Nemerle.Compiler.Test.NccTest._N_closureOf_isExpectedMessage_14856,System.Collections.Generic.Dictionary{System.Int32,System.Text.RegularExpressions.Regex},System.Int32)" />
-    <member name="M:Nemerle.Compiler.Test.NccTest._N_checkMessage_14774(Nemerle.Compiler.Test.NccTest._N_closureOf_validateMessages_14750,System.Int32,System.Text.RegularExpressions.Regex,System.String,System.Boolean)" />
-    <member name="M:Nemerle.Compiler.Test.NccTest._N_validateBinaryStep_14430(Nemerle.Compiler.Test.NccTest._N_closureOf_Run_14385,Nemerle.Compiler.Test.NccTestDescription,System.String,Nemerle.Compiler.Test.NccResult)" />
-    <member name="M:Nemerle.Compiler.Test.NccTest._N_validateMessagesStep_14424(Nemerle.Compiler.Test.NccTest._N_closureOf_Run_14385,Nemerle.Compiler.Test.NccTestDescription,System.String,Nemerle.Compiler.Test.NccResult)" />
-    <member name="M:Nemerle.Compiler.Test.NccTest._N_compileStep_14418(Nemerle.Compiler.Test.NccTest._N_closureOf_Run_14385,Nemerle.Compiler.Test.NccTestDescription)" />
-    <member name="M:Nemerle.Compiler.Test.NccTest._N_parseStep_14412(Nemerle.Compiler.Test.NccTest._N_closureOf_Run_14385,System.IO.TextReader)" />
-    <member name="M:Nemerle.Compiler.Test.NccTest._N_showNccOutput_14393(Nemerle.Compiler.Test.NccTest._N_closureOf_Run_14385,Nemerle.Compiler.Test.NccResult)" />
+    <member name="M:Nemerle.Compiler.Test.NccTest._N_lookupPattern_14868(Nemerle.Compiler.Test.NccTest._N_closureOf_isExpectedMessage_14858,System.Collections.Generic.Dictionary{System.Int32,System.Text.RegularExpressions.Regex},System.Int32)" />
+    <member name="M:Nemerle.Compiler.Test.NccTest._N_checkMessage_14776(Nemerle.Compiler.Test.NccTest._N_closureOf_validateMessages_14752,System.Int32,System.Text.RegularExpressions.Regex,System.String,System.Boolean)" />
+    <member name="M:Nemerle.Compiler.Test.NccTest._N_validateBinaryStep_14432(Nemerle.Compiler.Test.NccTest._N_closureOf_Run_14387,Nemerle.Compiler.Test.NccTestDescription,System.String,Nemerle.Compiler.Test.NccResult)" />
+    <member name="M:Nemerle.Compiler.Test.NccTest._N_validateMessagesStep_14426(Nemerle.Compiler.Test.NccTest._N_closureOf_Run_14387,Nemerle.Compiler.Test.NccTestDescription,System.String,Nemerle.Compiler.Test.NccResult)" />
+    <member name="M:Nemerle.Compiler.Test.NccTest._N_compileStep_14420(Nemerle.Compiler.Test.NccTest._N_closureOf_Run_14387,Nemerle.Compiler.Test.NccTestDescription)" />
+    <member name="M:Nemerle.Compiler.Test.NccTest._N_parseStep_14414(Nemerle.Compiler.Test.NccTest._N_closureOf_Run_14387,System.IO.TextReader)" />
+    <member name="M:Nemerle.Compiler.Test.NccTest._N_showNccOutput_14395(Nemerle.Compiler.Test.NccTest._N_closureOf_Run_14387,Nemerle.Compiler.Test.NccResult)" />
     <member name="M:Nemerle.Compiler.Test.NccTest.#ctor(System.String,System.String,Nemerle.Test.Framework.ColorizedOutputWriter,Nemerle.Compiler.Test.Ncc,System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.String},Nemerle.Core.option{Nemerle.Compiler.Test.Verifier},Nemerle.Compiler.Test.ProcessStartInfoFactory,System.Int32)" />
     <member name="M:Nemerle.Compiler.Test.NccTest.get_Name" />
     <member name="P:Nemerle.Compiler.Test.NccTest.Name" />

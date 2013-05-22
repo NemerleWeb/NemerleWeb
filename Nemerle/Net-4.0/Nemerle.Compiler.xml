@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>D:\MyProjects\nemerle\bin\Release\net-4.5\\Stage4\\Nemerle.Compiler.xml</name>
+    <name>C:\dev\open-source\nemerle\bin\Release\net-4.5\\Stage1\\Nemerle.Compiler.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.Compiler.CompilationOptions" />
-    <member name="M:Nemerle.Compiler.CompilationOptions._N_split_opt_24979(System.String)" />
+    <member name="M:Nemerle.Compiler.CompilationOptions._N_split_opt_24981(System.String)" />
     <member name="F:Nemerle.Compiler.CompilationOptions.OutputFileName" />
     <member name="F:Nemerle.Compiler.CompilationOptions.OutputPath" />
     <member name="F:Nemerle.Compiler.CompilationOptions.ProjectPath" />
@@ -171,8 +171,8 @@
     <member name="M:Nemerle.Compiler.CompilationAbortedException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)" />
     <member name="M:Nemerle.Compiler.CompilationAbortedException.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.ManagerClass" />
-    <member name="M:Nemerle.Compiler.ManagerClass._N_resetChildren_29181(Nemerle.Compiler.ManagerClass._N_closureOf_CleanUpTypes_29175,Nemerle.Collections.Hashtable{System.String,Nemerle.Compiler.NamespaceTree.Node})" />
-    <member name="M:Nemerle.Compiler.ManagerClass._N_tryEx_28068(Nemerle.Compiler.ManagerClass._N_closureOf_LoadExternalLibraries_28050,Nemerle.Builtins.FunctionVoid)" />
+    <member name="M:Nemerle.Compiler.ManagerClass._N_resetChildren_29183(Nemerle.Compiler.ManagerClass._N_closureOf_CleanUpTypes_29177,Nemerle.Collections.Hashtable{System.String,Nemerle.Compiler.NamespaceTree.Node})" />
+    <member name="M:Nemerle.Compiler.ManagerClass._N_tryEx_28070(Nemerle.Compiler.ManagerClass._N_closureOf_LoadExternalLibraries_28052,Nemerle.Builtins.FunctionVoid)" />
     <member name="M:Nemerle.Compiler.ManagerClass.#cctor" />
     <member name="M:Nemerle.Compiler.ManagerClass.get_IsStop" />
     <member name="P:Nemerle.Compiler.ManagerClass.IsStop" />
@@ -949,17 +949,17 @@
     <member name="P:Nemerle.Compiler.Region.Text" />
     <member name="M:Nemerle.Compiler.Region.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.LexerBase" />
-    <member name="M:Nemerle.Compiler.LexerBase._N_special_33342(System.Char)">
+    <member name="M:Nemerle.Compiler.LexerBase._N_special_33344(System.Char)">
       <summary>
         <para>we should have integer number here
 
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Compiler.LexerBase._N_check_type_suffix_33336(Nemerle.Compiler.LexerBase._N_closureOf_get_number_33238,System.UInt64)" />
-    <member name="M:Nemerle.Compiler.LexerBase._N_exponent_part_33302(Nemerle.Compiler.LexerBase._N_closureOf_get_number_33238,System.Boolean)" />
-    <member name="M:Nemerle.Compiler.LexerBase._N_read_word_32600(Nemerle.Compiler.LexerBase._N_closureOf_parse_preprocessor_32578)" />
-    <member name="M:Nemerle.Compiler.LexerBase._N_eat_spaces_32586(Nemerle.Compiler.LexerBase._N_closureOf_parse_preprocessor_32578)" />
+    <member name="M:Nemerle.Compiler.LexerBase._N_check_type_suffix_33338(Nemerle.Compiler.LexerBase._N_closureOf_get_number_33240,System.UInt64)" />
+    <member name="M:Nemerle.Compiler.LexerBase._N_exponent_part_33304(Nemerle.Compiler.LexerBase._N_closureOf_get_number_33240,System.Boolean)" />
+    <member name="M:Nemerle.Compiler.LexerBase._N_read_word_32602(Nemerle.Compiler.LexerBase._N_closureOf_parse_preprocessor_32580)" />
+    <member name="M:Nemerle.Compiler.LexerBase._N_eat_spaces_32588(Nemerle.Compiler.LexerBase._N_closureOf_parse_preprocessor_32580)" />
     <member name="M:Nemerle.Compiler.LexerBase.#ctor(Nemerle.Compiler.ManagerClass,System.String)" />
     <member name="M:Nemerle.Compiler.LexerBase.get_LinesLengths" />
     <member name="P:Nemerle.Compiler.LexerBase.LinesLengths" />
@@ -1096,7 +1096,7 @@
     <member name="M:Nemerle.Compiler.LexerStringBase.peek_or_white" />
     <member name="M:Nemerle.Compiler.LexerStringBase.read_from_input" />
     <member name="T:Nemerle.Compiler.LexerFile" />
-    <member name="M:Nemerle.Compiler.LexerFile._N_loop1_34007(Nemerle.Compiler.LexerFile._N_closureOf_comment_beginning_33977,System.Boolean,System.Boolean)" />
+    <member name="M:Nemerle.Compiler.LexerFile._N_loop1_34009(Nemerle.Compiler.LexerFile._N_closureOf_comment_beginning_33979,System.Boolean,System.Boolean)" />
     <member name="F:Nemerle.Compiler.LexerFile.comment_loc" />
     <member name="F:Nemerle.Compiler.LexerFile.currentComment" />
     <member name="M:Nemerle.Compiler.LexerFile.#ctor(Nemerle.Compiler.ManagerClass,System.Int32,System.String)" />
@@ -1105,7 +1105,7 @@
     <member name="M:Nemerle.Compiler.LexerFile.GetToken" />
     <member name="M:Nemerle.Compiler.LexerFile.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.LexerString" />
-    <member name="M:Nemerle.Compiler.LexerString._N_loop1_34135(Nemerle.Compiler.LexerString._N_closureOf_comment_beginning_34097,System.Boolean,System.Boolean)" />
+    <member name="M:Nemerle.Compiler.LexerString._N_loop1_34137(Nemerle.Compiler.LexerString._N_closureOf_comment_beginning_34099,System.Boolean,System.Boolean)" />
     <member name="F:Nemerle.Compiler.LexerString.comment_loc" />
     <member name="F:Nemerle.Compiler.LexerString.currentComment" />
     <member name="F:Nemerle.Compiler.LexerString.CommentLocations" />
@@ -1113,7 +1113,7 @@
     <member name="M:Nemerle.Compiler.LexerString.comment_beginning" />
     <member name="M:Nemerle.Compiler.LexerString.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.LexerCompletion" />
-    <member name="M:Nemerle.Compiler.LexerCompletion._N_resetCompletionMark_34190(Nemerle.Compiler.LexerCompletion._N_closureOf_GetToken_34182)" />
+    <member name="M:Nemerle.Compiler.LexerCompletion._N_resetCompletionMark_34192(Nemerle.Compiler.LexerCompletion._N_closureOf_GetToken_34184)" />
     <member name="F:Nemerle.Compiler.LexerCompletion.CompletionMarkLine" />
     <member name="F:Nemerle.Compiler.LexerCompletion.CompletionMarkChar" />
     <member name="M:Nemerle.Compiler.LexerCompletion.#ctor(Nemerle.Compiler.ManagerClass,System.String,Nemerle.Compiler.Location,System.Int32,System.Int32)" />
@@ -1197,26 +1197,26 @@
     <member name="F:Nemerle.Compiler.OperatorDefinition.Right" />
     <member name="M:Nemerle.Compiler.OperatorDefinition.#ctor(Nemerle.Compiler.NamespaceTree.Node,System.String,System.Int32,System.Int32,System.Boolean)" />
     <member name="T:Nemerle.Compiler.MainParser" />
-    <member name="M:Nemerle.Compiler.MainParser._N_tryMakeDollarised_38761(Nemerle.Compiler.MainParser._N_closureOf_makeStrsConcat_38738)" />
-    <member name="M:Nemerle.Compiler.MainParser._N_makeStrsConcat_38732(Nemerle.Compiler.MainParser._N_closureOf_parse_expr_sequence_38713,Nemerle.Compiler.Token,System.Boolean)" />
-    <member name="M:Nemerle.Compiler.MainParser._N_isStr_38718(Nemerle.Compiler.Token)" />
-    <member name="M:Nemerle.Compiler.MainParser._N_push_38602``1(Nemerle.Compiler.MainParser._N_closureOf_parse_quotation_38576,System.String,Nemerle.Builtins.Function{``0})" />
-    <member name="M:Nemerle.Compiler.MainParser._N_ReportError_37970(Nemerle.Compiler.MainParser._N_closureOf_loop2_37962,Nemerle.Compiler.Token,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.Compiler.MainParser._N_loop2_37956(Nemerle.Compiler.MainParser._N_closureOf_parse_match_case_37946,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Compiler.MainParser._N_create_typarms_37284(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Core.list{Nemerle.Compiler.Parsetree.Constraint})" />
-    <member name="M:Nemerle.Compiler.MainParser._N_add_and_loop_37154(Nemerle.Compiler.MainParser._N_closureOf_loop_37138,Nemerle.Compiler.MainParser._N_closureOf_get_modifiers_37124,Nemerle.Compiler.NemerleModifiers)" />
-    <member name="M:Nemerle.Compiler.MainParser._N_loop_37132(Nemerle.Compiler.MainParser._N_closureOf_get_modifiers_37124,Nemerle.Compiler.NemerleModifiers)" />
-    <member name="M:Nemerle.Compiler.MainParser._N_mekeNewSplicable_36869(Nemerle.Compiler.Parsetree.PExpr,System.String,System.Boolean)" />
-    <member name="M:Nemerle.Compiler.MainParser._N_redirect_36612(Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.Parsetree.Name,Nemerle.Core.option{Nemerle.Compiler.Parsetree.ClassMember.Function})" />
-    <member name="M:Nemerle.Compiler.MainParser._N_make_option_36462(Nemerle.Compiler.MainParser._N_closureOf_parse_option_36452,Nemerle.Compiler.Parsetree.Splicable,Nemerle.Compiler.Token,Nemerle.Compiler.Location,Nemerle.Compiler.Token.BracesGroup)" />
-    <member name="M:Nemerle.Compiler.MainParser._N_parseNestedTypeDeclaration_36255(Nemerle.Compiler.MainParser._N_closureOf_ParseClassMember_36227)" />
-    <member name="M:Nemerle.Compiler.MainParser._N__N_lambda__35909_36107(Nemerle.Compiler.Parsetree.ClassMember)" />
-    <member name="M:Nemerle.Compiler.MainParser._N_errTypeExpected_36006(Nemerle.Compiler.MainParser._N_closureOf_processType_35988,Nemerle.Compiler.Location)" />
-    <member name="M:Nemerle.Compiler.MainParser._N_processType_35982(Nemerle.Compiler.MainParser._N_closureOf_ParseTypeDeclaration_35970,System.String)" />
-    <member name="M:Nemerle.Compiler.MainParser._N_expect_close_35054(Nemerle.Compiler.MainParser._N_closureOf_loop_35020,Nemerle.Compiler.MainParser._N_closureOf_parse_grammar_rule_34987,Nemerle.Compiler.GrammarElement)" />
-    <member name="M:Nemerle.Compiler.MainParser._N_loop_35014(Nemerle.Compiler.MainParser._N_closureOf_parse_grammar_rule_34987,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement},Nemerle.Compiler.GrammarElement)" />
-    <member name="M:Nemerle.Compiler.MainParser._N_expect_semicolon_34999(Nemerle.Compiler.MainParser._N_closureOf_parse_grammar_rule_34987)" />
-    <member name="M:Nemerle.Compiler.MainParser._N_eat_definition_34811(Nemerle.Compiler.MainParser._N_closureOf_parse_top_extensions_34782,Nemerle.Compiler.SyntaxDefinition)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_tryMakeDollarised_38763(Nemerle.Compiler.MainParser._N_closureOf_makeStrsConcat_38740)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_makeStrsConcat_38734(Nemerle.Compiler.MainParser._N_closureOf_parse_expr_sequence_38715,Nemerle.Compiler.Token,System.Boolean)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_isStr_38720(Nemerle.Compiler.Token)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_push_38604``1(Nemerle.Compiler.MainParser._N_closureOf_parse_quotation_38578,System.String,Nemerle.Builtins.Function{``0})" />
+    <member name="M:Nemerle.Compiler.MainParser._N_ReportError_37972(Nemerle.Compiler.MainParser._N_closureOf_loop2_37964,Nemerle.Compiler.Token,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_loop2_37958(Nemerle.Compiler.MainParser._N_closureOf_parse_match_case_37948,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Compiler.MainParser._N_create_typarms_37286(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Core.list{Nemerle.Compiler.Parsetree.Constraint})" />
+    <member name="M:Nemerle.Compiler.MainParser._N_add_and_loop_37156(Nemerle.Compiler.MainParser._N_closureOf_loop_37140,Nemerle.Compiler.MainParser._N_closureOf_get_modifiers_37126,Nemerle.Compiler.NemerleModifiers)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_loop_37134(Nemerle.Compiler.MainParser._N_closureOf_get_modifiers_37126,Nemerle.Compiler.NemerleModifiers)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_mekeNewSplicable_36871(Nemerle.Compiler.Parsetree.PExpr,System.String,System.Boolean)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_redirect_36614(Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.Parsetree.Name,Nemerle.Core.option{Nemerle.Compiler.Parsetree.ClassMember.Function})" />
+    <member name="M:Nemerle.Compiler.MainParser._N_make_option_36464(Nemerle.Compiler.MainParser._N_closureOf_parse_option_36454,Nemerle.Compiler.Parsetree.Splicable,Nemerle.Compiler.Token,Nemerle.Compiler.Location,Nemerle.Compiler.Token.BracesGroup)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_parseNestedTypeDeclaration_36257(Nemerle.Compiler.MainParser._N_closureOf_ParseClassMember_36229)" />
+    <member name="M:Nemerle.Compiler.MainParser._N__N_lambda__35911_36109(Nemerle.Compiler.Parsetree.ClassMember)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_errTypeExpected_36008(Nemerle.Compiler.MainParser._N_closureOf_processType_35990,Nemerle.Compiler.Location)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_processType_35984(Nemerle.Compiler.MainParser._N_closureOf_ParseTypeDeclaration_35972,System.String)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_expect_close_35056(Nemerle.Compiler.MainParser._N_closureOf_loop_35022,Nemerle.Compiler.MainParser._N_closureOf_parse_grammar_rule_34989,Nemerle.Compiler.GrammarElement)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_loop_35016(Nemerle.Compiler.MainParser._N_closureOf_parse_grammar_rule_34989,Nemerle.Core.list{Nemerle.Compiler.Parsetree.SyntaxElement},Nemerle.Compiler.GrammarElement)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_expect_semicolon_35001(Nemerle.Compiler.MainParser._N_closureOf_parse_grammar_rule_34989)" />
+    <member name="M:Nemerle.Compiler.MainParser._N_eat_definition_34813(Nemerle.Compiler.MainParser._N_closureOf_parse_top_extensions_34784,Nemerle.Compiler.SyntaxDefinition)" />
     <member name="M:Nemerle.Compiler.MainParser.load_syntax(Nemerle.Core.list{Nemerle.Compiler.SyntaxDefinition},Nemerle.Collections.Map{System.String,Nemerle.Compiler.GrammarElement})">
       <summary>
         <para>This functions loads given syntax extensions into current syntax
@@ -1617,9 +1617,9 @@
     <member name="F:Nemerle.Compiler.DispatchingFileParser.registeredParsers" />
     <member name="M:Nemerle.Compiler.DispatchingFileParser.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.Parsetree.TopDeclaration" />
-    <member name="M:Nemerle.Compiler.Parsetree.TopDeclaration._N_getInner_39568(Nemerle.Compiler.Parsetree.TopDeclaration._N_closureOf_GetAllInnerTypes_39560,Nemerle.Compiler.Parsetree.TopDeclaration)" />
-    <member name="M:Nemerle.Compiler.Parsetree.TopDeclaration._N_makeName_39514(Nemerle.Compiler.Parsetree.TopDeclaration._N_closureOf_get_FullName_39508,Nemerle.Compiler.Parsetree.TopDeclaration)" />
-    <member name="M:Nemerle.Compiler.Parsetree.TopDeclaration._N_makeName_39481(Nemerle.Compiler.Parsetree.TopDeclaration._N_closureOf_get_FullQualifiedName_39475,Nemerle.Compiler.Parsetree.TopDeclaration)" />
+    <member name="M:Nemerle.Compiler.Parsetree.TopDeclaration._N_getInner_39570(Nemerle.Compiler.Parsetree.TopDeclaration._N_closureOf_GetAllInnerTypes_39562,Nemerle.Compiler.Parsetree.TopDeclaration)" />
+    <member name="M:Nemerle.Compiler.Parsetree.TopDeclaration._N_makeName_39516(Nemerle.Compiler.Parsetree.TopDeclaration._N_closureOf_get_FullName_39510,Nemerle.Compiler.Parsetree.TopDeclaration)" />
+    <member name="M:Nemerle.Compiler.Parsetree.TopDeclaration._N_makeName_39483(Nemerle.Compiler.Parsetree.TopDeclaration._N_closureOf_get_FullQualifiedName_39477,Nemerle.Compiler.Parsetree.TopDeclaration)" />
     <member name="F:Nemerle.Compiler.Parsetree.TopDeclaration.DeclaredTypeParameters" />
     <member name="M:Nemerle.Compiler.Parsetree.TopDeclaration.get_DeclaredTypeParametersCount" />
     <member name="P:Nemerle.Compiler.Parsetree.TopDeclaration.DeclaredTypeParametersCount" />
@@ -1691,11 +1691,11 @@
     <member name="T:Nemerle.Compiler.Parsetree.TopDeclaration.Delegate" />
     <member name="T:Nemerle.Compiler.Parsetree.TopDeclaration.Enum" />
     <member name="T:Nemerle.Compiler.Parsetree.ClassMember" />
-    <member name="M:Nemerle.Compiler.Parsetree.ClassMember._N_prefix_40416(Nemerle.Compiler.Parsetree.ClassMember._N_closureOf_ToString_40390)" />
-    <member name="M:Nemerle.Compiler.Parsetree.ClassMember._N_ifMutable_40406(Nemerle.Compiler.Parsetree.ClassMember._N_closureOf_ToString_40390)" />
-    <member name="M:Nemerle.Compiler.Parsetree.ClassMember._N_prefix_40344(Nemerle.Compiler.Parsetree.ClassMember._N_closureOf_HeaderToString_40318)" />
-    <member name="M:Nemerle.Compiler.Parsetree.ClassMember._N_ifMutable_40334(Nemerle.Compiler.Parsetree.ClassMember._N_closureOf_HeaderToString_40318)" />
-    <member name="M:Nemerle.Compiler.Parsetree.ClassMember._N_print_40277(Nemerle.Compiler.Parsetree.ClassMember._N_closureOf_PrintBody_40262,Nemerle.Core.option{Nemerle.Compiler.Parsetree.ClassMember.Function},System.String)" />
+    <member name="M:Nemerle.Compiler.Parsetree.ClassMember._N_prefix_40418(Nemerle.Compiler.Parsetree.ClassMember._N_closureOf_ToString_40392)" />
+    <member name="M:Nemerle.Compiler.Parsetree.ClassMember._N_ifMutable_40408(Nemerle.Compiler.Parsetree.ClassMember._N_closureOf_ToString_40392)" />
+    <member name="M:Nemerle.Compiler.Parsetree.ClassMember._N_prefix_40346(Nemerle.Compiler.Parsetree.ClassMember._N_closureOf_HeaderToString_40320)" />
+    <member name="M:Nemerle.Compiler.Parsetree.ClassMember._N_ifMutable_40336(Nemerle.Compiler.Parsetree.ClassMember._N_closureOf_HeaderToString_40320)" />
+    <member name="M:Nemerle.Compiler.Parsetree.ClassMember._N_print_40279(Nemerle.Compiler.Parsetree.ClassMember._N_closureOf_PrintBody_40264,Nemerle.Core.option{Nemerle.Compiler.Parsetree.ClassMember.Function},System.String)" />
     <member name="M:Nemerle.Compiler.Parsetree.ClassMember.SetEnv(Nemerle.Compiler.GlobalEnv)" />
     <member name="F:Nemerle.Compiler.Parsetree.ClassMember._env" />
     <member name="F:Nemerle.Compiler.Parsetree.ClassMember._tokens" />
@@ -1947,7 +1947,7 @@
     <member name="T:Nemerle.Compiler.Parsetree.Splicable.Expression" />
     <member name="T:Nemerle.Compiler.Parsetree.Splicable.HalfId" />
     <member name="T:Nemerle.Compiler.Parsetree.PParameter" />
-    <member name="M:Nemerle.Compiler.Parsetree.PParameter._N_from_expr_42892(Nemerle.Compiler.Parsetree.PParameter._N_closureOf__ctor_42884,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Compiler.Parsetree.PParameter._N_from_expr_42894(Nemerle.Compiler.Parsetree.PParameter._N_closureOf__ctor_42886,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="F:Nemerle.Compiler.Parsetree.PParameter.Type" />
     <member name="F:Nemerle.Compiler.Parsetree.PParameter._N_PatternHack_8347" />
     <member name="M:Nemerle.Compiler.Parsetree.PParameter.get_PatternHack" />
@@ -2097,11 +2097,11 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Compiler.PreParser._N_create_body_token_44142(Nemerle.Compiler.PreParser._N_closureOf_parse_using_directive_44130)" />
-    <member name="M:Nemerle.Compiler.PreParser._N_parse_using_directive_44124(Nemerle.Compiler.PreParser._N_closureOf_ParseTopLevelImpl_44065,Nemerle.Compiler.Token)" />
-    <member name="M:Nemerle.Compiler.PreParser._N_make_before_location_44118(Nemerle.Compiler.Location)" />
-    <member name="M:Nemerle.Compiler.PreParser._N_get_qualified_tokens_44098(Nemerle.Compiler.PreParser._N_closureOf_ParseTopLevelImpl_44065)" />
-    <member name="M:Nemerle.Compiler.PreParser._N_get_qualified_identifier_44077(Nemerle.Compiler.PreParser._N_closureOf_ParseTopLevelImpl_44065)" />
+    <member name="M:Nemerle.Compiler.PreParser._N_create_body_token_44144(Nemerle.Compiler.PreParser._N_closureOf_parse_using_directive_44132)" />
+    <member name="M:Nemerle.Compiler.PreParser._N_parse_using_directive_44126(Nemerle.Compiler.PreParser._N_closureOf_ParseTopLevelImpl_44067,Nemerle.Compiler.Token)" />
+    <member name="M:Nemerle.Compiler.PreParser._N_make_before_location_44120(Nemerle.Compiler.Location)" />
+    <member name="M:Nemerle.Compiler.PreParser._N_get_qualified_tokens_44100(Nemerle.Compiler.PreParser._N_closureOf_ParseTopLevelImpl_44067)" />
+    <member name="M:Nemerle.Compiler.PreParser._N_get_qualified_identifier_44079(Nemerle.Compiler.PreParser._N_closureOf_ParseTopLevelImpl_44067)" />
     <member name="F:Nemerle.Compiler.PreParser.lexer" />
     <member name="F:Nemerle.Compiler.PreParser.last_token" />
     <member name="F:Nemerle.Compiler.PreParser.last_declaration_token" />
@@ -2227,10 +2227,10 @@
     <member name="M:Nemerle.Compiler.PreParserIndent.get_token_after_indent(Nemerle.Compiler.Token,System.String)" />
     <member name="M:Nemerle.Compiler.PreParserIndent.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.PreprocessorEvaluator" />
-    <member name="M:Nemerle.Compiler.PreprocessorEvaluator._N_highest_44755(Nemerle.Compiler.PreprocessorEvaluator._N_closureOf_EvalCondition_44685)" />
-    <member name="M:Nemerle.Compiler.PreprocessorEvaluator._N_high_44749(Nemerle.Compiler.PreprocessorEvaluator._N_closureOf_EvalCondition_44685)" />
-    <member name="M:Nemerle.Compiler.PreprocessorEvaluator._N_low_44743(Nemerle.Compiler.PreprocessorEvaluator._N_closureOf_EvalCondition_44685)" />
-    <member name="M:Nemerle.Compiler.PreprocessorEvaluator._N_lowest_44737(Nemerle.Compiler.PreprocessorEvaluator._N_closureOf_EvalCondition_44685)" />
+    <member name="M:Nemerle.Compiler.PreprocessorEvaluator._N_highest_44757(Nemerle.Compiler.PreprocessorEvaluator._N_closureOf_EvalCondition_44687)" />
+    <member name="M:Nemerle.Compiler.PreprocessorEvaluator._N_high_44751(Nemerle.Compiler.PreprocessorEvaluator._N_closureOf_EvalCondition_44687)" />
+    <member name="M:Nemerle.Compiler.PreprocessorEvaluator._N_low_44745(Nemerle.Compiler.PreprocessorEvaluator._N_closureOf_EvalCondition_44687)" />
+    <member name="M:Nemerle.Compiler.PreprocessorEvaluator._N_lowest_44739(Nemerle.Compiler.PreprocessorEvaluator._N_closureOf_EvalCondition_44687)" />
     <member name="M:Nemerle.Compiler.PreprocessorEvaluator.EvalCondition(Nemerle.Collections.Map{System.String,System.Boolean},System.String)" />
     <member name="M:Nemerle.Compiler.PreprocessorEvaluator.EvalConditions(Nemerle.Compiler.IMember,Nemerle.Compiler.GlobalEnv)" />
     <member name="T:Nemerle.Compiler.ISource" />
@@ -2335,7 +2335,7 @@
     <member name="M:Nemerle.Compiler.LocationStack.Pop" />
     <member name="M:Nemerle.Compiler.LocationStack.Top" />
     <member name="T:Nemerle.Compiler.NemerleCodeCompiler" />
-    <member name="M:Nemerle.Compiler.NemerleCodeCompiler._N_err_event_50953(Nemerle.Compiler.NemerleCodeCompiler._N_closureOf_CompileAssemblyFromFileBatch_50929,System.Boolean,Nemerle.Compiler.Location,System.String)" />
+    <member name="M:Nemerle.Compiler.NemerleCodeCompiler._N_err_event_50955(Nemerle.Compiler.NemerleCodeCompiler._N_closureOf_CompileAssemblyFromFileBatch_50931,System.Boolean,Nemerle.Compiler.Location,System.String)" />
     <member name="M:Nemerle.Compiler.NemerleCodeCompiler.#ctor" />
     <member name="M:Nemerle.Compiler.NemerleCodeCompiler.CompileAssemblyFromDom(System.CodeDom.Compiler.CompilerParameters,System.CodeDom.CodeCompileUnit)" />
     <member name="M:Nemerle.Compiler.NemerleCodeCompiler.CompileAssemblyFromDomBatch(System.CodeDom.Compiler.CompilerParameters,System.CodeDom.CodeCompileUnit[])" />
@@ -2492,10 +2492,10 @@
     <member name="M:Nemerle.Compiler.RelocationInfo.ToString" />
     <member name="M:Nemerle.Compiler.RelocationInfo.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.Completion" />
-    <member name="M:Nemerle.Compiler.Completion._N_scanStaticMembers_51540(Nemerle.Compiler.Completion._N_closureOf_AddTypesAndNamespaces_51481,Nemerle.Compiler.TypeInfo)" />
-    <member name="M:Nemerle.Compiler.Completion._N_scanAndAdd_51506(Nemerle.Compiler.Completion._N_closureOf_AddTypesAndNamespaces_51481,Nemerle.Compiler.NamespaceTree.Node)" />
-    <member name="M:Nemerle.Compiler.Completion._N_loop_51351(Nemerle.Compiler.Completion._N_closureOf_MatchName_51338,System.String,System.Int32,System.String,System.Int32)" />
-    <member name="M:Nemerle.Compiler.Completion._N_relocatePoint_51272(Nemerle.Compiler.TextPoint,Nemerle.Compiler.RelocationInfo)" />
+    <member name="M:Nemerle.Compiler.Completion._N_scanStaticMembers_51542(Nemerle.Compiler.Completion._N_closureOf_AddTypesAndNamespaces_51483,Nemerle.Compiler.TypeInfo)" />
+    <member name="M:Nemerle.Compiler.Completion._N_scanAndAdd_51508(Nemerle.Compiler.Completion._N_closureOf_AddTypesAndNamespaces_51483,Nemerle.Compiler.NamespaceTree.Node)" />
+    <member name="M:Nemerle.Compiler.Completion._N_loop_51353(Nemerle.Compiler.Completion._N_closureOf_MatchName_51340,System.String,System.Int32,System.String,System.Int32)" />
+    <member name="M:Nemerle.Compiler.Completion._N_relocatePoint_51274(Nemerle.Compiler.TextPoint,Nemerle.Compiler.RelocationInfo)" />
     <member name="M:Nemerle.Compiler.Completion.Relocate(Nemerle.Compiler.Location,Nemerle.Compiler.RelocationInfo)">
       <summary>
         <para>Shift Location.
@@ -2554,12 +2554,12 @@
 </para> <para>This module is stateless.
 
 </para></remarks></member>
-    <member name="M:Nemerle.Compiler.TyCodec._N_walk_52100(Nemerle.Compiler.TyCodec._N_closureOf_FlattenTerm_52092,Nemerle.Compiler.TyCodec.Term)" />
-    <member name="M:Nemerle.Compiler.TyCodec._N_tryAddSuperType_51987(Nemerle.Compiler.TyCodec._N_closureOf_ReflectTypeBuilder_51929,System.Type)" />
-    <member name="M:Nemerle.Compiler.TyCodec._N_typeof_type_51947(Nemerle.Compiler.TyCodec._N_closureOf_ReflectTypeBuilder_51929,System.Type)" />
-    <member name="M:Nemerle.Compiler.TyCodec._N_get_list_51687(Nemerle.Compiler.TyCodec._N_closureOf_ParseTerm_51663,Nemerle.Core.list{Nemerle.Compiler.TyCodec.Term},System.Int32)" />
-    <member name="M:Nemerle.Compiler.TyCodec._N_maybe_get_51681(Nemerle.Compiler.TyCodec._N_closureOf_ParseTerm_51663,System.Int32)" />
-    <member name="M:Nemerle.Compiler.TyCodec._N_get_name_51671(Nemerle.Compiler.TyCodec._N_closureOf_ParseTerm_51663,System.Int32)" />
+    <member name="M:Nemerle.Compiler.TyCodec._N_walk_52102(Nemerle.Compiler.TyCodec._N_closureOf_FlattenTerm_52094,Nemerle.Compiler.TyCodec.Term)" />
+    <member name="M:Nemerle.Compiler.TyCodec._N_tryAddSuperType_51989(Nemerle.Compiler.TyCodec._N_closureOf_ReflectTypeBuilder_51931,System.Type)" />
+    <member name="M:Nemerle.Compiler.TyCodec._N_typeof_type_51949(Nemerle.Compiler.TyCodec._N_closureOf_ReflectTypeBuilder_51931,System.Type)" />
+    <member name="M:Nemerle.Compiler.TyCodec._N_get_list_51689(Nemerle.Compiler.TyCodec._N_closureOf_ParseTerm_51665,Nemerle.Core.list{Nemerle.Compiler.TyCodec.Term},System.Int32)" />
+    <member name="M:Nemerle.Compiler.TyCodec._N_maybe_get_51683(Nemerle.Compiler.TyCodec._N_closureOf_ParseTerm_51665,System.Int32)" />
+    <member name="M:Nemerle.Compiler.TyCodec._N_get_name_51673(Nemerle.Compiler.TyCodec._N_closureOf_ParseTerm_51665,System.Int32)" />
     <member name="M:Nemerle.Compiler.TyCodec.ParseTerm(System.String)" />
     <member name="M:Nemerle.Compiler.TyCodec.decode(Nemerle.Compiler.LibraryReference,Nemerle.Collections.Map{System.String,Nemerle.Compiler.StaticTypeVar},Nemerle.Compiler.TyCodec.Term)" />
     <member name="M:Nemerle.Compiler.TyCodec.reflect_typarms(Nemerle.Compiler.LibraryReference,Nemerle.Collections.Map{System.String,Nemerle.Compiler.StaticTypeVar},System.Type)" />
@@ -2733,7 +2733,7 @@
     <member name="M:Nemerle.Compiler.FunctionType.#ctor(Nemerle.Compiler.ManagerClass,System.Int32)" />
     <member name="M:Nemerle.Compiler.FunctionType.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.InternalTypeClass" />
-    <member name="M:Nemerle.Compiler.InternalTypeClass._N_single_52774(Nemerle.Compiler.InternalTypeClass._N_closureOf_InitSystemTypes_52746,Nemerle.Compiler.TypeInfo,System.String)" />
+    <member name="M:Nemerle.Compiler.InternalTypeClass._N_single_52776(Nemerle.Compiler.InternalTypeClass._N_closureOf_InitSystemTypes_52748,Nemerle.Compiler.TypeInfo,System.String)" />
     <member name="F:Nemerle.Compiler.InternalTypeClass.Void_tc" />
     <member name="F:Nemerle.Compiler.InternalTypeClass.Array_tc" />
     <member name="F:Nemerle.Compiler.InternalTypeClass.Attribute_tc" />
@@ -2873,12 +2873,12 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Compiler.LibraryReference._N_lift_53679(Nemerle.Compiler.LibraryReference._N_closureOf_makeArg_53672,Nemerle.Compiler.LibraryReference._N_closureOf_ConvertCustomAttributesData_53648,System.Object)" />
-    <member name="M:Nemerle.Compiler.LibraryReference._N_make_tupl_53223(Nemerle.Compiler.LibraryReference._N_closureOf_TypeOfType_53178,Nemerle.Core.list{Nemerle.Compiler.TypeVar})" />
-    <member name="M:Nemerle.Compiler.LibraryReference._N_checkFriend_53116(Nemerle.Compiler.LibraryReference._N_closureOf_GetIsFriend_53085,System.Runtime.CompilerServices.InternalsVisibleToAttribute)" />
-    <member name="M:Nemerle.Compiler.LibraryReference._N_generatePublicKeyToken_53110(System.Byte[])" />
-    <member name="M:Nemerle.Compiler.LibraryReference._N_toHexString_53105(System.Byte[])" />
-    <member name="M:Nemerle.Compiler.LibraryReference._N_snKey_53095(Nemerle.Compiler.LibraryReference._N_closureOf_GetIsFriend_53085)" />
+    <member name="M:Nemerle.Compiler.LibraryReference._N_lift_53681(Nemerle.Compiler.LibraryReference._N_closureOf_makeArg_53674,Nemerle.Compiler.LibraryReference._N_closureOf_ConvertCustomAttributesData_53650,System.Object)" />
+    <member name="M:Nemerle.Compiler.LibraryReference._N_make_tupl_53225(Nemerle.Compiler.LibraryReference._N_closureOf_TypeOfType_53180,Nemerle.Core.list{Nemerle.Compiler.TypeVar})" />
+    <member name="M:Nemerle.Compiler.LibraryReference._N_checkFriend_53118(Nemerle.Compiler.LibraryReference._N_closureOf_GetIsFriend_53087,System.Runtime.CompilerServices.InternalsVisibleToAttribute)" />
+    <member name="M:Nemerle.Compiler.LibraryReference._N_generatePublicKeyToken_53112(System.Byte[])" />
+    <member name="M:Nemerle.Compiler.LibraryReference._N_toHexString_53107(System.Byte[])" />
+    <member name="M:Nemerle.Compiler.LibraryReference._N_snKey_53097(Nemerle.Compiler.LibraryReference._N_closureOf_GetIsFriend_53087)" />
     <member name="F:Nemerle.Compiler.LibraryReference._library">
       <summary>
         <para>The assembly associated with this object
@@ -2991,12 +2991,12 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Compiler.LibraryReferenceManager._N_loop_55266(Nemerle.Compiler.LibraryReferenceManager._N_closureOf_framework_nesting_55255,System.Type,Nemerle.Core.list{System.String})" />
-    <member name="M:Nemerle.Compiler.LibraryReferenceManager._N__N_lambda__55007_55033(Nemerle.Compiler.IMethod)" />
-    <member name="M:Nemerle.Compiler.LibraryReferenceManager._N__N_lambda__55001_55025(Nemerle.Compiler.IMethod)" />
-    <member name="M:Nemerle.Compiler.LibraryReferenceManager._N_getAssemblyPath_54772(System.Type)" />
-    <member name="M:Nemerle.Compiler.LibraryReferenceManager._N_assembly_by_name_54695(Nemerle.Compiler.LibraryReferenceManager._N_closureOf_LookupAssembly_54687,System.String)" />
-    <member name="M:Nemerle.Compiler.LibraryReferenceManager._N_assembly_dir_53784(Nemerle.Compiler.LibraryReferenceManager._N_closureOf__ctor_53773,System.Type)" />
+    <member name="M:Nemerle.Compiler.LibraryReferenceManager._N_loop_55268(Nemerle.Compiler.LibraryReferenceManager._N_closureOf_framework_nesting_55257,System.Type,Nemerle.Core.list{System.String})" />
+    <member name="M:Nemerle.Compiler.LibraryReferenceManager._N__N_lambda__55009_55035(Nemerle.Compiler.IMethod)" />
+    <member name="M:Nemerle.Compiler.LibraryReferenceManager._N__N_lambda__55003_55027(Nemerle.Compiler.IMethod)" />
+    <member name="M:Nemerle.Compiler.LibraryReferenceManager._N_getAssemblyPath_54774(System.Type)" />
+    <member name="M:Nemerle.Compiler.LibraryReferenceManager._N_assembly_by_name_54697(Nemerle.Compiler.LibraryReferenceManager._N_closureOf_LookupAssembly_54689,System.String)" />
+    <member name="M:Nemerle.Compiler.LibraryReferenceManager._N_assembly_dir_53786(Nemerle.Compiler.LibraryReferenceManager._N_closureOf__ctor_53775,System.Type)" />
     <member name="F:Nemerle.Compiler.LibraryReferenceManager.NameTree" />
     <member name="F:Nemerle.Compiler.LibraryReferenceManager.add_buildins" />
     <member name="M:Nemerle.Compiler.LibraryReferenceManager.#ctor(Nemerle.Compiler.ManagerClass,Nemerle.Core.list{System.String})">
@@ -3097,12 +3097,12 @@
     <member name="F:Nemerle.Compiler.NumericKind.Float" />
     <member name="F:Nemerle.Compiler.NumericKind.Char" />
     <member name="T:Nemerle.Compiler.DecisionTreeCompiler" />
-    <member name="M:Nemerle.Compiler.DecisionTreeCompiler._N_make_stats_60078(Nemerle.Compiler.DecisionTreeCompiler._N_closureOf_get_stats_60060,Nemerle.Compiler.DecisionTreeBuilder.Decision,System.Int32,System.Boolean)" />
-    <member name="M:Nemerle.Compiler.DecisionTreeCompiler._N_selectCases_59771(Nemerle.Compiler.DecisionTreeCompiler._N_closureOf_compile_switch_59749,Nemerle.Compiler.DecisionTreeBuilder.Decision)" />
-    <member name="M:Nemerle.Compiler.DecisionTreeCompiler._N_compile_literal_59497(Nemerle.Compiler.DecisionTreeCompiler._N_closureOf_compile_ifeq_59474,Nemerle.Compiler.Literal,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Location,Nemerle.Compiler.Location)" />
-    <member name="M:Nemerle.Compiler.DecisionTreeCompiler._N_compile_variant_59484(Nemerle.Compiler.DecisionTreeCompiler._N_closureOf_compile_ifeq_59474,Nemerle.Compiler.TypeInfo,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Location,Nemerle.Compiler.Location)" />
-    <member name="M:Nemerle.Compiler.DecisionTreeCompiler._N_walk_patterns_59168(Nemerle.Compiler.DecisionTreeCompiler._N_closureOf_collect_effects_and_guards_59154,System.Int32,Nemerle.Compiler.DecisionTreeCompiler.SharedEffect,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Typedtree.Pattern,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.LocalValue,Nemerle.Compiler.Typedtree.TExpr}}}},Nemerle.Core.list{Nemerle.Compiler.Typedtree.Match_case})" />
-    <member name="M:Nemerle.Compiler.DecisionTreeCompiler._N_walk_cases_59162(Nemerle.Compiler.DecisionTreeCompiler._N_closureOf_collect_effects_and_guards_59154,System.Int32,Nemerle.Core.list{Nemerle.Compiler.Typedtree.Match_case})" />
+    <member name="M:Nemerle.Compiler.DecisionTreeCompiler._N_make_stats_60083(Nemerle.Compiler.DecisionTreeCompiler._N_closureOf_get_stats_60065,Nemerle.Compiler.DecisionTreeBuilder.Decision,System.Int32,System.Boolean)" />
+    <member name="M:Nemerle.Compiler.DecisionTreeCompiler._N_selectCases_59776(Nemerle.Compiler.DecisionTreeCompiler._N_closureOf_compile_switch_59754,Nemerle.Compiler.DecisionTreeBuilder.Decision)" />
+    <member name="M:Nemerle.Compiler.DecisionTreeCompiler._N_compile_literal_59502(Nemerle.Compiler.DecisionTreeCompiler._N_closureOf_compile_ifeq_59479,Nemerle.Compiler.Literal,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Location,Nemerle.Compiler.Location)" />
+    <member name="M:Nemerle.Compiler.DecisionTreeCompiler._N_compile_variant_59489(Nemerle.Compiler.DecisionTreeCompiler._N_closureOf_compile_ifeq_59479,Nemerle.Compiler.TypeInfo,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Location,Nemerle.Compiler.Location)" />
+    <member name="M:Nemerle.Compiler.DecisionTreeCompiler._N_walk_patterns_59173(Nemerle.Compiler.DecisionTreeCompiler._N_closureOf_collect_effects_and_guards_59159,System.Int32,Nemerle.Compiler.DecisionTreeCompiler.SharedEffect,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Typedtree.Pattern,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.LocalValue,Nemerle.Compiler.Typedtree.TExpr}}}},Nemerle.Core.list{Nemerle.Compiler.Typedtree.Match_case})" />
+    <member name="M:Nemerle.Compiler.DecisionTreeCompiler._N_walk_cases_59167(Nemerle.Compiler.DecisionTreeCompiler._N_closureOf_collect_effects_and_guards_59159,System.Int32,Nemerle.Core.list{Nemerle.Compiler.Typedtree.Match_case})" />
     <member name="F:Nemerle.Compiler.DecisionTreeCompiler.tyvar" />
     <member name="F:Nemerle.Compiler.DecisionTreeCompiler.val" />
     <member name="F:Nemerle.Compiler.DecisionTreeCompiler.cases" />
@@ -3180,12 +3180,11 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Compiler.TypesManager._N_take_string_63220(Nemerle.Compiler.TypesManager._N_closureOf_CreateAssemblyName_63197,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Compiler.TypesManager._N_addAttributeForType_62853(Nemerle.Compiler.TypesManager._N_closureOf_loop_62821,Nemerle.Compiler.TypesManager._N_closureOf_GetInformationalAssemblyAttributes_62807,System.Type)" />
-    <member name="M:Nemerle.Compiler.TypesManager._N_take_string_62842(Nemerle.Compiler.TypesManager._N_closureOf_loop_62821,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Compiler.TypesManager._N_add_62742(Nemerle.Compiler.TypesManager._N_closureOf_AddAssemblyAttribute_62724,Nemerle.MacroPhase)" />
-    <member name="M:Nemerle.Compiler.TypesManager._N_allow_it_61912(Nemerle.Compiler.TypesManager._N_closureOf_compile_all_tyinfos_61902,Nemerle.Compiler.TypeBuilder)" />
-    <member name="M:Nemerle.Compiler.TypesManager._N_escape_resource_61243(System.String)" />
+    <member name="M:Nemerle.Compiler.TypesManager._N_take_string_63181(Nemerle.Compiler.TypesManager._N_closureOf_CreateAssemblyName_63158,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Compiler.TypesManager._N_addAttributeForType_62828(Nemerle.Compiler.TypesManager._N_closureOf_GetInformationalAssemblyAttributes_62804,System.Type)" />
+    <member name="M:Nemerle.Compiler.TypesManager._N_add_62747(Nemerle.Compiler.TypesManager._N_closureOf_AddAssemblyAttribute_62729,Nemerle.MacroPhase)" />
+    <member name="M:Nemerle.Compiler.TypesManager._N_allow_it_61917(Nemerle.Compiler.TypesManager._N_closureOf_compile_all_tyinfos_61907,Nemerle.Compiler.TypeBuilder)" />
+    <member name="M:Nemerle.Compiler.TypesManager._N_escape_resource_61248(System.String)" />
     <member name="M:Nemerle.Compiler.TypesManager.resolve_hack(System.Object,System.ResolveEventArgs)" />
     <member name="M:Nemerle.Compiler.TypesManager.#ctor(Nemerle.Compiler.ManagerClass)" />
     <member name="M:Nemerle.Compiler.TypesManager.Dispose" />
@@ -3375,24 +3374,24 @@
     <member name="T:Nemerle.Compiler.TypesManager.AttributeMacroExpansion" />
     <member name="T:Nemerle.Compiler.TypesManager.AssemblyAttributeMacroExpansion" />
     <member name="T:Nemerle.Compiler.TypeBuilder" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_isImplementInterface_68030(Nemerle.Compiler.TypeBuilder._N_closureOf_GetAllSubTypes_67990,Nemerle.Compiler.TypeBuilder)" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_getDirectSubTypes_68002(Nemerle.Compiler.TypeBuilder._N_closureOf_GetAllSubTypes_67990,Nemerle.Compiler.TypeBuilder)" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_check_for_invalid_attr_67872(Nemerle.Compiler.TypeBuilder._N_closureOf_CheckTypeAttributes_67851,Nemerle.Compiler.NemerleModifiers,System.String)" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_title_67859(Nemerle.Compiler.TypeBuilder._N_closureOf_CheckTypeAttributes_67851)" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_check_ctors_67676(Nemerle.Compiler.TypeInfo)" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_checkFixedType_67568(Nemerle.Compiler.TypeBuilder._N_closureOf_check_bound_type_67562,Nemerle.Compiler.FixedType)" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_scream_about_unimplemented_67230(Nemerle.Compiler.TypeBuilder._N_closureOf_resolve_method_implements_66874,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.IMethod}})" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_create_additional_overrides_67182(Nemerle.Compiler.TypeBuilder._N_closureOf_resolve_method_implements_66874,System.String,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.IMethod}})" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_bind_implicit_implements_67128(Nemerle.Compiler.TypeBuilder._N_closureOf_resolve_method_implements_66874,Nemerle.Compiler.MethodBuilder)" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_partition_and_set_67049(Nemerle.Compiler.TypeBuilder._N_closureOf_bindOneExplicitMethodRef_66996,Nemerle.Compiler.TypeBuilder._N_closureOf_bind_explicit_implements_66978,Nemerle.Compiler.TypeBuilder._N_closureOf_resolve_method_implements_66874,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.IMethod}},Nemerle.Collections.Hashtable{System.String,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.IMethod}}})" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_bind_explicit_implements_66972(Nemerle.Compiler.TypeBuilder._N_closureOf_resolve_method_implements_66874,Nemerle.Compiler.MethodBuilder)" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_collect_methods_66940(Nemerle.Compiler.FixedType.Class,Nemerle.Collections.Hashtable{System.String,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.IMethod}}})" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_partition_correct_meth_66902(Nemerle.Compiler.TypeBuilder._N_closureOf_resolve_method_implements_66874,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.IMethod}},Nemerle.Compiler.IMethod,System.Boolean)" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_is_cast_op_65913(Nemerle.Compiler.TypeBuilder._N_closureOf_replace_method_65890,Nemerle.Compiler.IMethod)" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_replace_method_65884(Nemerle.Compiler.TypeBuilder._N_closureOf_AddMember_65871,Nemerle.Core.list{Nemerle.Compiler.IMember},Nemerle.Compiler.MethodBuilder,Nemerle.Core.list{Nemerle.Compiler.IMember})" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_inherit_it_65693(Nemerle.Compiler.IMember)" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_add_sr_65625(Nemerle.Compiler.TypeBuilder._N_closureOf_add_subtyping_of_65615,Nemerle.Collections.Map{Nemerle.Compiler.TypeInfo,Nemerle.Builtins.Tuple{Nemerle.Compiler.TypeInfo,Nemerle.Core.list{Nemerle.Compiler.FixedType}}},Nemerle.Compiler.TypeInfo,Nemerle.Core.list{Nemerle.Compiler.FixedType})" />
-    <member name="M:Nemerle.Compiler.TypeBuilder._N_getLoc_64893(Nemerle.Compiler.Parsetree.TopDeclaration)" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_isImplementInterface_67985(Nemerle.Compiler.TypeBuilder._N_closureOf_GetAllSubTypes_67945,Nemerle.Compiler.TypeBuilder)" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_getDirectSubTypes_67957(Nemerle.Compiler.TypeBuilder._N_closureOf_GetAllSubTypes_67945,Nemerle.Compiler.TypeBuilder)" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_check_for_invalid_attr_67827(Nemerle.Compiler.TypeBuilder._N_closureOf_CheckTypeAttributes_67806,Nemerle.Compiler.NemerleModifiers,System.String)" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_title_67814(Nemerle.Compiler.TypeBuilder._N_closureOf_CheckTypeAttributes_67806)" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_check_ctors_67631(Nemerle.Compiler.TypeInfo)" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_checkFixedType_67523(Nemerle.Compiler.TypeBuilder._N_closureOf_check_bound_type_67517,Nemerle.Compiler.FixedType)" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_scream_about_unimplemented_67185(Nemerle.Compiler.TypeBuilder._N_closureOf_resolve_method_implements_66829,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.IMethod}})" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_create_additional_overrides_67137(Nemerle.Compiler.TypeBuilder._N_closureOf_resolve_method_implements_66829,System.String,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.IMethod}})" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_bind_implicit_implements_67083(Nemerle.Compiler.TypeBuilder._N_closureOf_resolve_method_implements_66829,Nemerle.Compiler.MethodBuilder)" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_partition_and_set_67004(Nemerle.Compiler.TypeBuilder._N_closureOf_bindOneExplicitMethodRef_66951,Nemerle.Compiler.TypeBuilder._N_closureOf_bind_explicit_implements_66933,Nemerle.Compiler.TypeBuilder._N_closureOf_resolve_method_implements_66829,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.IMethod}},Nemerle.Collections.Hashtable{System.String,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.IMethod}}})" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_bind_explicit_implements_66927(Nemerle.Compiler.TypeBuilder._N_closureOf_resolve_method_implements_66829,Nemerle.Compiler.MethodBuilder)" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_collect_methods_66895(Nemerle.Compiler.FixedType.Class,Nemerle.Collections.Hashtable{System.String,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.IMethod}}})" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_partition_correct_meth_66857(Nemerle.Compiler.TypeBuilder._N_closureOf_resolve_method_implements_66829,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.IMethod}},Nemerle.Compiler.IMethod,System.Boolean)" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_is_cast_op_65868(Nemerle.Compiler.TypeBuilder._N_closureOf_replace_method_65845,Nemerle.Compiler.IMethod)" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_replace_method_65839(Nemerle.Compiler.TypeBuilder._N_closureOf_AddMember_65826,Nemerle.Core.list{Nemerle.Compiler.IMember},Nemerle.Compiler.MethodBuilder,Nemerle.Core.list{Nemerle.Compiler.IMember})" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_inherit_it_65648(Nemerle.Compiler.IMember)" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_add_sr_65580(Nemerle.Compiler.TypeBuilder._N_closureOf_add_subtyping_of_65570,Nemerle.Collections.Map{Nemerle.Compiler.TypeInfo,Nemerle.Builtins.Tuple{Nemerle.Compiler.TypeInfo,Nemerle.Core.list{Nemerle.Compiler.FixedType}}},Nemerle.Compiler.TypeInfo,Nemerle.Core.list{Nemerle.Compiler.FixedType})" />
+    <member name="M:Nemerle.Compiler.TypeBuilder._N_getLoc_64848(Nemerle.Compiler.Parsetree.TopDeclaration)" />
     <member name="M:Nemerle.Compiler.TypeBuilder.CreateEmitBuilder">
       <summary>
         <para>This method makes a skeleton of a class -- the class partial type and
@@ -3470,7 +3469,7 @@
     <member name="F:Nemerle.Compiler.TypeBuilder.member_list" />
     <member name="F:Nemerle.Compiler.TypeBuilder.constant_object" />
     <member name="F:Nemerle.Compiler.TypeBuilder.underlying_enum_type" />
-    <member name="F:Nemerle.Compiler.TypeBuilder._N_UnimplementedMembers_11661" />
+    <member name="F:Nemerle.Compiler.TypeBuilder._N_UnimplementedMembers_11667" />
     <member name="M:Nemerle.Compiler.TypeBuilder.get_UnimplementedMembers" />
     <member name="M:Nemerle.Compiler.TypeBuilder.set_UnimplementedMembers(Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.IMember}})" />
     <member name="P:Nemerle.Compiler.TypeBuilder.UnimplementedMembers" />
@@ -3520,9 +3519,6 @@
       </summary> <remarks><para>Used by [TypeBuilder.Iter] function.
 
 </para></remarks></member>
-    <member name="F:Nemerle.Compiler.TypeBuilder._userData" />
-    <member name="M:Nemerle.Compiler.TypeBuilder.get_UserData" />
-    <member name="P:Nemerle.Compiler.TypeBuilder.UserData" />
     <member name="F:Nemerle.Compiler.TypeBuilder.is_special_variant_methods_added" />
     <member name="M:Nemerle.Compiler.TypeBuilder.#ctor(Nemerle.Compiler.TypesManager,Nemerle.Compiler.TypeBuilder,Nemerle.Compiler.Parsetree.TopDeclaration,Nemerle.Compiler.NamespaceTree.Node)" />
     <member name="M:Nemerle.Compiler.TypeBuilder.CalcAccessibility" />
@@ -3954,7 +3950,7 @@
     <member name="T:Nemerle.Compiler.TypeBuilder.Subinfo" />
     <member name="T:Nemerle.Compiler.TypeBuilder.RecursiveTypeDefinition" />
     <member name="T:Nemerle.Compiler.MethodBuilder" />
-    <member name="M:Nemerle.Compiler.MethodBuilder._N_bind_70242(Nemerle.Compiler.MethodBuilder._N_closureOf__ctor_70197,Nemerle.Compiler.Location,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Compiler.MethodBuilder._N_bind_70197(Nemerle.Compiler.MethodBuilder._N_closureOf__ctor_70152,Nemerle.Compiler.Location,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Compiler.MethodBuilder.Nemerle#Compiler#IMethod#GetMethodInfo" />
     <member name="M:Nemerle.Compiler.MethodBuilder.Nemerle#Compiler#IMethod#GetConstructorInfo" />
     <member name="M:Nemerle.Compiler.MethodBuilder.get_IsAbstract" />
@@ -4010,7 +4006,7 @@
     <member name="F:Nemerle.Compiler.MethodBuilder.typesToCheckAccessability" />
     <member name="F:Nemerle.Compiler.MethodBuilder.typarmsContainer" />
     <member name="F:Nemerle.Compiler.MethodBuilder.overridden_method" />
-    <member name="F:Nemerle.Compiler.MethodBuilder._N_ImplementedMethods_12273" />
+    <member name="F:Nemerle.Compiler.MethodBuilder._N_ImplementedMethods_12275" />
     <member name="M:Nemerle.Compiler.MethodBuilder.get_ImplementedMethods" />
     <member name="M:Nemerle.Compiler.MethodBuilder.set_ImplementedMethods(Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.IMethod}})" />
     <member name="P:Nemerle.Compiler.MethodBuilder.ImplementedMethods" />
@@ -4197,8 +4193,8 @@
     <member name="M:Nemerle.Compiler.FieldBuilder.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.PropertyBuilder" />
     <member name="M:Nemerle.Compiler.PropertyBuilder.Nemerle#Compiler#IProperty#GetPropertyInfo" />
-    <member name="M:Nemerle.Compiler.PropertyBuilder._N_process_accessor_71624(Nemerle.Compiler.PropertyBuilder._N_closureOf__ctor_71587,Nemerle.Core.option{Nemerle.Compiler.Parsetree.ClassMember.Function})" />
-    <member name="M:Nemerle.Compiler.PropertyBuilder._N_chop_71428(System.Type[][])" />
+    <member name="M:Nemerle.Compiler.PropertyBuilder._N_process_accessor_71579(Nemerle.Compiler.PropertyBuilder._N_closureOf__ctor_71542,Nemerle.Core.option{Nemerle.Compiler.Parsetree.ClassMember.Function})" />
+    <member name="M:Nemerle.Compiler.PropertyBuilder._N_chop_71383(System.Type[][])" />
     <member name="M:Nemerle.Compiler.PropertyBuilder.CreateEmitBuilder(System.Reflection.Emit.TypeBuilder)">
       <summary>
         <para>Adds a property builder
@@ -4270,8 +4266,8 @@
     <member name="T:Nemerle.Compiler.EventBuilder" />
     <member name="M:Nemerle.Compiler.EventBuilder.Nemerle#Compiler#IEvent#GetRemover" />
     <member name="M:Nemerle.Compiler.EventBuilder.Nemerle#Compiler#IEvent#GetAdder" />
-    <member name="M:Nemerle.Compiler.EventBuilder._N_make_method_71903(Nemerle.Compiler.EventBuilder._N_closureOf__ctor_71866,Nemerle.Compiler.Parsetree.ClassMember.Function)" />
-    <member name="M:Nemerle.Compiler.EventBuilder._N_update_mfunction_71881(Nemerle.Compiler.EventBuilder._N_closureOf__ctor_71866,Nemerle.Compiler.Parsetree.ClassMember.Function,System.String)" />
+    <member name="M:Nemerle.Compiler.EventBuilder._N_make_method_71858(Nemerle.Compiler.EventBuilder._N_closureOf__ctor_71821,Nemerle.Compiler.Parsetree.ClassMember.Function)" />
+    <member name="M:Nemerle.Compiler.EventBuilder._N_update_mfunction_71836(Nemerle.Compiler.EventBuilder._N_closureOf__ctor_71821,Nemerle.Compiler.Parsetree.ClassMember.Function,System.String)" />
     <member name="M:Nemerle.Compiler.EventBuilder.CreateEmitBuilder(System.Reflection.Emit.TypeBuilder)">
       <summary>
         <para>Adds an event builder
@@ -4320,16 +4316,16 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Compiler.ILEmitter._N_fail_74726(Nemerle.Compiler.ILEmitter._N_closureOf_emit_value_type_conversion_74714)" />
-    <member name="M:Nemerle.Compiler.ILEmitter._N_make_labels_74630(Nemerle.Compiler.ILEmitter._N_closureOf_emit_switch_74597,System.Int32,Nemerle.Core.list{Nemerle.Builtins.Tuple{System.Int32,Nemerle.Compiler.Typedtree.TExpr}})" />
-    <member name="M:Nemerle.Compiler.ILEmitter._N_emit_debug_74460(Nemerle.Compiler.ILEmitter._N_closureOf_emit_debug_info_74444,System.Diagnostics.SymbolStore.ISymbolDocumentWriter,System.Int32,System.Int32,System.Int32,System.Int32)" />
-    <member name="M:Nemerle.Compiler.ILEmitter._N_walk_case_74072(Nemerle.Compiler.ILEmitter._N_closureOf_emit_73551,Nemerle.Compiler.Typedtree.Try_case)" />
-    <member name="M:Nemerle.Compiler.ILEmitter._N_emit_br_73744(Nemerle.Compiler.ILEmitter._N_closureOf_emit_branch_73733,Nemerle.Compiler.ILEmitter._N_closureOf_emit_73551,System.Reflection.Emit.OpCode,System.Reflection.Emit.OpCode)" />
-    <member name="M:Nemerle.Compiler.ILEmitter._N_emit_branch_73727(Nemerle.Compiler.ILEmitter._N_closureOf_emit_73551,Nemerle.Compiler.Typedtree.TExpr,System.Reflection.Emit.Label,Nemerle.Compiler.Location)" />
-    <member name="M:Nemerle.Compiler.ILEmitter._N_emit_debug_73714(Nemerle.Compiler.ILEmitter._N_closureOf_emit_73551,Nemerle.Compiler.Location)" />
-    <member name="M:Nemerle.Compiler.ILEmitter._N_emit_store_73658(Nemerle.Compiler.ILEmitter._N_closureOf_emit_73551,Nemerle.Compiler.LocalValue,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.ILEmitter._N_is_single_arg_function_73118(Nemerle.Compiler.ILEmitter._N_closureOf_emit_tuple_function_conversion_73092,Nemerle.Compiler.TypeVar)" />
-    <member name="M:Nemerle.Compiler.ILEmitter._N_interesting_part_73100(Nemerle.Compiler.ILEmitter._N_closureOf_emit_tuple_function_conversion_73092,Nemerle.Compiler.TypeVar)" />
+    <member name="M:Nemerle.Compiler.ILEmitter._N_fail_74680(Nemerle.Compiler.ILEmitter._N_closureOf_emit_value_type_conversion_74668)" />
+    <member name="M:Nemerle.Compiler.ILEmitter._N_make_labels_74584(Nemerle.Compiler.ILEmitter._N_closureOf_emit_switch_74551,System.Int32,Nemerle.Core.list{Nemerle.Builtins.Tuple{System.Int32,Nemerle.Compiler.Typedtree.TExpr}})" />
+    <member name="M:Nemerle.Compiler.ILEmitter._N_emit_debug_74414(Nemerle.Compiler.ILEmitter._N_closureOf_emit_debug_info_74398,System.Diagnostics.SymbolStore.ISymbolDocumentWriter,System.Int32,System.Int32,System.Int32,System.Int32)" />
+    <member name="M:Nemerle.Compiler.ILEmitter._N_walk_case_74026(Nemerle.Compiler.ILEmitter._N_closureOf_emit_73505,Nemerle.Compiler.Typedtree.Try_case)" />
+    <member name="M:Nemerle.Compiler.ILEmitter._N_emit_br_73698(Nemerle.Compiler.ILEmitter._N_closureOf_emit_branch_73687,Nemerle.Compiler.ILEmitter._N_closureOf_emit_73505,System.Reflection.Emit.OpCode,System.Reflection.Emit.OpCode)" />
+    <member name="M:Nemerle.Compiler.ILEmitter._N_emit_branch_73681(Nemerle.Compiler.ILEmitter._N_closureOf_emit_73505,Nemerle.Compiler.Typedtree.TExpr,System.Reflection.Emit.Label,Nemerle.Compiler.Location)" />
+    <member name="M:Nemerle.Compiler.ILEmitter._N_emit_debug_73668(Nemerle.Compiler.ILEmitter._N_closureOf_emit_73505,Nemerle.Compiler.Location)" />
+    <member name="M:Nemerle.Compiler.ILEmitter._N_emit_store_73612(Nemerle.Compiler.ILEmitter._N_closureOf_emit_73505,Nemerle.Compiler.LocalValue,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.ILEmitter._N_is_single_arg_function_73072(Nemerle.Compiler.ILEmitter._N_closureOf_emit_tuple_function_conversion_73046,Nemerle.Compiler.TypeVar)" />
+    <member name="M:Nemerle.Compiler.ILEmitter._N_interesting_part_73054(Nemerle.Compiler.ILEmitter._N_closureOf_emit_tuple_function_conversion_73046,Nemerle.Compiler.TypeVar)" />
     <member name="M:Nemerle.Compiler.ILEmitter.#cctor">
       <summary>
         <para>Generates the IL code for a method or a constructor
@@ -4337,8 +4333,8 @@
 </para>
       </summary>
     </member>
-    <member name="F:Nemerle.Compiler.ILEmitter._N_lockVar_18416" />
-    <member name="F:Nemerle.Compiler.ILEmitter._N_cache_18417" />
+    <member name="F:Nemerle.Compiler.ILEmitter._N_lockVar_18418" />
+    <member name="F:Nemerle.Compiler.ILEmitter._N_cache_18419" />
     <member name="F:Nemerle.Compiler.ILEmitter._module_builder" />
     <member name="F:Nemerle.Compiler.ILEmitter._ilg" />
     <member name="F:Nemerle.Compiler.ILEmitter._parent_type_builder" />
@@ -4538,24 +4534,24 @@
     <member name="M:Nemerle.Compiler.ILEmitter.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.ILEmitter.NemerleGenerator" />
     <member name="T:Nemerle.Compiler.Typer3" />
-    <member name="M:Nemerle.Compiler.Typer3._N_walk_case_79478(Nemerle.Compiler.Typer3._N_closureOf_DoSubstExpr_79454,Nemerle.Compiler.Typedtree.Try_case)" />
-    <member name="M:Nemerle.Compiler.Typer3._N_is_bool_pattern_79038(Nemerle.Compiler.Typedtree.Pattern)" />
-    <member name="M:Nemerle.Compiler.Typer3._N_plain_call_78824(Nemerle.Compiler.Typer3._N_closureOf_EmitCall_78791)" />
-    <member name="M:Nemerle.Compiler.Typer3._N_just_call_78813(Nemerle.Compiler.Typer3._N_closureOf_EmitCall_78791,Nemerle.Compiler.IMethod,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Core.list{Nemerle.Compiler.Typedtree.Parm})" />
-    <member name="M:Nemerle.Compiler.Typer3._N_properApply_78641(Nemerle.Compiler.Typer3._N_closureOf_EmitDelegateCtor_78609,Nemerle.Compiler.FixedType)" />
-    <member name="M:Nemerle.Compiler.Typer3._N_addNames_78358(Nemerle.Compiler.Typer3._N_closureOf_addParamNames_78352,Nemerle.Compiler.Parsetree.PExpr,System.Collections.Generic.List{Nemerle.Compiler.Parsetree.Name})" />
-    <member name="M:Nemerle.Compiler.Typer3._N_fix_type_78332(Nemerle.Compiler.Typer3._N_closureOf_EmitFunctionalValue_78308,Nemerle.Compiler.TypeVar)" />
-    <member name="M:Nemerle.Compiler.Typer3._N_we_use_77928(Nemerle.Compiler.Typer3._N_closureOf_ComputeUsedClosures_77918,Nemerle.Compiler.LocalValue)" />
-    <member name="M:Nemerle.Compiler.Typer3._N_ctor_calls_77781(Nemerle.Compiler.Typer3._N_closureOf_FixBaseCall_77566,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.Typer3._N_ctor_calls_77738(Nemerle.Compiler.Typer3._N_closureOf_FixBaseCall_77566,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.Typer3._N_inject_77255(Nemerle.Compiler.Typer3._N_closureOf_InjectAroundCtor_77247,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.Typer3._N_alt_77071(Nemerle.Compiler.Typer3._N_closureOf_CtorCalls_77026,Nemerle.Core.list{Nemerle.Builtins.Tuple{System.Int32,System.Int32}})" />
-    <member name="M:Nemerle.Compiler.Typer3._N_acc_77057(Nemerle.Compiler.Typer3._N_closureOf_CtorCalls_77026,Nemerle.Core.list{Nemerle.Builtins.Tuple{System.Int32,System.Int32}})" />
-    <member name="M:Nemerle.Compiler.Typer3._N_ctor_calls_77051(Nemerle.Compiler.Typer3._N_closureOf_CtorCalls_77026,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.Typer3._N_fix_type_76612(Nemerle.Compiler.Typer3._N_closureOf_PrepareClosure_76597,Nemerle.Compiler.TypeVar)" />
-    <member name="M:Nemerle.Compiler.Typer3._N_walk_case_76478(Nemerle.Compiler.Typer3._N_closureOf_RewriteTryFinally_76399,Nemerle.Compiler.Typedtree.Try_case)" />
-    <member name="M:Nemerle.Compiler.Typer3._N_contains_yield_76429(Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.Typer3._N_fix_type_76110(Nemerle.Compiler.Typer3._N_closureOf_EmitCtorProxy_76092,Nemerle.Compiler.TypeVar)" />
+    <member name="M:Nemerle.Compiler.Typer3._N_walk_case_79432(Nemerle.Compiler.Typer3._N_closureOf_DoSubstExpr_79408,Nemerle.Compiler.Typedtree.Try_case)" />
+    <member name="M:Nemerle.Compiler.Typer3._N_is_bool_pattern_78992(Nemerle.Compiler.Typedtree.Pattern)" />
+    <member name="M:Nemerle.Compiler.Typer3._N_plain_call_78778(Nemerle.Compiler.Typer3._N_closureOf_EmitCall_78745)" />
+    <member name="M:Nemerle.Compiler.Typer3._N_just_call_78767(Nemerle.Compiler.Typer3._N_closureOf_EmitCall_78745,Nemerle.Compiler.IMethod,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Core.list{Nemerle.Compiler.Typedtree.Parm})" />
+    <member name="M:Nemerle.Compiler.Typer3._N_properApply_78595(Nemerle.Compiler.Typer3._N_closureOf_EmitDelegateCtor_78563,Nemerle.Compiler.FixedType)" />
+    <member name="M:Nemerle.Compiler.Typer3._N_addNames_78312(Nemerle.Compiler.Typer3._N_closureOf_addParamNames_78306,Nemerle.Compiler.Parsetree.PExpr,System.Collections.Generic.List{Nemerle.Compiler.Parsetree.Name})" />
+    <member name="M:Nemerle.Compiler.Typer3._N_fix_type_78286(Nemerle.Compiler.Typer3._N_closureOf_EmitFunctionalValue_78262,Nemerle.Compiler.TypeVar)" />
+    <member name="M:Nemerle.Compiler.Typer3._N_we_use_77882(Nemerle.Compiler.Typer3._N_closureOf_ComputeUsedClosures_77872,Nemerle.Compiler.LocalValue)" />
+    <member name="M:Nemerle.Compiler.Typer3._N_ctor_calls_77735(Nemerle.Compiler.Typer3._N_closureOf_FixBaseCall_77520,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.Typer3._N_ctor_calls_77692(Nemerle.Compiler.Typer3._N_closureOf_FixBaseCall_77520,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.Typer3._N_inject_77209(Nemerle.Compiler.Typer3._N_closureOf_InjectAroundCtor_77201,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.Typer3._N_alt_77025(Nemerle.Compiler.Typer3._N_closureOf_CtorCalls_76980,Nemerle.Core.list{Nemerle.Builtins.Tuple{System.Int32,System.Int32}})" />
+    <member name="M:Nemerle.Compiler.Typer3._N_acc_77011(Nemerle.Compiler.Typer3._N_closureOf_CtorCalls_76980,Nemerle.Core.list{Nemerle.Builtins.Tuple{System.Int32,System.Int32}})" />
+    <member name="M:Nemerle.Compiler.Typer3._N_ctor_calls_77005(Nemerle.Compiler.Typer3._N_closureOf_CtorCalls_76980,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.Typer3._N_fix_type_76566(Nemerle.Compiler.Typer3._N_closureOf_PrepareClosure_76551,Nemerle.Compiler.TypeVar)" />
+    <member name="M:Nemerle.Compiler.Typer3._N_walk_case_76432(Nemerle.Compiler.Typer3._N_closureOf_RewriteTryFinally_76353,Nemerle.Compiler.Typedtree.Try_case)" />
+    <member name="M:Nemerle.Compiler.Typer3._N_contains_yield_76383(Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.Typer3._N_fix_type_76064(Nemerle.Compiler.Typer3._N_closureOf_EmitCtorProxy_76046,Nemerle.Compiler.TypeVar)" />
     <member name="F:Nemerle.Compiler.Typer3.top_typer" />
     <member name="M:Nemerle.Compiler.Typer3.get_Redirects" />
     <member name="P:Nemerle.Compiler.Typer3.Redirects" />
@@ -4655,8 +4651,8 @@
     <member name="M:Nemerle.Compiler.Typer3.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.Typer3.TopTyper" />
     <member name="T:Nemerle.Compiler.Typer4" />
-    <member name="M:Nemerle.Compiler.Typer4._N_walk_case_80215(Nemerle.Compiler.Typer4._N_closureOf_NeedsEmptyStack_80163,Nemerle.Compiler.Typedtree.Try_case)" />
-    <member name="M:Nemerle.Compiler.Typer4._N_walk_case_79947(Nemerle.Compiler.Typer4._N_closureOf_Throws_79844,Nemerle.Compiler.Typedtree.Try_case)" />
+    <member name="M:Nemerle.Compiler.Typer4._N_walk_case_80171(Nemerle.Compiler.Typer4._N_closureOf_NeedsEmptyStack_80119,Nemerle.Compiler.Typedtree.Try_case)" />
+    <member name="M:Nemerle.Compiler.Typer4._N_walk_case_79903(Nemerle.Compiler.Typer4._N_closureOf_Throws_79800,Nemerle.Compiler.Typedtree.Try_case)" />
     <member name="F:Nemerle.Compiler.Typer4.current_fun" />
     <member name="F:Nemerle.Compiler.Typer4.current_type" />
     <member name="F:Nemerle.Compiler.Typer4.messenger" />
@@ -4696,9 +4692,9 @@
     <member name="M:Nemerle.Compiler.BuiltinWrapMethod.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.BuiltinMethod" />
     <member name="M:Nemerle.Compiler.BuiltinMethod.Nemerle#Compiler#IMember#GetMemType" />
-    <member name="M:Nemerle.Compiler.BuiltinMethod._N_fp_80883(Nemerle.Compiler.BuiltinMethod._N_closureOf__ctor_80875,System.String,Nemerle.Compiler.TypeVar)" />
-    <member name="M:Nemerle.Compiler.BuiltinMethod._N_fp_80855(Nemerle.Compiler.BuiltinMethod._N_closureOf__ctor_80847,System.String,Nemerle.Compiler.TypeVar)" />
-    <member name="M:Nemerle.Compiler.BuiltinMethod._N_fp_80828(Nemerle.Compiler.BuiltinMethod._N_closureOf__ctor_80820,System.String,Nemerle.Compiler.TypeVar)" />
+    <member name="M:Nemerle.Compiler.BuiltinMethod._N_fp_80839(Nemerle.Compiler.BuiltinMethod._N_closureOf__ctor_80831,System.String,Nemerle.Compiler.TypeVar)" />
+    <member name="M:Nemerle.Compiler.BuiltinMethod._N_fp_80811(Nemerle.Compiler.BuiltinMethod._N_closureOf__ctor_80803,System.String,Nemerle.Compiler.TypeVar)" />
+    <member name="M:Nemerle.Compiler.BuiltinMethod._N_fp_80784(Nemerle.Compiler.BuiltinMethod._N_closureOf__ctor_80776,System.String,Nemerle.Compiler.TypeVar)" />
     <member name="F:Nemerle.Compiler.BuiltinMethod.id" />
     <member name="F:Nemerle.Compiler.BuiltinMethod.header" />
     <member name="F:Nemerle.Compiler.BuiltinMethod.declaring" />
@@ -4778,9 +4774,9 @@
     <member name="T:Nemerle.Compiler.RefTo.Types" />
     <member name="T:Nemerle.Compiler.MemberBuilder" />
     <member name="M:Nemerle.Compiler.MemberBuilder.Nemerle#Compiler#IMember#get_DeclaringType" />
-    <member name="M:Nemerle.Compiler.MemberBuilder._N_makeGetSet_68675(System.Boolean,System.Boolean)" />
-    <member name="M:Nemerle.Compiler.MemberBuilder._N_add_68667(System.String,System.Boolean)" />
-    <member name="M:Nemerle.Compiler.MemberBuilder._N_makeTypeName_68662(System.Type)" />
+    <member name="M:Nemerle.Compiler.MemberBuilder._N_makeGetSet_68630(System.Boolean,System.Boolean)" />
+    <member name="M:Nemerle.Compiler.MemberBuilder._N_add_68622(System.String,System.Boolean)" />
+    <member name="M:Nemerle.Compiler.MemberBuilder._N_makeTypeName_68617(System.Type)" />
     <member name="M:Nemerle.Compiler.MemberBuilder.GetConditions" />
     <member name="M:Nemerle.Compiler.MemberBuilder.get_IsConditional" />
     <member name="M:Nemerle.Compiler.MemberBuilder.get_IsStatic" />
@@ -4901,12 +4897,12 @@
     <member name="P:Nemerle.Compiler.MemberBuilder.OptionalModifiers" />
     <member name="M:Nemerle.Compiler.MemberBuilder.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.AttributeCompilerClass" />
-    <member name="M:Nemerle.Compiler.AttributeCompilerClass._N_problem_82174(Nemerle.Compiler.AttributeCompilerClass._N_closureOf_pre_compile_82151)" />
-    <member name="M:Nemerle.Compiler.AttributeCompilerClass._N_convert_82045(Nemerle.Compiler.AttributeCompilerClass._N_closureOf_compile_expr_82000,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.AttributeCompilerClass._N_compile_type_82010(Nemerle.Compiler.AttributeCompilerClass._N_closureOf_compile_expr_82000,Nemerle.Compiler.Location,Nemerle.Compiler.FixedType)" />
-    <member name="M:Nemerle.Compiler.AttributeCompilerClass._N_getErrorLocation_81906(Nemerle.Compiler.AttributeCompilerClass._N_closureOf_CheckConditional_81896)" />
-    <member name="M:Nemerle.Compiler.AttributeCompilerClass._N_is_attribute_81266(Nemerle.Compiler.AttributeCompilerClass._N_closureOf_ResolveAttribute_81230,Nemerle.Compiler.TypeInfo)" />
-    <member name="M:Nemerle.Compiler.AttributeCompilerClass._N_add_end_81240(Nemerle.Compiler.AttributeCompilerClass._N_closureOf_ResolveAttribute_81230,Nemerle.Core.list{System.String},System.String)" />
+    <member name="M:Nemerle.Compiler.AttributeCompilerClass._N_problem_82130(Nemerle.Compiler.AttributeCompilerClass._N_closureOf_pre_compile_82107)" />
+    <member name="M:Nemerle.Compiler.AttributeCompilerClass._N_convert_82001(Nemerle.Compiler.AttributeCompilerClass._N_closureOf_compile_expr_81956,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.AttributeCompilerClass._N_compile_type_81966(Nemerle.Compiler.AttributeCompilerClass._N_closureOf_compile_expr_81956,Nemerle.Compiler.Location,Nemerle.Compiler.FixedType)" />
+    <member name="M:Nemerle.Compiler.AttributeCompilerClass._N_getErrorLocation_81862(Nemerle.Compiler.AttributeCompilerClass._N_closureOf_CheckConditional_81852)" />
+    <member name="M:Nemerle.Compiler.AttributeCompilerClass._N_is_attribute_81222(Nemerle.Compiler.AttributeCompilerClass._N_closureOf_ResolveAttribute_81186,Nemerle.Compiler.TypeInfo)" />
+    <member name="M:Nemerle.Compiler.AttributeCompilerClass._N_add_end_81196(Nemerle.Compiler.AttributeCompilerClass._N_closureOf_ResolveAttribute_81186,Nemerle.Core.list{System.String},System.String)" />
     <member name="M:Nemerle.Compiler.AttributeCompilerClass.#ctor(Nemerle.Compiler.ManagerClass)" />
     <member name="M:Nemerle.Compiler.AttributeCompilerClass.CompileAttribute(Nemerle.Compiler.GlobalEnv,Nemerle.Compiler.TypeBuilder,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="M:Nemerle.Compiler.AttributeCompilerClass.ResolveAttribute(Nemerle.Compiler.GlobalEnv,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.TypeInfo)" />
@@ -4942,10 +4938,10 @@
     </member>
     <member name="M:Nemerle.Compiler.Delegates.create_begin_invoke_parms(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PParameter})" />
     <member name="T:Nemerle.Compiler.GlobalEnv" />
-    <member name="M:Nemerle.Compiler.GlobalEnv._N_lookup_members_83047(Nemerle.Compiler.GlobalEnv._N_closureOf_LookupSymbolExt_82980,Nemerle.Compiler.NamespaceTree.Node,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.TypeInfo,Nemerle.Compiler.IMember}})" />
-    <member name="M:Nemerle.Compiler.GlobalEnv._N_add_members_from_83002(Nemerle.Compiler.GlobalEnv._N_closureOf_LookupSymbolExt_82980,Nemerle.Builtins.Tuple{Nemerle.Compiler.TypeInfo,Nemerle.Compiler.TypeInfo},Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.TypeInfo,Nemerle.Compiler.IMember}})" />
-    <member name="M:Nemerle.Compiler.GlobalEnv._N_check_access_82800(Nemerle.Compiler.GlobalEnv._N_closureOf_LookupType_82762,Nemerle.Core.option{Nemerle.Compiler.TypeInfo})" />
-    <member name="M:Nemerle.Compiler.GlobalEnv._N_non_public_external_82784(Nemerle.Compiler.GlobalEnv._N_closureOf_LookupType_82762,Nemerle.Compiler.TypeInfo)" />
+    <member name="M:Nemerle.Compiler.GlobalEnv._N_lookup_members_83003(Nemerle.Compiler.GlobalEnv._N_closureOf_LookupSymbolExt_82936,Nemerle.Compiler.NamespaceTree.Node,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.TypeInfo,Nemerle.Compiler.IMember}})" />
+    <member name="M:Nemerle.Compiler.GlobalEnv._N_add_members_from_82958(Nemerle.Compiler.GlobalEnv._N_closureOf_LookupSymbolExt_82936,Nemerle.Builtins.Tuple{Nemerle.Compiler.TypeInfo,Nemerle.Compiler.TypeInfo},Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.TypeInfo,Nemerle.Compiler.IMember}})" />
+    <member name="M:Nemerle.Compiler.GlobalEnv._N_check_access_82756(Nemerle.Compiler.GlobalEnv._N_closureOf_LookupType_82718,Nemerle.Core.option{Nemerle.Compiler.TypeInfo})" />
+    <member name="M:Nemerle.Compiler.GlobalEnv._N_non_public_external_82740(Nemerle.Compiler.GlobalEnv._N_closureOf_LookupType_82718,Nemerle.Compiler.TypeInfo)" />
     <member name="F:Nemerle.Compiler.GlobalEnv.open_namespaces" />
     <member name="F:Nemerle.Compiler.GlobalEnv.current_namespace" />
     <member name="F:Nemerle.Compiler.GlobalEnv.namespace_aliases" />
@@ -5083,16 +5079,16 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Compiler.MacroClasses._N_create_transform_tree_84292(Nemerle.Compiler.MacroClasses._N_closureOf_GenerateMacroClass_83824,Nemerle.Core.list{Nemerle.Compiler.MacroParm})" />
-    <member name="M:Nemerle.Compiler.MacroClasses._N_makeRuleStr_84206(Nemerle.Compiler.MacroClasses._N_closureOf_makeGrammarString_84104,Nemerle.Compiler.Parsetree.PExpr,System.Text.StringBuilder)" />
-    <member name="M:Nemerle.Compiler.MacroClasses._N_makeParamType_84139(Nemerle.Compiler.Parsetree.PParameter)" />
-    <member name="M:Nemerle.Compiler.MacroClasses._N_makeParamDefaultValues_84111(Nemerle.Compiler.Parsetree.PParameter)" />
-    <member name="M:Nemerle.Compiler.MacroClasses._N_message_83974(Nemerle.Compiler.MacroClasses._N_closureOf_GenerateMacroClass_83824,Nemerle.Core.list{System.String})" />
-    <member name="M:Nemerle.Compiler.MacroClasses._N_traverse_patterns_83956(Nemerle.Compiler.MacroClasses._N_closureOf_GenerateMacroClass_83824,Nemerle.Core.list{Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr}},Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.Parsetree.PExpr}},Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.Parsetree.PExpr}},Nemerle.Core.Cons[T]{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Core.Cons[T]{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Compiler.MacroClasses._N_normal_parm_83917(Nemerle.Compiler.MacroClasses._N_closureOf_GenerateMacroClass_83824,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.Name)" />
-    <member name="M:Nemerle.Compiler.MacroClasses._N_roll_expr_83908(Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.Parsetree.PExpr}},Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.Compiler.MacroClasses._N_roll_83900(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.Compiler.MacroClasses._N_set_target_info_83869(Nemerle.Compiler.MacroClasses._N_closureOf_GenerateMacroClass_83824,System.Int32,System.Int32,System.String,System.String)" />
+    <member name="M:Nemerle.Compiler.MacroClasses._N_create_transform_tree_84248(Nemerle.Compiler.MacroClasses._N_closureOf_GenerateMacroClass_83780,Nemerle.Core.list{Nemerle.Compiler.MacroParm})" />
+    <member name="M:Nemerle.Compiler.MacroClasses._N_makeRuleStr_84162(Nemerle.Compiler.MacroClasses._N_closureOf_makeGrammarString_84060,Nemerle.Compiler.Parsetree.PExpr,System.Text.StringBuilder)" />
+    <member name="M:Nemerle.Compiler.MacroClasses._N_makeParamType_84095(Nemerle.Compiler.Parsetree.PParameter)" />
+    <member name="M:Nemerle.Compiler.MacroClasses._N_makeParamDefaultValues_84067(Nemerle.Compiler.Parsetree.PParameter)" />
+    <member name="M:Nemerle.Compiler.MacroClasses._N_message_83930(Nemerle.Compiler.MacroClasses._N_closureOf_GenerateMacroClass_83780,Nemerle.Core.list{System.String})" />
+    <member name="M:Nemerle.Compiler.MacroClasses._N_traverse_patterns_83912(Nemerle.Compiler.MacroClasses._N_closureOf_GenerateMacroClass_83780,Nemerle.Core.list{Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr}},Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.Parsetree.PExpr}},Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.Parsetree.PExpr}},Nemerle.Core.Cons[T]{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Core.Cons[T]{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Compiler.MacroClasses._N_normal_parm_83873(Nemerle.Compiler.MacroClasses._N_closureOf_GenerateMacroClass_83780,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.Name)" />
+    <member name="M:Nemerle.Compiler.MacroClasses._N_roll_expr_83864(Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.Parsetree.PExpr}},Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Compiler.MacroClasses._N_roll_83856(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Compiler.MacroClasses._N_set_target_info_83825(Nemerle.Compiler.MacroClasses._N_closureOf_GenerateMacroClass_83780,System.Int32,System.Int32,System.String,System.String)" />
     <member name="M:Nemerle.Compiler.MacroClasses.GenerateMacroClass(Nemerle.Compiler.ManagerClass,Nemerle.Compiler.Parsetree.TopDeclaration.Macro,Nemerle.Compiler.NamespaceTree.Node)">
       <summary>
         <para>Generate class implementing interface [MacroRegistry.IMacro], which
@@ -5112,7 +5108,7 @@
     <member name="M:Nemerle.Compiler.MacroClasses.analyze_syntax(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Collections.Map{System.String,Nemerle.Builtins.Tuple{System.Int32,Nemerle.Compiler.Parsetree.PExpr}})" />
     <member name="M:Nemerle.Compiler.MacroClasses.CreatePermutingFunction(Nemerle.Core.list{System.Int32})" />
     <member name="T:Nemerle.Compiler.NamespaceTree" />
-    <member name="M:Nemerle.Compiler.NamespaceTree._N_resetChildren_84546(Nemerle.Compiler.NamespaceTree._N_closureOf_ResetAllTypes_84540,Nemerle.Collections.Hashtable{System.String,Nemerle.Compiler.NamespaceTree.Node})" />
+    <member name="M:Nemerle.Compiler.NamespaceTree._N_resetChildren_84502(Nemerle.Compiler.NamespaceTree._N_closureOf_ResetAllTypes_84496,Nemerle.Collections.Hashtable{System.String,Nemerle.Compiler.NamespaceTree.Node})" />
     <member name="F:Nemerle.Compiler.NamespaceTree.macro_context" />
     <member name="F:Nemerle.Compiler.NamespaceTree.macro_contexts" />
     <member name="F:Nemerle.Compiler.NamespaceTree.macro_context_class" />
@@ -5158,7 +5154,7 @@
     <member name="T:Nemerle.Compiler.NamespaceTree.TypeInfoCache" />
     <member name="T:Nemerle.Compiler.NamespaceTree.Node" />
     <member name="T:Nemerle.Compiler.ScanTypeHierarchy" />
-    <member name="M:Nemerle.Compiler.ScanTypeHierarchy._N_handle_type_85748(Nemerle.Compiler.ScanTypeHierarchy._N_closureOf_ProcessDeclaration_85738,Nemerle.Compiler.TypeBuilder,Nemerle.Compiler.NamespaceTree.Node,Nemerle.Compiler.Parsetree.TopDeclaration)" />
+    <member name="M:Nemerle.Compiler.ScanTypeHierarchy._N_handle_type_85704(Nemerle.Compiler.ScanTypeHierarchy._N_closureOf_ProcessDeclaration_85694,Nemerle.Compiler.TypeBuilder,Nemerle.Compiler.NamespaceTree.Node,Nemerle.Compiler.Parsetree.TopDeclaration)" />
     <member name="M:Nemerle.Compiler.ScanTypeHierarchy.#ctor(Nemerle.Compiler.ManagerClass)" />
     <member name="M:Nemerle.Compiler.ScanTypeHierarchy.ProcessDeclaration(Nemerle.Compiler.Parsetree.TopDeclaration)">
       <summary>
@@ -5298,6 +5294,10 @@
     <member name="M:Nemerle.Compiler.IProperty.GetSetter" />
     <member name="T:Nemerle.Compiler.MemberInfo" />
     <member name="M:Nemerle.Compiler.MemberInfo.#ctor" />
+    <member name="M:Nemerle.Compiler.MemberInfo.StartTyping" />
+    <member name="F:Nemerle.Compiler.MemberInfo._userData" />
+    <member name="M:Nemerle.Compiler.MemberInfo.get_UserData" />
+    <member name="P:Nemerle.Compiler.MemberInfo.UserData" />
     <member name="M:Nemerle.Compiler.MemberInfo.get_IsConstructor" />
     <member name="P:Nemerle.Compiler.MemberInfo.IsConstructor" />
     <member name="F:Nemerle.Compiler.MemberInfo.is_obsolete" />
@@ -5341,7 +5341,7 @@
       </summary> <remarks><para>Used mainly with [FreshSubst ()] or [MakeSubst ()].
 
 </para></remarks></member>
-    <member name="M:Nemerle.Compiler.TypeInfo._N_getGenericParamCount_57303(Nemerle.Compiler.IMember)">
+    <member name="M:Nemerle.Compiler.TypeInfo._N_getGenericParamCount_57312(Nemerle.Compiler.IMember)">
       <summary>
         <para>workaround since generic parameters are not coming via signature
 
@@ -5667,15 +5667,15 @@
     <member name="P:Nemerle.Compiler.TypeInfo.SystemType" />
     <member name="M:Nemerle.Compiler.TypeInfo.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.XmlDoc" />
-    <member name="M:Nemerle.Compiler.XmlDoc._N_appendTypeName_88120(Nemerle.Compiler.XmlDoc._N_closureOf_GetKey_88108,System.Text.StringBuilder,Nemerle.Compiler.TypeInfo)" />
-    <member name="M:Nemerle.Compiler.XmlDoc._N_indexOf_88017(Nemerle.Core.list{Nemerle.Compiler.StaticTypeVar},Nemerle.Compiler.StaticTypeVar)" />
-    <member name="M:Nemerle.Compiler.XmlDoc._N_appendTypeNameAndArgs_87970(Nemerle.Compiler.XmlDoc._N_closureOf_AppendParmTypeName_87962,System.Text.StringBuilder,System.String,Nemerle.Core.list{Nemerle.Compiler.TypeVar})" />
-    <member name="M:Nemerle.Compiler.XmlDoc._N_open_fake_87601(Nemerle.Compiler.XmlDoc._N_closureOf_parse_comment_87530,System.String)" />
-    <member name="M:Nemerle.Compiler.XmlDoc._N_possibly_close_87591(Nemerle.Compiler.XmlDoc._N_closureOf_parse_comment_87530,Nemerle.Builtins.Function{System.String,System.Boolean})" />
-    <member name="M:Nemerle.Compiler.XmlDoc._N_output_87577(Nemerle.Compiler.XmlDoc._N_closureOf_parse_comment_87530,Nemerle.Compiler.XmlDoc.XToken)" />
-    <member name="M:Nemerle.Compiler.XmlDoc._N_skip_ws_87565(Nemerle.Compiler.XmlDoc._N_closureOf_parse_comment_87530)" />
-    <member name="M:Nemerle.Compiler.XmlDoc._N_is_text_holding_87556(System.String)" />
-    <member name="M:Nemerle.Compiler.XmlDoc._N_scan_87234(Nemerle.Compiler.XmlDoc._N_closureOf_loop_87209,Nemerle.Compiler.XmlDoc._N_closureOf_tokenize_87176,Nemerle.Builtins.Function{System.Char,System.Boolean})" />
+    <member name="M:Nemerle.Compiler.XmlDoc._N_appendTypeName_88076(Nemerle.Compiler.XmlDoc._N_closureOf_GetKey_88064,System.Text.StringBuilder,Nemerle.Compiler.TypeInfo)" />
+    <member name="M:Nemerle.Compiler.XmlDoc._N_indexOf_87973(Nemerle.Core.list{Nemerle.Compiler.StaticTypeVar},Nemerle.Compiler.StaticTypeVar)" />
+    <member name="M:Nemerle.Compiler.XmlDoc._N_appendTypeNameAndArgs_87926(Nemerle.Compiler.XmlDoc._N_closureOf_AppendParmTypeName_87918,System.Text.StringBuilder,System.String,Nemerle.Core.list{Nemerle.Compiler.TypeVar})" />
+    <member name="M:Nemerle.Compiler.XmlDoc._N_open_fake_87557(Nemerle.Compiler.XmlDoc._N_closureOf_parse_comment_87486,System.String)" />
+    <member name="M:Nemerle.Compiler.XmlDoc._N_possibly_close_87547(Nemerle.Compiler.XmlDoc._N_closureOf_parse_comment_87486,Nemerle.Builtins.Function{System.String,System.Boolean})" />
+    <member name="M:Nemerle.Compiler.XmlDoc._N_output_87533(Nemerle.Compiler.XmlDoc._N_closureOf_parse_comment_87486,Nemerle.Compiler.XmlDoc.XToken)" />
+    <member name="M:Nemerle.Compiler.XmlDoc._N_skip_ws_87521(Nemerle.Compiler.XmlDoc._N_closureOf_parse_comment_87486)" />
+    <member name="M:Nemerle.Compiler.XmlDoc._N_is_text_holding_87512(System.String)" />
+    <member name="M:Nemerle.Compiler.XmlDoc._N_scan_87190(Nemerle.Compiler.XmlDoc._N_closureOf_loop_87165,Nemerle.Compiler.XmlDoc._N_closureOf_tokenize_87132,Nemerle.Builtins.Function{System.Char,System.Boolean})" />
     <member name="F:Nemerle.Compiler.XmlDoc.document" />
     <member name="F:Nemerle.Compiler.XmlDoc.docNode" />
     <member name="F:Nemerle.Compiler.XmlDoc.last_loc" />
@@ -5806,36 +5806,36 @@
     <member name="P:Nemerle.Compiler.ExprWalker.Callback" />
     <member name="M:Nemerle.Compiler.ExprWalker.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.PrettyPrint" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_case_91371(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91128,Nemerle.Compiler.Typedtree.Try_case)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_local_fun_decl_91241(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91128,System.String,Nemerle.Compiler.Typedtree.TFunHeader)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_need_curly_braces_91220(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91128,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_is_list_nil_91211(Nemerle.Compiler.IMember)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_is_list_cons_91203(Nemerle.Compiler.IMember)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_fun_call_parms_91188(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91128,Nemerle.Core.list{Nemerle.Compiler.Typedtree.Parm})" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_expr_list_91181(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91128,System.String,Nemerle.Core.list{Nemerle.Compiler.Typedtree.TExpr},System.String,System.String)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_type_91174(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91128,Nemerle.Compiler.TypeVar)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_recurse_and_indent_91167(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91128,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_recurse_no_indent_91160(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91128,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_append_91144(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91128,System.String)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_expr_is_false_90707(Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_expr_is_true_90699(Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_expr_is_bool_90683(Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_do_print_90656(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90593,Nemerle.Compiler.Typedtree.Pattern,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.LocalValue,Nemerle.Compiler.Typedtree.TExpr}},System.String)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_patterns_90649(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90593,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Typedtree.Pattern,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.LocalValue,Nemerle.Compiler.Typedtree.TExpr}}}})" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_pattern_90642(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90593,Nemerle.Compiler.Typedtree.Pattern)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_recurse_and_short_indent_90635(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90593,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_recurse_and_indent_90628(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90593,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_recurse_90621(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90593,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_indent_90614(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90593)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_append_90607(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90593,System.String)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_record_field_90452(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintPattern_90407,Nemerle.Compiler.IMember,Nemerle.Compiler.Typedtree.Pattern)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_pattern_90422(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintPattern_90407,Nemerle.Compiler.Typedtree.Pattern)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_append_90415(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintPattern_90407,System.String)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_gel_90262(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintExpr_89955,Nemerle.Compiler.GrammarElement)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_case_90198(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintExpr_89955,Nemerle.Compiler.Parsetree.TryCase)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_sprint_ss_90019(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintExpr_89955,Nemerle.Compiler.Parsetree.Splicable)" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_funparms_90012(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintExpr_89955,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PParameter})" />
-    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_tconstraints_89974(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintExpr_89955,Nemerle.Core.list{Nemerle.Compiler.Parsetree.Constraint})" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_case_91327(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91084,Nemerle.Compiler.Typedtree.Try_case)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_local_fun_decl_91197(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91084,System.String,Nemerle.Compiler.Typedtree.TFunHeader)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_need_curly_braces_91176(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91084,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_is_list_nil_91167(Nemerle.Compiler.IMember)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_is_list_cons_91159(Nemerle.Compiler.IMember)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_fun_call_parms_91144(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91084,Nemerle.Core.list{Nemerle.Compiler.Typedtree.Parm})" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_expr_list_91137(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91084,System.String,Nemerle.Core.list{Nemerle.Compiler.Typedtree.TExpr},System.String,System.String)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_type_91130(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91084,Nemerle.Compiler.TypeVar)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_recurse_and_indent_91123(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91084,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_recurse_no_indent_91116(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91084,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_append_91100(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyExpr_91084,System.String)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_expr_is_false_90663(Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_expr_is_true_90655(Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_expr_is_bool_90639(Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_do_print_90612(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90549,Nemerle.Compiler.Typedtree.Pattern,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.LocalValue,Nemerle.Compiler.Typedtree.TExpr}},System.String)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_patterns_90605(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90549,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Typedtree.Pattern,Nemerle.Compiler.Typedtree.TExpr,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.LocalValue,Nemerle.Compiler.Typedtree.TExpr}}}})" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_pattern_90598(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90549,Nemerle.Compiler.Typedtree.Pattern)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_recurse_and_short_indent_90591(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90549,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_recurse_and_indent_90584(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90549,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_recurse_90577(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90549,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_indent_90570(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90549)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_append_90563(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintTyMatch_90549,System.String)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_record_field_90408(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintPattern_90363,Nemerle.Compiler.IMember,Nemerle.Compiler.Typedtree.Pattern)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_pattern_90378(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintPattern_90363,Nemerle.Compiler.Typedtree.Pattern)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_append_90371(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintPattern_90363,System.String)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_gel_90218(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintExpr_89911,Nemerle.Compiler.GrammarElement)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_case_90154(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintExpr_89911,Nemerle.Compiler.Parsetree.TryCase)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_sprint_ss_89975(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintExpr_89911,Nemerle.Compiler.Parsetree.Splicable)" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_funparms_89968(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintExpr_89911,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PParameter})" />
+    <member name="M:Nemerle.Compiler.PrettyPrint._N_print_tconstraints_89930(Nemerle.Compiler.PrettyPrint._N_closureOf_SprintExpr_89911,Nemerle.Core.list{Nemerle.Compiler.Parsetree.Constraint})" />
     <member name="M:Nemerle.Compiler.PrettyPrint.UpdateLocation(Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.Location)" />
     <member name="M:Nemerle.Compiler.PrettyPrint.PrintName(Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.LocatableTextWriter)" />
     <member name="M:Nemerle.Compiler.PrettyPrint.SprintExpr(Nemerle.Core.option{Nemerle.Compiler.Typer},Nemerle.Compiler.Parsetree.PExpr,System.String,Nemerle.Compiler.LocatableTextWriter)" />
@@ -5934,8 +5934,8 @@
     <member name="T:Nemerle.Compiler.NamespaceTreeUtils" />
     <member name="M:Nemerle.Compiler.NamespaceTreeUtils.GetReferencedNamespaces(Nemerle.Compiler.NamespaceTree)" />
     <member name="T:Nemerle.Compiler.CFG" />
-    <member name="M:Nemerle.Compiler.CFG._N_NodesAddFromList_91749(Nemerle.Compiler.CFG._N_closureOf_BuildCFG_91727,Nemerle.Compiler.CFG._N_closureOf_BuildCFG_91709,Nemerle.Core.list{Nemerle.Compiler.Typedtree.TExpr})" />
-    <member name="M:Nemerle.Compiler.CFG._N_BuildCFG_91721(Nemerle.Compiler.CFG._N_closureOf_BuildCFG_91709,System.Int32,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.CFG._N_NodesAddFromList_91705(Nemerle.Compiler.CFG._N_closureOf_BuildCFG_91683,Nemerle.Compiler.CFG._N_closureOf_BuildCFG_91665,Nemerle.Core.list{Nemerle.Compiler.Typedtree.TExpr})" />
+    <member name="M:Nemerle.Compiler.CFG._N_BuildCFG_91677(Nemerle.Compiler.CFG._N_closureOf_BuildCFG_91665,System.Int32,Nemerle.Compiler.Typedtree.TExpr)" />
     <member name="M:Nemerle.Compiler.CFG.#ctor" />
     <member name="M:Nemerle.Compiler.CFG.BuildCFG(Nemerle.Compiler.Typedtree.TExpr)" />
     <member name="M:Nemerle.Compiler.CFG.BuildExprAvail(CFG.Array)" />
@@ -5960,7 +5960,7 @@
     <member name="M:CFG.Array.Count" />
     <member name="M:CFG.Array.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.Decorator" />
-    <member name="M:Nemerle.Compiler.Decorator._N_LayDefs_92269(Nemerle.Compiler.Decorator._N_closureOf_MultipleAssignResolver_92261,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.LocalValue,Nemerle.Compiler.Typedtree.TExpr}})" />
+    <member name="M:Nemerle.Compiler.Decorator._N_LayDefs_92225(Nemerle.Compiler.Decorator._N_closureOf_MultipleAssignResolver_92217,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.LocalValue,Nemerle.Compiler.Typedtree.TExpr}})" />
     <member name="M:Nemerle.Compiler.Decorator.#ctor" />
     <member name="M:Nemerle.Compiler.Decorator.Propagatable(Nemerle.Compiler.Typedtree.TExpr)" />
     <member name="M:Nemerle.Compiler.Decorator.SetDefOf(Nemerle.Compiler.Typedtree.TExpr,Nemerle.Compiler.Typedtree.TExpr.Def)" />
@@ -5981,8 +5981,8 @@
     <member name="M:Nemerle.Compiler.Optimizer.Run" />
     <member name="M:Nemerle.Compiler.Optimizer.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.Preparer" />
-    <member name="M:Nemerle.Compiler.Preparer._N_LayDefs_92800(Nemerle.Compiler.Preparer._N_closureOf_SplitTrivialTuple_92770,Nemerle.Core.list{Nemerle.Compiler.LocalValue},Nemerle.Core.list{Nemerle.Compiler.Typedtree.TExpr},Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.Preparer._N_CreateLocalValues_92784(Nemerle.Compiler.Preparer._N_closureOf_SplitTrivialTuple_92770,System.Int32,Nemerle.Core.list{Nemerle.Compiler.Typedtree.TExpr})" />
+    <member name="M:Nemerle.Compiler.Preparer._N_LayDefs_92756(Nemerle.Compiler.Preparer._N_closureOf_SplitTrivialTuple_92726,Nemerle.Core.list{Nemerle.Compiler.LocalValue},Nemerle.Core.list{Nemerle.Compiler.Typedtree.TExpr},Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.Preparer._N_CreateLocalValues_92740(Nemerle.Compiler.Preparer._N_closureOf_SplitTrivialTuple_92726,System.Int32,Nemerle.Core.list{Nemerle.Compiler.Typedtree.TExpr})" />
     <member name="M:Nemerle.Compiler.Preparer.#ctor" />
     <member name="M:Nemerle.Compiler.Preparer.AddDefs(Nemerle.Compiler.Typedtree.TExpr,Nemerle.Core.list{Nemerle.Compiler.Typedtree.TParameter})" />
     <member name="M:Nemerle.Compiler.Preparer.RemoveDefs(Nemerle.Compiler.Typedtree.TExpr)" />
@@ -5995,7 +5995,7 @@
     <member name="M:Nemerle.Compiler.Propagator.Propagate(CFG.Array,Nemerle.Compiler.CFG.GenKillInOut[],Nemerle.Compiler.CFG.DefUseInOut[])" />
     <member name="M:Nemerle.Compiler.Propagator.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.Unification" />
-    <member name="M:Nemerle.Compiler.Unification._N_GetUnited_93199(Nemerle.Compiler.Unification._N_closureOf_Apply_93189,Nemerle.Compiler.LocalValue)" />
+    <member name="M:Nemerle.Compiler.Unification._N_GetUnited_93155(Nemerle.Compiler.Unification._N_closureOf_Apply_93145,Nemerle.Compiler.LocalValue)" />
     <member name="M:Nemerle.Compiler.Unification.#ctor" />
     <member name="M:Nemerle.Compiler.Unification.Calculate(CFG.Array,Nemerle.Compiler.CFG.DefUseInOut[],Nemerle.Core.list{Nemerle.Compiler.Typedtree.TParameter})" />
     <member name="M:Nemerle.Compiler.Unification.Apply(Nemerle.Compiler.Typedtree.TExpr,Nemerle.Collections.Hashtable{Nemerle.Compiler.LocalValue,Nemerle.Compiler.LocalValue})" />
@@ -6016,9 +6016,9 @@
     <member name="M:UseSet.ToString" />
     <member name="M:UseSet.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.ConstantFolder" />
-    <member name="M:Nemerle.Compiler.ConstantFolder._N_lookup_type_94295(Nemerle.Compiler.ConstantFolder._N_closureOf_fold_type_conversion_94285)" />
-    <member name="M:Nemerle.Compiler.ConstantFolder._N_report_conversion_failure_94135(Nemerle.Compiler.ConstantFolder._N_closureOf_convert_integer_literal_94125)" />
-    <member name="M:Nemerle.Compiler.ConstantFolder._N_positive_93728(Nemerle.Compiler.Literal.Integer)" />
+    <member name="M:Nemerle.Compiler.ConstantFolder._N_lookup_type_94251(Nemerle.Compiler.ConstantFolder._N_closureOf_fold_type_conversion_94241)" />
+    <member name="M:Nemerle.Compiler.ConstantFolder._N_report_conversion_failure_94091(Nemerle.Compiler.ConstantFolder._N_closureOf_convert_integer_literal_94081)" />
+    <member name="M:Nemerle.Compiler.ConstantFolder._N_positive_93684(Nemerle.Compiler.Literal.Integer)" />
     <member name="M:Nemerle.Compiler.ConstantFolder.#cctor" />
     <member name="F:Nemerle.Compiler.ConstantFolder.known_operators" />
     <member name="M:Nemerle.Compiler.ConstantFolder.is_known_operator(System.String)" />
@@ -6053,7 +6053,7 @@
     <member name="M:Nemerle.Compiler.ConstantFolder.FoldConstants(Nemerle.Compiler.GlobalEnv,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.TypeBuilder)" />
     <member name="M:Nemerle.Compiler.ConstantFolder.FoldConstants(Nemerle.Compiler.TypeBuilder,Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="T:Nemerle.Compiler.DecisionTreeBuilder" />
-    <member name="M:Nemerle.Compiler.DecisionTreeBuilder._N_traverse_94646(Nemerle.Compiler.DecisionTreeBuilder._N_closureOf_CheckMatching_94630,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.DecisionTreeBuilder.Path,Nemerle.Compiler.DecisionTreeBuilder.Con}},Nemerle.Compiler.DecisionTreeBuilder.Decision)" />
+    <member name="M:Nemerle.Compiler.DecisionTreeBuilder._N_traverse_94602(Nemerle.Compiler.DecisionTreeBuilder._N_closureOf_CheckMatching_94586,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.DecisionTreeBuilder.Path,Nemerle.Compiler.DecisionTreeBuilder.Con}},Nemerle.Compiler.DecisionTreeBuilder.Decision)" />
     <member name="M:Nemerle.Compiler.DecisionTreeBuilder.Build(Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Typedtree.Pattern,System.Boolean,System.Int32}})">
       <summary>
         <para>Build decision tree for given list of (pattern, has_guard, id)
@@ -6171,7 +6171,7 @@
     <member name="F:Nemerle.Compiler.LocalValue.id" />
     <member name="M:Nemerle.Compiler.LocalValue.get_Id" />
     <member name="P:Nemerle.Compiler.LocalValue.Id" />
-    <member name="F:Nemerle.Compiler.LocalValue._N_IsPinned_14834" />
+    <member name="F:Nemerle.Compiler.LocalValue._N_IsPinned_14836" />
     <member name="M:Nemerle.Compiler.LocalValue.get_IsPinned" />
     <member name="M:Nemerle.Compiler.LocalValue.set_IsPinned(System.Boolean)" />
     <member name="P:Nemerle.Compiler.LocalValue.IsPinned" />
@@ -6317,17 +6317,17 @@
     <member name="M:Nemerle.Compiler.MacroRegistry.__fake" />
     <member name="M:Nemerle.Compiler.MacroRegistry.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.Macros" />
-    <member name="M:Nemerle.Compiler.Macros._N_trav_top_decl_99109(Nemerle.Compiler.Macros._N_closureOf_TraverseExprWithContext_99002,Nemerle.Compiler.Parsetree.TopDeclaration)" />
-    <member name="M:Nemerle.Compiler.Macros._N_trav_field_99100(Nemerle.Compiler.Macros._N_closureOf_TraverseExprWithContext_99002,Nemerle.Compiler.Parsetree.ClassMember.Field)" />
-    <member name="M:Nemerle.Compiler.Macros._N_trav_fun_head_99077(Nemerle.Compiler.Macros._N_closureOf_TraverseExprWithContext_99002,Nemerle.Compiler.Parsetree.PFunHeader)" />
-    <member name="M:Nemerle.Compiler.Macros._N_trav_funparms_99046(Nemerle.Compiler.Macros._N_closureOf_TraverseExprWithContext_99002,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PParameter})" />
-    <member name="M:Nemerle.Compiler.Macros._N_trav_top_decl_98515(Nemerle.Compiler.Macros._N_closureOf_TraverseExpr_98407,Nemerle.Compiler.Parsetree.TopDeclaration)" />
-    <member name="M:Nemerle.Compiler.Macros._N_trav_field_98506(Nemerle.Compiler.Macros._N_closureOf_TraverseExpr_98407,Nemerle.Compiler.Parsetree.ClassMember.Field)" />
-    <member name="M:Nemerle.Compiler.Macros._N_trav_fun_head_98483(Nemerle.Compiler.Macros._N_closureOf_TraverseExpr_98407,Nemerle.Compiler.Parsetree.PFunHeader)" />
-    <member name="M:Nemerle.Compiler.Macros._N_trav_funparms_98452(Nemerle.Compiler.Macros._N_closureOf_TraverseExpr_98407,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PParameter})" />
-    <member name="M:Nemerle.Compiler.Macros._N_traversep_98445(Nemerle.Compiler.Macros._N_closureOf_TraverseExpr_98407,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.Compiler.Macros._N_convert_params_98130(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Core.list{Nemerle.Compiler.IField},Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Compiler.Macros._N_constructor_97689(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Compiler.Macros._N_trav_top_decl_99064(Nemerle.Compiler.Macros._N_closureOf_TraverseExprWithContext_98957,Nemerle.Compiler.Parsetree.TopDeclaration)" />
+    <member name="M:Nemerle.Compiler.Macros._N_trav_field_99055(Nemerle.Compiler.Macros._N_closureOf_TraverseExprWithContext_98957,Nemerle.Compiler.Parsetree.ClassMember.Field)" />
+    <member name="M:Nemerle.Compiler.Macros._N_trav_fun_head_99032(Nemerle.Compiler.Macros._N_closureOf_TraverseExprWithContext_98957,Nemerle.Compiler.Parsetree.PFunHeader)" />
+    <member name="M:Nemerle.Compiler.Macros._N_trav_funparms_99001(Nemerle.Compiler.Macros._N_closureOf_TraverseExprWithContext_98957,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PParameter})" />
+    <member name="M:Nemerle.Compiler.Macros._N_trav_top_decl_98470(Nemerle.Compiler.Macros._N_closureOf_TraverseExpr_98362,Nemerle.Compiler.Parsetree.TopDeclaration)" />
+    <member name="M:Nemerle.Compiler.Macros._N_trav_field_98461(Nemerle.Compiler.Macros._N_closureOf_TraverseExpr_98362,Nemerle.Compiler.Parsetree.ClassMember.Field)" />
+    <member name="M:Nemerle.Compiler.Macros._N_trav_fun_head_98438(Nemerle.Compiler.Macros._N_closureOf_TraverseExpr_98362,Nemerle.Compiler.Parsetree.PFunHeader)" />
+    <member name="M:Nemerle.Compiler.Macros._N_trav_funparms_98407(Nemerle.Compiler.Macros._N_closureOf_TraverseExpr_98362,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PParameter})" />
+    <member name="M:Nemerle.Compiler.Macros._N_traversep_98400(Nemerle.Compiler.Macros._N_closureOf_TraverseExpr_98362,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Compiler.Macros._N_convert_params_98085(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr},Nemerle.Core.list{Nemerle.Compiler.IField},Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Compiler.Macros._N_constructor_97644(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
     <member name="M:Nemerle.Compiler.Macros.#cctor">
       <summary>
         <para>PUBLIC API FOR USAGE IN MACROS
@@ -6580,10 +6580,10 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Compiler.FixedType._N_makeTyArgs_102428(Nemerle.Compiler.FixedType._N_closureOf_GetInstantiatedSuperType_102396,Nemerle.Compiler.FixedType.Class,Nemerle.Core.list{Nemerle.Compiler.FixedType})" />
-    <member name="M:Nemerle.Compiler.FixedType._N_get_siblings_102174(Nemerle.Compiler.TypeInfo)" />
-    <member name="M:Nemerle.Compiler.FixedType._N_unifyTypeArgs_101632(Nemerle.Compiler.FixedType._N_closureOf_Require_101531,Nemerle.Core.list{Nemerle.Compiler.FixedType},Nemerle.Compiler.TypeInfo,Nemerle.Compiler.TypeInfo,Nemerle.Core.list{Nemerle.Compiler.TypeVar},Nemerle.Core.list{Nemerle.Compiler.TypeVar})" />
-    <member name="M:Nemerle.Compiler.FixedType._N_covariant_check_101538(Nemerle.Compiler.StaticTypeVar,Nemerle.Compiler.TypeVar,Nemerle.Compiler.TypeVar)" />
+    <member name="M:Nemerle.Compiler.FixedType._N_makeTyArgs_102383(Nemerle.Compiler.FixedType._N_closureOf_GetInstantiatedSuperType_102351,Nemerle.Compiler.FixedType.Class,Nemerle.Core.list{Nemerle.Compiler.FixedType})" />
+    <member name="M:Nemerle.Compiler.FixedType._N_get_siblings_102129(Nemerle.Compiler.TypeInfo)" />
+    <member name="M:Nemerle.Compiler.FixedType._N_unifyTypeArgs_101587(Nemerle.Compiler.FixedType._N_closureOf_Require_101486,Nemerle.Core.list{Nemerle.Compiler.FixedType},Nemerle.Compiler.TypeInfo,Nemerle.Compiler.TypeInfo,Nemerle.Core.list{Nemerle.Compiler.TypeVar},Nemerle.Core.list{Nemerle.Compiler.TypeVar})" />
+    <member name="M:Nemerle.Compiler.FixedType._N_covariant_check_101493(Nemerle.Compiler.StaticTypeVar,Nemerle.Compiler.TypeVar,Nemerle.Compiler.TypeVar)" />
     <member name="M:Nemerle.Compiler.FixedType.Equals(Nemerle.Compiler.FixedType)">
       <summary>
         <para>Check for type equality, taking intersection types
@@ -6823,15 +6823,15 @@
     <member name="F:Nemerle.Compiler.OverloadPossibility.permutation_array" />
     <member name="F:Nemerle.Compiler.OverloadPossibility.formal_types" />
     <member name="F:Nemerle.Compiler.OverloadPossibility.did_mambo_jumbo" />
-    <member name="F:Nemerle.Compiler.OverloadPossibility._N_ResolvedCallParameters_15700" />
+    <member name="F:Nemerle.Compiler.OverloadPossibility._N_ResolvedCallParameters_15702" />
     <member name="M:Nemerle.Compiler.OverloadPossibility.get_ResolvedCallParameters" />
     <member name="M:Nemerle.Compiler.OverloadPossibility.set_ResolvedCallParameters(Nemerle.Core.list{Nemerle.Compiler.Typedtree.Parm})" />
     <member name="P:Nemerle.Compiler.OverloadPossibility.ResolvedCallParameters" />
-    <member name="F:Nemerle.Compiler.OverloadPossibility._N_IsAllNestedDelayedTypingResolved_15707" />
+    <member name="F:Nemerle.Compiler.OverloadPossibility._N_IsAllNestedDelayedTypingResolved_15709" />
     <member name="M:Nemerle.Compiler.OverloadPossibility.get_IsAllNestedDelayedTypingResolved" />
     <member name="M:Nemerle.Compiler.OverloadPossibility.set_IsAllNestedDelayedTypingResolved(System.Boolean)" />
     <member name="P:Nemerle.Compiler.OverloadPossibility.IsAllNestedDelayedTypingResolved" />
-    <member name="F:Nemerle.Compiler.OverloadPossibility._N_IsNeedTupleConvertion_15714" />
+    <member name="F:Nemerle.Compiler.OverloadPossibility._N_IsNeedTupleConvertion_15716" />
     <member name="M:Nemerle.Compiler.OverloadPossibility.get_IsNeedTupleConvertion" />
     <member name="M:Nemerle.Compiler.OverloadPossibility.set_IsNeedTupleConvertion(System.Boolean)" />
     <member name="P:Nemerle.Compiler.OverloadPossibility.IsNeedTupleConvertion" />
@@ -6924,9 +6924,9 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Compiler.Solver._N_add_supertypes_104120(Nemerle.Compiler.Solver._N_closureOf_sum_list_104108,Nemerle.Collections.Set{Nemerle.Compiler.TypeInfo})" />
-    <member name="M:Nemerle.Compiler.Solver._N_sum_list_104102(Nemerle.Compiler.Solver._N_closureOf_Sum_104090,Nemerle.Core.list{Nemerle.Compiler.FixedType},System.Boolean)" />
-    <member name="M:Nemerle.Compiler.Solver._N_intersect_classes_103850(Nemerle.Compiler.Solver._N_closureOf_Intersect_103842,Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.FixedType.Class)" />
+    <member name="M:Nemerle.Compiler.Solver._N_add_supertypes_104075(Nemerle.Compiler.Solver._N_closureOf_sum_list_104063,Nemerle.Collections.Set{Nemerle.Compiler.TypeInfo})" />
+    <member name="M:Nemerle.Compiler.Solver._N_sum_list_104057(Nemerle.Compiler.Solver._N_closureOf_Sum_104045,Nemerle.Core.list{Nemerle.Compiler.FixedType},System.Boolean)" />
+    <member name="M:Nemerle.Compiler.Solver._N_intersect_classes_103805(Nemerle.Compiler.Solver._N_closureOf_Intersect_103797,Nemerle.Compiler.FixedType.Class,Nemerle.Compiler.FixedType.Class)" />
     <member name="M:Nemerle.Compiler.Solver.PushState">
       <summary>
         <para>Store current constraint state.
@@ -7027,7 +7027,7 @@
 </para>
       </summary>
     </member>
-    <member name="M:Nemerle.Compiler.StaticTypeVar._N_check_constraints_104976(Nemerle.Compiler.FixedType,Nemerle.Builtins.Function{Nemerle.Compiler.FixedType,System.Boolean})" />
+    <member name="M:Nemerle.Compiler.StaticTypeVar._N_check_constraints_104931(Nemerle.Compiler.FixedType,Nemerle.Builtins.Function{Nemerle.Compiler.FixedType,System.Boolean})" />
     <member name="F:Nemerle.Compiler.StaticTypeVar.gtype" />
     <member name="F:Nemerle.Compiler.StaticTypeVar.id" />
     <member name="F:Nemerle.Compiler.StaticTypeVar.name" />
@@ -7295,7 +7295,7 @@
     <member name="P:Nemerle.Compiler.Typedtree.TParameter.CustomAttributes" />
     <member name="M:Nemerle.Compiler.Typedtree.TParameter.get_Name" />
     <member name="P:Nemerle.Compiler.Typedtree.TParameter.Name" />
-    <member name="F:Nemerle.Compiler.Typedtree.TParameter._N_NameLocation_16184" />
+    <member name="F:Nemerle.Compiler.Typedtree.TParameter._N_NameLocation_16186" />
     <member name="M:Nemerle.Compiler.Typedtree.TParameter.get_NameLocation" />
     <member name="M:Nemerle.Compiler.Typedtree.TParameter.set_NameLocation(Nemerle.Compiler.Location)" />
     <member name="P:Nemerle.Compiler.Typedtree.TParameter.NameLocation" />
@@ -7312,7 +7312,7 @@
     <member name="P:Nemerle.Compiler.Typedtree.TParameter.DefaultValue" />
     <member name="M:Nemerle.Compiler.Typedtree.TParameter.get_Declaration" />
     <member name="P:Nemerle.Compiler.Typedtree.TParameter.Declaration" />
-    <member name="F:Nemerle.Compiler.Typedtree.TParameter._N_PatternHack_16211" />
+    <member name="F:Nemerle.Compiler.Typedtree.TParameter._N_PatternHack_16213" />
     <member name="M:Nemerle.Compiler.Typedtree.TParameter.get_PatternHack" />
     <member name="M:Nemerle.Compiler.Typedtree.TParameter.set_PatternHack(Nemerle.Compiler.Parsetree.PExpr)" />
     <member name="P:Nemerle.Compiler.Typedtree.TParameter.PatternHack" />
@@ -7351,23 +7351,23 @@
     <member name="F:Nemerle.Compiler.Typedtree.FunctionUsage.Used" />
     <member name="F:Nemerle.Compiler.Typedtree.FunctionUsage.UsedAsFirstClass" />
     <member name="T:Nemerle.Compiler.Typedtree.TFunHeader" />
-    <member name="F:Nemerle.Compiler.Typedtree.TFunHeader._N_Name_16261" />
+    <member name="F:Nemerle.Compiler.Typedtree.TFunHeader._N_Name_16263" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.get_Name" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.set_Name(System.String)" />
     <member name="P:Nemerle.Compiler.Typedtree.TFunHeader.Name" />
-    <member name="F:Nemerle.Compiler.Typedtree.TFunHeader._N_ReturnType_16268" />
+    <member name="F:Nemerle.Compiler.Typedtree.TFunHeader._N_ReturnType_16270" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.get_ReturnType" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.set_ReturnType(Nemerle.Compiler.TypeVar)" />
     <member name="P:Nemerle.Compiler.Typedtree.TFunHeader.ReturnType" />
-    <member name="F:Nemerle.Compiler.Typedtree.TFunHeader._N_ReturnTypeLocation_16275" />
+    <member name="F:Nemerle.Compiler.Typedtree.TFunHeader._N_ReturnTypeLocation_16277" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.get_ReturnTypeLocation" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.set_ReturnTypeLocation(Nemerle.Compiler.Location)" />
     <member name="P:Nemerle.Compiler.Typedtree.TFunHeader.ReturnTypeLocation" />
-    <member name="F:Nemerle.Compiler.Typedtree.TFunHeader._N_Parameters_16282" />
+    <member name="F:Nemerle.Compiler.Typedtree.TFunHeader._N_Parameters_16284" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.get_Parameters" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.set_Parameters(Nemerle.Core.list{Nemerle.Compiler.Typedtree.TParameter})" />
     <member name="P:Nemerle.Compiler.Typedtree.TFunHeader.Parameters" />
-    <member name="F:Nemerle.Compiler.Typedtree.TFunHeader._N_TypeParameters_16289" />
+    <member name="F:Nemerle.Compiler.Typedtree.TFunHeader._N_TypeParameters_16291" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.get_TypeParameters" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.set_TypeParameters(Nemerle.Core.list{Nemerle.Compiler.StaticTypeVar})" />
     <member name="P:Nemerle.Compiler.Typedtree.TFunHeader.TypeParameters" />
@@ -7379,7 +7379,7 @@
     <member name="P:Nemerle.Compiler.Typedtree.TFunHeader.ClosureVars" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.get_Declaration" />
     <member name="P:Nemerle.Compiler.Typedtree.TFunHeader.Declaration" />
-    <member name="F:Nemerle.Compiler.Typedtree.TFunHeader._N_Parsed_16308" />
+    <member name="F:Nemerle.Compiler.Typedtree.TFunHeader._N_Parsed_16310" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.get_Parsed" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.set_Parsed(Nemerle.Compiler.Parsetree.Function_decl)" />
     <member name="P:Nemerle.Compiler.Typedtree.TFunHeader.Parsed" />
@@ -7405,7 +7405,7 @@
     <member name="F:Nemerle.Compiler.Typedtree.TFunHeader.body" />
     <member name="F:Nemerle.Compiler.Typedtree.TFunHeader.has_1st_class_child" />
     <member name="F:Nemerle.Compiler.Typedtree.TFunHeader.cannot_inline" />
-    <member name="F:Nemerle.Compiler.Typedtree.TFunHeader._N_ConvertToLoopWithClosure_16344" />
+    <member name="F:Nemerle.Compiler.Typedtree.TFunHeader._N_ConvertToLoopWithClosure_16346" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.get_ConvertToLoopWithClosure" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.set_ConvertToLoopWithClosure(System.Boolean)" />
     <member name="P:Nemerle.Compiler.Typedtree.TFunHeader.ConvertToLoopWithClosure" />
@@ -7455,7 +7455,7 @@
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.CreateAliasMethod(Nemerle.Compiler.NemerleModifiers,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Subst)" />
     <member name="M:Nemerle.Compiler.Typedtree.TFunHeader.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.Typedtree.Pattern" />
-    <member name="M:Nemerle.Compiler.Typedtree.Pattern._N_do_walk_106836(Nemerle.Compiler.Typedtree.Pattern._N_closureOf_Walk_106826,Nemerle.Compiler.Typedtree.Pattern)" />
+    <member name="M:Nemerle.Compiler.Typedtree.Pattern._N_do_walk_106791(Nemerle.Compiler.Typedtree.Pattern._N_closureOf_Walk_106781,Nemerle.Compiler.Typedtree.Pattern)" />
     <member name="F:Nemerle.Compiler.Typedtree.Pattern.ty" />
     <member name="M:Nemerle.Compiler.Typedtree.Pattern.#ctor" />
     <member name="M:Nemerle.Compiler.Typedtree.Pattern.#ctor(Nemerle.Compiler.Location)" />
@@ -7544,9 +7544,9 @@
     <member name="F:Nemerle.Compiler.Typedtree.TExprFlags.NeedsEmptyStack" />
     <member name="F:Nemerle.Compiler.Typedtree.TExprFlags.NeedsEmptyStackComputed" />
     <member name="T:Nemerle.Compiler.Typedtree.CacheDesc" />
-    <member name="M:Nemerle.Compiler.Typedtree.CacheDesc._N_get_ref_107544(Nemerle.Compiler.Typedtree.CacheDesc._N_closureOf_Finalize_107486,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.Typedtree.CacheDesc._N_cache_obj_107532(Nemerle.Compiler.Typedtree.CacheDesc._N_closureOf_Finalize_107486,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.Typedtree.CacheDesc._N_unfold_107500(Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.Typedtree.CacheDesc._N_get_ref_107499(Nemerle.Compiler.Typedtree.CacheDesc._N_closureOf_Finalize_107441,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.Typedtree.CacheDesc._N_cache_obj_107487(Nemerle.Compiler.Typedtree.CacheDesc._N_closureOf_Finalize_107441,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.Typedtree.CacheDesc._N_unfold_107455(Nemerle.Compiler.Typedtree.TExpr)" />
     <member name="F:Nemerle.Compiler.Typedtree.CacheDesc.p_indices" />
     <member name="F:Nemerle.Compiler.Typedtree.CacheDesc.p_expr" />
     <member name="F:Nemerle.Compiler.Typedtree.CacheDesc.t_indices" />
@@ -7708,7 +7708,7 @@
     <member name="F:Nemerle.Compiler.Typedtree.Parm.name" />
     <member name="F:Nemerle.Compiler.Typedtree.Parm.IsByDefault" />
     <member name="F:Nemerle.Compiler.Typedtree.Parm.required_type" />
-    <member name="F:Nemerle.Compiler.Typedtree.Parm._N_NameToComplete_17417" />
+    <member name="F:Nemerle.Compiler.Typedtree.Parm._N_NameToComplete_17419" />
     <member name="M:Nemerle.Compiler.Typedtree.Parm.get_NameToComplete" />
     <member name="M:Nemerle.Compiler.Typedtree.Parm.set_NameToComplete(System.String)" />
     <member name="P:Nemerle.Compiler.Typedtree.Parm.NameToComplete" />
@@ -7718,39 +7718,39 @@
     <member name="M:Nemerle.Compiler.Typedtree.Parm.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="M:Nemerle.Compiler.Typedtree.Parm.#ctor(Nemerle.Compiler.Typedtree.ParmKind,Nemerle.Compiler.Typedtree.TExpr,System.String,Nemerle.Compiler.TypeVar)" />
     <member name="T:Nemerle.Compiler.Typer" />
-    <member name="M:Nemerle.Compiler.Typer._N_le_118026``1(Nemerle.Compiler.Typer._N_closureOf_MinimalTypesWithImplicit_118018{``0},Nemerle.Compiler.TypeVar,Nemerle.Compiler.TypeVar)" />
-    <member name="M:Nemerle.Compiler.Typer._N_makeArgsTypes_117688(Nemerle.Compiler.Typer._N_closureOf_IsBetterOverload_117633,Nemerle.Compiler.OverloadPossibility)" />
-    <member name="M:Nemerle.Compiler.Typer._N_getBetterList_117511(Nemerle.Compiler.Typer._N_closureOf_IsBetterOverload_117482,Nemerle.Compiler.TypeVar[],Nemerle.Compiler.TypeVar[])" />
-    <member name="M:Nemerle.Compiler.Typer._N_real_check_117346(Nemerle.Compiler.Typer._N_closureOf_IsBetterType_117338,Nemerle.Compiler.TypeVar,Nemerle.Compiler.TypeVar)" />
-    <member name="M:Nemerle.Compiler.Typer._N_print_error_message_116924(Nemerle.Compiler.Typer._N_closureOf_ResolveOverload_116888,Nemerle.Compiler.OverloadPossibility)" />
-    <member name="M:Nemerle.Compiler.Typer._N_transform_parms_116665(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Compiler.Typer._N_checkMatch_116301(Nemerle.Compiler.Typer._N_closureOf_TypeMatch_116254)" />
-    <member name="M:Nemerle.Compiler.Typer._N_decode_assigns_116109(Nemerle.Compiler.Typer._N_closureOf_TypePatterns_116092,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Compiler.Typer._N_decode_when_116099(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr}})" />
-    <member name="M:Nemerle.Compiler.Typer._N_is_void_115936(Nemerle.Compiler.FixedType)" />
-    <member name="M:Nemerle.Compiler.Typer._N_is_enum_115926(Nemerle.Compiler.FixedType)" />
-    <member name="M:Nemerle.Compiler.Typer._N_is_strange_type_115916(Nemerle.Compiler.FixedType)" />
-    <member name="M:Nemerle.Compiler.Typer._N_get_convertion_operators_115890(Nemerle.Compiler.FixedType)" />
-    <member name="M:Nemerle.Compiler.Typer._N_refout_115622(Nemerle.Compiler.Typer._N_closureOf_TypeCall_115614,System.String,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.Compiler.Typer._N_tryInterpretAsEnumField_115230(Nemerle.Compiler.Typer._N_closureOf_TypeNameFull_115126,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.Compiler.Typer._N_lookup_114765(Nemerle.Compiler.Typer._N_closureOf_TypeMember_114730,Nemerle.Compiler.FixedType)" />
-    <member name="M:Nemerle.Compiler.Typer._N_single_114516(Nemerle.Compiler.Typer._N_closureOf_InterpretGlobal_114504,Nemerle.Compiler.IMember)" />
-    <member name="M:Nemerle.Compiler.Typer._N_make_overload_114471(Nemerle.Compiler.Typer._N_closureOf_ConstructMethodOverload_114445)" />
-    <member name="M:Nemerle.Compiler.Typer._N_loop_114249(Nemerle.Compiler.TypeInfo,Nemerle.Compiler.TypeInfo)" />
-    <member name="M:Nemerle.Compiler.Typer._N_flatten_113825(Nemerle.Compiler.Typer._N_closureOf_TypeArray_113780,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{System.Int32})" />
-    <member name="M:Nemerle.Compiler.Typer._N_dimensions_113809(Nemerle.Compiler.Typer._N_closureOf_TypeArray_113780,Nemerle.Compiler.Parsetree.PExpr,System.Int32)" />
-    <member name="M:Nemerle.Compiler.Typer._N_expr_list_flatten_and_count_113790(Nemerle.Compiler.Typer._N_closureOf_TypeArray_113780,Nemerle.Compiler.Parsetree.PExpr,System.Int32)" />
-    <member name="M:Nemerle.Compiler.Typer._N_warn_113520(Nemerle.Compiler.Typer._N_closureOf_TypeLocalDefinition_113507,System.String,System.String)" />
-    <member name="M:Nemerle.Compiler.Typer._N_truncate_113425(Nemerle.Compiler.Typer._N_closureOf_truncateLoc_113403,Nemerle.Compiler.Typer._N_closureOf_GetDebugLocation_113340,System.Int32,System.Int32,System.Boolean)" />
-    <member name="M:Nemerle.Compiler.Typer._N_skip_113347(Nemerle.Compiler.Location,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Location,Nemerle.Compiler.Parsetree.PExpr}})" />
-    <member name="M:Nemerle.Compiler.Typer._N_list_of_zeros_113176(Nemerle.Compiler.Typer._N_closureOf_DoType_112567,System.UInt64)" />
-    <member name="M:Nemerle.Compiler.Typer._N_list_of_zeros_113166(Nemerle.Compiler.Typer._N_closureOf_DoType_112567,System.Int32)" />
-    <member name="M:Nemerle.Compiler.Typer._N_has_constraint_113102(Nemerle.Compiler.StaticTypeVar)" />
-    <member name="M:Nemerle.Compiler.Typer._N_do_type_conversion_113093(Nemerle.Compiler.Typer._N_closureOf_DoType_112567)" />
-    <member name="M:Nemerle.Compiler.Typer._N_loop_112753(Nemerle.Compiler.Typer._N_closureOf_DoType_112567,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Compiler.Typer._N_resolve_112010(Nemerle.Compiler.Typer._N_closureOf_TryResolveNestedDelayedTyping_111997,System.Collections.Generic.IEnumerable{Nemerle.Compiler.Typer.DelayedTyping},System.Int32,System.Boolean)" />
-    <member name="M:Nemerle.Compiler.Typer._N_addDelegateCtor_111803(Nemerle.Compiler.Typer._N_closureOf_NonLiteralCast_111744,Nemerle.Compiler.Typedtree.TExpr)" />
-    <member name="M:Nemerle.Compiler.Typer._N_fresh_type_111512(Nemerle.Compiler.IMethod)" />
+    <member name="M:Nemerle.Compiler.Typer._N_le_117984``1(Nemerle.Compiler.Typer._N_closureOf_MinimalTypesWithImplicit_117976{``0},Nemerle.Compiler.TypeVar,Nemerle.Compiler.TypeVar)" />
+    <member name="M:Nemerle.Compiler.Typer._N_makeArgsTypes_117646(Nemerle.Compiler.Typer._N_closureOf_IsBetterOverload_117591,Nemerle.Compiler.OverloadPossibility)" />
+    <member name="M:Nemerle.Compiler.Typer._N_getBetterList_117469(Nemerle.Compiler.Typer._N_closureOf_IsBetterOverload_117440,Nemerle.Compiler.TypeVar[],Nemerle.Compiler.TypeVar[])" />
+    <member name="M:Nemerle.Compiler.Typer._N_real_check_117304(Nemerle.Compiler.Typer._N_closureOf_IsBetterType_117296,Nemerle.Compiler.TypeVar,Nemerle.Compiler.TypeVar)" />
+    <member name="M:Nemerle.Compiler.Typer._N_print_error_message_116882(Nemerle.Compiler.Typer._N_closureOf_ResolveOverload_116846,Nemerle.Compiler.OverloadPossibility)" />
+    <member name="M:Nemerle.Compiler.Typer._N_transform_parms_116623(Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Compiler.Typer._N_checkMatch_116259(Nemerle.Compiler.Typer._N_closureOf_TypeMatch_116212)" />
+    <member name="M:Nemerle.Compiler.Typer._N_decode_assigns_116067(Nemerle.Compiler.Typer._N_closureOf_TypePatterns_116050,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Compiler.Typer._N_decode_when_116057(Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Compiler.Parsetree.PExpr}})" />
+    <member name="M:Nemerle.Compiler.Typer._N_is_void_115894(Nemerle.Compiler.FixedType)" />
+    <member name="M:Nemerle.Compiler.Typer._N_is_enum_115884(Nemerle.Compiler.FixedType)" />
+    <member name="M:Nemerle.Compiler.Typer._N_is_strange_type_115874(Nemerle.Compiler.FixedType)" />
+    <member name="M:Nemerle.Compiler.Typer._N_get_convertion_operators_115848(Nemerle.Compiler.FixedType)" />
+    <member name="M:Nemerle.Compiler.Typer._N_refout_115580(Nemerle.Compiler.Typer._N_closureOf_TypeCall_115572,System.String,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Compiler.Typer._N_tryInterpretAsEnumField_115188(Nemerle.Compiler.Typer._N_closureOf_TypeNameFull_115084,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Compiler.Typer._N_lookup_114723(Nemerle.Compiler.Typer._N_closureOf_TypeMember_114688,Nemerle.Compiler.FixedType)" />
+    <member name="M:Nemerle.Compiler.Typer._N_single_114474(Nemerle.Compiler.Typer._N_closureOf_InterpretGlobal_114462,Nemerle.Compiler.IMember)" />
+    <member name="M:Nemerle.Compiler.Typer._N_make_overload_114429(Nemerle.Compiler.Typer._N_closureOf_ConstructMethodOverload_114403)" />
+    <member name="M:Nemerle.Compiler.Typer._N_loop_114207(Nemerle.Compiler.TypeInfo,Nemerle.Compiler.TypeInfo)" />
+    <member name="M:Nemerle.Compiler.Typer._N_flatten_113783(Nemerle.Compiler.Typer._N_closureOf_TypeArray_113738,Nemerle.Compiler.Parsetree.PExpr,Nemerle.Core.list{System.Int32})" />
+    <member name="M:Nemerle.Compiler.Typer._N_dimensions_113767(Nemerle.Compiler.Typer._N_closureOf_TypeArray_113738,Nemerle.Compiler.Parsetree.PExpr,System.Int32)" />
+    <member name="M:Nemerle.Compiler.Typer._N_expr_list_flatten_and_count_113748(Nemerle.Compiler.Typer._N_closureOf_TypeArray_113738,Nemerle.Compiler.Parsetree.PExpr,System.Int32)" />
+    <member name="M:Nemerle.Compiler.Typer._N_warn_113478(Nemerle.Compiler.Typer._N_closureOf_TypeLocalDefinition_113465,System.String,System.String)" />
+    <member name="M:Nemerle.Compiler.Typer._N_truncate_113383(Nemerle.Compiler.Typer._N_closureOf_truncateLoc_113361,Nemerle.Compiler.Typer._N_closureOf_GetDebugLocation_113298,System.Int32,System.Int32,System.Boolean)" />
+    <member name="M:Nemerle.Compiler.Typer._N_skip_113305(Nemerle.Compiler.Location,Nemerle.Core.list{Nemerle.Builtins.Tuple{Nemerle.Compiler.Location,Nemerle.Compiler.Parsetree.PExpr}})" />
+    <member name="M:Nemerle.Compiler.Typer._N_list_of_zeros_113134(Nemerle.Compiler.Typer._N_closureOf_DoType_112525,System.UInt64)" />
+    <member name="M:Nemerle.Compiler.Typer._N_list_of_zeros_113124(Nemerle.Compiler.Typer._N_closureOf_DoType_112525,System.Int32)" />
+    <member name="M:Nemerle.Compiler.Typer._N_has_constraint_113060(Nemerle.Compiler.StaticTypeVar)" />
+    <member name="M:Nemerle.Compiler.Typer._N_do_type_conversion_113051(Nemerle.Compiler.Typer._N_closureOf_DoType_112525)" />
+    <member name="M:Nemerle.Compiler.Typer._N_loop_112711(Nemerle.Compiler.Typer._N_closureOf_DoType_112525,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Compiler.Typer._N_resolve_111968(Nemerle.Compiler.Typer._N_closureOf_TryResolveNestedDelayedTyping_111955,System.Collections.Generic.IEnumerable{Nemerle.Compiler.Typer.DelayedTyping},System.Int32,System.Boolean)" />
+    <member name="M:Nemerle.Compiler.Typer._N_addDelegateCtor_111761(Nemerle.Compiler.Typer._N_closureOf_NonLiteralCast_111702,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.Typer._N_fresh_type_111470(Nemerle.Compiler.IMethod)" />
     <member name="F:Nemerle.Compiler.Typer.is_instance_ctor" />
     <member name="F:Nemerle.Compiler.Typer.field_inits_typed" />
     <member name="F:Nemerle.Compiler.Typer.is_method" />
@@ -8096,14 +8096,14 @@
     <member name="T:Nemerle.Compiler.Typer.IllegalYieldReturnType" />
     <member name="T:Nemerle.Compiler.Typer.DelayedMacro" />
     <member name="T:Nemerle.Compiler.ExtensionPattern" />
-    <member name="M:Nemerle.Compiler.ExtensionPattern._N_handle_pats_121182(Nemerle.Compiler.ExtensionPattern._N_closureOf_Transform_121102,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Compiler.ExtensionPattern._N_handle_assigns_121142(Nemerle.Compiler.ExtensionPattern._N_closureOf_Transform_121102,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
-    <member name="M:Nemerle.Compiler.ExtensionPattern._N_add_wildcards_121126(Nemerle.Core.list{System.String},Nemerle.Collections.Map{System.String,Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Compiler.ExtensionPattern._N_handle_pats_121140(Nemerle.Compiler.ExtensionPattern._N_closureOf_Transform_121060,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Compiler.ExtensionPattern._N_handle_assigns_121100(Nemerle.Compiler.ExtensionPattern._N_closureOf_Transform_121060,Nemerle.Core.list{Nemerle.Compiler.Parsetree.PExpr})" />
+    <member name="M:Nemerle.Compiler.ExtensionPattern._N_add_wildcards_121084(Nemerle.Core.list{System.String},Nemerle.Collections.Map{System.String,Nemerle.Compiler.Parsetree.PExpr})" />
     <member name="F:Nemerle.Compiler.ExtensionPattern.parent" />
     <member name="F:Nemerle.Compiler.ExtensionPattern.name" />
     <member name="F:Nemerle.Compiler.ExtensionPattern.identifiers" />
     <member name="F:Nemerle.Compiler.ExtensionPattern.pattern" />
-    <member name="F:Nemerle.Compiler.ExtensionPattern._N_Temporary_18035">
+    <member name="F:Nemerle.Compiler.ExtensionPattern._N_Temporary_18037">
       <summary>
         <para>Must be removed before build type tree.
 
@@ -8143,23 +8143,23 @@
     <member name="T:Nemerle.Compiler.Elem.Overload" />
     <member name="T:Nemerle.Compiler.Elem.Member" />
     <member name="T:Nemerle.Compiler.CompletionResult" />
-    <member name="F:Nemerle.Compiler.CompletionResult._N_Elems_18153" />
+    <member name="F:Nemerle.Compiler.CompletionResult._N_Elems_18155" />
     <member name="M:Nemerle.Compiler.CompletionResult.get_Elems" />
     <member name="P:Nemerle.Compiler.CompletionResult.Elems" />
-    <member name="F:Nemerle.Compiler.CompletionResult._N_NamePrefix_18158" />
+    <member name="F:Nemerle.Compiler.CompletionResult._N_NamePrefix_18160" />
     <member name="M:Nemerle.Compiler.CompletionResult.get_NamePrefix" />
     <member name="P:Nemerle.Compiler.CompletionResult.NamePrefix" />
-    <member name="F:Nemerle.Compiler.CompletionResult._N_Location_18163" />
+    <member name="F:Nemerle.Compiler.CompletionResult._N_Location_18165" />
     <member name="M:Nemerle.Compiler.CompletionResult.get_Location" />
     <member name="P:Nemerle.Compiler.CompletionResult.Location" />
-    <member name="F:Nemerle.Compiler.CompletionResult._N_IsMemeberComplation_18168" />
+    <member name="F:Nemerle.Compiler.CompletionResult._N_IsMemeberComplation_18170" />
     <member name="M:Nemerle.Compiler.CompletionResult.get_IsMemeberComplation" />
     <member name="P:Nemerle.Compiler.CompletionResult.IsMemeberComplation" />
-    <member name="F:Nemerle.Compiler.CompletionResult._N_ObjectType_18173" />
+    <member name="F:Nemerle.Compiler.CompletionResult._N_ObjectType_18175" />
     <member name="M:Nemerle.Compiler.CompletionResult.get_ObjectType" />
     <member name="M:Nemerle.Compiler.CompletionResult.set_ObjectType(Nemerle.Compiler.FixedType)" />
     <member name="P:Nemerle.Compiler.CompletionResult.ObjectType" />
-    <member name="F:Nemerle.Compiler.CompletionResult._N_Env_18180" />
+    <member name="F:Nemerle.Compiler.CompletionResult._N_Env_18182" />
     <member name="M:Nemerle.Compiler.CompletionResult.get_Env" />
     <member name="M:Nemerle.Compiler.CompletionResult.set_Env(Nemerle.Compiler.GlobalEnv)" />
     <member name="P:Nemerle.Compiler.CompletionResult.Env" />
@@ -8182,10 +8182,10 @@
     <member name="M:Nemerle.Compiler.TyperBase.__fake" />
     <member name="M:Nemerle.Compiler.TyperBase.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.Typer2" />
-    <member name="M:Nemerle.Compiler.Typer2._N_warnDangerousOperator_124801(Nemerle.Compiler.Typer2._N_closureOf_TransformNullableOperators_124788,System.String)" />
-    <member name="M:Nemerle.Compiler.Typer2._N_register_case_124398(Nemerle.Compiler.Typedtree.Try_case)" />
-    <member name="M:Nemerle.Compiler.Typer2._N_PlainRef_124372(Nemerle.Compiler.LocalValue)" />
-    <member name="M:Nemerle.Compiler.Typer2._N_get_default_value_124204(Nemerle.Compiler.Typer2._N_closureOf_DoWalk_123998,Nemerle.Compiler.Typedtree.TExpr)" />
+    <member name="M:Nemerle.Compiler.Typer2._N_warnDangerousOperator_124759(Nemerle.Compiler.Typer2._N_closureOf_TransformNullableOperators_124746,System.String)" />
+    <member name="M:Nemerle.Compiler.Typer2._N_register_case_124356(Nemerle.Compiler.Typedtree.Try_case)" />
+    <member name="M:Nemerle.Compiler.Typer2._N_PlainRef_124330(Nemerle.Compiler.LocalValue)" />
+    <member name="M:Nemerle.Compiler.Typer2._N_get_default_value_124162(Nemerle.Compiler.Typer2._N_closureOf_DoWalk_123956,Nemerle.Compiler.Typedtree.TExpr)" />
     <member name="F:Nemerle.Compiler.Typer2.top_level_fun" />
     <member name="F:Nemerle.Compiler.Typer2.this_ptr_decl" />
     <member name="F:Nemerle.Compiler.Typer2.typer" />
@@ -8240,7 +8240,7 @@
     <member name="M:Nemerle.Compiler.Typer2.RelocateImplInternal(Nemerle.Compiler.RelocationInfo)" />
     <member name="T:Nemerle.Compiler.Typer2.Context" />
     <member name="T:Nemerle.Compiler.TypeVar" />
-    <member name="M:Nemerle.Compiler.TypeVar._N_error_100471(Nemerle.Compiler.TypeVar._N_closureOf_AddRelation_100421,System.Int32,Nemerle.Compiler.FixedType)" />
+    <member name="M:Nemerle.Compiler.TypeVar._N_error_100426(Nemerle.Compiler.TypeVar._N_closureOf_AddRelation_100376,System.Int32,Nemerle.Compiler.FixedType)" />
     <member name="M:Nemerle.Compiler.TypeVar.#cctor" />
     <member name="M:Nemerle.Compiler.TypeVar.Require(Nemerle.Compiler.TypeVar)">
       <summary>
@@ -8420,7 +8420,7 @@
     <member name="F:Nemerle.Compiler.TypeVar.lower_tyvars" />
     <member name="F:Nemerle.Compiler.TypeVar.upper_tyvars" />
     <member name="F:Nemerle.Compiler.TypeVar.flags" />
-    <member name="F:Nemerle.Compiler.TypeVar._N_ImplicitCastHint_15456" />
+    <member name="F:Nemerle.Compiler.TypeVar._N_ImplicitCastHint_15458" />
     <member name="M:Nemerle.Compiler.TypeVar.get_ImplicitCastHint" />
     <member name="M:Nemerle.Compiler.TypeVar.set_ImplicitCastHint(Nemerle.Compiler.TypeVar)" />
     <member name="P:Nemerle.Compiler.TypeVar.ImplicitCastHint" />
@@ -8473,10 +8473,10 @@
     <member name="T:Nemerle.Compiler.TypeVar.Flags" />
     <member name="T:Nemerle.Compiler.TyVarEnv" />
     <member name="T:Nemerle.Compiler.TypeVarEnv" />
-    <member name="M:Nemerle.Compiler.TypeVarEnv._N_scan_125977(Nemerle.Compiler.TypeVarEnv._N_closureOf_tryFindCyclicConstraint_125967,Nemerle.Compiler.TypeVarEnv._N_closureOf_tryDetectCyclicConstraints_125945,Nemerle.Compiler.TypeVarEnv._N_closureOf_AddTyparms_125861,Nemerle.Compiler.StaticTypeVar,Nemerle.Core.Nil[T]{System.String})" />
-    <member name="M:Nemerle.Compiler.TypeVarEnv._N_tryFindCyclicConstraint_125960(Nemerle.Compiler.TypeVarEnv._N_closureOf_tryDetectCyclicConstraints_125945,Nemerle.Compiler.TypeVarEnv._N_closureOf_AddTyparms_125861,Nemerle.Compiler.StaticTypeVar)" />
-    <member name="M:Nemerle.Compiler.TypeVarEnv._N_type_class_125589(Nemerle.Compiler.TypeVarEnv._N_closureOf_Bind_125555,Nemerle.Compiler.Parsetree.PExpr)" />
-    <member name="M:Nemerle.Compiler.TypeVarEnv._N_f2_125583(Nemerle.Compiler.TypeVarEnv._N_closureOf_Bind_125555,Nemerle.Compiler.Parsetree.PExpr,System.Boolean)" />
+    <member name="M:Nemerle.Compiler.TypeVarEnv._N_scan_125935(Nemerle.Compiler.TypeVarEnv._N_closureOf_tryFindCyclicConstraint_125925,Nemerle.Compiler.TypeVarEnv._N_closureOf_tryDetectCyclicConstraints_125903,Nemerle.Compiler.TypeVarEnv._N_closureOf_AddTyparms_125819,Nemerle.Compiler.StaticTypeVar,Nemerle.Core.Nil[T]{System.String})" />
+    <member name="M:Nemerle.Compiler.TypeVarEnv._N_tryFindCyclicConstraint_125918(Nemerle.Compiler.TypeVarEnv._N_closureOf_tryDetectCyclicConstraints_125903,Nemerle.Compiler.TypeVarEnv._N_closureOf_AddTyparms_125819,Nemerle.Compiler.StaticTypeVar)" />
+    <member name="M:Nemerle.Compiler.TypeVarEnv._N_type_class_125547(Nemerle.Compiler.TypeVarEnv._N_closureOf_Bind_125513,Nemerle.Compiler.Parsetree.PExpr)" />
+    <member name="M:Nemerle.Compiler.TypeVarEnv._N_f2_125541(Nemerle.Compiler.TypeVarEnv._N_closureOf_Bind_125513,Nemerle.Compiler.Parsetree.PExpr,System.Boolean)" />
     <member name="F:Nemerle.Compiler.TypeVarEnv.tyvars" />
     <member name="F:Nemerle.Compiler.TypeVarEnv.triggerObsolete" />
     <member name="M:Nemerle.Compiler.TypeVarEnv.#ctor(Nemerle.Compiler.ManagerClass,Nemerle.Collections.Map{Nemerle.Compiler.Parsetree.Name,Nemerle.Compiler.StaticTypeVar})" />
