@@ -92,7 +92,7 @@ namespace NemerleWeb
               class ServerProxy
               {}
           ]>);
-          tb.Define(<[ decl: server : ServerProxy { get { ServerProxy() } } ]>);
+          tb.Define(<[ decl: new server : ServerProxy { get { ServerProxy() } } ]>);
           
           foreach(method is IMethod
             when !method.IsConstructor && method.DeclaringType.FullName == serverClass.FullName
@@ -109,7 +109,7 @@ namespace NemerleWeb
               
             _ = ctb.DefineWithSource(<[ decl: 
               [System.Web.Mvc.HttpPost, System.Web.Mvc.ValidateInput(false)]
-              public $(methodName : name) (model : string) : System.Web.Mvc.ActionResult
+              public new $(methodName : name) (model : string) : System.Web.Mvc.ActionResult
               {
                 def parsedModel = Newtonsoft.Json.Linq.JObject.Parse(model);
                 
@@ -134,12 +134,12 @@ namespace NemerleWeb
             def allParms = fparms.Append([<[ parameter: _callback : Action[$(method.ReturnType : typed)] ]>]);
                   
             ptb.Define(<[ decl:                   
-              public $(methodName : name) (..$(allParms)) : void
+              public new $(methodName : name) (..$(allParms)) : void
               {}
             ]>);
           }
           ctb.Define(<[ decl:
-              public __SetSignalRConnectionId(id : string) : System.Web.Mvc.ActionResult
+              public new __SetSignalRConnectionId(id : string) : System.Web.Mvc.ActionResult
               {                
                 HttpContext.Current.Session["SignalRConnectionId"] = id;
                 Content("");
@@ -353,15 +353,15 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
           def tparms = tparms.tyvars.Map(t => <[ $(tb.ParsedName.NewName(t.ToString()) : name) ]>);
           <[ $(tb.ParsedName : name).[..$tparms] ]>;
         }
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : Func[$(T), TM]) : string { "" }]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : $(T) -> TM, _view : string) : string { "" } ]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : $(T) -> TM, _view : TM -> void -> string) : string { "" } ]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : $(T) -> TM, _view : TM -> string) : string { "" } ]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM) : string { "" } ]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM, _view : string) : string { "" } ]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM, _view : TM -> string) : string { "" } ]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM, _view : TM -> void -> string) : string { "" }]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public GetTemplateName([NotNull] _modelName : string, [NotNull] _viewName : string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](_model : Func[$(T), TM]) : string { "" }]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](_model : $(T) -> TM, _view : string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](_model : $(T) -> TM, _view : TM -> void -> string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](_model : $(T) -> TM, _view : TM -> string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](_model : TM) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](_model : TM, _view : string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](_model : TM, _view : TM -> string) : string { "" } ]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](_model : TM, _view : TM -> void -> string) : string { "" }]>);
+      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public new GetTemplateName([NotNull] _modelName : string, [NotNull] _viewName : string) : string { "" } ]>);
     }
   }
 }
