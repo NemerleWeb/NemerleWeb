@@ -74,11 +74,6 @@
       <HintPath>$(Nemerle)\Nemerle.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Nemerle.Compiler">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(Nemerle)\Nemerle.Compiler.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Nemerle.Macros">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(Nemerle)\Nemerle.Macros.dll</HintPath>
@@ -107,7 +102,7 @@
       <AssemblyName>Owin.dll</AssemblyName>
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
-	<Reference Include="mscorlib" />
+    <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
