@@ -54,15 +54,13 @@ namespace NemerleWeb.Rsdn
     public View() : string
     {
       <#
-        <div $foreach(c in Children)>   
-          <div style-margin-left="$(c.Depth * 10)">
-            <a click="$(c.CaptionClick())" css-with-children="$(c.HasChildren)" class="node">
-              <img attr-src="$(c.IconUrl)" />
-              <span>$(c.Caption)</span>
-            </a>            
-            <div $when(c.IsOpened && Children != null)>
-              <div template="$(template(c))" />
-            </div>
+        <div $foreach(c in Children) style-margin-left="$(c.Depth * 10)" class="node">   
+          <a click="$(c.CaptionClick())" css-with-children="$(c.HasChildren)">
+            <img class="node-icon" attr-src="$(c.IconUrl)" />
+            <span class="node-caption">$(c.Caption)</span>
+          </a>            
+          <div $when(c.IsOpened && Children != null)>
+            <div template="$(template(c))" />
           </div>
         </div>
       #>
