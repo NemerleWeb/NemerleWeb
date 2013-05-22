@@ -71,7 +71,7 @@ namespace NemerleWeb
     
     tsParser = TSDeclarationParser();
     
-    DefaultImplementation : PExpr = <[ { throw ClientCodeCalledInServerException(); } ]>;
+    DefaultImplementation : PExpr = <[ { IgnoreParams(); throw ClientCodeCalledInServerException(); } ]>;
     
     public Impl(typer : Typer, options : list[PExpr]) : void
     {
@@ -432,7 +432,7 @@ namespace NemerleWeb
       def typePrefix = $"$(var.Name)_Variable";
       def varType = ConvertType(typePrefix, var.Type, typesScope);
       
-      _ = othersScope.Define(<[ decl: public mutable $(var.Name : usesite) : $varType; ]>);
+      _ = othersScope.Define(<[ decl: public mutable $(var.Name : usesite) : $varType = default($varType); ]>);
     }
   
     /// <summary>
@@ -583,10 +583,10 @@ namespace NemerleWeb
           
           if(isStatic is Some(true))
             _ = classType.DefineWithSource(
-              <[ decl: public static mutable $(name : usesite) : $variableType; ]>);
+              <[ decl: public static mutable $(name : usesite) : $variableType = default($variableType); ]>);
           else
             _ = classType.DefineWithSource(
-              <[ decl: public mutable $(name : usesite) : $variableType; ]>);
+              <[ decl: public mutable $(name : usesite) : $variableType = default($variableType); ]>);
           
         | Method(name, _optional, parms, returnType) =>
           // Don't pay attention to optional, always generate property
@@ -774,7 +774,7 @@ namespace NemerleWeb
         def typePrefix = $"$(fullPrefix)_Property";
         def propertyType = ConvertType(typePrefix, type, typesScope);
         
-        _ = anonClass.DefineWithSource(<[ decl: public mutable $(name : usesite) : $propertyType; ]>);
+        _ = anonClass.DefineWithSource(<[ decl: public $(name : usesite) : $propertyType { get; set; } ]>);
       
       | Function(name, _optional, parms, returnType) =>
         // Don't pay attention to optional, always generate property
