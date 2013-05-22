@@ -46,6 +46,11 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Web "/>
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <Name>System.Web.Mvc</Name>
+      <AssemblyName>System.Web.Mvc.dll</AssemblyName>
+    </Reference>
     <Reference Include="Nemerle">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(Nemerle)\Nemerle.dll</HintPath>
