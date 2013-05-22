@@ -8,6 +8,7 @@ body {
 
 .node {
     font-size: 12px;
+    position: relative;
     clear: both;
 }
 
@@ -18,6 +19,10 @@ body {
 
 .node a:hover {
     color: #176bbb;
+}
+
+.node a:hover .node-pin {
+    visibility: visible;
 }
 
 .node.with-children a{
@@ -33,6 +38,47 @@ body {
 .node .node-caption {
     display: block;
     margin-left: 35px;
+    margin-right: 26px;
+}
+
+.node .node-pin {
+    position: absolute;
+    right: 5px;
+    top: 0;
+    background-image: url('/content/images/pin.png');
+    width: 16px;
+    height: 16px;
+    visibility: hidden;
+}
+
+.node .node-pin:hover {
+    transition: -webkit-transform 0.5s;
+    transition: transform 0.5s;
+    transition: -ms-transform 0.5s;
+    
+    transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg); /* IE 9 */
+    -webkit-transform: rotate(-45deg); /* Safari and Chrome */
+}
+
+.node .node-pin.pinned {
+    transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg); /* IE 9 */
+    -webkit-transform: rotate(-45deg); /* Safari and Chrome */
+}
+
+.node .node-pin.pinned:hover {
+    transition: -webkit-transform 0.5s;
+    transition: transform 0.5s;
+    transition: -ms-transform 0.5s;
+    
+    transform: rotate(15deg);
+    -ms-transform: rotate(15deg); /* IE 9 */
+    -webkit-transform: rotate(15deg); /* Safari and Chrome */
+}
+
+.pinned-nodes {
+    margin-bottom: 10px;
 }
 
 .selected-search-result {
