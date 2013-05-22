@@ -1,0 +1,17 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.TypedJS
+{
+  public module JSStringExtensions
+  {
+    public Replace(this str : string, reg : RegExp, replacement : string) : string
+    { throw ClientCodeCalledInServerException() }
+  }
+}

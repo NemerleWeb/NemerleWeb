@@ -66,6 +66,9 @@
     <Compile Include="Globals.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JSStringExtensions.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="markdown.n">
       <SubType>Code</SubType>
     </Compile>
@@ -98,6 +101,7 @@
     <Folder Include="Scripts\typings\handlebars\" />
     <Folder Include="Scripts\typings\highcharts\" />
     <Folder Include="Scripts\typings\history\" />
+    <Folder Include="Scripts\typings\jquery.cookie\" />
     <Folder Include="Scripts\typings\jquery.scrollTo\" />
     <Folder Include="Scripts\typings\jquery.timepicker\" />
     <Folder Include="Scripts\typings\jquery.validation\" />
@@ -191,6 +195,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\history\history.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.cookie\jquery.cookie.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.scrollTo\jquery.scrollTo.d.ts">
