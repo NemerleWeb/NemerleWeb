@@ -18,7 +18,7 @@ namespace NemerleWeb.Rsdn
     SearchResults : TreeNode;
     
     mutable _selectedSearchResultIndex : int;    
-    SelectedSearchResultIndex : int { 
+    public SelectedSearchResultIndex : int { 
       get { _selectedSearchResultIndex }
       set {
         when(_selectedSearchResultIndex != value) {

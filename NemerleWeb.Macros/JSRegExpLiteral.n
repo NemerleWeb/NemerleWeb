@@ -1,0 +1,20 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
+using Nemerle.Compiler.Typedtree;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  macro JSRegExpLiteral(str : PExpr, modifier : PExpr = null)
+  syntax ("re", str, modifier)
+  {
+    <[ NemerleWeb.TypedJS.RegExp.$(JSApiSpecial.Call : usesite)($str, $modifier) ]>
+  }  
+}
