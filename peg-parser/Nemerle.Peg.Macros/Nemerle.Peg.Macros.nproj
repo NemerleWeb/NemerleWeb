@@ -5,6 +5,7 @@
 	<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <NemerleBinPathRoot Condition=" '$(NemerleBinPathRoot)' == '' ">$(ProgramFiles)\Nemerle</NemerleBinPathRoot>
     <Nemerle Condition=" '$(Nemerle)' == '' ">$(NemerleBinPathRoot)\$(NemerleVersion)</Nemerle>
+    <NoStdLib>true</NoStdLib>
     <Name>Nemerle.Peg.Macros</Name>
   </PropertyGroup>
   <PropertyGroup>

@@ -4,6 +4,7 @@
     <NemerleVersion>Net-4.0</NemerleVersion>
     <NemerleBinPathRoot Condition=" '$(NemerleBinPathRoot)' == '' ">$(ProgramFiles)\Nemerle</NemerleBinPathRoot>
     <Nemerle Condition=" '$(Nemerle)' == '' ">$(NemerleBinPathRoot)\$(NemerleVersion)</Nemerle>
+    <NoStdLib>true</NoStdLib>
     <Name>Nemerle.Peg</Name>
     <SourceAnalysisOverrideSettingsFile>C:\Documents and Settings\smatveev\Application Data\ICSharpCode/SharpDevelop3.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
     <NoStdMacros>False</NoStdMacros>
