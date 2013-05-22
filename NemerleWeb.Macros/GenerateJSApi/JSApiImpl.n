@@ -32,13 +32,11 @@ namespace NemerleWeb
       foreach(ast is TopDeclaration.Class in typeBuilder.AstParts)
         foreach(function is ClassMember.Function in ast.decls)
            when(function.Body is <[]> || function.Body is <[ () ]>)
-            function.Body = <[ throw NemerleWeb.ClientCodeCalledInServerException(); ]>;
+            function.Body = <[ { IgnoreParams(); throw NemerleWeb.ClientCodeCalledInServerException(); } ]>;
       
       // Add JSApi attribute if it hasn't been added
       when(!typeBuilder.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
         typeBuilder.Ast.AddCustomAttribute(<[ NemerleWeb.JSApiAttribute ]>);
-       
-      // Add empty protected constructor if doesn't exist
     }
   }
 }
