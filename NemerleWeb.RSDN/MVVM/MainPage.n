@@ -16,15 +16,22 @@ namespace NemerleWeb.Rsdn
   public class MainPage
   {    
     public mutable static SelectedUrl : string;
-    
-    Root : TreeNode { get; set; }
+    public mutable static Instance : MainPage;
+            
+    Root : TreeNode { get; set; }    
+    Pinned : TreeNode { get; set; }
     MenuHeight : float { get { window.innerHeight } }
     Search : Search { get; set; }
-    
+        
     public this() 
     {
+      MainPage.Instance = this;
+      
       LoadTopNodes();
+      Pinned = TreeNode();
       Search = Search();
+            
+      UpdatePinned();
       
       _ = jscall @$(window).resize(_ => {
         nweb.invalidate();
@@ -41,6 +48,42 @@ namespace NemerleWeb.Rsdn
       });
     }
     
+    UpdatePinned() : void
+    {
+      server.LoadByIds(GetPinned(), nodes => {
+        foreach(n in nodes)
+          n.IsPinned = true;
+          
+        Pinned.Children = nodes.ToList()
+      });
+    }
+    
+    public AddPinned(id : string) : void
+    {
+      def pinned = nweb.getCookie("pinned");
+      
+      if(pinned == null) nweb.setCookie("pinned", id, 360);
+      else nweb.setCookie("pinned", pinned + "," + id, 360);
+      
+      UpdatePinned();
+    }
+    
+    public RemovePinned(id : string) : void
+    {
+      def pinned = nweb.getCookie.[string]("pinned");
+      when(pinned != null) nweb.setCookie("pinned", pinned.Replace(re (",?" + id) "g", ""), 360);
+      
+      UpdatePinned();
+    }
+    
+    public static GetPinned() : IEnumerable[string]
+    {
+      match(nweb.getCookie.[string]("pinned")) {
+      | null => []
+      | str => str.Split(',')
+      }
+    }
+    
     public static SelectNode(node : TreeNode) : void
     {
       SelectedUrl = node.Href;
@@ -51,9 +94,12 @@ namespace NemerleWeb.Rsdn
     {
       <#
         <div class="page">
-          <div class="left" style-height="$MenuHeight">
+          <div class="left" style-height="$MenuHeight">          
             <div $when(Root != null) class="root">
               <div template="$(template(Search))" />
+              <div class="pinned-nodes">
+                <div template="$(template(Pinned))" />
+              </div>
               <div $when(string.IsNullOrEmpty(Search.SearchTerm))>
                 <div template="$(template(Root))" />
               </div>
@@ -71,6 +117,11 @@ namespace NemerleWeb.Rsdn
       public GetTopNodes() : List[TreeNode]
       {
         TreeLoader.GetTopNodes()
+      }
+      
+      public LoadByIds(ids : IEnumerable[string]) : IEnumerable[TreeNode]
+      {
+        TreeLoader.LoadByIds(ids)
       }
     }
   }

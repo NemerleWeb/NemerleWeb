@@ -97,6 +97,11 @@ namespace NemerleWeb.Rsdn
              .Select(n => CloneNoChildren(n, true))      
     }
     
+    public LoadByIds(ids : IEnumerable[string]) : IEnumerable[TreeNode]
+    {
+      _leaves.Where(n => ids.Any(i => i == n.Id)).Select(n => CloneNoChildren(n, true))
+    }
+    
     CloneNoChildren(node : TreeNode, resetDepth = false : bool) : TreeNode
     {
       TreeNode() <- (

@@ -11,7 +11,11 @@ namespace NemerleWeb.TypedJS
   public partial module nweb
   {
     public invalidate() : void;
-  
+    
+    public setCookie(name : string, value : object, days : int) : void;
+    public getCookie[T](name : string) : T;
+    public removeCookie(name : string) : void;
+    
     [JSApiImpl]
     public partial module utils
     {

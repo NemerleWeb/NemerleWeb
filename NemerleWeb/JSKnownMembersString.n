@@ -15,7 +15,8 @@ namespace NemerleWeb
   {
     public Register() : void
     {
-      JSKnownMembers.RegisterType(typeof(string), Handler);
+      JSKnownMembers.RegisterType(typeof(string), Handler);      
+      JSKnownMembers.RegisterType("NemerleWeb.TypedJS.JSStringExtensions", Handler)
     }
         
     private Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
@@ -76,8 +77,8 @@ namespace NemerleWeb
         | "Normalize"
         | "PadLeft"
         | "PadRight"
-        | "Remove"
-        | "Split"
+        | "Remove" => None()
+        | "Split" => Some(left.JSMethodCall("split", parms))
         | "StartsWith" => None()
         | "Substring" => Some(left.JSMethodCall("substr", parms))
         | "ToLower"
@@ -101,8 +102,8 @@ namespace NemerleWeb
         | "LastIndexOfAny"
         | "PadLeft"
         | "PadRight"
-        | "Remove"
-        | "Replace"
+        | "Remove" => None()
+        | "Replace" => Some(left.JSMethodCall("replace", parms))
         | "Split"
         | "StartsWith" => None()
         | "Substring" => Some(left.JSMethodCall("substr", parms))
@@ -154,7 +155,7 @@ namespace NemerleWeb
     
     EmptyString : JSAst.Literal = JSAst.Literal(JSLiteral.String(""));
     
-    private StaticHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
+    private StaticHandler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
       match (parms)
       {
@@ -206,6 +207,7 @@ namespace NemerleWeb
       | [arg1, arg2, arg3] =>
         match (member.Name)
         {
+        | "Replace" => Some(arg1.JSMethodCall("replace", [arg2, arg3]))
         | "Concat" => Some(JSAstHelper.JSToString(arg1).JSMethodCall("concat", [arg2, arg3]))
         | "Equals"
         | _ => None()

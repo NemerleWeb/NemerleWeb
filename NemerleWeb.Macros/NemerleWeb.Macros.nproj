@@ -120,6 +120,9 @@
     <Compile Include="JS.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JSRegExpLiteral.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="nweb.n">
       <SubType>Code</SubType>
     </Compile>
