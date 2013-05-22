@@ -7,13 +7,20 @@ body {
 }
 
 .node {
-    cursor: pointer;   
-    color: #1e90ff;
     font-size: 12px;
     clear: both;
 }
 
-.node.with-children {
+.node a {
+    color: #1e90ff;
+    text-decoration: none;
+}
+
+.node a:hover {
+    color: #176bbb;
+}
+
+.node.with-children a{
     color: #2f4f4f;
 }
 
@@ -26,14 +33,6 @@ body {
 .node .node-caption {
     display: block;
     margin-left: 35px;
-}
-
-.search-results span {
-    font-size: 12px;
-}
-
-.search-results img {
-    vertical-align: baseline;
 }
 
 .search-results > div {

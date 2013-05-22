@@ -130,7 +130,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
-	<Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>System.Web.Helpers</Name>
       <AssemblyName>System.Web.Helpers.dll</AssemblyName>
@@ -139,7 +139,7 @@
     </Reference>
     <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>System.Web.Mvc</Name>
-      <AssemblyName>System.Web.Mvc.dll</AssemblyName>      
+      <AssemblyName>System.Web.Mvc.dll</AssemblyName>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
@@ -187,6 +187,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MVVM\MainPage.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\Search.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MVVM\TreeNode.n">
