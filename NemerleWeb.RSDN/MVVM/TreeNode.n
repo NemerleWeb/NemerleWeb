@@ -22,6 +22,7 @@ namespace NemerleWeb.Rsdn
     public IsOpened : bool { get; set; }
     public Children : List[TreeNode] { get; set; }    
     public HasChildren : bool { get; set; }
+    public IsSelected : bool { get; set; }
     
     public IconUrl : string 
     {      
@@ -54,7 +55,7 @@ namespace NemerleWeb.Rsdn
     public View() : string
     {
       <#
-        <div $foreach(c in Children) style-margin-left="$(c.Depth * 10)" class="node">   
+        <div $foreach(c in Children) style-margin-left="$(c.Depth * 10)" class="node" css-selected-search-result="$(c.IsSelected)">
           <a click="$(c.CaptionClick())" attr-href="$(c.Href)" css-with-children="$(c.HasChildren)">
             <img class="node-icon" attr-src="$(c.IconUrl)" />
             <span class="node-caption">$(c.Caption)</span>

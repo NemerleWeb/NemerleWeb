@@ -15,8 +15,23 @@ namespace NemerleWeb.Rsdn
   [Unit]
   public class Search
   {       
-    SearchResults : List[(TreeNode * list[string])] { get; set; }    
-    SelectedSearchResultIndex : int { get; set; }
+    SearchResults : TreeNode;
+    
+    mutable _selectedSearchResultIndex : int;    
+    SelectedSearchResultIndex : int { 
+      get { _selectedSearchResultIndex }
+      set {
+        when(_selectedSearchResultIndex != value) {
+          when(_selectedSearchResultIndex < SearchResults.Children.Count && _selectedSearchResultIndex > -1)
+            SearchResults.Children[_selectedSearchResultIndex].IsSelected = false;
+            
+          when(value < SearchResults.Children.Count && value > -1)   
+            SearchResults.Children[value].IsSelected = true;
+            
+          _selectedSearchResultIndex = value;          
+        }
+      }
+    }
     
     mutable _searchTerm : string;
     public SearchTerm : string { 
@@ -33,18 +48,18 @@ namespace NemerleWeb.Rsdn
     private static DownArrow = 40;
     
     public this() {
-      SearchResults = List();
+      SearchResults = TreeNode() <- ( Children = List() );      
       
       _ = jscall @$("body").on("keydown", "", e => {
         def e = e :> KeyboardEvent;
-        if(e.altKey && SearchResults.Count > 0) {
-          when(e.keyCode == DownArrow && SelectedSearchResultIndex < SearchResults.Count - 2) {
+        if(e.altKey && SearchResults.Children.Count > 0) {
+          when(e.keyCode == DownArrow && SelectedSearchResultIndex < SearchResults.Children.Count - 2) {
               SelectedSearchResultIndex++;
-              SelectNode(SearchResults[SelectedSearchResultIndex][0]);
+              SelectNode(SearchResults.Children[SelectedSearchResultIndex]);
           }          
           when(e.keyCode == UpArrow && SelectedSearchResultIndex > 0) {
             SelectedSearchResultIndex--;
-            SelectNode(SearchResults[SelectedSearchResultIndex][0]);
+            SelectNode(SearchResults.Children[SelectedSearchResultIndex]);
           }
           
           window.console.log(e);
@@ -57,24 +72,17 @@ namespace NemerleWeb.Rsdn
     {
       if(!string.IsNullOrWhiteSpace(term)) {        
         server.Search(term, nodes => {
+          SearchResults.Children = nodes.ToList();
           SelectedSearchResultIndex = -1;
-          SearchResults = nodes.ToList();
         });
-      } else SearchResults.Clear();
-    }
-    
-    public IsSelectedResult(node : TreeNode) : bool
-    {
-      if(SelectedSearchResultIndex > -1 && SelectedSearchResultIndex < SearchResults.Count)
-        node.Id == SearchResults[SelectedSearchResultIndex][0].Id;
-      else false
+      } else SearchResults.Children.Clear();
     }
     
     public static SelectNode(node : TreeNode) : void
     {
       MainPage.SelectedUrl = node.Href;
     }
-    
+        
     [Html]
     public View() : string
     {
@@ -82,20 +90,15 @@ namespace NemerleWeb.Rsdn
         <div class="search-bar">
           <input id="search-input" value="$SearchTerm" />
         </div>
-        <div $when(!string.IsNullOrEmpty(SearchTerm)) class="search-results">
-          <div $foreach((node, path) in SearchResults) css-selected-search-result="$(IsSelectedResult(node))" class="node">
-            <a click="$(SelectNode(node))" attr-href="$(node.Href)">
-              <img class="node-icon" attr-src="$(node.IconUrl)" />
-              <span class="node-caption">$(node.Caption)</span>
-            </a>
-          </div>
+        <div $when(!string.IsNullOrEmpty(SearchTerm)) class="search-results">          
+          <div template="$(template(SearchResults))" />
         </div>
       #>
     }
     
     public class Server
     {
-      public Search(term : string) : IEnumerable[(TreeNode * list[string])]
+      public Search(term : string) : IEnumerable[TreeNode]
       {
         TreeLoader.Search(term)
       }

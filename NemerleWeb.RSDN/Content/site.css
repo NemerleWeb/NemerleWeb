@@ -35,10 +35,6 @@ body {
     margin-left: 35px;
 }
 
-.search-results > div {
-    padding: 3px 0;
-}
-
 .selected-search-result {
     font-weight: bold;
 }
