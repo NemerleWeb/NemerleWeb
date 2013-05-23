@@ -15,7 +15,6 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using BF = System.Reflection.BindingFlags;
 using TExpr = Nemerle.Compiler.Typedtree.TExpr;
@@ -83,35 +82,33 @@ namespace NemerleWeb
           def env = env.EnterIntoNamespace(tb.NamespaceNode);
           def controllerName = tb.Name + "Controller";
           def field = <[ decl: _server : $(serverClass.Name : usesite) = $(serverClass.Name : usesite)() ]>;          
-          def ctb = env.Define(<[ decl: 
+          def controller = env.Define(<[ decl: 
             public class $(controllerName : usesite) : System.Web.Mvc.Controller
             {}
           ]>);
-          ctb.Define(field);
+          controller.Define(field);
                  
-          def ptb = tb.DefineNestedType(<[ decl:
+          def proxy = tb.DefineNestedType(<[ decl:
               class ServerProxy
               {}
           ]>);
+          proxy.HasBeenUsed = true;
           tb.Define(<[ decl: new server : ServerProxy { get { ServerProxy() } } ]>);
           
           foreach(method is IMethod
             when !method.IsConstructor && method.DeclaringType.FullName == serverClass.FullName
             in serverClass.GetMembers())
           {
-            // Suppress warnings
-            IgnoreParameters(method);
-            
             def parameters = method.GetParameters().Map(p => <[ $(p.Name : usesite) : $(p.ty : typed) ]>);              
             def fparms = parameters.Map(PParameter);
-            def methodName = ctb.ParsedName.NewName(method.Name);
+            def methodName = controller.ParsedName.NewName(method.Name);
                   
             when(method.ReturnType.TryRequire(<[ ttype: void ]>))
               Message.FatalError("Server methods cannot return void, please return something");
-                
+
             def deserializedParams = method.GetParameters().Map(p => <[ parsedModel[$(p.Name : string)].ToObject.[$(p.ty : typed)]() ]>);
               
-            _ = ctb.DefineWithSource(<[ decl: 
+            _ = controller.DefineWithSource(<[ decl: 
               [System.Web.Mvc.HttpPost, System.Web.Mvc.ValidateInput(false)]
               public new $(methodName : name) (model : string) : System.Web.Mvc.ActionResult
               {
@@ -137,19 +134,21 @@ namespace NemerleWeb
             //assert2(false);
             def allParms = fparms.Append([<[ parameter: _callback : Action[$(method.ReturnType : typed)] ]>]);
                   
-            ptb.Define(<[ decl:                   
+            proxy.Define(<[ decl:                   
               public new $(methodName : name) (..$(allParms)) : void
-              {}
+              {
+                IgnoreParams();
+              }
             ]>);
           }
-          ctb.Define(<[ decl:
+          controller.Define(<[ decl:
               public new __SetSignalRConnectionId(id : string) : System.Web.Mvc.ActionResult
               {                
                 HttpContext.Current.Session["SignalRConnectionId"] = id;
                 Content("");
               }]>);
-          ptb.Compile();
-          ctb.Compile();
+          proxy.Compile();
+          controller.Compile();
       }
       else
       {
@@ -173,18 +172,20 @@ namespace NemerleWeb
           def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");
           AddLambdasData(tb, lambdas);
       };
-      
-      // Suppress warnings
-      foreach(member in tb.GetMethods(
+    }
+
+    private IgnoreMethods(tb : TypeBuilder) : void
+    {
+      foreach(method in tb.GetMethods(
                           BindingFlags.Instance |
                           BindingFlags.Static |
                           BindingFlags.Public |
                           BindingFlags.NonPublic))
       {
-        member.HasBeenUsed = true;
+        method.HasBeenUsed = true;
       }
     }
-
+    
     private MscorlibGuid = "BED7F4EA-1A96-11d2-8F08-00A0C9A6186D";
     
     private ValidateReferences(manager : ManagerClass) : void
@@ -390,14 +391,6 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       {
         tb.Define(pageMethod);
       }
-    }
-    
-    private IgnoreParameters(m : IMethod) : void
-    {
-      // Suppress warnings
-      foreach(p in m.Header.Parameters)
-        when(p.decl != null)
-          p.decl.EverUsed = true;
     }
   }
 }
