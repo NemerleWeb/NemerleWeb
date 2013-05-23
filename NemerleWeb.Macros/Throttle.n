@@ -26,17 +26,15 @@ namespace NemerleWeb
       
       match(expr) 
       {
-        | <[ ($(timeout : int), $code) ]> => 
-          def method = typer.CurrentMethodBuilder;
-          def parmTypes = string.Join("_", method.GetParameters().Select(p => p.ty.TypeInfo.Name));
-          def timeoutVarName = "_timeoutVar" + method.Name + JSClass.GetProperName(parmTypes);
+        | <[ ($(timeout : int), $code) ]> =>                     
+          def timeoutVarName = "_timeoutVar" + typer.Manager.GetNewId();
           typer.CurrentTypeBuilder.Define(<[ decl: mutable $(timeoutVarName : usesite) : float; ]>);
           
-          def lambda = <[ () => { $code } ]>;
+          def lambda = <[ () => { $code; NemerleWeb.TypedJS.nweb.invalidate(); } ]>;
           
           <[ 
             NemerleWeb.TypedJS.window.clearTimeout($(timeoutVarName : usesite));
-            $(timeoutVarName : usesite) = NemerleWeb.TypedJS.window.setTimeout($(lambda), $timeout, null);
+            $(timeoutVarName : usesite) = NemerleWeb.TypedJS.window.setTimeout($(lambda), $timeout, null);            
           ]>
         | _ => Message.FatalError("Expecting throttle(100, { code }) syntax)");
       }      

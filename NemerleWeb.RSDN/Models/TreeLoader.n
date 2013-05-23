@@ -20,7 +20,7 @@ namespace NemerleWeb.Rsdn
     _tree : TreeNode;
     _childrenById : ConcurrentDictionary[string, List[TreeNode]] = ConcurrentDictionary();
     _searchTerms : SortedDictionary[string, int] = SortedDictionary();
-    _searchTermResults : ConcurrentDictionary[string, IEnumerable[TreeNode]] = ConcurrentDictionary();
+    _searchTermResults : ConcurrentDictionary[string, array[TreeNode]] = ConcurrentDictionary();
     _leaves : IEnumerable[TreeNode];
     
     this()
@@ -63,7 +63,7 @@ namespace NemerleWeb.Rsdn
       _childrenById.GetOrAdd(id, List());
     }
     
-    public Search(term : string, limitSearch : bool = true) : IEnumerable[TreeNode]
+    public Search(term : string, limitSearch : bool = true) : array[TreeNode]
     {
       lock(_searchTerms) {
         if(_searchTerms.ContainsKey(term))
