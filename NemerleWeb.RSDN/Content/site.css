@@ -6,10 +6,15 @@ body {
     padding: 10px;
 }
 
+a img {
+    border: none;
+}
+
 .node {
     font-size: 12px;
     position: relative;
     clear: both;
+    margin: 2px 0;
 }
 
 .node a {
