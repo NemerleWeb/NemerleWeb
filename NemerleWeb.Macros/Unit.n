@@ -106,13 +106,16 @@ namespace NemerleWeb
             when(method.ReturnType.TryRequire(<[ ttype: void ]>))
               Message.FatalError("Server methods cannot return void, please return something");
 
-            def deserializedParams = method.GetParameters().Map(p => <[ parsedModel[$(p.Name : string)].ToObject.[$(p.ty : typed)]() ]>);
+            def deserializedParams = method
+              .GetParameters()
+              .Map(p => <[ parsedModel[$(p.Name : string)].ToObject.[$(p.ty : typed)]() ]>);
               
             _ = controller.DefineWithSource(<[ decl: 
               [System.Web.Mvc.HttpPost, System.Web.Mvc.ValidateInput(false)]
               public new $(methodName : name) (model : string) : System.Web.Mvc.ActionResult
               {
                 def parsedModel = Newtonsoft.Json.Linq.JObject.Parse(model);
+                _ = parsedModel;
                 
                 def result = _server.$(method.Name : dyn)(..$deserializedParams);
                   
@@ -174,18 +177,6 @@ namespace NemerleWeb
       };
     }
 
-    private IgnoreMethods(tb : TypeBuilder) : void
-    {
-      foreach(method in tb.GetMethods(
-                          BindingFlags.Instance |
-                          BindingFlags.Static |
-                          BindingFlags.Public |
-                          BindingFlags.NonPublic))
-      {
-        method.HasBeenUsed = true;
-      }
-    }
-    
     private MscorlibGuid = "BED7F4EA-1A96-11d2-8F08-00A0C9A6186D";
     
     private ValidateReferences(manager : ManagerClass) : void
