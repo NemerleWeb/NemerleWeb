@@ -62,7 +62,7 @@ namespace NemerleWeb.Rsdn
             SelectNode(SearchResults.Children[SelectedSearchResultIndex]);
           }
           
-          window.console.log(e);
+          //window.console.log(e);
           false
         } else true
       });

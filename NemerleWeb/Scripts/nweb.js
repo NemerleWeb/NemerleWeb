@@ -506,7 +506,7 @@ var nweb = {
     indent = !!indent ? indent : "";
     // TODO: Remove
     if(false)
-	  if(typeof console !== "undefined")
+      if(typeof console !== "undefined")
         console.log(indent + nweb.invalidationCount++);
 
     var changeFound;
