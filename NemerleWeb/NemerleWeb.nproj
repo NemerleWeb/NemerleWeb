@@ -283,6 +283,9 @@
     <Content Include="Scripts\jquery.signalR-1.0.1.min.js">
       <SubType>Content</SubType>
     </Content>
+    <EmbeddedResource Include="Scripts\json2.js">
+      <SubType>Content</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Scripts\linq.js">
       <SubType>Content</SubType>
     </EmbeddedResource>
