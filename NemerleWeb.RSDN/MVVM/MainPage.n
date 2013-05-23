@@ -31,7 +31,7 @@ namespace NemerleWeb.Rsdn
       LoadTopNodes();
       Pinned = TreeNode();
       Search = Search();
-            
+                       
       UpdatePinned();
       
       _ = jscall @$(window).resize(_ => {
@@ -95,7 +95,7 @@ namespace NemerleWeb.Rsdn
     {
       <#
         <div class="page">
-          <div class="left" style-height="$MenuHeight">          
+          <div class="left">          
             <div $when(Root != null) class="root">
               <div template="$(template(Search))" />
               <div class="pinned-nodes">
