@@ -14,29 +14,14 @@ namespace NemerleWeb.Rsdn
 {    
   [Unit]
   public class Search
-  {       
-    SearchResults : TreeNode;
-    
-    mutable _selectedSearchResultIndex : int;    
-    public SelectedSearchResultIndex : int { 
-      get { _selectedSearchResultIndex }
-      set {
-        when(_selectedSearchResultIndex != value) {
-          when(_selectedSearchResultIndex < SearchResults.Children.Count && _selectedSearchResultIndex > -1)
-            SearchResults.Children[_selectedSearchResultIndex].IsSelected = false;
-            
-          when(value < SearchResults.Children.Count && value > -1)   
-            SearchResults.Children[value].IsSelected = true;
-            
-          _selectedSearchResultIndex = value;          
-        }
-      }
-    }
-    
+  { 
+    public IsLimited : bool { get; set; }
+    public SearchResults : TreeNode;
+        
     mutable _searchTerm : string;
     public SearchTerm : string { 
       get { _searchTerm; }
-      set {          
+      set {         
         throttle(500, {
           when(_searchTerm != value) {
             _searchTerm = value;
@@ -45,41 +30,18 @@ namespace NemerleWeb.Rsdn
         });
       }; 
     }
-  
-    public IsLimited : bool { get; set; }
-    
-    private static UpArrow = 38;
-    private static DownArrow = 40;
-    
-    public this() {
-      SearchResults = TreeNode() <- ( Children = List() );      
-      
-      _ = jscall @$("body").on("keydown", "", e => {
-        def e = e :> KeyboardEvent;
-        if(e.altKey && SearchResults.Children.Count > 0) {
-          when(e.keyCode == DownArrow && SelectedSearchResultIndex < SearchResults.Children.Count - 2) {
-              SelectedSearchResultIndex++;
-              SelectNode(SearchResults.Children[SelectedSearchResultIndex]);
-          }          
-          when(e.keyCode == UpArrow && SelectedSearchResultIndex > 0) {
-            SelectedSearchResultIndex--;
-            SelectNode(SearchResults.Children[SelectedSearchResultIndex]);
-          }
-          
-          //window.console.log(e);
-          false
-        } else true
-      });
+        
+    public this() 
+    {
+      SearchResults = TreeNode() <- ( Children = List() );
     }
         
     public Search(term : string, limitedSearch : bool) : void
     {
-      window.console.log("search");
       if(!string.IsNullOrWhiteSpace(term)) {        
         server.Search(term, limitedSearch, nodes => {
           SearchResults.Children = nodes.ToList();
-          SelectedSearchResultIndex = -1;
-          IsLimited = limitedSearch;
+          IsLimited = limitedSearch && nodes.Length == 40;
         });
       } else SearchResults.Children.Clear();
     }
@@ -107,7 +69,7 @@ namespace NemerleWeb.Rsdn
     
     public class Server
     {
-      public Search(term : string, limitedSearch : bool = false) : IEnumerable[TreeNode]
+      public Search(term : string, limitedSearch : bool = false) : array[TreeNode]
       {
         TreeLoader.Search(term, limitedSearch)
       }
