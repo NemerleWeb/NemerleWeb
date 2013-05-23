@@ -1,5 +1,16 @@
+body, html {
+    height:100%;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     font-family: Tahoma, Geneva, sans-serif;
+    position: relative;
+}
+
+.body-container, #nweb-start, .page {
+    height: 100%;
 }
 
 .search-bar {
@@ -48,6 +59,7 @@ a img {
 
 .node .node-pin {
     position: absolute;
+    cursor: pointer;
     right: 5px;
     top: 0;
     background-image: url('/content/images/pin.png');
@@ -91,18 +103,25 @@ a img {
 }
 
 .left {
-    width: 25%;
     float: left;
-    overflow: scroll;
+    width: 25%;
+    height: 100%;
+    overflow: auto;
+    position: absolute;
+    top: 0;
+    bottom: 0;
 }
 
 .right {
-    width: 70%;
+    width: 75%;
     float: right;
+    height: 100%;
 }
 
 .right iframe {
     border: none;
+    padding: 0;
+    margin: 0;
     width: 100%;
-    height: 1000px;
+    height: 99%;
 }
