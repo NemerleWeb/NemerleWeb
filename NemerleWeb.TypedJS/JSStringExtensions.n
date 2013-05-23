@@ -12,6 +12,9 @@ namespace NemerleWeb.TypedJS
   public module JSStringExtensions
   {
     public Replace(this str : string, reg : RegExp, replacement : string) : string
-    { throw ClientCodeCalledInServerException() }
+    {
+      IgnoreParams();
+      throw ClientCodeCalledInServerException()
+    }
   }
 }

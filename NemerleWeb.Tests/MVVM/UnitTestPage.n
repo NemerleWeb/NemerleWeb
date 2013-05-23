@@ -9,8 +9,7 @@ using Nemerle;
 using Nemerle.Utility;
 using Nemerle.Peg;
 using NemerleWeb.Tests.Macro;
-//using NemerleWeb.TypedJS;
-using NemerleWeb.TypedJSManual;
+using NemerleWeb.TypedJS;
 
 namespace NemerleWeb.Tests
 {
@@ -889,54 +888,40 @@ namespace NemerleWeb.Tests
       
       test("regexp exec 1", () =>
       {
-        def res = RegExp("pattern").exec("pattern");
+        def res = jsnew RegExp("pattern", undefined).exec("pattern");
         res[0] == "pattern"
       });
       
       test("regexp exec 2", () =>
       {
-        def res = RegExp("pattern", "i").exec("pattern");
+        def res = jsnew RegExp("pattern", "i").exec("pattern");
         res[0] == "pattern"
       });
       
       test("regexp test", () =>
       {
-        RegExp("pattern").test("pattern")
+        jsnew RegExp("pattern", undefined).test("pattern")
       });
       
       test("regexp compile 1", () =>
       {
-        def pat = RegExp("pattern");
-        pat.compile();
+        def pat = jsnew RegExp("pattern", undefined);
+        _ = pat.compile();
         pat.test("pattern")
-      });
-      
-      test("regexp compile 2", () =>
-      {
-        def pat = RegExp("something");
-        pat.compile("pattern");
-        pat.test("pattern")
-      });
-      
-      test("regexp compile 3", () =>
-      {
-        def pat = RegExp("something");
-        pat.compile("pattern", "i");
-        pat.test("PATTERN")
       });
       
       test("regexp exec 1", () =>
       {
-        def pat = RegExp(".+");        
+        def pat = jsnew RegExp(".+", undefined);        
         def result = pat.exec("hello world");
-        result.Length == 1 && result[0] == "hello world"
+        result.length == 1 && result[0] == "hello world"
       });
       
       test("regexp exec 2", () =>
       {
-        def pat = RegExp(".+(el{2}).+");        
+        def pat = jsnew RegExp(".+(el{2}).+", undefined);        
         def result = pat.exec("hello world");
-        result.Length == 2 
+        result.length == 2 
         && result[0] == "hello world"
         && result[1] == "ell"
       });

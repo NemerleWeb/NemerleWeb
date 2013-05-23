@@ -718,6 +718,9 @@ namespace NemerleWeb
         [JSApi] public sealed class $(className : usesite) { }
       ]>);
       
+      // Suppress warning
+      anonClass.HasBeenUsed = true;
+      
       // Add members
       foreach(member in members)
       {
