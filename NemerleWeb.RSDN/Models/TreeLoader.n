@@ -39,7 +39,7 @@ namespace NemerleWeb.Rsdn
           TreeNode() <- (           
             Id = id,
             Caption = element.Attribute("caption")?.Value,
-            Href = "http://www.rsdn.ru" + element.Attribute("href")?.Value,
+            Href = element.Attribute("href")?.Value,
             Icon = element.Attribute("icon")?.Value,
             Hide = element.Attribute("hide")?.Value == "1",
             HasChildren = childNodes.Count > 0,

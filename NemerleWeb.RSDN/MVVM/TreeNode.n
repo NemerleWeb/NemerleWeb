@@ -24,6 +24,7 @@ namespace NemerleWeb.Rsdn
     public Children : List[TreeNode] { get; set; }    
     public HasChildren : bool { get; set; }
     
+    public IsLoading : bool { get; set; }    
     public IsSelected : bool { get; set; }    
     public IsPinned : bool { get; set; }
     
@@ -44,22 +45,24 @@ namespace NemerleWeb.Rsdn
       IsPinned = !IsPinned;
       
       if(IsPinned) MainPage.Instance.AddPinned(Id)
-      else MainPage.Instance.RemovePinned(Id)      
+      else MainPage.Instance.RemovePinned(Id)
     }
     
     public CaptionClick() : void
     {
       if(HasChildren) {
         if(Children == null) {
-          server.LoadNodeChildren(Id, children => {
+          IsLoading = true;
+          IsOpened = !IsOpened;
+          server.LoadNodeChildren(Id, children => {           
             Children = children;
-            IsOpened = !IsOpened;
+            IsLoading = false;
           });
         } else
           IsOpened = !IsOpened;
       }
       else
-        MainPage.SelectedUrl = Href;
+        MainPage.SelectedUrl = "http://www.rsdn.ru" + Href;
     }
     
     [Html]
@@ -67,13 +70,16 @@ namespace NemerleWeb.Rsdn
     {
       <#
         <div $foreach(c in Children) style-margin-left="$(c.Depth * 10)" class="node" css-selected-search-result="$(c.IsSelected)">
-          <a click="$(c.CaptionClick())" attr-href="$(c.Href)" css-with-children="$(c.HasChildren)">
+          <a click="$(c.CaptionClick())" attr-href="$("http://www.rsdn.ru" + c.Href)" css-with-children="$(c.HasChildren)">
             <img class="node-icon" attr-src="$(c.IconUrl)" />
             <span class="node-caption">
               $(c.Caption)
             </span>
             <div $when(!c.HasChildren) click="$(c.TogglePin())" class="node-pin" css-pinned="$(c.IsPinned)" />
           </a>
+          <div $when(c.IsLoading) class="node-loading">
+            Загрузка, пожалуйста подождите...
+          </div>
           <div $when(c.IsOpened && Children != null)>
             <div template="$(template(c))" />
           </div>

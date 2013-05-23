@@ -48,8 +48,7 @@ namespace NemerleWeb.Rsdn
     {
       server.LoadByIds(GetPinned(), nodes => {
         foreach(n in nodes)
-          n.IsPinned = true;
-          
+          n.IsPinned = true;          
         Pinned.Children = nodes.ToList()
       });
     }
