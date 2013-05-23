@@ -105,7 +105,7 @@ namespace NemerleWeb.Tests
     }
     
     [Unit]
-    class ClassWithConstructors
+    public class ClassWithConstructors
     {
       public this() { }
       public this(_ : int) { }
@@ -371,7 +371,7 @@ namespace NemerleWeb.Tests
     }
     
     [Unit]
-    class Located
+    public class Located
     {
       [Accessor] location : int;
       
@@ -1560,7 +1560,10 @@ namespace NemerleWeb.Tests
         def b = VirtualNonVirtualTest();
         def c : VirtualNonVirtualBaseTest = b;
         
-        // TODO: #58        
+        // TODO: #58    
+        _ = a.NonVirtual();
+        _ = a.Virtual();
+        
         //a.Virtual() == "Virtual" && a.NonVirtual() == "NonVirtual" &&
         //c.Virtual() == "Virtual2" && c.NonVirtual() == "NonVirtual" &&
         //b.Virtual() == "Virtual2" && b.NonVirtual() == "NonVirtual2"
