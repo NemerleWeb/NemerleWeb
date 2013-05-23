@@ -28,6 +28,11 @@ a img {
     margin: 2px 0;
 }
 
+.node-loading {
+    font-size: 10px;
+    color: #666;
+}
+
 .node a {
     color: #1e90ff;
     text-decoration: none;

@@ -41,6 +41,7 @@ namespace NemerleWeb.Rsdn
       if(!string.IsNullOrWhiteSpace(term)) {        
         server.Search(term, limitedSearch, nodes => {
           SearchResults.Children = nodes.ToList();
+          
           IsLimited = limitedSearch && nodes.Length == 40;
         });
       } else SearchResults.Children.Clear();
@@ -58,11 +59,11 @@ namespace NemerleWeb.Rsdn
         <div class="search-bar">
           <input id="search-input" value="$SearchTerm" />
         </div>
-        <div $when(!string.IsNullOrEmpty(SearchTerm)) class="search-results">          
+        <div $when(!string.IsNullOrEmpty(SearchTerm)) class="search-results"> 
           <div template="$(template(SearchResults))" />          
           <div $when(IsLimited) click="$(Search(SearchTerm, false))" class="search-show-all">
             showing first 40 results, click for rest
-          </div>          
+          </div>
         </div>
       #>
     }
