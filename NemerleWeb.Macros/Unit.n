@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using BF = System.Reflection.BindingFlags;
 using TExpr = Nemerle.Compiler.Typedtree.TExpr;
@@ -92,12 +93,15 @@ namespace NemerleWeb
               class ServerProxy
               {}
           ]>);
-          tb.Define(<[ decl: server : ServerProxy { get { ServerProxy() } } ]>);
+          tb.Define(<[ decl: new server : ServerProxy { get { ServerProxy() } } ]>);
           
           foreach(method is IMethod
             when !method.IsConstructor && method.DeclaringType.FullName == serverClass.FullName
             in serverClass.GetMembers())
           {
+            // Suppress warnings
+            IgnoreParameters(method);
+            
             def parameters = method.GetParameters().Map(p => <[ $(p.Name : usesite) : $(p.ty : typed) ]>);              
             def fparms = parameters.Map(PParameter);
             def methodName = ctb.ParsedName.NewName(method.Name);
@@ -109,7 +113,7 @@ namespace NemerleWeb
               
             _ = ctb.DefineWithSource(<[ decl: 
               [System.Web.Mvc.HttpPost, System.Web.Mvc.ValidateInput(false)]
-              public $(methodName : name) (model : string) : System.Web.Mvc.ActionResult
+              public new $(methodName : name) (model : string) : System.Web.Mvc.ActionResult
               {
                 def parsedModel = Newtonsoft.Json.Linq.JObject.Parse(model);
                 
@@ -134,12 +138,12 @@ namespace NemerleWeb
             def allParms = fparms.Append([<[ parameter: _callback : Action[$(method.ReturnType : typed)] ]>]);
                   
             ptb.Define(<[ decl:                   
-              public $(methodName : name) (..$(allParms)) : void
+              public new $(methodName : name) (..$(allParms)) : void
               {}
             ]>);
           }
           ctb.Define(<[ decl:
-              public __SetSignalRConnectionId(id : string) : System.Web.Mvc.ActionResult
+              public new __SetSignalRConnectionId(id : string) : System.Web.Mvc.ActionResult
               {                
                 HttpContext.Current.Session["SignalRConnectionId"] = id;
                 Content("");
@@ -148,7 +152,11 @@ namespace NemerleWeb
           ctb.Compile();
       }
       else
-        _ = tb.DefineNestedType(<[ decl: public class Server {} ]>).Compile();
+      {
+        def server = tb.DefineNestedType(<[ decl: public class Server {} ]>);
+        server.HasBeenUsed = true;
+        server.Compile();
+      }
           
       JSClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
       JSClass.StringType = <[ ttype : System.String ]>;
@@ -165,6 +173,16 @@ namespace NemerleWeb
           def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");
           AddLambdasData(tb, lambdas);
       };
+      
+      // Suppress warnings
+      foreach(member in tb.GetMethods(
+                          BindingFlags.Instance |
+                          BindingFlags.Static |
+                          BindingFlags.Public |
+                          BindingFlags.NonPublic))
+      {
+        member.HasBeenUsed = true;
+      }
     }
 
     private MscorlibGuid = "BED7F4EA-1A96-11d2-8F08-00A0C9A6186D";
@@ -354,15 +372,33 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
           def tparms = tparms.tyvars.Map(t => <[ $(tb.ParsedName.NewName(t.ToString()) : name) ]>);
           <[ $(tb.ParsedName : name).[..$tparms] ]>;
         }
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : Func[$(T), TM]) : string { "" }]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : $(T) -> TM, _view : string) : string { "" } ]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : $(T) -> TM, _view : TM -> void -> string) : string { "" } ]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : $(T) -> TM, _view : TM -> string) : string { "" } ]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM) : string { "" } ]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM, _view : string) : string { "" } ]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM, _view : TM -> string) : string { "" } ]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public template[TM](_model : TM, _view : TM -> void -> string) : string { "" }]>);
-      tb.Define(<[decl: [NemerleWeb.IgnoreAttribute] public GetTemplateName([NotNull] _modelName : string, [NotNull] _viewName : string) : string { "" } ]>);
+      
+      def pageBaseMethods =
+        [
+          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : Func[$(T), TM]) : string { IgnoreParams(); "" } ]>,
+          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : $(T) -> TM, view : string) : string { IgnoreParams(); "" } ]>,
+          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : $(T) -> TM, view : TM -> void -> string) : string { IgnoreParams(); "" } ]>,
+          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : $(T) -> TM, view : TM -> string) : string { IgnoreParams(); "" } ]>,
+          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : TM) : string { IgnoreParams(); "" } ]>,
+          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : TM, view : string) : string { IgnoreParams(); "" } ]>,
+          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : TM, view : TM -> string) : string { IgnoreParams(); "" } ]>,
+          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : TM, view : TM -> void -> string) : string { IgnoreParams(); "" }]>,
+          <[decl: [NemerleWeb.IgnoreAttribute] public new GetTemplateName([NotNull] modelName : string, [NotNull] viewName : string) : string { IgnoreParams(); "" } ]>,
+        ];
+        
+      // Define and suppress warnings about unused parameters
+      foreach(pageMethod in pageBaseMethods)
+      {
+        tb.Define(pageMethod);
+      }
+    }
+    
+    private IgnoreParameters(m : IMethod) : void
+    {
+      // Suppress warnings
+      foreach(p in m.Header.Parameters)
+        when(p.decl != null)
+          p.decl.EverUsed = true;
     }
   }
 }

@@ -53,7 +53,9 @@ $$.connection.hub.start({}, function() {
 
       UnitImpl.AddSignalrData(declaringType, script);
 
-      tb.Define(<[ decl: client : $(declaringType.ParsedTypeName); ]>);        
+      def client = tb.DefineAndReturn(<[ decl: client : $(declaringType.ParsedTypeName) = default($(declaringType.ParsedTypeName)); ]>);
+      client.HasBeenUsed = true;
+      
       tb.DefineNestedType(<[ decl: public class $(hubName : dyn) : HubBase {} ]>).Compile();
     }
   }
