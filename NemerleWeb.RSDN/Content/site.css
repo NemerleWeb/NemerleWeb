@@ -102,6 +102,20 @@ a img {
     font-weight: bold;
 }
 
+.search-show-all {
+    text-align: center;
+    font-size: 14px;
+    margin: 15px 0;
+    padding: 3px 0;
+    cursor: pointer;
+    color: #333;
+}
+
+.search-show-all:hover {
+    background-color: #d5d5d5;
+    text-decoration: underline;
+}
+
 .left {
     float: left;
     width: 25%;
