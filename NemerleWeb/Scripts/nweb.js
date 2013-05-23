@@ -2,8 +2,8 @@
 
 var nweb = {
   go: function (model, tpl, dest, fromDebugger) {
-    if (nweb.debugger && !fromDebugger)
-      nweb.debugger(model);
+    if (nweb["debugger"] && !fromDebugger)
+      nweb["debugger"](model);
     
     var template = tpl ? tpl : nweb.utils.getTemplateName(model, "View");
     var destination = dest ? dest : "#nweb-start";
@@ -479,7 +479,7 @@ var nweb = {
         else
           return val;
       } catch (e) {
-        console.error("Error evaluating: " + parsedExpr + " " + e);
+        console.error("Error evaluating: " + parsedExpr + " " + e.message);
         return undefined;
       }
     }
@@ -773,7 +773,7 @@ nweb.removeCookie = function(name) {
   nweb.setCookie(name, "", -1);
 };
 
-if (nweb.debugger) {
+if (nweb["debugger"]) {
     nweb.utils.areArraysEqual = function(l, r) {
         if (l.length != r.length)
             return false;

@@ -318,6 +318,7 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
             {
               def scripts =
               [
+                "NemerleWeb.Scripts.json2.js",
                 "NemerleWeb.Scripts.jquery-1.8.2.js",
                 "NemerleWeb.Scripts.jquery.signalR-1.0.1.js",
                 "NemerleWeb.Scripts.linq.js",
