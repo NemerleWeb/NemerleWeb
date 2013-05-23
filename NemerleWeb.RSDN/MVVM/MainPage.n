@@ -27,17 +27,12 @@ namespace NemerleWeb.Rsdn
     {
       SelectedUrl = "";
       MainPage.Instance = this;
-      
+                  
       LoadTopNodes();
       Pinned = TreeNode();
       Search = Search();
                        
-      UpdatePinned();
-      
-      _ = jscall @$(window).resize(_ => {
-        nweb.invalidate();
-        null
-      });
+      UpdatePinned();      
     }
     
     public LoadTopNodes() : void
@@ -98,10 +93,10 @@ namespace NemerleWeb.Rsdn
           <div class="left">          
             <div $when(Root != null) class="root">
               <div template="$(template(Search))" />
-              <div class="pinned-nodes">
-                <div template="$(template(Pinned))" />
-              </div>
               <div $when(string.IsNullOrEmpty(Search.SearchTerm))>
+                <div class="pinned-nodes">
+                  <div template="$(template(Pinned))" />
+                </div>
                 <div template="$(template(Root))" />
               </div>
             </div>

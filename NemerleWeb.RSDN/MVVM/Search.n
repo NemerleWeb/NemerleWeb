@@ -36,14 +36,18 @@ namespace NemerleWeb.Rsdn
     mutable _searchTerm : string;
     public SearchTerm : string { 
       get { _searchTerm; }
-      set {
+      set {          
+        throttle(500, {
           when(_searchTerm != value) {
             _searchTerm = value;
-            Search(value);
+            Search(value, true);
           }
+        });
       }; 
     }
   
+    public IsLimited : bool { get; set; }
+    
     private static UpArrow = 38;
     private static DownArrow = 40;
     
@@ -68,12 +72,14 @@ namespace NemerleWeb.Rsdn
       });
     }
         
-    public Search(term : string) : void
+    public Search(term : string, limitedSearch : bool) : void
     {
+      window.console.log("search");
       if(!string.IsNullOrWhiteSpace(term)) {        
-        server.Search(term, nodes => {
+        server.Search(term, limitedSearch, nodes => {
           SearchResults.Children = nodes.ToList();
           SelectedSearchResultIndex = -1;
+          IsLimited = limitedSearch;
         });
       } else SearchResults.Children.Clear();
     }
@@ -91,16 +97,19 @@ namespace NemerleWeb.Rsdn
           <input id="search-input" value="$SearchTerm" />
         </div>
         <div $when(!string.IsNullOrEmpty(SearchTerm)) class="search-results">          
-          <div template="$(template(SearchResults))" />
+          <div template="$(template(SearchResults))" />          
+          <div $when(IsLimited) click="$(Search(SearchTerm, false))" class="search-show-all">
+            showing first 40 results, click for rest
+          </div>          
         </div>
       #>
     }
     
     public class Server
     {
-      public Search(term : string) : IEnumerable[TreeNode]
+      public Search(term : string, limitedSearch : bool = false) : IEnumerable[TreeNode]
       {
-        TreeLoader.Search(term)
+        TreeLoader.Search(term, limitedSearch)
       }
     }
   }

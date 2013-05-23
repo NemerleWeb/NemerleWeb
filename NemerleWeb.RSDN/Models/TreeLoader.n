@@ -63,7 +63,7 @@ namespace NemerleWeb.Rsdn
       _childrenById.GetOrAdd(id, List());
     }
     
-    public Search(term : string) : IEnumerable[TreeNode]
+    public Search(term : string, limitSearch : bool = true) : IEnumerable[TreeNode]
     {
       lock(_searchTerms) {
         if(_searchTerms.ContainsKey(term))
@@ -73,8 +73,9 @@ namespace NemerleWeb.Rsdn
       }
       
       lock(_searchTermResults) {
-        _searchTermResults.GetOrAdd(term, _ => {
-          SearchLeavesForTerm(term).ToArray()
+        _searchTermResults.GetOrAdd(term + "_//_" + limitSearch, _ => {
+          def result = SearchLeavesForTerm(term);
+          if(limitSearch) result.Take(40).ToArray() else result.ToArray();
         });
       }
     }
