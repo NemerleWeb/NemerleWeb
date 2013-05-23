@@ -107,7 +107,7 @@ namespace NemerleWeb.Rsdn
             </div>
           </div>
           <div class="right">
-            <iframe attr-src="$SelectedUrl" />
+            <iframe attr-src="$SelectedUrl" frameborder="0" border="0" />
           </div>
         </div>
       #>
