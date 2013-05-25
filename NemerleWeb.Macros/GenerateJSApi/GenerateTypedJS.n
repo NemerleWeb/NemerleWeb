@@ -346,8 +346,10 @@ namespace NemerleWeb
     {
       def name = ast.First().Name;
       
-      def ret = ast.SelectMany(
-        f => AnalyzeOverloads(f.Params).Select(p => TSGlobal.Function(name, p, f.ReturnType)));
+      def ret = ast
+        .SelectMany(f =>
+          AnalyzeOverloads(f.Params).Select(p => TSGlobal.Function(name, p, f.ReturnType)))
+        .Distinct(TSGlobalFunctionEqualityComparer());
         
       ret
     }

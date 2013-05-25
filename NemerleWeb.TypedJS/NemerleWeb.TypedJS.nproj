@@ -63,9 +63,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Globals.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="JSStringExtensions.n">
       <SubType>Code</SubType>
     </Compile>

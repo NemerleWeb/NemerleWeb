@@ -40,7 +40,7 @@ namespace TSParser
       | (Variable(xname, _), Variable(yname, _)) => xname == yname
       | (Method(xname, _, xparams, _), Method(yname, _, yparams, _)) =>
         xname == yname &&
-        TSParamUtils.CompareParams(xparams, yparams)
+        TSParamsEqualityComparer().Equals(xparams, yparams)
       | _ => false
     }
   }
@@ -50,7 +50,7 @@ namespace TSParser
     protected override EqualsImpl(x : TSClassMember, y : TSClassMember) : bool
     {
       | (Constructor(xparams), Constructor(yparams)) =>
-        TSParamUtils.CompareParams(xparams, yparams)
+        TSParamsEqualityComparer().Equals(xparams, yparams)
       | (Member(xpart, _, _), Member(ypart, _, _)) =>
         TSClassMemberPartEqualityComparer().Equals(xpart, ypart)
       | _ => false
@@ -84,20 +84,37 @@ namespace TSParser
     }
   }
   
+  public class TSParamsEqualityComparer : BaseEqualityComparer[IEnumerable[TSParam]]
+  {
+    protected override EqualsImpl(x : IEnumerable[TSParam], y : IEnumerable[TSParam]) : bool
+    {
+      Enumerable.SequenceEqual(x, y, TSParamEqualityComparer())
+    }
+  }
+  
   public class TSObjectEqualityComparer : BaseEqualityComparer[TSObject]
   {
     protected override EqualsImpl(x : TSObject, y : TSObject) : bool
     {
       | (Call(xparms, _), Call(yparms, _)) => xparms.Equals(yparms)
       | (Construct(xparams, _), Construct(yparams, _)) =>
-        TSParamUtils.CompareParams(xparams, yparams)
+        TSParamsEqualityComparer().Equals(xparams, yparams)
       | (Index(_, TSIndexParamType.Number, _), Index(_, TSIndexParamType.Number, _)) => true
       | (Index(_, TSIndexParamType.String, _), Index(_, TSIndexParamType.String, _)) => true
       | (Property(xname, _, _), Property(yname, _, _)) => xname == yname
       | (Function(xname, _, xparams, _), Function(yname, _, yparams, _)) =>
         xname == yname &&
-        TSParamUtils.CompareParams(xparams, yparams)
+        TSParamsEqualityComparer().Equals(xparams, yparams)
       | _ => false
+    }
+  }
+  
+  public class TSGlobalFunctionEqualityComparer : BaseEqualityComparer[TSGlobal.Function]
+  {
+    protected override EqualsImpl(x : TSGlobal.Function, y : TSGlobal.Function) : bool
+    {
+      x.Name == y.Name &&
+      TSParamsEqualityComparer().Equals(x.Params, y.Params)
     }
   }
   
@@ -117,19 +134,9 @@ namespace TSParser
         Enumerable.SequenceEqual(xmembers, ymembers, TSObjectEqualityComparer())
       | (Lambda(xparams, xreturnType), Lambda(yparams, yreturnType)) 
       | (New(xparams, xreturnType), New(yparams, yreturnType)) => 
-        TSParamUtils.CompareParams(xparams, yparams) &&
+        TSParamsEqualityComparer().Equals(xparams, yparams) &&
         TSTypeEqualityComparer().Equals(xreturnType, yreturnType)
       | _ => false
     }
-  }
-  
-  public module TSParamUtils
-  {
-    public CompareParams(x : IEnumerable[TSParam], y : IEnumerable[TSParam]) : bool
-    {
-      // TODO: This naive implementation is not good at all.
-      // f(a, b?) > f(a)
-      Enumerable.SequenceEqual(x, y, TSParamEqualityComparer())
-    }
-  }
+  }  
 }
