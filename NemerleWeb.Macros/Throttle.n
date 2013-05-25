@@ -34,7 +34,7 @@ namespace NemerleWeb
           
           <[ 
             NemerleWeb.TypedJS.window.clearTimeout($(timeoutVarName : usesite));
-            $(timeoutVarName : usesite) = NemerleWeb.TypedJS.window.setTimeout($(lambda), $timeout, null);            
+            $(timeoutVarName : usesite) = NemerleWeb.TypedJS.window.setTimeout($(lambda), $timeout);            
           ]>
         | _ => Message.FatalError("Expecting throttle(100, { code }) syntax)");
       }      
