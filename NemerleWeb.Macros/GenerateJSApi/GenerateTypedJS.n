@@ -345,16 +345,47 @@ namespace NemerleWeb
     private AnalyzeFunction(ast : IEnumerable[TSGlobal.Function]) : IEnumerable[TSGlobal]
     {
       def name = ast.First().Name;
-      def returnType = ast.First().ReturnType;
       
-      def overloads(parms)
-      {
-        [parms]
-      }
-      
-      def functionOverloads = ast.SelectMany(f => overloads(f.Params));
-      def ret = functionOverloads.Select(o => TSGlobal.Function(name, o, returnType));
+      def ret = ast.SelectMany(
+        f => AnalyzeOverloads(f.Params).Select(p => TSGlobal.Function(name, p, f.ReturnType)));
+        
       ret
+    }
+    
+    /// <summary>
+    /// Create all possible overloads according to the rules
+    /// Go through all parameters and start generating overloads if needed
+    /// <note>This method removes all elements from the list.</note>
+    /// </summary>
+    private AnalyzeOverloadsList(parms : List[TSParam]) : IEnumerable[list[TSParam]]
+    {
+      if(parms.Count == 0)
+        yield []
+      else
+        match(parms.Last())
+        {
+        // Required
+        // Generate parameters and stop
+        | TSParam.Required
+        | TSParam.Option(_, false, _, _) =>
+          yield parms.NToList();
+        
+        // Option or Rest
+        // Generate all parameters, process all without last parameter
+        | TSParam.Option(_, true, _, _)
+        | TSParam.Rest =>
+          yield parms.NToList();
+          
+          // Remove last param
+          parms.RemoveAt(parms.Count - 1);
+          foreach(res in AnalyzeOverloadsList(parms))
+            yield res;
+        }
+    }
+    
+    private AnalyzeOverloads(parms : list[TSParam]) : IEnumerable[list[TSParam]]
+    {
+      AnalyzeOverloadsList(parms.ToList())
     }
     
     #endregion
