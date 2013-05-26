@@ -77,16 +77,22 @@ a img {
     transition: -webkit-transform 0.5s;
     transition: transform 0.5s;
     transition: -ms-transform 0.5s;
+    transition: -o-transform 0.5s;
+    transition: -moz-transform 0.5s;
     
     transform: rotate(-45deg);
     -ms-transform: rotate(-45deg); /* IE 9 */
     -webkit-transform: rotate(-45deg); /* Safari and Chrome */
+    -o-transform: rotate(-45deg); /* Opera */
+    -moz-transform: rotate(-45deg); /* Mozilla */
 }
 
 .node .node-pin.pinned {
     transform: rotate(-45deg);
     -ms-transform: rotate(-45deg); /* IE 9 */
     -webkit-transform: rotate(-45deg); /* Safari and Chrome */
+    -o-transform: rotate(-45deg); /* Opera */
+    -moz-transform: rotate(-45deg); /* Mozilla */
 }
 
 .node .node-pin.pinned:hover {
@@ -97,6 +103,8 @@ a img {
     transform: rotate(15deg);
     -ms-transform: rotate(15deg); /* IE 9 */
     -webkit-transform: rotate(15deg); /* Safari and Chrome */
+    -o-transform: rotate(-15deg); /* Opera */
+    -moz-transform: rotate(-15deg); /* Mozilla */
 }
 
 .pinned-nodes {
