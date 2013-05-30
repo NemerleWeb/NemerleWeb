@@ -15,18 +15,21 @@ namespace NemerleWeb.Rsdn
   [Unit]
   public class MainPage
   {    
-    public mutable static SelectedUrl : string;
     public mutable static Instance : MainPage;
             
     Root : TreeNode { get; set; }    
     Pinned : TreeNode { get; set; }
     MenuHeight : float { get { window.innerHeight } }
     Search : Search { get; set; }
+    
+    ActiveNodes : list[TreeNode] { get; set; }
+    SelectedUrl : string { get; set; }    
         
     public this() 
     {
-      SelectedUrl = "";
       MainPage.Instance = this;
+      
+      SelectedUrl = "";
                   
       LoadTopNodes();
       Pinned = TreeNode();
@@ -71,7 +74,7 @@ namespace NemerleWeb.Rsdn
       UpdatePinned();
     }
     
-    public static GetPinned() : IEnumerable[string]
+    public GetPinned() : IEnumerable[string]
     {
       match(nweb.getCookie.[string]("pinned")) {
       | null => []
@@ -79,9 +82,20 @@ namespace NemerleWeb.Rsdn
       }
     }
     
-    public static SelectNode(node : TreeNode) : void
+    public SelectNode(node : TreeNode) : void
     {
-      SelectedUrl = node.Href;
+      def getAllParents(node : TreeNode) : list[TreeNode] {
+      | _ when node.Parent != null => node.Parent :: getAllParents(node.Parent)
+      | _ => [];
+      };
+        
+      SelectedUrl = "http://www.rsdn.ru" + node.Href;
+      ActiveNodes = node :: getAllParents(node);
+    }
+    
+    public IsActiveNode(node : TreeNode) : bool 
+    {
+      ActiveNodes?.Any(n => n.Id == node.Id);     
     }
     
     [Html]
