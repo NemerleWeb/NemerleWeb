@@ -92,6 +92,7 @@ a img {
 }
 
 .node .node-pin.pinned {
+    visibility: visible;
     transform: rotate(-45deg);
     -ms-transform: rotate(-45deg); /* IE 9 */
     -webkit-transform: rotate(-45deg); /* Safari and Chrome */

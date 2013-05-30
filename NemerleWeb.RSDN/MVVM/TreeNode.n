@@ -26,9 +26,7 @@ namespace NemerleWeb.Rsdn
     
     public Parent : TreeNode { get; set; }
     public IsLoading : bool { get; set; }    
-    public IsSelected : bool { get; set; }    
-    public IsPinned : bool { get; set; }
-    public IsActive : bool { get; set; }
+    public IsSelected : bool { get; set; }
     
     public IconUrl : string 
     {      
@@ -43,10 +41,8 @@ namespace NemerleWeb.Rsdn
     }
     
     public TogglePin() : void
-    {      
-      IsPinned = !IsPinned;
-      
-      if(IsPinned) MainPage.Instance.AddPinned(Id)
+    {            
+      if(!MainPage.Instance.IsPinned(this)) MainPage.Instance.AddPinned(Id)
       else MainPage.Instance.RemovePinned(Id)
     }
     
@@ -80,7 +76,7 @@ namespace NemerleWeb.Rsdn
             <span class="node-caption" css-is-active="$(MainPage.Instance.IsActiveNode(c))">
               $(c.Caption)
             </span>
-            <div $when(!c.HasChildren) click="$(c.TogglePin())" class="node-pin" css-pinned="$(c.IsPinned)" />
+            <div $when(!c.HasChildren) click="$(c.TogglePin())" class="node-pin" css-pinned="$(MainPage.Instance.IsPinned(c))" />
           </a>
           <div $when(c.IsLoading) class="node-loading">
             Загрузка, пожалуйста подождите...
