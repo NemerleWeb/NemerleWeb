@@ -16,21 +16,20 @@ namespace NemerleWeb.Rsdn
   public class MainPage
   {    
     public mutable static Instance : MainPage;
-            
+
     Root : TreeNode { get; set; }    
     Pinned : TreeNode { get; set; }
-    MenuHeight : float { get { window.innerHeight } }
     Search : Search { get; set; }
     
     ActiveNodes : list[TreeNode] { get; set; }
-    SelectedUrl : string { get; set; }    
-        
+    SelectedUrl : string { get; set; }
+
     public this() 
     {
       MainPage.Instance = this;
       
       SelectedUrl = "";
-                  
+
       LoadTopNodes();
       Pinned = TreeNode();
       Search = Search();
@@ -49,7 +48,7 @@ namespace NemerleWeb.Rsdn
     
     UpdatePinned() : void
     {
-      server.LoadByIds(GetPinned(), nodes => {        
+      server.LoadByIds(GetPinned(), nodes => {
         Pinned.Children = nodes.ToList()
       });
     }
