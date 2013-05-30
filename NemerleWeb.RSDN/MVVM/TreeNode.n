@@ -63,7 +63,12 @@ namespace NemerleWeb.Rsdn
         } else
           IsOpened = !IsOpened;
       }
-      else MainPage.Instance.SelectNode(this);
+      else { 
+        if(window.@event.ctrlKey)
+          window.open("http://www.rsdn.ru" + this.Href, "_blank", null, false);
+        else
+          MainPage.Instance.SelectNode(this);
+      }
     }
     
     [Html]
