@@ -23,7 +23,6 @@ namespace NemerleWeb.Rsdn
     Search : Search { get; set; }
     
     ActiveNodes : list[TreeNode] { get; set; }
-    PinnedNodes : list[TreeNode] { get; set; }
     SelectedUrl : string { get; set; }    
         
     public this() 
@@ -92,14 +91,14 @@ namespace NemerleWeb.Rsdn
       | _ when node.Parent != null => node.Parent :: getAllParents(node.Parent)
       | _ => [];
       };
-        
+      
       SelectedUrl = "http://www.rsdn.ru" + node.Href;
       ActiveNodes = node :: getAllParents(node);
     }
     
     public IsActiveNode(node : TreeNode) : bool 
     {
-      ActiveNodes?.Any(n => n.Id == node.Id);     
+      ActiveNodes?.Any(n => n.Id == node.Id);
     }
     
     [Html]
