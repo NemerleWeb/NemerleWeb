@@ -74,7 +74,7 @@ namespace NemerleWeb.Rsdn
     public View() : string
     {
       <#
-        <div $foreach(c in Children) style-margin-left="$(c.Depth * 10)" class="node" css-selected-search-result="$(c.IsSelected)">
+        <div $foreach(c in Children) style-margin-left="$(c.Depth * 6)" class="node" css-selected-search-result="$(c.IsSelected)">
           <a click="$(c.CaptionClick())" attr-href="$("http://www.rsdn.ru" + c.Href)" css-with-children="$(c.HasChildren)">
             <img class="node-icon" attr-src="$(c.IconUrl)" />
             <span class="node-caption" css-is-active="$(MainPage.Instance.IsActiveNode(c))">
