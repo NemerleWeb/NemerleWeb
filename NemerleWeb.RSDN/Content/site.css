@@ -135,19 +135,21 @@ a img {
 }
 
 .left {
-    float: left;
     width: 25%;
     height: 100%;
     overflow: auto;
-    position: absolute;
-    top: 0;
-    bottom: 0;
 }
 
 .right {
     width: 75%;
     float: right;
     height: 100%;
+    overflow: auto;
+}
+
+.vsplitbar {
+	width: 5px;
+	background: #aaa;
 }
 
 .right iframe {

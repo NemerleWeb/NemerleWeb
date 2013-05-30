@@ -36,7 +36,7 @@ namespace NemerleWeb.Rsdn
       Pinned = TreeNode();
       Search = Search();
                        
-      UpdatePinned();      
+      UpdatePinned();
     }
     
     public LoadTopNodes() : void
