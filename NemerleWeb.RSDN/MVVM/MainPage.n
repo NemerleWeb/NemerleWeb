@@ -23,6 +23,7 @@ namespace NemerleWeb.Rsdn
     Search : Search { get; set; }
     
     ActiveNodes : list[TreeNode] { get; set; }
+    PinnedNodes : list[TreeNode] { get; set; }
     SelectedUrl : string { get; set; }    
         
     public this() 
@@ -49,9 +50,7 @@ namespace NemerleWeb.Rsdn
     
     UpdatePinned() : void
     {
-      server.LoadByIds(GetPinned(), nodes => {
-        foreach(n in nodes)
-          n.IsPinned = true;          
+      server.LoadByIds(GetPinned(), nodes => {        
         Pinned.Children = nodes.ToList()
       });
     }
@@ -80,6 +79,11 @@ namespace NemerleWeb.Rsdn
       | null => []
       | str => str.Split(',')
       }
+    }
+    
+    public IsPinned(node : TreeNode) : bool
+    {
+      GetPinned().Any(id => id == node.Id);
     }
     
     public SelectNode(node : TreeNode) : void
