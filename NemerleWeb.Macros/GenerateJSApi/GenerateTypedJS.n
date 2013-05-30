@@ -315,6 +315,11 @@ namespace NemerleWeb
       [ret]
     }
     
+    private AnalyzeTSObject(obj : TSObject) : TSObject
+    {
+      obj
+    }
+    
     /// <summary>
     /// Unite
     /// </summary>
