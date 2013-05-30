@@ -152,6 +152,9 @@
     <Content Include="Scripts\typings\angularjs\angular-sanitize.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\angularjs\angular-scenario.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\angularjs\angular.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -219,6 +222,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\knockout.validation\knockout.validation.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\knockout\knockout.amd.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\knockout\knockout.d.ts">
