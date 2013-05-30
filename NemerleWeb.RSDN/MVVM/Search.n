@@ -49,7 +49,7 @@ namespace NemerleWeb.Rsdn
     
     public static SelectNode(node : TreeNode) : void
     {
-      MainPage.SelectedUrl = node.Href;
+      MainPage.Instance.SelectNode(node);
     }
         
     [Html]

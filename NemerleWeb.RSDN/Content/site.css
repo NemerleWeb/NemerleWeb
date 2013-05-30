@@ -59,7 +59,11 @@ a img {
 .node .node-caption {
     display: block;
     margin-left: 35px;
-    padding-right: 26 px;
+    padding-right: 26px;
+}
+
+.node .node-caption.is-active {
+    font-weight: bold;
 }
 
 .node .node-pin {

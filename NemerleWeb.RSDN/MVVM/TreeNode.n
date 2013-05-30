@@ -24,9 +24,11 @@ namespace NemerleWeb.Rsdn
     public Children : List[TreeNode] { get; set; }    
     public HasChildren : bool { get; set; }
     
+    public Parent : TreeNode { get; set; }
     public IsLoading : bool { get; set; }    
     public IsSelected : bool { get; set; }    
     public IsPinned : bool { get; set; }
+    public IsActive : bool { get; set; }
     
     public IconUrl : string 
     {      
@@ -56,13 +58,16 @@ namespace NemerleWeb.Rsdn
           IsOpened = !IsOpened;
           server.LoadNodeChildren(Id, children => {           
             Children = children;
+            
+            foreach(child in Children)
+              child.Parent = this;
+              
             IsLoading = false;
           });
         } else
           IsOpened = !IsOpened;
       }
-      else
-        MainPage.SelectedUrl = "http://www.rsdn.ru" + Href;
+      else MainPage.Instance.SelectNode(this);
     }
     
     [Html]
@@ -72,7 +77,7 @@ namespace NemerleWeb.Rsdn
         <div $foreach(c in Children) style-margin-left="$(c.Depth * 10)" class="node" css-selected-search-result="$(c.IsSelected)">
           <a click="$(c.CaptionClick())" attr-href="$("http://www.rsdn.ru" + c.Href)" css-with-children="$(c.HasChildren)">
             <img class="node-icon" attr-src="$(c.IconUrl)" />
-            <span class="node-caption">
+            <span class="node-caption" css-is-active="$(MainPage.Instance.IsActiveNode(c))">
               $(c.Caption)
             </span>
             <div $when(!c.HasChildren) click="$(c.TogglePin())" class="node-pin" css-pinned="$(c.IsPinned)" />
