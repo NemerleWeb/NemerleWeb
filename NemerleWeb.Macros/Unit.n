@@ -340,6 +340,18 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
                 Content("", "text/javascript");
             }
             
+            public LambdasWithUnit(id : string) : System.Web.Mvc.ActionResult
+            {
+              if(id.EndsWith(".js")) {
+                def typeName = id.Substring(0, id.Length - 3);
+                def lambdasScript = NemerleWeb.NWebData.GetLambdasScript(typeName);                
+                def unitScript = NemerleWeb.NWebData.GetScript(typeName);
+                Content(lambdasScript + System.Environment.NewLine + unitScript, "text/javascript");
+              }
+              else
+                Content("", "text/javascript");
+            }
+            
             public Templates(id : string) : System.Web.Mvc.ActionResult
             {
               if(id.EndsWith(".js"))
