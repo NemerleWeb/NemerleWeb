@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>C:\dev\open-source\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.WPF.xml</name>
+    <name>D:\MyProjects\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.WPF.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.WPF.DependencyProperty_property_postscanMacro" />

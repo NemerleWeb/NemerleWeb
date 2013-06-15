@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
   <assembly>
-    <name>C:\dev\open-source\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.ComputationExpressions.Macros.xml</name>
+    <name>D:\MyProjects\nemerle\bin\Release\net-4.5\\PowerPack\\Nemerle.ComputationExpressions.Macros.xml</name>
   </assembly>
   <members>
     <member name="T:Nemerle.ComputationExpressions.Extensions.ArrayBuilder">
