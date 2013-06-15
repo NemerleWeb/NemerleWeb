@@ -14,11 +14,6 @@ namespace TSParser
 {
   public abstract class BaseEqualityComparer[T] : EqualityComparer[T] where T : class
   {
-    public override GetHashCode(obj : T) : int
-    {
-      obj.GetHashCode()
-    }
-    
     public override Equals(x : T, y : T) : bool
     {
       if(object.ReferenceEquals(x, y))
@@ -35,6 +30,12 @@ namespace TSParser
     
   public class TSClassMemberPartEqualityComparer : BaseEqualityComparer[TSClassMemberPart]
   {
+    public override GetHashCode(obj : TSClassMemberPart) : int
+    {
+      | Variable => 1
+      | Method => 2
+    }
+    
     protected override EqualsImpl(x : TSClassMemberPart, y : TSClassMemberPart) : bool
     {
       | (Variable(xname, _), Variable(yname, _)) => xname == yname
@@ -47,6 +48,12 @@ namespace TSParser
   
   public class TSClassMemberEqualityComparer : BaseEqualityComparer[TSClassMember]
   {
+    public override GetHashCode(obj : TSClassMember) : int
+    {
+      | Constructor => 1
+      | Member => 2
+    }
+    
     protected override EqualsImpl(x : TSClassMember, y : TSClassMember) : bool
     {
       | (Constructor(xparams), Constructor(yparams)) =>
@@ -59,6 +66,15 @@ namespace TSParser
   
   public class TSParamEqualityComparer : BaseEqualityComparer[TSParam]
   {
+    // All Required is treated as Option(optional = false)
+    // Rest => Option
+    public override GetHashCode(obj : TSParam) : int
+    {
+      | Required as r => TSParam.Option(r.Name, false, r.Type, r.Access).GetHashCode()
+      | Rest as r => TSParam.Option(r.Name, false, Some(r.Type), None()).GetHashCode()
+      | _ => obj.GetHashCode()
+    }
+    
     protected override EqualsImpl(x : TSParam, y : TSParam) : bool
     {
       | (Required(_, xtype, _), Required(_, ytype, _))
@@ -85,7 +101,12 @@ namespace TSParser
   }
   
   public class TSParamsEqualityComparer : BaseEqualityComparer[IEnumerable[TSParam]]
-  {
+  { 
+    public override GetHashCode(obj : IEnumerable[TSParam]) : int
+    {
+      obj.GetHashCode()
+    }
+  
     protected override EqualsImpl(x : IEnumerable[TSParam], y : IEnumerable[TSParam]) : bool
     {
       Enumerable.SequenceEqual(x, y, TSParamEqualityComparer())
@@ -94,9 +115,19 @@ namespace TSParser
   
   public class TSObjectEqualityComparer : BaseEqualityComparer[TSObject]
   {
+    public override GetHashCode(obj : TSObject) : int
+    {
+      | Call => 1
+      | Construct => 2
+      | Index => 3
+      | Property => 4
+      | Function => 5
+    }
+      
     protected override EqualsImpl(x : TSObject, y : TSObject) : bool
     {
-      | (Call(xparms, _), Call(yparms, _)) => xparms.Equals(yparms)
+      | (Call(xparams, _), Call(yparams, _)) =>
+        TSParamsEqualityComparer().Equals(xparams, yparams)
       | (Construct(xparams, _), Construct(yparams, _)) =>
         TSParamsEqualityComparer().Equals(xparams, yparams)
       | (Index(_, TSIndexParamType.Number, _), Index(_, TSIndexParamType.Number, _)) => true
@@ -111,6 +142,11 @@ namespace TSParser
   
   public class TSGlobalFunctionEqualityComparer : BaseEqualityComparer[TSGlobal.Function]
   {
+    public override GetHashCode(obj : TSGlobal.Function) : int
+    {
+      obj.Name.GetHashCode()
+    }
+    
     protected override EqualsImpl(x : TSGlobal.Function, y : TSGlobal.Function) : bool
     {
       x.Name == y.Name &&
@@ -120,6 +156,20 @@ namespace TSParser
   
   public class TSTypeEqualityComparer : BaseEqualityComparer[TSType]
   {
+    public override GetHashCode(obj : TSType) : int
+    {
+      | Any => 1
+      | Number => 2
+      | Bool => 3
+      | String => 4
+      | Void => 5
+      | Named => 6
+      | Array => 7
+      | Object => 8
+      | Lambda => 9
+      | New => 10
+    }
+    
     protected override EqualsImpl(x : TSType, y : TSType) : bool
     {
       | (Any, Any) => true
