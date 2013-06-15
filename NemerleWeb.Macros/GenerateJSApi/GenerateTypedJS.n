@@ -350,7 +350,7 @@ namespace NemerleWeb
     private AnalyzeFunction(ast : IEnumerable[TSGlobal.Function]) : IEnumerable[TSGlobal]
     {
       def name = ast.First().Name;
-      
+      when(name == "xf")assert2(false);
       def ret = ast
         .SelectMany(f =>
           AnalyzeOverloads(f.Params).Select(p => TSGlobal.Function(name, p, f.ReturnType)))
@@ -390,9 +390,66 @@ namespace NemerleWeb
         }
     }
     
+    /// <summary>
+    /// Analyze lambda arguments and create Action/Func overload if return type is any.
+    /// </summary>
+    private AnalyzeLambdaOverloads(parms : List[TSParam]) : IEnumerable[list[TSParam]]
+    {
+      if(parms.Count == 0)
+        []
+      else
+        AnalyzeLambdaOverloadsImpl(parms, 0)
+    }
+    
+    private AnalyzeLambdaOverloadsImpl(parms : List[TSParam], index : int) : IEnumerable[list[TSParam]]
+    {
+      if(index < parms.Count) 
+      {
+        def parmsOverload = 
+          match(parms[index])
+          {
+          | TSParam.Required(_, Some(TSType.Lambda(_, TSType.Any) as l), _) as p =>
+            AnalyzeLambdaOverloadsImplGenerate(
+              parms,
+              index,
+              () => TSParam.Required(p.Name, Some(TSType.Lambda(l.Params, TSType.Void())), p.Access))
+          | TSParam.Option(_, _, Some(TSType.Lambda(_, TSType.Any) as l ), _) as p =>
+            AnalyzeLambdaOverloadsImplGenerate(
+              parms,
+              index,
+              () => TSParam.Option(p.Name, p.Optional, Some(TSType.Lambda(l.Params, TSType.Void())), p.Access))
+          | TSParam.Rest(_, TSType.Array(TSType.Lambda(_, TSType.Any) as l, rank)) as p =>
+            AnalyzeLambdaOverloadsImplGenerate(
+              parms,
+              index,
+              () => TSParam.Rest(p.Name, TSType.Array(TSType.Lambda(l.Params, TSType.Void()), rank)))
+          | _ =>
+            AnalyzeLambdaOverloadsImpl(parms, index + 1)
+          };
+          
+        foreach(res in parmsOverload) yield res;
+      }
+      else
+        yield parms.NToList();
+    }
+    
+    private AnalyzeLambdaOverloadsImplGenerate(parms : List[TSParam], index : int, f : void -> TSParam) : IEnumerable[list[TSParam]]
+    {
+      // Original parameters
+      foreach(res in AnalyzeLambdaOverloadsImpl(parms, index + 1)) yield res;
+        
+      // New parameters
+      def newParms = List(parms);
+      newParms[index] = f();
+          
+      foreach(res in AnalyzeLambdaOverloadsImpl(newParms, index + 1)) yield res;
+    }
+    
     private AnalyzeOverloads(parms : list[TSParam]) : IEnumerable[list[TSParam]]
     {
-      AnalyzeOverloadsList(parms.ToList())
+      def res = AnalyzeLambdaOverloads(parms.ToList()).ToList();
+      def res = res.SelectMany(parms => AnalyzeOverloadsList(parms.ToList()));
+      res
     }
     
     #endregion
@@ -851,7 +908,7 @@ namespace NemerleWeb
       match(inputType)
       {
       | Array(type, 0) => <[ $(ConvertType(prefix, type, typesScope)) ]>
-      | Array(type, arity) => <[ array[$(ConvertType(prefix, TSType.Array(type, arity - 1), typesScope))] ]>
+      | Array(type, rank) => <[ array[$(ConvertType(prefix, TSType.Array(type, rank - 1), typesScope))] ]>
       | Bool => <[ bool ]>   
       | Lambda(parms, ret) =>
         mutable lambdaParams = GetParamsType(prefix, parms, typesScope);
@@ -976,6 +1033,8 @@ namespace NemerleWeb
   
   #endregion
   
+  #region Extensions
+  
   internal module TypedJSStringExtensions
   {
     public SplitDot(this s : string) : list[string]
@@ -988,4 +1047,6 @@ namespace NemerleWeb
       string.Join(".", seq)
     }
   }
+  
+  #endregion
 }
