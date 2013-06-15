@@ -306,7 +306,7 @@ namespace NemerleWeb
       def extends = ast.SelectMany(_.Extends).Distinct().NToList();
       
       def members = ast
-        .SelectMany(a => a.Type.Members)
+        .SelectMany(a => a.Type.Members.SelectMany(AnalyzeTSObject))
         .Distinct(TSObjectEqualityComparer())
         .NToList();
       def @type = TSType.Object(members);
@@ -315,9 +315,25 @@ namespace NemerleWeb
       [ret]
     }
     
-    private AnalyzeTSObject(obj : TSObject) : TSObject
+    private AnalyzeTSObject(obj : TSObject) : IEnumerable[TSObject]
     {
-      obj
+      | Call as c =>
+        def calls = AnalyzeOverloads(c.Params)
+          .Select(p => TSObject.Call(p, c.ReturnType));
+        foreach(res in calls) yield res;
+      
+      | Construct as c =>
+        def constructs = AnalyzeOverloads(c.Params)
+          .Select(p => TSObject.Construct(p, c.Type));
+        foreach(res in constructs) yield res;
+      
+      | Function as f => 
+        def funcs = AnalyzeOverloads(f.Params)
+          .Select(p => TSObject.Function(f.Name, f.Optional, p, f.ReturnType));
+        foreach(res in funcs) yield res;
+        
+      | Index
+      | Property => yield obj
     }
     
     /// <summary>
@@ -350,7 +366,7 @@ namespace NemerleWeb
     private AnalyzeFunction(ast : IEnumerable[TSGlobal.Function]) : IEnumerable[TSGlobal]
     {
       def name = ast.First().Name;
-      when(name == "xf")assert2(false);
+      
       def ret = ast
         .SelectMany(f =>
           AnalyzeOverloads(f.Params).Select(p => TSGlobal.Function(name, p, f.ReturnType)))
@@ -433,15 +449,18 @@ namespace NemerleWeb
         yield parms.NToList();
     }
     
-    private AnalyzeLambdaOverloadsImplGenerate(parms : List[TSParam], index : int, f : void -> TSParam) : IEnumerable[list[TSParam]]
+    private AnalyzeLambdaOverloadsImplGenerate(
+      parms : List[TSParam],
+      index : int,
+      f : void -> TSParam) : IEnumerable[list[TSParam]]
     {
       // Original parameters
       foreach(res in AnalyzeLambdaOverloadsImpl(parms, index + 1)) yield res;
-        
-      // New parameters
+      
+      // New parameters with permutation for lambda parameters
       def newParms = List(parms);
       newParms[index] = f();
-          
+        
       foreach(res in AnalyzeLambdaOverloadsImpl(newParms, index + 1)) yield res;
     }
     
@@ -795,19 +814,16 @@ namespace NemerleWeb
         CreateAnonymousTypeAlways(prefix, members, typesScope)
     }
     
+    static mutable anonymousTypeIndex : int = 0;
+    
     private CreateAnonymousTypeAlways(prefix : string, members : list[TSObject], typesScope : Scope) : PExpr
     {
       // Handle no members case
       
       def classNamePrefix = $"$(prefix)_AnonymousType";
       
-      // Find unused name for anonymous class
-      // This handles situation when two functions with same name have different anonymous types.
-      mutable i = 0;
-      while(typesScope.LookupType(classNamePrefix + i.ToString()).IsSome)
-        i++;
-      
-      def className = classNamePrefix + i.ToString();
+      anonymousTypeIndex++;
+      def className = $"$classNamePrefix$anonymousTypeIndex";
       
       def anonClass = typesScope.Define(<[ decl:
         [JSApi] public sealed class $(className : usesite) { }
@@ -817,7 +833,8 @@ namespace NemerleWeb
       anonClass.HasBeenUsed = true;
       
       // Add members
-      foreach(member in members)
+      def analyzedMembers = members.SelectMany(AnalyzeTSObject).Distinct(TSObjectEqualityComparer());
+      foreach(member in analyzedMembers)
       {
       | Call(parms, returnType) =>
         def fullPrefix = $"$(className)_Call";
