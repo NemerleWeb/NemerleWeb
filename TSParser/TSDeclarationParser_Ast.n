@@ -126,7 +126,7 @@ namespace TSParser
     | String
     | Void
     | Named { Name : string; }
-    | Array { Type : TSType; Arity : int; }
+    | Array { Type : TSType; Rank : int; }
     | Object { Members : list[TSObject]; }
     | Lambda { Params : list[TSParam]; ReturnType : TSType; }
     | New { Params : list[TSParam]; ReturnType : TSType; }
