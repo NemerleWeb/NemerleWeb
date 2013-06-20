@@ -263,6 +263,9 @@ namespace NemerleWeb
           JSAst.NotImpl();
     }
 
+    /// <summary>
+    /// Special method for building ast for slices.
+    /// </summary>
     public BuildJSAstForSplices(expr : TExpr, methodHeader : TFunHeader) : IEnumerable[JSAst.DefValue]
     {
       def ast = JSAstBuilder.Build(expr, [], methodHeader);
@@ -274,18 +277,22 @@ namespace NemerleWeb
         }
       });
       
-      JSAstHelper.IterateAST(ast)
-                 .Where(a => a is JSAst.DefValue || a is JSAst.Assign)
-                 .Select.[JSAst, JSAst.DefValue](j =>
-                    match(j)
-                    {                    
-                    | JSAst.DefValue(name, Call(MethodRef(Method = "template") as template, [PropertyGet(l1, r1), PropertyGet as p2])) => 
-                      JSAst.DefValue(name, JSAst.Call(template, [JSAst.FieldRef(l1, r1), p2]))
-                    | JSAst.Assign(JSAst.LocalRef(name, _type), r) => JSAst.DefValue(name, r)
-                    | JSAst.Assign(JSAst.FieldRef(_obj, name), r) => JSAst.DefValue(name, r)
-                    | JSAst.DefValue => j :> JSAst.DefValue
-                    | _ => Message.Error("Must not get here"); null
-                 });
+      JSAstHelper
+        .IterateAST(ast)
+        .Where(a => a is JSAst.DefValue || a is JSAst.Assign)
+        .Select(j =>
+          match(j)
+          {                 
+          | JSAst.DefValue(name, Call(MethodRef(Method = "template") as template, [PropertyGet(l1, r1), PropertyGet as p2])) => 
+            JSAst.DefValue(name, JSAst.Call(template, [JSAst.FieldRef(l1, r1), p2]))
+          // Convert sequence to anonymous function call
+          | JSAst.DefValue(name, JSAst.Seq as val) =>             
+            JSAst.DefValue(name, JSAst.Call(JSAstHelper.MakeReturningFunction(val), []))
+          | JSAst.DefValue => j :> JSAst.DefValue
+          | JSAst.Assign(JSAst.LocalRef(name, _type), r) => JSAst.DefValue(name, r)
+          | JSAst.Assign(JSAst.FieldRef(_obj, name), r) => JSAst.DefValue(name, r)
+          | _ => Message.Error("Must not get here"); null
+        });
     }
       
     public BuildJSAst(expr : TExpr, shouldReturn : bool, methodHeader : TFunHeader) : JSAst

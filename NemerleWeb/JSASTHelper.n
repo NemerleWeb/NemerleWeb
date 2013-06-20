@@ -68,7 +68,7 @@ namespace NemerleWeb
           | Label(id, body) when gotos.ContainsKey(id.ToString()) =>
             def functionName = "_nweb_lbl_l" + id.ToString();
             JSAst.Seq([
-              JSAst.DeclFunction(functionName, [], MakeReturn(body)),
+              JSAst.Function(functionName, [], MakeReturn(body)),
               JSAst.Call(JSAst.LocalRef(functionName, None()), [])
             ]);
             //JSAst.WhileNamed(JSAst.Literal(JSLiteral.Bool(true)), JSAst.Seq([body, JSAst.Break()]), "l" + id.ToString()); //ConvertLabelToSwitch(l)
@@ -320,7 +320,7 @@ namespace NemerleWeb
     
     public MakeReturningFunction(ast : JSAst) : JSAst
     {
-      | _ => JSAst.DefFunction(JSAst.Void(), [], MakeReturn(ast))
+      JSAst.Function("", [], MakeReturn(ast))
     }
     
     public Append(ast : JSAst, toAppend : JSAst) : JSAst

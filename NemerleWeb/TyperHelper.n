@@ -34,22 +34,24 @@ namespace NemerleWeb
           def tt = GetTypedBody(method, typer, typer.CurrentTypeBuilder);
           def defs2 = JSAstBuilder.BuildJSAstForSplices(tt, method.Header);
           
-          defs.Concat(defs2)
-              .SelectMany(j =>
-                regexp match(j.Name)
-                {
-                | <#^_var(?<index : int>\d+)_\d+$#> => 
-                  match(j.Val)
+          def ret =
+            defs.Concat(defs2)
+                .SelectMany(j =>
+                  regexp match(j.Name)
                   {
-                  | JSAst.Tuple(args) =>
-                    def values = args.MapI((i, a) => $<#"$i": "$(normalize(a.Write()))"#>);
-                    [(index, $<#{..$values}#>)]
-                  | _ => [(index, normalize(j.Val.Write()))]
-                  }                  
-                | _ => []
-                })
-              .GroupBy((i, _) => i)
-              .ToDictionary(g => g.Key, g => g.FirstOrDefault((_, v) => !string.IsNullOrEmpty(v))[1]);
+                  | <#^_var(?<index : int>\d+)_\d+$#> => 
+                    match(j.Val)
+                    {
+                    | JSAst.Tuple(args) =>
+                      def values = args.MapI((i, a) => $<#"$i": "$(normalize(a.Write()))"#>);
+                      [(index, $<#{..$values}#>)]
+                    | _ => [(index, normalize(j.Val.Write()))]
+                    }                  
+                  | _ => []
+                  })
+                .GroupBy((i, _) => i)
+                .ToDictionary(g => g.Key, g => g.FirstOrDefault((_, v) => !string.IsNullOrEmpty(v))[1]);
+          ret
         }
         
         public GetMethodJSAst(method : IMethod, typer : Typer, tb : TypeBuilder) : JSAst 
