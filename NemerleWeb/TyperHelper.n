@@ -19,6 +19,13 @@ namespace NemerleWeb
         
         public GetSplices(expr : PExpr, typer : Typer) : Dictionary[int, string]
         {
+          // Normalize string for slices.
+          // New line symbol must not appear.
+          def normalize(s)
+          {
+            s.Replace("\r", " ").Replace("\n", " ")
+          }
+          
           def method = BuildMethod(expr, typer);
           def oldBody = method.Header.body;
           def typedBody = GetTypedBody(method, typer, typer.CurrentTypeBuilder, false);
@@ -35,9 +42,9 @@ namespace NemerleWeb
                   match(j.Val)
                   {
                   | JSAst.Tuple(args) =>
-                    def values = args.MapI((i, a) => $"\"$i\": \"$(a.Write())\"");
+                    def values = args.MapI((i, a) => $<#"$i": "$(normalize(a.Write()))"#>);
                     [(index, $<#{..$values}#>)]
-                  | _ => [(index, j.Val.Write())]
+                  | _ => [(index, normalize(j.Val.Write()))]
                   }                  
                 | _ => []
                 })
