@@ -91,32 +91,42 @@ namespace NemerleWeb
             public override Write(indent = "" : string) : string
             {
               def writeParam(p) { p.Write("") }
+              def writeParamsRaw(parms) { $<#..$(parms; ", "; writeParam)#> }
+              def writeParams(parms) { $"($(writeParamsRaw(parms)))" }
               
-              indent +
+              def output =
                 match(this)
                 {
-                | Call(OpCode as op, [e1, e2])         => $<#($(e1.Write("")) $(op.Write("")) $(e2.Write("")))#>
+                | Call(OpCode as op, [e1, e2])         =>
+                  $<#($(e1.Write("")) $(op.Write("")) $(e2.Write("")))#>
                 
-                | Call(Constructor(type, None), parms) => $<#new $(type)(..$(parms; ", "; writeParam))#>
+                | Call(Constructor(type, None), parms) => $<#new $(type)$(writeParams(parms))#>
                 | Call(Constructor(type, Some(paramsType)), parms) => 
                   def methodSignature = JSAstHelper.MethodSignature(paramsType);
                   def comma = if (parms is []) "" else ", ";
-                  $<#new $(type)($methodSignature$comma..$(parms; ", "; writeParam))#>
+                  $<#new $(type)($methodSignature$comma$(writeParamsRaw(parms)))#>
                 
                 | Call(ConstructorRef(type, None), parms) =>
-                  $<#$(type).call(..$(JSAst.This() :: parms; ", "; writeParam))#>
+                  $<#$(type).call$(writeParams(JSAst.This() :: parms))#>
+                
                 | Call(ConstructorRef(type, Some(paramsType)), parms) =>
                   def methodSignature = JSAstHelper.MethodSignature(paramsType);
                   def comma = if (parms is []) "" else ", ";
                   def astThis = JSAst.This().Write();
-                  $<#$(type).call($astThis, $methodSignature$comma..$(parms; ", "; writeParam))#>
+                  $<#$(type).call($astThis, $methodSignature$comma$(writeParamsRaw(parms)))#>
                 
-                | Call(Indexer(obj), parms)          => $<#$(obj.Write())[..$(parms; ", "; writeParam)]#>                
+                | Call(Indexer(obj), parms)          =>
+                  $<#$(obj.Write())[$(writeParamsRaw(parms))]#>                
+                
                 | Call(MethodRef(obj, method, Some) as f, parms) when
                   !JSAstHelper.IsSpecialMethod(method) =>
-                  $<#$(f.Write()).call(..$(obj :: parms; ", "; writeParam))#>
-                | Call(f, parms)                     => $<#$(f.Write())(..$(parms; ", "; writeParam))#>    
-                }
+                  $<#$(f.Write()).call$(writeParams(obj :: parms))#>
+                
+                | Call(Function as f, parms) => $<#($(f.Write()))$(writeParams(parms))#>
+                | Call(f, parms)             => $<#$(f.Write())$(writeParams(parms))#>    
+                };
+              
+              indent + output
             }
             
             static private Literal_Int1 : JSAst.Literal = JSAst.Literal(JSLiteral.Integer(1));
@@ -286,29 +296,6 @@ namespace NemerleWeb
               Type
             }
           }
-        | DefFunction
-          {
-            Obj : JSAst;
-            Parameters : list[JSAst];
-            Body : JSAst;
-            
-            public override Write(indent = "" : string) : string
-            {
-$<#$(indent)function(..$(Parameters; ";"; p => p.Write(""))) { 
-$(Body.Write(indent + "  ")) 
-$(indent)}#>
-            }
-        }
-        | DeclFunction {
-          Name : string;
-          Parameters : list[JSAst];
-          Body : JSAst;
-          
-          public override Write(_indent = "" : string) : string
-          {
-$<#function $Name(..$(Parameters; ";"; p => p.Write(""))) { $(Body.Write("  ")) }#>
-          }
-        }
         | DefValue       { Name : string; Val : JSAst;
           public override Write(indent = "" : string) : string {
             match(this)
@@ -348,6 +335,19 @@ $(Body.Write("  "))
 }#> 
             }
         }
+        | Function
+          {
+            Name : string;
+            Parameters : list[JSAst];
+            Body : JSAst;
+          
+            public override Write(indent = "" : string) : string
+            {
+$<#$(indent)function $Name(..$(Parameters; ";"; p => p.Write(""))) {
+$(Body.Write(indent + "  "))
+$(indent)}#>
+            }
+          }
         | GlobalRef
           {
             Member : string;
@@ -844,13 +844,12 @@ $(indent)}
             | Code                        => ast'
             | Constructor                 => ast'
             | ConstructorRef              => ast'
-            | Continue(loopname)          => JSAst.Continue(loopname)
-            | DefFunction(obj, ps, bdy)   => JSAst.DefFunction(recurse(obj), ps.Map(recurse), recurse(bdy))
-            | DeclFunction(name, ps, bdy) => JSAst.DeclFunction(name, ps.Map(recurse), recurse(bdy))
+            | Continue(loopname)          => JSAst.Continue(loopname)            
             | DefValue(name, val)         => JSAst.DefValue(name, recurse(val))
             | Delete                      => ast'
             | FieldRef(obj, parm)         => JSAst.FieldRef(recurse(obj), parm)
             | For(it, coll, body)         => JSAst.For(it, recurse(coll), recurse(body))
+            | Function(name, ps, bdy)     => JSAst.Function(name, ps.Map(recurse), recurse(bdy))            
             | GlobalRef                   => ast'
             | Goto                        => ast'
             | HasType(obj, type)          => JSAst.HasType(recurse(obj), type)
