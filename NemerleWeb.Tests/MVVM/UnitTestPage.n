@@ -903,13 +903,6 @@ namespace NemerleWeb.Tests
         jsnew RegExp("pattern", undefined).test("pattern")
       });
       
-      test("regexp compile 1", () =>
-      {
-        def pat = jsnew RegExp("pattern", undefined);
-        _ = pat.compile();
-        pat.test("pattern")
-      });
-      
       test("regexp exec 1", () =>
       {
         def pat = jsnew RegExp(".+", undefined);        
