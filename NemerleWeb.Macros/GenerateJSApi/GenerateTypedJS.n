@@ -576,7 +576,7 @@ namespace NemerleWeb
             ]>)
         else
         {
-          def extends = tsInterface.Extends.Select(e => <[ $(e : usesite) ]>);
+          def extends = tsInterface.Extends.Select(typesScope.FromQualifiedIdentifier);
           typesScope.Define(
             <[ decl:
               [JSApi] public partial interface $(tsInterface.Name : usesite) : ..$extends {}
@@ -662,8 +662,14 @@ namespace NemerleWeb
           | (None, []) =>
             typesScope.Define(<[ decl: [JSApi] public partial class $(tsClass.Name : usesite) {} ]>)
           | _ =>
-            def extends = if (tsClass.Extends is Some(ex)) [<[ $(ex : usesite) ]>] else [];
-            def implement = tsClass.Implements.Select(e => <[ $(e : usesite) ]>);
+            def extends =
+              if (tsClass.Extends is Some(ex))
+                if(typesScope.LookupType(ex) is Some(t))
+                  [t]
+                else []
+              else [];
+            
+            def implement = tsClass.Implements.Select(typesScope.FromQualifiedIdentifier);
             def inherit = extends.Concat(implement);
             
             typesScope.Define(
@@ -939,7 +945,7 @@ namespace NemerleWeb
           };
         
         <[ $type.[..$lambdaParams] ]>
-      | Named(name) => LookupType(name, typesScope)
+      | Named(name) => LookupTypeInScope(name, typesScope)
       | New(parms, returnType) =>
         CreateAnonymousType(prefix, [TSObject.Construct(parms, Some(returnType))], typesScope)
         
@@ -965,7 +971,7 @@ namespace NemerleWeb
     // TypeScript behaves like C# and allows this code with choosing internal module.
     // We must do same lookup and find out all types starting from the current scope.
     // </summary>
-    private LookupType(name : string, scope : Scope) : PExpr
+    private LookupTypeInScope(name : string, scope : Scope) : PExpr
     {
       // Try finding type going up in hierarcy of scope.
       // TODO: Think about functional solution :)
