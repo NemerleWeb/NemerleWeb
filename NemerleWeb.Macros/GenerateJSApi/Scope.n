@@ -49,9 +49,14 @@ namespace NemerleWeb
     public LookupType(qid : string) : option[PExpr]
     {
       if(IsTypeExist(qid))
-        Some(PExpr.FromQualifiedIdentifier(Manager, qid))
+        Some(FromQualifiedIdentifier(qid))
       else
         None()
+    }
+
+    public FromQualifiedIdentifier(qid : string) : PExpr
+    {
+      PExpr.FromQualifiedIdentifier(Manager, qid)
     }
     
     private IsTypeExist(typeName : string) : bool
