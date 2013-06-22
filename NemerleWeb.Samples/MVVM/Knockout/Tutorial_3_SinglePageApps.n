@@ -2,127 +2,132 @@
 using System.Collections.Generic;
 using System.Linq;
 using NemerleWeb;
-
+using NemerleWeb.TypedJS;
 
 namespace NemerleWeb.Samples
 {
-    [Unit]
-    public class SPAPage
-    {
-        [Record, Unit]
-        public class Mail
-        {   
-            public Id : int { get; set; }
-            public From : string { get; set; }
-            public To : string { get; set; }
-            public Date : string { get; set; }
-            public Subject : string { get; set; }
-            public MessageContent : string { get; set; }
-            public Folder : string { get; set; }
-        }
-        
-        [Record, Unit]
-        public class FolderData
-        {
-            public Id : string { get; set; }
-            public Mails : IEnumerable[Mail] { get; set; }
-        }
-        
-        public Folders : List[string] { get; set; }
-        public ChosenFolderId : string { get; set; }
-        public ChosenFolderData : FolderData { get; set; }
-        public ChosenMailData : Mail { get; set; }
-        
-        public this() 
-        {
-            Folders = ["Inbox", "Archive", "Sent", "Spam"].ToList();            
-            js <#
-                Sammy(function() {
-                    this.get("#:folder", function() {
-                        self.set_ChosenFolderId(this.params.folder);
-                        self.set_ChosenMailData(null);
-                        $.get("/SPAPage/Folder", { folder: this.params.folder }, function(result) { 
-                            self.set_ChosenFolderData(nweb.utils.toTypedObject(result));
-                            nweb.invalidate();
-                        });
-                    });
-                    
-                    this.get("#:folder/:mailId", function() {
-                        self.set_ChosenFolderId(this.params.folder);
-                        self.set_ChosenMailData(null);
-                        $.get("/SPAPage/Mail", { mailId: this.params.mailId }, function(result) { 
-                            self.set_ChosenMailData(nweb.utils.toTypedObject(result));
-                            nweb.invalidate();
-                        });
-                    });
-                    
-                    this.get('', function() { this.app.runRoute('get', '#Inbox') });
-                }).run();
-            #>;
-        }
-        
-        public GoToFolder(_folder : int) : void {
-            js location.hash = _folder;
-        }
-        
-        public GoToMail(_mail : Mail) : void {
-            js location.hash = _mail.get_Folder() + '/' + _mail.get_Id();
-        }
-        
-        public class Server
-        {
-            allMail : list[Mail] = [
-                            Mail(1, "Abbot \u003coliver@smoke-stage.xyz\u003e", "steve@example.com", "May 25, 2011", "Booking confirmation #389629244", "", "Inbox"),
-                            Mail(2, "Addison Begoat \u003cupton.oprdrusson@pear-income.xyz\u003e", "steve@example.com", "May 7, 2011", "FW: Associate advice", "", "Inbox"),
-                            Mail(3, "Allistair \u003cleroy72@plane-railway.xyz\u003e", "steve@example.com", "May 19, 2011", "RE: Phone call tomorrow 5 o\u0027clock", "", "Inbox"),
-                            Mail(4, "(archived) Abbot \u003coliver@smoke-stage.xyz\u003e", "steve@example.com", "May 25, 2011", "Booking confirmation #389629244", "", "Archive"),
-                            Mail(5, "(archived) Addison Begoat \u003cupton.oprdrusson@pear-income.xyz\u003e", "steve@example.com", "May 7, 2011", "FW: Associate advice", "", "Archive")
-                          ];
-                          
-            public Folder(folder : string) : FolderData
-            {
-                FolderData(folder, allMail.Where(m => m.Folder == folder));
-            }
-            
-            public Mail(mailId : int) : Mail
-            {
-                allMail.FirstOrDefault(m => m.Id == mailId);
-            }
-        }
-        
-        [Html]
-        public View() : string
-        {
-            <# 
-            <div xmlns="">
-                <h3>Single page apps</h3>
-                <ul class="folders">
-                    <li $foreach(f in Folders) text="$f" css-selected="$(f == ChosenFolderId)" click="$GoToFolder"> </li>
-                </ul>
-
-                <table $when(ChosenFolderData != null) class="mails">
-                    <thead><tr><th>From</th><th>To</th><th>Subject</th><th>Date</th></tr></thead>
-                    <tbody>
-                        <tr $foreach(m in ChosenFolderData.Mails) click="$GoToMail">
-                            <td>$(m.From)</td>
-                            <td>$(m.To)</td>
-                            <td>$(m.Subject)</td>
-                            <td>$(m.Date)</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div $when(ChosenMailData != null) class="viewMail">
-                    <div class="mailInfo">
-                        <h1>$(ChosenMailData.Subject)</h1>
-                        <p><label>From</label>: <span>$(ChosenMailData.From)</span></p>
-                        <p><label>To</label>: <span>$(ChosenMailData.To)</span></p>
-                        <p><label>Date</label>: <span>$(ChosenMailData.Date)</span></p>
-                    </div>
-                    <p class="message" html="$(ChosenMailData.MessageContent)"> </p>
-                </div>
-            </div>
-            #>
-        }
+  [Unit]
+  public class SPAPage
+  {
+    [Record, Unit]
+    public class Mail
+    {   
+        public Id : int { get; set; }
+        public From : string { get; set; }
+        public To : string { get; set; }
+        public Date : string { get; set; }
+        public Subject : string { get; set; }
+        public MessageContent : string { get; set; }
+        public Folder : string { get; set; }
     }
+        
+    [Record, Unit]
+    public class FolderData
+    {
+        public Id : string { get; set; }
+        public Mails : IEnumerable[Mail] { get; set; }
+    }
+        
+    public Folders : List[string] { get; set; }
+    public ChosenFolderId : string { get; set; }
+    public ChosenFolderData : FolderData { get; set; }
+    public ChosenMailData : Mail { get; set; }
+      
+    public this() 
+    {
+      Folders = ["Inbox", "Archive", "Sent", "Spam"].ToList();            
+      js <#
+          Sammy(function() {
+              this.get("#:folder", function() {
+                  self.set_ChosenFolderId(this.params.folder);
+                  self.set_ChosenMailData(null);
+                  $.get("/SPAPage/Folder", { folder: this.params.folder }, function(result) { 
+                      self.set_ChosenFolderData(nweb.utils.toTypedObject(result));
+                      nweb.invalidate();
+                  });
+              });
+                    
+              this.get("#:folder/:mailId", function() {
+                  self.set_ChosenFolderId(this.params.folder);
+                  self.set_ChosenMailData(null);
+                  $.get("/SPAPage/Mail", { mailId: this.params.mailId }, function(result) { 
+                      self.set_ChosenMailData(nweb.utils.toTypedObject(result));
+                      nweb.invalidate();
+                  });
+              });
+                    
+              this.get('', function() { this.app.runRoute('get', '#Inbox') });
+          }).run();
+      #>;
+    }
+   
+    public GoToFolder(folder : string) : void
+    {
+      window.location.hash = folder;
+    }
+        
+    public GoToMail(mail : Mail) : void
+    {
+      window.location.hash = mail.Folder + '/' + mail.Id;
+    }   
+        
+    public class Server
+    {
+      allMail : list[Mail] = 
+        [
+          Mail(1, "Abbot \u003coliver@smoke-stage.xyz\u003e", "steve@example.com", "May 25, 2011", "Booking confirmation #389629244", "", "Inbox"),
+          Mail(2, "Addison Begoat \u003cupton.oprdrusson@pear-income.xyz\u003e", "steve@example.com", "May 7, 2011", "FW: Associate advice", "", "Inbox"),
+          Mail(3, "Allistair \u003cleroy72@plane-railway.xyz\u003e", "steve@example.com", "May 19, 2011", "RE: Phone call tomorrow 5 o\u0027clock", "", "Inbox"),
+          Mail(4, "(archived) Abbot \u003coliver@smoke-stage.xyz\u003e", "steve@example.com", "May 25, 2011", "Booking confirmation #389629244", "", "Archive"),
+          Mail(5, "(archived) Addison Begoat \u003cupton.oprdrusson@pear-income.xyz\u003e", "steve@example.com", "May 7, 2011", "FW: Associate advice", "", "Archive")
+        ];
+      
+      [System.Web.Mvc.HttpGet]
+      public Folder(folder : string) : FolderData
+      {
+        FolderData(folder, allMail.Where(m => m.Folder == folder));
+      }
+      
+      [System.Web.Mvc.HttpGet]
+      public Mail(mailId : int) : Mail
+      {
+        allMail.FirstOrDefault(m => m.Id == mailId);
+      }
+    }
+        
+    [Html]
+    public View() : string
+    {
+      <# 
+      <div xmlns="">
+          <h3>Single page apps</h3>
+          <ul class="folders">
+              <li $foreach(f in Folders) text="$f" css-selected="$(f == ChosenFolderId)" click="$GoToFolder"> </li>
+          </ul>
+
+          <table $when(ChosenFolderData != null) class="mails">
+              <thead><tr><th>From</th><th>To</th><th>Subject</th><th>Date</th></tr></thead>
+              <tbody>
+                  <tr $foreach(m in ChosenFolderData.Mails) click="$GoToMail">
+                      <td>$(m.From)</td>
+                      <td>$(m.To)</td>
+                      <td>$(m.Subject)</td>
+                      <td>$(m.Date)</td>
+                  </tr>
+              </tbody>
+          </table>
+
+          <div $when(ChosenMailData != null) class="viewMail">
+              <div class="mailInfo">
+                  <h1>$(ChosenMailData.Subject)</h1>
+                  <p><label>From</label>: <span>$(ChosenMailData.From)</span></p>
+                  <p><label>To</label>: <span>$(ChosenMailData.To)</span></p>
+                  <p><label>Date</label>: <span>$(ChosenMailData.Date)</span></p>
+              </div>
+              <p class="message" html="$(ChosenMailData.MessageContent)"> </p>
+          </div>
+      </div>
+      #>
+    }
+  }
 }
