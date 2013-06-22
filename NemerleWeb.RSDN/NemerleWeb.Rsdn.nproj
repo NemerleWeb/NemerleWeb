@@ -317,7 +317,7 @@
     <Content Include="Scripts\sammy.js">
       <SubType>Content</SubType>
     </Content>
-	<Content Include="Scripts\deprecated.js">
+    <Content Include="Scripts\deprecated.js">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Web.config" />
@@ -390,7 +390,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>49919</DevelopmentServerPort>
+          <DevelopmentServerPort>56418</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>
