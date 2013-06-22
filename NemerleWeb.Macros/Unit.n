@@ -327,7 +327,7 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
                     else
                     {
                       def errorMessage = $"!!!ERROR!!! Cannot find $file!!!";
-                      _ = sb.Append($"\r\n// $errorMessage\r\nconsole.log($errorMessage);\r\n");
+                      _ = sb.Append($"\r\n// $errorMessage\r\nconsole.error($errorMessage);\r\n");
                     }
                 
                 Content(sb.ToString(), "text/javascript");

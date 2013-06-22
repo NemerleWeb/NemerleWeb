@@ -45,6 +45,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+      <Name>EntityFramework</Name>
+      <AssemblyName>EntityFramework.dll</AssemblyName>
+      <HintPath>..\packages\EntityFramework.5.0.0\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Client, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>Microsoft.AspNet.SignalR.Client</Name>
       <AssemblyName>Microsoft.AspNet.SignalR.Client.dll</AssemblyName>
@@ -129,6 +134,10 @@
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Entity">
+      <Name>System.Data.Entity</Name>
+      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\v3.5\System.Data.Entity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -207,7 +216,19 @@
     <Content Include="App_Data\tree.xml">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Content\Images\jquery.splitter\hgrabber.gif">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Content\Images\jquery.splitter\vdockbar-trans.gif">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Content\Images\jquery.splitter\vgrabber.gif">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Content\Images\pin.png">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Content\jquery.splitter.css">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Global.asax" />
@@ -233,10 +254,19 @@
     <Content Include="Scripts\jquery-1.10.1.min.map">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\jquery.cookie.js">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\jquery.signalR-1.1.2.js">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\jquery.signalR-1.1.2.min.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery.splitter.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery.splitter.min.js">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\jquery.unobtrusive-ajax.js">
@@ -287,7 +317,7 @@
     <Content Include="Scripts\sammy.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\splitter.js">
+	<Content Include="Scripts\deprecated.js">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Web.config" />
@@ -308,6 +338,7 @@
     <Folder Include="bin\" />
     <Folder Include="Content\" />
     <Folder Include="Content\Images\" />
+    <Folder Include="Content\Images\jquery.splitter\" />
     <Folder Include="Controllers\" />
     <Folder Include="Models\" />
     <Folder Include="MVVM" />

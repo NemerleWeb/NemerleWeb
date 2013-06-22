@@ -1,0 +1,48 @@
+.ui-state-default {
+  background-color: #b6b6b6;
+}
+
+.ui-state-hover {
+  background-color: #a8a8a8;
+}
+
+.ui-state-highlight {
+  background-color: #a8a8a8;
+}
+
+.ui-state-error {
+  background-color: #eaa;
+}
+
+.splitter-pane {
+  overflow: auto;
+}
+
+.splitter-bar-vertical {
+  background-image: url(/content/images/jquery.splitter/vgrabber.gif);
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 6px;
+}
+
+.splitter-bar-horizontal {
+  background-image: url(/content/images/jquery.splitter/hgrabber.gif);
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 6px;
+}
+
+.splitter-bar-vertical-docked {
+  background-image: url(/content/images/jquery.splitter/vdockbar-trans.gif);
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 10px;
+}
+
+.splitter-bar.ui-state-highlight {
+  opacity: 0.7;
+}
+
+.splitter-iframe-hide {
+  visibility: hidden;
+}
