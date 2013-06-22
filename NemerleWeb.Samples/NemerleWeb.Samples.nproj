@@ -314,10 +314,16 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-ui-1.8.11.js">
+    <Content Include="Scripts\jquery-1.10.1.intellisense.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-ui-1.8.11.min.js">
+    <Content Include="Scripts\jquery-1.10.1.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery-1.10.1.min.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery-1.10.1.min.map">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\jquery.unobtrusive-ajax.js">
