@@ -341,9 +341,6 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\knockout.mapping-latest.js">
-      <SubType>Content</SubType>
-    </Content>
     <Content Include="Scripts\lang-n.js">
       <SubType>Content</SubType>
     </Content>
@@ -365,7 +362,10 @@
     <Content Include="Scripts\prettify.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\sammy.js">
+    <Content Include="Scripts\sammy-0.7.4.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\sammy-0.7.4.min.js">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Views\Home\Tests.cshtml">
