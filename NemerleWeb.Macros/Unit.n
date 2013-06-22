@@ -310,18 +310,32 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
               def scripts =
               [
                 "NemerleWeb.Scripts.json2.js",
-                "NemerleWeb.Scripts.jquery-1.8.2.js",
-                "NemerleWeb.Scripts.jquery.signalR-1.0.1.js",
+                "NemerleWeb.Scripts.jquery-1.10.1.js",
+                "NemerleWeb.Scripts.jquery.signalR-1.1.2.js",
                 "NemerleWeb.Scripts.linq.js",
                 "NemerleWeb.Scripts.nweb.js"
               ];
               
-              def sb = System.Text.StringBuilder();
-              foreach(file in scripts)
-                using(stream = typeof(NemerleWeb.JSAst).Assembly.GetManifestResourceStream(file))
-                using(reader = System.IO.StreamReader(stream))
-                  _ = sb.Append(reader.ReadToEnd());
-              Content(sb.ToString(), "text/javascript");
+              try
+              {
+                def sb = System.Text.StringBuilder();
+                foreach(file in scripts)
+                  using(stream = typeof(NemerleWeb.JSAst).Assembly.GetManifestResourceStream(file))
+                    if(stream != null)
+                      using(reader = System.IO.StreamReader(stream))
+                        _ = sb.Append(reader.ReadToEnd());
+                    else
+                    {
+                      def errorMessage = $"!!!ERROR!!! Cannot find $file!!!";
+                      _ = sb.Append($"\r\n// $errorMessage\r\nconsole.log($errorMessage);\r\n");
+                    }
+                
+                Content(sb.ToString(), "text/javascript");
+              }
+              catch
+              {
+              | e => Content(e.ToString(), "text/javascript");
+              }
             }
             
             public Unit(id : string) : System.Web.Mvc.ActionResult
