@@ -366,9 +366,6 @@
     <Content Include="Scripts\linq.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\modernizr-2.0.6-development-only.js">
-      <SubType>Content</SubType>
-    </Content>
     <Content Include="Scripts\NWebJs.Tests\simple-repeat.html">
       <SubType>Content</SubType>
     </Content>
