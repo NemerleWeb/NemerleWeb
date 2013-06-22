@@ -103,7 +103,7 @@
     <Reference Include="Newtonsoft.Json">
       <Name>Newtonsoft.Json</Name>
       <AssemblyName>Newtonsoft.Json.dll</AssemblyName>
-      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5">
