@@ -109,11 +109,19 @@ namespace NemerleWeb
             def deserializedParams = method
               .GetParameters()
               .Map(p => <[ parsedModel[$(p.Name : string)].ToObject.[$(p.ty : typed)]() ]>);
+            
+            def mvcAttribute = 
+              if(method.IsCustomAttributeDefined("System.Web.Mvc.HttpGetAttribute"))
+                <[ System.Web.Mvc.HttpGet ]>
+              else
+                <[ System.Web.Mvc.HttpPost ]>;
               
             _ = controller.DefineWithSource(<[ decl: 
-              [System.Web.Mvc.HttpPost, System.Web.Mvc.ValidateInput(false)]
+              [$mvcAttribute, System.Web.Mvc.ValidateInput(false)]
               public new $(methodName : name) (model : string) : System.Web.Mvc.ActionResult
               {
+                when(model == null) throw ArgumentNullException("model");
+                
                 def parsedModel = Newtonsoft.Json.Linq.JObject.Parse(model);
                 _ = parsedModel;
                 
