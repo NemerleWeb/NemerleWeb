@@ -110,14 +110,8 @@ namespace NemerleWeb
               .GetParameters()
               .Map(p => <[ parsedModel[$(p.Name : string)].ToObject.[$(p.ty : typed)]() ]>);
             
-            def mvcAttribute = 
-              if(method.IsCustomAttributeDefined("System.Web.Mvc.HttpGetAttribute"))
-                <[ System.Web.Mvc.HttpGet ]>
-              else
-                <[ System.Web.Mvc.HttpPost ]>;
-              
             _ = controller.DefineWithSource(<[ decl: 
-              [$mvcAttribute, System.Web.Mvc.ValidateInput(false)]
+              [System.Web.Mvc.HttpPost, System.Web.Mvc.ValidateInput(false)]
               public new $(methodName : name) (model : string) : System.Web.Mvc.ActionResult
               {
                 when(model == null) throw ArgumentNullException("model");

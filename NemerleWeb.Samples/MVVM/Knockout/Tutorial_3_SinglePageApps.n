@@ -82,13 +82,11 @@ namespace NemerleWeb.Samples
           Mail(5, "(archived) Addison Begoat \u003cupton.oprdrusson@pear-income.xyz\u003e", "steve@example.com", "May 7, 2011", "FW: Associate advice", "", "Archive")
         ];
       
-      [System.Web.Mvc.HttpGet]
       public Folder(folder : string) : FolderData
       {
         FolderData(folder, allMail.Where(m => m.Folder == folder));
       }
       
-      [System.Web.Mvc.HttpGet]
       public Mail(mailId : int) : Mail
       {
         allMail.FirstOrDefault(m => m.Id == mailId);
