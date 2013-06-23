@@ -561,7 +561,7 @@ namespace NemerleWeb
       def functionParams = ConvertParameters(function.Name, function.Params, typesScope);
         
       _ = othersScope.Define(<[ decl: 
-        $(function.Name : usesite)(..$functionParams) : $returnType
+        public $(function.Name : usesite)(..$functionParams) : $returnType
           $DefaultImplementation
       ]>);   
     }
