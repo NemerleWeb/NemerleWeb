@@ -112,6 +112,7 @@
     <Folder Include="Scripts\typings\linq\" />
     <Folder Include="Scripts\typings\modernizr\" />
     <Folder Include="Scripts\typings\moment\" />
+    <Folder Include="Scripts\typings\rx.js" />
     <Folder Include="Scripts\typings\numeraljs\" />
     <Folder Include="Scripts\typings\preloadjs\" />
     <Folder Include="Scripts\typings\qunit\" />
@@ -258,6 +259,21 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\requirejs\require.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\rx.js\rx.js.aggregates.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\rx.js\rx.js.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\rx.js\rx.js.html.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\rx.js\rx.js.jquery.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\rx.js\rx.js.time.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\select2\select2.d.ts">
