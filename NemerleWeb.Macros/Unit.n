@@ -99,7 +99,7 @@ namespace NemerleWeb
             when !method.IsConstructor && method.DeclaringType.FullName == serverClass.FullName
             in serverClass.GetMembers())
           {
-            def parameters = method.GetParameters().Map(p => <[ $(p.Name : usesite) : $(p.ty : typed) ]>);              
+            def parameters = method.GetParameters().Map(p => <[ $(p.Name : usesite) : $(p.ty : typed) ]>);
             def fparms = parameters.Map(PParameter);
             def methodName = controller.ParsedName.NewName(method.Name);
                   
@@ -109,24 +109,58 @@ namespace NemerleWeb
             def deserializedParams = method
               .GetParameters()
               .Map(p => <[ parsedModel[$(p.Name : string)].ToObject.[$(p.ty : typed)]() ]>);
-            
-            _ = controller.DefineWithSource(<[ decl: 
-              [System.Web.Mvc.HttpPost, System.Web.Mvc.ValidateInput(false)]
-              public new $(methodName : name) (model : string) : System.Web.Mvc.ActionResult
+              
+            // Do not override methods where MVC attributes defined
+            def isMvcAttributeDefined(verb)
+            {
+              method.IsCustomAttributeDefined($"System.Web.Mvc.Http$(verb)Attribute");
+            }
+            def mvcAttributes = ["Get", "Post", "Put", "Delete"];
+            def hasMvcAttribute = mvcAttributes.Any(isMvcAttributeDefined);
+              
+            def controllerMethod =
+              if(hasMvcAttribute)
               {
-                when(model == null) throw ArgumentNullException("model");
+                def callParams = method.GetParameters().Map(p => <[ $(p.Name : usesite) ]>);
                 
-                def parsedModel = Newtonsoft.Json.Linq.JObject.Parse(model);
-                _ = parsedModel;
-                
-                def result = _server.$(method.Name : dyn)(..$deserializedParams);
-                  
-                def settings = Newtonsoft.Json.JsonSerializerSettings();
-                settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
+                def m = <[ decl:
+                  public new $(method.Name : usesite) (..$fparms) : System.Web.Mvc.ActionResult
+                  {
+                    def result = _server.$(method.Name : dyn)(..$callParams);
+                    
+                    def settings = Newtonsoft.Json.JsonSerializerSettings();
+                    settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
                                 
-                Content(Newtonsoft.Json.JsonConvert.SerializeObject(result, settings));
+                    Content(Newtonsoft.Json.JsonConvert.SerializeObject(result, settings));
+                  }
+                ]>;
+                
+                // Add all attributes back
+                m.AddCustomAttribute(<[ System.Web.Mvc.ValidateInput(false) ]>);
+                foreach(a in m.GetCustomAttributes())
+                  m.AddCustomAttribute(a);
+                
+                m
               }
-            ]>);
+              else
+                (<[ decl: 
+                  [System.Web.Mvc.HttpPost, System.Web.Mvc.ValidateInput(false)]
+                  public new $(methodName : name) (model : string) : System.Web.Mvc.ActionResult
+                  {
+                    when(model == null) throw ArgumentNullException("model");
+                
+                    def parsedModel = Newtonsoft.Json.Linq.JObject.Parse(model);
+                    _ = parsedModel;
+                
+                    def result = _server.$(method.Name : dyn)(..$deserializedParams);
+                  
+                    def settings = Newtonsoft.Json.JsonSerializerSettings();
+                    settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
+                                
+                    Content(Newtonsoft.Json.JsonConvert.SerializeObject(result, settings));
+                  }
+                ]>);
+            _ = controller.DefineWithSource(controllerMethod);
                   
             if (serverMethods.ContainsKey(method.Name))
             {
