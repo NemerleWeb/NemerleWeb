@@ -230,7 +230,7 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
     }
     
     private CollectJSApiRoots(typer : Typer) : void
-    { 
+    {
       // Collect from current and referenced assemblies
       foreach(lib in typer.Env.Manager.ReferencedAssemblies)
       {

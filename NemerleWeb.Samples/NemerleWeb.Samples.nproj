@@ -226,6 +226,9 @@
     <Compile Include="MVVM\TestPage.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MVVM\TypedJS.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\VariantsAndMatchingPage.n">
       <SubType>Code</SubType>
     </Compile>

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.Concurrent;
 using Nemerle;
 using NemerleWeb;
-
-using System.Collections.Concurrent;
+using NemerleWeb.TypedJS;
+using NemerleWeb.Samples.TypedJS;
 
 namespace NemerleWeb.Samples
 {
@@ -98,7 +99,7 @@ namespace NemerleWeb.Samples
       server.LoadSourceFor("MVVM/Samples.n", source =>
       {
         ThisPageSource = source;
-        js prettyPrint();
+        prettyPrint();
       });
     }
     
@@ -113,15 +114,15 @@ namespace NemerleWeb.Samples
       server.LoadSourceForList(samples[index].SourceFiles, source =>
       {          
         samples[index].Source = source;
-        js prettyPrint();
+        prettyPrint();
       });  
     }
     
     SelectSample(sample : Sample) : void 
     {
       SelectedSample = sample;
-      js <# nweb.invalidate() #>;
-      js prettyPrint();
+      nweb.invalidate();
+      prettyPrint();
     }
     
     public class Server

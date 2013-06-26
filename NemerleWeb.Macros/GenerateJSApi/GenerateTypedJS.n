@@ -84,6 +84,9 @@ namespace NemerleWeb
         Manager().CoreEnv,
         <[ NemerleWeb.JSApiRootAttribute($(args.Root : string)) ]>);
         
+      // Add JSApi root
+      _ = JSClassSettings.JSApiRoots.Add(args.Root);        
+        
       // Step 1: PreParse
       def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
       def tsFilesToParse = PreParseTSAll(projectDir, args.Lib, args.Args);
