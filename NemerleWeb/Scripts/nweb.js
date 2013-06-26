@@ -337,7 +337,7 @@ var nweb = {
         nweb.eraseGeneratedElements(binding);
 
         jQuery.each($el, function (i, e) {
-          nweb.applyBindings(value, e, binding.subBindings = [], loopStack, true);
+          nweb.applyBindings(value, e, binding.subBindings, loopStack, true);
         });
       }
     };
