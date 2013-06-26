@@ -43,7 +43,7 @@ namespace NemerleWeb.Samples
                   self.set_ChosenFolderId(this.params.folder);
                   self.set_ChosenMailData(null);
                   $.get("/SPAPage/Folder", { folder: this.params.folder }, function(result) { 
-                      self.set_ChosenFolderData(nweb.utils.toTypedObject(result));
+                      self.set_ChosenFolderData(nweb.utils.toTypedObject(JSON.parse(result)));
                       nweb.invalidate();
                   });
               });
@@ -52,7 +52,7 @@ namespace NemerleWeb.Samples
                   self.set_ChosenFolderId(this.params.folder);
                   self.set_ChosenMailData(null);
                   $.get("/SPAPage/Mail", { mailId: this.params.mailId }, function(result) { 
-                      self.set_ChosenMailData(nweb.utils.toTypedObject(result));
+                      self.set_ChosenMailData(nweb.utils.toTypedObject(JSON.parse(result)));
                       nweb.invalidate();
                   });
               });
@@ -80,7 +80,9 @@ namespace NemerleWeb.Samples
           Mail(2, "Addison Begoat \u003cupton.oprdrusson@pear-income.xyz\u003e", "steve@example.com", "May 7, 2011", "FW: Associate advice", "", "Inbox"),
           Mail(3, "Allistair \u003cleroy72@plane-railway.xyz\u003e", "steve@example.com", "May 19, 2011", "RE: Phone call tomorrow 5 o\u0027clock", "", "Inbox"),
           Mail(4, "(archived) Abbot \u003coliver@smoke-stage.xyz\u003e", "steve@example.com", "May 25, 2011", "Booking confirmation #389629244", "", "Archive"),
-          Mail(5, "(archived) Addison Begoat \u003cupton.oprdrusson@pear-income.xyz\u003e", "steve@example.com", "May 7, 2011", "FW: Associate advice", "", "Archive")
+          Mail(5, "(archived) Addison Begoat \u003cupton.oprdrusson@pear-income.xyz\u003e", "steve@example.com", "May 7, 2011", "FW: Associate advice", "", "Archive"),
+          Mail(6, "Abba\u003cxxyyy@pear-income.xyz\u003e", "steve@example.com", "May 7, 2011", "Just test", "", "Sent"),
+          Mail(7, "Just spam\u003cspammer@spam.com\u003e", "spammer@spam.com", "Jan 10, 2111", "This is spam !", "", "Spam"),
         ];
       
       [HttpGet]

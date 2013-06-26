@@ -166,6 +166,7 @@
     <Folder Include="HtmlMacro\" />
     <Folder Include="EventsDSL" />
     <Folder Include="GenerateJSApi" />
+    <Folder Include="Properties" />
     <Folder Include="Scripts\" />
     <Folder Include="SignalR" />
   </ItemGroup>
