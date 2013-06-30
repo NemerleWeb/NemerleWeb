@@ -43,6 +43,7 @@ namespace TSParser
         get_s : void = "get"s;
         set_s : void = "set"s;
         interface_s : void = "interface"s;
+        require_s : void = "require"s;
         
         dot : void = '.';
         dot_s : void = dot s;
@@ -63,6 +64,10 @@ namespace TSParser
         lparen : void = '(';
         lparen_s : void = lparen s;
         rparen : void = ')';
+        less : void = '<';
+        less_s : void = less s;
+        greater : void = '>';
+        greater_s : void = greater s;
         rparen_s : void = rparen s;
         assign : void = '=';
         assign_s : void = assign s;
@@ -289,10 +294,13 @@ namespace TSParser
           lbrace_s PropertyNameAndValueList rbrace_s /
           lbrace_s PropertyNameAndValueList comma_s rbrace_s;
         PropertyNameAndValueList = PropertyAssignment (comma_s PropertyAssignment)*;
-        PropertyAssignment =
-          PropertyName colon_s AssignmentExpression /
-          get_s PropertyName lparen_s rparen_s lbrace_s FunctionBody rbrace_s /
-          set_s PropertyName lparen_s PropertySetParameterList rparen_s lbrace_s FunctionBody rbrace_s;
+        
+        // Modified in TypeScript (4.5)
+        //PropertyAssignment =
+        //  PropertyName colon_s AssignmentExpression /
+        //  get_s PropertyName lparen_s rparen_s lbrace_s FunctionBody rbrace_s /
+        //  set_s PropertyName lparen_s PropertySetParameterList rparen_s lbrace_s FunctionBody rbrace_s;
+          
         PropertyName = IdentifierName / StringLiteral / NumericLiteral;
         PropertySetParameterList = Identifier;
         
@@ -443,131 +451,174 @@ namespace TSParser
         
         #region TypeScript
         
-        #region Specifying Types (3.5)
+        #region Type Parameter Lists (3.5.1)
         
-        // Array is specified here, because otherwise we have left recursion.
-        ScriptType : TSType = (TypeLiteral / PredefinedType / TypeNameTS) ('['s ']'s)*;
-        PredefinedType : TSType = ("any" / "number" / "bool" / "string" / "void") s !IdentifierPart;
-        TypeName : string = Identifier (dot Identifier)*;
-        TypeNameTS : TSType = TypeName;
-        ModuleName : string = TypeName;
-        TypeLiteral : TSType = ObjectType / FunctionType / ConstructorType;
+        TypeParameters = less_s TypeParameterList greater_s;
+        // Return list instead of option
+        TypeParametersOpt = TypeParameters?;
+        TypeParameterList = TypeParameter (comma_s TypeParameter);
+        TypeParameter = Identifier Contraint?;
+        Contraint = extends_s TypeReference;
         
         #endregion
         
-        #region Object Type Literals (3.5.3)
+        #region Specifying Types (3.6)
         
-        ObjectType : TSType = lbrace_s TypeBody rbrace_s;
-        ObjectTypeTS : TSType.Object = lbrace_s TypeBody rbrace_s;
-        TypeBody : list[TSObject] = TypeMemberList scS / TypeMemberListOpt;
-        TypeMemberListOpt : list[TSObject] = TypeMemberList?;
-        TypeMemberList : list[TSObject] = TypeMember (scS TypeMember)* S;
+        // Array is specified here, because otherwise we have left recursion.
+        ScriptType : TSType = (PredefinedType / TypeReference / TypeLiteral) ('['s ']'s)*;
+        
+        // Note: bool is not a valid type in TypeScript 0.9 but many libraries still use it.
+        PredefinedType : TSType = ("any" / "number" / "bool" / "boolean" / "string" / "void") s !IdentifierPart;
+        
+        TypeReference : TSType = TypeName TypeArguments?;
+        TypeName : string = Identifier (dot_s Identifier)*;        
+        ModuleName : string = TypeName;
+        
+        TypeArguments = less_s TypeArgumentList greater_s;
+        TypeArgumentList = TypeArgument (comma_s TypeArgument)*;
+        TypeArgument = ScriptType;        
+        
+        #endregion
+        
+        #region Type Literals (3.6.3)
+        
+        TypeLiteral : TSType = ObjectType / FunctionType / ConstructorType;        
+        
+        ArrayType : TSType.Array = (PredefinedType / TypeReference / TypeLiteral) ('['s ']'s)+;
+        FunctionType : TSType = lparen_s ParameterListOpt rparen_s arrow_s ReturnType s;
+        ConstructorType : TSType = new_s lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
+        
+        #endregion
+                 
+        #region Object Type Literals (3.7)
+        
+        ObjectType : TSType.Object = lbrace_s TypeBody rbrace_s;
+        TypeBody : List[TSObject] = TypeMemberList semicolon? S;
+        TypeMemberList : List[TSObject] = TypeMember (scS TypeMember)* S;
         TypeMember : TSObject =
+          PropertySignature /
           CallSignature /
           ConstructSignature /
           IndexSignature /
-          FunctionSignature /
-          PropertySignature;
-        
-        CallSignature      : TSObject = lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation?;
-        ConstructSignature : TSObject = new_s lparen_s ParameterListOpt rparen_s TypeAnnotation?;
-        IndexSignature     : TSObject =
-          lbrack_s Identifier required colon_s ("number" / "string") s rbrack_s TypeAnnotation;
-        PropertySignature  : TSObject = AnyIdentifier optional TypeAnnotation?;
-        FunctionSignature  : TSObject =
-          AnyIdentifier optional lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation?;
-        
+          MethodSignature;
+          
         #endregion
-        
-        #region Array Type Literal (3.5.4)
-        
-        ArrayType : TSType.Array = (PredefinedType / TypeNameTS / TypeLiteral) ('['s ']'s)+;
-        
-        #endregion
-        
-        #region Function Type Literals (3.5.5)
-        
-        FunctionType : TSType = lparen_s ParameterListOpt rparen_s arrow_s ReturnType s;
-        
-        #endregion
-        
-        #region Constructor Type Literals (3.5.6)
-        
-        ConstructorType : TSType = new_s lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
+          
+        #region Property Signatures (3.7.1)
 
-        #endregion
-        
-        #region Variable Statements (5.1)
-        
-        VariableDeclaration = AnyIdentifier TypeAnnotation?;
-        TypeAnnotation : TSType = colon_s ScriptType s;
+        PropertySignature  : TSObject = PropertyName optional TypeAnnotation?;
         
         #endregion
         
-        #region Function Declarations
+        #region Call Signatures (3.7.2)
         
-        // Modified
-        FunctionDeclaration = FunctionOverload+;
-        FunctionOverload = function_s FunctionSignature scS;
-        
+        CallSignature      : TSObject =
+          TypeParametersOpt lparen_s ParameterListOpt rparen_s TypeAnnotation?;
+          
         #endregion
         
-        #region Function Signatures (6.2)
+        #region Parameter List (3.7.2.2)
         
         // According to spec, additional comma is forbiden, but TS compiler handles it.
-        ParameterList : list[TSParam] =
+        ParameterList : List[TSParam] =
           ParameterListROR /
           ParameterListRR /
           ParameterListRO /
-          ParameterListOR /
-          OptionalParameterList /
+          ParameterListOR /          
           RequiredParameterList /
+          OptionalParameterList /
           RestParameter;
           
         // Return empty list instead of option
-        ParameterListOpt : list[TSParam] = ParameterList?;
+        ParameterListOpt : List[TSParam] = ParameterList?;
         
-        ParameterListROR : list[TSParam] = RequiredParameterList comma_s OptionalParameterList comma_s RestParameter;
-        ParameterListOR  : list[TSParam] = OptionalParameterList comma_s RestParameter;
-        ParameterListRO  : list[TSParam] = RequiredParameterList comma_s OptionalParameterList;
-        ParameterListRR  : list[TSParam] = RequiredParameterList comma_s RestParameter;
+        ParameterListROR : List[TSParam] =
+          RequiredParameterList comma_s OptionalParameterList comma_s RestParameter;
+        ParameterListOR  : List[TSParam] =
+          OptionalParameterList comma_s RestParameter;
+        ParameterListRO  : List[TSParam] =
+          RequiredParameterList comma_s OptionalParameterList;
+        ParameterListRR  : List[TSParam] =
+          RequiredParameterList comma_s RestParameter;
           
-        RequiredParameterList : list[TSParam] = RequiredParameter (comma_s RequiredParameter)*;
+        RequiredParameterList : List[TSParam] = RequiredParameter (comma_s RequiredParameter)*;
         RequiredParameter : TSParam = PublicOrPrivate? Identifier required TypeAnnotation?;
         Public : MemberAccess = "public";
         Private : MemberAccess = "private";
         PublicOrPrivate : MemberAccess = (Public/Private)s;
-        OptionalParameterList : list[TSParam] = OptionalParameter (comma_s OptionalParameter)*;
+        OptionalParameterList : List[TSParam] = OptionalParameter (comma_s OptionalParameter)*;
         // Optional parameter must not have Initialiser in declaration files.
         OptionalParameter : TSParam = PublicOrPrivate? Identifier optional TypeAnnotation?;
-                                      //                        / TypeAnnotation? Initialiser;
-        RestParameter : list[TSParam] = ellipsis_s Identifier required colon_s ArrayType;
-        ReturnTypeAnnotation : TSType = colon_s ReturnType s;
-        VoidType : TSType = "void";
-        ReturnType : TSType = ScriptType / VoidType;
+        RestParameter : List[TSParam] = ellipsis_s Identifier required colon_s ArrayType;
         
         #endregion
         
+        #region Construct/Index/Method Signatures (3.7.3, 3.7.4, 3.7.5)
+        
+        ConstructSignature : TSObject =
+          new_s TypeParametersOpt lparen_s ParameterListOpt rparen_s TypeAnnotation?;
+        IndexSignature     : TSObject =
+          lbrack_s Identifier required colon_s ("number" / "string") s rbrack_s TypeAnnotation;
+        MehtodSignature  : TSObject = PropertyName optional CallSignature;
+        
+        #endregion
+        
+        #region Object Literals (4.5)
+        
+        PropertyAssignment =
+          PropertyName colon_s AssignmentExpression /
+          PropertyName CallSignature lbrace_s FunctionBody rbrace_s /
+          GetAccessor /
+          SetAccessor;
+          
+        GetAccessor =
+          get_s PropertyName lbrack_s rbrack_s TypeAnnotation? lbrace_s FunctionBody rbrace_s;
+        SetAccessor =
+          set_s PropertyName lbrack_s Identifier TypeAnnotation? rbrack_s;
+        
+        #endregion
+        
+        #region Variable Statements (5.1)
+        
+        VariableDeclaration = Identifier TypeAnnotation?;
+        TypeAnnotation : TSType = colon_s ScriptType s;
+        
+        #endregion
+        
+        #region Function Declarations (6.1)
+        
+        // Modified
+        FunctionDeclaration = FunctionOverload+;
+        FunctionOverload = function_s Identifier CallSignature scS;
+        
+        #endregion       
+        
         #region Interface Declarations (7.1)
         
-        InterfaceDeclaration : TSGlobal = interface_s Identifier InterfaceExtendsClause? ObjectTypeTS S;
-        InterfaceExtendsClause : list[string] = extends_s InterfaceNameList;
-        InterfaceNameList : list[string] = InterfaceName (comma_s InterfaceName)*;
-        InterfaceName : string = TypeName;
+        InterfaceDeclaration : TSGlobal =
+          interface_s Identifier TypeParametersOpt InterfaceExtendsClause? ObjectType S;
+        InterfaceExtendsClause : List[string] = extends_s ClassOrInterfaceTypeList;
+        ClassOrInterfaceTypeList : List[string] =
+          ClassOrInterfaceType (comma_s ClassOrInterfaceType)*;
+        ClassOrInterfaceType = TypeReference;
         
         #endregion
         
         #region Class Declarations (8.1)
         
-        ClassDeclaration = class_s Identifier ClassHeritage lbrace_s ClassBody rbrace_s;
+        ClassDeclaration =
+          class_s Identifier TypeParametersOpt ClassHeritage lbrace_s ClassBody rbrace_s;
         
         ClassHeritage : ClassHeritage = ClassExtendsClause? ImplementsClause?;
-        ClassExtendsClause : string = extends_s ClassName;
-        ClassName : string = TypeName;
-        ImplementsClause : list[string] = implements_s InterfaceNameList;
+        ClassExtendsClause : string = extends_s ClassType;
+        ClassType = TypeReference;
+        ImplementsClause : List[string] = implements_s ClassOrInterfaceTypeList;
         
         ClassBody = ClassElement*;
-        ClassElement = ConstructorDeclaration / MemberDeclaration;
+        ClassElement =
+          ConstructorDeclaration /
+          MemberDeclaration /
+          IndexSignature;
         
         #endregion
         
@@ -580,146 +631,151 @@ namespace TSParser
         
         #region Member Declarations (8.4)
         
-        MemberDeclaration = MemberFunctionDeclaration / MemberVariableDeclaration;
+        MemberDeclaration =
+          MemberFunctionDeclaration /
+          MemberVariableDeclaration /
+          MemberAccessorDeclaration;
         
-        MemberVariableDeclaration = PublicOrPrivate? static_s? VariableDeclaration scS;
+        MemberVariableDeclaration =
+          PublicOrPrivate? static_s? PropertyName TypeAnnotation? scS;
         
         MemberFunctionDeclaration = MemberFunctionOverload+;
-        MemberFunctionOverload = PublicOrPrivate? static_s? FunctionSignature scS;
-                
+        MemberFunctionOverload = PublicOrPrivate? static_s? PropertyName CallSignature scS;
+        
+        MemberAccessorDeclaration = PublicOrPrivate? static_s? (GetAccessor / SetAccessor);
+        
         #endregion
         
-        #region Enum Declaration
+        #region Enums (9)
         
         EnumDeclaration = enum_s Identifier lbrace_s EnumBody? rbrace_s S;
-        EnumBody : list[TSEnumElement] = EnumElement (comma_s EnumElement)* comma?s;
-        EnumElement : TSEnumElement = AnyIdentifier Initialiser?;
+        EnumBody : List[TSEnumElement] =
+          ConstantEnumMember (comma_s ConstantEnumMember)*;
+        ConstantEnumMember = PropertyName;
         
         #endregion
         
-        #region Programs (9.1)
+        #region Module Declarations (10.1)
         
-        SourceFile = DeclarationSourceFile;
-        ModuleElement =
-          Statement /
-          FunctionDeclaration /
-          ClassDeclaration /
-          InterfaceDeclaration /
-          ModuleDeclaration /
-          EnumDeclaration /
-          ImportDeclaration /
-          ExportDeclaration /
-          AmbientDeclaration;
+        ModuleDeclaration = module_s IdentifierPath lbrace_s ModuleBody rbrace_s;
+        IdentifierPath : string = Identifier (dot_s Identifier)*;        
         
         #endregion
         
-        #region Module Declarations (9.2)
+        #region Module Body (10.2)
         
-        ModuleDeclaration = module_s IdentifierPath? lbrace_s ModuleBody rbrace_s;
-        IdentifierPath : string = Identifier (dot Identifier)*;
         ModuleBody = ModuleElement*;
         
+        ModuleElement =
+          Statement /
+          export_s?
+          (
+            FunctionDeclaration /
+            ClassDeclaration /
+            InterfaceDeclaration /
+            ModuleDeclaration /
+            EnumDeclaration /
+            ImportDeclaration
+          );
+          
         #endregion
         
-        #region Export Declarations (9.2.1)
+        #region Import Declarations (10.3)
         
-        // Allow export function();
-        ExportFunctionDeclaration = AmbientFunctionDeclaration;
-        ExportDeclaration =
-          export_s VariableStatement /
-          export_s ExportFunctionDeclaration /
-          export_s ClassDeclaration /
-          export_s InterfaceDeclaration /
-          export_s ModuleDeclaration /
-          export_s EnumDeclaration /
-          export_s AmbientDeclaration /
-          ExportAssignment;
-        ExportAssignment : TSGlobal = export_s assign_s Identifier semicolon;
-            
+        ImportDeclaration = import_s Identifier assign_s EntityName scS;
+        EntityName = ModuleName (dot Identifier)?;
+        
         #endregion
+
+        #region Source Files (11)
         
-        #region Import Declarations (9.2.2)
-        
-        ImportDeclaration : TSGlobal = import_s Identifier assign_s ModuleReference scS;
-        ModuleReference : string = ExternalModuleReference / ModuleName;
-        ExternalModuleReference : string = module_s lparen_s StringLiteral s rparen_s;
+        SourceFile = DeclarationSourceFile;
+        DeclarationSourceFile : List[TSGlobal] = GS DeclarationElement*;
+        DeclarationElement : TSGlobal =
+          Reference /
+          export_s? InterfaceDeclaration /
+          export_s? ImportDeclaration/
+          ExportAssignment /
+          export_s? ExternalImportDeclaration /
+          export_s? AmbientDeclaration;
         
         #endregion
         
-        #region Ambient Declarations (10.1)
+        #region External Import Declarations (11.2.2)
+        
+        ExternalImportDeclaration = import_s Identifier assign_s ExternalModuleReference scS;
+        ExternalModuleReference = require_s lbrack_s StringLiteral rbrack_s;
+        
+        #endregion
+        
+        #region Export Assignments (11.2.4)
+        
+        ExportAssignment = export_s assign_s Identifier scS;
+        
+        #endregion
+        
+        #region Ambient Declarations (12.1)
                 
-        AmbientDeclaration =
+        AmbientDeclaration : TSGlobal =
           declare_s
            (
             AmbientVariableDeclaration /
             AmbientFunctionDeclaration /
             AmbientClassDeclaration /
+            AmbientEnumDeclaration /
             AmbientModuleDeclaration /
-            AmbientEnumDeclaration
+            AmbientExternalModuleDeclaration
            );
         
-        #endregion
+        AmbientVariableDeclaration : TSGlobal = var_s Identifier TypeAnnotation? scS;
+        AmbientFunctionDeclaration : TSGlobal = function_s Identifier CallSignature scS;
         
-        #region Ambient Variable Declarations (10.1.1)
-        
-        AmbientVariableDeclaration : TSGlobal = var_s Identifier TypeAnnotation? S;
-        
-        #endregion
-        
-        #region Ambient Variable Declarations (10.1.2)
-        
-        AmbientFunctionDeclaration : TSGlobal = function_s Identifier lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation? S;
-        
-        // This rule is not by specification, but TypeScript parses it correctly.
-        AmbientConstructDeclaration : TSGlobal = function_s new_s lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation? S;
-        
-        #endregion
-        
-        #region Ambient Class Declarations (10.1.3)
-        
-        AmbientClassDeclaration : TSGlobal = class_s Identifier ClassHeritage lbrace_s AmbientClassBody rbrace_s S;
-        AmbientClassBody : list[TSClassMember] = AmbientClassBodyElement*;
-        AmbientClassBodyElement : TSClassMember = AmbientConstructorDeclaration / AmbientMemberDeclaration;
-        AmbientConstructorDeclaration : TSClassMember = constructor_s lparen_s ParameterListOpt rparen_s scS;
-        AmbientMemberVariable : TSClassMemberPart = Identifier TypeAnnotation?;
-        // Same as FunctionSignature but with other type
-        ClassMemberFunctionSignature  : TSClassMemberPart = AnyIdentifier optional lparen_s ParameterListOpt rparen_s ReturnTypeAnnotation?;
-        AmbientMemberDeclaration : TSClassMember = PublicOrPrivate? static_s? (ClassMemberFunctionSignature / AmbientMemberVariable) scS;
-        
-        AmbientEnumDeclaration : TSGlobal = enum_s Identifier lbrace_s EnumBody? rbrace_s S;
-        
-        #endregion        
-        
-        #region Ambient Module Declarations (10.1.4)
-        
-        AmbientModuleDeclaration : TSGlobal = module_s AmbientModuleIdentification s lbrace_s AmbientModuleBody rbrace_s S;
-        AmbientModuleIdentification : string = StringLiteral / IdentifierPath;
-        AmbientModuleBody : list[TSGlobal] = AmbientElement*;
-        
-        AmbientElementNotImport : TSGlobal =
-          export_s? declare_s?
-            (
-              AmbientVariableDeclaration /
-              AmbientConstructDeclaration /
-              AmbientFunctionDeclaration /
-              AmbientClassDeclaration /
-              InterfaceDeclaration /
-              AmbientModuleDeclaration /
-              AmbientEnumDeclaration
-            );
-        AmbientElement : TSGlobal =
-          Reference /
-          AmbientElementNotImport /
-          ImportDeclaration /
-          ExportAssignment;
-        
-        #endregion
+        // Class
+        AmbientClassDeclaration : TSGlobal = 
+          class_s Identifier TypeParametersOpt ClassHeritage
+          lbrace_s AmbientClassBody rbrace_s S;
+        AmbientClassBody : List[TSClassMember] = AmbientClassBodyElement*;
+        AmbientClassBodyElement : TSClassMember =
+          AmbientConstructorDeclaration /
+          AmbientMemberDeclaration /
+          IndexSignature;
+        AmbientConstructorDeclaration : TSClassMember =
+          constructor_s lparen_s ParameterListOpt rparen_s scS;       
+        AmbientMemberDeclaration : TSClassMember =
+          PublicOrPrivate? static_s? PropertyName (CallSignature / TypeAnnotation?) scS;  
                 
-        #region Declaration Source Files (10.2)
+        // Enum
+        AmbientEnumDeclaration : TSGlobal =
+          enum_s Identifier lbrace_s AmbientEnumBody? rbrace_s S;
+        AmbientEnumBody = AmbientEnumMember*;
+        AmbientEnumMember = PropertyName (assign_s IntegerLiteral)? comma_s?
         
-        DeclarationSourceFile : List[TSGlobal] = GS AmbientElement*;
-        
-        #endregion
+        // Module
+         AmbientModuleDeclaration : TSGlobal =
+          module_s IdentifierPath lbrace_s AmbientModuleBody rbrace_s S;
+        AmbientModuleBody : List[TSGlobal] = AmbientModuleElement*;
+        AmbientModuleElement =
+          export_s
+          (
+            AmbientVariableStatement /
+            AmbientFunctionDeclaration /
+            AmbientClassDeclaration /
+            InterfaceDeclaration /
+            AmbientEnumDeclaration /
+            AmbientModuleDeclaration /
+            ImportDeclaration
+          );
+          
+        // External
+        AmbientExternalModuleDeclaration =
+          module_s StringLiteral lbrace_s AmbientExternalModuleBody rbrace_s;
+        AmbientExternalModuleBody = AmbientExternalModuleElement*;
+        AmbientExternalModuleElement =
+          AmbientModuleElement /
+          ExportAssignment /
+          export_s? ExternalImportDeclaration;
+          
+        #endregion               
         
         #region Reference
 
@@ -739,6 +795,7 @@ namespace TSParser
     )]
   public class TSDeclarationParser
   {
+    /*
     optional(n : NToken) : bool
     {
       !n.IsEmpty
@@ -802,15 +859,10 @@ namespace TSParser
       Id(first, rest)
     }
     
-    ObjectType(members : list[TSObject]) : TSType
+    ObjectType(members : List[TSObject]) : TSType.Object
     {
-      ObjectTypeTS(members)
-    }
-    
-    ObjectTypeTS(members : list[TSObject]) : TSType.Object
-    {
-      TSType.Object(members)
-    }
+      TSType.Object(members.NToList())
+    }  
     
     ArrayType(type : TSType, arrayArity : List[NToken * NToken]) : TSType.Array
     {
@@ -1031,9 +1083,14 @@ namespace TSParser
       TSGlobal.Export(id)
     }
     
-    ImportDeclaration(id : string, moduleRef : string) : TSGlobal
+    ImportDeclaration(id : string, moduleReference : string) : TSGlobal
     {
-      TSGlobal.Import(id, moduleRef)
+      TSGlobal.Import(id, moduleReference)
+    }
+    
+    ExternalImportDeclaration(id : string, moduleReference : string) : TSGlobal
+    {
+      TSGlobal.Import(id, moduleReference)
     }
     
     ReferencePath(_ : NToken, _ : NToken, path : string) : TSGlobal
@@ -1049,6 +1106,6 @@ namespace TSParser
     ReferenceElement(_ : NToken, _ : NToken, reference : TSGlobal, _ : NToken, _ : NToken) : TSGlobal
     {
       reference
-    }
+    }*/
   }  
 }
