@@ -132,10 +132,12 @@ namespace TSParser
     | New { Params : list[TSParam]; ReturnType : TSType; }
   }
 
-  /// <summary>
-  /// Global scope members.
-  /// Note: names are never empty.
-  /// </summary>
+  public variant TSAmbient
+  {
+    | Variable { Name : string; Type : option[TSType]; }
+    | Function { Name : string; Signature : object; }
+  }
+  
   [StructuralEquality]
   public variant TSGlobal
   {

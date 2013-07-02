@@ -428,7 +428,7 @@ namespace TSParser
         VariableDeclarationList = VariableDeclaration (comma_s VariableDeclaration)*;
         // This rule is modified in TypeSript see: 5.1
         //VariableDeclaration = Identifier;
-        Initialiser : string = assign AssignmentExpression;
+        Initialiser /*: string*/ = assign AssignmentExpression;
         
         #endregion
         
@@ -465,12 +465,12 @@ namespace TSParser
         #region Specifying Types (3.6)
         
         // Array is specified here, because otherwise we have left recursion.
-        ScriptType : TSType = (PredefinedType / TypeReference / TypeLiteral) ('['s ']'s)*;
+        ScriptType /*: TSType*/ = (PredefinedType / TypeReference / TypeLiteral) ('['s ']'s)*;
         
         // Note: bool is not a valid type in TypeScript 0.9 but many libraries still use it.
-        PredefinedType : TSType = ("any" / "number" / "bool" / "boolean" / "string" / "void") s !IdentifierPart;
+        PredefinedType /*: TSType*/ = ("any" / "number" / "bool" / "boolean" / "string" / "void") s !IdentifierPart;
         
-        TypeReference : TSType = TypeName TypeArguments?;
+        TypeReference /*: TSType*/ = TypeName TypeArguments?;
         TypeName : string = Identifier (dot_s Identifier)*;        
         ModuleName : string = TypeName;
         
@@ -483,20 +483,20 @@ namespace TSParser
         #region Type Literals (3.6.3)
         
         // Array is excluded to prevent left recursion.
-        TypeLiteral : TSType = ObjectType / FunctionType / ConstructorType;        
+        TypeLiteral /*: TSType*/ = ObjectType / FunctionType / ConstructorType;        
         
-        ArrayType : TSType.Array = (PredefinedType / TypeReference / TypeLiteral) ('['s ']'s)+;
-        FunctionType : TSType = lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
-        ConstructorType : TSType = new_s lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
+        ArrayType /*: TSType.Array*/ = (PredefinedType / TypeReference / TypeLiteral) ('['s ']'s)+;
+        FunctionType /*: TSType*/ = lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
+        ConstructorType /*: TSType*/ = new_s lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
         
         #endregion
                  
         #region Object Type Literals (3.7)
         
-        ObjectType : TSType.Object = lbrace_s TypeBody rbrace_s;
-        TypeBody : List[TSObject] = TypeMemberList semicolon? S;
-        TypeMemberList : List[TSObject] = TypeMember (scS TypeMember)* S;
-        TypeMember : TSObject =
+        ObjectType /*: TSType.Object*/ = lbrace_s TypeBody rbrace_s;
+        TypeBody /*: List[TSObject]*/ = TypeMemberList semicolon? S;
+        TypeMemberList /*: List[TSObject]*/ = TypeMember (scS TypeMember)* S;
+        TypeMember /*: TSObject*/ =
           PropertySignature /
           CallSignature /
           ConstructSignature /
@@ -507,13 +507,13 @@ namespace TSParser
           
         #region Property Signatures (3.7.1)
 
-        PropertySignature  : TSObject = PropertyName optional TypeAnnotation?;
+        PropertySignature /*: TSObject*/ = PropertyName optional TypeAnnotation?;
         
         #endregion
         
         #region Call Signatures (3.7.2)
         
-        CallSignature      : TSObject =
+        CallSignature =
           TypeParametersOpt lparen_s ParameterListOpt rparen_s TypeAnnotation?;
           
         #endregion
@@ -521,7 +521,7 @@ namespace TSParser
         #region Parameter List (3.7.2.2)
         
         // According to spec, additional comma is forbiden, but TS compiler handles it.
-        ParameterList : List[TSParam] =
+        ParameterList /*: List[TSParam]*/ =
           ParameterListROR /
           ParameterListRR /
           ParameterListRO /
@@ -531,36 +531,36 @@ namespace TSParser
           RestParameter;
           
         // Return empty list instead of option
-        ParameterListOpt : List[TSParam] = ParameterList?;
+        ParameterListOpt /*: List[TSParam]*/ = ParameterList?;
         
-        ParameterListROR : List[TSParam] =
+        ParameterListROR /*: List[TSParam]*/ =
           RequiredParameterList comma_s OptionalParameterList comma_s RestParameter;
-        ParameterListOR  : List[TSParam] =
+        ParameterListOR  /*: List[TSParam]*/ =
           OptionalParameterList comma_s RestParameter;
-        ParameterListRO  : List[TSParam] =
+        ParameterListRO  /*: List[TSParam]*/ =
           RequiredParameterList comma_s OptionalParameterList;
-        ParameterListRR  : List[TSParam] =
+        ParameterListRR  /*: List[TSParam]*/ =
           RequiredParameterList comma_s RestParameter;
           
-        RequiredParameterList : List[TSParam] = RequiredParameter (comma_s RequiredParameter)*;
-        RequiredParameter : TSParam = PublicOrPrivate? Identifier required TypeAnnotation?;
-        Public : MemberAccess = "public";
-        Private : MemberAccess = "private";
-        PublicOrPrivate : MemberAccess = (Public/Private)s;
-        OptionalParameterList : List[TSParam] = OptionalParameter (comma_s OptionalParameter)*;
+        RequiredParameterList /*: List[TSParam]*/ = RequiredParameter (comma_s RequiredParameter)*;
+        RequiredParameter /*: TSParam*/ = PublicOrPrivate? Identifier required TypeAnnotation?;
+        Public /*: MemberAccess*/ = "public";
+        Private /*: MemberAccess*/ = "private";
+        PublicOrPrivate /*: MemberAccess*/ = (Public/Private)s;
+        OptionalParameterList /*: List[TSParam]*/ = OptionalParameter (comma_s OptionalParameter)*;
         // Optional parameter must not have Initialiser in declaration files.
-        OptionalParameter : TSParam = PublicOrPrivate? Identifier optional TypeAnnotation?;
-        RestParameter : List[TSParam] = ellipsis_s Identifier required colon_s ArrayType;
+        OptionalParameter /*: TSParam*/ = PublicOrPrivate? Identifier optional TypeAnnotation?;
+        RestParameter /*: List[TSParam]*/ = ellipsis_s Identifier required colon_s ArrayType;
         
         #endregion
         
         #region Construct/Index/Method Signatures (3.7.3, 3.7.4, 3.7.5)
         
-        ConstructSignature : TSObject =
+        ConstructSignature /*: TSObject*/ =
           new_s TypeParametersOpt lparen_s ParameterListOpt rparen_s TypeAnnotation?;
-        IndexSignature     : TSObject =
+        IndexSignature     /*: TSObject*/ =
           lbrack_s Identifier required colon_s ("number" / "string") s rbrack_s TypeAnnotation;
-        MethodSignature  : TSObject = PropertyName optional CallSignature;
+        MethodSignature  /*: TSObject*/ = PropertyName optional CallSignature;
         
         #endregion
         
@@ -582,7 +582,7 @@ namespace TSParser
         #region Variable Statements (5.1)
         
         VariableDeclaration = Identifier TypeAnnotation?;
-        TypeAnnotation : TSType = colon_s ScriptType s;
+        TypeAnnotation /*: TSType*/ = colon_s ScriptType s;
         
         #endregion
         
@@ -596,10 +596,10 @@ namespace TSParser
         
         #region Interface Declarations (7.1)
         
-        InterfaceDeclaration : TSGlobal =
+        InterfaceDeclaration /*: TSGlobal*/ =
           interface_s Identifier TypeParametersOpt InterfaceExtendsClause? ObjectType S;
-        InterfaceExtendsClause : List[string] = extends_s ClassOrInterfaceTypeList;
-        ClassOrInterfaceTypeList : List[string] =
+        InterfaceExtendsClause /*: List[string]*/ = extends_s ClassOrInterfaceTypeList;
+        ClassOrInterfaceTypeList /*: List[string]*/ =
           ClassOrInterfaceType (comma_s ClassOrInterfaceType)*;
         ClassOrInterfaceType = TypeReference;
         
@@ -610,10 +610,10 @@ namespace TSParser
         ClassDeclaration =
           class_s Identifier TypeParametersOpt ClassHeritage lbrace_s ClassBody rbrace_s;
         
-        ClassHeritage : ClassHeritage = ClassExtendsClause? ImplementsClause?;
-        ClassExtendsClause : string = extends_s ClassType;
+        ClassHeritage /*: ClassHeritage*/ = ClassExtendsClause? ImplementsClause?;
+        ClassExtendsClause /*: string*/ = extends_s ClassType;
         ClassType = TypeReference;
-        ImplementsClause : List[string] = implements_s ClassOrInterfaceTypeList;
+        ImplementsClause /*: List[string]*/ = implements_s ClassOrInterfaceTypeList;
         
         ClassBody = ClassElement*;
         ClassElement =
@@ -650,7 +650,7 @@ namespace TSParser
         #region Enums (9)
         
         EnumDeclaration = enum_s Identifier lbrace_s EnumBody? rbrace_s S;
-        EnumBody : List[TSEnumElement] =
+        EnumBody /*: List[TSEnumElement]*/ =
           ConstantEnumMember (comma_s ConstantEnumMember)* comma_s?;
         ConstantEnumMember = PropertyName (assign_s IntegerLiteral)?;
         IntegerLiteral = SignedInteger / HexIntegerLiteral;
@@ -695,7 +695,7 @@ namespace TSParser
         
         SourceFile = DeclarationSourceFile;
         DeclarationSourceFile : List[TSGlobal] = GS DeclarationElement*;
-        DeclarationElement : TSGlobal =
+        DeclarationElement /*: TSGlobal*/ =
           Reference /
           export_s? InterfaceDeclaration /
           export_s? ImportDeclaration/
@@ -720,7 +720,7 @@ namespace TSParser
         
         #region Ambient Declarations (12.1)
                 
-        AmbientDeclaration : TSGlobal =
+        AmbientDeclaration /*: TSAmbient*/ =
           declare_s
            (
             AmbientVariableDeclaration /
@@ -731,33 +731,33 @@ namespace TSParser
             AmbientExternalModuleDeclaration
            );
         
-        AmbientVariableDeclaration : TSGlobal = var_s Identifier TypeAnnotation? scS;
-        AmbientFunctionDeclaration : TSGlobal = function_s Identifier CallSignature scS;
+        AmbientVariableDeclaration /*: TSAmbient*/ = var_s Identifier TypeAnnotation? scS;
+        AmbientFunctionDeclaration /*: TSAmbient*/ = function_s Identifier CallSignature scS;
         
         // Class
-        AmbientClassDeclaration : TSGlobal = 
+        AmbientClassDeclaration /*: TSAmbient*/ = 
           class_s Identifier TypeParametersOpt ClassHeritage
           lbrace_s AmbientClassBody rbrace_s S;
-        AmbientClassBody : List[TSClassMember] = AmbientClassBodyElement*;
-        AmbientClassBodyElement : TSClassMember =
+        AmbientClassBody /*: List[TSClassMember]*/ = AmbientClassBodyElement*;
+        AmbientClassBodyElement /*: TSClassMember*/ =
           AmbientConstructorDeclaration /
           AmbientMemberDeclaration /
           IndexSignature;
-        AmbientConstructorDeclaration : TSClassMember =
+        AmbientConstructorDeclaration /*: TSClassMember*/ =
           constructor_s lparen_s ParameterListOpt rparen_s scS;       
-        AmbientMemberDeclaration : TSClassMember =
+        AmbientMemberDeclaration /*: TSClassMember*/ =
           PublicOrPrivate? static_s? PropertyName (CallSignature / TypeAnnotation?) scS;
                 
         // Enum
-        AmbientEnumDeclaration : TSGlobal =
+        AmbientEnumDeclaration /*: TSGlobal*/ =
           enum_s Identifier lbrace_s AmbientEnumBody? rbrace_s S;
         AmbientEnumBody = AmbientEnumMember*;
         AmbientEnumMember = PropertyName (assign_s IntegerLiteral)? comma_s?;
         
         // Module
-        AmbientModuleDeclaration : TSGlobal =
+        AmbientModuleDeclaration /*: TSGlobal*/ =
           module_s IdentifierPath lbrace_s AmbientModuleBody rbrace_s S;
-        AmbientModuleBody : List[TSGlobal] = AmbientModuleElement*;
+        AmbientModuleBody /*: List[TSGlobal]*/ = AmbientModuleElement*;
         AmbientModuleElement =
           export_s
           (
@@ -771,7 +771,7 @@ namespace TSParser
           );
           
         // External
-        AmbientExternalModuleDeclaration : TSGlobal =
+        AmbientExternalModuleDeclaration /*: TSGlobal*/ =
           module_s StringLiteral lbrace_s AmbientExternalModuleBody rbrace_s;
         AmbientExternalModuleBody = AmbientExternalModuleElement*;
         AmbientExternalModuleElement =
@@ -784,11 +784,11 @@ namespace TSParser
         #region Reference
 
         /// <reference path="..." />
-        ReferencePath : TSGlobal = "path"s '='s StringLiteral;
-        ReferenceNoDefaultLib : TSGlobal = "no-default-lib"s '='s ("\"true\"" / "'true'");
-        ReferenceElement : TSGlobal = '<'s "reference"s (ReferencePath / ReferenceNoDefaultLib)s '/'s '>'s;
+        ReferencePath /*: TSGlobal*/ = "path"s '='s StringLiteral;
+        ReferenceNoDefaultLib /*: TSGlobal*/ = "no-default-lib"s '='s ("\"true\"" / "'true'");
+        ReferenceElement /*: TSGlobal*/ = '<'s "reference"s (ReferencePath / ReferenceNoDefaultLib)s '/'s '>'s;
         xmlComment : void = "///";
-        Reference : TSGlobal = xmlComment s ReferenceElement;
+        Reference /*: TSGlobal*/ = xmlComment s ReferenceElement;
         
         #endregion
         
@@ -829,6 +829,10 @@ namespace TSParser
       if (rest.Count == 0) first else $<#$first...$(rest; ".")#>
     }
     
+    
+    
+    
+    /*
     Initialiser(assignmentExpr : NToken) : string
     {
       GetText(assignmentExpr)
@@ -851,16 +855,12 @@ namespace TSParser
       | _ => assert(false);
       }
     }
-    
-    
-    
-    /*
-    
+    */
     TypeName(first : string, rest : List[string]) : string
     {
       Id(first, rest)
     }
-    
+    /*
     ObjectType(members : List[TSObject]) : TSType.Object
     {
       TSType.Object(members.NToList())
@@ -881,12 +881,12 @@ namespace TSParser
       member :: rest.NToList()
     }
     
-    CallSignature(parms : list[TSParam], returnType : option[TSType]) : TSObject
+    CallSignature(parms : List[TSParam], returnType : option[TSType]) : TSObject
     {
       TSObject.Call(parms, returnType)
     }
 
-    ConstructSignature(parms : list[TSParam], type : option[TSType]) : TSObject
+    ConstructSignature(parms : List[TSParam], type : option[TSType]) : TSObject
     {
       TSObject.Construct(parms, type)
     }
@@ -909,17 +909,17 @@ namespace TSParser
       TSObject.Property(id, optional, type)
     }
 
-    FunctionSignature(id : string, optional : bool, parms : list[TSParam], returnType : option[TSType]) : TSObject
+    FunctionSignature(id : string, optional : bool, parms : List[TSParam], returnType : option[TSType]) : TSObject
     {
       TSObject.Function(id, optional, parms, returnType)
     }
     
-    FunctionType(parms : list[TSParam], returnType : TSType) : TSType
+    FunctionType(parms : List[TSParam], returnType : TSType) : TSType
     {
       TSType.Lambda(parms, returnType)
     }
     
-    ConstructorType(parms : list[TSParam], returnType : TSType) : TSType
+    ConstructorType(parms : List[TSParam], returnType : TSType) : TSType
     {
       TSType.New(parms, returnType)
     }
@@ -928,12 +928,12 @@ namespace TSParser
     {
       TSType.Void()
     }
-    
+    */
     IdentifierPath(first : string, rest : List[string]) : string
     {
       Id(first, rest)
     }
-    
+    /*
     Public(_ : NToken) : MemberAccess
     {
       MemberAccess.Public
@@ -944,22 +944,22 @@ namespace TSParser
       MemberAccess.Private
     }
     
-    ParameterListOpt(parms : option[list[TSParam]]) : list[TSParam] 
+    ParameterListOpt(parms : option[list[TSParam]]) : List[TSParam]
     {
       parms ?? []
     }
     
-    ParameterListROR(required : list[TSParam], optional : list[TSParam], rest : list[TSParam]) : list[TSParam]
+    ParameterListROR(required : List[TSParam], optional : List[TSParam], rest : List[TSParam]) : List[TSParam]
     {
       required.Append(optional).Append(rest)
     }
     
-    ParameterListOR(optional : list[TSParam], rest : list[TSParam]) : list[TSParam]
+    ParameterListOR(optional : List[TSParam], rest : List[TSParam]) : List[TSParam]
     {
       optional.Append(rest)
     }
     
-    ParameterListRO(required : list[TSParam], optional : list[TSParam]) : list[TSParam]
+    ParameterListRO(required : List[TSParam], optional : List[TSParam]) : List[TSParam]
     {
       required.Append(optional)
     }
@@ -969,7 +969,7 @@ namespace TSParser
       TSParam.Required(id, type, access)
     }
     
-    ParameterListRR(required : list[TSParam], rest : list[TSParam]) : list[TSParam]
+    ParameterListRR(required : List[TSParam], rest : List[TSParam]) : List[TSParam]
     {
       required.Append(rest)
     }
@@ -980,17 +980,17 @@ namespace TSParser
       TSParam.Option(id, optional, type, access)
     }
     
-    RequiredParameterList(first : TSParam, rest : List[TSParam]) : list[TSParam]
+    RequiredParameterList(first : TSParam, rest : List[TSParam]) : List[TSParam]
     {
       first :: rest.NToList()
     }
     
-    OptionalParameterList(first : TSParam, rest : List[TSParam]) : list[TSParam]
+    OptionalParameterList(first : TSParam, rest : List[TSParam]) : List[TSParam]
     {
       first :: rest.NToList()
     }
     
-    RestParameter(id : string, type : TSType.Array) : list[TSParam]
+    RestParameter(id : string, type : TSType.Array) : List[TSParam]
     {
       [TSParam.Rest(id, type)]
     }
@@ -1010,17 +1010,17 @@ namespace TSParser
       (extends, implement ?? [])
     }
     
-    AmbientVariableDeclaration(id : string, type : option[TSType]) : TSGlobal
+    AmbientVariableDeclaration(id : string, type : option[TSType]) : TSAmbient
     {
-      TSGlobal.Variable(id, type)
+      TSAmbient.Variable(id, type)
     }
     
-    AmbientFunctionDeclaration(name : string, parms : list[TSParam], returnType : option[TSType]) : TSGlobal
+    AmbientFunctionDeclaration(name : string, _signature : NToken) : TSAmbient
     {
-      TSGlobal.Function(name, parms, returnType)
+      TSAmbient.Function(name, _signature);
     }
     
-    AmbientConstructDeclaration(parms : list[TSParam], returnType : option[TSType]) : TSGlobal
+    AmbientConstructDeclaration(parms : List[TSParam], returnType : option[TSType]) : TSGlobal
     {
       TSGlobal.Construct(parms, returnType)
     }
@@ -1035,7 +1035,7 @@ namespace TSParser
       elements.NToList()
     }
     
-    AmbientConstructorDeclaration(parms : list[TSParam]) : TSClassMember
+    AmbientConstructorDeclaration(parms : List[TSParam]) : TSClassMember
     {
       TSClassMember.Constructor(parms)
     }
@@ -1045,7 +1045,7 @@ namespace TSParser
       TSClassMemberPart.Variable(id, type)
     }
 
-    ClassMemberFunctionSignature(id : string, optional : bool, parms : list[TSParam], returnType : option[TSType]) : TSClassMemberPart
+    ClassMemberFunctionSignature(id : string, optional : bool, parms : List[TSParam], returnType : option[TSType]) : TSClassMemberPart
     {
       TSClassMemberPart.Method(id, optional, parms, returnType)
     }
@@ -1095,6 +1095,9 @@ namespace TSParser
       TSGlobal.Import(id, moduleReference)
     }
     
+    
+    
+    
     ReferencePath(_ : NToken, _ : NToken, path : string) : TSGlobal
     {
       TSGlobal.ReferencePath(path)
@@ -1108,6 +1111,12 @@ namespace TSParser
     ReferenceElement(_ : NToken, _ : NToken, reference : TSGlobal, _ : NToken, _ : NToken) : TSGlobal
     {
       reference
-    }*/
+    }
+    */
+    
+    DeclarationSourceFile(_ : NToken) : List[TSGlobal]
+    {
+      List()
+    }
   }  
 }
