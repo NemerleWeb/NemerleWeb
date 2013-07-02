@@ -15,35 +15,35 @@ interface KnockoutSubscribableFunctions {
 
 interface KnockoutComputedFunctions extends KnockoutSubscribableFunctions {
     getDependenciesCount(): number;
-    hasWriteFunction(): bool;
+    hasWriteFunction(): boolean;
 }
 
 interface KnockoutObservableFunctions extends KnockoutSubscribableFunctions {
 }
 
-interface KnockoutObservableArrayFunctions extends KnockoutObservableFunctions {
+interface KnockoutObservableArrayFunctions<T> extends KnockoutObservableFunctions {
     // General Array functions
-    indexOf(searchElement, fromIndex?: number): number;
-    slice(start: number, end?: number): any[];
-    splice(start: number): any[];
-    splice(start: number, deleteCount: number, ...items: any[]): any[];
+    indexOf(searchElement: T, fromIndex?: number): number;
+    slice(start: number, end?: number): T[];
+    splice(start: number): T[];
+    splice(start: number, deleteCount: number, ...items: T[]): T[];
     pop();
-    push(...items: any[]): void;
+    push(...items: T[]): void;
     shift();
-    unshift(...items: any[]): number;
-    reverse(): any[];
+    unshift(...items: T[]): number;
+    reverse(): T[];
     sort(): void;
     sort(compareFunction): void;
 
     // Ko specific
-    replace(oldItem: any, newItem: any): void;
+    replace(oldItem: T, newItem: T): void;
 
-    remove(item): any[];
-    removeAll(items: any[]): any[];
-    removeAll(): any[];
+    remove(item): T[];
+    removeAll(items: T[]): T[];
+    removeAll(): T[];
 
-    destroy(item): void;
-    destroyAll(items: any[]): void;
+    destroy(item: T): void;
+    destroyAll(items: T[]): void;
     destroyAll(): void;
 }
 
@@ -61,48 +61,39 @@ interface KnockoutSubscription extends KnockoutSubscribableFunctions {
 interface KnockoutComputedStatic {
     fn: KnockoutComputedFunctions;
 
-    (): KnockoutComputed;
-    (func: Function, context?: any, options?: any): KnockoutComputed;
-    (def: KnockoutComputedDefine): KnockoutComputed;
-    (options?: any): KnockoutComputed;
+    <T>(): KnockoutComputed<T>;
+    <T>(func: () => T, context?: any, options?: any): KnockoutComputed<T>;
+    <T>(def: KnockoutComputedDefine<T>): KnockoutComputed<T>;
+    (options?: any): KnockoutComputed<any>;
 }
 
-interface KnockoutComputed extends KnockoutObservableAny, KnockoutComputedFunctions {
+interface KnockoutComputed<T> extends KnockoutComputedFunctions {
+    (): T;
+    (value: T): void;
+
+    subscribe(callback: (newValue: T) => void, target?:any, topic?: string): KnockoutSubscription;
+    notifySubscribers(valueToWrite: T, topic?: string);
 }
 
 interface KnockoutObservableArrayStatic {
 
-    fn: KnockoutObservableArrayFunctions;
+    fn: KnockoutObservableArrayFunctions<any>;
 
-    (): KnockoutObservableArray;
-    (value: any[]): KnockoutObservableArray;
-
-    new(): KnockoutObservableArray;
-    new(value: any[]): KnockoutObservableArray;
+    <T>(value?: T[]): KnockoutObservableArray<T>;
 }
 
-interface KnockoutObservableArray extends KnockoutObservableArrayFunctions {
-    (): any[];
-    (value: any[]): void;
+interface KnockoutObservableArray<T> extends KnockoutObservableArrayFunctions<T> {
+    (): T[];
+    (value: T[]): void;
 
-    subscribe(callback: (newValue: any[]) => void, target?:any, topic?: string): KnockoutSubscription;
-    notifySubscribers(valueToWrite: any[], topic?: string);
+    subscribe(callback: (newValue: T[]) => void, target?:any, topic?: string): KnockoutSubscription;
+    notifySubscribers(valueToWrite: T[], topic?: string);
 }
 
 interface KnockoutObservableStatic {
     fn: KnockoutObservableFunctions;
 
-    (value: string): KnockoutObservableString;
-    (value: Date): KnockoutObservableDate;
-    (value: number): KnockoutObservableNumber;
-    (value: bool): KnockoutObservableBool;
-    (value?: any): KnockoutObservableAny;
-
-    new(value: string): KnockoutObservableString;
-    new(value: Date): KnockoutObservableDate;
-    new(value: number): KnockoutObservableNumber;
-    new(value: bool): KnockoutObservableBool;
-    new(value?: any): KnockoutObservableAny;
+    <T>(value?: T): KnockoutObservable<T>;
 }
 
 /** use as method to get/set the value */
@@ -110,61 +101,17 @@ interface KnockoutObservableBase extends KnockoutObservableFunctions {
     getSubscriptionsCount(): number;
 }
 
-/** use as method to get/set the value 
-can cast to a more appropriate (typed) interface such as KnockoutObservableString  or KnockoutObservableNumber
-*/
-interface KnockoutObservableAny extends KnockoutObservableBase {
+interface KnockoutObservable<T> extends KnockoutObservableBase {
+    (): T;
+    (value: T): void;
 
-    (): any;
-    (value): void;
-
-    subscribe(callback: (newValue: any) => void, target?:any, topic?: string): KnockoutSubscription;
-    notifySubscribers(valueToWrite, topic?: string);
+    subscribe(callback: (newValue: T) => void, target?:any, topic?: string): KnockoutSubscription;
+    notifySubscribers(valueToWrite: T, topic?: string);
 }
 
-interface KnockoutObservableString extends KnockoutObservableBase {
-    (): string;
-    (value: string): void;
-
-    subscribe(callback: (newValue: string) => void, target?:any, topic?: string): KnockoutSubscription;
-    notifySubscribers(valueToWrite: string, topic?: string);
-}
-
-interface KnockoutObservableObject extends KnockoutObservableBase {
-    (): {};
-    (value: {}): void;
-
-    subscribe(callback: (newValue: {}) => void , target?: any, topic?: string): KnockoutSubscription;
-    notifySubscribers(valueToWrite: {}, topic?: string);
-}
-
-interface KnockoutObservableNumber extends KnockoutObservableBase {
-    (): number;
-    (value: number): void;
-
-    subscribe(callback: (newValue: number) => void, target?:any, topic?: string): KnockoutSubscription;
-    notifySubscribers(valueToWrite: number, topic?: string);
-}
-
-interface KnockoutObservableBool extends KnockoutObservableBase {
-    (): bool;
-    (value: bool): void;
-
-    subscribe(callback: (newValue: bool) => void, target?:any, topic?: string): KnockoutSubscription;
-    notifySubscribers(valueToWrite: bool, topic?: string);
-}
-
-interface KnockoutObservableDate extends KnockoutObservableBase {
-    (): Date;
-    (value: Date): void;
-
-    subscribe(callback: (newValue: Date) => void, target?:any, topic?: string): KnockoutSubscription;
-    notifySubscribers(valueToWrite: Date, topic?: string);
-}
-
-interface KnockoutComputedDefine {
-    read(): any;
-    write(any);
+interface KnockoutComputedDefine<T> {
+    read(): T;
+    write(T);
 }
 
 interface KnockoutBindingContext {
@@ -186,6 +133,8 @@ interface KnockoutBindingHandler {
 }
 
 interface KnockoutBindingHandlers {
+    [bindingHandler: string]: KnockoutBindingHandler;
+
     // Controlling text and appearance
     visible: KnockoutBindingHandler;
     text: KnockoutBindingHandler;
@@ -227,7 +176,7 @@ interface KnockoutMemoization {
 interface KnockoutVirtualElement {}
 
 interface KnockoutVirtualElements {
-	allowedBindings: { [bindingName: string]: bool; };
+	allowedBindings: { [bindingName: string]: boolean; };
 	emptyNode( e: KnockoutVirtualElement );
 	firstChild( e: KnockoutVirtualElement );
 	insertAfter( container: KnockoutVirtualElement, nodeToInsert: HTMLElement, insertAfter: HTMLElement );
@@ -267,7 +216,7 @@ interface KnockoutUtils {
 
         set (node: Element, key: string, value: any);
 
-        getAll(node: Element, createIfNotFound: bool);
+        getAll(node: Element, createIfNotFound: boolean);
 
         clear(node: Element);
     };
@@ -296,7 +245,7 @@ interface KnockoutUtils {
 
     arrayIndexOf(array: any[], item: any): number;
 
-    arrayFirst(array: any[], predicate: (item) => bool, predicateOwner?: any): any;
+    arrayFirst(array: any[], predicate: (item) => boolean, predicateOwner?: any): any;
 
     arrayRemoveItem(array: any[], itemToRemove: any): void;
 
@@ -304,7 +253,7 @@ interface KnockoutUtils {
 
     arrayMap(array: any[], mapping: (item) => any): any[];
 
-    arrayFilter(array: any[], predicate: (item) => bool): any[];
+    arrayFilter(array: any[], predicate: (item) => boolean): any[];
 
     arrayPushAll(array: any[], valuesToPush: any[]): any[];
 
@@ -314,13 +263,13 @@ interface KnockoutUtils {
 
     moveCleanedNodesToContainerElement(nodes: any[]): HTMLElement;
 
-    cloneNodes(nodesArray: any[], shouldCleanNodes: bool): any[];
+    cloneNodes(nodesArray: any[], shouldCleanNodes: boolean): any[];
 
     setDomNodeChildren(domNode: any, childNodes: any[]): void;
 
     replaceDomNodes(nodeToReplaceOrNodeArray: any, newNodesArray: any[]): void;
 
-    setOptionNodeSelectionState(optionNode: any, isSelected: bool): void;
+    setOptionNodeSelectionState(optionNode: any, isSelected: boolean): void;
 
     stringTrim(str: string): string;
 
@@ -328,9 +277,9 @@ interface KnockoutUtils {
 
     stringStartsWith(str: string, startsWith: string): string;
 
-    domNodeIsContainedBy(node: any, containedByNode: any): bool;
+    domNodeIsContainedBy(node: any, containedByNode: any): boolean;
 
-    domNodeIsAttachedToDocument(node: any): bool;
+    domNodeIsAttachedToDocument(node: any): boolean;
 
     tagNameLower(element: any): string;
 
@@ -340,7 +289,7 @@ interface KnockoutUtils {
 
     unwrapObservable(value: any): any;
 
-    toggleDomNodeCssClass(node: any, className: string, shouldHaveClass: bool): void;
+    toggleDomNodeCssClass(node: any, className: string, shouldHaveClass: boolean): void;
 
     //setTextContent(element: any, textContent: string): void; // NOT PART OF THE MINIFIED API SURFACE (ONLY IN knockout-{version}.debug.js) https://github.com/SteveSanderson/knockout/issues/670
 
@@ -366,9 +315,9 @@ interface KnockoutUtils {
 
     ieVersion: number;
 
-    isIe6: bool;
+    isIe6: boolean;
 
-    isIe7: bool;
+    isIe7: boolean;
 }
 
 //////////////////////////////////
@@ -416,7 +365,7 @@ interface KnockoutTemplateEngine extends KnockoutNativeTemplateEngine {
 
     renderTemplate(template, bindingContext, options, templateDocument);
 
-    isTemplateRewritten(template, templateDocument): bool;
+    isTemplateRewritten(template, templateDocument): boolean;
 
     rewriteTemplate(template, rewriterCallback, templateDocument);
 }
@@ -440,11 +389,11 @@ interface KnockoutStatic {
     observableArray: KnockoutObservableArrayStatic;
 
     contextFor(node: any): any;
-    isSubscribable(instance: any): bool;
+    isSubscribable(instance: any): boolean;
     toJSON(viewModel: any, replacer?: Function, space?: any): string;
     toJS(viewModel: any): any;
-    isObservable(instance: any): bool;
-    isComputed(instance: any): bool;
+    isObservable(instance: any): boolean;
+    isComputed(instance: any): boolean;
     dataFor(node: any): any;
     removeNode(node: Element);
     cleanNode(node: Element);

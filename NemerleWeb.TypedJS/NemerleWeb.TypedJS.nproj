@@ -112,10 +112,10 @@
     <Folder Include="Scripts\typings\linq\" />
     <Folder Include="Scripts\typings\modernizr\" />
     <Folder Include="Scripts\typings\moment\" />
-    <Folder Include="Scripts\typings\rx.js" />
-    <Folder Include="Scripts\typings\numeraljs\" />
     <Folder Include="Scripts\typings\preloadjs\" />
     <Folder Include="Scripts\typings\qunit\" />
+    <Folder Include="Scripts\typings\rx.js" />
+    <Folder Include="Scripts\typings\numeraljs\" />
     <Folder Include="Scripts\typings\requirejs\" />
     <Folder Include="Scripts\typings\select2\" />
     <Folder Include="Scripts\typings\signalr\" />
@@ -283,12 +283,6 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\toastr\toastr.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\typings\underscore\underscore-typed-1.4.2.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\typings\underscore\underscore-typed-1.4.3.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\underscore\underscore-typed.d.ts">

@@ -1,0 +1,45 @@
+﻿using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Console;
+using System.Linq;
+
+using TSParser;
+
+module Program
+{
+  Main() : void
+  {
+    def parseText(text)
+    {
+      def parser = TSDeclarationParser();
+      def (pos, ret) = parser.TryParse(text);
+      pos == text.Length
+    }
+    def parseTextWithResult(text : string) : void
+    {
+      if(parseText(text))
+        WriteLine("SUCCESS");
+      else
+        WriteLine("FAILURE");
+    }
+    def parseFile(path : string) : void
+    {
+      if(parseText(File.ReadAllText(path)))
+        WriteLine($"$path - SUCCESS");
+      else
+        WriteLine($"$path - FAILURE");
+    }
+    
+    parseTextWithResult(<#interface A{}#>);
+    
+    //foreach(f in Directory.EnumerateFiles(@"..\..\..\NemerleWeb.TypedJS\Scripts\", "*.*", SearchOption.AllDirectories))
+      //parseFile(f);
+    
+    _ = ReadLine();
+  }
+}

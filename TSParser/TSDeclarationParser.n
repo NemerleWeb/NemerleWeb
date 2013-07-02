@@ -22,7 +22,7 @@ namespace TSParser
         S : void = (Spacing / semicolon)*;
         scS : void = semicolon S;
         
-        GlobalSpacing : void = WhiteSpace / LineTerminatorSequence / GlobalComment;        
+        GlobalSpacing : void = WhiteSpace / LineTerminatorSequence / GlobalComment;
         GS : void = (GlobalSpacing / semicolon)*;
         
         import_s : void   = "import"s;
@@ -493,7 +493,7 @@ namespace TSParser
                  
         #region Object Type Literals (3.7)
         
-        ObjectType /*: TSType.Object*/ = lbrace_s TypeBody rbrace_s;
+        ObjectType /*: TSType.Object*/ = lbrace_s TypeBody? rbrace_s;
         TypeBody /*: List[TSObject]*/ = TypeMemberList semicolon? S;
         TypeMemberList /*: List[TSObject]*/ = TypeMember (scS TypeMember)* S;
         TypeMember /*: TSObject*/ =
