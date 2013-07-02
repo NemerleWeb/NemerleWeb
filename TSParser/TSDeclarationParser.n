@@ -759,7 +759,7 @@ namespace TSParser
           module_s IdentifierPath lbrace_s AmbientModuleBody rbrace_s S;
         AmbientModuleBody /*: List[TSGlobal]*/ = AmbientModuleElement*;
         AmbientModuleElement =
-          export_s
+          export_s?
           (
             AmbientVariableDeclaration /
             AmbientFunctionDeclaration /
