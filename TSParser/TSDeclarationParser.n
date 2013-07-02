@@ -482,10 +482,11 @@ namespace TSParser
         
         #region Type Literals (3.6.3)
         
+        // Array is excluded to prevent left recursion.
         TypeLiteral : TSType = ObjectType / FunctionType / ConstructorType;        
         
         ArrayType : TSType.Array = (PredefinedType / TypeReference / TypeLiteral) ('['s ']'s)+;
-        FunctionType : TSType = lparen_s ParameterListOpt rparen_s arrow_s ReturnType s;
+        FunctionType : TSType = lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
         ConstructorType : TSType = new_s lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
         
         #endregion
@@ -559,7 +560,7 @@ namespace TSParser
           new_s TypeParametersOpt lparen_s ParameterListOpt rparen_s TypeAnnotation?;
         IndexSignature     : TSObject =
           lbrack_s Identifier required colon_s ("number" / "string") s rbrack_s TypeAnnotation;
-        MehtodSignature  : TSObject = PropertyName optional CallSignature;
+        MethodSignature  : TSObject = PropertyName optional CallSignature;
         
         #endregion
         
@@ -650,8 +651,11 @@ namespace TSParser
         
         EnumDeclaration = enum_s Identifier lbrace_s EnumBody? rbrace_s S;
         EnumBody : List[TSEnumElement] =
-          ConstantEnumMember (comma_s ConstantEnumMember)*;
-        ConstantEnumMember = PropertyName;
+          ConstantEnumMember (comma_s ConstantEnumMember)* comma_s?;
+        ConstantEnumMember = PropertyName (assign_s IntegerLiteral)?;
+        IntegerLiteral = SignedInteger / HexIntegerLiteral;
+        ComputedEnumMemberList = ComputedEnumMember (comma_s ComputedEnumMember)*;
+        ComputedEnumMember = PropertyName assign_s AssignmentExpression;
         
         #endregion
         
@@ -742,22 +746,22 @@ namespace TSParser
         AmbientConstructorDeclaration : TSClassMember =
           constructor_s lparen_s ParameterListOpt rparen_s scS;       
         AmbientMemberDeclaration : TSClassMember =
-          PublicOrPrivate? static_s? PropertyName (CallSignature / TypeAnnotation?) scS;  
+          PublicOrPrivate? static_s? PropertyName (CallSignature / TypeAnnotation?) scS;
                 
         // Enum
         AmbientEnumDeclaration : TSGlobal =
           enum_s Identifier lbrace_s AmbientEnumBody? rbrace_s S;
         AmbientEnumBody = AmbientEnumMember*;
-        AmbientEnumMember = PropertyName (assign_s IntegerLiteral)? comma_s?
+        AmbientEnumMember = PropertyName (assign_s IntegerLiteral)? comma_s?;
         
         // Module
-         AmbientModuleDeclaration : TSGlobal =
+        AmbientModuleDeclaration : TSGlobal =
           module_s IdentifierPath lbrace_s AmbientModuleBody rbrace_s S;
         AmbientModuleBody : List[TSGlobal] = AmbientModuleElement*;
         AmbientModuleElement =
           export_s
           (
-            AmbientVariableStatement /
+            AmbientVariableDeclaration /
             AmbientFunctionDeclaration /
             AmbientClassDeclaration /
             InterfaceDeclaration /
@@ -767,7 +771,7 @@ namespace TSParser
           );
           
         // External
-        AmbientExternalModuleDeclaration =
+        AmbientExternalModuleDeclaration : TSGlobal =
           module_s StringLiteral lbrace_s AmbientExternalModuleBody rbrace_s;
         AmbientExternalModuleBody = AmbientExternalModuleElement*;
         AmbientExternalModuleElement =
@@ -795,7 +799,6 @@ namespace TSParser
     )]
   public class TSDeclarationParser
   {
-    /*
     optional(n : NToken) : bool
     {
       !n.IsEmpty
@@ -842,17 +845,16 @@ namespace TSParser
       {
       | "any" => TSType.Any()
       | "number" => TSType.Number()
-      | "bool" => TSType.Bool()
+      | "boolean" | "bool" => TSType.Bool()
       | "string" => TSType.String()
       | "void" => TSType.Void()
       | _ => assert(false);
       }
     }
     
-    TypeNameTS(type : string) : TSType
-    {
-      TSType.Named(type)
-    }
+    
+    
+    /*
     
     TypeName(first : string, rest : List[string]) : string
     {
