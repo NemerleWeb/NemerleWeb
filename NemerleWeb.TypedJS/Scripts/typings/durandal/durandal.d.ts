@@ -249,7 +249,7 @@ declare module "durandal/viewModel" {
     export var activator: {
         (): IDurandalViewModelActiveItem;
         (initialActiveItem: any, settings?: IViewModelDefaults): IDurandalViewModelActiveItem;
-    }
+    };
 }
 
 declare module "durandal/viewModelBinder" {

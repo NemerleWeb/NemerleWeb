@@ -24,6 +24,7 @@ namespace TSParser
         
         GlobalSpacing : void = WhiteSpace / LineTerminatorSequence / GlobalComment;
         GS : void = (GlobalSpacing / semicolon)*;
+        scGS : void = semicolon GS;
         
         import_s : void   = "import"s;
         export_s : void   = "export"s;
@@ -217,7 +218,9 @@ namespace TSParser
 
         #region StringLiteral (7.8.4)
         
-        StringLiteral : string = dquote DoubleStringCharacter* dquote / squote SingleStringCharacter* squote;
+        StringLiteral : string =
+          dquote DoubleStringCharacter* dquote /
+          squote SingleStringCharacter* squote;
         DoubleStringCharacter = 
           !('"' / '\\' / LineTerminator) SourceCharacter /
           '\\' EscapeSequence /
@@ -301,7 +304,7 @@ namespace TSParser
         //  get_s PropertyName lparen_s rparen_s lbrace_s FunctionBody rbrace_s /
         //  set_s PropertyName lparen_s PropertySetParameterList rparen_s lbrace_s FunctionBody rbrace_s;
           
-        PropertyName = IdentifierName / StringLiteral / NumericLiteral;
+        PropertyName = (IdentifierName / StringLiteral / NumericLiteral) s;
         PropertySetParameterList = Identifier;
         
         #endregion
@@ -495,13 +498,13 @@ namespace TSParser
         
         ObjectType /*: TSType.Object*/ = lbrace_s TypeBody? rbrace_s;
         TypeBody /*: List[TSObject]*/ = TypeMemberList semicolon? S;
-        TypeMemberList /*: List[TSObject]*/ = TypeMember (scS TypeMember)* S;
+        TypeMemberList /*: List[TSObject]*/ = TypeMember (scGS TypeMember)* S;
         TypeMember /*: TSObject*/ =
-          PropertySignature /
-          CallSignature /
           ConstructSignature /
+          MethodSignature /          
+          CallSignature /
           IndexSignature /
-          MethodSignature;
+          PropertySignature;
           
         #endregion
           
@@ -590,14 +593,14 @@ namespace TSParser
         
         // Modified
         FunctionDeclaration = FunctionOverload+;
-        FunctionOverload = function_s Identifier CallSignature scS;
+        FunctionOverload = function_s Identifier CallSignature scGS;
         
         #endregion       
         
         #region Interface Declarations (7.1)
         
         InterfaceDeclaration /*: TSGlobal*/ =
-          interface_s Identifier TypeParametersOpt InterfaceExtendsClause? ObjectType S;
+          interface_s Identifier TypeParametersOpt InterfaceExtendsClause? ObjectType scGS;
         InterfaceExtendsClause /*: List[string]*/ = extends_s ClassOrInterfaceTypeList;
         ClassOrInterfaceTypeList /*: List[string]*/ =
           ClassOrInterfaceType (comma_s ClassOrInterfaceType)*;
@@ -626,7 +629,7 @@ namespace TSParser
         #region Constructor Declaration (8.3)
         
         ConstructorDeclaration = ConstructorOverload+;
-        ConstructorOverload = constructor_s lparen_s ParameterListOpt rparen_s scS;
+        ConstructorOverload = constructor_s lparen_s ParameterListOpt rparen_s scGS;
         
         #endregion
         
@@ -638,10 +641,10 @@ namespace TSParser
           MemberAccessorDeclaration;
         
         MemberVariableDeclaration =
-          PublicOrPrivate? static_s? PropertyName TypeAnnotation? scS;
+          PublicOrPrivate? static_s? PropertyName TypeAnnotation? scGS;
         
         MemberFunctionDeclaration = MemberFunctionOverload+;
-        MemberFunctionOverload = PublicOrPrivate? static_s? PropertyName CallSignature scS;
+        MemberFunctionOverload = PublicOrPrivate? static_s? PropertyName CallSignature scGS;
         
         MemberAccessorDeclaration = PublicOrPrivate? static_s? (GetAccessor / SetAccessor);
         
@@ -661,7 +664,7 @@ namespace TSParser
         
         #region Module Declarations (10.1)
         
-        ModuleDeclaration = module_s IdentifierPath lbrace_s ModuleBody rbrace_s;
+        ModuleDeclaration = module_s IdentifierPath lbrace_s GS ModuleBody rbrace_s;
         IdentifierPath : string = Identifier (dot_s Identifier)*;        
         
         #endregion
@@ -686,7 +689,7 @@ namespace TSParser
         
         #region Import Declarations (10.3)
         
-        ImportDeclaration = import_s Identifier assign_s EntityName scS;
+        ImportDeclaration = import_s Identifier assign_s EntityName scGS;
         EntityName = ModuleName (dot Identifier)?;
         
         #endregion
@@ -707,14 +710,14 @@ namespace TSParser
         
         #region External Import Declarations (11.2.2)
         
-        ExternalImportDeclaration = import_s Identifier assign_s ExternalModuleReference scS;
-        ExternalModuleReference = require_s lbrack_s StringLiteral rbrack_s;
+        ExternalImportDeclaration = import_s Identifier assign_s ExternalModuleReference scGS;
+        ExternalModuleReference = require_s lbrack_s StringLiteral s rbrack_s;
         
         #endregion
         
         #region Export Assignments (11.2.4)
         
-        ExportAssignment = export_s assign_s Identifier scS;
+        ExportAssignment = export_s assign_s Identifier scGS;
         
         #endregion
         
@@ -727,12 +730,12 @@ namespace TSParser
             AmbientFunctionDeclaration /
             AmbientClassDeclaration /
             AmbientEnumDeclaration /
-            AmbientModuleDeclaration /
-            AmbientExternalModuleDeclaration
+            AmbientExternalModuleDeclaration /
+            AmbientModuleDeclaration
            );
         
-        AmbientVariableDeclaration /*: TSAmbient*/ = var_s Identifier TypeAnnotation? scS;
-        AmbientFunctionDeclaration /*: TSAmbient*/ = function_s Identifier CallSignature scS;
+        AmbientVariableDeclaration /*: TSAmbient*/ = var_s Identifier TypeAnnotation? scGS;
+        AmbientFunctionDeclaration /*: TSAmbient*/ = function_s Identifier CallSignature scGS;
         
         // Class
         AmbientClassDeclaration /*: TSAmbient*/ = 
@@ -744,9 +747,9 @@ namespace TSParser
           AmbientMemberDeclaration /
           IndexSignature;
         AmbientConstructorDeclaration /*: TSClassMember*/ =
-          constructor_s lparen_s ParameterListOpt rparen_s scS;       
+          constructor_s lparen_s ParameterListOpt rparen_s scGS;       
         AmbientMemberDeclaration /*: TSClassMember*/ =
-          PublicOrPrivate? static_s? PropertyName (CallSignature / TypeAnnotation?) scS;
+          PublicOrPrivate? static_s? PropertyName (CallSignature / TypeAnnotation?) scGS;
                 
         // Enum
         AmbientEnumDeclaration /*: TSGlobal*/ =
@@ -772,7 +775,7 @@ namespace TSParser
           
         // External
         AmbientExternalModuleDeclaration /*: TSGlobal*/ =
-          module_s StringLiteral lbrace_s AmbientExternalModuleBody rbrace_s;
+          module_s StringLiteral s lbrace_s GS AmbientExternalModuleBody rbrace_s GS;
         AmbientExternalModuleBody = AmbientExternalModuleElement*;
         AmbientExternalModuleElement =
           AmbientModuleElement /

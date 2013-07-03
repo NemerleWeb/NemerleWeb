@@ -16,7 +16,12 @@ module Program
   {
     def parser = TSDeclarationParser();
     def (pos, ret) = parser.TryParse(text);
-    pos == text.Length
+    if(pos == text.Length) true
+    else
+    {
+      WriteLine(text.Substring(pos, 50));
+      false
+    }
   }
   parseTextWithResult(text : string) : void
   {
@@ -28,7 +33,7 @@ module Program
   parseFile(path : string) : void
   {
     if(parseText(File.ReadAllText(path)))
-      WriteLine($"$path - SUCCESS");
+      ()//WriteLine($"$path - SUCCESS");
     else
       WriteLine($"$path - FAILURE");
   }
@@ -36,7 +41,8 @@ module Program
   
   Main() : void
   {
-    //parseTextWithResult(<#interface A{}#>);
+    parseTextWithResult(<#
+    #>);
     
     foreach(f in Directory.EnumerateFiles(@"..\..\..\NemerleWeb.TypedJS\Scripts\", "*.*", SearchOption.AllDirectories))
       parseFile(f);
