@@ -705,8 +705,11 @@ namespace TSParser
         
         #region Import Declarations (10.3)
         
-        ImportDeclaration = import_s Identifier assign_s EntityName;
+        ImportDeclaration = import_s Identifier assign_s (ModuleEntityName / EntityName) endS;
         EntityName = ModuleName (dot Identifier)?;
+        
+        // NOTE: This rule is not according to specification
+        ModuleEntityName = module_s lparen_s StringLiteral rparen_s;
         
         #endregion
 
@@ -716,25 +719,26 @@ namespace TSParser
         DeclarationSourceFile : List[TSGlobal] = GS DeclarationElement*;
         DeclarationElement /*: TSGlobal*/ =
           Reference /
-          export_s? InterfaceDeclaration /
-          export_s? ImportDeclaration/
           ExportAssignment /
+          export_s? InterfaceDeclaration /
           export_s? ExternalImportDeclaration /
+          export_s? ImportDeclaration/          
           export_s? AmbientDeclaration;
         
         #endregion
         
         #region External Import Declarations (11.2.2)
         
-        ExternalImportDeclaration = import_s Identifier assign_s ExternalModuleReference endS;
-        // Note: module is not according to specification but some files are written this way.
-        ExternalModuleReference = (require_s / module_s) lbrack_s StringLiteral s rbrack_s;
+        ExternalImportDeclaration = import_s Identifier assign_s ExternalModuleReference endS;        
+        ExternalModuleReference = require_s lbrack_s StringLiteral s rbrack_s;
         
         #endregion
         
         #region Export Assignments (11.2.4)
         
-        ExportAssignment = export_s assign_s Identifier endS;
+        // NOTE: This is not according to specification
+        ExportModuleAssignment = export_s Identifier assign_s ModuleEntityName endS;
+        ExportAssignment = ExportModuleAssignment / (export_s assign_s Identifier endS);
         
         #endregion
         

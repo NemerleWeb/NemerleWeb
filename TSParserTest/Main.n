@@ -42,10 +42,14 @@ module Program
   Main() : void
   {
     parseTextWithResult(<#
+
+
+
     #>);
     
     foreach(f in Directory.EnumerateFiles(@"..\..\..\NemerleWeb.TypedJS\Scripts\", "*.*", SearchOption.AllDirectories))
       parseFile(f);
+      ();
     
     WriteLine("Press any key to continue");
     _ = ReadKey();
