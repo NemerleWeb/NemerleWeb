@@ -84,50 +84,177 @@
     <Folder Include="Properties\" />
     <Folder Include="Scripts\" />
     <Folder Include="Scripts\typings\" />
+    <Folder Include="Scripts\typings\ace\" />
     <Folder Include="Scripts\typings\angularjs\" />
+    <Folder Include="Scripts\typings\arbiter\" />
+    <Folder Include="Scripts\typings\async\" />
+    <Folder Include="Scripts\typings\azure-mobile-services-client\" />
+    <Folder Include="Scripts\typings\AzureMobileServicesClient\" />
+    <Folder Include="Scripts\typings\backbone-relational\" />
     <Folder Include="Scripts\typings\backbone\" />
+    <Folder Include="Scripts\typings\bgiframe\" />
     <Folder Include="Scripts\typings\bootbox\" />
     <Folder Include="Scripts\typings\bootstrap-notify\" />
     <Folder Include="Scripts\typings\bootstrap.datepicker\" />
     <Folder Include="Scripts\typings\bootstrap\" />
+    <Folder Include="Scripts\typings\box2d\" />
     <Folder Include="Scripts\typings\breeze\" />
+    <Folder Include="Scripts\typings\casperjs\" />
+    <Folder Include="Scripts\typings\chai-fuzzy\" />
+    <Folder Include="Scripts\typings\chai-jquery\" />
+    <Folder Include="Scripts\typings\chai\" />
+    <Folder Include="Scripts\typings\cheerio\" />
     <Folder Include="Scripts\typings\chosen\" />
+    <Folder Include="Scripts\typings\chrome\" />
+    <Folder Include="Scripts\typings\codemirror\" />
+    <Folder Include="Scripts\typings\colors\" />
+    <Folder Include="Scripts\typings\d3\" />
     <Folder Include="Scripts\typings\durandal\" />
+    <Folder Include="Scripts\typings\dustjs-linkedin\" />
+    <Folder Include="Scripts\typings\easeljs\" />
+    <Folder Include="Scripts\typings\ember\" />
+    <Folder Include="Scripts\typings\epiceditor\" />
+    <Folder Include="Scripts\typings\expect.js\" />
+    <Folder Include="Scripts\typings\extjs\" />
     <Folder Include="Scripts\typings\fabricjs\" />
+    <Folder Include="Scripts\typings\fancybox\" />
+    <Folder Include="Scripts\typings\filesystem\" />
     <Folder Include="Scripts\typings\filewriter\" />
+    <Folder Include="Scripts\typings\firebase\" />
+    <Folder Include="Scripts\typings\flexSlider\" />
     <Folder Include="Scripts\typings\flot\" />
+    <Folder Include="Scripts\typings\foundation\" />
+    <Folder Include="Scripts\typings\fpsmeter\" />
+    <Folder Include="Scripts\typings\fullCalendar\" />
+    <Folder Include="Scripts\typings\gae.channel.api\" />
+    <Folder Include="Scripts\typings\gamequery\" />
+    <Folder Include="Scripts\typings\gldatepicker\" />
     <Folder Include="Scripts\typings\globalize\" />
+    <Folder Include="Scripts\typings\google.analytics\" />
+    <Folder Include="Scripts\typings\google.geolocation\" />
+    <Folder Include="Scripts\typings\googlemaps\" />
+    <Folder Include="Scripts\typings\greensock\" />
+    <Folder Include="Scripts\typings\gruntjs\" />
+    <Folder Include="Scripts\typings\hammerjs\" />
     <Folder Include="Scripts\typings\handlebars\" />
     <Folder Include="Scripts\typings\highcharts\" />
     <Folder Include="Scripts\typings\history\" />
+    <Folder Include="Scripts\typings\humane\" />
+    <Folder Include="Scripts\typings\i18next\" />
+    <Folder Include="Scripts\typings\icheck\" />
+    <Folder Include="Scripts\typings\iscroll\" />
+    <Folder Include="Scripts\typings\jake\" />
+    <Folder Include="Scripts\typings\jasmine-matchers\" />
     <Folder Include="Scripts\typings\jasmine\" />
+    <Folder Include="Scripts\typings\jqrangeslider\" />
+    <Folder Include="Scripts\typings\jquery.autosize\" />
+    <Folder Include="Scripts\typings\jquery.bbq\" />
+    <Folder Include="Scripts\typings\jquery.bootstrap.wizard\" />
+    <Folder Include="Scripts\typings\jquery.clientSideLogging\" />
+    <Folder Include="Scripts\typings\jquery.contextMenu\" />
     <Folder Include="Scripts\typings\jquery.cookie\" />
+    <Folder Include="Scripts\typings\jquery.cycle\" />
+    <Folder Include="Scripts\typings\jquery.dataTables\" />
+    <Folder Include="Scripts\typings\jquery.dynatree\" />
+    <Folder Include="Scripts\typings\jquery.elang\" />
+    <Folder Include="Scripts\typings\jquery.form\" />
+    <Folder Include="Scripts\typings\jquery.jnotify\" />
+    <Folder Include="Scripts\typings\jquery.livestampjs\" />
+    <Folder Include="Scripts\typings\jquery.menuaim\" />
+    <Folder Include="Scripts\typings\jquery.noty\" />
+    <Folder Include="Scripts\typings\jquery.pickadate\" />
     <Folder Include="Scripts\typings\jquery.scrollTo\" />
+    <Folder Include="Scripts\typings\jquery.simplePagination\" />
+    <Folder Include="Scripts\typings\jquery.tagsmanager\" />
     <Folder Include="Scripts\typings\jquery.timepicker\" />
+    <Folder Include="Scripts\typings\jquery.tinycarousel\" />
+    <Folder Include="Scripts\typings\jquery.tinyscrollbar\" />
+    <Folder Include="Scripts\typings\jquery.transit\" />
     <Folder Include="Scripts\typings\jquery.validation\" />
+    <Folder Include="Scripts\typings\jquery.watermark\" />
+    <Folder Include="Scripts\typings\jquerymobile\" />
     <Folder Include="Scripts\typings\jqueryui\" />
     <Folder Include="Scripts\typings\jquery\" />
+    <Folder Include="Scripts\typings\js-fixtures\" />
+    <Folder Include="Scripts\typings\jscrollpane\" />
+    <Folder Include="Scripts\typings\jsdeferred\" />
+    <Folder Include="Scripts\typings\jsoneditoronline\" />
+    <Folder Include="Scripts\typings\jsplumb\" />
+    <Folder Include="Scripts\typings\jstorage\" />
+    <Folder Include="Scripts\typings\jszip\" />
+    <Folder Include="Scripts\typings\jwplayer\" />
+    <Folder Include="Scripts\typings\keyboardjs\" />
+    <Folder Include="Scripts\typings\knockback\" />
+    <Folder Include="Scripts\typings\knockout.editables\" />
     <Folder Include="Scripts\typings\knockout.mapping\" />
     <Folder Include="Scripts\typings\knockout.postbox\" />
     <Folder Include="Scripts\typings\knockout.validation\" />
+    <Folder Include="Scripts\typings\knockout.viewmodel\" />
     <Folder Include="Scripts\typings\knockout\" />
     <Folder Include="Scripts\typings\kolite\" />
+    <Folder Include="Scripts\typings\ladda\" />
+    <Folder Include="Scripts\typings\leaflet\" />
+    <Folder Include="Scripts\typings\leapmotionTS\" />
+    <Folder Include="Scripts\typings\less\" />
     <Folder Include="Scripts\typings\linq\" />
+    <Folder Include="Scripts\typings\logg\" />
+    <Folder Include="Scripts\typings\marionette\" />
+    <Folder Include="Scripts\typings\marked\" />
+    <Folder Include="Scripts\typings\mocha\" />
     <Folder Include="Scripts\typings\modernizr\" />
     <Folder Include="Scripts\typings\moment\" />
+    <Folder Include="Scripts\typings\mousetrap\" />
+    <Folder Include="Scripts\typings\msnodesql\" />
+    <Folder Include="Scripts\typings\mustache\" />
+    <Folder Include="Scripts\typings\nodemailer\" />
+    <Folder Include="Scripts\typings\node\" />
+    <Folder Include="Scripts\typings\node_redis\" />
+    <Folder Include="Scripts\typings\node_zeromq\" />
+    <Folder Include="Scripts\typings\noVNC\" />
+    <Folder Include="Scripts\typings\phantomjs\" />
+    <Folder Include="Scripts\typings\phonegap\" />
+    <Folder Include="Scripts\typings\platform\" />
+    <Folder Include="Scripts\typings\pouchDB\" />
     <Folder Include="Scripts\typings\preloadjs\" />
+    <Folder Include="Scripts\typings\pubsubjs\" />
     <Folder Include="Scripts\typings\qunit\" />
     <Folder Include="Scripts\typings\q\" />
+    <Folder Include="Scripts\typings\restangular\" />
+    <Folder Include="Scripts\typings\restify\" />
+    <Folder Include="Scripts\typings\reveal\" />
+    <Folder Include="Scripts\typings\routie\" />
     <Folder Include="Scripts\typings\rx.js" />
     <Folder Include="Scripts\typings\numeraljs\" />
     <Folder Include="Scripts\typings\requirejs\" />
+    <Folder Include="Scripts\typings\scroller\" />
     <Folder Include="Scripts\typings\select2\" />
+    <Folder Include="Scripts\typings\sencha_touch\" />
     <Folder Include="Scripts\typings\signalr\" />
+    <Folder Include="Scripts\typings\sinon-chai\" />
     <Folder Include="Scripts\typings\sinon\" />
+    <Folder Include="Scripts\typings\socket.io\" />
+    <Folder Include="Scripts\typings\sockjs\" />
+    <Folder Include="Scripts\typings\soundjs\" />
     <Folder Include="Scripts\typings\spin\" />
+    <Folder Include="Scripts\typings\state-machine\" />
+    <Folder Include="Scripts\typings\storejs\" />
+    <Folder Include="Scripts\typings\sugar\" />
+    <Folder Include="Scripts\typings\swipeview\" />
+    <Folder Include="Scripts\typings\threejs\" />
     <Folder Include="Scripts\typings\toastr\" />
     <Folder Include="Scripts\typings\trunk8\" />
+    <Folder Include="Scripts\typings\tween.js\" />
+    <Folder Include="Scripts\typings\tweenjs\" />
+    <Folder Include="Scripts\typings\underscore-ko\" />
     <Folder Include="Scripts\typings\underscore\" />
+    <Folder Include="Scripts\typings\unity-webapi\" />
+    <Folder Include="Scripts\typings\videojs\" />
+    <Folder Include="Scripts\typings\viewporter\" />
+    <Folder Include="Scripts\typings\vimeo\" />
+    <Folder Include="Scripts\typings\webaudioapi\" />
+    <Folder Include="Scripts\typings\webrtc\" />
+    <Folder Include="Scripts\typings\youtube\" />
+    <Folder Include="Scripts\typings\zepto\" />
     <Folder Include="Scripts\typings\zeroclipboard\" />
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +275,9 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\ace\ace.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\angularjs\angular-cookies.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -166,7 +296,25 @@
     <Content Include="Scripts\typings\angularjs\angular.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\arbiter\Arbiter.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\async\async.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\azure-mobile-services-client\AzureMobileServicesClient.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\AzureMobileServicesClient\AzureMobileServicesClient.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\backbone-relational\backbone-relational.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\backbone\backbone.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\bgiframe\typescript.bgiframe.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\bootbox\bootbox.d.ts">
@@ -181,28 +329,133 @@
     <Content Include="Scripts\typings\bootstrap\bootstrap.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\box2d\box2dweb.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\breeze\breeze-1.0.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\breeze\breeze.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\casperjs\casperjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\chai-fuzzy\chai-fuzzy-assert.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\chai-jquery\chai-jquery.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\chai\chai-assert.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\chai\chai.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\cheerio\cheerio.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\chosen\chosen.jquery.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\chrome\chrome.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\codemirror\codemirror.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\colors\colors.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\d3\d3.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\d3\d3.superformula.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\durandal\durandal.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\dustjs-linkedin\dustjs-linkedin.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\easeljs\easeljs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\ember\ember.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\epiceditor\epiceditor.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\expect.js\expect.js.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\extjs\ExtJS-4.2.0.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\extjs\ExtJS.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\fabricjs\fabricjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\fancybox\fancybox.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\filesystem\filesystem.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\filewriter\filewriter.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\firebase\firebase.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\flexSlider\flexSlider.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\flot\jquery.flot.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\foundation\foundation.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\fpsmeter\FPSMeter.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\fullCalendar\fullCalendar.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\gae.channel.api\gae.channel.api.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\gamequery\gamequery.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\gldatepicker\gldatepicker.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\globalize\globalize.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\google.analytics\ga.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\google.geolocation\google.geolocation.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\googlemaps\google.maps.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\greensock\greensock.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\gruntjs\gruntjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\hammerjs\hammerjs.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\handlebars\handlebars.d.ts">
@@ -214,25 +467,148 @@
     <Content Include="Scripts\typings\history\history.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\humane\humane.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\i18next\i18next.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\icheck\icheck.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\iscroll\iscroll-lite.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\iscroll\iscroll.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jake\jake.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jasmine-matchers\jasmine-matchers.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\jasmine\jasmine.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jqrangeslider\jqrangeslider.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.autosize\jquery.autosize.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.bbq\jquery.bbq.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.bootstrap.wizard\jquery.bootstrap.wizard.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.clientSideLogging\jquery.clientSideLogging.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.contextMenu\jquery.contextMenu.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.cookie\jquery.cookie.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\jquery.cycle\jquery.cycle.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.dataTables\jquery.dataTables.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.dynatree\jquery.dynatree.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.elang\jquery.elang.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.form\jquery.form.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.jnotify\jquery.jnotify.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.livestampjs\jquery.livestampjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.menuaim\jquery.menuaim.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.noty\jquery.noty.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.pickadate\jquery.pickadate.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\jquery.scrollTo\jquery.scrollTo.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.simplePagination\jquery.simplePagination.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.tagsmanager\jquery.tagsmanager.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.timepicker\jquery.timepicker.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\jquery.tinycarousel\jquery.tinycarousel.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.tinyscrollbar\jquery.tinyscrollbar.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.transit\jquery.transit.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\jquery.validation\jquery.validation.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.watermark\jquery.watermark.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquerymobile\jquerymobile.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jqueryui\jqueryui.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery\jquery.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\js-fixtures\fixtures.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jscrollpane\jscrollpane.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jsdeferred\jsdeferred.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jsoneditoronline\jsoneditoronline.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jsplumb\jquery.jsPlumb.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jstorage\jstorage.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jszip\jszip.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jwplayer\jwplayer.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\keyboardjs\keyboardjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\knockback\knockback.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\knockout.editables\ko.editables.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\knockout.mapping\knockout.mapping.d.ts">
@@ -244,6 +620,9 @@
     <Content Include="Scripts\typings\knockout.validation\knockout.validation.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\knockout.viewmodel\knockout.viewmodel.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\knockout\knockout.amd.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -251,6 +630,18 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\kolite\kolite.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\ladda\ladda.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\leaflet\leaflet.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\leapmotionTS\LeapMotionTS.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\less\less.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\linq\linq.3.0.3-Beta4.d.ts">
@@ -262,16 +653,70 @@
     <Content Include="Scripts\typings\linq\linq.jquery.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\logg\logg.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\marionette\marionette.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\marked\marked.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\mocha\mocha.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\modernizr\modernizr.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\moment\moment.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\mousetrap\mousetrap.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\msnodesql\msnodesql.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\mustache\mustache.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\nodemailer\nodemailer.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\node\node-0.8.8.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\node\node.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\node_redis\node_redis.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\node_zeromq\zmq.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\noVNC\noVNC.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\numeraljs\numeraljs.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\phantomjs\phantomjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\phonegap\phonegap.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\platform\platform.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\pouchDB\pouch.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\preloadjs\preloadjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\pubsubjs\pubsub.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\qunit\qunit.d.ts">
@@ -283,7 +728,25 @@
     <Content Include="Scripts\typings\requirejs\require.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\restangular\restangular.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\restify\restify.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\reveal\reveal.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\routie\routie.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\rx.js\rx.js.aggregates.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\rx.js\rx.js.binding.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\rx.js\rx.js.coincidence.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\rx.js\rx.js.d.ts">
@@ -292,22 +755,64 @@
     <Content Include="Scripts\typings\rx.js\rx.js.html.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\rx.js\rx.js.joinpatterns.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\rx.js\rx.js.jquery.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\rx.js\rx.js.time.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\scroller\easyscroller.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\scroller\scroller.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\select2\select2.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\sencha_touch\SenchaTouch.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\signalr\signalr.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\sinon-chai\sinon-chai.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\sinon\sinon-1.5.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\socket.io\socket.io.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\sockjs\sockjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\soundjs\soundjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\spin\spin.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\state-machine\state-machine.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\storejs\storejs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\sugar\sugar.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\swipeview\swipeview.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\threejs\three-r55.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\threejs\three.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\toastr\toastr.d.ts">
@@ -316,10 +821,52 @@
     <Content Include="Scripts\typings\trunk8\trunk8.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\tween.js\tween.js.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\tweenjs\tweenjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\underscore-ko\underscore-ko.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\underscore\underscore-typed.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\underscore\underscore.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\unity-webapi\unity-webapi.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\videojs\videojs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\viewporter\viewporter.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\vimeo\froogaloop.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\webaudioapi\waa-20120802.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\webaudioapi\waa-nightly.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\webaudioapi\waa.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\webrtc\MediaStream.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\webrtc\RTCPeerConnection.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\youtube\youtube.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\zepto\zepto.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\zeroclipboard\zeroclipboard.d.ts">
