@@ -85,10 +85,12 @@
     <Folder Include="Scripts\" />
     <Folder Include="Scripts\typings\" />
     <Folder Include="Scripts\typings\angularjs\" />
+    <Folder Include="Scripts\typings\backbone\" />
     <Folder Include="Scripts\typings\bootbox\" />
     <Folder Include="Scripts\typings\bootstrap-notify\" />
     <Folder Include="Scripts\typings\bootstrap.datepicker\" />
     <Folder Include="Scripts\typings\bootstrap\" />
+    <Folder Include="Scripts\typings\breeze\" />
     <Folder Include="Scripts\typings\chosen\" />
     <Folder Include="Scripts\typings\durandal\" />
     <Folder Include="Scripts\typings\fabricjs\" />
@@ -98,6 +100,7 @@
     <Folder Include="Scripts\typings\handlebars\" />
     <Folder Include="Scripts\typings\highcharts\" />
     <Folder Include="Scripts\typings\history\" />
+    <Folder Include="Scripts\typings\jasmine\" />
     <Folder Include="Scripts\typings\jquery.cookie\" />
     <Folder Include="Scripts\typings\jquery.scrollTo\" />
     <Folder Include="Scripts\typings\jquery.timepicker\" />
@@ -114,12 +117,16 @@
     <Folder Include="Scripts\typings\moment\" />
     <Folder Include="Scripts\typings\preloadjs\" />
     <Folder Include="Scripts\typings\qunit\" />
+    <Folder Include="Scripts\typings\q\" />
     <Folder Include="Scripts\typings\rx.js" />
     <Folder Include="Scripts\typings\numeraljs\" />
     <Folder Include="Scripts\typings\requirejs\" />
     <Folder Include="Scripts\typings\select2\" />
     <Folder Include="Scripts\typings\signalr\" />
+    <Folder Include="Scripts\typings\sinon\" />
+    <Folder Include="Scripts\typings\spin\" />
     <Folder Include="Scripts\typings\toastr\" />
+    <Folder Include="Scripts\typings\trunk8\" />
     <Folder Include="Scripts\typings\underscore\" />
     <Folder Include="Scripts\typings\zeroclipboard\" />
   </ItemGroup>
@@ -159,6 +166,9 @@
     <Content Include="Scripts\typings\angularjs\angular.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\backbone\backbone.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\bootbox\bootbox.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -169,6 +179,12 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\bootstrap\bootstrap.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\breeze\breeze-1.0.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\breeze\breeze.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\chosen\chosen.jquery.d.ts">
@@ -196,6 +212,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\history\history.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jasmine\jasmine.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.cookie\jquery.cookie.d.ts">
@@ -258,6 +277,9 @@
     <Content Include="Scripts\typings\qunit\qunit.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\q\Q.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\requirejs\require.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -282,7 +304,16 @@
     <Content Include="Scripts\typings\signalr\signalr.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\sinon\sinon-1.5.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\spin\spin.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\toastr\toastr.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\trunk8\trunk8.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\underscore\underscore-typed.d.ts">
