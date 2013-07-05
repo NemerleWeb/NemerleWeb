@@ -727,7 +727,8 @@ namespace TSParser
         #region External Import Declarations (11.2.2)
         
         ExternalImportDeclaration = import_s Identifier assign_s ExternalModuleReference endS;
-        ExternalModuleReference = require_s lbrack_s StringLiteral s rbrack_s;
+        // Note: module is not according to specification but some files are written this way.
+        ExternalModuleReference = (require_s / module_s) lbrack_s StringLiteral s rbrack_s;
         
         #endregion
         
@@ -789,12 +790,12 @@ namespace TSParser
           
         // External
         AmbientExternalModuleDeclaration /*: TSGlobal*/ =
-          module_s StringLiteral s lbrace_s GS AmbientExternalModuleBody rbrace_s GS;
+          module_s StringLiteral s lbrace_s s AmbientExternalModuleBody rbrace_s endS;
         AmbientExternalModuleBody = AmbientExternalModuleElement*;
-        AmbientExternalModuleElement =
-          AmbientModuleElement /
+        AmbientExternalModuleElement =          
           ExportAssignment /
-          export_s? ExternalImportDeclaration;
+          export_s? ExternalImportDeclaration /
+          AmbientModuleElement;
           
         #endregion               
         

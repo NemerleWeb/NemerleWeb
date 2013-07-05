@@ -108,13 +108,16 @@
     <Folder Include="Scripts\typings\chrome\" />
     <Folder Include="Scripts\typings\codemirror\" />
     <Folder Include="Scripts\typings\colors\" />
+    <Folder Include="Scripts\typings\commander\" />
     <Folder Include="Scripts\typings\d3\" />
+    <Folder Include="Scripts\typings\domo\" />
     <Folder Include="Scripts\typings\durandal\" />
     <Folder Include="Scripts\typings\dustjs-linkedin\" />
     <Folder Include="Scripts\typings\easeljs\" />
     <Folder Include="Scripts\typings\ember\" />
     <Folder Include="Scripts\typings\epiceditor\" />
     <Folder Include="Scripts\typings\expect.js\" />
+    <Folder Include="Scripts\typings\express\" />
     <Folder Include="Scripts\typings\extjs\" />
     <Folder Include="Scripts\typings\fabricjs\" />
     <Folder Include="Scripts\typings\fancybox\" />
@@ -127,10 +130,12 @@
     <Folder Include="Scripts\typings\fpsmeter\" />
     <Folder Include="Scripts\typings\fullCalendar\" />
     <Folder Include="Scripts\typings\gae.channel.api\" />
+    <Folder Include="Scripts\typings\gamepad\" />
     <Folder Include="Scripts\typings\gamequery\" />
     <Folder Include="Scripts\typings\gldatepicker\" />
     <Folder Include="Scripts\typings\globalize\" />
     <Folder Include="Scripts\typings\google.analytics\" />
+    <Folder Include="Scripts\typings\google.feeds\" />
     <Folder Include="Scripts\typings\google.geolocation\" />
     <Folder Include="Scripts\typings\googlemaps\" />
     <Folder Include="Scripts\typings\greensock\" />
@@ -142,6 +147,7 @@
     <Folder Include="Scripts\typings\humane\" />
     <Folder Include="Scripts\typings\i18next\" />
     <Folder Include="Scripts\typings\icheck\" />
+    <Folder Include="Scripts\typings\impress\" />
     <Folder Include="Scripts\typings\iscroll\" />
     <Folder Include="Scripts\typings\jake\" />
     <Folder Include="Scripts\typings\jasmine-matchers\" />
@@ -151,6 +157,7 @@
     <Folder Include="Scripts\typings\jquery.bbq\" />
     <Folder Include="Scripts\typings\jquery.bootstrap.wizard\" />
     <Folder Include="Scripts\typings\jquery.clientSideLogging\" />
+    <Folder Include="Scripts\typings\jquery.colorbox\" />
     <Folder Include="Scripts\typings\jquery.contextMenu\" />
     <Folder Include="Scripts\typings\jquery.cookie\" />
     <Folder Include="Scripts\typings\jquery.cycle\" />
@@ -166,10 +173,12 @@
     <Folder Include="Scripts\typings\jquery.scrollTo\" />
     <Folder Include="Scripts\typings\jquery.simplePagination\" />
     <Folder Include="Scripts\typings\jquery.tagsmanager\" />
+    <Folder Include="Scripts\typings\jquery.timeago\" />
     <Folder Include="Scripts\typings\jquery.timepicker\" />
     <Folder Include="Scripts\typings\jquery.tinycarousel\" />
     <Folder Include="Scripts\typings\jquery.tinyscrollbar\" />
     <Folder Include="Scripts\typings\jquery.transit\" />
+    <Folder Include="Scripts\typings\jquery.ui.layout\" />
     <Folder Include="Scripts\typings\jquery.validation\" />
     <Folder Include="Scripts\typings\jquery.watermark\" />
     <Folder Include="Scripts\typings\jquerymobile\" />
@@ -196,6 +205,7 @@
     <Folder Include="Scripts\typings\leaflet\" />
     <Folder Include="Scripts\typings\leapmotionTS\" />
     <Folder Include="Scripts\typings\less\" />
+    <Folder Include="Scripts\typings\libxmljs\" />
     <Folder Include="Scripts\typings\linq\" />
     <Folder Include="Scripts\typings\logg\" />
     <Folder Include="Scripts\typings\marionette\" />
@@ -206,6 +216,7 @@
     <Folder Include="Scripts\typings\mousetrap\" />
     <Folder Include="Scripts\typings\msnodesql\" />
     <Folder Include="Scripts\typings\mustache\" />
+    <Folder Include="Scripts\typings\node-azure\" />
     <Folder Include="Scripts\typings\nodemailer\" />
     <Folder Include="Scripts\typings\node\" />
     <Folder Include="Scripts\typings\node_redis\" />
@@ -214,6 +225,7 @@
     <Folder Include="Scripts\typings\phantomjs\" />
     <Folder Include="Scripts\typings\phonegap\" />
     <Folder Include="Scripts\typings\platform\" />
+    <Folder Include="Scripts\typings\popcorn\" />
     <Folder Include="Scripts\typings\pouchDB\" />
     <Folder Include="Scripts\typings\preloadjs\" />
     <Folder Include="Scripts\typings\pubsubjs\" />
@@ -240,6 +252,7 @@
     <Folder Include="Scripts\typings\storejs\" />
     <Folder Include="Scripts\typings\sugar\" />
     <Folder Include="Scripts\typings\swipeview\" />
+    <Folder Include="Scripts\typings\teechart\" />
     <Folder Include="Scripts\typings\threejs\" />
     <Folder Include="Scripts\typings\toastr\" />
     <Folder Include="Scripts\typings\trunk8\" />
@@ -248,6 +261,7 @@
     <Folder Include="Scripts\typings\underscore-ko\" />
     <Folder Include="Scripts\typings\underscore\" />
     <Folder Include="Scripts\typings\unity-webapi\" />
+    <Folder Include="Scripts\typings\urijs\" />
     <Folder Include="Scripts\typings\videojs\" />
     <Folder Include="Scripts\typings\viewporter\" />
     <Folder Include="Scripts\typings\vimeo\" />
@@ -368,10 +382,16 @@
     <Content Include="Scripts\typings\colors\colors.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\commander\commander.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\d3\d3.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\d3\d3.superformula.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\domo\domo.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\durandal\durandal.d.ts">
@@ -390,6 +410,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\expect.js\expect.js.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\express\express.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\extjs\ExtJS-4.2.0.d.ts">
@@ -431,6 +454,9 @@
     <Content Include="Scripts\typings\gae.channel.api\gae.channel.api.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\gamepad\gamepad.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\gamequery\gamequery.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -441,6 +467,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\google.analytics\ga.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\google.feeds\google.feed.api.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\google.geolocation\google.geolocation.d.ts">
@@ -476,6 +505,9 @@
     <Content Include="Scripts\typings\icheck\icheck.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\impress\impress.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\iscroll\iscroll-lite.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -504,6 +536,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.clientSideLogging\jquery.clientSideLogging.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.colorbox\jquery.colorbox.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.contextMenu\jquery.contextMenu.d.ts">
@@ -551,6 +586,9 @@
     <Content Include="Scripts\typings\jquery.tagsmanager\jquery.tagsmanager.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\jquery.timeago\jquery.timeago.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\jquery.timepicker\jquery.timepicker.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -561,6 +599,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.transit\jquery.transit.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.ui.layout\jquery.ui.layout.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.validation\jquery.validation.d.ts">
@@ -644,6 +685,9 @@
     <Content Include="Scripts\typings\less\less.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\libxmljs\libxmljs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\linq\linq.3.0.3-Beta4.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -680,6 +724,9 @@
     <Content Include="Scripts\typings\mustache\mustache.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\node-azure\azure.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\nodemailer\nodemailer.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -708,6 +755,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\platform\platform.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\popcorn\popcorn.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\pouchDB\pouch.d.ts">
@@ -809,6 +859,9 @@
     <Content Include="Scripts\typings\swipeview\swipeview.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\teechart\teechart.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\threejs\three-r55.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -837,6 +890,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\unity-webapi\unity-webapi.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\urijs\URI.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\videojs\videojs.d.ts">
