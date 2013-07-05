@@ -19,11 +19,12 @@ namespace TSParser
         
         Spacing : void = WhiteSpace / LineTerminatorSequence / Comment;
         s : void = Spacing*;
-        S : void = (Spacing / semicolon)*;
-        scS : void = semicolon S;
+        S : void = Spacing+;
         
         // String ending, this is not defined in specification, but real TS parser works that way.
-        endS : void = (WhiteSpace / SingleLineComment)* semicolon? S;
+        // Maybe think about better rule.
+        // Using this rule it parses "a /**/ b /**/" while it must not.
+        endS : void = s semicolon? s;
         
         // GlobalSpacing is used for finding references
         GlobalSpacing : void = WhiteSpace / LineTerminatorSequence / GlobalComment;
@@ -38,7 +39,7 @@ namespace TSParser
         new_s : void      = "new"s;
         delete_s : void = "delete"s;
         void_s : void = "void"s;
-        typeof_s : void = "typeof"s;
+        typeof_S : void = "typeof"S;
         constructor_s : void = "constructor"s;
         enum_s : void = "enum"s;
         class_s : void = "class"s;
@@ -430,7 +431,7 @@ namespace TSParser
         
         #region Variable Statement (12.2)
         
-        VariableStatement = var_s VariableDeclarationList scS;
+        VariableStatement = var_s VariableDeclarationList endS;
         VariableDeclarationList = VariableDeclaration (comma_s VariableDeclaration)*;
         // This rule is modified in TypeSript see: 5.1
         //VariableDeclaration = Identifier;
@@ -462,16 +463,18 @@ namespace TSParser
         TypeParameters = less_s TypeParameterList greater_s;
         // Return list instead of option
         TypeParametersOpt = TypeParameters?;
-        TypeParameterList = TypeParameter (comma_s TypeParameter);
+        TypeParameterList = TypeParameter (comma_s TypeParameter)*;
         TypeParameter = Identifier Contraint?;
-        Contraint = extends_s TypeReference;
+        // ObjectType is not specified but it is allowed by compiler
+        Contraint = extends_s (TypeReference / ObjectType);
         
         #endregion
         
         #region Specifying Types (3.6)
         
         // Array is specified here, because otherwise we have left recursion.
-        ScriptType /*: TSType*/ = (PredefinedType / TypeReference / TypeLiteral) ('['s ']'s)*;
+        Type = PredefinedType / TypeQuery / TypeReference / TypeLiteral;
+        ScriptType /*: TSType*/ = Type ('['s ']'s)*;
         
         // Note: bool is not a valid type in TypeScript 0.9 but many libraries still use it.
         PredefinedType /*: TSType*/ = ("any" / "number" / "bool" / "boolean" / "string" / "void") s !IdentifierPart;
@@ -486,12 +489,19 @@ namespace TSParser
         
         #endregion
         
-        #region Type Literals (3.6.3)
+        #region Type Queries
+        
+        TypeQuery = typeof_S TypeQueryExpression;
+        TypeQueryExpression = Identifier (dot_s IdentifierName)*;
+        
+        #endregion
+        
+        #region Type Literals (3.6.4)
         
         // Array is excluded to prevent left recursion.
         TypeLiteral /*: TSType*/ = ObjectType / FunctionType / ConstructorType;        
         
-        ArrayType /*: TSType.Array*/ = (PredefinedType / TypeReference / TypeLiteral) ('['s ']'s)+;
+        ArrayType /*: TSType.Array*/ = Type ('['s ']'s)+;
         FunctionType /*: TSType*/ = lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
         ConstructorType /*: TSType*/ = new_s lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
         
@@ -503,9 +513,9 @@ namespace TSParser
         TypeBody /*: List[TSObject]*/ = TypeMemberList semicolon? endS;
         TypeMemberList /*: List[TSObject]*/ = TypeMember (endS TypeMember)* endS;
         TypeMember /*: TSObject*/ =
+          CallSignature /
           ConstructSignature /
           MethodSignature /          
-          CallSignature /
           IndexSignature /
           PropertySignature;
           
@@ -549,14 +559,17 @@ namespace TSParser
           RequiredParameterList comma_s RestParameter;
           
         RequiredParameterList /*: List[TSParam]*/ = RequiredParameter (comma_s RequiredParameter)*;
-        RequiredParameter /*: TSParam*/ = PublicOrPrivate? Identifier required TypeAnnotation?;
+        RequiredParameter /*: TSParam*/ =
+          Identifier colon_s StringLiteral /
+          PublicOrPrivate? Identifier required TypeAnnotation?;
+          
         Public /*: MemberAccess*/ = "public";
         Private /*: MemberAccess*/ = "private";
         PublicOrPrivate /*: MemberAccess*/ = (Public/Private)s;
         OptionalParameterList /*: List[TSParam]*/ = OptionalParameter (comma_s OptionalParameter)*;
         // Optional parameter must not have Initialiser in declaration files.
         OptionalParameter /*: TSParam*/ = PublicOrPrivate? Identifier optional TypeAnnotation?;
-        RestParameter /*: List[TSParam]*/ = ellipsis_s Identifier required colon_s ArrayType;
+        RestParameter /*: List[TSParam]*/ = ellipsis_s Identifier TypeAnnotation?;
         
         #endregion
         
@@ -596,7 +609,7 @@ namespace TSParser
         
         // Modified
         FunctionDeclaration = FunctionOverload+;
-        FunctionOverload = function_s Identifier CallSignature scS;
+        FunctionOverload = function_s Identifier CallSignature endS;
         
         #endregion       
         
@@ -632,7 +645,7 @@ namespace TSParser
         #region Constructor Declaration (8.3)
         
         ConstructorDeclaration = ConstructorOverload+;
-        ConstructorOverload = constructor_s lparen_s ParameterListOpt rparen_s scS;
+        ConstructorOverload = constructor_s lparen_s ParameterListOpt rparen_s endS;
         
         #endregion
         
@@ -644,10 +657,10 @@ namespace TSParser
           MemberAccessorDeclaration;
         
         MemberVariableDeclaration =
-          PublicOrPrivate? static_s? PropertyName TypeAnnotation? scS;
+          PublicOrPrivate? static_s? PropertyName TypeAnnotation? endS;
         
         MemberFunctionDeclaration = MemberFunctionOverload+;
-        MemberFunctionOverload = PublicOrPrivate? static_s? PropertyName CallSignature scS;
+        MemberFunctionOverload = PublicOrPrivate? static_s? PropertyName CallSignature endS;
         
         MemberAccessorDeclaration = PublicOrPrivate? static_s? (GetAccessor / SetAccessor);
         
@@ -655,7 +668,7 @@ namespace TSParser
         
         #region Enums (9)
         
-        EnumDeclaration = enum_s Identifier lbrace_s EnumBody? rbrace_s S;
+        EnumDeclaration = enum_s Identifier lbrace_s EnumBody? rbrace_s endS;
         EnumBody /*: List[TSEnumElement]*/ =
           ConstantEnumMember (comma_s ConstantEnumMember)* comma_s?;
         ConstantEnumMember = PropertyName (assign_s IntegerLiteral)?;
@@ -713,14 +726,14 @@ namespace TSParser
         
         #region External Import Declarations (11.2.2)
         
-        ExternalImportDeclaration = import_s Identifier assign_s ExternalModuleReference scS;
+        ExternalImportDeclaration = import_s Identifier assign_s ExternalModuleReference endS;
         ExternalModuleReference = require_s lbrack_s StringLiteral s rbrack_s;
         
         #endregion
         
         #region Export Assignments (11.2.4)
         
-        ExportAssignment = export_s assign_s Identifier scS;
+        ExportAssignment = export_s assign_s Identifier endS;
         
         #endregion
         
@@ -743,7 +756,7 @@ namespace TSParser
         // Class
         AmbientClassDeclaration /*: TSAmbient*/ = 
           class_s Identifier TypeParametersOpt ClassHeritage
-          lbrace_s AmbientClassBody rbrace_s S;
+          lbrace_s AmbientClassBody rbrace_s endS;
         AmbientClassBody /*: List[TSClassMember]*/ = AmbientClassBodyElement*;
         AmbientClassBodyElement /*: TSClassMember*/ =
           (AmbientConstructorDeclaration / AmbientMemberDeclaration / IndexSignature) endS;

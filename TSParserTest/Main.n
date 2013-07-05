@@ -47,6 +47,6 @@ module Program
     foreach(f in Directory.EnumerateFiles(@"..\..\..\NemerleWeb.TypedJS\Scripts\", "*.*", SearchOption.AllDirectories))
       parseFile(f);
     
-    _ = ReadLine();
+    _ = ReadKey();
   }
 }
