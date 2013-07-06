@@ -222,6 +222,7 @@
     <Folder Include="Scripts\typings\node_redis\" />
     <Folder Include="Scripts\typings\node_zeromq\" />
     <Folder Include="Scripts\typings\noVNC\" />
+    <Folder Include="Scripts\typings\numeraljs\" />
     <Folder Include="Scripts\typings\phantomjs\" />
     <Folder Include="Scripts\typings\phonegap\" />
     <Folder Include="Scripts\typings\platform\" />
@@ -236,8 +237,8 @@
     <Folder Include="Scripts\typings\reveal\" />
     <Folder Include="Scripts\typings\routie\" />
     <Folder Include="Scripts\typings\rx.js" />
-    <Folder Include="Scripts\typings\numeraljs\" />
     <Folder Include="Scripts\typings\requirejs\" />
+    <Folder Include="Scripts\typings\sammyjs\" />
     <Folder Include="Scripts\typings\scroller\" />
     <Folder Include="Scripts\typings\select2\" />
     <Folder Include="Scripts\typings\sencha_touch\" />
@@ -812,6 +813,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\rx.js\rx.js.time.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\sammyjs\sammyjs.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\scroller\easyscroller.d.ts">
