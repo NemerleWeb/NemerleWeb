@@ -615,7 +615,7 @@ namespace TSParser
         
         #region Interface Declarations (7.1)
         
-        InterfaceDeclaration /*: TSGlobal*/ =
+        InterfaceDeclaration : DeclarationElement =
           interface_s Identifier TypeParametersOpt InterfaceExtendsClause? ObjectType;
         InterfaceExtendsClause /*: List[string]*/ = extends_s ClassOrInterfaceTypeList;
         ClassOrInterfaceTypeList /*: List[string]*/ =
@@ -705,19 +705,20 @@ namespace TSParser
         
         #region Import Declarations (10.3)
         
-        ImportDeclaration = import_s Identifier assign_s (ModuleEntityName / EntityName) endS;
-        EntityName = ModuleName (dot Identifier)?;
+        ImportDeclaration : DeclarationElement =
+          import_s Identifier assign_s (ModuleEntityName / EntityName) endS;
+        EntityName : string = ModuleName (dot Identifier)?;
         
         // NOTE: This rule is not according to specification
-        ModuleEntityName = module_s lparen_s StringLiteral rparen_s;
+        ModuleEntityName : string = module_s lparen_s StringLiteral rparen_s;
         
         #endregion
 
         #region Source Files (11)
         
         SourceFile = DeclarationSourceFile;
-        DeclarationSourceFile : List[TSGlobal] = GS DeclarationElement*;
-        DeclarationElement /*: TSGlobal*/ =
+        DeclarationSourceFile : List[DeclarationElement] = GS DeclarationElement*;
+        DeclarationElement : DeclarationElement =
           Reference /
           ExportAssignment /
           export_s? InterfaceDeclaration /
@@ -729,7 +730,7 @@ namespace TSParser
         
         #region External Import Declarations (11.2.2)
         
-        ExternalImportDeclaration = import_s Identifier assign_s ExternalModuleReference endS;        
+        ExternalImportDeclaration : DeclarationElement = import_s Identifier assign_s ExternalModuleReference endS;        
         ExternalModuleReference = require_s lbrack_s StringLiteral s rbrack_s;
         
         #endregion
@@ -737,14 +738,15 @@ namespace TSParser
         #region Export Assignments (11.2.4)
         
         // NOTE: This is not according to specification
-        ExportModuleAssignment = export_s Identifier assign_s ModuleEntityName endS;
-        ExportAssignment = ExportModuleAssignment / (export_s assign_s Identifier endS);
+        ExportModuleAssignment : ExportAssignmentRule = export_s Identifier assign_s ModuleEntityName endS;
+        ExportIdentifierAssignment : ExportAssignmentRule = export_s assign_s Identifier endS;
+        ExportAssignment : DeclarationElement = ExportModuleAssignment / ExportIdentifierAssignment;
         
         #endregion
         
         #region Ambient Declarations (12.1)
                 
-        AmbientDeclaration /*: TSAmbient*/ =
+        AmbientDeclaration : DeclarationElement =
           declare_s
            (
             AmbientVariableDeclaration /
@@ -806,21 +808,42 @@ namespace TSParser
         #region Reference
 
         /// <reference path="..." />
-        ReferencePath /*: TSGlobal*/ = "path"s '='s StringLiteral;
-        ReferenceNoDefaultLib /*: TSGlobal*/ = "no-default-lib"s '='s ("\"true\"" / "'true'");
-        ReferenceElement /*: TSGlobal*/ = '<'s "reference"s (ReferencePath / ReferenceNoDefaultLib)s '/'s '>'s;
+        ReferencePath : ReferenceRule = "path"s assign_s StringLiteral;
+        ReferenceNoDefaultLib : ReferenceRule =
+          "no-default-lib"s assign_s ("\"true\"" / "'true'");
+        ReferenceElement : DeclarationElement =
+          less_s "reference"s (ReferencePath / ReferenceNoDefaultLib)s '/'s greater_s;
         xmlComment : void = "///";
-        Reference /*: TSGlobal*/ = xmlComment s ReferenceElement;
+        Reference : DeclarationElement = xmlComment s ReferenceElement;
         
         #endregion
         
         #endregion
         
-        start : List[TSGlobal] = DeclarationSourceFile;
+        start : List[DeclarationElement] = DeclarationSourceFile;
       }
     )]
   public class TSDeclarationParser
   {
+    #region Helpers
+    
+    static Id(first : string, rest : List[string]) : string
+    {
+      if (rest.Count == 0) first else $<#$first...$(rest; ".")#>
+    }
+    
+    static Id(first : string, rest : option[List[string]]) : string
+    {
+      Id(first, rest ?? List())
+    }
+    
+    static Id(first : string, rest : option[string]) : string
+    {
+      if(rest is Some(r)) $"$(first).$r" else first
+    }
+    
+    #endregion
+    
     optional(n : NToken) : bool
     {
       !n.IsEmpty
@@ -844,11 +867,6 @@ namespace TSParser
     Identifier(id : NToken) : string
     {
       GetText(id)
-    }
-    
-    static Id(first : string, rest : List[string]) : string
-    {
-      if (rest.Count == 0) first else $<#$first...$(rest; ".")#>
     }
     
     
@@ -1016,12 +1034,13 @@ namespace TSParser
     {
       [TSParam.Rest(id, type)]
     }
+    */
 
-    InterfaceDeclaration(id : string, extends : option[list[string]], type : TSType.Object) : TSGlobal
+    InterfaceDeclaration(id : string, t : NToken, extends : NToken, type : NToken) : DeclarationElement
     {
-      TSGlobal.Interface(id, extends ?? [], type)
+      DeclarationElement.InterfaceDeclaration()
     }
-    
+    /*
     InterfaceNameList(first : string, rest : List[string]) : list[string]
     {
       first :: rest.NToList()
@@ -1106,39 +1125,56 @@ namespace TSParser
     {
       TSGlobal.Export(id)
     }
-    
-    ImportDeclaration(id : string, moduleReference : string) : TSGlobal
-    {
-      TSGlobal.Import(id, moduleReference)
-    }
-    
-    ExternalImportDeclaration(id : string, moduleReference : string) : TSGlobal
-    {
-      TSGlobal.Import(id, moduleReference)
-    }
-    
-    
-    
-    
-    ReferencePath(_ : NToken, _ : NToken, path : string) : TSGlobal
-    {
-      TSGlobal.ReferencePath(path)
-    }
-    
-    ReferenceNoDefaultLib(_ : NToken, _ : NToken, _ : NToken) : TSGlobal
-    {
-      TSGlobal.ReferenceNoDefaultLib()
-    }
-    
-    ReferenceElement(_ : NToken, _ : NToken, reference : TSGlobal, _ : NToken, _ : NToken) : TSGlobal
-    {
-      reference
-    }
     */
     
-    DeclarationSourceFile(_ : NToken) : List[TSGlobal]
+    EntityName(first : string, rest : option[string]) : string
     {
-      List()
+      Id(first, rest)
+    }
+    
+    AmbientDeclaration(_ : NToken) : DeclarationElement
+    {
+      DeclarationElement.AmbientDeclaration()
+    }
+    
+    ImportDeclaration(id : string, moduleReference : string) : DeclarationElement
+    {
+      DeclarationElement.ImportDeclaration()
+    }
+    
+    ExternalImportDeclaration(id : string, _ : NToken) : DeclarationElement
+    {
+      DeclarationElement.ExternalImportDeclaration()
+    }
+    
+    ExportModuleAssignment(id : string, moduleEntity : string) : ExportAssignmentRule
+    {
+      ExportAssignmentRule.Module(id, moduleEntity)
+    }
+    
+    ExportIdentifierAssignment(id : string) : ExportAssignmentRule
+    {
+      ExportAssignmentRule.Identifier(id)
+    }
+    
+    ExportAssignment(e : ExportAssignmentRule) : DeclarationElement
+    {
+      DeclarationElement.ExportAssignment(e)
+    }    
+    
+    ReferencePath(_ : NToken, path : string) : ReferenceRule
+    {
+      ReferenceRule.Lib(path)
+    }
+    
+    ReferenceNoDefaultLib(_ : NToken, _ : NToken) : ReferenceRule
+    {
+      ReferenceRule.NoDefaultLib()
+    }
+    
+    ReferenceElement(_ : NToken, reference : ReferenceRule, _ : NToken) : DeclarationElement
+    {
+      DeclarationElement.Reference(reference)
     }
   }  
 }

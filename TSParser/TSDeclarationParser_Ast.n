@@ -11,6 +11,29 @@ using System.Linq;
 
 namespace TSParser
 {
+  public variant DeclarationElement : Located
+  {
+    | Reference { Value : ReferenceRule; }
+    | ExportAssignment { Value : ExportAssignmentRule; }
+    | InterfaceDeclaration
+    | ExternalImportDeclaration
+    | ImportDeclaration
+    | AmbientDeclaration
+  }
+  
+  public variant ReferenceRule
+  {
+    | NoDefaultLib
+    | Lib { Path : string; }
+  }
+  
+  public variant ExportAssignmentRule
+  {
+    | Module { Name : string; ModuleEntity : string; }
+    | Identifier { Name : string; }
+  }
+  
+  #region Old AST
   type ClassHeritage = option[string] * list[string];
   
   public enum MemberAccess
@@ -164,4 +187,5 @@ namespace TSParser
     | ReferencePath { path : string; }
     | ReferenceNoDefaultLib
   }
+  #endregion
 }
