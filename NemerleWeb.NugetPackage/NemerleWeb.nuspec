@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>NemerleWeb</id>
+    <version>1.0.0</version>
+    <authors>NemerleWeb team</authors>
+    <owners>NemerleWeb team</owners>
+    <licenseUrl>http://http://opensource.org/licenses/mit-license.php</licenseUrl>
+    <projectUrl>http://www.github.com/NemerleWeb/NemerleWeb</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>NemerleWeb web framework</description>
+    
+    <copyright>Copyright 2013</copyright>
+    <tags>Nemerle Web MVVM</tags>
+  </metadata>
+</package>
