@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+  <TemplateData>
+    <Name>NemerleWeb.ProjectTemplate</Name>
+    <Description>NemerleWeb.ProjectTemplate</Description>
+    <Icon>NemerleWeb.ProjectTemplate.ico</Icon>
+    <ProjectType>CSharp</ProjectType>
+    <RequiredFrameworkVersion>2.0</RequiredFrameworkVersion>
+    <SortOrder>1000</SortOrder>
+    <TemplateID>ad6b1a55-c31c-4ee1-8765-3335aa02ef04</TemplateID>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>NemerleWeb.ProjectTemplate</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="ProjectTemplate.csproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" TargetFileName="Properties\AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">Class1.cs</ProjectItem>
+    </Project>
+  </TemplateContent>
+    <WizardExtension>
+        <Assembly>NuGet.VisualStudio.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+        <FullClassName>NuGet.VisualStudio.TemplateWizard</FullClassName>
+    </WizardExtension>
+    <WizardData>
+        <packages repository="extension"
+              repositoryId="NemerleWeb.VSIX..e452766b-81fa-4b07-a10f-27e4860473f3">
+            <package id="SamplePackage" version="1.0" />
+        </packages>
+    </WizardData>
+</VSTemplate>
