@@ -730,8 +730,9 @@ namespace TSParser
         
         #region External Import Declarations (11.2.2)
         
-        ExternalImportDeclaration : DeclarationElement = import_s Identifier assign_s ExternalModuleReference endS;        
-        ExternalModuleReference = require_s lbrack_s StringLiteral s rbrack_s;
+        ExternalImportDeclaration : DeclarationElement =
+          import_s Identifier assign_s ExternalModuleReference endS;        
+        ExternalModuleReference : string = require_s lbrack_s StringLiteral s rbrack_s;
         
         #endregion
         
@@ -1137,14 +1138,14 @@ namespace TSParser
       DeclarationElement.AmbientDeclaration()
     }
     
-    ImportDeclaration(id : string, moduleReference : string) : DeclarationElement
+    ImportDeclaration(id : string, entity : string) : DeclarationElement
     {
-      DeclarationElement.ImportDeclaration()
+      DeclarationElement.ImportDeclaration(ImportDeclarationRule(id, entity))
     }
     
-    ExternalImportDeclaration(id : string, _ : NToken) : DeclarationElement
+    ExternalImportDeclaration(id : string, moduleReference : string) : DeclarationElement
     {
-      DeclarationElement.ExternalImportDeclaration()
+      DeclarationElement.ExternalImportDeclaration(ExternalImportDeclarationRule(id, moduleReference))
     }
     
     ExportModuleAssignment(id : string, moduleEntity : string) : ExportAssignmentRule

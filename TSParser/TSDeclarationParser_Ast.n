@@ -16,8 +16,8 @@ namespace TSParser
     | Reference { Value : ReferenceRule; }
     | ExportAssignment { Value : ExportAssignmentRule; }
     | InterfaceDeclaration
-    | ExternalImportDeclaration
-    | ImportDeclaration
+    | ExternalImportDeclaration { Value : ExternalImportDeclarationRule; }
+    | ImportDeclaration { Value : ImportDeclarationRule; }
     | AmbientDeclaration
   }
   
@@ -31,6 +31,20 @@ namespace TSParser
   {
     | Module { Name : string; ModuleEntity : string; }
     | Identifier { Name : string; }
+  }
+  
+  [Record]
+  public class ExternalImportDeclarationRule
+  {
+    public Name : string { get; }
+    public ModuleReference : string { get; }
+  }
+  
+  [Record]
+  public class ImportDeclarationRule
+  {
+    public Name : string { get; }
+    public Entity : string { get; }
   }
   
   #region Old AST
