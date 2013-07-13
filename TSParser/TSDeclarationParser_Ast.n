@@ -11,11 +11,14 @@ using System.Linq;
 
 namespace TSParser
 {
+  type TypeReference = string;
+  type ClassOrInterfaceTypeList = List[TypeReference];
+  
   public variant DeclarationElement : Located
   {
     | Reference { Value : ReferenceRule; }
     | ExportAssignment { Value : ExportAssignmentRule; }
-    | InterfaceDeclaration
+    | InterfaceDeclaration { Value : InterfaceDeclarationRule; }
     | ExternalImportDeclaration { Value : ExternalImportDeclarationRule; }
     | ImportDeclaration { Value : ImportDeclarationRule; }
     | AmbientDeclaration
@@ -45,6 +48,15 @@ namespace TSParser
   {
     public Name : string { get; }
     public Entity : string { get; }
+  }
+  
+  [Record]
+  public class InterfaceDeclarationRule
+  {
+    public Name : string { get; }
+    public TypeParameters : List[object] { get; }
+    public Extends : ClassOrInterfaceTypeList { get; }
+    public Type : object { get; }
   }
   
   #region Old AST

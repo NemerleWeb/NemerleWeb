@@ -479,7 +479,7 @@ namespace TSParser
         // Note: bool is not a valid type in TypeScript 0.9 but many libraries still use it.
         PredefinedType /*: TSType*/ = ("any" / "number" / "bool" / "boolean" / "string" / "void") s !IdentifierPart;
         
-        TypeReference /*: TSType*/ = TypeName TypeArguments?;
+        TypeReference : string /*: TSType*/ = TypeName TypeArguments?;
         TypeName : string = Identifier (dot_s Identifier)*;        
         ModuleName : string = TypeName;
         
@@ -617,10 +617,10 @@ namespace TSParser
         
         InterfaceDeclaration : DeclarationElement =
           interface_s Identifier TypeParametersOpt InterfaceExtendsClause? ObjectType;
-        InterfaceExtendsClause /*: List[string]*/ = extends_s ClassOrInterfaceTypeList;
-        ClassOrInterfaceTypeList /*: List[string]*/ =
+        InterfaceExtendsClause : List[TypeReference] = extends_s ClassOrInterfaceTypeList;
+        ClassOrInterfaceTypeList : List[TypeReference] =
           ClassOrInterfaceType (comma_s ClassOrInterfaceType)*;
-        ClassOrInterfaceType = TypeReference;
+        ClassOrInterfaceType : TypeReference = TypeReference;
         
         #endregion
         
@@ -699,7 +699,7 @@ namespace TSParser
             ModuleDeclaration /
             EnumDeclaration /
             ImportDeclaration
-          );
+          ) endS;
           
         #endregion
         
@@ -717,7 +717,7 @@ namespace TSParser
         #region Source Files (11)
         
         SourceFile = DeclarationSourceFile;
-        DeclarationSourceFile : List[DeclarationElement] = GS DeclarationElement*;
+        DeclarationSourceFile : List[DeclarationElement] = GS (DeclarationElement endS)*;
         DeclarationElement : DeclarationElement =
           Reference /
           ExportAssignment /
@@ -841,6 +841,14 @@ namespace TSParser
     static Id(first : string, rest : option[string]) : string
     {
       if(rest is Some(r)) $"$(first).$r" else first
+    }
+    
+    static MakeList[T](first : T, rest : List[T]) : List[T]
+    {
+      def ret = List();
+      ret.Add(first);
+      ret.AddRange(rest);
+      ret
     }
     
     #endregion
@@ -1036,11 +1044,27 @@ namespace TSParser
       [TSParam.Rest(id, type)]
     }
     */
-
-    InterfaceDeclaration(id : string, t : NToken, extends : NToken, type : NToken) : DeclarationElement
+    
+    TypeReference(typeName : string, typeArguments : NToken) : TypeReference
     {
-      DeclarationElement.InterfaceDeclaration()
+      typeName
+    }    
+    
+    InterfaceDeclaration(
+      id : string,
+      t : NToken,
+      extends : option[ClassOrInterfaceTypeList],
+      type : NToken) : DeclarationElement
+    {
+      DeclarationElement.InterfaceDeclaration(
+        InterfaceDeclarationRule(id, List(), extends.WithDefault(List()), type))
     }
+    
+    ClassOrInterfaceTypeList(first : string, rest : List[String]) : ClassOrInterfaceTypeList
+    {
+      MakeList(first, rest)
+    }
+    
     /*
     InterfaceNameList(first : string, rest : List[string]) : list[string]
     {
