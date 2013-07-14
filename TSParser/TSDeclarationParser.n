@@ -24,11 +24,11 @@ namespace TSParser
         // String ending, this is not defined in specification, but real TS parser works that way.
         // Maybe think about better rule.
         // Using this rule it parses "a /**/ b /**/" while it must not.
-        endS : void = s semicolon? s;
+        endS : void = s semicolon? s (s semicolon)*;        
         
-        // GlobalSpacing is used for finding references
-        GlobalSpacing : void = WhiteSpace / LineTerminatorSequence / GlobalComment;
-        GS : void = (GlobalSpacing / semicolon)*;
+        // HeaderSpacing is used for finding references
+        HeaderSpacing : void = WhiteSpace / LineTerminatorSequence / GlobalComment;
+        HS : void = (HeaderSpacing / semicolon)*;
         
         import_s : void   = "import"s;
         export_s : void   = "export"s;
@@ -473,19 +473,20 @@ namespace TSParser
         #region Specifying Types (3.6)
         
         // Array is specified here, because otherwise we have left recursion.
-        Type : ScriptType = PredefinedType / TypeQuery / TypeReference / TypeLiteral;
+        Type : ScriptType = (TypeQuery / TypeReference / TypeLiteral / PredefinedType) s;
         ScriptType : ScriptType = Type ('['s ']'s)*;
         
         // Note: bool is not a valid type in TypeScript 0.9 but many libraries still use it.
-        PredefinedType : ScriptType = ("any" / "number" / "bool" / "boolean" / "string" / "void") s !IdentifierPart;
+        PredefinedType : ScriptType =
+          ("any" / "number" / "boolean" / "bool" / "string" / "void");
         
-        TypeReference : ScriptType = TypeName TypeArguments?;
+        TypeReference : ScriptType = !(PredefinedType s) TypeName TypeArguments?;
         TypeName : string = Identifier (dot_s Identifier)*;        
         ModuleName : string = TypeName;
         
         TypeArguments : List[ScriptType] = less_s TypeArgumentList greater_s;
         TypeArgumentList : List[ScriptType] = TypeArgument (comma_s TypeArgument)*;
-        TypeArgument : ScriptType = ScriptType;        
+        TypeArgument : ScriptType = ScriptType;
         
         #endregion
         
@@ -681,7 +682,7 @@ namespace TSParser
         
         #region Module Declarations (10.1)
         
-        ModuleDeclaration = module_s IdentifierPath lbrace_s GS ModuleBody rbrace_s;
+        ModuleDeclaration = module_s IdentifierPath lbrace_s ModuleBody rbrace_s;
         IdentifierPath : string = Identifier (dot_s Identifier)*;        
         
         #endregion
@@ -718,7 +719,7 @@ namespace TSParser
         #region Source Files (11)
         
         SourceFile = DeclarationSourceFile;
-        DeclarationSourceFile : List[DeclarationElement] = GS (DeclarationElement endS)*;
+        DeclarationSourceFile : List[DeclarationElement] = HS (DeclarationElement endS)*;
         DeclarationElement : DeclarationElement =
           Reference /
           ExportAssignment /
