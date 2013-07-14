@@ -477,7 +477,7 @@ namespace TSParser
         ScriptType /*: TSType*/ = Type ('['s ']'s)*;
         
         // Note: bool is not a valid type in TypeScript 0.9 but many libraries still use it.
-        PredefinedType /*: TSType*/ = ("any" / "number" / "bool" / "boolean" / "string" / "void") s !IdentifierPart;
+        PredefinedType : ScriptType = ("any" / "number" / "bool" / "boolean" / "string" / "void") s !IdentifierPart;
         
         TypeReference : string /*: TSType*/ = TypeName TypeArguments?;
         TypeName : string = Identifier (dot_s Identifier)*;        
@@ -891,20 +891,20 @@ namespace TSParser
     {
       if (arrayArity.Count == 0) type else TSType.Array(type, arrayArity.Count)
     }
-    
-    PredefinedType(type : NToken) : TSType
+    */
+    PredefinedType(type : NToken) : ScriptType
     {
       match(GetText(type))
       {
-      | "any" => TSType.Any()
-      | "number" => TSType.Number()
-      | "boolean" | "bool" => TSType.Bool()
-      | "string" => TSType.String()
-      | "void" => TSType.Void()
+      | "any" => ScriptType.Any()
+      | "number" => ScriptType.Number()
+      | "boolean" | "bool" => ScriptType.Boolean()
+      | "string" => ScriptType.String()
+      | "void" => ScriptType.Void()
       | _ => assert(false);
       }
     }
-    */
+    
     TypeName(first : string, rest : List[string]) : string
     {
       Id(first, rest)
@@ -1076,19 +1076,19 @@ namespace TSParser
       (extends, implement ?? [])
     }
     */
-    AmbientVariableDeclaration(id : string, type : NToken) : AmbientDeclarationRule
+    AmbientVariableDeclaration(name : string, type : NToken) : AmbientDeclarationRule
     {
-      AmbientDeclarationRule.VariableDeclaration()
+      AmbientDeclarationRule.VariableDeclaration(name)
     }
     
     AmbientFunctionDeclaration(name : string, _signature : NToken) : AmbientDeclarationRule
     {
-      AmbientDeclarationRule.FunctionDeclaration()
+      AmbientDeclarationRule.FunctionDeclaration(name)
     }
     
     AmbientClassDeclaration(name : string, _ : NToken, _ : NToken, _ : NToken) : AmbientDeclarationRule
     {
-      AmbientDeclarationRule.ClassDeclaration()
+      AmbientDeclarationRule.ClassDeclaration(name)
     }
     /*
     AmbientClassBody(elements : List[TSClassMember]) : list[TSClassMember]
@@ -1119,12 +1119,12 @@ namespace TSParser
     
     AmbientExternalModuleDeclaration(name : string, _ : NToken) : AmbientDeclarationRule
     {
-      AmbientDeclarationRule.ExternalModuleDeclaration()
+      AmbientDeclarationRule.ExternalModuleDeclaration(name)
     }
     
-    AmbientModuleDeclaration(id :string , elements : NToken) : AmbientDeclarationRule
+    AmbientModuleDeclaration(name : string , elements : NToken) : AmbientDeclarationRule
     {
-      AmbientDeclarationRule.ModuleDeclaration()
+      AmbientDeclarationRule.ModuleDeclaration(name)
     }
    /* 
     AmbientModuleBody(elements : List[TSGlobal]) : list[TSGlobal]
@@ -1134,7 +1134,7 @@ namespace TSParser
     */
     AmbientEnumDeclaration(name : string, _ : NToken) : AmbientDeclarationRule
     {
-      AmbientDeclarationRule.EnumDeclaration()
+      AmbientDeclarationRule.EnumDeclaration(name)
     }
     /*
     EnumBody(first : TSEnumElement, rest : List[TSEnumElement]) : list[TSEnumElement]

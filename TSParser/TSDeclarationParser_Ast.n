@@ -62,166 +62,37 @@ namespace TSParser
   public variant AmbientDeclarationRule
   {
     | VariableDeclaration
+      {
+        Name : string;
+      }
     | FunctionDeclaration
+      {
+        Name : string;
+      }
     | ClassDeclaration
+      {
+        Name : string;
+      }
     | EnumDeclaration
+      {
+        Name : string;
+      }
     | ExternalModuleDeclaration
+      {
+        Name : string;
+      }
     | ModuleDeclaration
-  }
-  
-  #region Old AST
-  type ClassHeritage = option[string] * list[string];
-  
-  public enum MemberAccess
-  {
-    | Public
-    | Private
-  }
-  
-  public variant TSClassMemberPart
-  {
-    [StructuralEquality(Ignore = [Type])]    
-    | Variable { Name : string; Type : option[TSType]; }
-    
-    [StructuralEquality(Ignore = [Optional, ReturnType])]
-    | Method 
       {
         Name : string;
-        Optional : bool;
-        Params : list[TSParam];
-        ReturnType : option[TSType];
       }
   }
   
-  public variant TSClassMember
-  {
-    [StructuralEquality]    
-    | Constructor { Params : list[TSParam]; }
-    
-    [StructuralEquality(Ignore = [Static, Access])]
-    | Member
-      {
-        Part : TSClassMemberPart;
-        Static : option[bool];
-        Access : option[MemberAccess];
-      }
-  }
-  
-  public variant TSParam
-  {
-    [StructuralEquality(Ignore = [Name, Access])]
-    | Required
-      {
-        Name : string;
-        Type : option[TSType];
-        Access : option[MemberAccess];
-      }
-     
-    [StructuralEquality(Ignore = [Name, Optional, Access])]
-    | Option
-      { 
-        Name : string;
-        Optional : bool;
-        Type : option[TSType];
-        Access : option[MemberAccess];
-      }
-      
-    [StructuralEquality(Ignore = [Name])]
-    | Rest { Name : string; Type : TSType.Array; }
-  }
-  
-  // Index parameter type either number or string.
-  // Nothing else is allowed.
-  [StructuralEquality]
-  public variant TSIndexParamType
-  {
-    | Number
-    | String
-  }
-    
-  public variant TSObject
-  {
-    [StructuralEquality(Ignore = [ReturnType])]
-    | Call { Params : list[TSParam]; ReturnType : option[TSType]; }
-    
-    [StructuralEquality]
-    | Construct { Params : list[TSParam]; Type : option[TSType]; }
-    
-    [StructuralEquality(Ignore = [ParamName, ReturnType])]
-    | Index
-      { 
-        ParamName : string;
-        ParamType : TSIndexParamType;
-        ReturnType : TSType;
-      }
-      
-    [StructuralEquality(Ignore = [Optional, Type])]
-    | Property { Name : string; Optional : bool; Type : option[TSType]; }
-    
-    [StructuralEquality(Ignore = [Optional, ReturnType])]
-    | Function
-      {
-        Name : string;
-        Optional : bool;
-        Params : list[TSParam];
-        ReturnType : option[TSType];
-      }
-  }
-  
-  [Record]
-  [StructuralEquality]
-  public class TSEnumElement
-  {
-    Name : string;
-    Initialiser : option[string];
-  }
-  
-  [StructuralEquality]
-  public variant TSType
+  public variant ScriptType
   {
     | Any
     | Number
-    | Bool
+    | Boolean
     | String
     | Void
-    | Named { Name : string; }
-    | Array { Type : TSType; Rank : int; }
-    | Object { Members : list[TSObject]; }
-    | Lambda { Params : list[TSParam]; ReturnType : TSType; }
-    | New { Params : list[TSParam]; ReturnType : TSType; }
   }
-
-  public variant TSAmbient
-  {
-    | Variable { Name : string; Type : option[TSType]; }
-    | Function { Name : string; Signature : object; }
-  }
-  
-  [StructuralEquality]
-  public variant TSGlobal
-  {
-    | Variable { Name : string; Type : option[TSType]; }
-    | Construct { Params : list[TSParam]; ReturnType : option[TSType]; }
-    | Function
-      {
-        Name : string;
-        Params : list[TSParam];
-        ReturnType : option[TSType];
-      }
-    | Class 
-      { 
-        Name : string;
-        Extends : option[string]; 
-        Implements : list[string];
-        Members : list[TSClassMember];
-      }
-    | Interface { Name : string; Extends : list[string]; Type : TSType.Object; }
-    | Module { Name : string; Members : list[TSGlobal]; }
-    | Enum { Name : string; Elements : list[TSEnumElement]; }
-    | Import { Name : string; ModuleReference : string; }
-    | Export { Identifier : string; }
-    | ReferencePath { path : string; }
-    | ReferenceNoDefaultLib
-  }
-  #endregion
 }
