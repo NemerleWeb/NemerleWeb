@@ -460,11 +460,11 @@ namespace TSParser
         
         #region Type Parameter Lists (3.5.1)
         
-        TypeParameters = less_s TypeParameterList greater_s;
+        TypeParameters : List[ScriptTypeParameter] = less_s TypeParameterList greater_s;
         // Return list instead of option
-        TypeParametersOpt = TypeParameters?;
-        TypeParameterList = TypeParameter (comma_s TypeParameter)*;
-        TypeParameter = Identifier Contraint?;
+        TypeParametersOpt : List[ScriptTypeParameter] = TypeParameters?;
+        TypeParameterList : List[ScriptTypeParameter] = TypeParameter (comma_s TypeParameter)*;
+        TypeParameter : ScriptTypeParameter = Identifier Contraint?;
         // ObjectType is not specified but it is allowed by compiler
         Contraint : ScriptType = extends_s (TypeReference / ObjectType);
         
@@ -883,6 +883,21 @@ namespace TSParser
       GetText(assignmentExpr)
     }
 */
+    TypeParametersOpt(l : option[List[ScriptTypeParameter]]) : List[ScriptTypeParameter]
+    {
+      l.WithDefault(List())
+    }
+
+    TypeParameterList(first : ScriptTypeParameter, rest : List[ScriptTypeParameter]) : List[ScriptTypeParameter]
+    {
+      MakeList(first, rest)
+    }
+
+    TypeParameter(id : string, constraint : option[ScriptType]) : ScriptTypeParameter
+    {
+      ScriptTypeParameter(id, constraint)
+    }
+
     TypeArgumentList(first : ScriptType, rest : List[ScriptType]) : List[ScriptType]
     {
       MakeList(first, rest)
@@ -1063,12 +1078,12 @@ namespace TSParser
     
     InterfaceDeclaration(
       id : string,
-      typeParameters : NToken,
+      typeParameters : List[ScriptTypeParameter],
       extends : option[List[ScriptType]],
       type : ScriptType.Object) : DeclarationElement
     {
       DeclarationElement.InterfaceDeclaration(
-        InterfaceDeclarationRule(id, List(), extends.WithDefault(List()), type))
+        InterfaceDeclarationRule(id, typeParameters, extends.WithDefault(List()), type))
     }
     
     ClassOrInterfaceTypeList(first : ScriptType, rest : List[ScriptType]) : List[ScriptType]
@@ -1097,9 +1112,13 @@ namespace TSParser
       AmbientDeclarationRule.FunctionDeclaration(name)
     }
     
-    AmbientClassDeclaration(name : string, _ : NToken, _ : NToken, _ : NToken) : AmbientDeclarationRule
+    AmbientClassDeclaration(
+      name : string,
+      typeParameters : List[ScriptTypeParameter],
+      _ : NToken,
+      _ : NToken) : AmbientDeclarationRule
     {
-      AmbientDeclarationRule.ClassDeclaration(name)
+      AmbientDeclarationRule.ClassDeclaration(name, typeParameters)
     }
     /*
     AmbientClassBody(elements : List[TSClassMember]) : list[TSClassMember]

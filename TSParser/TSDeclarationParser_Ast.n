@@ -51,7 +51,7 @@ namespace TSParser
   public class InterfaceDeclarationRule
   {
     public Name : string { get; }
-    public TypeParameters : List[object] { get; }
+    public TypeParameters : List[ScriptTypeParameter] { get; }
     public Extends : List[ScriptType] { get; }
     public Type : ScriptType.Object { get; }
   }
@@ -70,6 +70,7 @@ namespace TSParser
     | ClassDeclaration
       {
         Name : string;
+        TypeParameters : List[ScriptTypeParameter];
       }
     | EnumDeclaration
       {
@@ -98,5 +99,12 @@ namespace TSParser
     | Object
     | Function
     | Constructor
+  }
+  
+  [Record]
+  public class ScriptTypeParameter
+  {
+    public Name : string { get; }
+    public Constraint : option[ScriptType] { get; }
   }
 }
