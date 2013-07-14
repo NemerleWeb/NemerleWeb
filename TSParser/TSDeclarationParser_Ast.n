@@ -11,9 +11,6 @@ using System.Linq;
 
 namespace TSParser
 {
-  type TypeReference = string;
-  type ClassOrInterfaceTypeList = List[TypeReference];
-  
   public variant DeclarationElement : Located
   {
     | Reference { Value : ReferenceRule; }
@@ -55,7 +52,7 @@ namespace TSParser
   {
     public Name : string { get; }
     public TypeParameters : List[object] { get; }
-    public Extends : ClassOrInterfaceTypeList { get; }
+    public Extends : List[ScriptType] { get; }
     public Type : object { get; }
   }
   
@@ -64,6 +61,7 @@ namespace TSParser
     | VariableDeclaration
       {
         Name : string;
+        Type : option[ScriptType];
       }
     | FunctionDeclaration
       {
@@ -94,5 +92,8 @@ namespace TSParser
     | Boolean
     | String
     | Void
+    | Named { Name : string; }
+    | Query { Ref : string; }
+    | Array { Type : ScriptType; Rank : int; }
   }
 }

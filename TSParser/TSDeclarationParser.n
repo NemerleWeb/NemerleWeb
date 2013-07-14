@@ -143,7 +143,7 @@ namespace TSParser
         // Any name
         AnyIdentifier : string = IdentifierName s;
         Identifier : string = !(ReservedWord Spacing+) IdentifierName s;
-        IdentifierName = IdentifierStart+ IdentifierPart*;
+        IdentifierName : string = IdentifierStart+ IdentifierPart*;
         IdentifierStart = UnicodeLetter / '$' / '_' / '\\' UnicodeEscapeSequence;
         IdentifierPart =
           IdentifierStart /
@@ -473,13 +473,13 @@ namespace TSParser
         #region Specifying Types (3.6)
         
         // Array is specified here, because otherwise we have left recursion.
-        Type = PredefinedType / TypeQuery / TypeReference / TypeLiteral;
-        ScriptType /*: TSType*/ = Type ('['s ']'s)*;
+        Type : ScriptType = PredefinedType / TypeQuery / TypeReference / TypeLiteral;
+        ScriptType : ScriptType = Type ('['s ']'s)*;
         
         // Note: bool is not a valid type in TypeScript 0.9 but many libraries still use it.
         PredefinedType : ScriptType = ("any" / "number" / "bool" / "boolean" / "string" / "void") s !IdentifierPart;
         
-        TypeReference : string /*: TSType*/ = TypeName TypeArguments?;
+        TypeReference : ScriptType = TypeName TypeArguments?;
         TypeName : string = Identifier (dot_s Identifier)*;        
         ModuleName : string = TypeName;
         
@@ -491,15 +491,15 @@ namespace TSParser
         
         #region Type Queries
         
-        TypeQuery = typeof_S TypeQueryExpression;
-        TypeQueryExpression = Identifier (dot_s IdentifierName)*;
+        TypeQuery : ScriptType = typeof_S TypeQueryExpression;
+        TypeQueryExpression : string = Identifier (dot_s IdentifierName)*;
         
         #endregion
         
         #region Type Literals (3.6.4)
         
         // Array is excluded to prevent left recursion.
-        TypeLiteral /*: TSType*/ = ObjectType / FunctionType / ConstructorType;        
+        TypeLiteral : ScriptType = ObjectType / FunctionType / ConstructorType;        
         
         ArrayType /*: TSType.Array*/ = Type ('['s ']'s)+;
         FunctionType /*: TSType*/ = lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
@@ -601,7 +601,7 @@ namespace TSParser
         #region Variable Statements (5.1)
         
         VariableDeclaration = Identifier TypeAnnotation?;
-        TypeAnnotation /*: TSType*/ = colon_s ScriptType s;
+        TypeAnnotation : ScriptType = colon_s ScriptType s;
         
         #endregion
         
@@ -617,10 +617,10 @@ namespace TSParser
         
         InterfaceDeclaration : DeclarationElement =
           interface_s Identifier TypeParametersOpt InterfaceExtendsClause? ObjectType;
-        InterfaceExtendsClause : List[TypeReference] = extends_s ClassOrInterfaceTypeList;
-        ClassOrInterfaceTypeList : List[TypeReference] =
+        InterfaceExtendsClause : List[ScriptType] = extends_s ClassOrInterfaceTypeList;
+        ClassOrInterfaceTypeList : List[ScriptType] =
           ClassOrInterfaceType (comma_s ClassOrInterfaceType)*;
-        ClassOrInterfaceType : TypeReference = TypeReference;
+        ClassOrInterfaceType : ScriptType = TypeReference;
         
         #endregion
         
@@ -868,14 +868,9 @@ namespace TSParser
       GetText(s)
     }
     
-    AnyIdentifier(id : NToken) : string
+    IdentifierName(first : NToken, rest : NToken) : string
     {
-      GetText(id)
-    }    
-    
-    Identifier(id : NToken) : string
-    {
-      GetText(id)
+      GetText(first) + GetText(rest)
     }
     
     
@@ -886,12 +881,12 @@ namespace TSParser
     {
       GetText(assignmentExpr)
     }
-
-    ScriptType(type : TSType, arrayArity : List[NToken * NToken]) : TSType
+*/
+    ScriptType(type : ScriptType, arrayRank : List[NToken * NToken]) : ScriptType
     {
-      if (arrayArity.Count == 0) type else TSType.Array(type, arrayArity.Count)
+      if (arrayRank.Count == 0) type else ScriptType.Array(type, arrayRank.Count)
     }
-    */
+    
     PredefinedType(type : NToken) : ScriptType
     {
       match(GetText(type))
@@ -1045,22 +1040,37 @@ namespace TSParser
     }
     */
     
-    TypeReference(typeName : string, typeArguments : NToken) : TypeReference
+    TypeQuery(query : string) : ScriptType
     {
-      typeName
-    }    
+      ScriptType.Query(query)
+    }
+    
+    TypeQueryExpression(first : string, rest : List[string]) : string
+    {
+      Id(first, rest)
+    }
+    
+    TypeLiteral(_ : NToken) : ScriptType
+    {
+      ScriptType.Any()
+    }
+    
+    TypeReference(typeName : string, typeArguments : NToken) : ScriptType
+    {
+      ScriptType.Named(typeName)
+    }
     
     InterfaceDeclaration(
       id : string,
       t : NToken,
-      extends : option[ClassOrInterfaceTypeList],
+      extends : option[List[ScriptType]],
       type : NToken) : DeclarationElement
     {
       DeclarationElement.InterfaceDeclaration(
         InterfaceDeclarationRule(id, List(), extends.WithDefault(List()), type))
     }
     
-    ClassOrInterfaceTypeList(first : string, rest : List[String]) : ClassOrInterfaceTypeList
+    ClassOrInterfaceTypeList(first : ScriptType, rest : List[ScriptType]) : List[ScriptType]
     {
       MakeList(first, rest)
     }
@@ -1076,9 +1086,9 @@ namespace TSParser
       (extends, implement ?? [])
     }
     */
-    AmbientVariableDeclaration(name : string, type : NToken) : AmbientDeclarationRule
+    AmbientVariableDeclaration(name : string, type : option[ScriptType]) : AmbientDeclarationRule
     {
-      AmbientDeclarationRule.VariableDeclaration(name)
+      AmbientDeclarationRule.VariableDeclaration(name, type)
     }
     
     AmbientFunctionDeclaration(name : string, _signature : NToken) : AmbientDeclarationRule
