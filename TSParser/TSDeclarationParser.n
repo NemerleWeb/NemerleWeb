@@ -466,7 +466,7 @@ namespace TSParser
         TypeParameterList = TypeParameter (comma_s TypeParameter)*;
         TypeParameter = Identifier Contraint?;
         // ObjectType is not specified but it is allowed by compiler
-        Contraint = extends_s (TypeReference / ObjectType);
+        Contraint : ScriptType = extends_s (TypeReference / ObjectType);
         
         #endregion
         
@@ -483,9 +483,9 @@ namespace TSParser
         TypeName : string = Identifier (dot_s Identifier)*;        
         ModuleName : string = TypeName;
         
-        TypeArguments = less_s TypeArgumentList greater_s;
-        TypeArgumentList = TypeArgument (comma_s TypeArgument)*;
-        TypeArgument = ScriptType;        
+        TypeArguments : List[ScriptType] = less_s TypeArgumentList greater_s;
+        TypeArgumentList : List[ScriptType] = TypeArgument (comma_s TypeArgument)*;
+        TypeArgument : ScriptType = ScriptType;        
         
         #endregion
         
@@ -501,15 +501,16 @@ namespace TSParser
         // Array is excluded to prevent left recursion.
         TypeLiteral : ScriptType = ObjectType / FunctionType / ConstructorType;        
         
-        ArrayType /*: TSType.Array*/ = Type ('['s ']'s)+;
-        FunctionType /*: TSType*/ = lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
-        ConstructorType /*: TSType*/ = new_s lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
+        ArrayType : ScriptType.Array = Type ('['s ']'s)+;
+        FunctionType : ScriptType = lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
+        ConstructorType : ScriptType = new_s lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
         
         #endregion
                  
         #region Object Type Literals (3.7)
         
-        ObjectType /*: TSType.Object*/ = lbrace_s TypeBody? rbrace_s;
+        ObjectType : ScriptType = ObjectTypeStrict;
+        ObjectTypeStrict : ScriptType.Object = lbrace_s TypeBody? rbrace_s;
         TypeBody /*: List[TSObject]*/ = TypeMemberList semicolon? endS;
         TypeMemberList /*: List[TSObject]*/ = TypeMember (endS TypeMember)* endS;
         TypeMember /*: TSObject*/ =
@@ -616,7 +617,7 @@ namespace TSParser
         #region Interface Declarations (7.1)
         
         InterfaceDeclaration : DeclarationElement =
-          interface_s Identifier TypeParametersOpt InterfaceExtendsClause? ObjectType;
+          interface_s Identifier TypeParametersOpt InterfaceExtendsClause? ObjectTypeStrict;
         InterfaceExtendsClause : List[ScriptType] = extends_s ClassOrInterfaceTypeList;
         ClassOrInterfaceTypeList : List[ScriptType] =
           ClassOrInterfaceType (comma_s ClassOrInterfaceType)*;
@@ -882,9 +883,14 @@ namespace TSParser
       GetText(assignmentExpr)
     }
 */
-    ScriptType(type : ScriptType, arrayRank : List[NToken * NToken]) : ScriptType
+    TypeArgumentList(first : ScriptType, rest : List[ScriptType]) : List[ScriptType]
     {
-      if (arrayRank.Count == 0) type else ScriptType.Array(type, arrayRank.Count)
+      MakeList(first, rest)
+    }
+
+    ScriptType(type : ScriptType, rank : List[NToken * NToken]) : ScriptType
+    {
+      if (rank.Count == 0) type else ScriptType.Array(type, rank.Count)
     }
     
     PredefinedType(type : NToken) : ScriptType
@@ -904,17 +910,22 @@ namespace TSParser
     {
       Id(first, rest)
     }
-    /*
-    ObjectType(members : List[TSObject]) : TSType.Object
-    {
-      TSType.Object(members.NToList())
-    }  
     
-    ArrayType(type : TSType, arrayArity : List[NToken * NToken]) : TSType.Array
+    ObjectType(o : ScriptType.Object) : ScriptType
     {
-      TSType.Array(type, arrayArity.Count)
+      o
     }
     
+    ObjectTypeStrict(members : NToken) : ScriptType.Object
+    {
+      ScriptType.Object()
+    }  
+    
+    ArrayType(type : ScriptType, rank : List[NToken * NToken]) : ScriptType.Array
+    {
+      ScriptType.Array(type, rank.Count)
+    }
+    /*
     TypeMemberListOpt(members : option[list[TSObject]]) : list[TSObject]
     {
       members ?? []
@@ -957,22 +968,17 @@ namespace TSParser
     {
       TSObject.Function(id, optional, parms, returnType)
     }
-    
-    FunctionType(parms : List[TSParam], returnType : TSType) : TSType
-    {
-      TSType.Lambda(parms, returnType)
-    }
-    
-    ConstructorType(parms : List[TSParam], returnType : TSType) : TSType
-    {
-      TSType.New(parms, returnType)
-    }
-    
-    VoidType(_ : NToken) : TSType
-    {
-      TSType.Void()
-    }
     */
+    FunctionType(parms : NToken, returnType : ScriptType) : ScriptType
+    {
+      ScriptType.Function()
+    }
+    
+    ConstructorType(parms : NToken, returnType : ScriptType) : ScriptType
+    {
+      ScriptType.Constructor()
+    }
+   
     IdentifierPath(first : string, rest : List[string]) : string
     {
       Id(first, rest)
@@ -1050,21 +1056,16 @@ namespace TSParser
       Id(first, rest)
     }
     
-    TypeLiteral(_ : NToken) : ScriptType
+    TypeReference(typeName : string, typeArguments : option[List[ScriptType]]) : ScriptType
     {
-      ScriptType.Any()
-    }
-    
-    TypeReference(typeName : string, typeArguments : NToken) : ScriptType
-    {
-      ScriptType.Named(typeName)
+      ScriptType.Ref(typeName, typeArguments.WithDefault(List()))
     }
     
     InterfaceDeclaration(
       id : string,
-      t : NToken,
+      typeParameters : NToken,
       extends : option[List[ScriptType]],
-      type : NToken) : DeclarationElement
+      type : ScriptType.Object) : DeclarationElement
     {
       DeclarationElement.InterfaceDeclaration(
         InterfaceDeclarationRule(id, List(), extends.WithDefault(List()), type))

@@ -53,7 +53,7 @@ namespace TSParser
     public Name : string { get; }
     public TypeParameters : List[object] { get; }
     public Extends : List[ScriptType] { get; }
-    public Type : object { get; }
+    public Type : ScriptType.Object { get; }
   }
   
   public variant AmbientDeclarationRule
@@ -92,8 +92,11 @@ namespace TSParser
     | Boolean
     | String
     | Void
-    | Named { Name : string; }
-    | Query { Ref : string; }
+    | Ref { Name : string; TypeArguments : List[ScriptType]; }
+    | Query { Name : string; }
     | Array { Type : ScriptType; Rank : int; }
+    | Object
+    | Function
+    | Constructor
   }
 }
