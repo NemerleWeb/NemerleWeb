@@ -758,11 +758,11 @@ namespace TSParser
             AmbientModuleDeclaration
            ) endS;
         
-        AmbientVariableDeclaration /*: TSAmbient*/ = var_s Identifier TypeAnnotation?;
-        AmbientFunctionDeclaration /*: TSAmbient*/ = function_s Identifier CallSignature;
+        AmbientVariableDeclaration : AmbientDeclarationRule = var_s Identifier TypeAnnotation?;
+        AmbientFunctionDeclaration : AmbientDeclarationRule = function_s Identifier CallSignature;
         
         // Class
-        AmbientClassDeclaration /*: TSAmbient*/ = 
+        AmbientClassDeclaration : AmbientDeclarationRule = 
           class_s Identifier TypeParametersOpt ClassHeritage
           lbrace_s AmbientClassBody rbrace_s endS;
         AmbientClassBody /*: List[TSClassMember]*/ = AmbientClassBodyElement*;
@@ -774,13 +774,13 @@ namespace TSParser
           PublicOrPrivate? static_s? PropertyName (CallSignature / TypeAnnotation?);
                 
         // Enum
-        AmbientEnumDeclaration /*: TSGlobal*/ =
+        AmbientEnumDeclaration : AmbientDeclarationRule =
           enum_s Identifier lbrace_s AmbientEnumBody? rbrace_s;
         AmbientEnumBody = AmbientEnumMember*;
         AmbientEnumMember = PropertyName (assign_s IntegerLiteral)? comma_s?;
         
         // Module
-        AmbientModuleDeclaration /*: TSGlobal*/ =
+        AmbientModuleDeclaration : AmbientDeclarationRule =
           module_s IdentifierPath lbrace_s AmbientModuleBody rbrace_s;
         AmbientModuleBody /*: List[TSGlobal]*/ = AmbientModuleElement*;
         AmbientModuleElement =
@@ -796,7 +796,7 @@ namespace TSParser
           ) endS;
           
         // External
-        AmbientExternalModuleDeclaration /*: TSGlobal*/ =
+        AmbientExternalModuleDeclaration : AmbientDeclarationRule =
           module_s StringLiteral s lbrace_s s AmbientExternalModuleBody rbrace_s endS;
         AmbientExternalModuleBody = AmbientExternalModuleElement*;
         AmbientExternalModuleElement =          
@@ -1075,27 +1075,22 @@ namespace TSParser
     {
       (extends, implement ?? [])
     }
-    
-    AmbientVariableDeclaration(id : string, type : option[TSType]) : TSAmbient
+    */
+    AmbientVariableDeclaration(id : string, type : NToken) : AmbientDeclarationRule
     {
-      TSAmbient.Variable(id, type)
+      AmbientDeclarationRule.VariableDeclaration()
     }
     
-    AmbientFunctionDeclaration(name : string, _signature : NToken) : TSAmbient
+    AmbientFunctionDeclaration(name : string, _signature : NToken) : AmbientDeclarationRule
     {
-      TSAmbient.Function(name, _signature);
+      AmbientDeclarationRule.FunctionDeclaration()
     }
     
-    AmbientConstructDeclaration(parms : List[TSParam], returnType : option[TSType]) : TSGlobal
+    AmbientClassDeclaration(name : string, _ : NToken, _ : NToken, _ : NToken) : AmbientDeclarationRule
     {
-      TSGlobal.Construct(parms, returnType)
+      AmbientDeclarationRule.ClassDeclaration()
     }
-    
-    AmbientClassDeclaration(id : string, classHeritage : ClassHeritage, members : list[TSClassMember]) : TSGlobal
-    {
-      TSGlobal.Class(id, classHeritage[0], classHeritage[1], members)
-    }
-    
+    /*
     AmbientClassBody(elements : List[TSClassMember]) : list[TSClassMember]
     {
       elements.NToList()
@@ -1120,22 +1115,28 @@ namespace TSParser
     {
       TSClassMember.Member(part, isStatic, access)
     }
+    */
     
-    AmbientModuleDeclaration(id :string , elements : list[TSGlobal]) : TSGlobal
+    AmbientExternalModuleDeclaration(name : string, _ : NToken) : AmbientDeclarationRule
     {
-      TSGlobal.Module(id, elements)
+      AmbientDeclarationRule.ExternalModuleDeclaration()
     }
     
+    AmbientModuleDeclaration(id :string , elements : NToken) : AmbientDeclarationRule
+    {
+      AmbientDeclarationRule.ModuleDeclaration()
+    }
+   /* 
     AmbientModuleBody(elements : List[TSGlobal]) : list[TSGlobal]
     {
       elements.NToList()
     }
-    
-    AmbientEnumDeclaration(id : string, elements : option[list[TSEnumElement]]) : TSGlobal
+    */
+    AmbientEnumDeclaration(name : string, _ : NToken) : AmbientDeclarationRule
     {
-      TSGlobal.Enum(id, elements ?? [])
+      AmbientDeclarationRule.EnumDeclaration()
     }
-    
+    /*
     EnumBody(first : TSEnumElement, rest : List[TSEnumElement]) : list[TSEnumElement]
     {
       first :: rest.NToList()
@@ -1152,14 +1153,16 @@ namespace TSParser
     }
     */
     
+    
+    
     EntityName(first : string, rest : option[string]) : string
     {
       Id(first, rest)
     }
     
-    AmbientDeclaration(_ : NToken) : DeclarationElement
+    AmbientDeclaration(value : AmbientDeclarationRule) : DeclarationElement
     {
-      DeclarationElement.AmbientDeclaration()
+      DeclarationElement.AmbientDeclaration(value)
     }
     
     ImportDeclaration(id : string, entity : string) : DeclarationElement

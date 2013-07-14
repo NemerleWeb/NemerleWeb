@@ -21,7 +21,7 @@ namespace TSParser
     | InterfaceDeclaration { Value : InterfaceDeclarationRule; }
     | ExternalImportDeclaration { Value : ExternalImportDeclarationRule; }
     | ImportDeclaration { Value : ImportDeclarationRule; }
-    | AmbientDeclaration
+    | AmbientDeclaration { Value : AmbientDeclarationRule; }
   }
   
   public variant ReferenceRule
@@ -57,6 +57,16 @@ namespace TSParser
     public TypeParameters : List[object] { get; }
     public Extends : ClassOrInterfaceTypeList { get; }
     public Type : object { get; }
+  }
+  
+  public variant AmbientDeclarationRule
+  {
+    | VariableDeclaration
+    | FunctionDeclaration
+    | ClassDeclaration
+    | EnumDeclaration
+    | ExternalModuleDeclaration
+    | ModuleDeclaration
   }
   
   #region Old AST

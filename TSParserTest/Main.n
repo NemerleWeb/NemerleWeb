@@ -42,6 +42,11 @@ module Program
   Main() : void
   {
     parseTextWithResult(<#
+    /// <reference path="XXXX" />
+    
+interface A extends B<C> {
+};
+
 
 
 
