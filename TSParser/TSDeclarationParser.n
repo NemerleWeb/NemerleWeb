@@ -202,7 +202,7 @@ namespace TSParser
 
         #region NumericLiteral (7.8.3)
 
-        NumericLiteral = (DecimalLiteral / HexIntegerLiteral) !(IdentifierStart / DecimalDigit);
+        NumericLiteral : string = (DecimalLiteral / HexIntegerLiteral) !(IdentifierStart / DecimalDigit);
 
         DecimalLiteral =
           DecimalIntegerLiteral dot DecimalDigit* ExponentPart? /
@@ -308,7 +308,7 @@ namespace TSParser
         //  get_s PropertyName lparen_s rparen_s lbrace_s FunctionBody rbrace_s /
         //  set_s PropertyName lparen_s PropertySetParameterList rparen_s lbrace_s FunctionBody rbrace_s;
           
-        PropertyName = (IdentifierName / StringLiteral / NumericLiteral) s;
+        PropertyName : string = (IdentifierName / StringLiteral / NumericLiteral) s;
         PropertySetParameterList = Identifier;
         
         #endregion
@@ -777,8 +777,9 @@ namespace TSParser
         // Enum
         AmbientEnumDeclaration : AmbientDeclarationRule =
           enum_s Identifier lbrace_s AmbientEnumBody? rbrace_s;
-        AmbientEnumBody = AmbientEnumMember*;
-        AmbientEnumMember = PropertyName (assign_s IntegerLiteral)? comma_s?;
+        AmbientEnumBody : List[EnumMember] = AmbientEnumMember (comma_s AmbientEnumMember)* comma_s?;
+        AmbientEnumMember : EnumMember = PropertyName AmbientEnumMemberInitialiser? s;
+        AmbientEnumMemberInitialiser : int = assign_s IntegerLiteral;
         
         // Module
         AmbientModuleDeclaration : AmbientDeclarationRule =
@@ -869,20 +870,17 @@ namespace TSParser
       GetText(s)
     }
     
+    NumericLiteral(n : NToken) : string
+    {
+      GetText(n)
+    }
+    
     IdentifierName(first : NToken, rest : NToken) : string
     {
       GetText(first) + GetText(rest)
     }
     
-    
-    
-    
-    /*
-    Initialiser(assignmentExpr : NToken) : string
-    {
-      GetText(assignmentExpr)
-    }
-*/
+  
     TypeParametersOpt(l : option[List[ScriptTypeParameter]]) : List[ScriptTypeParameter]
     {
       l.WithDefault(List())
@@ -1162,20 +1160,30 @@ namespace TSParser
       elements.NToList()
     }
     */
-    AmbientEnumDeclaration(name : string, _ : NToken) : AmbientDeclarationRule
+    AmbientEnumDeclaration(name : string, members : option[List[EnumMember]]) : AmbientDeclarationRule
     {
-      AmbientDeclarationRule.EnumDeclaration(name)
-    }
-    /*
-    EnumBody(first : TSEnumElement, rest : List[TSEnumElement]) : list[TSEnumElement]
-    {
-      first :: rest.NToList()
+      AmbientDeclarationRule.EnumDeclaration(name, members.WithDefault(List()))
     }
     
-    EnumElement(id : string, initialiser : option[string]) : TSEnumElement
+    AmbientEnumBody(first : EnumMember, rest : List[EnumMember]) : List[EnumMember]
     {
-      TSEnumElement(id, initialiser)
+      MakeList(first, rest)
     }
+    
+    AmbientEnumMember(id : string, initialiser : option[int]) : EnumMember
+    {
+      EnumMember(id, initialiser)
+    }
+    
+    AmbientEnumMemberInitialiser(i : NToken) : int
+    {
+      int.Parse(GetText(i))
+    }
+    
+    
+    
+    /*
+    
     
     ExportAssignment(id : string) : TSGlobal
     {

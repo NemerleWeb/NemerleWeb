@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace TSParser
 {
-  public variant DeclarationElement : Located
+  public variant DeclarationElement
   {
     | Reference { Value : ReferenceRule; }
     | ExportAssignment { Value : ExportAssignmentRule; }
@@ -75,6 +75,7 @@ namespace TSParser
     | EnumDeclaration
       {
         Name : string;
+        Members : List[EnumMember];
       }
     | ExternalModuleDeclaration
       {
@@ -106,5 +107,12 @@ namespace TSParser
   {
     public Name : string { get; }
     public Constraint : option[ScriptType] { get; }
+  }
+  
+  [Record]
+  public class EnumMember
+  {
+    public Name : string { get; }
+    public Value : option[int] { get; }
   }
 }

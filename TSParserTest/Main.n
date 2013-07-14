@@ -43,6 +43,9 @@ module Program
   {
     parseTextWithResult(<#
     /// <reference path="XXXX" />
+    declare class P extends QQ < P > {
+    };
+    declare enum Q { Z,X};
     
 interface A extends B<C> {
 };
@@ -53,7 +56,7 @@ interface A extends B<C> {
     #>);
     
     foreach(f in Directory.EnumerateFiles(@"..\..\..\NemerleWeb.TypedJS\Scripts\", "*.*", SearchOption.AllDirectories))
-      parseFile(f);
+      //parseFile(f);
       ();
     
     WriteLine("Press any key to continue");
