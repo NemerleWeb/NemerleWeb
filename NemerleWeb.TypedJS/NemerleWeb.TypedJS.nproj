@@ -226,12 +226,12 @@
     <Folder Include="Scripts\typings\pubsubjs\" />
     <Folder Include="Scripts\typings\qunit\" />
     <Folder Include="Scripts\typings\q\" />
+    <Folder Include="Scripts\typings\requirejs\" />
     <Folder Include="Scripts\typings\restangular\" />
     <Folder Include="Scripts\typings\restify\" />
     <Folder Include="Scripts\typings\reveal\" />
     <Folder Include="Scripts\typings\routie\" />
     <Folder Include="Scripts\typings\rx.js" />
-    <Folder Include="Scripts\typings\requirejs\" />
     <Folder Include="Scripts\typings\sammyjs\" />
     <Folder Include="Scripts\typings\scroller\" />
     <Folder Include="Scripts\typings\select2\" />
