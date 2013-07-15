@@ -45,12 +45,11 @@ module Program
 
    
    declare var Q : {
-     (o:number,oo?:string,  ... rest : number[] ) : string;
+     (o:number,oo?:string, ... rest : number [] ) : string;
    };
- }
  
- ;
-
+   
+   
     #>);
     
     foreach(f in Directory.EnumerateFiles(@"..\..\..\NemerleWeb.TypedJS\Scripts\", "*.*", SearchOption.AllDirectories))

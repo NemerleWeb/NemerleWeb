@@ -513,7 +513,7 @@ namespace TSParser
         
         ObjectType : ScriptType = ObjectTypeStrict;
         ObjectTypeStrict : ScriptType.Object = lbrace_s TypeBody? rbrace_s;
-        TypeBody : List[ScriptObject] = TypeMemberList semicolon? endS;
+        TypeBody : List[ScriptObject] = TypeMemberList;
         TypeMemberList : List[ScriptObject] = TypeMember (endS TypeMember)* endS;
         TypeMember : ScriptObject =
           CallSignatureObject /
@@ -566,7 +566,7 @@ namespace TSParser
         RequiredParameter : ScriptParameter =
           RequiredParameterStringLiteral / RequiredParameterRegular;
           
-        RequiredParameterStringLiteral : ScriptParameter = Identifier colon_s StringLiteral;
+        RequiredParameterStringLiteral : ScriptParameter = Identifier colon_s StringLiteral s;
         RequiredParameterRegular : ScriptParameter = PublicOrPrivate? Identifier required TypeAnnotation?;
           
         Public : MemberAccess = "public";
@@ -575,7 +575,7 @@ namespace TSParser
         OptionalParameterList : List[ScriptParameter] = OptionalParameter (comma_s OptionalParameter)*;
         // Optional parameter must not have Initialiser in declaration files.
         OptionalParameter : ScriptParameter = PublicOrPrivate? Identifier optional TypeAnnotation?;
-        RestParameter : List[ScriptParameter] = ellipsis_s Identifier ArrayType?;
+        RestParameter : List[ScriptParameter] = ellipsis_s Identifier colon_s ArrayType?;
         
         #endregion
         
