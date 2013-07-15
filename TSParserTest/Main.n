@@ -42,24 +42,11 @@ module Program
   Main() : void
   {
     parseTextWithResult(<#
-    /// <reference path="XXXX" />
-    declare class P extends QQ < P > {
-    };
-    declare enum Q { Z,X};
-    
-interface A extends B<C> {
-};
 
-declare var P : {
-  q : number;
-};
-declare var PP : boolean;
-
-declare module QZ { 
-  
-   /* */
-   var O : number;
- 
+   
+   declare var Q : {
+     (o:number,oo?:string,  ... rest : number[] ) : string;
+   };
  }
  
  ;
@@ -67,8 +54,8 @@ declare module QZ {
     #>);
     
     foreach(f in Directory.EnumerateFiles(@"..\..\..\NemerleWeb.TypedJS\Scripts\", "*.*", SearchOption.AllDirectories))
-      //parseFile(f);
-      ();
+      parseFile(f);
+      //();
     
     WriteLine("Press any key to continue");
     _ = ReadKey();

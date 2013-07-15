@@ -3,6 +3,7 @@ using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
 using Nemerle.Peg;
+using Nemerle.Extensions;
 
 using System;
 using System.Collections.Generic;
@@ -512,10 +513,10 @@ namespace TSParser
         
         ObjectType : ScriptType = ObjectTypeStrict;
         ObjectTypeStrict : ScriptType.Object = lbrace_s TypeBody? rbrace_s;
-        TypeBody /*: List[TSObject]*/ = TypeMemberList semicolon? endS;
-        TypeMemberList /*: List[TSObject]*/ = TypeMember (endS TypeMember)* endS;
-        TypeMember /*: TSObject*/ =
-          CallSignature /
+        TypeBody : List[ScriptObject] = TypeMemberList semicolon? endS;
+        TypeMemberList : List[ScriptObject] = TypeMember (endS TypeMember)* endS;
+        TypeMember : ScriptObject =
+          CallSignatureObject /
           ConstructSignature /
           MethodSignature /          
           IndexSignature /
@@ -525,13 +526,14 @@ namespace TSParser
           
         #region Property Signatures (3.7.1)
 
-        PropertySignature /*: TSObject*/ = PropertyName optional TypeAnnotation?;
+        PropertySignature : ScriptObject = PropertyName optional TypeAnnotation?;
         
         #endregion
         
         #region Call Signatures (3.7.2)
         
-        CallSignature =
+        CallSignatureObject : ScriptObject = CallSignature;
+        CallSignature : ScriptCallSignature =
           TypeParametersOpt lparen_s ParameterListOpt rparen_s TypeAnnotation?;
           
         #endregion
@@ -539,7 +541,7 @@ namespace TSParser
         #region Parameter List (3.7.2.2)
         
         // According to spec, additional comma is forbiden, but TS compiler handles it.
-        ParameterList /*: List[TSParam]*/ =
+        ParameterList : List[ScriptParameter] =
           ParameterListROR /
           ParameterListRR /
           ParameterListRO /
@@ -549,39 +551,41 @@ namespace TSParser
           RestParameter;
           
         // Return empty list instead of option
-        ParameterListOpt /*: List[TSParam]*/ = ParameterList?;
+        ParameterListOpt : List[ScriptParameter] = ParameterList?;
         
-        ParameterListROR /*: List[TSParam]*/ =
+        ParameterListROR : List[ScriptParameter] =
           RequiredParameterList comma_s OptionalParameterList comma_s RestParameter;
-        ParameterListOR  /*: List[TSParam]*/ =
+        ParameterListOR  : List[ScriptParameter] =
           OptionalParameterList comma_s RestParameter;
-        ParameterListRO  /*: List[TSParam]*/ =
+        ParameterListRO  : List[ScriptParameter] =
           RequiredParameterList comma_s OptionalParameterList;
-        ParameterListRR  /*: List[TSParam]*/ =
+        ParameterListRR  : List[ScriptParameter] =
           RequiredParameterList comma_s RestParameter;
           
-        RequiredParameterList /*: List[TSParam]*/ = RequiredParameter (comma_s RequiredParameter)*;
-        RequiredParameter /*: TSParam*/ =
-          Identifier colon_s StringLiteral /
-          PublicOrPrivate? Identifier required TypeAnnotation?;
+        RequiredParameterList : List[ScriptParameter] = RequiredParameter (comma_s RequiredParameter)*;
+        RequiredParameter : ScriptParameter =
+          RequiredParameterStringLiteral / RequiredParameterRegular;
           
-        Public /*: MemberAccess*/ = "public";
-        Private /*: MemberAccess*/ = "private";
-        PublicOrPrivate /*: MemberAccess*/ = (Public/Private)s;
-        OptionalParameterList /*: List[TSParam]*/ = OptionalParameter (comma_s OptionalParameter)*;
+        RequiredParameterStringLiteral : ScriptParameter = Identifier colon_s StringLiteral;
+        RequiredParameterRegular : ScriptParameter = PublicOrPrivate? Identifier required TypeAnnotation?;
+          
+        Public : MemberAccess = "public";
+        Private : MemberAccess = "private";
+        PublicOrPrivate : MemberAccess = (Public/Private)s;
+        OptionalParameterList : List[ScriptParameter] = OptionalParameter (comma_s OptionalParameter)*;
         // Optional parameter must not have Initialiser in declaration files.
-        OptionalParameter /*: TSParam*/ = PublicOrPrivate? Identifier optional TypeAnnotation?;
-        RestParameter /*: List[TSParam]*/ = ellipsis_s Identifier TypeAnnotation?;
+        OptionalParameter : ScriptParameter = PublicOrPrivate? Identifier optional TypeAnnotation?;
+        RestParameter : List[ScriptParameter] = ellipsis_s Identifier ArrayType?;
         
         #endregion
         
         #region Construct/Index/Method Signatures (3.7.3, 3.7.4, 3.7.5)
         
-        ConstructSignature /*: TSObject*/ =
+        ConstructSignature : ScriptObject =
           new_s TypeParametersOpt lparen_s ParameterListOpt rparen_s TypeAnnotation?;
-        IndexSignature     /*: TSObject*/ =
+        IndexSignature     : ScriptObject =
           lbrack_s Identifier required colon_s ("number" / "string") s rbrack_s TypeAnnotation;
-        MethodSignature  /*: TSObject*/ = PropertyName optional CallSignature;
+        MethodSignature  : ScriptObject = PropertyName optional CallSignature;
         
         #endregion
         
@@ -848,9 +852,13 @@ namespace TSParser
     
     static MakeList[T](first : T, rest : List[T]) : List[T]
     {
+      MakeList(first).Concat(rest).ToList();
+    }
+    
+    static MakeList[T](first : T) : List[T]
+    {
       def ret = List();
       ret.Add(first);
-      ret.AddRange(rest);
       ret
     }
     
@@ -879,8 +887,7 @@ namespace TSParser
     IdentifierName(first : NToken, rest : NToken) : string
     {
       GetText(first) + GetText(rest)
-    }
-    
+    }   
   
     TypeParametersOpt(l : option[List[ScriptTypeParameter]]) : List[ScriptTypeParameter]
     {
@@ -930,135 +937,147 @@ namespace TSParser
       o
     }
     
-    ObjectTypeStrict(members : NToken) : ScriptType.Object
+    ObjectTypeStrict(members : option[List[ScriptObject]]) : ScriptType.Object
     {
-      ScriptType.Object()
-    }  
+      ScriptType.Object(members.WithDefault(List()))
+    }
+    
+    TypeMemberList(first : ScriptObject, rest : List[ScriptObject]) : List[ScriptObject]
+    {
+      MakeList(first, rest)
+    }
+           
+    PropertySignature(id : string, optional : bool, type : option[ScriptType]) : ScriptObject
+    {
+      ScriptObject.Property(id, optional, type)
+    }
+    
+    CallSignatureObject(c : ScriptCallSignature) : ScriptObject
+    {
+      ScriptObject.Call(c)
+    }
+    
+    CallSignature(
+      typeParams : List[ScriptTypeParameter],
+      parms : List[ScriptParameter],
+      returnType : option[ScriptType]) : ScriptCallSignature
+    {
+      ScriptCallSignature(typeParams, parms, returnType)
+    }
+
+    ConstructSignature(
+      typeParams : List[ScriptTypeParameter],
+      parms : List[ScriptParameter],
+      type : option[ScriptType]) : ScriptObject
+    {
+      ScriptObject.Construct(typeParams, parms, type)
+    }
+    
+    IndexSignature(paramName : string, paramType : NToken, returnType : ScriptType) : ScriptObject
+    {
+      def indexParamType = 
+        match(GetText(paramType))
+        {
+        | "number" => IndexParameterType.Number()
+        | "string" => IndexParameterType.String()
+        | _ => assert(false);
+        };
+      
+      ScriptObject.Index(paramName, indexParamType, returnType)
+    }
+
+    MethodSignature(id : string, optional : bool, signature : ScriptCallSignature) : ScriptObject
+    {
+      ScriptObject.Method(id, optional, signature)
+    }
     
     ArrayType(type : ScriptType, rank : List[NToken * NToken]) : ScriptType.Array
     {
       ScriptType.Array(type, rank.Count)
     }
-    /*
-    TypeMemberListOpt(members : option[list[TSObject]]) : list[TSObject]
+    
+    FunctionType(parms : List[ScriptParameter], returnType : ScriptType) : ScriptType
     {
-      members ?? []
+      ScriptType.Function(parms, returnType)
     }
     
-    TypeMemberList(member : TSObject, rest : List[TSObject]) : list[TSObject]
+    ConstructorType(parms : List[ScriptParameter], returnType : ScriptType) : ScriptType
     {
-      member :: rest.NToList()
-    }
-    
-    CallSignature(parms : List[TSParam], returnType : option[TSType]) : TSObject
-    {
-      TSObject.Call(parms, returnType)
-    }
-
-    ConstructSignature(parms : List[TSParam], type : option[TSType]) : TSObject
-    {
-      TSObject.Construct(parms, type)
-    }
-    
-    IndexSignature(paramName : string, paramType : NToken, returnType : TSType) : TSObject
-    {
-      def indexParamType = 
-        match(GetText(paramType))
-        {
-        | "number" => TSIndexParamType.Number()
-        | "string" => TSIndexParamType.String()
-        | _ => assert(false);
-        };
-      
-      TSObject.Index(paramName, indexParamType, returnType)
-    }
-    
-    PropertySignature(id : string, optional : bool, type : option[TSType]) : TSObject
-    {
-      TSObject.Property(id, optional, type)
-    }
-
-    FunctionSignature(id : string, optional : bool, parms : List[TSParam], returnType : option[TSType]) : TSObject
-    {
-      TSObject.Function(id, optional, parms, returnType)
-    }
-    */
-    FunctionType(parms : NToken, returnType : ScriptType) : ScriptType
-    {
-      ScriptType.Function()
-    }
-    
-    ConstructorType(parms : NToken, returnType : ScriptType) : ScriptType
-    {
-      ScriptType.Constructor()
+      ScriptType.Constructor(parms, returnType)
     }
    
     IdentifierPath(first : string, rest : List[string]) : string
     {
       Id(first, rest)
     }
-    /*
+    
     Public(_ : NToken) : MemberAccess
     {
-      MemberAccess.Public
+      MemberAccess.Public()
     }
     
     Private(_ : NToken) : MemberAccess
     {
-      MemberAccess.Private
+      MemberAccess.Private()
     }
     
-    ParameterListOpt(parms : option[list[TSParam]]) : List[TSParam]
+    ParameterListOpt(parms : option[List[ScriptParameter]]) : List[ScriptParameter]
     {
-      parms ?? []
+      parms.WithDefault(List())
     }
     
-    ParameterListROR(required : List[TSParam], optional : List[TSParam], rest : List[TSParam]) : List[TSParam]
+    ParameterListROR(required : List[ScriptParameter], optional : List[ScriptParameter], rest : List[ScriptParameter]) : List[ScriptParameter]
     {
-      required.Append(optional).Append(rest)
+      required.Concat(optional).Concat(rest).ToList()
     }
     
-    ParameterListOR(optional : List[TSParam], rest : List[TSParam]) : List[TSParam]
+    ParameterListOR(optional : List[ScriptParameter], rest : List[ScriptParameter]) : List[ScriptParameter]
     {
-      optional.Append(rest)
+      optional.Concat(rest).ToList()
     }
     
-    ParameterListRO(required : List[TSParam], optional : List[TSParam]) : List[TSParam]
+    ParameterListRO(required : List[ScriptParameter], optional : List[ScriptParameter]) : List[ScriptParameter]
     {
-      required.Append(optional)
+      required.Concat(optional).ToList()
     }
     
-    RequiredParameter(access : option[MemberAccess], id : string, type : option[TSType]) : TSParam
+    RequiredParameterStringLiteral(id : string, value : string) : ScriptParameter
     {
-      TSParam.Required(id, type, access)
+      ScriptParameter.Required(RequiredParameter.Literal(id, value))
     }
     
-    ParameterListRR(required : List[TSParam], rest : List[TSParam]) : List[TSParam]
+    RequiredParameterRegular(access : option[MemberAccess], id : string, type : option[ScriptType]) : ScriptParameter
     {
-      required.Append(rest)
+      ScriptParameter.Required(RequiredParameter.Regular(id, type, access))
     }
     
-    // _optional is always true in declaration files
-    OptionalParameter(access : option[MemberAccess], id : string, optional : bool, type : option[TSType]) : TSParam
+    ParameterListRR(required : List[ScriptParameter], rest : List[ScriptParameter]) : List[ScriptParameter]
     {
-      TSParam.Option(id, optional, type, access)
+      required.Concat(rest).ToList()
     }
     
-    RequiredParameterList(first : TSParam, rest : List[TSParam]) : List[TSParam]
+    // Either specification is incorrect, or compiler behaves wrong.
+    // In any case it is not possible to specify default value in ambient context right now.
+    // Therefore '_optional' is ignored assuming we have no initialiser.
+    OptionalParameter(access : option[MemberAccess], id : string, _optional : bool, type : option[ScriptType]) : ScriptParameter
     {
-      first :: rest.NToList()
+      ScriptParameter.Optional(id, type, access)
     }
     
-    OptionalParameterList(first : TSParam, rest : List[TSParam]) : List[TSParam]
+    RequiredParameterList(first : ScriptParameter, rest : List[ScriptParameter]) : List[ScriptParameter]
     {
-      first :: rest.NToList()
+      MakeList(first, rest)
     }
     
-    RestParameter(id : string, type : TSType.Array) : List[TSParam]
+    OptionalParameterList(first : ScriptParameter, rest : List[ScriptParameter]) : List[ScriptParameter]
     {
-      [TSParam.Rest(id, type)]
+      MakeList(first, rest)
     }
-    */
+    
+    RestParameter(id : string, type : option[ScriptType.Array]) : List[ScriptParameter]
+    {
+      MakeList(ScriptParameter.Rest(id, type) : ScriptParameter)
+    }
     
     TypeQuery(query : string) : ScriptType
     {
@@ -1106,9 +1125,9 @@ namespace TSParser
       AmbientDeclarationRule.VariableDeclaration(name, type)
     }
     
-    AmbientFunctionDeclaration(name : string, _signature : NToken) : AmbientDeclarationRule
+    AmbientFunctionDeclaration(name : string, signature : ScriptCallSignature) : AmbientDeclarationRule
     {
-      AmbientDeclarationRule.FunctionDeclaration(name)
+      AmbientDeclarationRule.FunctionDeclaration(name, signature)
     }
     
     AmbientClassDeclaration(
@@ -1125,17 +1144,17 @@ namespace TSParser
       elements.NToList()
     }
     
-    AmbientConstructorDeclaration(parms : List[TSParam]) : TSClassMember
+    AmbientConstructorDeclaration(parms : List[ScriptParameter]) : TSClassMember
     {
       TSClassMember.Constructor(parms)
     }
     
-    AmbientMemberVariable(id : string, type : option[TSType]) : TSClassMemberPart
+    AmbientMemberVariable(id : string, type : option[ScriptType]) : TSClassMemberPart
     {
       TSClassMemberPart.Variable(id, type)
     }
 
-    ClassMemberFunctionSignature(id : string, optional : bool, parms : List[TSParam], returnType : option[TSType]) : TSClassMemberPart
+    ClassMemberFunctionSignature(id : string, optional : bool, parms : List[ScriptParameter], returnType : option[ScriptType]) : TSClassMemberPart
     {
       TSClassMemberPart.Method(id, optional, parms, returnType)
     }

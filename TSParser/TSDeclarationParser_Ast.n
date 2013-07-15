@@ -66,6 +66,7 @@ namespace TSParser
     | FunctionDeclaration
       {
         Name : string;
+        Signature : ScriptCallSignature;
       }
     | ClassDeclaration
       {
@@ -97,9 +98,52 @@ namespace TSParser
     | Ref { Name : string; TypeArguments : List[ScriptType]; }
     | Query { Name : string; }
     | Array { Type : ScriptType; Rank : int; }
-    | Object
-    | Function
-    | Constructor
+    | Object { Members : List[ScriptObject]; }
+    | Function { Parameters : List[ScriptParameter]; ReturnType : ScriptType; }
+    | Constructor { Parameters : List[ScriptParameter]; ReturnType : ScriptType; }
+  }
+  
+  public variant ScriptObject
+  {
+    | Property
+      {
+        Name : string;
+        Optional : bool;
+        Type : option[ScriptType];
+      }
+    | Call { Value : ScriptCallSignature; }
+    | Construct
+      {
+        TypeParameters : List[ScriptTypeParameter];
+        Parameters : List[ScriptParameter];
+        ReturnType : option[ScriptType];
+      }
+    | Index
+      {
+        ParameterName : string;
+        ParameterType : IndexParameterType;
+        ReturnType : ScriptType;
+      }
+    | Method
+      {
+        Name : string;
+        Optional : bool;
+        Signature : ScriptCallSignature;
+      }
+  }
+  
+  public variant IndexParameterType
+  {
+    | Number
+    | String
+  }
+  
+  [Record]
+  public class ScriptCallSignature
+  {
+    public TypeParameters : List[ScriptTypeParameter] { get; }
+    public Parameters : List[ScriptParameter] { get; }
+    public ReturnType : option[ScriptType] { get; }
   }
   
   [Record]
@@ -107,6 +151,42 @@ namespace TSParser
   {
     public Name : string { get; }
     public Constraint : option[ScriptType] { get; }
+  }
+  
+  public variant ScriptParameter
+  {
+    | Required
+      {
+        Value : RequiredParameter;
+      }
+    | Optional
+      {
+        Name : string;
+        Type : option[ScriptType];
+        Access : option[MemberAccess];
+      }
+    | Rest
+      {
+        Name : string;
+        Type : option[ScriptType.Array];
+      }
+  }
+  
+  public variant RequiredParameter
+  {
+    | Literal { Name : string; Value : string; }
+    | Regular
+      {
+        Name : string;
+        Type : option[ScriptType];
+        Access : option[MemberAccess];
+      }
+  }
+  
+  public variant MemberAccess
+  {
+    | Public
+    | Private
   }
   
   [Record]
