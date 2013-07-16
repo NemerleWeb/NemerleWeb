@@ -575,7 +575,7 @@ namespace TSParser
         OptionalParameterList : List[ScriptParameter] = OptionalParameter (comma_s OptionalParameter)*;
         // Optional parameter must not have Initialiser in declaration files.
         OptionalParameter : ScriptParameter = PublicOrPrivate? Identifier optional TypeAnnotation?;
-        RestParameter : List[ScriptParameter] = ellipsis_s Identifier colon_s ArrayType?;
+        RestParameter : List[ScriptParameter] = ellipsis_s Identifier (colon_s ArrayType)?;
         
         #endregion
         
