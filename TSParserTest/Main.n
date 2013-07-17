@@ -42,19 +42,12 @@ module Program
   Main() : void
   {
     parseTextWithResult(<#
-
-interface JQueryPromise<T> {
-
-    then(onReject: (...reasons) => U);
-
-  
-}
-   
+declare function f(...a : Array<number>) : boolean;   
    
     #>);
     
     foreach(f in Directory.EnumerateFiles(@"..\..\..\NemerleWeb.TypedJS\Scripts\", "*.*", SearchOption.AllDirectories))
-      //parseFile(f);
+      parseFile(f);
       ();
     
     WriteLine("Press any key to continue");

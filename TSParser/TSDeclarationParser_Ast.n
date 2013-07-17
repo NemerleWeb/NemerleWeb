@@ -168,7 +168,7 @@ namespace TSParser
     | Rest
       {
         Name : string;
-        Type : option[ScriptType.Array];
+        Type : option[ScriptType];
       }
   }
   

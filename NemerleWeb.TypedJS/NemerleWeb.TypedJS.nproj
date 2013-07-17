@@ -86,6 +86,7 @@
     <Folder Include="Scripts\typings\AzureMobileServicesClient\" />
     <Folder Include="Scripts\typings\backbone-relational\" />
     <Folder Include="Scripts\typings\backbone\" />
+    <Folder Include="Scripts\typings\backgrid\" />
     <Folder Include="Scripts\typings\bgiframe\" />
     <Folder Include="Scripts\typings\bootbox\" />
     <Folder Include="Scripts\typings\bootstrap-notify\" />
@@ -126,6 +127,12 @@
     <Folder Include="Scripts\typings\gae.channel.api\" />
     <Folder Include="Scripts\typings\gamepad\" />
     <Folder Include="Scripts\typings\gamequery\" />
+    <Folder Include="Scripts\typings\gapi.pagespeedonline\" />
+    <Folder Include="Scripts\typings\gapi.translate\" />
+    <Folder Include="Scripts\typings\gapi.urlshortener\" />
+    <Folder Include="Scripts\typings\gapi.youtubeAnalytics\" />
+    <Folder Include="Scripts\typings\gapi.youtube\" />
+    <Folder Include="Scripts\typings\gapi\" />
     <Folder Include="Scripts\typings\gldatepicker\" />
     <Folder Include="Scripts\typings\globalize\" />
     <Folder Include="Scripts\typings\google.analytics\" />
@@ -236,6 +243,7 @@
     <Folder Include="Scripts\typings\scroller\" />
     <Folder Include="Scripts\typings\select2\" />
     <Folder Include="Scripts\typings\sencha_touch\" />
+    <Folder Include="Scripts\typings\sharepoint\" />
     <Folder Include="Scripts\typings\signalr\" />
     <Folder Include="Scripts\typings\sinon-chai\" />
     <Folder Include="Scripts\typings\sinon\" />
@@ -321,6 +329,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\backbone\backbone.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\backgrid\backgrid.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\bgiframe\typescript.bgiframe.d.ts">
@@ -453,6 +464,24 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\gamequery\gamequery.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\gapi.pagespeedonline\gapi.pagespeedonline.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\gapi.translate\gapi.translate.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\gapi.urlshortener\gapi.urlshortener.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\gapi.youtubeAnalytics\gapi.youtubeAnalytics.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\gapi.youtube\gapi.youtube.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\gapi\gapi.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\gldatepicker\gldatepicker.d.ts">
@@ -822,6 +851,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\sencha_touch\SenchaTouch.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\sharepoint\SharePoint.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\signalr\signalr.d.ts">

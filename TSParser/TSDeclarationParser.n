@@ -88,6 +88,9 @@ namespace TSParser
         arrow : void = "=>";
         arrow_s : void = arrow s;
         
+        Array : void = "Array";
+        Array_s : void = Array s;
+        
         #endregion
         
         #region Special rules
@@ -503,7 +506,7 @@ namespace TSParser
         // Array is excluded to prevent left recursion.
         TypeLiteral : ScriptType = ObjectType / FunctionType / ConstructorType;        
         
-        ArrayType : ScriptType.Array = Type ('['s ']'s)+;
+        ArrayType : ScriptType = Type ('['s ']'s)+;
         FunctionType : ScriptType = lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
         ConstructorType : ScriptType = new_s lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
         
@@ -575,7 +578,9 @@ namespace TSParser
         OptionalParameterList : List[ScriptParameter] = OptionalParameter (comma_s OptionalParameter)*;
         // Optional parameter must not have Initialiser in declaration files.
         OptionalParameter : ScriptParameter = PublicOrPrivate? Identifier optional TypeAnnotation?;
-        RestParameter : List[ScriptParameter] = ellipsis_s Identifier (colon_s ArrayType)?;
+        // This is not defined explicitely in grammar but implies
+        RestArrayType : ScriptType = Array_s less_s ScriptType greater_s;
+        RestParameter : List[ScriptParameter] = ellipsis_s Identifier (colon_s (RestArrayType / ArrayType))?;
         
         #endregion
         
@@ -991,7 +996,7 @@ namespace TSParser
       ScriptObject.Method(id, optional, signature)
     }
     
-    ArrayType(type : ScriptType, rank : List[NToken * NToken]) : ScriptType.Array
+    ArrayType(type : ScriptType, rank : List[NToken * NToken]) : ScriptType
     {
       ScriptType.Array(type, rank.Count)
     }
@@ -1074,7 +1079,12 @@ namespace TSParser
       MakeList(first, rest)
     }
     
-    RestParameter(id : string, type : option[ScriptType.Array]) : List[ScriptParameter]
+    RestArrayType(type : ScriptType) : ScriptType
+    {
+      ScriptType.Ref("Array", array[type].ToList());
+    }
+    
+    RestParameter(id : string, type : option[ScriptType]) : List[ScriptParameter]
     {
       MakeList(ScriptParameter.Rest(id, type) : ScriptParameter)
     }
