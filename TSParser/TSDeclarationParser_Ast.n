@@ -85,14 +85,15 @@ namespace TSParser.Ast
   {
     public Name : string;
     public TypeParameters : List[ScriptTypeParameter];
-    // public Members : List[object];
+    public Heritage : ClassHeritage;
+    public Members : List[AmbientClassBodyElement];
   }
 
   [Record]
   public class AmbientEnumDeclaration
   {
     public Name : string;
-    public Members : List[EnumMember];
+    public Members : List[AmbientEnumMember];
   }
 
   [Record]
@@ -140,18 +141,21 @@ namespace TSParser.Ast
         Parameters : List[ScriptParameter];
         ReturnType : option[ScriptType];
       }
-    | Index
-      {
-        ParameterName : string;
-        ParameterType : IndexParameterType;
-        ReturnType : ScriptType;
-      }
+    | Index { Value : Ast.IndexSignature; }
     | Method
       {
         Name : string;
         Optional : bool;
         Signature : CallSignature;
       }
+  }
+  
+  [Record]
+  public class IndexSignature
+  {
+    ParameterName : string;
+    ParameterType : IndexParameterType;
+    ReturnType : ScriptType;
   }
   
   public variant IndexParameterType
@@ -212,7 +216,7 @@ namespace TSParser.Ast
   }
   
   [Record]
-  public class EnumMember
+  public class AmbientEnumMember
   {
     public Name : string;
     public Value : option[int];
@@ -234,5 +238,32 @@ namespace TSParser.Ast
     | ExportAssignment { Value : Ast.ExportAssignment; }
     | ExternalImportDeclaration { Value : Ast.ExternalImportDeclaration; }
     | ModuleElement { Value : Ast.AmbientModuleElement; }
+  }
+  
+  public variant AmbientClassBodyElement
+  {
+    | Constructor { Parameters : List[Ast.ScriptParameter]; }
+    | Property
+      {
+        Name : string;
+        Type : option[ScriptType];
+        Access : option[MemberAccess];
+        Static : bool;
+      }
+    | Method
+      {
+        Name : string;
+        Signature : CallSignature;
+        Access : option[MemberAccess];
+        Static : bool;
+      }
+    | Index { Value : Ast.IndexSignature; }
+  }
+  
+  [Record]
+  public class ClassHeritage
+  {
+    public Base : option[ScriptType];
+    public Interfaces : List[ScriptType];
   }
 }

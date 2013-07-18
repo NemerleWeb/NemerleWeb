@@ -97,8 +97,8 @@ namespace TSParser
         
         required : void = !'?';
         optional : bool = ('?' s)?;
-        static_ : bool = "static";
-        static_s : bool = static_ s;
+        static_ = "static";
+        static_s_ : bool = static_? s;
         
         #endregion
         
@@ -640,10 +640,10 @@ namespace TSParser
         ClassDeclaration =
           class_s Identifier TypeParametersOpt ClassHeritage lbrace_s ClassBody rbrace_s;
         
-        ClassHeritage /*: ClassHeritage*/ = ClassExtendsClause? ImplementsClause?;
-        ClassExtendsClause /*: string*/ = extends_s ClassType;
-        ClassType = TypeReference;
-        ImplementsClause /*: List[string]*/ = implements_s ClassOrInterfaceTypeList;
+        ClassHeritage : Ast.ClassHeritage = ClassExtendsClause? ImplementsClause?;
+        ClassExtendsClause : Ast.ScriptType = extends_s ClassType;
+        ClassType : Ast.ScriptType = TypeReference;
+        ImplementsClause : List[Ast.ScriptType] = implements_s ClassOrInterfaceTypeList;
         
         ClassBody = ClassElement*;
         ClassElement =
@@ -668,12 +668,12 @@ namespace TSParser
           MemberAccessorDeclaration;
         
         MemberVariableDeclaration =
-          PublicOrPrivate? static_s? PropertyName TypeAnnotation? endS;
+          PublicOrPrivate? static_s_ PropertyName TypeAnnotation? endS;
         
         MemberFunctionDeclaration = MemberFunctionOverload+;
-        MemberFunctionOverload = PublicOrPrivate? static_s? PropertyName CallSignature endS;
+        MemberFunctionOverload = PublicOrPrivate? static_s_ PropertyName CallSignature endS;
         
-        MemberAccessorDeclaration = PublicOrPrivate? static_s? (GetAccessor / SetAccessor);
+        MemberAccessorDeclaration = PublicOrPrivate? static_s_ (GetAccessor / SetAccessor);
         
         #endregion
         
@@ -776,19 +776,31 @@ namespace TSParser
         AmbientClassDeclaration : Ast.AmbientDeclaration = 
           class_s Identifier TypeParametersOpt ClassHeritage
           lbrace_s AmbientClassBody rbrace_s endS;
-        AmbientClassBody /*: List[TSClassMember]*/ = AmbientClassBodyElement*;
-        AmbientClassBodyElement /*: TSClassMember*/ =
-          (AmbientConstructorDeclaration / AmbientMemberDeclaration / IndexSignature) endS;
-        AmbientConstructorDeclaration /*: TSClassMember*/ =
+        AmbientClassBody : List[Ast.AmbientClassBodyElement] = AmbientClassBodyElement*;
+        AmbientClassBodyElement : Ast.AmbientClassBodyElement =
+          (
+            AmbientConstructorDeclaration /
+            AmbientMemberDeclaration /
+            IndexSignature_AmbientClassBodyElement
+          ) endS;
+        AmbientConstructorDeclaration : Ast.AmbientClassBodyElement =
           constructor_s lparen_s ParameterListOpt rparen_s;
-        AmbientMemberDeclaration /*: TSClassMember*/ =
-          PublicOrPrivate? static_s? PropertyName (CallSignature / TypeAnnotation?);
+        AmbientMemberDeclaration : Ast.AmbientClassBodyElement =
+          AmbientMemberDeclarationMethod / AmbientMemberDeclarationProperty;
+          
+        AmbientMemberDeclarationProperty : Ast.AmbientClassBodyElement =
+          PublicOrPrivate? static_s_ PropertyName TypeAnnotation?;
+        AmbientMemberDeclarationMethod : Ast.AmbientClassBodyElement =
+          PublicOrPrivate? static_s_ PropertyName CallSignature;
+          
+        // Special translation rules for AmbientClassBodyElement
+        IndexSignature_AmbientClassBodyElement : Ast.AmbientClassBodyElement = IndexSignature;
                 
         // Enum
         AmbientEnumDeclaration : Ast.AmbientDeclaration =
           enum_s Identifier lbrace_s AmbientEnumBody? rbrace_s;
-        AmbientEnumBody : List[Ast.EnumMember] = AmbientEnumMember (comma_s AmbientEnumMember)* comma_s?;
-        AmbientEnumMember : Ast.EnumMember = PropertyName AmbientEnumMemberInitialiser? s;
+        AmbientEnumBody : List[Ast.AmbientEnumMember] = AmbientEnumMember (comma_s AmbientEnumMember)* comma_s?;
+        AmbientEnumMember : Ast.AmbientEnumMember = PropertyName AmbientEnumMemberInitialiser? s;
         AmbientEnumMemberInitialiser : int = assign_s IntegerLiteral;
         
         // Module
@@ -891,7 +903,7 @@ namespace TSParser
       !n.IsEmpty
     }
     
-    static_(n : NToken) : bool
+    static_s_(n : NToken) : bool
     {
       !n.IsEmpty
     }
@@ -1005,7 +1017,7 @@ namespace TSParser
         | _ => assert(false);
         };
       
-      Ast.ScriptObject.Index(paramName, indexParamType, returnType)
+      Ast.ScriptObject.Index(Ast.IndexSignature(paramName, indexParamType, returnType))
     }
 
     MethodSignature(id : string, optional : bool, signature : Ast.CallSignature) : Ast.ScriptObject
@@ -1136,17 +1148,11 @@ namespace TSParser
       MakeList(first, rest)
     }
     
-    /*
-    InterfaceNameList(first : string, rest : List[string]) : list[string]
+    ClassHeritage(baseClass : option[Ast.ScriptType], interfaces : option[List[Ast.ScriptType]]) : Ast.ClassHeritage
     {
-      first :: rest.NToList()
+      Ast.ClassHeritage(baseClass, interfaces.WithDefault(List()))
     }
     
-    ClassHeritage(extends : option[string], implement : option[list[string]]) : ClassHeritage
-    {
-      (extends, implement ?? [])
-    }
-    */
     AmbientVariableDeclaration(name : string, type : option[Ast.ScriptType]) : Ast.AmbientDeclaration
     {
       Ast.AmbientDeclaration.VariableDeclaration(Ast.AmbientVariableDeclaration(name, type))
@@ -1160,37 +1166,39 @@ namespace TSParser
     AmbientClassDeclaration(
       name : string,
       typeParameters : List[Ast.ScriptTypeParameter],
-      _ : NToken,
-      _ : NToken) : Ast.AmbientDeclaration
+      heritage : Ast.ClassHeritage,
+      members : List[Ast.AmbientClassBodyElement]) : Ast.AmbientDeclaration
     {
-      Ast.AmbientDeclaration.ClassDeclaration(Ast.AmbientClassDeclaration(name, typeParameters))
+      Ast.AmbientDeclaration.ClassDeclaration(
+        Ast.AmbientClassDeclaration(name, typeParameters, heritage, members))
     }
-    /*
-    AmbientClassBody(elements : List[TSClassMember]) : list[TSClassMember]
+    AmbientConstructorDeclaration(parms : List[Ast.ScriptParameter]) : Ast.AmbientClassBodyElement
     {
-      elements.NToList()
-    }
-    
-    AmbientConstructorDeclaration(parms : List[Ast.ScriptParameter]) : TSClassMember
-    {
-      TSClassMember.Constructor(parms)
+      Ast.AmbientClassBodyElement.Constructor(parms)
     }
     
-    AmbientMemberVariable(id : string, type : option[Ast.ScriptType]) : TSClassMemberPart
+    AmbientMemberDeclarationProperty(
+      access : option[Ast.MemberAccess],
+      isStatic : bool,
+      name : string,
+      type : option[Ast.ScriptType]) : Ast.AmbientClassBodyElement
     {
-      TSClassMemberPart.Variable(id, type)
-    }
-
-    ClassMemberFunctionSignature(id : string, optional : bool, parms : List[Ast.ScriptParameter], returnType : option[Ast.ScriptType]) : TSClassMemberPart
-    {
-      TSClassMemberPart.Method(id, optional, parms, returnType)
+      Ast.AmbientClassBodyElement.Property(name, type, access, isStatic)
     }
     
-    AmbientMemberDeclaration(access : option[MemberAccess], isStatic : option[bool], part : TSClassMemberPart) : TSClassMember
+    AmbientMemberDeclarationMethod(
+      access : option[Ast.MemberAccess],
+      isStatic : bool,
+      name : string,
+      signature : Ast.CallSignature) : Ast.AmbientClassBodyElement
     {
-      TSClassMember.Member(part, isStatic, access)
+      Ast.AmbientClassBodyElement.Method(name, signature, access, isStatic)
     }
-    */
+    
+    IndexSignature_AmbientClassBodyElement(v : Ast.ScriptObject) : Ast.AmbientClassBodyElement
+    {
+      Ast.AmbientClassBodyElement.Index((v :> Ast.ScriptObject.Index).Value)
+    }
     
     AmbientExternalModuleDeclaration(
       name : string,
@@ -1264,20 +1272,20 @@ namespace TSParser
         (v :> Ast.DeclarationElement.ImportDeclaration).Value)
     }
    
-    AmbientEnumDeclaration(name : string, members : option[List[Ast.EnumMember]]) : Ast.AmbientDeclaration
+    AmbientEnumDeclaration(name : string, members : option[List[Ast.AmbientEnumMember]]) : Ast.AmbientDeclaration
     {
       Ast.AmbientDeclaration.EnumDeclaration(
         Ast.AmbientEnumDeclaration(name, members.WithDefault(List())))
     }
     
-    AmbientEnumBody(first : Ast.EnumMember, rest : List[Ast.EnumMember]) : List[Ast.EnumMember]
+    AmbientEnumBody(first : Ast.AmbientEnumMember, rest : List[Ast.AmbientEnumMember]) : List[Ast.AmbientEnumMember]
     {
       MakeList(first, rest)
     }
     
-    AmbientEnumMember(id : string, initialiser : option[int]) : Ast.EnumMember
+    AmbientEnumMember(id : string, initialiser : option[int]) : Ast.AmbientEnumMember
     {
-      Ast.EnumMember(id, initialiser)
+      Ast.AmbientEnumMember(id, initialiser)
     }
     
     AmbientEnumMemberInitialiser(i : NToken) : int
