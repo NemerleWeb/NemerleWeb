@@ -9,84 +9,106 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TSParser
+namespace TSParser.Ast
 {
   public variant DeclarationElement
   {
-    | Reference { Value : ReferenceRule; }
-    | ExportAssignment { Value : ExportAssignmentRule; }
-    | InterfaceDeclaration { Value : InterfaceDeclarationRule; }
-    | ExternalImportDeclaration { Value : ExternalImportDeclarationRule; }
-    | ImportDeclaration { Value : ImportDeclarationRule; }
-    | AmbientDeclaration { Value : AmbientDeclarationRule; }
+    | Reference { Value : Ast.Reference; }
+    | ExportAssignment { Value : Ast.ExportAssignment; }
+    | InterfaceDeclaration { Value : Ast.InterfaceDeclaration; }
+    | ExternalImportDeclaration { Value : Ast.ExternalImportDeclaration; }
+    | ImportDeclaration { Value : Ast.ImportDeclaration; }
+    | AmbientDeclaration { Value : Ast.AmbientDeclaration; }
   }
   
-  public variant ReferenceRule
+  public variant Reference
   {
     | NoDefaultLib
     | Lib { Path : string; }
   }
   
-  public variant ExportAssignmentRule
+  public variant ExportAssignment
   {
     | Module { Name : string; ModuleEntity : string; }
     | Identifier { Name : string; }
   }
   
   [Record]
-  public class ExternalImportDeclarationRule
+  public class ExternalImportDeclaration
   {
-    public Name : string { get; }
-    public ModuleReference : string { get; }
+    public Name : string;
+    public ModuleReference : string;
   }
   
   [Record]
-  public class ImportDeclarationRule
+  public class ImportDeclaration
   {
-    public Name : string { get; }
-    public Entity : string { get; }
+    public Name : string;
+    public Entity : string;
   }
   
   [Record]
-  public class InterfaceDeclarationRule
+  public class InterfaceDeclaration
   {
-    public Name : string { get; }
-    public TypeParameters : List[ScriptTypeParameter] { get; }
-    public Extends : List[ScriptType] { get; }
-    public Type : ScriptType.Object { get; }
+    public Name : string;
+    public TypeParameters : List[ScriptTypeParameter];
+    public Extends : List[ScriptType];
+    public Type : ScriptType.Object;
   }
   
-  public variant AmbientDeclarationRule
+  public variant AmbientDeclaration
   {
-    | VariableDeclaration
-      {
-        Name : string;
-        Type : option[ScriptType];
-      }
-    | FunctionDeclaration
-      {
-        Name : string;
-        Signature : ScriptCallSignature;
-      }
-    | ClassDeclaration
-      {
-        Name : string;
-        TypeParameters : List[ScriptTypeParameter];
-      }
-    | EnumDeclaration
-      {
-        Name : string;
-        Members : List[EnumMember];
-      }
-    | ExternalModuleDeclaration
-      {
-        Name : string;
-      }
-    | ModuleDeclaration
-      {
-        Name : string;
-      }
+    | VariableDeclaration { Value : Ast.AmbientVariableDeclaration; }
+    | FunctionDeclaration { Value : Ast.AmbientFunctionDeclaration; }
+    | ClassDeclaration { Value : Ast.AmbientClassDeclaration; }
+    | EnumDeclaration { Value : Ast.AmbientEnumDeclaration; }
+    | ExternalModuleDeclaration { Value : Ast.AmbientExternalModuleDeclaration; }
+    | ModuleDeclaration { Value : Ast.AmbientModuleDeclaration; }
   }
+  
+  [Record]
+  public class AmbientVariableDeclaration
+  {
+    public Name : string;
+    public Type : option[ScriptType];
+  }
+
+  [Record]
+  public class AmbientFunctionDeclaration
+  {
+    public Name : string;
+    public Signature : CallSignature;
+  }
+
+  [Record]
+  public class AmbientClassDeclaration
+  {
+    public Name : string;
+    public TypeParameters : List[ScriptTypeParameter];
+    // public Members : List[object];
+  }
+
+  [Record]
+  public class AmbientEnumDeclaration
+  {
+    public Name : string;
+    public Members : List[EnumMember];
+  }
+
+  [Record]
+  public class AmbientExternalModuleDeclaration
+  {
+    public Name : string;
+    public Members : List[AmbientExternalModuleElement];
+   }
+
+  [Record]
+  public class AmbientModuleDeclaration
+  {
+    public Name : string;
+    public Members : List[AmbientModuleElement];
+  }
+  
   
   public variant ScriptType
   {
@@ -111,7 +133,7 @@ namespace TSParser
         Optional : bool;
         Type : option[ScriptType];
       }
-    | Call { Value : ScriptCallSignature; }
+    | Call { Value : Ast.CallSignature; }
     | Construct
       {
         TypeParameters : List[ScriptTypeParameter];
@@ -128,7 +150,7 @@ namespace TSParser
       {
         Name : string;
         Optional : bool;
-        Signature : ScriptCallSignature;
+        Signature : CallSignature;
       }
   }
   
@@ -139,25 +161,25 @@ namespace TSParser
   }
   
   [Record]
-  public class ScriptCallSignature
+  public class CallSignature
   {
-    public TypeParameters : List[ScriptTypeParameter] { get; }
-    public Parameters : List[ScriptParameter] { get; }
-    public ReturnType : option[ScriptType] { get; }
+    public TypeParameters : List[ScriptTypeParameter];
+    public Parameters : List[ScriptParameter];
+    public ReturnType : option[ScriptType];
   }
   
   [Record]
   public class ScriptTypeParameter
   {
-    public Name : string { get; }
-    public Constraint : option[ScriptType] { get; }
+    public Name : string;
+    public Constraint : option[ScriptType];
   }
   
   public variant ScriptParameter
   {
     | Required
       {
-        Value : RequiredParameter;
+        Value : Ast.RequiredParameter;
       }
     | Optional
       {
@@ -192,7 +214,25 @@ namespace TSParser
   [Record]
   public class EnumMember
   {
-    public Name : string { get; }
-    public Value : option[int] { get; }
+    public Name : string;
+    public Value : option[int];
+  }
+  
+  public variant AmbientModuleElement
+  {
+    | VariableDeclaration { Value : Ast.AmbientVariableDeclaration; }
+    | FunctionDeclaration { Value : Ast.AmbientFunctionDeclaration; }
+    | ClassDeclaration { Value : Ast.AmbientClassDeclaration; }
+    | InterfaceDeclaration { Value : Ast.InterfaceDeclaration; }
+    | EnumDeclaration { Value : Ast.AmbientEnumDeclaration; }
+    | ModuleDeclaration { Value : Ast.AmbientModuleDeclaration; }
+    | ImportDeclaration { Value : Ast.ImportDeclaration; }
+  }
+  
+  public variant AmbientExternalModuleElement
+  {
+    | ExportAssignment { Value : Ast.ExportAssignment; }
+    | ExternalImportDeclaration { Value : Ast.ExternalImportDeclaration; }
+    | ModuleElement { Value : Ast.AmbientModuleElement; }
   }
 }

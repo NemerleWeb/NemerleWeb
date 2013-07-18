@@ -464,39 +464,39 @@ namespace TSParser
         
         #region Type Parameter Lists (3.5.1)
         
-        TypeParameters : List[ScriptTypeParameter] = less_s TypeParameterList greater_s;
+        TypeParameters : List[Ast.ScriptTypeParameter] = less_s TypeParameterList greater_s;
         // Return list instead of option
-        TypeParametersOpt : List[ScriptTypeParameter] = TypeParameters?;
-        TypeParameterList : List[ScriptTypeParameter] = TypeParameter (comma_s TypeParameter)*;
-        TypeParameter : ScriptTypeParameter = Identifier Contraint?;
+        TypeParametersOpt : List[Ast.ScriptTypeParameter] = TypeParameters?;
+        TypeParameterList : List[Ast.ScriptTypeParameter] = TypeParameter (comma_s TypeParameter)*;
+        TypeParameter : Ast.ScriptTypeParameter = Identifier Contraint?;
         // ObjectType is not specified but it is allowed by compiler
-        Contraint : ScriptType = extends_s (TypeReference / ObjectType);
+        Contraint : Ast.ScriptType = extends_s (TypeReference / ObjectType);
         
         #endregion
         
         #region Specifying Types (3.6)
         
         // Array is specified here, because otherwise we have left recursion.
-        Type : ScriptType = (TypeQuery / TypeReference / TypeLiteral / PredefinedType) s;
-        ScriptType : ScriptType = Type ('['s ']'s)*;
+        Type : Ast.ScriptType = (TypeQuery / TypeReference / TypeLiteral / PredefinedType) s;
+        ScriptType : Ast.ScriptType = Type ('['s ']'s)*;
         
         // Note: bool is not a valid type in TypeScript 0.9 but many libraries still use it.
-        PredefinedType : ScriptType =
+        PredefinedType : Ast.ScriptType =
           ("any" / "number" / "boolean" / "bool" / "string" / "void");
         
-        TypeReference : ScriptType = !(PredefinedType s) TypeName TypeArguments?;
+        TypeReference : Ast.ScriptType = !(PredefinedType s) TypeName TypeArguments?;
         TypeName : string = Identifier (dot_s Identifier)*;        
         ModuleName : string = TypeName;
         
-        TypeArguments : List[ScriptType] = less_s TypeArgumentList greater_s;
-        TypeArgumentList : List[ScriptType] = TypeArgument (comma_s TypeArgument)*;
-        TypeArgument : ScriptType = ScriptType;
+        TypeArguments : List[Ast.ScriptType] = less_s TypeArgumentList greater_s;
+        TypeArgumentList : List[Ast.ScriptType] = TypeArgument (comma_s TypeArgument)*;
+        TypeArgument : Ast.ScriptType = ScriptType;
         
         #endregion
         
         #region Type Queries
         
-        TypeQuery : ScriptType = typeof_S TypeQueryExpression;
+        TypeQuery : Ast.ScriptType = typeof_S TypeQueryExpression;
         TypeQueryExpression : string = Identifier (dot_s IdentifierName)*;
         
         #endregion
@@ -504,21 +504,21 @@ namespace TSParser
         #region Type Literals (3.6.4)
         
         // Array is excluded to prevent left recursion.
-        TypeLiteral : ScriptType = ObjectType / FunctionType / ConstructorType;        
+        TypeLiteral : Ast.ScriptType = ObjectType / FunctionType / ConstructorType;        
         
-        ArrayType : ScriptType = Type ('['s ']'s)+;
-        FunctionType : ScriptType = lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
-        ConstructorType : ScriptType = new_s lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
+        ArrayType : Ast.ScriptType = Type ('['s ']'s)+;
+        FunctionType : Ast.ScriptType = lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
+        ConstructorType : Ast.ScriptType = new_s lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
         
         #endregion
                  
         #region Object Type Literals (3.7)
         
-        ObjectType : ScriptType = ObjectTypeStrict;
-        ObjectTypeStrict : ScriptType.Object = lbrace_s TypeBody? rbrace_s;
-        TypeBody : List[ScriptObject] = TypeMemberList;
-        TypeMemberList : List[ScriptObject] = TypeMember (endS TypeMember)* endS;
-        TypeMember : ScriptObject =
+        ObjectType : Ast.ScriptType = ObjectTypeStrict;
+        ObjectTypeStrict : Ast.ScriptType.Object = lbrace_s TypeBody? rbrace_s;
+        TypeBody : List[Ast.ScriptObject] = TypeMemberList;
+        TypeMemberList : List[Ast.ScriptObject] = TypeMember (endS TypeMember)* endS;
+        TypeMember : Ast.ScriptObject =
           CallSignatureObject /
           ConstructSignature /
           MethodSignature /          
@@ -529,14 +529,14 @@ namespace TSParser
           
         #region Property Signatures (3.7.1)
 
-        PropertySignature : ScriptObject = PropertyName optional TypeAnnotation?;
+        PropertySignature : Ast.ScriptObject = PropertyName optional TypeAnnotation?;
         
         #endregion
         
         #region Call Signatures (3.7.2)
         
-        CallSignatureObject : ScriptObject = CallSignature;
-        CallSignature : ScriptCallSignature =
+        CallSignatureObject : Ast.ScriptObject = CallSignature;
+        CallSignature : Ast.CallSignature =
           TypeParametersOpt lparen_s ParameterListOpt rparen_s TypeAnnotation?;
           
         #endregion
@@ -544,7 +544,7 @@ namespace TSParser
         #region Parameter List (3.7.2.2)
         
         // According to spec, additional comma is forbiden, but TS compiler handles it.
-        ParameterList : List[ScriptParameter] =
+        ParameterList : List[Ast.ScriptParameter] =
           ParameterListROR /
           ParameterListRR /
           ParameterListRO /
@@ -554,43 +554,43 @@ namespace TSParser
           RestParameter;
           
         // Return empty list instead of option
-        ParameterListOpt : List[ScriptParameter] = ParameterList?;
+        ParameterListOpt : List[Ast.ScriptParameter] = ParameterList?;
         
-        ParameterListROR : List[ScriptParameter] =
+        ParameterListROR : List[Ast.ScriptParameter] =
           RequiredParameterList comma_s OptionalParameterList comma_s RestParameter;
-        ParameterListOR  : List[ScriptParameter] =
+        ParameterListOR  : List[Ast.ScriptParameter] =
           OptionalParameterList comma_s RestParameter;
-        ParameterListRO  : List[ScriptParameter] =
+        ParameterListRO  : List[Ast.ScriptParameter] =
           RequiredParameterList comma_s OptionalParameterList;
-        ParameterListRR  : List[ScriptParameter] =
+        ParameterListRR  : List[Ast.ScriptParameter] =
           RequiredParameterList comma_s RestParameter;
           
-        RequiredParameterList : List[ScriptParameter] = RequiredParameter (comma_s RequiredParameter)*;
-        RequiredParameter : ScriptParameter =
+        RequiredParameterList : List[Ast.ScriptParameter] = RequiredParameter (comma_s RequiredParameter)*;
+        RequiredParameter : Ast.ScriptParameter =
           RequiredParameterStringLiteral / RequiredParameterRegular;
           
-        RequiredParameterStringLiteral : ScriptParameter = Identifier colon_s StringLiteral s;
-        RequiredParameterRegular : ScriptParameter = PublicOrPrivate? Identifier required TypeAnnotation?;
+        RequiredParameterStringLiteral : Ast.ScriptParameter = Identifier colon_s StringLiteral s;
+        RequiredParameterRegular : Ast.ScriptParameter = PublicOrPrivate? Identifier required TypeAnnotation?;
           
-        Public : MemberAccess = "public";
-        Private : MemberAccess = "private";
-        PublicOrPrivate : MemberAccess = (Public/Private)s;
-        OptionalParameterList : List[ScriptParameter] = OptionalParameter (comma_s OptionalParameter)*;
+        Public : Ast.MemberAccess = "public";
+        Private : Ast.MemberAccess = "private";
+        PublicOrPrivate : Ast.MemberAccess = (Public/Private)s;
+        OptionalParameterList : List[Ast.ScriptParameter] = OptionalParameter (comma_s OptionalParameter)*;
         // Optional parameter must not have Initialiser in declaration files.
-        OptionalParameter : ScriptParameter = PublicOrPrivate? Identifier optional TypeAnnotation?;
+        OptionalParameter : Ast.ScriptParameter = PublicOrPrivate? Identifier optional TypeAnnotation?;
         // This is not defined explicitely in grammar but implies
-        RestArrayType : ScriptType = Array_s less_s ScriptType greater_s;
-        RestParameter : List[ScriptParameter] = ellipsis_s Identifier (colon_s (RestArrayType / ArrayType))?;
+        RestArrayType : Ast.ScriptType = Array_s less_s ScriptType greater_s;
+        RestParameter : List[Ast.ScriptParameter] = ellipsis_s Identifier (colon_s (RestArrayType / ArrayType))?;
         
         #endregion
         
         #region Construct/Index/Method Signatures (3.7.3, 3.7.4, 3.7.5)
         
-        ConstructSignature : ScriptObject =
+        ConstructSignature : Ast.ScriptObject =
           new_s TypeParametersOpt lparen_s ParameterListOpt rparen_s TypeAnnotation?;
-        IndexSignature     : ScriptObject =
+        IndexSignature     : Ast.ScriptObject =
           lbrack_s Identifier required colon_s ("number" / "string") s rbrack_s TypeAnnotation;
-        MethodSignature  : ScriptObject = PropertyName optional CallSignature;
+        MethodSignature  : Ast.ScriptObject = PropertyName optional CallSignature;
         
         #endregion
         
@@ -612,7 +612,7 @@ namespace TSParser
         #region Variable Statements (5.1)
         
         VariableDeclaration = Identifier TypeAnnotation?;
-        TypeAnnotation : ScriptType = colon_s ScriptType s;
+        TypeAnnotation : Ast.ScriptType = colon_s ScriptType s;
         
         #endregion
         
@@ -626,12 +626,12 @@ namespace TSParser
         
         #region Interface Declarations (7.1)
         
-        InterfaceDeclaration : DeclarationElement =
+        InterfaceDeclaration : Ast.DeclarationElement =
           interface_s Identifier TypeParametersOpt InterfaceExtendsClause? ObjectTypeStrict;
-        InterfaceExtendsClause : List[ScriptType] = extends_s ClassOrInterfaceTypeList;
-        ClassOrInterfaceTypeList : List[ScriptType] =
+        InterfaceExtendsClause : List[Ast.ScriptType] = extends_s ClassOrInterfaceTypeList;
+        ClassOrInterfaceTypeList : List[Ast.ScriptType] =
           ClassOrInterfaceType (comma_s ClassOrInterfaceType)*;
-        ClassOrInterfaceType : ScriptType = TypeReference;
+        ClassOrInterfaceType : Ast.ScriptType = TypeReference;
         
         #endregion
         
@@ -716,7 +716,7 @@ namespace TSParser
         
         #region Import Declarations (10.3)
         
-        ImportDeclaration : DeclarationElement =
+        ImportDeclaration : Ast.DeclarationElement =
           import_s Identifier assign_s (ModuleEntityName / EntityName) endS;
         EntityName : string = ModuleName (dot Identifier)?;
         
@@ -728,8 +728,8 @@ namespace TSParser
         #region Source Files (11)
         
         SourceFile = DeclarationSourceFile;
-        DeclarationSourceFile : List[DeclarationElement] = HS (DeclarationElement endS)*;
-        DeclarationElement : DeclarationElement =
+        DeclarationSourceFile : List[Ast.DeclarationElement] = HS (DeclarationElement endS)*;
+        DeclarationElement : Ast.DeclarationElement =
           Reference /
           ExportAssignment /
           export_s? InterfaceDeclaration /
@@ -741,7 +741,7 @@ namespace TSParser
         
         #region External Import Declarations (11.2.2)
         
-        ExternalImportDeclaration : DeclarationElement =
+        ExternalImportDeclaration : Ast.DeclarationElement =
           import_s Identifier assign_s ExternalModuleReference endS;        
         ExternalModuleReference : string = require_s lbrack_s StringLiteral s rbrack_s;
         
@@ -750,15 +750,15 @@ namespace TSParser
         #region Export Assignments (11.2.4)
         
         // NOTE: This is not according to specification
-        ExportModuleAssignment : ExportAssignmentRule = export_s Identifier assign_s ModuleEntityName endS;
-        ExportIdentifierAssignment : ExportAssignmentRule = export_s assign_s Identifier endS;
-        ExportAssignment : DeclarationElement = ExportModuleAssignment / ExportIdentifierAssignment;
+        ExportModuleAssignment : Ast.ExportAssignment = export_s Identifier assign_s ModuleEntityName endS;
+        ExportIdentifierAssignment : Ast.ExportAssignment = export_s assign_s Identifier endS;
+        ExportAssignment : Ast.DeclarationElement = ExportModuleAssignment / ExportIdentifierAssignment;
         
         #endregion
         
         #region Ambient Declarations (12.1)
                 
-        AmbientDeclaration : DeclarationElement =
+        AmbientDeclaration : Ast.DeclarationElement =
           declare_s
            (
             AmbientVariableDeclaration /
@@ -769,11 +769,11 @@ namespace TSParser
             AmbientModuleDeclaration
            ) endS;
         
-        AmbientVariableDeclaration : AmbientDeclarationRule = var_s Identifier TypeAnnotation?;
-        AmbientFunctionDeclaration : AmbientDeclarationRule = function_s Identifier CallSignature;
+        AmbientVariableDeclaration : Ast.AmbientDeclaration = var_s Identifier TypeAnnotation?;
+        AmbientFunctionDeclaration : Ast.AmbientDeclaration = function_s Identifier CallSignature;
         
         // Class
-        AmbientClassDeclaration : AmbientDeclarationRule = 
+        AmbientClassDeclaration : Ast.AmbientDeclaration = 
           class_s Identifier TypeParametersOpt ClassHeritage
           lbrace_s AmbientClassBody rbrace_s endS;
         AmbientClassBody /*: List[TSClassMember]*/ = AmbientClassBodyElement*;
@@ -785,17 +785,17 @@ namespace TSParser
           PublicOrPrivate? static_s? PropertyName (CallSignature / TypeAnnotation?);
                 
         // Enum
-        AmbientEnumDeclaration : AmbientDeclarationRule =
+        AmbientEnumDeclaration : Ast.AmbientDeclaration =
           enum_s Identifier lbrace_s AmbientEnumBody? rbrace_s;
-        AmbientEnumBody : List[EnumMember] = AmbientEnumMember (comma_s AmbientEnumMember)* comma_s?;
-        AmbientEnumMember : EnumMember = PropertyName AmbientEnumMemberInitialiser? s;
+        AmbientEnumBody : List[Ast.EnumMember] = AmbientEnumMember (comma_s AmbientEnumMember)* comma_s?;
+        AmbientEnumMember : Ast.EnumMember = PropertyName AmbientEnumMemberInitialiser? s;
         AmbientEnumMemberInitialiser : int = assign_s IntegerLiteral;
         
         // Module
-        AmbientModuleDeclaration : AmbientDeclarationRule =
+        AmbientModuleDeclaration : Ast.AmbientDeclaration =
           module_s IdentifierPath lbrace_s AmbientModuleBody rbrace_s;
-        AmbientModuleBody /*: List[TSGlobal]*/ = AmbientModuleElement*;
-        AmbientModuleElement =
+        AmbientModuleBody /*: List[Ast.AmbientModuleElement]*/ = AmbientModuleElement*;
+        AmbientModuleElement /*: Ast.AmbientModuleElement*/ =
           export_s?
           (
             AmbientVariableDeclaration /
@@ -808,7 +808,7 @@ namespace TSParser
           ) endS;
           
         // External
-        AmbientExternalModuleDeclaration : AmbientDeclarationRule =
+        AmbientExternalModuleDeclaration : Ast.AmbientDeclaration =
           module_s StringLiteral s lbrace_s s AmbientExternalModuleBody rbrace_s endS;
         AmbientExternalModuleBody = AmbientExternalModuleElement*;
         AmbientExternalModuleElement =          
@@ -821,19 +821,19 @@ namespace TSParser
         #region Reference
 
         /// <reference path="..." />
-        ReferencePath : ReferenceRule = "path"s assign_s StringLiteral;
-        ReferenceNoDefaultLib : ReferenceRule =
+        ReferencePath : Ast.Reference = "path"s assign_s StringLiteral;
+        ReferenceNoDefaultLib : Ast.Reference =
           "no-default-lib"s assign_s ("\"true\"" / "'true'");
-        ReferenceElement : DeclarationElement =
+        ReferenceElement : Ast.DeclarationElement =
           less_s "reference"s (ReferencePath / ReferenceNoDefaultLib)s '/'s greater_s;
         xmlComment : void = "///";
-        Reference : DeclarationElement = xmlComment s ReferenceElement;
+        Reference : Ast.DeclarationElement = xmlComment s ReferenceElement;
         
         #endregion
         
         #endregion
         
-        start : List[DeclarationElement] = DeclarationSourceFile;
+        start : List[Ast.DeclarationElement] = DeclarationSourceFile;
       }
     )]
   public class TSDeclarationParser
@@ -894,40 +894,40 @@ namespace TSParser
       GetText(first) + GetText(rest)
     }   
   
-    TypeParametersOpt(l : option[List[ScriptTypeParameter]]) : List[ScriptTypeParameter]
+    TypeParametersOpt(l : option[List[Ast.ScriptTypeParameter]]) : List[Ast.ScriptTypeParameter]
     {
       l.WithDefault(List())
     }
 
-    TypeParameterList(first : ScriptTypeParameter, rest : List[ScriptTypeParameter]) : List[ScriptTypeParameter]
+    TypeParameterList(first : Ast.ScriptTypeParameter, rest : List[Ast.ScriptTypeParameter]) : List[Ast.ScriptTypeParameter]
     {
       MakeList(first, rest)
     }
 
-    TypeParameter(id : string, constraint : option[ScriptType]) : ScriptTypeParameter
+    TypeParameter(id : string, constraint : option[Ast.ScriptType]) : Ast.ScriptTypeParameter
     {
-      ScriptTypeParameter(id, constraint)
+      Ast.ScriptTypeParameter(id, constraint)
     }
 
-    TypeArgumentList(first : ScriptType, rest : List[ScriptType]) : List[ScriptType]
+    TypeArgumentList(first : Ast.ScriptType, rest : List[Ast.ScriptType]) : List[Ast.ScriptType]
     {
       MakeList(first, rest)
     }
 
-    ScriptType(type : ScriptType, rank : List[NToken * NToken]) : ScriptType
+    ScriptType(type : Ast.ScriptType, rank : List[NToken * NToken]) : Ast.ScriptType
     {
-      if (rank.Count == 0) type else ScriptType.Array(type, rank.Count)
+      if (rank.Count == 0) type else Ast.ScriptType.Array(type, rank.Count)
     }
     
-    PredefinedType(type : NToken) : ScriptType
+    PredefinedType(type : NToken) : Ast.ScriptType
     {
       match(GetText(type))
       {
-      | "any" => ScriptType.Any()
-      | "number" => ScriptType.Number()
-      | "boolean" | "bool" => ScriptType.Boolean()
-      | "string" => ScriptType.String()
-      | "void" => ScriptType.Void()
+      | "any" => Ast.ScriptType.Any()
+      | "number" => Ast.ScriptType.Number()
+      | "boolean" | "bool" => Ast.ScriptType.Boolean()
+      | "string" => Ast.ScriptType.String()
+      | "void" => Ast.ScriptType.Void()
       | _ => assert(false);
       }
     }
@@ -937,78 +937,78 @@ namespace TSParser
       Id(first, rest)
     }
     
-    ObjectType(o : ScriptType.Object) : ScriptType
+    ObjectType(o : Ast.ScriptType.Object) : Ast.ScriptType
     {
       o
     }
     
-    ObjectTypeStrict(members : option[List[ScriptObject]]) : ScriptType.Object
+    ObjectTypeStrict(members : option[List[Ast.ScriptObject]]) : Ast.ScriptType.Object
     {
-      ScriptType.Object(members.WithDefault(List()))
+      Ast.ScriptType.Object(members.WithDefault(List()))
     }
     
-    TypeMemberList(first : ScriptObject, rest : List[ScriptObject]) : List[ScriptObject]
+    TypeMemberList(first : Ast.ScriptObject, rest : List[Ast.ScriptObject]) : List[Ast.ScriptObject]
     {
       MakeList(first, rest)
     }
            
-    PropertySignature(id : string, optional : bool, type : option[ScriptType]) : ScriptObject
+    PropertySignature(id : string, optional : bool, type : option[Ast.ScriptType]) : Ast.ScriptObject
     {
-      ScriptObject.Property(id, optional, type)
+      Ast.ScriptObject.Property(id, optional, type)
     }
     
-    CallSignatureObject(c : ScriptCallSignature) : ScriptObject
+    CallSignatureObject(c : Ast.CallSignature) : Ast.ScriptObject
     {
-      ScriptObject.Call(c)
+      Ast.ScriptObject.Call(c)
     }
     
     CallSignature(
-      typeParams : List[ScriptTypeParameter],
-      parms : List[ScriptParameter],
-      returnType : option[ScriptType]) : ScriptCallSignature
+      typeParams : List[Ast.ScriptTypeParameter],
+      parms : List[Ast.ScriptParameter],
+      returnType : option[Ast.ScriptType]) : Ast.CallSignature
     {
-      ScriptCallSignature(typeParams, parms, returnType)
+      Ast.CallSignature(typeParams, parms, returnType)
     }
 
     ConstructSignature(
-      typeParams : List[ScriptTypeParameter],
-      parms : List[ScriptParameter],
-      type : option[ScriptType]) : ScriptObject
+      typeParams : List[Ast.ScriptTypeParameter],
+      parms : List[Ast.ScriptParameter],
+      type : option[Ast.ScriptType]) : Ast.ScriptObject
     {
-      ScriptObject.Construct(typeParams, parms, type)
+      Ast.ScriptObject.Construct(typeParams, parms, type)
     }
     
-    IndexSignature(paramName : string, paramType : NToken, returnType : ScriptType) : ScriptObject
+    IndexSignature(paramName : string, paramType : NToken, returnType : Ast.ScriptType) : Ast.ScriptObject
     {
       def indexParamType = 
         match(GetText(paramType))
         {
-        | "number" => IndexParameterType.Number()
-        | "string" => IndexParameterType.String()
+        | "number" => Ast.IndexParameterType.Number()
+        | "string" => Ast.IndexParameterType.String()
         | _ => assert(false);
         };
       
-      ScriptObject.Index(paramName, indexParamType, returnType)
+      Ast.ScriptObject.Index(paramName, indexParamType, returnType)
     }
 
-    MethodSignature(id : string, optional : bool, signature : ScriptCallSignature) : ScriptObject
+    MethodSignature(id : string, optional : bool, signature : Ast.CallSignature) : Ast.ScriptObject
     {
-      ScriptObject.Method(id, optional, signature)
+      Ast.ScriptObject.Method(id, optional, signature)
     }
     
-    ArrayType(type : ScriptType, rank : List[NToken * NToken]) : ScriptType
+    ArrayType(type : Ast.ScriptType, rank : List[NToken * NToken]) : Ast.ScriptType
     {
-      ScriptType.Array(type, rank.Count)
+      Ast.ScriptType.Array(type, rank.Count)
     }
     
-    FunctionType(parms : List[ScriptParameter], returnType : ScriptType) : ScriptType
+    FunctionType(parms : List[Ast.ScriptParameter], returnType : Ast.ScriptType) : Ast.ScriptType
     {
-      ScriptType.Function(parms, returnType)
+      Ast.ScriptType.Function(parms, returnType)
     }
     
-    ConstructorType(parms : List[ScriptParameter], returnType : ScriptType) : ScriptType
+    ConstructorType(parms : List[Ast.ScriptParameter], returnType : Ast.ScriptType) : Ast.ScriptType
     {
-      ScriptType.Constructor(parms, returnType)
+      Ast.ScriptType.Constructor(parms, returnType)
     }
    
     IdentifierPath(first : string, rest : List[string]) : string
@@ -1016,47 +1016,47 @@ namespace TSParser
       Id(first, rest)
     }
     
-    Public(_ : NToken) : MemberAccess
+    Public(_ : NToken) : Ast.MemberAccess
     {
-      MemberAccess.Public()
+      Ast.MemberAccess.Public()
     }
     
-    Private(_ : NToken) : MemberAccess
+    Private(_ : NToken) : Ast.MemberAccess
     {
-      MemberAccess.Private()
+      Ast.MemberAccess.Private()
     }
     
-    ParameterListOpt(parms : option[List[ScriptParameter]]) : List[ScriptParameter]
+    ParameterListOpt(parms : option[List[Ast.ScriptParameter]]) : List[Ast.ScriptParameter]
     {
       parms.WithDefault(List())
     }
     
-    ParameterListROR(required : List[ScriptParameter], optional : List[ScriptParameter], rest : List[ScriptParameter]) : List[ScriptParameter]
+    ParameterListROR(required : List[Ast.ScriptParameter], optional : List[Ast.ScriptParameter], rest : List[Ast.ScriptParameter]) : List[Ast.ScriptParameter]
     {
       required.Concat(optional).Concat(rest).ToList()
     }
     
-    ParameterListOR(optional : List[ScriptParameter], rest : List[ScriptParameter]) : List[ScriptParameter]
+    ParameterListOR(optional : List[Ast.ScriptParameter], rest : List[Ast.ScriptParameter]) : List[Ast.ScriptParameter]
     {
       optional.Concat(rest).ToList()
     }
     
-    ParameterListRO(required : List[ScriptParameter], optional : List[ScriptParameter]) : List[ScriptParameter]
+    ParameterListRO(required : List[Ast.ScriptParameter], optional : List[Ast.ScriptParameter]) : List[Ast.ScriptParameter]
     {
       required.Concat(optional).ToList()
     }
     
-    RequiredParameterStringLiteral(id : string, value : string) : ScriptParameter
+    RequiredParameterStringLiteral(id : string, value : string) : Ast.ScriptParameter
     {
-      ScriptParameter.Required(RequiredParameter.Literal(id, value))
+      Ast.ScriptParameter.Required(Ast.RequiredParameter.Literal(id, value))
     }
     
-    RequiredParameterRegular(access : option[MemberAccess], id : string, type : option[ScriptType]) : ScriptParameter
+    RequiredParameterRegular(access : option[Ast.MemberAccess], id : string, type : option[Ast.ScriptType]) : Ast.ScriptParameter
     {
-      ScriptParameter.Required(RequiredParameter.Regular(id, type, access))
+      Ast.ScriptParameter.Required(Ast.RequiredParameter.Regular(id, type, access))
     }
     
-    ParameterListRR(required : List[ScriptParameter], rest : List[ScriptParameter]) : List[ScriptParameter]
+    ParameterListRR(required : List[Ast.ScriptParameter], rest : List[Ast.ScriptParameter]) : List[Ast.ScriptParameter]
     {
       required.Concat(rest).ToList()
     }
@@ -1064,34 +1064,34 @@ namespace TSParser
     // Either specification is incorrect, or compiler behaves wrong.
     // In any case it is not possible to specify default value in ambient context right now.
     // Therefore '_optional' is ignored assuming we have no initialiser.
-    OptionalParameter(access : option[MemberAccess], id : string, _optional : bool, type : option[ScriptType]) : ScriptParameter
+    OptionalParameter(access : option[Ast.MemberAccess], id : string, _optional : bool, type : option[Ast.ScriptType]) : Ast.ScriptParameter
     {
-      ScriptParameter.Optional(id, type, access)
+      Ast.ScriptParameter.Optional(id, type, access)
     }
     
-    RequiredParameterList(first : ScriptParameter, rest : List[ScriptParameter]) : List[ScriptParameter]
+    RequiredParameterList(first : Ast.ScriptParameter, rest : List[Ast.ScriptParameter]) : List[Ast.ScriptParameter]
     {
       MakeList(first, rest)
     }
     
-    OptionalParameterList(first : ScriptParameter, rest : List[ScriptParameter]) : List[ScriptParameter]
+    OptionalParameterList(first : Ast.ScriptParameter, rest : List[Ast.ScriptParameter]) : List[Ast.ScriptParameter]
     {
       MakeList(first, rest)
     }
     
-    RestArrayType(type : ScriptType) : ScriptType
+    RestArrayType(type : Ast.ScriptType) : Ast.ScriptType
     {
-      ScriptType.Ref("Array", array[type].ToList());
+      Ast.ScriptType.Ref("Array", array[type].ToList());
     }
     
-    RestParameter(id : string, type : option[ScriptType]) : List[ScriptParameter]
+    RestParameter(id : string, type : option[Ast.ScriptType]) : List[Ast.ScriptParameter]
     {
-      MakeList(ScriptParameter.Rest(id, type) : ScriptParameter)
+      MakeList(Ast.ScriptParameter.Rest(id, type) : Ast.ScriptParameter)
     }
     
-    TypeQuery(query : string) : ScriptType
+    TypeQuery(query : string) : Ast.ScriptType
     {
-      ScriptType.Query(query)
+      Ast.ScriptType.Query(query)
     }
     
     TypeQueryExpression(first : string, rest : List[string]) : string
@@ -1099,22 +1099,22 @@ namespace TSParser
       Id(first, rest)
     }
     
-    TypeReference(typeName : string, typeArguments : option[List[ScriptType]]) : ScriptType
+    TypeReference(typeName : string, typeArguments : option[List[Ast.ScriptType]]) : Ast.ScriptType
     {
-      ScriptType.Ref(typeName, typeArguments.WithDefault(List()))
+      Ast.ScriptType.Ref(typeName, typeArguments.WithDefault(List()))
     }
     
     InterfaceDeclaration(
       id : string,
-      typeParameters : List[ScriptTypeParameter],
-      extends : option[List[ScriptType]],
-      type : ScriptType.Object) : DeclarationElement
+      typeParameters : List[Ast.ScriptTypeParameter],
+      extends : option[List[Ast.ScriptType]],
+      type : Ast.ScriptType.Object) : Ast.DeclarationElement
     {
-      DeclarationElement.InterfaceDeclaration(
-        InterfaceDeclarationRule(id, typeParameters, extends.WithDefault(List()), type))
+      Ast.DeclarationElement.InterfaceDeclaration(
+        Ast.InterfaceDeclaration(id, typeParameters, extends.WithDefault(List()), type))
     }
     
-    ClassOrInterfaceTypeList(first : ScriptType, rest : List[ScriptType]) : List[ScriptType]
+    ClassOrInterfaceTypeList(first : Ast.ScriptType, rest : List[Ast.ScriptType]) : List[Ast.ScriptType]
     {
       MakeList(first, rest)
     }
@@ -1130,23 +1130,23 @@ namespace TSParser
       (extends, implement ?? [])
     }
     */
-    AmbientVariableDeclaration(name : string, type : option[ScriptType]) : AmbientDeclarationRule
+    AmbientVariableDeclaration(name : string, type : option[Ast.ScriptType]) : Ast.AmbientDeclaration
     {
-      AmbientDeclarationRule.VariableDeclaration(name, type)
+      Ast.AmbientDeclaration.VariableDeclaration(Ast.AmbientVariableDeclaration(name, type))
     }
     
-    AmbientFunctionDeclaration(name : string, signature : ScriptCallSignature) : AmbientDeclarationRule
+    AmbientFunctionDeclaration(name : string, signature : Ast.CallSignature) : Ast.AmbientDeclaration
     {
-      AmbientDeclarationRule.FunctionDeclaration(name, signature)
+      Ast.AmbientDeclaration.FunctionDeclaration(Ast.AmbientFunctionDeclaration(name, signature))
     }
     
     AmbientClassDeclaration(
       name : string,
-      typeParameters : List[ScriptTypeParameter],
+      typeParameters : List[Ast.ScriptTypeParameter],
       _ : NToken,
-      _ : NToken) : AmbientDeclarationRule
+      _ : NToken) : Ast.AmbientDeclaration
     {
-      AmbientDeclarationRule.ClassDeclaration(name, typeParameters)
+      Ast.AmbientDeclaration.ClassDeclaration(Ast.AmbientClassDeclaration(name, typeParameters))
     }
     /*
     AmbientClassBody(elements : List[TSClassMember]) : list[TSClassMember]
@@ -1154,17 +1154,17 @@ namespace TSParser
       elements.NToList()
     }
     
-    AmbientConstructorDeclaration(parms : List[ScriptParameter]) : TSClassMember
+    AmbientConstructorDeclaration(parms : List[Ast.ScriptParameter]) : TSClassMember
     {
       TSClassMember.Constructor(parms)
     }
     
-    AmbientMemberVariable(id : string, type : option[ScriptType]) : TSClassMemberPart
+    AmbientMemberVariable(id : string, type : option[Ast.ScriptType]) : TSClassMemberPart
     {
       TSClassMemberPart.Variable(id, type)
     }
 
-    ClassMemberFunctionSignature(id : string, optional : bool, parms : List[ScriptParameter], returnType : option[ScriptType]) : TSClassMemberPart
+    ClassMemberFunctionSignature(id : string, optional : bool, parms : List[Ast.ScriptParameter], returnType : option[Ast.ScriptType]) : TSClassMemberPart
     {
       TSClassMemberPart.Method(id, optional, parms, returnType)
     }
@@ -1175,14 +1175,14 @@ namespace TSParser
     }
     */
     
-    AmbientExternalModuleDeclaration(name : string, _ : NToken) : AmbientDeclarationRule
+    AmbientExternalModuleDeclaration(name : string, _ : NToken) : Ast.AmbientDeclaration
     {
-      AmbientDeclarationRule.ExternalModuleDeclaration(name)
+      Ast.AmbientDeclaration.ExternalModuleDeclaration(Ast.AmbientExternalModuleDeclaration(name, List()))
     }
     
-    AmbientModuleDeclaration(name : string , elements : NToken) : AmbientDeclarationRule
+    AmbientModuleDeclaration(name : string , elements : NToken) : Ast.AmbientDeclaration
     {
-      AmbientDeclarationRule.ModuleDeclaration(name)
+      Ast.AmbientDeclaration.ModuleDeclaration(Ast.AmbientModuleDeclaration(name, List()))
     }
    /* 
     AmbientModuleBody(elements : List[TSGlobal]) : list[TSGlobal]
@@ -1190,19 +1190,20 @@ namespace TSParser
       elements.NToList()
     }
     */
-    AmbientEnumDeclaration(name : string, members : option[List[EnumMember]]) : AmbientDeclarationRule
+    AmbientEnumDeclaration(name : string, members : option[List[Ast.EnumMember]]) : Ast.AmbientDeclaration
     {
-      AmbientDeclarationRule.EnumDeclaration(name, members.WithDefault(List()))
+      Ast.AmbientDeclaration.EnumDeclaration(
+        Ast.AmbientEnumDeclaration(name, members.WithDefault(List())))
     }
     
-    AmbientEnumBody(first : EnumMember, rest : List[EnumMember]) : List[EnumMember]
+    AmbientEnumBody(first : Ast.EnumMember, rest : List[Ast.EnumMember]) : List[Ast.EnumMember]
     {
       MakeList(first, rest)
     }
     
-    AmbientEnumMember(id : string, initialiser : option[int]) : EnumMember
+    AmbientEnumMember(id : string, initialiser : option[int]) : Ast.EnumMember
     {
-      EnumMember(id, initialiser)
+      Ast.EnumMember(id, initialiser)
     }
     
     AmbientEnumMemberInitialiser(i : NToken) : int
@@ -1228,49 +1229,50 @@ namespace TSParser
       Id(first, rest)
     }
     
-    AmbientDeclaration(value : AmbientDeclarationRule) : DeclarationElement
+    AmbientDeclaration(value : Ast.AmbientDeclaration) : Ast.DeclarationElement
     {
-      DeclarationElement.AmbientDeclaration(value)
+      Ast.DeclarationElement.AmbientDeclaration(value)
     }
     
-    ImportDeclaration(id : string, entity : string) : DeclarationElement
+    ImportDeclaration(id : string, entity : string) : Ast.DeclarationElement
     {
-      DeclarationElement.ImportDeclaration(ImportDeclarationRule(id, entity))
+      Ast.DeclarationElement.ImportDeclaration(Ast.ImportDeclaration(id, entity))
     }
     
-    ExternalImportDeclaration(id : string, moduleReference : string) : DeclarationElement
+    ExternalImportDeclaration(id : string, moduleReference : string) : Ast.DeclarationElement
     {
-      DeclarationElement.ExternalImportDeclaration(ExternalImportDeclarationRule(id, moduleReference))
+      Ast.DeclarationElement.ExternalImportDeclaration(
+        Ast.ExternalImportDeclaration(id, moduleReference))
     }
     
-    ExportModuleAssignment(id : string, moduleEntity : string) : ExportAssignmentRule
+    ExportModuleAssignment(id : string, moduleEntity : string) : Ast.ExportAssignment
     {
-      ExportAssignmentRule.Module(id, moduleEntity)
+      Ast.ExportAssignment.Module(id, moduleEntity)
     }
     
-    ExportIdentifierAssignment(id : string) : ExportAssignmentRule
+    ExportIdentifierAssignment(id : string) : Ast.ExportAssignment
     {
-      ExportAssignmentRule.Identifier(id)
+      Ast.ExportAssignment.Identifier(id)
     }
     
-    ExportAssignment(e : ExportAssignmentRule) : DeclarationElement
+    ExportAssignment(e : Ast.ExportAssignment) : Ast.DeclarationElement
     {
-      DeclarationElement.ExportAssignment(e)
+      Ast.DeclarationElement.ExportAssignment(e)
     }    
     
-    ReferencePath(_ : NToken, path : string) : ReferenceRule
+    ReferencePath(_ : NToken, path : string) : Ast.Reference
     {
-      ReferenceRule.Lib(path)
+      Ast.Reference.Lib(path)
     }
     
-    ReferenceNoDefaultLib(_ : NToken, _ : NToken) : ReferenceRule
+    ReferenceNoDefaultLib(_ : NToken, _ : NToken) : Ast.Reference
     {
-      ReferenceRule.NoDefaultLib()
+      Ast.Reference.NoDefaultLib()
     }
     
-    ReferenceElement(_ : NToken, reference : ReferenceRule, _ : NToken) : DeclarationElement
+    ReferenceElement(_ : NToken, reference : Ast.Reference, _ : NToken) : Ast.DeclarationElement
     {
-      DeclarationElement.Reference(reference)
+      Ast.DeclarationElement.Reference(reference)
     }
   }  
 }
