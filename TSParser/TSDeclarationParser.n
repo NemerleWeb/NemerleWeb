@@ -680,7 +680,7 @@ namespace TSParser
         #region Enums (9)
         
         EnumDeclaration = enum_s Identifier lbrace_s EnumBody? rbrace_s endS;
-        EnumBody /*: List[TSEnumElement]*/ =
+        EnumBody =
           ConstantEnumMember (comma_s ConstantEnumMember)* comma_s?;
         ConstantEnumMember = PropertyName (assign_s IntegerLiteral)?;
         IntegerLiteral = SignedInteger / HexIntegerLiteral;
@@ -794,28 +794,45 @@ namespace TSParser
         // Module
         AmbientModuleDeclaration : Ast.AmbientDeclaration =
           module_s IdentifierPath lbrace_s AmbientModuleBody rbrace_s;
-        AmbientModuleBody /*: List[Ast.AmbientModuleElement]*/ = AmbientModuleElement*;
-        AmbientModuleElement /*: Ast.AmbientModuleElement*/ =
+        AmbientModuleBody : List[Ast.AmbientModuleElement] = AmbientModuleElement*;
+        AmbientModuleElement : Ast.AmbientModuleElement =
           export_s?
           (
-            AmbientVariableDeclaration /
-            AmbientFunctionDeclaration /
-            AmbientClassDeclaration /
-            InterfaceDeclaration /
-            AmbientEnumDeclaration /
-            AmbientModuleDeclaration /
-            ImportDeclaration
+            AmbientVariableDeclaration_AmbientModuleElement /
+            AmbientFunctionDeclaration_AmbientModuleElement /
+            AmbientClassDeclaration_AmbientModuleElement /
+            InterfaceDeclaration_AmbientModuleElement /
+            AmbientEnumDeclaration_AmbientModuleElement /
+            AmbientModuleDeclaration_AmbientModuleElement /
+            ImportDeclaration_AmbientModuleElement
           ) endS;
+          
+        // Special translation rules for AmbientModuleElement
+        AmbientVariableDeclaration_AmbientModuleElement : Ast.AmbientModuleElement = AmbientVariableDeclaration;
+        AmbientFunctionDeclaration_AmbientModuleElement : Ast.AmbientModuleElement = AmbientFunctionDeclaration;
+        AmbientClassDeclaration_AmbientModuleElement    : Ast.AmbientModuleElement = AmbientClassDeclaration;
+        InterfaceDeclaration_AmbientModuleElement       : Ast.AmbientModuleElement = InterfaceDeclaration;
+        AmbientEnumDeclaration_AmbientModuleElement     : Ast.AmbientModuleElement = AmbientEnumDeclaration;
+        AmbientModuleDeclaration_AmbientModuleElement   : Ast.AmbientModuleElement = AmbientModuleDeclaration;
+        ImportDeclaration_AmbientModuleElement          : Ast.AmbientModuleElement = ImportDeclaration;
           
         // External
         AmbientExternalModuleDeclaration : Ast.AmbientDeclaration =
           module_s StringLiteral s lbrace_s s AmbientExternalModuleBody rbrace_s endS;
-        AmbientExternalModuleBody = AmbientExternalModuleElement*;
-        AmbientExternalModuleElement =          
-          ExportAssignment /
-          export_s? ExternalImportDeclaration /
-          AmbientModuleElement;
+        AmbientExternalModuleBody : List[Ast.AmbientExternalModuleElement] = AmbientExternalModuleElement*;
+        AmbientExternalModuleElement : Ast.AmbientExternalModuleElement =
+          ExportAssignment_AmbientExternalModuleElement /
+          export_s? ExternalImportDeclaration_AmbientExternalModuleElement /
+          AmbientModuleElement_AmbientExternalModuleElement;
           
+        // Special translation rules for AmbientExternalModuleElement
+        ExportAssignment_AmbientExternalModuleElement : Ast.AmbientExternalModuleElement =
+          ExportAssignment;
+        ExternalImportDeclaration_AmbientExternalModuleElement : Ast.AmbientExternalModuleElement =
+          ExternalImportDeclaration;
+        AmbientModuleElement_AmbientExternalModuleElement : Ast.AmbientExternalModuleElement =
+          AmbientModuleElement;
+        
         #endregion               
         
         #region Reference
@@ -1175,21 +1192,78 @@ namespace TSParser
     }
     */
     
-    AmbientExternalModuleDeclaration(name : string, _ : NToken) : Ast.AmbientDeclaration
+    AmbientExternalModuleDeclaration(
+      name : string,
+      members : List[Ast.AmbientExternalModuleElement]) : Ast.AmbientDeclaration
     {
-      Ast.AmbientDeclaration.ExternalModuleDeclaration(Ast.AmbientExternalModuleDeclaration(name, List()))
+      Ast.AmbientDeclaration.ExternalModuleDeclaration(
+        Ast.AmbientExternalModuleDeclaration(name, members))
     }
     
-    AmbientModuleDeclaration(name : string , elements : NToken) : Ast.AmbientDeclaration
+    ExportAssignment_AmbientExternalModuleElement(v : Ast.DeclarationElement) : Ast.AmbientExternalModuleElement
     {
-      Ast.AmbientDeclaration.ModuleDeclaration(Ast.AmbientModuleDeclaration(name, List()))
+      Ast.AmbientExternalModuleElement.ExportAssignment(
+        (v :> Ast.DeclarationElement.ExportAssignment).Value)
     }
-   /* 
-    AmbientModuleBody(elements : List[TSGlobal]) : list[TSGlobal]
+    
+    ExternalImportDeclaration_AmbientExternalModuleElement(v : Ast.DeclarationElement) : Ast.AmbientExternalModuleElement
     {
-      elements.NToList()
+      Ast.AmbientExternalModuleElement.ExternalImportDeclaration(
+        (v :> Ast.DeclarationElement.ExternalImportDeclaration).Value)
     }
-    */
+    
+    AmbientModuleElement_AmbientExternalModuleElement(v : Ast.AmbientModuleElement) : Ast.AmbientExternalModuleElement
+    {
+      Ast.AmbientExternalModuleElement.ModuleElement(v)
+    }
+
+    AmbientModuleDeclaration(name : string , members : List[Ast.AmbientModuleElement]) : Ast.AmbientDeclaration
+    {
+      Ast.AmbientDeclaration.ModuleDeclaration(Ast.AmbientModuleDeclaration(name, members))
+    }
+    
+    AmbientVariableDeclaration_AmbientModuleElement(v : Ast.AmbientDeclaration) : Ast.AmbientModuleElement
+    {
+      Ast.AmbientModuleElement.VariableDeclaration(
+        (v :> Ast.AmbientDeclaration.VariableDeclaration).Value)
+    }
+    
+    AmbientFunctionDeclaration_AmbientModuleElement(v : Ast.AmbientDeclaration) : Ast.AmbientModuleElement
+    {
+      Ast.AmbientModuleElement.FunctionDeclaration(
+        (v :> Ast.AmbientDeclaration.FunctionDeclaration).Value)
+    }
+    
+    AmbientClassDeclaration_AmbientModuleElement(v : Ast.AmbientDeclaration) : Ast.AmbientModuleElement
+    {
+      Ast.AmbientModuleElement.ClassDeclaration(
+        (v :> Ast.AmbientDeclaration.ClassDeclaration).Value)
+    }
+    
+    InterfaceDeclaration_AmbientModuleElement(v : Ast.DeclarationElement) : Ast.AmbientModuleElement
+    {
+      Ast.AmbientModuleElement.InterfaceDeclaration(
+        (v :> Ast.DeclarationElement.InterfaceDeclaration).Value)
+    }
+    
+    AmbientEnumDeclaration_AmbientModuleElement(v : Ast.AmbientDeclaration) : Ast.AmbientModuleElement
+    {
+      Ast.AmbientModuleElement.EnumDeclaration(
+        (v :> Ast.AmbientDeclaration.EnumDeclaration).Value)
+    }
+    
+    AmbientModuleDeclaration_AmbientModuleElement(v : Ast.AmbientDeclaration) : Ast.AmbientModuleElement
+    {
+      Ast.AmbientModuleElement.ModuleDeclaration(
+        (v :> Ast.AmbientDeclaration.ModuleDeclaration).Value)
+    }
+    
+    ImportDeclaration_AmbientModuleElement(v : Ast.DeclarationElement) : Ast.AmbientModuleElement
+    {
+      Ast.AmbientModuleElement.ImportDeclaration(
+        (v :> Ast.DeclarationElement.ImportDeclaration).Value)
+    }
+   
     AmbientEnumDeclaration(name : string, members : option[List[Ast.EnumMember]]) : Ast.AmbientDeclaration
     {
       Ast.AmbientDeclaration.EnumDeclaration(
@@ -1210,19 +1284,6 @@ namespace TSParser
     {
       int.Parse(GetText(i))
     }
-    
-    
-    
-    /*
-    
-    
-    ExportAssignment(id : string) : TSGlobal
-    {
-      TSGlobal.Export(id)
-    }
-    */
-    
-    
     
     EntityName(first : string, rest : option[string]) : string
     {
