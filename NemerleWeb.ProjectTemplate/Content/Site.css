@@ -1,0 +1,9 @@
+.welcome {
+    width: 500px;
+    padding: 0px 20px 20px 20px;
+    margin: 20px auto;
+    background-color: #e1e7ef;
+    border: 1px solid #a8b0bb;
+    color: #35383c;
+    font-family: Georgia, serif;
+}

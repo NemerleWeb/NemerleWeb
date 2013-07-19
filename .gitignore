@@ -12,7 +12,5 @@ _ReSharper.*
 packages
 
 /NemerleWeb.NugetPackage/NemerleWeb.1.0.0.nupkg
-/NemerleWeb.NugetPackage/lib/net45/NemerleWeb.Macros.dll
-/NemerleWeb.NugetPackage/lib/net45/NemerleWeb.Macros.pdb
-/NemerleWeb.NugetPackage/lib/net45/NemerleWeb.dll
-/NemerleWeb.NugetPackage/lib/net45/NemerleWeb.pdb
+/NemerleWeb.NugetPackage/lib/net45/*.dll
+/NemerleWeb.NugetPackage/lib/net45/*.pdb
