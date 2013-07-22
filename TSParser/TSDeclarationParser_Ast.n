@@ -190,6 +190,9 @@ namespace TSParser.Ast
         Name : string;
         Type : option[ScriptType];
         Access : option[MemberAccess];
+        
+        // Always true in Ambient context
+        new Optional : bool;
       }
     | Rest
       {

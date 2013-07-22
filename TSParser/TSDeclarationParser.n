@@ -1090,12 +1090,9 @@ namespace TSParser
       required.Concat(rest).ToList()
     }
     
-    // Either specification is incorrect, or compiler behaves wrong.
-    // In any case it is not possible to specify default value in ambient context right now.
-    // Therefore '_optional' is ignored assuming we have no initialiser.
-    OptionalParameter(access : option[Ast.MemberAccess], id : string, _optional : bool, type : option[Ast.ScriptType]) : Ast.ScriptParameter
+    OptionalParameter(access : option[Ast.MemberAccess], id : string, optional : bool, type : option[Ast.ScriptType]) : Ast.ScriptParameter
     {
-      Ast.ScriptParameter.Optional(id, type, access)
+      Ast.ScriptParameter.Optional(id, type, access, optional)
     }
     
     RequiredParameterList(first : Ast.ScriptParameter, rest : List[Ast.ScriptParameter]) : List[Ast.ScriptParameter]
