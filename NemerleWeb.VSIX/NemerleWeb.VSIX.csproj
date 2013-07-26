@@ -90,6 +90,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NemerleWeb.ItemTemplate\NemerleWeb.ItemTemplate.csproj">
+      <Project>{C63B6C30-7D00-4367-9B48-DF06232D3E9B}</Project>
+      <Name>NemerleWeb.ItemTemplate</Name>
+      <VSIXSubPath>ItemTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
     <ProjectReference Include="..\NemerleWeb.ProjectTemplate\NemerleWeb.ProjectTemplate.csproj">
       <Project>{290D3D2C-51B2-4286-B3EF-47F3C7607F20}</Project>
       <Name>NemerleWeb.ProjectTemplate</Name>
