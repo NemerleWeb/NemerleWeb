@@ -27,7 +27,7 @@ namespace NemerleWeb
             Right : JSAst;
             
             public override Write(indent = "" : string) : string
-            {
+            {              
               indent + $"$(Left.Write()) = $(Right.Write())";
             }
             public override Transform() : JSAst
@@ -297,7 +297,7 @@ namespace NemerleWeb
             }
           }
         | DefValue       { Name : string; Val : JSAst;
-          public override Write(indent = "" : string) : string {
+          public override Write(indent = "" : string) : string {            
             match(this)
             {
             | DefValue(name, Void) => indent + $<#var $(name.Replace(".", "_"))#>
@@ -673,8 +673,7 @@ $(indent)break;#>
             public override Write(indent = "" : string) : string {                            
               def jsparms = Parameters.Map((name, val) => $"$name: ' + JSON.stringify(nweb.utils.normalizeObjectForServer($(val.Write()))) + '");
               def callback = Callback.Write().TrimEnd(';');
-$<#
-$(indent)$$.ajax({
+$<#$$.ajax({
 $(indent)  url: '/$TypeName/$MethodName',
 $(indent)  type: 'POST',
 $(indent)  dataType: 'json',
@@ -688,8 +687,7 @@ $(indent)      $(callback)(typed);
 $(indent)
 $(indent)    nweb.invalidate();
 $(indent)  }
-$(indent)});
-#>
+$(indent)})#>
             }
         }    
         | Ternary        { Cond : JSAst; Body : JSAst; ElseBody : JSAst;
@@ -825,7 +823,7 @@ $(indent)}
             typeof(JSAst.Object),
             typeof(JSAst.Unpack),
             typeof(JSAst.GlobalRef),
-            //typeof(JSAst.Goto),
+            typeof(JSAst.ServerCall),
           ]);
         
         public static Recurse(ast : JSAst, selector : (JSAst * int) -> JSAst, currentDepth = 0 : int, topdown : bool = true) : JSAst 

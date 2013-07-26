@@ -45,12 +45,8 @@ class R
 public class Test
 {
   public this() {
-    document.body.onkeydown = Handle;
-  }
-  
-  public Handle(e : KeyboardEvent) : object
-  {
-    null
+    def xhr = server.A(i => ());
+    def st = xhr.status;
   }
   
   [Html]
@@ -62,5 +58,13 @@ public class Test
         <div></div>
        </div>
     #>
+  }
+  
+  public class Server
+  {
+    public A() : int
+    {
+      1
+    }
   }
 }

@@ -281,7 +281,8 @@ namespace NemerleWeb
         | TryFinally(body, handler) => JSAst.TryFinally(delayAssignment(body), handler)
         | Assign(l, r)     => JSAst.Assign(l, delayAssignment(r))
         | If(c, t, e)      => JSAst.If(c, delayAssignment(t), delayAssignment(e))
-        | ServerCall(m, t, ps, c) => JSAst.ServerCall(m, t, ps.Map(p => (p[0], delayAssignment(p[1]))), delayAssignment(c))
+        | ServerCall => JSAst.Assign(left, expr)
+        //| ServerCall(m, t, ps, c) => JSAst.ServerCall(m, t, ps.Map(p => (p[0], delayAssignment(p[1]))), delayAssignment(c)) //Not sure why we delay all the way to server call's closure. Will remove it if everything works as it should
         | Switch(e, cases, deflt) => JSAst.Switch(e, cases.Map(c => JSAst.SwitchCase(c.Id, delayAssignment(c.Body))), delayAssignment(deflt))
         | WhileNamed(c, b, n) => 
             def newBody =
@@ -299,7 +300,7 @@ namespace NemerleWeb
               | something => JSAst.Assign(left, delayAssignment(something))
               };
             JSAst.WhileNamed(c, newBody, n)
-        | Label(id, body) => JSAst.Label(id, delayAssignment(body))
+        | Label(id, body) => JSAst.Label(id, delayAssignment(body))        
         | Void => JSAst.Void()
         | e when JSAst.AllowedForAssignment.Contains(e.GetType()) => JSAst.Assign(left, e)
         | Undefined

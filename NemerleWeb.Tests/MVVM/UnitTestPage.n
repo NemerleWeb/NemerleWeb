@@ -1671,6 +1671,12 @@ namespace NemerleWeb.Tests
         
         !d.ContainsKey(1) && !d.ContainsKey(2)
       });
+      
+      test("server call should return XHR object", () => {
+        def xhr = server.A(res => ());   
+        
+        true
+      });
     }    
     
     [Html]
@@ -1686,6 +1692,14 @@ namespace NemerleWeb.Tests
           </tbody>
         </table>
       #>
+    }
+    
+    public class Server
+    {
+      public A() : int
+      {
+        0
+      }
     }
   }
 }
