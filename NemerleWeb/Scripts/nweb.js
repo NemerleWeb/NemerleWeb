@@ -528,7 +528,7 @@ var nweb = {
           }
           binding.oldValue = newValue.slice();
         } else {
-          if(binding.oldValue !== newValue) {
+          if (binding.oldValue !== newValue) {
             changeFound = true;
             binding.apply(newValue);
             binding.oldValue = newValue;
@@ -787,9 +787,16 @@ if (nweb["debugger"]) {
         if (r.length !== l.length)
             return false;
         for (var i = 0, len = l.length; i < len; i++)
-            if (l[i] !== r[i])
-                return false;
-        return true;
+          if (l[i] !== r[i]) {
+            if (typeof l[i] === 'undefined' && typeof r[i] !== 'undefined')
+              return false;
+            if (typeof r[i] === 'undefined' && typeof l[i] !== 'undefined')
+              return false;
+            if (nweb.utils.isArray(l[i]) && nweb.utils.isArray(r[i]))
+              return nweb.utils.areArraysEqual(l[i], r[i]);
+            return JSON.stringify(l[i]) === JSON.stringify(r[i]);
+          }
+      return true;
     };
 }
 
