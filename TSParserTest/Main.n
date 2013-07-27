@@ -42,8 +42,6 @@ module Program
   Main() : void
   {
     parseTextWithResult(<#
-declare function f(...a : Array<number>) : boolean;   
-   
     #>);
     
     foreach(f in Directory.EnumerateFiles(@"..\..\..\NemerleWeb.TypedJS\Scripts\", "*.*", SearchOption.AllDirectories))

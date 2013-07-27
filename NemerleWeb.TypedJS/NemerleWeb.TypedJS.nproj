@@ -233,6 +233,7 @@
     <Folder Include="Scripts\typings\pubsubjs\" />
     <Folder Include="Scripts\typings\qunit\" />
     <Folder Include="Scripts\typings\q\" />
+    <Folder Include="Scripts\typings\raphael\" />
     <Folder Include="Scripts\typings\requirejs\" />
     <Folder Include="Scripts\typings\restangular\" />
     <Folder Include="Scripts\typings\restify\" />
@@ -797,6 +798,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\q\Q.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\raphael\raphael.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\requirejs\require.d.ts">
