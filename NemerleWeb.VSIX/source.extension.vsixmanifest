@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="NemerleWeb.VSIX..e452766b-81fa-4b07-a10f-27e4860473f3" Version="1.0" Language="en-US" Publisher="" />
+        <Identity Id="NemerleWeb.VSIX..e452766b-81fa-4b07-a10f-27e4860473f3" Version="1.0" Language="en-US" Publisher="NemerleWeb team" />
         <DisplayName>NemerleWeb.VSIX</DisplayName>
-        <Description>Empty VSIX Project.</Description>
+        <Description xml:space="preserve">NemerleWeb extension</Description>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="11.0" />
@@ -13,5 +13,10 @@
     </Dependencies>
     <Assets>
         <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="NemerleWeb.ProjectTemplate" d:TargetPath="|NemerleWeb.ProjectTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
+        <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="NemerleWeb.ItemTemplate" d:TargetPath="|NemerleWeb.ItemTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
     </Assets>
+    <Reference Id="NuPackToolsVsix.Microsoft.67e54e40-0ae3-42c5-a949-fddf5739e7a5" MinVersion="1.7.30402.9028">
+        <Name>NuGet Package Manager</Name>
+        <MoreInfoUrl>http://docs.nuget.org/</MoreInfoUrl>
+    </Reference>
 </PackageManifest>

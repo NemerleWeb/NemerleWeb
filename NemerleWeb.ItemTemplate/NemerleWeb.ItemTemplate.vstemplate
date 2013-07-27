@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+  <TemplateData>
+    <Name>NemerleWeb page</Name>
+    <Description>NemerleWeb page</Description>
+    <Icon>NemerleWeb.ItemTemplate.ico</Icon>
+    <TemplateID>38aa44d0-ebae-4a3c-8bde-df3d1f6df29c</TemplateID>
+    <ProjectType>Nemerle</ProjectType>
+    <RequiredFrameworkVersion>4.0</RequiredFrameworkVersion>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <DefaultName>Page.n</DefaultName>
+  </TemplateData>
+  <TemplateContent>
+    <References>
+      <Reference>
+        <Assembly>System</Assembly>
+      </Reference>
+    </References>
+    <ProjectItem ReplaceParameters="true">Page.n</ProjectItem>
+  </TemplateContent>
+</VSTemplate>

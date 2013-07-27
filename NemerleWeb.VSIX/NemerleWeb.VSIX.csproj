@@ -45,11 +45,58 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\NemerleWeb.NugetPackage\NemerleWeb.1.0.0.nupkg">
+      <Link>packages\NemerleWeb.1.0.0.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\jQuery.1.6.4.nupkg">
+      <Link>packages\jQuery.1.6.4.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.1.1.2.nupkg">
+      <Link>packages\Microsoft.AspNet.SignalR.1.1.2.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.Client.1.1.2.nupkg">
+      <Link>packages\Microsoft.AspNet.SignalR.Client.1.1.2.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.Core.1.1.2.nupkg">
+      <Link>packages\Microsoft.AspNet.SignalR.Core.1.1.2.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.JS.1.1.2.nupkg">
+      <Link>packages\Microsoft.AspNet.SignalR.JS.1.1.2.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.Owin.1.1.2.nupkg">
+      <Link>packages\Microsoft.AspNet.SignalR.Owin.1.1.2.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.SystemWeb.1.1.2.nupkg">
+      <Link>packages\Microsoft.AspNet.SignalR.SystemWeb.1.1.2.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.Owin.Host.SystemWeb.1.0.1.nupkg">
+      <Link>packages\Microsoft.Owin.Host.SystemWeb.1.0.1.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\Owin.1.0.nupkg">
+      <Link>packages\Owin.1.0.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NemerleWeb.ItemTemplate\NemerleWeb.ItemTemplate.csproj">
+      <Project>{C63B6C30-7D00-4367-9B48-DF06232D3E9B}</Project>
+      <Name>NemerleWeb.ItemTemplate</Name>
+      <VSIXSubPath>ItemTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
     <ProjectReference Include="..\NemerleWeb.ProjectTemplate\NemerleWeb.ProjectTemplate.csproj">
       <Project>{290D3D2C-51B2-4286-B3EF-47F3C7607F20}</Project>
       <Name>NemerleWeb.ProjectTemplate</Name>
@@ -58,9 +105,7 @@
       <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="packages\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

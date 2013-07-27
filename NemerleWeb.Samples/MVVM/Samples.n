@@ -149,7 +149,7 @@ namespace NemerleWeb.Samples
             <li class="header">Samples</li>
             <li $foreach(s in Samples) css-selected="$(SelectedSample.Name == s.Name)"><span click="$SelectSample">$(s.Name)</span></li>
             <li class="split"></li>
-            <li class="header">KnockoutJs tutorials</li>
+            <li class="header">Samples from KnockoutJS</li>
             <li $foreach(s in KnockoutSamples) css-selected="$(SelectedSample.Name == s.Name)"><span click="$SelectSample">$(s.Name)</span></li>
             <li class="split"></li>
             <li class="header">Peg Samples</li>
