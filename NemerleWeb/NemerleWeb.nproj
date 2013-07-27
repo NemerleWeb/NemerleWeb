@@ -326,7 +326,7 @@
 	</Target>
   -->
 	<Target Name="AfterBuild">
-    <Exec Command="CreateNugetPackage.cmd" />
+    <!--<Exec Command="CreateNugetPackage.cmd" />-->
 	</Target>
 	
 </Project>
