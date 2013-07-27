@@ -12,6 +12,9 @@ using System.Linq;
 
 namespace NemerleWeb
 {
+  /// <summary>
+  /// Regular expression literal, in JS is /regexp/.
+  /// </summary>
   macro JSRegExpLiteral(str : PExpr, modifier : PExpr = null)
   syntax ("re", str, modifier)
   {
