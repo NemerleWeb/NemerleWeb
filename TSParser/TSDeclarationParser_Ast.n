@@ -1,3 +1,7 @@
+/*
+** Copyright by NN from NemerleWeb team (C) 2013
+*/
+
 using Nemerle;
 using Nemerle.Extensions;
 using Nemerle.Collections;
