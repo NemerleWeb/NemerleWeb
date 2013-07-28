@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using TSParser;
 using NemerleWeb;
 
+#if A
 namespace NemerleWeb
 {
   #region GenerateTypedJS
@@ -1058,21 +1059,5 @@ namespace NemerleWeb
   }
   
   #endregion
-  
-  #region Extensions
-  
-  internal module TypedJSStringExtensions
-  {
-    public SplitDot(this s : string) : list[string]
-    {
-      s.Split('.').NToList()
-    }
-    
-    public JoinDot(this seq : IEnumerable[string]) : string
-    {
-      string.Join(".", seq)
-    }
-  }
-  
-  #endregion
 }
+#endif

@@ -32,5 +32,15 @@ namespace NemerleWeb
     /// b.A == 1
     /// </summary>
     public New  = "<>New";
+    
+    /// <summary>
+    /// Used for indexers.    
+    /// </summary>
+    public Indexer = "<>Indexer";
+    
+    /// <summary>
+    /// Used for properties.
+    /// </summary>
+    public Property  = "<>Property";
   }
 }

@@ -1,0 +1,140 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
+using Nemerle.Compiler.Typedtree;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  /// <summary>
+  /// Imitates function call: A(...)
+  /// </summary>
+  macro JSCall(expr : PExpr)
+  syntax("jscall", expr)
+  {
+    JSSpecialImpl.DoTransformCallNew(Macros.ImplicitCTX(), expr, JSApiSpecial.Call, "jscall")
+  }
+
+  /// <summary>
+  /// Imitates new call: new A(...)
+  /// </summary>
+  macro JSNew(expr : PExpr)
+  syntax("jsnew", expr)
+  {
+    JSSpecialImpl.DoTransformCallNew(Macros.ImplicitCTX(), expr, JSApiSpecial.New, "jsnew")
+  }
+  
+  /// <summary>
+  /// Imitates indexer access: A[...]
+  /// </summary>
+  macro JSIndex(expr : PExpr)
+  syntax("jsindex", expr)
+  {
+    JSSpecialImpl.DoTransformIndexer(Macros.ImplicitCTX(), expr);
+  }
+  
+  /// <summary>
+  /// Imitates property acces: A.P
+  /// </summary>
+  macro JSProperty(expr : PExpr)
+  syntax("jsprop", expr)
+  {
+    JSSpecialImpl.DoTransformProperty(Macros.ImplicitCTX(), expr);
+  }  
+   
+  module JSSpecialImpl
+  {
+    public DoTransformCallNew(typer : Typer, expr : PExpr, jsMethodName : string, syntaxName : string) : PExpr
+    {
+      DoTransform(typer, expr, 
+        ex =>
+        match(ex)
+        {
+        | <[ $obj(..$args) ]> => Some(<[ $obj.$(jsMethodName : usesite)(..$args) ]>)
+        | _ => None()
+        },
+        $"$syntaxName obj(args)");
+    }
+    
+    public DoTransformIndexer(typer : Typer, expr : PExpr) : PExpr
+    {
+      DoTransform(
+        typer,
+        expr, 
+        ex =>
+          match(ex)
+          {
+          | <[ $obj[..$args] ]> => Some(<[ $obj.$(JSApiSpecial.Indexer : usesite)(..$args) ]>)
+          | _ => None()
+          },
+        "jsindex obj[index]");
+    }
+    
+    public DoTransformProperty(typer : Typer, expr : PExpr) : PExpr
+    {
+      DoTransform(
+        typer,
+        expr, 
+        ex =>
+          match(ex)
+          {
+          | <[ $obj.$arg ]> => 
+            def parameter = PExpr.Ref(arg.GetName());
+            Some(<[ $obj.$(JSApiSpecial.Property : usesite)($parameter) ]>)
+          | _ => None()
+          },
+        "jsprop obj.prop");
+    }
+    
+    /// <summary>
+    /// Generic transform for special js macros.
+    /// 
+    /// 'transform' is called for expression:  <[ $obj.$(jsMethodName : usesite)(..$args) ]>
+    /// </summary>
+    public DoTransform(
+      typer : Typer,
+      expr : PExpr,
+      transform : PExpr -> option[PExpr],
+      usage : string) : PExpr
+    {
+      Macros.DefineCTX(typer);
+      
+      // A(..).B(..) => A.Method(..).B(..)
+      // A(..) => A.Method(..)
+      def impl(ex)
+      {
+      | <[ $obj.$method(..$args).$nextMethod(..$nextArgs) ]> =>
+        def extractObj = impl(<[$obj.$method(..$args)]>);
+        <[ $extractObj.$nextMethod(..$nextArgs) ]>
+      
+      | <[ $obj(..$args).$nextMethod(..$nextArgs) ]> =>
+        def extractObj = impl(<[$obj(..$args)]>);
+        <[ $extractObj.$nextMethod(..$nextArgs) ]>
+        
+      | <[ $obj.$method(..$args).$nextProp ]> =>
+        def extractObj = impl(<[$obj.$method(..$args)]>);
+        <[ $extractObj.$nextProp ]>
+        
+      | <[ $obj(..$args).$nextProp ]> =>
+        def extractObj = impl(<[$obj(..$args)]>);
+        <[ $extractObj.$nextProp ]>      
+      
+      | _ =>
+        if(transform(ex) is Some(r)) r 
+        else
+        {
+          Message.Error($"$ex is incorect expression. Usage: $usage"); <[ ]>
+        }
+      }
+      
+      def ret = impl(expr);
+      ret
+    }
+  }
+}

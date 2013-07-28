@@ -213,22 +213,37 @@ namespace NemerleWeb
       // Constructor
       if(member.IsConstructor)
         JSAst.Call(JSAst.Constructor(JSClass.GetProperNameForJS(typeInfo), None()), parms);
+      
       // @() operator
       else
       if(left is JSAst.StaticMethodRef && member.Name == "()")
         parms.Head.ExternalMethodCall("", parms.Tail);
+      
       // Static method
       else
       if(left is JSAst.StaticMethodRef)
         JSClass.GetProperNameForJS(typeInfo).StaticCall(member, parms);        
+      
       // JSApiSpecial.Call
       else
       if(member.Name == JSApiSpecial.Call)
         left.ExternalMethodCall("", parms);
+      
       // JSApiSpecial.New
       else
       if(member.Name == JSApiSpecial.New)
         JSAst.Call(JSAst.Constructor(left.Write(), None()), parms);
+        
+      // JSApiSpecial.Indexer
+      else
+      if(member.Name == JSApiSpecial.Indexer)
+        JSAst.Call(JSAst.Indexer(left), parms);
+        
+      // JSApiSpecial.Property
+      else
+      if(member.Name == JSApiSpecial.Property)
+        JSAst.FieldRef(left, parms.Head.Write());
+        
       // Special members
       else
       if(member.Attributes.HasFlag(NemerleModifiers.SpecialName))
@@ -236,14 +251,18 @@ namespace NemerleWeb
         // Indexer
         if(member.Name == "get_Item" || member.Name == "set_Item")
           JSAst.ArrayIndexer(left, parms.First())
+          
         // Get property
         else
         if(member.Name.StartsWith("get_"))
           left.Field(member.Name.Substring(4));
+          
         // Set property
         else
         if(member.Name.StartsWith("set_"))
           JSAst.Assign(left.Field(member.Name.Substring(4)), parms.FirstOrDefault());
+        
+        // Default
         else
           defaultMethod();
       }      

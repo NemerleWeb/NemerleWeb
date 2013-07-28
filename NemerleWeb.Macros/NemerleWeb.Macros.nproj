@@ -113,6 +113,9 @@
     <Compile Include="EventsDSL\EventsMacros.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="GenerateJSApi\Extensions.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="GenerateJSApi\GenerateTypedJS.n">
       <SubType>Code</SubType>
     </Compile>
@@ -122,7 +125,7 @@
     <Compile Include="GenerateJSApi\JSApiRoot.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GenerateJSApi\JSCallNew.n">
+    <Compile Include="GenerateJSApi\JSSpecial.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GenerateJSApi\JSCallNewAttribute.n">
