@@ -119,6 +119,9 @@
     <Compile Include="GenerateJSApi\GenerateTypedJS.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="GenerateJSApi\GenerateTypedJSImpl.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="GenerateJSApi\JSApiImpl.n">
       <SubType>Code</SubType>
     </Compile>

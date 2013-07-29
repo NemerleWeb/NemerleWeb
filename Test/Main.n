@@ -13,6 +13,11 @@ using System.Xml.Linq;
 using NemerleWeb;
 using NemerleWeb.TypedJS;
 
+[assembly: GenerateTypedJS(
+ Root = "A",
+ Files = [ (""), ("", "") ]
+)]
+
 module Program
 {
   Main() : void
@@ -26,33 +31,10 @@ module Program
     _ = Console.ReadKey();
   }
 }
-/*
-[JSApiImpl]
-class R
-{
-  public this();
-  
-  [JSNew]
-  public @_() : R;
-  
-  [JSCall]
-  public @_() : R;
-  
-  public test() : R;
-}
-*/
+
 [Unit]
 public class Test
-{
-  public this() {
-    document.body.onkeydown = Handle;
-  }
-  
-  public Handle(e : KeyboardEvent) : object
-  {
-    null
-  }
-  
+{  
   [Html]
   public View() : string
   {
