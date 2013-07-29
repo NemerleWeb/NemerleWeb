@@ -37,10 +37,10 @@ namespace NemerleWeb
         
       // Add JSApi root
       _ = JSClassSettings.JSApiRoots.Add(args.Root);        
-        
+      
       // Step 1: PreParse
       def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
-      //def tsFilesToParse = PreParseTSAll(projectDir, args.Lib, args.Args);
+      def tsFilesToParse = PreParseTSAll(projectDir, args.Lib, args.Args);
       
       // Step 2: Parse
       //def tsAsts = tsFilesToParse.SelectMany(ParseTS);
@@ -59,15 +59,17 @@ namespace NemerleWeb
       | [<[ Root = $(root : string) ]>, <[ Files = [..$files] ]> ] with lib = ""
       | [<[ Root = $(root : string) ]>, <[ Lib = $(lib : string) ]>, <[ Files = [..$files] ]>] =>
         // Convert PExpr sequence to regular type
-        def filesArg = files.Select(
-          f => match(f)
-          {
-          | <[ $(dir : string) ]> with exclude = ""
-          | <[ ($(dir : string), $(exclude : string)) ]> => DirectoryArg(dir, exclude)
-          | _ =>
-            Message.Error("You must specify at most 1 or 2 arguments: directory and exclude pattern");
-            null
-          });
+        def filesArg =
+          files.Select(
+            f => match(f)
+            {
+            | <[ $(dir : string) ]> with exclude = ""
+            | <[ ($(dir : string), $(exclude : string)) ]> => DirectoryArg(dir, exclude)
+            | _ =>
+              Message.Error("You must specify at most 1 or 2 arguments: directory and exclude pattern");
+              null
+            })
+          .ToArray();
         GenerateArgs(root, lib, filesArg)
       | _ =>
         Message.Error("Specify Root, Files parameter and optional Lib. Files parameter must not be empty.");
@@ -76,8 +78,6 @@ namespace NemerleWeb
     }
     
     #endregion
-    
-    #if A
     
     #region PreParse
     
@@ -95,47 +95,52 @@ namespace NemerleWeb
         def isIncluded(s) { if (arg.Exclude == "") true else !re.IsMatch(s) }
       
         def fullDir = Path.Combine(projectDir, arg.Directory);          
-        try
-        {
-          def tsFiles = Directory.EnumerateFiles(fullDir, "*.d.ts", SearchOption.AllDirectories);
+        def tsFiles = Directory.EnumerateFiles(fullDir, "*.d.ts", SearchOption.AllDirectories);
 
-          foreach(tsFile when isIncluded(tsFile) in tsFiles)
-            PreParseTS(tsFile, tsFilesToParse);
-        }
-        catch
-        {
-          | _ => Message.Hint($"Directory \"$fullDir\" doesn't exist. Skipping.");
-        }
+        // Add all files and references, do not scan files twice.
+        foreach(tsFile in tsFiles)
+          when(isIncluded(tsFile) && tsFilesToParse.Add(tsFile))
+           tsFilesToParse.UnionWith(PreParseTS(tsFile).Where(_ != ""))
       }
       
       tsFilesToParse
     } 
     
-    private PreParseTS(tsFile : string, tsFilesToParse : HashSet[string]) : void
+    private PreParseTS(tsFile : string) : IEnumerable[string]
     {
-      when (tsFilesToParse.Add(tsFile))
-        match(tsParser.TryParse(File.ReadAllText(tsFile)))
+      def text =
+        try
         {
-        | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>
-          // Add file
-          _ = tsFilesToParse.Add(tsFile);
-        
-          // Check all references
-          foreach(TSGlobal.ReferencePath(path) in result)
-          {
-            def reference = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(tsFile), path));
-            _ = tsFilesToParse.Add(reference);
-          
-            PreParseTS(reference, tsFilesToParse);
-          }
-        | (pos, _) =>
-          // TODO: Add locations to parser and print here correct location in the file.
-          def text = tsParser.ParsingSource.OriginalText;
-          Message.Error(Location(tsFile, 0, 0, 0, 0), $"Failed to parse $tsFile, somewhere here: $(text.Substring(pos, 55))...");
+          File.ReadAllText(tsFile);
         }
+        catch
+        {
+          | e => Message.Hint($"Caught exception $e"); ""
+        };
+      when(text == "") yield "";
+      
+      match(tsParser.TryParse(text))
+      {
+      | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>
+        // Add file
+        yield tsFile;
+        
+        // Check all references
+        foreach(Ast.DeclarationElement.Reference(Ast.Reference.Lib(path)) in result)
+        {
+          def reference = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(tsFile), path));
+          yield reference;
+          
+          foreach(r in PreParseTS(reference)) yield r;
+        }
+      | (pos, _) =>
+        FailedParsing(tsFile, tsParser.ParsingSource.OriginalText, pos);
+      }
     }
     
     #endregion
+    
+    #if A
     
     #region Parse
     
@@ -146,19 +151,13 @@ namespace NemerleWeb
       | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>
         result
       | (pos, _) =>
-        def text = tsParser.ParsingSource.OriginalText;
-        def errorText =
-          if(pos + 55 > text.Length)
-            text.Substring(pos)
-          else
-            text.Substring(pos, 55);
-        Message.Error(Location(tsFile, 1, 1, 1, 1), $"Failed to parse $tsFile, somewhere here: $errorText...");
+        FailedParsing(tsFile, tsParser.ParsingSource.OriginalText, pos);
         null
       }
     }
     
     #endregion
-    
+        
     #region Analyze
     
     /// <summary>
@@ -991,10 +990,31 @@ namespace NemerleWeb
         t
       }
     }
+
+    private FailedParsing(tsFile : string, text : string, pos : int) : void
+    {
+      def errorText =
+        if(pos + 55 > text.Length)
+          text.Substring(pos)
+        else
+          text.Substring(pos, 55);
+      Message.Error(Location(tsFile, 1, 1, 1, 1), $"Failed to parse $tsFile, somewhere here: $errorText...");
+    }
     
     #endregion
     
+    
     #endif
+    
+    private FailedParsing(tsFile : string, text : string, pos : int) : void
+    {
+      def errorText =
+        if(pos + 55 > text.Length)
+          text.Substring(pos)
+        else
+          text.Substring(pos, 55);
+      Message.Error(Location(tsFile, 1, 1, 1, 1), $"Failed to parse $tsFile, somewhere here: $errorText...");
+    }
   }
 
   #region Data types
@@ -1011,7 +1031,7 @@ namespace NemerleWeb
   {
     public Root : string { get; }
     public Lib : string { get; }
-    public Args : IEnumerable[DirectoryArg] { get; }
+    public Args : array[DirectoryArg] { get; }
   }
   
   #endregion

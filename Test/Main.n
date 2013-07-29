@@ -15,7 +15,7 @@ using NemerleWeb.TypedJS;
 
 [assembly: GenerateTypedJS(
  Root = "A",
- Files = [ (""), ("", "") ]
+ Files = [ (@"d:\MyProjects\NemerleWeb\NemerleWeb.TypedJS\Scripts\typings") ]
 )]
 
 module Program
