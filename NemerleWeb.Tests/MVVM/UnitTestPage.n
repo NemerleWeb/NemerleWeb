@@ -1673,8 +1673,7 @@ namespace NemerleWeb.Tests
       });
       
       test("server call should return XHR object", () => {
-        def xhr = server.A(res => ());   
-        
+        def xhr = server.A(res => ());
         true
       });
     }    
