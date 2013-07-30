@@ -325,8 +325,16 @@
 	<Target Name="BeforeBuild">
 	</Target>
   -->
-	<Target Name="AfterBuild">
-    <Exec Command="CreateNugetPackage.cmd" />
-	</Target>
-	
+	<Target Name="AfterBuild" Condition="$(MSBuildProjectDirectory.ToLowerInvariant().Contains('temp')) == 'false'">
+	  <MakeDir Directories="$(MSBuildProjectDirectory)\..\NemerleWeb.NugetPackage\lib\net45" />
+	  <ItemGroup>
+	    <NemerleWebMacrosSource Include="$(MSBuildProjectDirectory)\..\NemerleWeb.Macros\bin\Debug\NemerleWeb.*" />
+		<NemerleWebTypedJSource Include="$(MSBuildProjectDirectory)\..\NemerleWeb.TypedJS\bin\Debug\NemerleWeb.*" />
+		<NemerleWebTSParserSource Include="$(MSBuildProjectDirectory)\..\TSParser\bin\Debug\TSParser.*.*" />		
+	  </ItemGroup>
+	  <Copy SourceFiles="@(NemerleWebMacrosSource)" DestinationFolder="$(MSBuildProjectDirectory)\..\NemerleWeb.NugetPackage\lib\net45" SkipUnchangedFiles="True" />
+	  <Copy SourceFiles="@(NemerleWebTypedJSource)" DestinationFolder="$(MSBuildProjectDirectory)\..\NemerleWeb.NugetPackage\lib\net45" SkipUnchangedFiles="True" />
+	  <Copy SourceFiles="@(NemerleWebTSParserSource)" DestinationFolder="$(MSBuildProjectDirectory)\..\NemerleWeb.NugetPackage\lib\net45" SkipUnchangedFiles="True" />
+      <Exec Command="&quot;$(MSBuildProjectDirectory)\..\.nuget\nuget&quot; pack &quot;$(MSBuildProjectDirectory)\..\NemerleWeb.NugetPackage\NemerleWeb.nuspec&quot; -OutputDirectory &quot;$(MSBuildProjectDirectory)\..\NemerleWeb.NugetPackage&quot;" />
+	</Target>	
 </Project>
