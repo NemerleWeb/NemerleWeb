@@ -77,7 +77,7 @@ namespace NemerleWeb
         match (call)
         {
         | Call(MethodRef(obj = Call(MethodRef(meth = serverMeth, obj = obj), _, _), meth = meth), parms, _)
-          when serverMeth.Name == "get_server" && obj is TExpr.This =>
+          when serverMeth.Name == "get_server" && (obj is TExpr.This || obj is TExpr.FieldMember) =>
             def parameters =
               if (parms.Length > 0) parms.Zip(meth.GetParameters()).Take(parms.Length - 1).Map((cp, mp) => (mp.name, builder'(cp.expr)))
               else [];
@@ -291,15 +291,14 @@ namespace NemerleWeb
         JSAst.Call(left, parms)
       else
       {
-        when (typeInfo != null &&
-          !(typeInfo.IsAbstract ||
-            typeInfo.IsInterface ||
-            typeInfo.GetSuperTypes().Any(t => t.TryRequire(JSClass.IPageType)) ||
-            member.Name == "apply" ||
-            member.Name == "apply_void"))
-          Message.Error(
-            member.Location,
-            $"Invalid method $(member.Name) in $(TypeName(typeInfo)), params: ..$parms not implemented in JS");
+        when (typeInfo != null && !(typeInfo.IsAbstract ||
+                                    typeInfo.IsInterface ||
+                                    typeInfo.GetSuperTypes().Any(t => t.TryRequire(JSClass.IPageType)) ||
+                                    member.Name == "apply" ||
+                                    member.Name == "apply_void")) {
+          Message.Error(member.Location, 
+                        $"Invalid method $(member.Name) in $(TypeName(typeInfo)), params: ..$parms not implemented in JS");
+        }
           
         left.MethodCall(member, parms)
       }

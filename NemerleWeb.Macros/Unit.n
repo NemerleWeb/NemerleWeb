@@ -174,9 +174,10 @@ namespace NemerleWeb
             def allParms = fparms.Append([<[ parameter: _callback : Action[$(method.ReturnType : typed)] ]>]);
                   
             proxy.Define(<[ decl:                   
-              public new $(methodName : name) (..$(allParms)) : void
+              public new $(methodName : name) (..$(allParms)) : NemerleWeb.TypedJS.XMLHttpRequest
               {
                 IgnoreParams();
+                throw ClientCodeCalledInServerException();
               }
             ]>);
           }

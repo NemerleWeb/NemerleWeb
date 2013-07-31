@@ -17,7 +17,8 @@ namespace NemerleWeb.Tests
     Results : List[(string * bool)] { get; set; }
     
     public this() 
-    {      
+    {    
+    /*
        server.TestPrimitive("123", result => {
          Results.Add(("Test primitive", result == "123"));
        });
@@ -41,6 +42,7 @@ namespace NemerleWeb.Tests
          def res = result.Dummy.Name == "Peter" && result.Dummy.Age == 45;
          Results.Add(("Test object with nested objects", res));
        });
+       */
     }
     
     [Html]
