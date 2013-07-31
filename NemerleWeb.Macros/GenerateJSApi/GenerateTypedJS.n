@@ -739,7 +739,7 @@ namespace NemerleWeb
   
     private CreateTSGlobalConstruct(_c : TSGlobal.Construct, _typesScope : Scope) : void
     {
-      Message.Hint("TSGlobal.Construct is not supported");
+      //Message.Hint("TSGlobal.Construct is not supported");
     }
     
     private CreateTSGlobalEnum(tsEnum : TSGlobal.Enum, typesScope : Scope) : void
@@ -750,12 +750,12 @@ namespace NemerleWeb
   
     private CreateTSGlobalImport(_i : TSGlobal.Import, _typesScope : Scope) : void
     {
-      Message.Hint("TSGlobal.Import is not supported");
+      //Message.Hint("TSGlobal.Import is not supported");
     }
   
     private CreateTSGlobalExport(_e : TSGlobal.Export, _typesScope : Scope) : void
     {
-      Message.Hint("TSGlobal.Export is not supported");
+      //Message.Hint("TSGlobal.Export is not supported");
     }
   
     private CreateTSGlobalModule(tsModule : TSGlobal.Module, typesScope : Scope, types : bool, typeMembers : bool) : void
