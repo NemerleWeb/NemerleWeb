@@ -1,0 +1,332 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Nemerle.Imperative;
+using Nemerle.Macros;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
+using Nemerle.Collections;
+using Nemerle.Utility;
+using Nemerle.Assertions;
+using System.IO;
+using System.Text.RegularExpressions;
+using TSParser;
+using TSParser.Ast;
+using NemerleWeb;
+
+namespace NemerleWeb
+{
+  /// <summary>
+  /// Description of TSAnalyzer.
+  /// </summary>
+  internal module TSAnalyzer
+  {    
+    public AnalyzeTSAst(tsAsts : IEnumerable[DeclarationElement]) : IEnumerable[DeclarationElement]
+    {
+      def filter(ast : DeclarationElement) : bool
+      {        
+        | DeclarationElement.InterfaceDeclaration => true
+        | DeclarationElement.AmbientDeclaration(v) =>
+          match(v)
+          {
+          | AmbientDeclaration.VariableDeclaration
+          | AmbientDeclaration.FunctionDeclaration
+          | AmbientDeclaration.ClassDeclaration
+          | AmbientDeclaration.EnumDeclaration
+          | AmbientDeclaration.ModuleDeclaration => true
+          | AmbientDeclaration.ExternalModuleDeclaration => false
+          }
+        | DeclarationElement.Reference
+        | DeclarationElement.ExportAssignment
+        | DeclarationElement.ExternalImportDeclaration
+        | DeclarationElement.ImportDeclaration => false
+      }
+      def group(ast : DeclarationElement) : Type * string
+      {
+         def name =
+          match(ast)
+          {
+          | _ => ""
+          };
+        
+        // Group by type and name
+        (ast.GetType(), name)
+      }
+      
+      tsAsts
+    }
+   #if A   
+    /// <summary>
+    /// Take all elements and remove duplicates
+    /// </summary>
+    public AnalyzeTSAst(tsAsts : IEnumerable[Ast.DeclarationElement]) : IEnumerable[Ast.DeclarationElement]
+    {
+      def filter(ast)
+      {
+        | TSGlobal.Variable 
+        | TSGlobal.Construct
+        | TSGlobal.Function
+        | TSGlobal.Class 
+        | TSGlobal.Interface
+        | TSGlobal.Module
+        | TSGlobal.Enum => true
+        | TSGlobal.Import 
+        | TSGlobal.Export
+        | _ => false
+      }
+      def group(ast)
+      {
+        def name =
+          match(ast)
+          {
+          | TSGlobal.Variable  as v => v.Name
+          | TSGlobal.Construct      => ""
+          | TSGlobal.Function  as f => f.Name ?? ""
+          | TSGlobal.Class     as c => c.Name
+          | TSGlobal.Interface as i => i.Name
+          | TSGlobal.Module    as m => m.Name
+          | TSGlobal.Enum      as e => e.Name
+          | _ => ""
+          };
+        // Group by type and name
+        (ast.GetType(), name)
+      }
+      def select(typeAndNameGroup)
+      {
+        def type = typeAndNameGroup.Key[0];
+        
+        if(type.Equals(typeof(TSGlobal.Class)))
+        {
+          AnalyzeClass(typeAndNameGroup.Cast.[TSGlobal.Class]())
+        }
+        else
+        if(type.Equals(typeof(TSGlobal.Interface)))
+        {
+          AnalyzeInterface(typeAndNameGroup.Cast.[TSGlobal.Interface]())
+        }
+        else
+        if(type.Equals(typeof(TSGlobal.Module)))
+        {
+          AnalyzeModule(typeAndNameGroup.Cast.[TSGlobal.Module]())
+        }
+        else
+        if(type.Equals(typeof(TSGlobal.Enum)))
+        {
+          AnalyzeEnum(typeAndNameGroup.Cast.[TSGlobal.Enum]())
+        }
+        else
+        if(type.Equals(typeof(TSGlobal.Function)))
+        {
+          AnalyzeFunction(typeAndNameGroup.Cast.[TSGlobal.Function]())
+        }
+        // By default take first and skip others        
+        else
+        {
+          [typeAndNameGroup.First()]
+        }
+      }
+      
+      tsAsts.Where(filter).GroupBy(group).SelectMany(select)
+    }
+   
+    /// <summary>
+    /// Unite
+    /// </summary>
+    private AnalyzeClass(ast : IEnumerable[TSGlobal.Class]) : IEnumerable[TSGlobal]
+    {
+      def name = ast.First().Name;
+      // Extends can be only once
+      def firstExtends = ast.FirstOrDefault(c => c.Extends.IsSome);
+      def extends = if(firstExtends != null) firstExtends.Extends else None();
+      // Implements is not limited
+      def @implements = ast.SelectMany(c => c.Implements).Distinct().NToList();
+      
+      def members = ast
+        .SelectMany(a => a.Members)
+        .Distinct(TSClassMemberEqualityComparer())
+        .NToList();
+      
+      def ret = TSGlobal.Class(name, extends, @implements, members);
+      [ret]
+    }
+    
+    /// <summary>
+    /// Unite
+    /// </summary>
+    private AnalyzeInterface(ast : IEnumerable[TSGlobal.Interface]) : IEnumerable[TSGlobal]
+    {
+      def name = ast.First().Name;
+      
+      // Extends is not limited
+      def extends = ast.SelectMany(_.Extends).Distinct().NToList();
+      
+      def members = ast
+        .SelectMany(a => a.Type.Members.SelectMany(AnalyzeTSObject))
+        .Distinct(TSObjectEqualityComparer())
+        .NToList();
+      def @type = TSType.Object(members);
+      
+      def ret = TSGlobal.Interface(name, extends, @type);
+      [ret]
+    }
+    
+    private AnalyzeTSObject(obj : TSObject) : IEnumerable[TSObject]
+    {
+      | Call as c =>
+        def calls = AnalyzeOverloads(c.Params)
+          .Select(p => TSObject.Call(p, c.ReturnType));
+        foreach(res in calls) yield res;
+      
+      | Construct as c =>
+        def constructs = AnalyzeOverloads(c.Params)
+          .Select(p => TSObject.Construct(p, c.Type));
+        foreach(res in constructs) yield res;
+      
+      | Function as f => 
+        def funcs = AnalyzeOverloads(f.Params)
+          .Select(p => TSObject.Function(f.Name, f.Optional, p, f.ReturnType));
+        foreach(res in funcs) yield res;
+        
+      | Index
+      | Property => yield obj
+    }
+    
+    /// <summary>
+    /// Unite
+    /// </summary>
+    private AnalyzeModule(ast : IEnumerable[TSGlobal.Module]) : IEnumerable[TSGlobal]
+    {
+      def name = ast.First().Name;
+      def members = ast.SelectMany(a => AnalyzeTSAst(a.Members)).NToList();
+      
+      def ret = TSGlobal.Module(name, members);
+      [ret]
+    }
+    
+    /// <summary>
+    /// Unite
+    /// </summary>
+    private AnalyzeEnum(ast : IEnumerable[TSGlobal.Enum]) : IEnumerable[TSGlobal]
+    {
+      def name = ast.First().Name;
+      def elements = ast.SelectMany(a => a.Elements).NToList();
+      
+      def ret = TSGlobal.Enum(name, elements);
+      [ret]
+    }
+    
+    /// <summary>
+    /// Generate overloads
+    /// </summary>
+    private AnalyzeFunction(ast : IEnumerable[TSGlobal.Function]) : IEnumerable[TSGlobal]
+    {
+      def name = ast.First().Name;
+      
+      def ret = ast
+        .SelectMany(f =>
+          AnalyzeOverloads(f.Params).Select(p => TSGlobal.Function(name, p, f.ReturnType)))
+        .Distinct(TSGlobalFunctionEqualityComparer());
+        
+      ret
+    }
+    
+    /// <summary>
+    /// Create all possible overloads according to the rules
+    /// Go through all parameters and start generating overloads if needed
+    /// <note>This method removes all elements from the list.</note>
+    /// </summary>
+    private AnalyzeOverloadsList(parms : List[TSParam]) : IEnumerable[list[TSParam]]
+    {
+      if(parms.Count == 0)
+        yield []
+      else
+        match(parms.Last())
+        {
+        // Required
+        // Generate parameters and stop
+        | TSParam.Required
+        | TSParam.Option(_, false, _, _) =>
+          yield parms.NToList();
+        
+        // Option or Rest
+        // Generate all parameters, process all without last parameter
+        | TSParam.Option(_, true, _, _)
+        | TSParam.Rest =>
+          yield parms.NToList();
+          
+          // Remove last param
+          parms.RemoveAt(parms.Count - 1);
+          foreach(res in AnalyzeOverloadsList(parms))
+            yield res;
+        }
+    }
+    
+    /// <summary>
+    /// Analyze lambda arguments and create Action/Func overload if return type is any.
+    /// </summary>
+    private AnalyzeLambdaOverloads(parms : List[TSParam]) : IEnumerable[list[TSParam]]
+    {
+      if(parms.Count == 0)
+        []
+      else
+        AnalyzeLambdaOverloadsImpl(parms, 0)
+    }
+    
+    private AnalyzeLambdaOverloadsImpl(parms : List[TSParam], index : int) : IEnumerable[list[TSParam]]
+    {
+      if(index < parms.Count) 
+      {
+        def parmsOverload = 
+          match(parms[index])
+          {
+          | TSParam.Required(_, Some(TSType.Lambda(_, TSType.Any) as l), _) as p =>
+            AnalyzeLambdaOverloadsImplGenerate(
+              parms,
+              index,
+              () => TSParam.Required(p.Name, Some(TSType.Lambda(l.Params, TSType.Void())), p.Access))
+          | TSParam.Option(_, _, Some(TSType.Lambda(_, TSType.Any) as l ), _) as p =>
+            AnalyzeLambdaOverloadsImplGenerate(
+              parms,
+              index,
+              () => TSParam.Option(p.Name, p.Optional, Some(TSType.Lambda(l.Params, TSType.Void())), p.Access))
+          | TSParam.Rest(_, TSType.Array(TSType.Lambda(_, TSType.Any) as l, rank)) as p =>
+            AnalyzeLambdaOverloadsImplGenerate(
+              parms,
+              index,
+              () => TSParam.Rest(p.Name, TSType.Array(TSType.Lambda(l.Params, TSType.Void()), rank)))
+          | _ =>
+            AnalyzeLambdaOverloadsImpl(parms, index + 1)
+          };
+          
+        foreach(res in parmsOverload) yield res;
+      }
+      else
+        yield parms.NToList();
+    }
+    
+    private AnalyzeLambdaOverloadsImplGenerate(
+      parms : List[TSParam],
+      index : int,
+      f : void -> TSParam) : IEnumerable[list[TSParam]]
+    {
+      // Original parameters
+      foreach(res in AnalyzeLambdaOverloadsImpl(parms, index + 1)) yield res;
+      
+      // New parameters with permutation for lambda parameters
+      def newParms = List(parms);
+      newParms[index] = f();
+        
+      foreach(res in AnalyzeLambdaOverloadsImpl(newParms, index + 1)) yield res;
+    }
+    
+    private AnalyzeOverloads(parms : list[TSParam]) : IEnumerable[list[TSParam]]
+    {
+      def res = AnalyzeLambdaOverloads(parms.ToList()).ToList();
+      def res = res.SelectMany(parms => AnalyzeOverloadsList(parms.ToList()));
+      res
+    }
+    
+    #endif
+  }
+}

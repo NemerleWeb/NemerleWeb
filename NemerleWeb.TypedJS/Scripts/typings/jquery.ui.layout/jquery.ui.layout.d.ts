@@ -4,7 +4,7 @@
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
 /// <reference path="../jquery/jquery.d.ts"/>
-/// <reference path="../jqueryui/jquery.ui.d.ts"/>
+/// <reference path="../jqueryui/jqueryui.d.ts"/>
 
 interface JQueryLayoutOptions {
     north: any;

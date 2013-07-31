@@ -137,6 +137,12 @@
     <Compile Include="GenerateJSApi\Scope.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="GenerateJSApi\TSAnalyzer.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GenerateJSApi\TSGenerator.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="HtmlMacro\XmlAst.n">
       <SubType>Code</SubType>
     </Compile>
