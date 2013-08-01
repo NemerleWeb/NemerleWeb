@@ -1,0 +1,30 @@
+﻿using Nemerle;
+using Nemerle.Extensions;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NemerleWeb;
+
+namespace NemerleWeb.NemerleWeb.Website
+{  
+  [Unit]
+  public class MainPage
+  {              
+    [Html]
+    public View() : string
+    {
+      <#
+        <div class="welcome">
+          <h1>This is a page created using Beyond Framework</h1>
+          You just started a new project using Beyond. 
+          To add logic, go to MVVM/MainPage.n file, remove unnecessary code and add yours.
+          For help, please refer to <a href="https://github.com/NemerleWeb/NemerleWeb">github page</a>.
+        </div>
+      #>
+    }
+  }
+}
