@@ -197,13 +197,16 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.6.4-vsdoc.js">
+    <Content Include="Scripts\jquery-1.9.1.intellisense.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.6.4.js">
+    <Content Include="Scripts\jquery-1.9.1.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.6.4.min.js">
+    <Content Include="Scripts\jquery-1.9.1.min.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery-1.9.1.min.map">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\jquery.signalR-1.1.2.js">

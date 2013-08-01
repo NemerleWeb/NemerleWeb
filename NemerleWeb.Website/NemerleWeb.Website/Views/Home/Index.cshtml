@@ -2,4 +2,19 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@Html.Raw(Model)
+<div class="jumbotron">
+    <h1>Nemerle Web</h1>
+    <p class="lead">
+        NemerleWeb is a reactive web application framework similar to AngularJS, Meteor and others. 
+        There are some things that are different though:
+    </p>
+    <ul class="feature-list">
+        <li>It's meant to be used with <a href="http://www.nemerle.org">Nemerle</a>, most powerful .NET language</li>
+        <li>Models are the same on server and client, kinda like with NodeJS</li>
+        <li>Communication with server is seamless. No serialization, no mapping.</li>
+        <li>Integrated SignalR support for duplex communication (again, seamless)</li>
+        <li>You can write macros to abstract commonly used code patterns</li>
+        <li>It's much nicer to look at :)</li>
+    </ul>
+    <p><a class="btn btn-large btn-success" href="#">Try it!</a></p>
+</div>
