@@ -58,6 +58,11 @@
             <SpecificVersion>False</SpecificVersion>
             <HintPath>$(Nemerle)\Nemerle.ComputationExpressions.dll</HintPath>
         </Reference>
+        <Reference Include="Nemerle.ComputationExpressions">
+            <Name>Nemerle.Peg</Name>
+            <SpecificVersion>False</SpecificVersion>
+            <HintPath>$(Nemerle)\Nemerle.Peg.dll</HintPath>
+        </Reference>
         <Reference Include="mscorlib" />
         <Reference Include="Microsoft.CSharp" />
         <Reference Include="System" />
@@ -180,6 +185,12 @@
         <MacroReference Include="NemerleWeb.Macros">
             <Private>True</Private>
             <HintPath>$nugetpackagesfolder$NemerleWeb.1.0.0\lib\net45\NemerleWeb.Macros.dll</HintPath>
+        </MacroReference>
+        <MacroReference Include="NemerleWeb.Peg.Macros">
+            <Name>Nemerle.Peg.Macros</Name>
+            <AssemblyName>Nemerle.Peg.Macros.dll</AssemblyName>
+            <HintPath>$(Nemerle)\Nemerle.Peg.Macros.dll</HintPath>
+            <Private>False</Private>
         </MacroReference>
         <MacroReference Include="Nemerle.ComputationExpressions.Macros">
             <Name>Nemerle.ComputationExpressions.Macros</Name>
