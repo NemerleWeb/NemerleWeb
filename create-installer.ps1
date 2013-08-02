@@ -23,5 +23,5 @@ if(test-path .\PSTools\Installer\AllTools.zip) {
 
 .\7z a -tzip PSTools\Installer\AllTools.zip .\PSTools\*
 
-copy .\7z.exe .\PSTools\Installer
+copy .\7z.* .\PSTools\Installer
 copy .\PSTools\standalone-install.ps1 .\PSTools\Installer
