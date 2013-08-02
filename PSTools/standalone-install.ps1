@@ -31,8 +31,13 @@ if(test-path 'HKLM:\Software\Microsoft\VisualStudio\11.0') {
 	$webClient.DownloadFile('http://www.nemerleweb.com/installer/NemerleWeb.VSIX.vsix', $vsixPath)
 	$vsInstallDir = (get-itemproperty 'HKLM:\Software\Microsoft\VisualStudio\11.0').InstallDir
 	$vsixInstaller = join-path $vsInstallDir VSIXInstaller.exe
+	$installCmd = "'" + $vsixInstaller + "' /q " + $vsixPath
 
-	iex "$vsixInstaller /q $vsixPath"
+	& "$vsixInstaller" /q $vsixPath
+
+	write-host "Visual Studio extension installed" -ForegroundColor Green
+} else {
+	write-host "You don't have Visual Studio 2012 installed, skippin extension installation" -ForegroundColor Yellow
 }
 
 pop-location
