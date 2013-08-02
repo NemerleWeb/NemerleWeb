@@ -21,7 +21,7 @@ if(test-path .\PSTools\Installer\AllTools.zip) {
     Remove-Item .\PSTools\Installer\AllTools.zip
 }
 
-.\7z a -tzip PSTools\Installer\AllTools.zip .\PSTools\*
+.\7z a -tzip NemerleWeb.Website\Installer\AllTools.zip .\PSTools\*
 
-copy .\7z.* .\PSTools\Installer
-copy .\PSTools\standalone-install.ps1 .\PSTools\Installer
+copy .\7z.* .\NemerleWeb.Website\Installer
+copy .\PSTools\standalone-install.ps1 .\NemerleWeb.Website\Installer
