@@ -6,12 +6,15 @@ push-location $installPath
 
 #download 7z.exe and 7z.dll
 $webClient = new-object net.webclient
+
+write-host "Dowdnloading installer files..."
 $webClient.DownloadFile('http://www.nemerleweb.com/installer/7z.exe', (join-path $installPath "7z.exe"))
 $webClient.DownloadFile('http://www.nemerleweb.com/installer/7z.dll', (join-path $installPath "7z.dll"))
 
 #download AllTools.zip
 $webClient.DownloadFile('http://www.nemerleweb.com/installer/AllTools.zip', (join-path $installPath ".\AllTools.zip"))
 
+write-host "Unpacking..."
 .\7z x -tzip AllTools.zip -y | out-null
 .\7z e -tzip ItemTemplate.zip -y | out-null
 .\7z x -tzip ProjectTemplate.zip -y | out-null
