@@ -1,3 +1,10 @@
+if(-not (test-path .\NemerleWeb.VSIX\bin\Debug\NemerleWeb.VSIX.vsix)) {
+    $msbuild = "$env:SystemRoot\Microsoft.NET\Framework\v4.0.30319\msbuild.exe"
+    iex "$msbuild NemerleWeb.VSIX.sln"
+}
+
+copy .\NemerleWeb.VSIX\bin\Debug\NemerleWeb.VSIX.vsix NemerleWeb.Website\Installer\
+
 if(test-path .\NemerleWeb.ProjectTemplate\bin) {
     Remove-Item .\NemerleWeb.ProjectTemplate\bin -Force -Recurse
 }
