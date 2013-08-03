@@ -17,7 +17,7 @@ namespace $rootnamespace$
     public View() : string
     {
        <#
-         <div>Add html here</div>
+         <div>Your html here</div>
        #>
     }
   }

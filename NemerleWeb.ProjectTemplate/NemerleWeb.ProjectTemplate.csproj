@@ -63,6 +63,7 @@
     <None Include="ProjectTemplate.nproj" />
     <None Include="NemerleWeb.ProjectTemplate.ico" />
     <None Include="Properties\AssemblyInfo.n" />
+    <None Include="Scripts\jquery-1.10.1.min.map" />
     <None Include="Views\Home\Index.cshtml" />
     <None Include="Views\Shared\Error.cshtml" />
     <None Include="Views\Shared\_Layout.cshtml" />
@@ -75,8 +76,11 @@
   <ItemGroup>
     <VSTemplate Include="NemerleWeb.ProjectTemplate.vstemplate" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Scripts\" />
+    <None Include="Scripts\jquery-1.10.1.intellisense.js" />
+    <None Include="Scripts\jquery-1.10.1.js" />
+    <None Include="Scripts\jquery-1.10.1.min.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
