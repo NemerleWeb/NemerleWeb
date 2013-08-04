@@ -1,3 +1,10 @@
+if(-not (test-path .\NemerleWeb.VSIX\bin\Debug\NemerleWeb.VSIX.vsix)) {
+    $msbuild = "$env:SystemRoot\Microsoft.NET\Framework\v4.0.30319\msbuild.exe"
+    iex "$msbuild NemerleWeb.VSIX.sln"
+}
+
+copy .\NemerleWeb.VSIX\bin\Debug\NemerleWeb.VSIX.vsix NemerleWeb.Website\Installer\
+
 if(test-path .\NemerleWeb.ProjectTemplate\bin) {
     Remove-Item .\NemerleWeb.ProjectTemplate\bin -Force -Recurse
 }
@@ -17,11 +24,11 @@ if(test-path .\NemerleWeb.ItemTemplate\obj) {
 .\7z a -tzip PSTools\ProjectTemplate.zip .\NemerleWeb.ProjectTemplate
 .\7z a -tzip PSTools\ItemTemplate.zip .\NemerleWeb.ItemTemplate\Page.n
 
-if(test-path .\PSTools\Installer\AllTools.zip) {
-    Remove-Item .\PSTools\Installer\AllTools.zip
+if(test-path .\NemerleWeb.Website\Installer\AllTools.zip) {
+    Remove-Item .\NemerleWeb.Website\Installer\AllTools.zip
 }
 
-.\7z a -tzip PSTools\Installer\AllTools.zip .\PSTools\*
+.\7z a -tzip NemerleWeb.Website\Installer\AllTools.zip .\PSTools\*
 
-copy .\7z.exe .\PSTools\Installer
-copy .\PSTools\standalone-install.ps1 .\PSTools\Installer
+copy .\7z.* .\NemerleWeb.Website\Installer
+copy .\PSTools\standalone-install.ps1 .\NemerleWeb.Website\Installer
