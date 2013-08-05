@@ -2,10 +2,24 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NemerleWeb.VSIX", "NemerleWeb.VSIX\NemerleWeb.VSIX.csproj", "{47789AB8-5ACC-47DA-BDF7-78A47286A1E3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B1454534-CABD-4ABE-CC8E-DDFF34F51B14} = {B1454534-CABD-4ABE-CC8E-DDFF34F51B14}
+		{65C01C91-F57A-4281-B09F-15BAA5AC3CC6} = {65C01C91-F57A-4281-B09F-15BAA5AC3CC6}
+		{B1635FEA-C0CD-4C8E-A18E-D97D59F21B14} = {B1635FEA-C0CD-4C8E-A18E-D97D59F21B14}
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14} = {ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NemerleWeb.ProjectTemplate", "NemerleWeb.ProjectTemplate\NemerleWeb.ProjectTemplate.csproj", "{290D3D2C-51B2-4286-B3EF-47F3C7607F20}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NemerleWeb.ItemTemplate", "NemerleWeb.ItemTemplate\NemerleWeb.ItemTemplate.csproj", "{C63B6C30-7D00-4367-9B48-DF06232D3E9B}"
+EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb", "NemerleWeb\NemerleWeb.nproj", "{B1635FEA-C0CD-4C8E-A18E-D97D59F21B14}"
+EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Macros", "NemerleWeb.Macros\NemerleWeb.Macros.nproj", "{B1454534-CABD-4ABE-CC8E-DDFF34F51B14}"
+EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.TypedJS", "NemerleWeb.TypedJS\NemerleWeb.TypedJS.nproj", "{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}"
+EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "TSParser", "TSParser\TSParser.nproj", "{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +39,22 @@ Global
 		{C63B6C30-7D00-4367-9B48-DF06232D3E9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C63B6C30-7D00-4367-9B48-DF06232D3E9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C63B6C30-7D00-4367-9B48-DF06232D3E9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1635FEA-C0CD-4C8E-A18E-D97D59F21B14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1635FEA-C0CD-4C8E-A18E-D97D59F21B14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1635FEA-C0CD-4C8E-A18E-D97D59F21B14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1635FEA-C0CD-4C8E-A18E-D97D59F21B14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1454534-CABD-4ABE-CC8E-DDFF34F51B14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1454534-CABD-4ABE-CC8E-DDFF34F51B14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1454534-CABD-4ABE-CC8E-DDFF34F51B14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1454534-CABD-4ABE-CC8E-DDFF34F51B14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65C01C91-F57A-4281-B09F-15BAA5AC3CC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

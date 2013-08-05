@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css">
+    <script src="@Url.Action("NemerleWebJs", "NemerleWebResource")" type="text/javascript"></script>
+    <script src="/signalr/hubs" type="text/javascript"></script>
+
+</head>
+<body>
+    <div class="container-narrow">
+        <div class="header">
+            <ul class="nav nav-pills pull-right">
+                <li class="active"><a href="#">Try</a></li>
+                <li><a href="#">Documentation</a></li>
+                <li><a href="#">Github repo</a></li>
+                <li><a href="#">Need help?</a></li>
+            </ul>
+            <h2 class="text-muted">Nemerle Web</h2>
+        </div>
+        
+        @RenderBody()
+    </div>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/js/bootstrap.min.js"></script>
+</body>
+</html>

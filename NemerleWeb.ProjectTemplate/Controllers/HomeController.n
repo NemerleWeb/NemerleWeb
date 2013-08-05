@@ -7,7 +7,7 @@ using System.Web.Mvc;
 using Nemerle;
 using NemerleWeb;
 
-namespace NemerleWeb.$safeprojectname$.Controllers
+namespace $safeprojectname$.Controllers
 {
   public class HomeController : Controller
   {

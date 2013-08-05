@@ -15,7 +15,6 @@
     <AssemblyName>NemerleWeb.Website</AssemblyName>
     <MvcBuildViews>false</MvcBuildViews>
     <NemerleVersion>Net-4.0</NemerleVersion>
-    <NemerleBinPathRoot Condition=" '$(Configuration)' == 'Release' ">$(SolutionDir)\Nemerle</NemerleBinPathRoot>
     <NemerleBinPathRoot Condition=" '$(NemerleBinPathRoot)' == '' ">$(ProgramFiles)\Nemerle</NemerleBinPathRoot>
     <Nemerle Condition=" '$(Nemerle)' == '' ">$(NemerleBinPathRoot)\$(NemerleVersion)</Nemerle>
     <NoStdLib>true</NoStdLib>
@@ -197,13 +196,16 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.6.4-vsdoc.js">
+    <Content Include="Scripts\jquery-1.9.1.intellisense.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.6.4.js">
+    <Content Include="Scripts\jquery-1.9.1.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.6.4.min.js">
+    <Content Include="Scripts\jquery-1.9.1.min.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery-1.9.1.min.map">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\jquery.signalR-1.1.2.js">
@@ -255,7 +257,8 @@
     </MacroReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
