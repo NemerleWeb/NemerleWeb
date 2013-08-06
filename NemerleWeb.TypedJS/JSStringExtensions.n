@@ -9,6 +9,9 @@ using System.Linq;
 
 namespace NemerleWeb.TypedJS
 {
+  // HACK: Remove
+  public class RegExp {}
+  
   public module JSStringExtensions
   {
     public Replace(this str : string, reg : RegExp, replacement : string) : string
