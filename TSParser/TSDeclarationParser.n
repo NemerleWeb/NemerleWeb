@@ -489,6 +489,7 @@ namespace TSParser
           ("any" / "number" / "boolean" / "bool" / "string" / "void");
         
         TypeReference : Ast.ScriptType = !(PredefinedType s) TypeName TypeArguments?;
+        TypeReferenceRef : Ast.ScriptType.Ref = TypeReference;
         TypeName : string = Identifier (dot_s Identifier)*;        
         ModuleName : string = TypeName;
         
@@ -632,10 +633,10 @@ namespace TSParser
         
         InterfaceDeclaration : Ast.DeclarationElement =
           interface_s Identifier TypeParametersOpt InterfaceExtendsClause? ObjectTypeStrict;
-        InterfaceExtendsClause : List[Ast.ScriptType] = extends_s ClassOrInterfaceTypeList;
-        ClassOrInterfaceTypeList : List[Ast.ScriptType] =
+        InterfaceExtendsClause : List[Ast.ScriptType.Ref] = extends_s ClassOrInterfaceTypeList;
+        ClassOrInterfaceTypeList : List[Ast.ScriptType.Ref] =
           ClassOrInterfaceType (comma_s ClassOrInterfaceType)*;
-        ClassOrInterfaceType : Ast.ScriptType = TypeReference;
+        ClassOrInterfaceType : Ast.ScriptType.Ref = TypeReferenceRef;
         
         #endregion
         
@@ -645,9 +646,9 @@ namespace TSParser
           class_s Identifier TypeParametersOpt ClassHeritage lbrace_s ClassBody rbrace_s;
         
         ClassHeritage : Ast.ClassHeritage = ClassExtendsClause? ImplementsClause?;
-        ClassExtendsClause : Ast.ScriptType = extends_s ClassType;
-        ClassType : Ast.ScriptType = TypeReference;
-        ImplementsClause : List[Ast.ScriptType] = implements_s ClassOrInterfaceTypeList;
+        ClassExtendsClause : Ast.ScriptType.Ref = extends_s ClassType;
+        ClassType : Ast.ScriptType.Ref = TypeReferenceRef;
+        ImplementsClause : List[Ast.ScriptType.Ref] = implements_s ClassOrInterfaceTypeList;
         
         ClassBody = ClassElement*;
         ClassElement =
@@ -1134,22 +1135,27 @@ namespace TSParser
       Ast.ScriptType.Ref(typeName, typeArguments.WithDefault(List()))
     }
     
+    TypeReferenceRef(t : Ast.ScriptType) : Ast.ScriptType.Ref
+    {
+      t :> Ast.ScriptType.Ref
+    }
+    
     InterfaceDeclaration(
       id : string,
       typeParameters : List[Ast.ScriptTypeParameter],
-      extends : option[List[Ast.ScriptType]],
+      extends : option[List[Ast.ScriptType.Ref]],
       type : Ast.ScriptType.Object) : Ast.DeclarationElement
     {
       Ast.DeclarationElement.InterfaceDeclaration(
         Ast.InterfaceDeclaration(id, typeParameters, extends.WithDefault(List()), type))
     }
     
-    ClassOrInterfaceTypeList(first : Ast.ScriptType, rest : List[Ast.ScriptType]) : List[Ast.ScriptType]
+    ClassOrInterfaceTypeList(first : Ast.ScriptType.Ref, rest : List[Ast.ScriptType.Ref]) : List[Ast.ScriptType.Ref]
     {
       MakeList(first, rest)
     }
     
-    ClassHeritage(baseClass : option[Ast.ScriptType], interfaces : option[List[Ast.ScriptType]]) : Ast.ClassHeritage
+    ClassHeritage(baseClass : option[Ast.ScriptType.Ref], interfaces : option[List[Ast.ScriptType.Ref]]) : Ast.ClassHeritage
     {
       Ast.ClassHeritage(baseClass, interfaces.WithDefault(List()))
     }

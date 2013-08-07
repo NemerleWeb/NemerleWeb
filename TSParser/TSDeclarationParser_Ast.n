@@ -56,7 +56,7 @@ namespace TSParser.Ast
   {
     public Name : string;
     public TypeParameters : List[ScriptTypeParameter];
-    public Extends : List[ScriptType];
+    public Extends : List[ScriptType.Ref];
     public Type : ScriptType.Object;
   }
   
@@ -270,7 +270,7 @@ namespace TSParser.Ast
   [Record]
   public class ClassHeritage
   {
-    public Base : option[ScriptType];
-    public Interfaces : List[ScriptType];
+    public Base : option[ScriptType.Ref];
+    public Interfaces : List[ScriptType.Ref];
   }
 }

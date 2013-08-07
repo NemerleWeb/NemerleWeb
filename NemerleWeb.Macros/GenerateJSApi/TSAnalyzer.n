@@ -74,8 +74,11 @@ namespace NemerleWeb
         
         if(type.Equals(typeof(DeclarationElement.InterfaceDeclaration)))
         {
-          [typeAndNameGroup.First()]
-          //AnalyzeInterface(typeAndNameGroup.Cast.[DeclarationElement.InterfaceDeclaration]())
+          AnalyzeInterface(
+            typeAndNameGroup
+              .Cast.[DeclarationElement.InterfaceDeclaration]()
+              .Select(i => i.Value))
+          .Select(i => DeclarationElement.InterfaceDeclaration(i))
         }
         else
         if(type.Equals(typeof(AmbientDeclaration.VariableDeclaration)))
@@ -118,12 +121,65 @@ namespace NemerleWeb
     }
     
     
+    /// <summary>
+    /// Input:
+    /// interface A : X<XX> { a : number; b : string; }
+    /// interface A : Y<YY> , X<XX> { a : number; }
+    ///
+    /// Output:
+    /// interface A : X<XX>, Y<YY> { a : number; b : string; }
+    /// </summary>
+    private AnalyzeInterface(ast : IEnumerable[InterfaceDeclaration]) : IEnumerable[InterfaceDeclaration]
+    {
+      def name = ast.First().Name;
+      
+      // Extends is not limited
+      // Take only known constraints
+      def filter(type : ScriptType.Ref) : bool
+      {
+        type.TypeArguments.All(t =>
+          match(t)
+          {
+          | ScriptType.Any
+          | ScriptType.Ref 
+          | ScriptType.Object as o when o.Members.IsEmpty() =>
+            true
+          | _ => false
+          })
+      }
+      
+      def extends = ast
+        .SelectMany(x => x.Extends)
+        .Where(filter)
+        .Distinct(ScriptTypeEqualityComparer())
+        .ToList();
+      _ = extends;
+      
+      Message.Hint($<#..$(extends; " "; e => e.Name)#>);
+      
+      []
+    }
     
    #if A
-   
-    /// <summary>
-    /// Unite
-    /// </summary>
+     
+    private AnalyzeInterface(ast : IEnumerable[TSGlobal.Interface]) : IEnumerable[TSGlobal]
+    {
+      def name = ast.First().Name;
+      
+      // Extends is not limited
+      def extends = ast.SelectMany(_.Extends).Distinct().NToList();
+      
+      def members = ast
+        .SelectMany(a => a.Type.Members.SelectMany(AnalyzeTSObject))
+        .Distinct(TSObjectEqualityComparer())
+        .NToList();
+      def @type = TSType.Object(members);
+      
+      def ret = TSGlobal.Interface(name, extends, @type);
+      [ret]
+    }
+    
+    
     private AnalyzeClass(ast : IEnumerable[TSGlobal.Class]) : IEnumerable[TSGlobal]
     {
       def name = ast.First().Name;
@@ -142,26 +198,7 @@ namespace NemerleWeb
       [ret]
     }
     
-    /// <summary>
-    /// Unite
-    /// </summary>
-    private AnalyzeInterface(ast : IEnumerable[TSGlobal.Interface]) : IEnumerable[TSGlobal]
-    {
-      def name = ast.First().Name;
-      
-      // Extends is not limited
-      def extends = ast.SelectMany(_.Extends).Distinct().NToList();
-      
-      def members = ast
-        .SelectMany(a => a.Type.Members.SelectMany(AnalyzeTSObject))
-        .Distinct(TSObjectEqualityComparer())
-        .NToList();
-      def @type = TSType.Object(members);
-      
-      def ret = TSGlobal.Interface(name, extends, @type);
-      [ret]
-    }
-    
+
     private AnalyzeTSObject(obj : TSObject) : IEnumerable[TSObject]
     {
       | Call as c =>
@@ -183,9 +220,6 @@ namespace NemerleWeb
       | Property => yield obj
     }
     
-    /// <summary>
-    /// Unite
-    /// </summary>
     private AnalyzeModule(ast : IEnumerable[TSGlobal.Module]) : IEnumerable[TSGlobal]
     {
       def name = ast.First().Name;
@@ -195,9 +229,6 @@ namespace NemerleWeb
       [ret]
     }
     
-    /// <summary>
-    /// Unite
-    /// </summary>
     private AnalyzeEnum(ast : IEnumerable[TSGlobal.Enum]) : IEnumerable[TSGlobal]
     {
       def name = ast.First().Name;
