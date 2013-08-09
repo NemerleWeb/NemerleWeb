@@ -31,7 +31,6 @@ if(test-path 'HKLM:\Software\Microsoft\VisualStudio\11.0') {
 	$webClient.DownloadFile('http://www.nemerleweb.com/installer/NemerleWeb.VSIX.vsix', $vsixPath)
 	$vsInstallDir = (get-itemproperty 'HKLM:\Software\Microsoft\VisualStudio\11.0').InstallDir
 	$vsixInstaller = join-path $vsInstallDir VSIXInstaller.exe
-	$installCmd = "'" + $vsixInstaller + "' /q " + $vsixPath
 
 	& "$vsixInstaller" /q $vsixPath
 
