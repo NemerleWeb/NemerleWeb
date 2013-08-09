@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NemerleWeb;
 
-namespace NemerleWeb.$safeprojectname$
+namespace $safeprojectname$
 {  
   [Unit]
   public class MainPage
@@ -19,10 +19,10 @@ namespace NemerleWeb.$safeprojectname$
     {
       <#
         <div class="welcome">
-          <h1>This is a page created using Beyond Framework</h1>
-          You just started a new project using Beyond. 
-          To add logic, go to MVVM/MainPage.n file, remove unnecessary code and add yours.
-          For help, please refer to <a href="https://github.com/NemerleWeb/NemerleWeb">github page</a>.
+          <h1>This is a page created using NemerleWeb</h1>
+          You just started a new project using NemerleWeb. 
+          Go to MVVM/MainPage.n file, remove this code and add yours.
+          For help, please refer to <a href="http://www.nemerleweb.com">www.nemerleweb.com</a>.
         </div>
       #>
     }

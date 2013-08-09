@@ -24,12 +24,21 @@ write-host "Unpacking..."
 .\install-nweb.ps1
 
 #check for visual studio
+
 if(test-path 'HKLM:\Software\Microsoft\VisualStudio\11.0') {
+	$vsInstallDir = (get-itemproperty 'HKLM:\Software\Microsoft\VisualStudio\11.0').InstallDir
+}
+
+if(test-path 'HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\11.0') {
+	$vsInstallDir = (get-itemproperty 'HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\11.0').InstallDir
+}
+
+if($vsInstallDir) {
 	write-host "You have Visual Studio 2012 installed, downloading extension..."
 	
 	$vsixPath = join-path $installPath "NemerleWeb.VSIX.vsix"
 	$webClient.DownloadFile('http://www.nemerleweb.com/installer/NemerleWeb.VSIX.vsix', $vsixPath)
-	$vsInstallDir = (get-itemproperty 'HKLM:\Software\Microsoft\VisualStudio\11.0').InstallDir
+	
 	$vsixInstaller = join-path $vsInstallDir VSIXInstaller.exe
 
 	& "$vsixInstaller" /q $vsixPath

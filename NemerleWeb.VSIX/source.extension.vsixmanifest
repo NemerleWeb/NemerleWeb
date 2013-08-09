@@ -2,8 +2,8 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
         <Identity Id="NemerleWeb.VSIX..e452766b-81fa-4b07-a10f-27e4860473f3" Version="1.0" Language="en-US" Publisher="NemerleWeb team" />
-        <DisplayName>NemerleWeb.VSIX</DisplayName>
-        <Description xml:space="preserve">NemerleWeb extension</Description>
+        <DisplayName>NemerleWeb</DisplayName>
+        <Description xml:space="preserve">NemerleWeb project and items templates</Description>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="11.0" />
