@@ -13,10 +13,10 @@ using System.Xml.Linq;
 using NemerleWeb;
 using NemerleWeb.TypedJS;
 
-[assembly: GenerateTypedJS(
- Root = "A",
- Files = [ (@"d:\MyProjects\NemerleWeb\NemerleWeb.TypedJS\Scripts\typings") ]
-)]
+//[assembly: GenerateTypedJS(
+// Root = "A",
+// Files = [ (@"d:\MyProjects\NemerleWeb\NemerleWeb.TypedJS\Scripts\typings") ]
+//)]
 
 module Program
 {

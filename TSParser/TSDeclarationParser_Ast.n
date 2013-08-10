@@ -177,6 +177,7 @@ namespace TSParser.Ast
   }
   
   [Record]
+  [StructuralEquality]
   public class ScriptTypeParameter
   {
     public Name : string;

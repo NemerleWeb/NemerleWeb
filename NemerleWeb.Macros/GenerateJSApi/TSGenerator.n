@@ -22,51 +22,104 @@ namespace NemerleWeb
   /// </summary>
   internal module TSGenerator
   {
+    #region Generation analysis
+    
     public GenerateCode(typer : Typer, root : string, tsAst : IEnumerable[DeclarationElement]) : void
     {
-    }
-    
-    #if A
-    public GenerateCode(typer : Typer, root : string, tsAst : IEnumerable[TSGlobal]) : void
-    {
       def jsApiNamespace = typer.Env.EnterIntoNamespace(root.SplitDot());
-      def jsApiModule = CreateModule(root.SplitDot(), Scope(typer.Env), [], true, true);
-      
-      GeneratePredefined(jsApiNamespace, jsApiModule);
+      //def jsApiModule = CreateModule(root.SplitDot(), Scope(typer.Env), [], true, true);
       
       // First generate all types
       GenerateTypes(Scope(jsApiNamespace), tsAst);
       
       // Generate types members
-      GenerateTypesMembers(Scope(jsApiNamespace), tsAst);
+      //GenerateTypesMembers(Scope(jsApiNamespace), tsAst);
       
-      // Then generate everything else
-      GenerateOthers(Scope(jsApiNamespace), jsApiModule, tsAst);
+      // Then generate the rest: variables, functions.
+      //GenerateRestMembers(Scope(jsApiNamespace), jsApiModule, tsAst);
       
       // Finalize
-      jsApiModule.Compile();
+      //jsApiModule.Compile();
     }
     
-    private GeneratePredefined(jsApiNamespace : GlobalEnv, _jsApiModule : TypeBuilder) : void
-    {
-      // HACK for supporting Array typing in TypeScript 0.8
-      jsApiNamespace.Define(<[ decl: type _element = object; ]>).Compile();    
-    }    
-    
-    private GenerateTypes(typesScope : Scope, members : IEnumerable[TSGlobal]) : void
+    private GenerateTypes(typesScope : Scope, members : IEnumerable[DeclarationElement]) : void
     {
       foreach(mem in members) 
-      {
-      | Interface as i => CreateTSGlobalInterface(i, typesScope, false)
-      | Class     as c => CreateTSGlobalClass    (c, typesScope, false)
-      | Enum      as e => CreateTSGlobalEnum     (e, typesScope)
-      | Import    as i => CreateTSGlobalImport   (i, typesScope)
-      | Export    as e => CreateTSGlobalExport   (e, typesScope)
-      | Module    as m => CreateTSGlobalModule   (m, typesScope, true, false)
+      { 
+      | InterfaceDeclaration(value) => CreateInterface(value, typesScope)
+      | AmbientDeclaration(value) => ()
       | _ => ()
       }
     }
     
+    #endregion
+    
+    #region Code Generation
+    
+    private CreateInterface(
+      tsInterface : InterfaceDeclaration,
+      typesScope : Scope) : void
+    {
+      def interfaceType =
+        if (tsInterface.Extends is [])
+          typesScope.Define(
+            <[ decl: 
+              [JSApi] public partial interface $(tsInterface.Name : usesite) {}
+            ]>)
+        else
+        {
+          def extends = tsInterface.Extends.Select(
+            e => typesScope.FromQualifiedIdentifier(e.Name));
+          typesScope.Define(
+            <[ decl:
+              [JSApi] public partial interface $(tsInterface.Name : usesite) : ..$extends {}
+            ]>)
+        };
+        
+      interfaceType.Compile();
+    }
+    
+    private CreateInterfaceTyped(
+      tsInterface : InterfaceDeclaration,
+      typesScope : Scope) : void
+    {
+      /*
+      def interfaceType =
+        if (typeMembers || tsInterface.Extends is [])
+          typesScope.Define(
+            <[ decl: 
+              [JSApi] public partial interface $(tsInterface.Name : usesite) {}
+            ]>)
+        else
+        {
+          def extends = tsInterface.Extends.Select(typesScope.FromQualifiedIdentifier);
+          typesScope.Define(
+            <[ decl:
+              [JSApi] public partial interface $(tsInterface.Name : usesite) : ..$extends {}
+            ]>)
+        };
+      */
+    }
+   
+    
+    #endregion
+    
+    #if A
+    
+    
+    private GenerateTypes(typesScope : Scope, members : IEnumerable[DeclarationElement]) : void
+    {
+      foreach(mem in members) 
+      { 
+      | InterfaceDeclaration(value) => ()//CreateTSGlobalInterface(i, typesScope, false)
+      //| Class     as c => CreateTSGlobalClass    (c, typesScope, false)
+      //| Enum      as e => CreateTSGlobalEnum     (e, typesScope)
+      //| Import    as i => CreateTSGlobalImport   (i, typesScope)
+      //| Export    as e => CreateTSGlobalExport   (e, typesScope)
+      //| Module    as m => CreateTSGlobalModule   (m, typesScope, true, false)
+      | _ => ()
+      }
+    }
     private GenerateTypesMembers(typesScope : Scope, members : IEnumerable[TSGlobal]) : void
     {
       foreach(mem in members) 

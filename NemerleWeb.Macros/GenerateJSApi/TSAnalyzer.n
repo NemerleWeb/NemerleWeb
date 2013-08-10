@@ -119,8 +119,7 @@ namespace NemerleWeb
       
        tsAsts.Where(filter).GroupBy(group).SelectMany(select)
     }
-    
-    
+        
     /// <summary>
     /// Input:
     /// interface A : X<XX> { a : number; b : string; }
@@ -148,37 +147,29 @@ namespace NemerleWeb
           })
       }
       
+      def typeParameters = ast
+        .SelectMany(x => x.TypeParameters)
+        .Distinct()
+        .NToList();
+      
       def extends = ast
         .SelectMany(x => x.Extends)
         .Where(filter)
         .Distinct()
-        .ToList();
-      _ = extends;
+        .NToList();
       
-      Message.Hint($<#..$(extends; " "; e => e.Name)#>);
+      def members = ast
+        .SelectMany(x => x.Type.Members.SelectMany(m => [m]))/*AnalyzeObject*/ 
+        .Distinct()
+        .NToList();
       
-      []
+      def @type = ScriptType.Object(members);
+        
+      yield InterfaceDeclaration(name, typeParameters, extends, @type)
     }
     
    #if A
-     
-    private AnalyzeInterface(ast : IEnumerable[TSGlobal.Interface]) : IEnumerable[TSGlobal]
-    {
-      def name = ast.First().Name;
-      
-      // Extends is not limited
-      def extends = ast.SelectMany(_.Extends).Distinct().NToList();
-      
-      def members = ast
-        .SelectMany(a => a.Type.Members.SelectMany(AnalyzeTSObject))
-        .Distinct(TSObjectEqualityComparer())
-        .NToList();
-      def @type = TSType.Object(members);
-      
-      def ret = TSGlobal.Interface(name, extends, @type);
-      [ret]
-    }
-    
+  
     
     private AnalyzeClass(ast : IEnumerable[TSGlobal.Class]) : IEnumerable[TSGlobal]
     {

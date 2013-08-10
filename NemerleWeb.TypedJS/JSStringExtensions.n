@@ -10,7 +10,7 @@ using System.Linq;
 namespace NemerleWeb.TypedJS
 {
   // HACK: Remove
-  public class RegExp {}
+  public partial interface RegExp {}
   
   public module JSStringExtensions
   {
