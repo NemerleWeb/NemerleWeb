@@ -6,6 +6,7 @@ using Nemerle.Imperative;
 using Nemerle.Macros;
 using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
+using PT = Nemerle.Compiler.Parsetree;
 using Nemerle.Collections;
 using Nemerle.Utility;
 using Nemerle.Assertions;
@@ -60,22 +61,19 @@ namespace NemerleWeb
       tsInterface : InterfaceDeclaration,
       typesScope : Scope) : void
     {
-      def interfaceType =
-        if (tsInterface.Extends is [])
-          typesScope.Define(
-            <[ decl: 
-              [JSApi] public partial interface $(tsInterface.Name : usesite) {}
-            ]>)
-        else
-        {
-          def extends = tsInterface.Extends.Select(
-            e => typesScope.FromQualifiedIdentifier(e.Name));
-          typesScope.Define(
-            <[ decl:
-              [JSApi] public partial interface $(tsInterface.Name : usesite) : ..$extends {}
-            ]>)
-        };
-        
+      def extends = tsInterface.Extends
+        .Select(e => typesScope.FromQualifiedIdentifier(e.Name));
+      
+      def typeParameters = tsInterface.TypeParameters
+        .Select(e => PT.Splicable.Name(Name(e.Name)))
+        .NToList();
+      
+      def interfaceType = typesScope.Define(
+        <[ decl:
+          [JSApi]
+          public partial interface $(tsInterface.Name : usesite)[..$typeParameters] : ..$extends {}
+        ]>);
+      
       interfaceType.Compile();
     }
     
