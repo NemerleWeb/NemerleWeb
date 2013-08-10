@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace TSParser.Ast
-{
+{  
   public variant DeclarationElement
   {
     | Reference { Value : Ast.Reference; }
@@ -55,8 +55,8 @@ namespace TSParser.Ast
   public class InterfaceDeclaration
   {
     public Name : string;
-    public TypeParameters : List[ScriptTypeParameter];
-    public Extends : List[ScriptType.Ref];
+    public TypeParameters : list[ScriptTypeParameter];
+    public Extends : list[ScriptType.Ref];
     public Type : ScriptType.Object;
   }
   
@@ -88,33 +88,33 @@ namespace TSParser.Ast
   public class AmbientClassDeclaration
   {
     public Name : string;
-    public TypeParameters : List[ScriptTypeParameter];
+    public TypeParameters : list[ScriptTypeParameter];
     public Heritage : ClassHeritage;
-    public Members : List[AmbientClassBodyElement];
+    public Members : list[AmbientClassBodyElement];
   }
 
   [Record]
   public class AmbientEnumDeclaration
   {
     public Name : string;
-    public Members : List[AmbientEnumMember];
+    public Members : list[AmbientEnumMember];
   }
 
   [Record]
   public class AmbientExternalModuleDeclaration
   {
     public Name : string;
-    public Members : List[AmbientExternalModuleElement];
+    public Members : list[AmbientExternalModuleElement];
    }
 
   [Record]
   public class AmbientModuleDeclaration
   {
     public Name : string;
-    public Members : List[AmbientModuleElement];
+    public Members : list[AmbientModuleElement];
   }
   
-  
+  [StructuralEquality(Ignore = [ReturnType])]
   public variant ScriptType
   {
     | Any
@@ -122,12 +122,12 @@ namespace TSParser.Ast
     | Boolean
     | String
     | Void
-    | Ref { Name : string; TypeArguments : List[ScriptType]; }
+    | Ref { Name : string; TypeArguments : list[ScriptType]; }
     | Query { Name : string; }
     | Array { Type : ScriptType; Rank : int; }
-    | Object { Members : List[ScriptObject]; }
-    | Function { Parameters : List[ScriptParameter]; ReturnType : ScriptType; }
-    | Constructor { Parameters : List[ScriptParameter]; ReturnType : ScriptType; }
+    | Object { Members : list[ScriptObject]; }
+    | Function { Parameters : list[ScriptParameter]; ReturnType : ScriptType; }
+    | Constructor { Parameters : list[ScriptParameter]; ReturnType : ScriptType; }
   }
   
   public variant ScriptObject
@@ -141,8 +141,8 @@ namespace TSParser.Ast
     | Call { Value : Ast.CallSignature; }
     | Construct
       {
-        TypeParameters : List[ScriptTypeParameter];
-        Parameters : List[ScriptParameter];
+        TypeParameters : list[ScriptTypeParameter];
+        Parameters : list[ScriptParameter];
         ReturnType : option[ScriptType];
       }
     | Index { Value : Ast.IndexSignature; }
@@ -171,8 +171,8 @@ namespace TSParser.Ast
   [Record]
   public class CallSignature
   {
-    public TypeParameters : List[ScriptTypeParameter];
-    public Parameters : List[ScriptParameter];
+    public TypeParameters : list[ScriptTypeParameter];
+    public Parameters : list[ScriptParameter];
     public ReturnType : option[ScriptType];
   }
   
@@ -249,7 +249,7 @@ namespace TSParser.Ast
   
   public variant AmbientClassBodyElement
   {
-    | Constructor { Parameters : List[Ast.ScriptParameter]; }
+    | Constructor { Parameters : list[Ast.ScriptParameter]; }
     | Property
       {
         Name : string;
@@ -271,6 +271,6 @@ namespace TSParser.Ast
   public class ClassHeritage
   {
     public Base : option[ScriptType.Ref];
-    public Interfaces : List[ScriptType.Ref];
+    public Interfaces : list[ScriptType.Ref];
   }
 }

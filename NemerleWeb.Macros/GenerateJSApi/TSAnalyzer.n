@@ -142,7 +142,7 @@ namespace NemerleWeb
           {
           | ScriptType.Any
           | ScriptType.Ref 
-          | ScriptType.Object as o when o.Members.IsEmpty() =>
+          | ScriptType.Object([]) =>
             true
           | _ => false
           })
@@ -151,7 +151,7 @@ namespace NemerleWeb
       def extends = ast
         .SelectMany(x => x.Extends)
         .Where(filter)
-        .Distinct(ScriptTypeEqualityComparer())
+        .Distinct()
         .ToList();
       _ = extends;
       

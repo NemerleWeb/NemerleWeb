@@ -139,9 +139,6 @@
     <Compile Include="GenerateJSApi\TSAnalyzer.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GenerateJSApi\TSComparers.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="GenerateJSApi\TSGenerator.n">
       <SubType>Code</SubType>
     </Compile>
