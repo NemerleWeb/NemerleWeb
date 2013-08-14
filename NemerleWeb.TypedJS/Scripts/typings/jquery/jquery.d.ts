@@ -411,7 +411,7 @@ interface JQuery {
     html(): string;
     html(htmlString: string): JQuery;
     html(htmlContent: (index: number, oldhtml: string) => string): JQuery;
-    html(JQuery): JQuery;
+    html(obj: JQuery): JQuery;
 
     prop(propertyName: string): any;
     prop(propertyName: string, value: any): JQuery;
@@ -448,14 +448,20 @@ interface JQuery {
     height(func: (index: any, height: any) => any): JQuery;
 
     innerHeight(): number;
+    innerHeight(value: number): JQuery;
+
     innerWidth(): number;
+    innerWidth(value: number): JQuery;
 
     offset(): { left: number; top: number; };
     offset(coordinates: any): JQuery;
     offset(func: (index: any, coords: any) => any): JQuery;
 
     outerHeight(includeMargin?: boolean): number;
+    outerHeight(value: number, includeMargin?: boolean): JQuery;
+
     outerWidth(includeMargin?: boolean): number;
+    outerWidth(value: number, includeMargin?: boolean): JQuery;
 
     position(): { top: number; left: number; };
 

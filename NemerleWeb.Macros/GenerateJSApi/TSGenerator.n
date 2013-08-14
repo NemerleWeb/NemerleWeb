@@ -68,13 +68,13 @@ namespace NemerleWeb
         .Select(e => PT.Splicable.Name(Name(e.Name)))
         .NToList();
       
-      def interfaceType = typesScope.Define(
-        <[ decl:
-          [JSApi]
-          public partial interface $(tsInterface.Name : usesite)[..$typeParameters] : ..$extends {}
-        ]>);
+      //def interfaceType = typesScope.Define(
+      //  <[ decl:
+      //    [JSApi]
+      //    public partial interface $(tsInterface.Name : usesite)[..$typeParameters] : ..$extends {}
+      //  ]>);
       
-      interfaceType.Compile();
+      //interfaceType.Compile();
     }
     
     private CreateInterfaceTyped(
