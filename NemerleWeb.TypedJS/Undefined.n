@@ -20,7 +20,7 @@ namespace NemerleWeb.TypedJS
 namespace NemerleWeb
 {
   [JSApi]
-  partial module TypedJS
+  public partial module TypedJS
   {
     public static undefined : Undefined;
   }

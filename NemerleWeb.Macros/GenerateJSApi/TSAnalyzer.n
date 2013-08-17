@@ -132,21 +132,6 @@ namespace NemerleWeb
     {
       def name = ast.First().Name;
       
-      // Extends is not limited
-      // Take only known constraints
-      def filter(type : ScriptType.Ref) : bool
-      {
-        type.TypeArguments.All(t =>
-          match(t)
-          {
-          | ScriptType.Any
-          | ScriptType.Ref 
-          | ScriptType.Object([]) =>
-            true
-          | _ => false
-          })
-      }
-      
       def typeParameters = ast
         .SelectMany(x => x.TypeParameters)
         .Distinct()
@@ -154,7 +139,6 @@ namespace NemerleWeb
       
       def extends = ast
         .SelectMany(x => x.Extends)
-        .Where(filter)
         .Distinct()
         .NToList();
       

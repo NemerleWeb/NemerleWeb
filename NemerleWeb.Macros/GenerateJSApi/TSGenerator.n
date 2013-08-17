@@ -32,7 +32,7 @@ namespace NemerleWeb
       
       // First generate all types
       GenerateTypes(Scope(jsApiNamespace), tsAst);
-      
+            
       // Generate types members
       //GenerateTypesMembers(Scope(jsApiNamespace), tsAst);
       
@@ -61,20 +61,20 @@ namespace NemerleWeb
       tsInterface : InterfaceDeclaration,
       typesScope : Scope) : void
     {
-      def extends = tsInterface.Extends
-        .Select(e => typesScope.FromQualifiedIdentifier(e.Name));
-      
       def typeParameters = tsInterface.TypeParameters
-        .Select(e => PT.Splicable.Name(Name(e.Name)))
+        .Select(e => PT.Splicable.Name(PT.Name(e.Name)))
         .NToList();
+        
+      def extends = tsInterface.Extends
+        .Select(e => ConvertTypeArgument(e, typeParameters, typesScope));
+        
+      def interfaceType = typesScope.Define(
+        <[ decl:
+          [JSApi]
+          public partial interface $(tsInterface.Name : usesite)[..$typeParameters] : ..$extends {}
+        ]>);
       
-      //def interfaceType = typesScope.Define(
-      //  <[ decl:
-      //    [JSApi]
-      //    public partial interface $(tsInterface.Name : usesite)[..$typeParameters] : ..$extends {}
-      //  ]>);
-      
-      //interfaceType.Compile();
+      interfaceType.Compile();
     }
     
     private CreateInterfaceTyped(
@@ -99,6 +99,63 @@ namespace NemerleWeb
       */
     }
    
+    
+    #endregion
+    
+    #region Converters
+    
+    private ConvertTypeArgument(
+      typeRef : ScriptType.Ref,
+      typeParameters : IEnumerable[PT.Splicable],
+      typesScope : Scope) : PExpr
+    {
+      // Name is either global or local, local is prefered
+      def name =
+        if(typeParameters.Cast.[PT.Splicable.Name]().Any(t => t.GetName().Id == typeRef.Name))
+          PExpr.Ref(Name(typeRef.Name));
+        else
+          typesScope.FromQualifiedIdentifier(typeRef.Name);
+      
+      if(typeRef.TypeArguments is [])
+        name
+      else
+      {
+        def typeArguments = typeRef.TypeArguments
+          .Select(tyArg => ConvertTypeArgumentImpl(tyArg, typeParameters, typesScope));
+        <[ $name.[..$typeArguments] ]>
+      }
+    }
+    
+    /// <summary>
+    /// Get PExpr from TS type
+    /// </summary>
+    private ConvertTypeArgumentImpl(
+      type : ScriptType,
+      typeParameters : IEnumerable[PT.Splicable],
+      typesScope : Scope) : PExpr
+    {
+      match(type)
+      {
+      | Any => <[ object ]>
+      | Number => <[ float ]>
+      | Boolean => <[ bool ]>
+      | String => <[ string ]>
+      | Void => <[ void ]>
+      | Ref as r => ConvertTypeArgument(r, typeParameters, typesScope)
+      | Query => Message.Error("Query type argument unsupported"); <[ ]>
+      | Array => Message.Error("Array type argument unsupported"); <[ ]>
+      | Object as o =>
+        if(o.Members is [])
+          <[ object ]>
+        else
+        {
+          Message.Error("Object type argument is supported only without members"); <[ ]>
+        }        
+      | Function => Message.Error("Function type argument unsupported"); <[ ]>
+      | Constructor => Message.Error("Constructor type argument unsupported"); <[ ]>
+      | _ => Message.Error($"Unsupport type argument $type");  <[]>
+      }
+    }    
     
     #endregion
     
