@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 
@@ -11,9 +12,29 @@ namespace NemerleWeb.NemerleWeb.Website.Controllers
 {
   public class HomeController : Controller
   {
+    static mutable _tutorial : string;
+    
+    static this() 
+    {
+      UpdateTutorial();
+    }
+    
     public Index() : ActionResult
     {
       View((NWeb MainPage()) : object);
+    }
+    
+    public Tutorial(update : bool = false) : ActionResult
+    {
+      when(update)
+        UpdateTutorial();
+        
+      View("Tutorial", _tutorial : object);
+    }
+    
+    private static UpdateTutorial() : void
+    {
+      _tutorial = WebClient().DownloadString("https://dl.dropboxusercontent.com/u/133081/tutorial.markdown");
     }
   }
 }

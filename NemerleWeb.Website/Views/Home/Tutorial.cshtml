@@ -1,0 +1,10 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<pre class="tutorial">@Model</pre>
+
+<script src="~/Scripts/markdown.js"></script>
+<script>
+    $(".tutorial").html(markdown.toHTML($(".tutorial").html()));
+</script>
