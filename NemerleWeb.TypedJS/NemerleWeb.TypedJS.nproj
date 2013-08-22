@@ -56,9 +56,6 @@
     <Reference Include="Nemerle" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Hacks.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="JSStringExtensions.n">
       <SubType>Code</SubType>
     </Compile>

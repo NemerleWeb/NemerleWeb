@@ -77,6 +77,20 @@ namespace NemerleWeb
     
     #endregion
     
+    #region Generate types members
+    
+    private GenerateTypesMembers(scope : Scope, members : IEnumerable[DeclarationElement]) : void
+    {
+      foreach(mem in members) 
+      { 
+      | InterfaceDeclaration(value) => CreateInterfaceMembers(scope, value)
+      //| AmbientDeclaration(value) => GenerateTypesAmbient(scope, value)
+      | _ => ()
+      }
+    }
+    
+    #endregion
+    
     #region Code Generation
     
     private CreateInterface(
@@ -127,8 +141,11 @@ namespace NemerleWeb
     {
       match(obj)
       {
-      | Call(value) => CreateCall(scope, value, prefix)
-      //| Construct
+      | Call(value)      => CreateCall(scope, value, prefix)
+      | Construct(value) => CreateConstruct(scope, value, prefix)
+      | Index(value)     => CreateIndex(scope, value, prefix)
+      | Property(value)  => CreateProperty(scope, value, prefix)
+      | Method(value)    => CreateMethod(scope, value, prefix)
       | _ => ()
       }
     }
@@ -138,24 +155,107 @@ namespace NemerleWeb
       def fullPrefix = string.Join(prefix, Call);
       def returnTypePrefix = string.Join(fullPrefix, Return);
       def realReturnType = <[ object ]>;//ConvertType(returnTypePrefix, returnType, scope);
-        
-      def functionParams = [];//ConvertParameters(fullPrefix, parms, scope);
-       
-      if(scope.IsInterface)
-      {
-        _ = scope.Define(
-          <[ decl: new $(JSApiSpecial.Call : usesite)(..$functionParams) : $realReturnType; ]>);
-      }
-      else
-      {
-        _ = scope.Define(
+      
+      def functionParams = ConvertParameters(scope, call.Parameters, fullPrefix);
+      
+      _ = scope.DefineWithSource(
+        if(scope.IsInterface)
+          <[ decl: new $(JSApiSpecial.Call : usesite)(..$functionParams) : $realReturnType; ]>
+        else
           <[ decl:
              public $(JSApiSpecial.Call : usesite)(..$functionParams) : $realReturnType
               $DefaultImplementation
           ]>);
-      }
     }
    
+    CreateConstruct(scope : TypeBuilder, construct : Construct, prefix : string) : void
+    {
+      def fullPrefix = string.Join(prefix, New);
+      def returnTypePrefix = string.Join(fullPrefix, Return);
+      def realReturnType = <[ object ]>;;//ConvertType(returnTypePrefix, type, scope);
+    
+      def functionParams = ConvertParameters(scope, construct.Parameters, fullPrefix);
+      
+      _ = scope.DefineWithSource(
+          if(scope.IsInterface)
+            <[ decl: new $(JSApiSpecial.New : usesite)(..$functionParams) : $realReturnType; ]>
+          else
+            <[ decl:
+              public $(JSApiSpecial.New : usesite)(..$functionParams) : $realReturnType
+                $DefaultImplementation
+            ]>);
+    }
+    
+    CreateIndex(scope : TypeBuilder, index : IndexSignature , prefix : string) : void
+    {
+      def (realParamType, typeName) =
+        match(index.ParameterType)
+        {
+        | Number => (<[ float ]>, "Number")
+        | String => (<[ string ]>, "String")
+        };
+        
+      def fullPrefix = string.Join(prefix, typeName, Index);
+      def returnTypePrefix = string.Join(fullPrefix, Return);
+      def realReturnType = <[ object ]>;//ConvertType(returnTypePrefix, returnType, scope);
+      
+      _ = scope.DefineWithSource(
+        if(scope.IsInterface)
+          <[ decl:
+            new Item[$(index.ParameterName : usesite) : $realParamType] : $realReturnType
+            {
+              get;
+              set;
+            }
+          ]>
+        else
+          <[ decl:
+            public Item[$(index.ParameterName : usesite) : $realParamType] : $realReturnType
+            {
+              get
+                $DefaultImplementation;
+              set
+                $DefaultImplementation;
+            }
+          ]>);
+    }
+
+    /// <summary>
+    /// Don't pay attention to optional, always generate property
+    /// </summary>
+    CreateProperty(scope : TypeBuilder, property : Property, prefix : string) : void
+    {
+      def fullPrefix = string.Join(prefix, property.Name);
+      def typePrefix = string.Join(fullPrefix, Property);
+      def propertyType = <[ object ]>; // ConvertType(typePrefix, type, scope);
+      
+      _ = scope.DefineWithSource(
+        if(scope.IsInterface)
+          <[ decl: new $(property.Name : usesite) : $propertyType { get; set; }; ]>
+        else
+          <[ decl: public $(property.Name : usesite) : $propertyType { get; set; } ]>);
+    }
+    
+    /// <summary>
+    /// Don't pay attention to optional, always generate method
+    /// </summary>
+    CreateMethod(scope : TypeBuilder, method : Method, prefix : string) : void
+    {
+      def fullPrefix = string.Join(prefix, method.Name);
+      def returnTypePrefix = string.Join(fullPrefix, Return);
+      def realReturnType = <[ object ]>;;//ConvertType(returnTypePrefix, returnType, scope);
+    
+      def functionParams = ConvertParameters(scope, method.Signature.Parameters, fullPrefix);
+    
+      _ = scope.DefineWithSource(
+        if(scope.IsInterface)
+          <[ decl: new $(method.Name : usesite)(..$functionParams) : $realReturnType; ]>
+        else
+          <[ decl: 
+            $(method.Name : usesite)(..$functionParams) : $realReturnType
+              $DefaultImplementation
+          ]>);
+    }
     
     #endregion
     
@@ -214,6 +314,14 @@ namespace NemerleWeb
       }
     }    
     
+    private ConvertParameters(
+      scope : TypeBuilder,
+      parms : IEnumerable[ScriptParameter],
+      prefix : string) : IEnumerable[PParameter]
+    {      
+      parms.Select(_ => <[ parameter: _ : object ]>)
+    }
+    
     #endregion
     
     #region Helpers
@@ -254,11 +362,14 @@ namespace NemerleWeb
     DefaultImplementation : PExpr = <[ { IgnoreParams(); throw ClientCodeCalledInServerException(); } ]>;
     
     private Call = "Call";
+    private New = "New";
     private Variable = "Variable";
     private Constructor = "Constructor";
+    private Index = "Index";
     private Return = "Return";
     private Parameter = "Parameter";
     private AnonymousType = "AnonymousType";
+    private Separator = "_";
         
     #endregion
     
