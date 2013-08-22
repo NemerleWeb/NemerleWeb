@@ -17,12 +17,12 @@ namespace TSParser.Ast
 {  
   public variant DeclarationElement
   {
-    | Reference { Value : Ast.Reference; }
-    | ExportAssignment { Value : Ast.ExportAssignment; }
-    | InterfaceDeclaration { Value : Ast.InterfaceDeclaration; }
+    | Reference                 { Value : Ast.Reference; }
+    | ExportAssignment          { Value : Ast.ExportAssignment; }
+    | InterfaceDeclaration      { Value : Ast.InterfaceDeclaration; }
     | ExternalImportDeclaration { Value : Ast.ExternalImportDeclaration; }
-    | ImportDeclaration { Value : Ast.ImportDeclaration; }
-    | AmbientDeclaration { Value : Ast.AmbientDeclaration; }
+    | ImportDeclaration         { Value : Ast.ImportDeclaration; }
+    | AmbientDeclaration        { Value : Ast.AmbientDeclaration; }
   }
   
   public variant Reference
@@ -62,12 +62,12 @@ namespace TSParser.Ast
   
   public variant AmbientDeclaration
   {
-    | VariableDeclaration { Value : Ast.AmbientVariableDeclaration; }
-    | FunctionDeclaration { Value : Ast.AmbientFunctionDeclaration; }
-    | ClassDeclaration { Value : Ast.AmbientClassDeclaration; }
-    | EnumDeclaration { Value : Ast.AmbientEnumDeclaration; }
+    | VariableDeclaration       { Value : Ast.AmbientVariableDeclaration; }
+    | FunctionDeclaration       { Value : Ast.AmbientFunctionDeclaration; }
+    | ClassDeclaration          { Value : Ast.AmbientClassDeclaration; }
+    | EnumDeclaration           { Value : Ast.AmbientEnumDeclaration; }
     | ExternalModuleDeclaration { Value : Ast.AmbientExternalModuleDeclaration; }
-    | ModuleDeclaration { Value : Ast.AmbientModuleDeclaration; }
+    | ModuleDeclaration         { Value : Ast.AmbientModuleDeclaration; }
   }
   
   [Record]
@@ -132,34 +132,19 @@ namespace TSParser.Ast
   
   public variant ScriptObject
   {
-    | Property
-      {
-        Name : string;
-        Optional : bool;
-        Type : option[ScriptType];
-      }
-    | Call { Value : Ast.CallSignature; }
-    | Construct
-      {
-        TypeParameters : list[ScriptTypeParameter];
-        Parameters : list[ScriptParameter];
-        ReturnType : option[ScriptType];
-      }
-    | Index { Value : Ast.IndexSignature; }
-    | Method
-      {
-        Name : string;
-        Optional : bool;
-        Signature : CallSignature;
-      }
+    | Property  { Value : Ast.Property; }
+    | Call      { Value : Ast.CallSignature; }
+    | Construct { Value : Ast.Construct; }      
+    | Index     { Value : Ast.IndexSignature; }
+    | Method    { Value : Ast.Method; }
   }
   
   [Record]
   public class IndexSignature
   {
-    ParameterName : string;
-    ParameterType : IndexParameterType;
-    ReturnType : ScriptType;
+    public ParameterName : string;
+    public ParameterType : IndexParameterType;
+    public ReturnType : ScriptType;
   }
   
   public variant IndexParameterType
@@ -174,7 +159,31 @@ namespace TSParser.Ast
     public TypeParameters : list[ScriptTypeParameter];
     public Parameters : list[ScriptParameter];
     public ReturnType : option[ScriptType];
+  }  
+  
+  [Record]
+  public class Property
+  {
+    public Name : string;
+    public Optional : bool;
+    public Type : option[ScriptType];
   }
+  
+  [Record]
+  public class Construct
+  {
+    public TypeParameters : list[ScriptTypeParameter];
+    public Parameters : list[ScriptParameter];
+    public ReturnType : option[ScriptType];      
+  }
+  
+  [Record]
+  public class Method
+  {
+    public Name : string;
+    public Optional : bool;
+    public Signature : CallSignature;
+  }  
   
   [Record]
   [StructuralEquality]
@@ -232,20 +241,20 @@ namespace TSParser.Ast
   
   public variant AmbientModuleElement
   {
-    | VariableDeclaration { Value : Ast.AmbientVariableDeclaration; }
-    | FunctionDeclaration { Value : Ast.AmbientFunctionDeclaration; }
-    | ClassDeclaration { Value : Ast.AmbientClassDeclaration; }
+    | VariableDeclaration  { Value : Ast.AmbientVariableDeclaration; }
+    | FunctionDeclaration  { Value : Ast.AmbientFunctionDeclaration; }
+    | ClassDeclaration     { Value : Ast.AmbientClassDeclaration; }
     | InterfaceDeclaration { Value : Ast.InterfaceDeclaration; }
-    | EnumDeclaration { Value : Ast.AmbientEnumDeclaration; }
-    | ModuleDeclaration { Value : Ast.AmbientModuleDeclaration; }
-    | ImportDeclaration { Value : Ast.ImportDeclaration; }
+    | EnumDeclaration      { Value : Ast.AmbientEnumDeclaration; }
+    | ModuleDeclaration    { Value : Ast.AmbientModuleDeclaration; }
+    | ImportDeclaration    { Value : Ast.ImportDeclaration; }
   }
   
   public variant AmbientExternalModuleElement
   {
-    | ExportAssignment { Value : Ast.ExportAssignment; }
+    | ExportAssignment          { Value : Ast.ExportAssignment; }
     | ExternalImportDeclaration { Value : Ast.ExternalImportDeclaration; }
-    | ModuleElement { Value : Ast.AmbientModuleElement; }
+    | ModuleElement             { Value : Ast.AmbientModuleElement; }
   }
   
   public variant AmbientClassBodyElement

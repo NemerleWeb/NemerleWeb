@@ -23,8 +23,6 @@ namespace NemerleWeb
     
     tsParser = TSDeclarationParser();
     
-    DefaultImplementation : PExpr = <[ { IgnoreParams(); throw ClientCodeCalledInServerException(); } ]>;
-    
     public Impl(typer : Typer, options : list[PExpr]) : void
     {
       DefineCTX(typer);

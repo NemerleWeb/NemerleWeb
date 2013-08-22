@@ -991,7 +991,7 @@ namespace TSParser
            
     PropertySignature(id : string, optional : bool, type : option[Ast.ScriptType]) : Ast.ScriptObject
     {
-      Ast.ScriptObject.Property(id, optional, type)
+      Ast.ScriptObject.Property(Ast.Property(id, optional, type))
     }
     
     CallSignatureObject(c : Ast.CallSignature) : Ast.ScriptObject
@@ -1012,7 +1012,7 @@ namespace TSParser
       parms : list[Ast.ScriptParameter],
       type : option[Ast.ScriptType]) : Ast.ScriptObject
     {
-      Ast.ScriptObject.Construct(typeParams, parms, type)
+      Ast.ScriptObject.Construct(Ast.Construct(typeParams, parms, type))
     }
     
     IndexSignature(paramName : string, paramType : NToken, returnType : Ast.ScriptType) : Ast.ScriptObject
@@ -1030,7 +1030,7 @@ namespace TSParser
 
     MethodSignature(id : string, optional : bool, signature : Ast.CallSignature) : Ast.ScriptObject
     {
-      Ast.ScriptObject.Method(id, optional, signature)
+      Ast.ScriptObject.Method(Ast.Method(id, optional, signature))
     }
     
     ArrayType(type : Ast.ScriptType, rank : List[NToken * NToken]) : Ast.ScriptType

@@ -36,6 +36,17 @@ namespace NemerleWeb
       else                  TypeBuilder.DefineNestedType(typeDeclaration)
     }
     
+    public IsInterface : bool
+    {
+      get
+      {
+        if(GlobalEnv == null)
+          false
+        else
+          TypeBuilder.IsInterface
+      } 
+    }
+    
     public FullNameParts : list[string]
     {
       [Memoize]
