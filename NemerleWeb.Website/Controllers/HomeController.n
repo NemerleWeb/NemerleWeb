@@ -34,7 +34,7 @@ namespace NemerleWeb.NemerleWeb.Website.Controllers
     
     private static UpdateTutorial() : void
     {
-      _tutorial = WebClient().DownloadString("https://dl.dropboxusercontent.com/u/133081/nweb/tutorial.markdown");
+      _tutorial = WebClient().DownloadString("https://dl.dropboxusercontent.com/s/1138yzd5q6gx8ha/tutorial.markdown");
     }
   }
 }
