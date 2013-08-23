@@ -1,12 +1,31 @@
 param(
   [string]$command,
-  [string]$packageName=''
+  [string]$arg0=''
 ) 
+
+$location = get-location
+$installPath = Join-Path $env:APPDATA "NemerleWeb"
 
 switch -wildcard ($command) 
 {
   "c*" {  #create
     Write-Host "Creating project"
+
+    $targetLocation = join-path $location $arg0
+    $sourceLocation = join-path $installPath "NemerleWeb.ProjectTemplate"    
+
+    if(test-path $targetLocation) {
+      Write-Host "Project with the same name already exists!" -ForegroundColor Red
+      return
+    }
+
+    robocopy $sourceLocation $targetLocation /MIR | out-null
+    
+    $files = Get-ChildItem -recurse $targetLocation -Include *.n, *.asax, *.nproj
+
+    foreach($file in $files) {
+      $content = (Get-Content $file.fullname) | ForEach-Object { $_ -replace "\`$safeprojectname\`$", $arg0 } | Set-Content $file.fullname
+    }
   }
 
   "p*" {  #add page
