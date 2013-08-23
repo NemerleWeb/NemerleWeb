@@ -217,7 +217,7 @@
     <Content Include="Scripts\markdown.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Views\Home\Tutorial.cshtml">
+    <Content Include="Views\Home\Content.cshtml">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Web.config" />
@@ -229,7 +229,6 @@
     </Content>
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
