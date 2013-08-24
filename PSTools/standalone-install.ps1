@@ -18,6 +18,7 @@ write-host "Unpacking..."
 .\7z x -tzip AllTools.zip -y | out-null
 .\7z e -tzip ItemTemplate.zip -y | out-null
 .\7z x -tzip ProjectTemplate.zip -y | out-null
+.\7z x -tzip IISExpress.zip -y | out-null
 
 .\dl-install-net45.ps1
 .\check-nemerle.ps1
@@ -40,13 +41,12 @@ if($vsInstallDir) {
 	$webClient.DownloadFile('http://www.nemerleweb.com/installer/NemerleWeb.VSIX.vsix', $vsixPath)
 	
 	$vsixInstaller = join-path $vsInstallDir VSIXInstaller.exe
-	$installCmd = "'" + $vsixInstaller + "' /q " + $vsixPath
 
-	& "$vsixInstaller" /q $vsixPath
+	& "$vsixInstaller" /quiet $vsixPath
 
 	write-host "Visual Studio extension installed" -ForegroundColor Green
 } else {
-	write-host "You don't have Visual Studio 2012 installed, skippin extension installation" -ForegroundColor Yellow
+	write-host "You don't have Visual Studio 2012 installed, skipping extension installation" -ForegroundColor Yellow
 }
 
 pop-location

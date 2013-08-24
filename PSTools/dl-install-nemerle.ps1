@@ -6,7 +6,8 @@ $url = "http://nemerle.org/Download/Nightly%20master-NET45-VS2012/567/NemerleSet
 $file = Join-Path $installPath "latest.msi"
 $downloader = new-object System.Net.WebClient
 $downloader.DownloadFile($url, $file)
-Write-Host "Installing Nemerle" -ForegroundColor Yellow;
-Start-Process -FilePath $file -ArgumentList "/q /norestart" -Wait
+Write-Host "Installing Nemerle: $file" -ForegroundColor Yellow;
+$logPath = join-path $installPath "log.log"
+Start-Process -FilePath "msiexec.exe" -ArgumentList " /i ""$file"" /qb" -Wait
   
 Remove-Item $file	

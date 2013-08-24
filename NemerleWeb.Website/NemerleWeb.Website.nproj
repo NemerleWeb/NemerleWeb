@@ -214,6 +214,12 @@
     <Content Include="Scripts\jquery.signalR-1.1.2.min.js">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\markdown.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Views\Home\Content.cshtml">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -223,7 +229,6 @@
     </Content>
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
@@ -276,7 +281,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>63042</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:51534/</IISUrl>
+          <IISUrl>http://localhost:51535/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

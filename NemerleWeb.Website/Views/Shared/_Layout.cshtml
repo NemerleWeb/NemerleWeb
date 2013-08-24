@@ -13,9 +13,9 @@
     <div class="container-narrow">
         <div class="header">
             <ul class="nav nav-pills pull-right">
-                <li class="active"><a href="#">Try</a></li>
-                <li><a href="#">Documentation</a></li>
-                <li><a href="#">Github repo</a></li>
+                <li><a href="/">Try</a></li>
+                <li><a href="/Home/Tutorial">Documentation</a></li>
+                <li><a href="https://github.com/NemerleWeb/NemerleWeb">Github repo</a></li>
                 <li><a href="#">Need help?</a></li>
             </ul>
             <h2 class="text-muted">Nemerle Web</h2>
@@ -24,5 +24,10 @@
         @RenderBody()
     </div>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.header a[href="' + this.location.pathname + '"]').parent().addClass('active');
+        });
+    </script>
 </body>
 </html>
