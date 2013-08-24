@@ -152,8 +152,8 @@ namespace NemerleWeb
     
     CreateCall(scope : TypeBuilder, call : CallSignature, prefix : string) : void
     {
-      def fullPrefix = string.Join(prefix, Call);
-      def returnTypePrefix = string.Join(fullPrefix, Return);
+      def fullPrefix = string.Join(Separator, prefix, Call);
+      def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
       def realReturnType = <[ object ]>;//ConvertType(returnTypePrefix, returnType, scope);
       
       def functionParams = ConvertParameters(scope, call.Parameters, fullPrefix);
@@ -170,8 +170,8 @@ namespace NemerleWeb
    
     CreateConstruct(scope : TypeBuilder, construct : Construct, prefix : string) : void
     {
-      def fullPrefix = string.Join(prefix, New);
-      def returnTypePrefix = string.Join(fullPrefix, Return);
+      def fullPrefix = string.Join(Separator, prefix, New);
+      def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
       def realReturnType = <[ object ]>;;//ConvertType(returnTypePrefix, type, scope);
     
       def functionParams = ConvertParameters(scope, construct.Parameters, fullPrefix);
@@ -195,8 +195,8 @@ namespace NemerleWeb
         | String => (<[ string ]>, "String")
         };
         
-      def fullPrefix = string.Join(prefix, typeName, Index);
-      def returnTypePrefix = string.Join(fullPrefix, Return);
+      def fullPrefix = string.Join(Separator, prefix, typeName, Index);
+      def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
       def realReturnType = <[ object ]>;//ConvertType(returnTypePrefix, returnType, scope);
       
       _ = scope.DefineWithSource(
@@ -225,8 +225,8 @@ namespace NemerleWeb
     /// </summary>
     CreateProperty(scope : TypeBuilder, property : Property, prefix : string) : void
     {
-      def fullPrefix = string.Join(prefix, property.Name);
-      def typePrefix = string.Join(fullPrefix, Property);
+      def fullPrefix = string.Join(Separator, prefix, property.Name);
+      def typePrefix = string.Join(Separator, fullPrefix, Property);
       def propertyType = <[ object ]>; // ConvertType(typePrefix, type, scope);
       
       _ = scope.DefineWithSource(
@@ -241,8 +241,8 @@ namespace NemerleWeb
     /// </summary>
     CreateMethod(scope : TypeBuilder, method : Method, prefix : string) : void
     {
-      def fullPrefix = string.Join(prefix, method.Name);
-      def returnTypePrefix = string.Join(fullPrefix, Return);
+      def fullPrefix = string.Join(Separator, prefix, method.Name);
+      def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
       def realReturnType = <[ object ]>;;//ConvertType(returnTypePrefix, returnType, scope);
     
       def functionParams = ConvertParameters(scope, method.Signature.Parameters, fullPrefix);
