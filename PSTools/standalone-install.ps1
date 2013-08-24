@@ -18,6 +18,7 @@ write-host "Unpacking..."
 .\7z x -tzip AllTools.zip -y | out-null
 .\7z e -tzip ItemTemplate.zip -y | out-null
 .\7z x -tzip ProjectTemplate.zip -y | out-null
+.\7z x -tzip IISExpress.zip -y | out-null
 
 .\dl-install-net45.ps1
 .\check-nemerle.ps1
