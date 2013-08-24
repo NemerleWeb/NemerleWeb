@@ -42,11 +42,11 @@ if($vsInstallDir) {
 	
 	$vsixInstaller = join-path $vsInstallDir VSIXInstaller.exe
 
-	& "$vsixInstaller" /q $vsixPath
+	& "$vsixInstaller" /quiet $vsixPath
 
 	write-host "Visual Studio extension installed" -ForegroundColor Green
 } else {
-	write-host "You don't have Visual Studio 2012 installed, skippin extension installation" -ForegroundColor Yellow
+	write-host "You don't have Visual Studio 2012 installed, skipping extension installation" -ForegroundColor Yellow
 }
 
 pop-location
