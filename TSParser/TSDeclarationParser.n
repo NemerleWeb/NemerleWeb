@@ -722,11 +722,8 @@ namespace TSParser
         #region Import Declarations (10.3)
         
         ImportDeclaration : Ast.DeclarationElement =
-          import_s Identifier assign_s (ModuleEntityName / EntityName) endS;
+          import_s Identifier assign_s EntityName endS;
         EntityName : string = ModuleName (dot Identifier)?;
-        
-        // NOTE: This rule is not according to specification
-        ModuleEntityName : string = module_s lparen_s StringLiteral rparen_s;
         
         #endregion
 
@@ -748,16 +745,13 @@ namespace TSParser
         
         ExternalImportDeclaration : Ast.DeclarationElement =
           import_s Identifier assign_s ExternalModuleReference endS;        
-        ExternalModuleReference : string = require_s lbrack_s StringLiteral s rbrack_s;
+        ExternalModuleReference : string = require_s lparen_s StringLiteral s rparen_s;
         
         #endregion
         
         #region Export Assignments (11.2.4)
         
-        // NOTE: This is not according to specification
-        ExportModuleAssignment : Ast.ExportAssignment = export_s Identifier assign_s ModuleEntityName endS;
-        ExportIdentifierAssignment : Ast.ExportAssignment = export_s assign_s Identifier endS;
-        ExportAssignment : Ast.DeclarationElement = ExportModuleAssignment / ExportIdentifierAssignment;
+        ExportAssignment : Ast.DeclarationElement = export_s assign_s Identifier endS;
         
         #endregion
         
@@ -1340,19 +1334,9 @@ namespace TSParser
         Ast.ExternalImportDeclaration(id, moduleReference))
     }
     
-    ExportModuleAssignment(id : string, moduleEntity : string) : Ast.ExportAssignment
+    ExportAssignment(id : string) : Ast.DeclarationElement
     {
-      Ast.ExportAssignment.Module(id, moduleEntity)
-    }
-    
-    ExportIdentifierAssignment(id : string) : Ast.ExportAssignment
-    {
-      Ast.ExportAssignment.Identifier(id)
-    }
-    
-    ExportAssignment(e : Ast.ExportAssignment) : Ast.DeclarationElement
-    {
-      Ast.DeclarationElement.ExportAssignment(e)
+      Ast.DeclarationElement.ExportAssignment(Ast.ExportAssignment(id))
     }    
     
     ReferencePath(_ : NToken, path : string) : Ast.Reference
@@ -1369,5 +1353,5 @@ namespace TSParser
     {
       Ast.DeclarationElement.Reference(reference)
     }
-  }  
+  }
 }

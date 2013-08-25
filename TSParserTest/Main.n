@@ -19,7 +19,12 @@ module Program
     if(pos == text.Length) true
     else
     {
-      WriteLine(text.Substring(pos, 50));
+      def errorText =
+        if(pos + 55 > text.Length)
+          text.Substring(pos)
+        else
+          text.Substring(pos, 55);
+      WriteLine(errorText);
       false
     }
   }
@@ -42,11 +47,11 @@ module Program
   Main() : void
   {
     parseTextWithResult(<#
-    #>);
+#>);
     
     foreach(f in Directory.EnumerateFiles(@"..\..\..\NemerleWeb.TypedJS\Scripts\", "*.*", SearchOption.AllDirectories))
       parseFile(f);
-      ();
+      //();
     
     WriteLine("Press any key to continue");
     _ = ReadKey();

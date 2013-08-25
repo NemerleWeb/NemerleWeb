@@ -122,11 +122,11 @@ namespace NemerleWeb
         
     /// <summary>
     /// Input:
-    /// interface A : X<XX> { a : number; b : string; }
-    /// interface A : Y<YY> , X<XX> { a : number; }
+    /// interface A : X&lt;XX&gt; { a : number; b : string; }
+    /// interface A : Y&lt;YY&gt; , X&lt;XX&gt; { a : number; }
     ///
     /// Output:
-    /// interface A : X<XX>, Y<YY> { a : number; b : string; }
+    /// interface A : X&lt;XX&gt;, Y&lt;YY&gt; { a : number; b : string; }
     /// </summary>
     private AnalyzeInterface(ast : IEnumerable[InterfaceDeclaration]) : IEnumerable[InterfaceDeclaration]
     {

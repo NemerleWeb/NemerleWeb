@@ -31,10 +31,10 @@ namespace TSParser.Ast
     | Lib { Path : string; }
   }
   
-  public variant ExportAssignment
+  [Record]
+  public class ExportAssignment
   {
-    | Module { Name : string; ModuleEntity : string; }
-    | Identifier { Name : string; }
+    public Name : string;
   }
   
   [Record]
