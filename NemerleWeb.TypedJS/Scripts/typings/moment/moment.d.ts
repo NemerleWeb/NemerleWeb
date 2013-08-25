@@ -68,8 +68,9 @@ interface Moment {
     subtract(soort: string, aantal: number): Moment;
 
     calendar(): string;
+    clone(): Moment;
 
-    valueOf(): string;
+    valueOf(): number;
 
     local(): Moment; // current date/time in local mode
 
@@ -95,13 +96,13 @@ interface Moment {
     seconds(): number;
     milliseconds(ms: number): Moment;
     milliseconds(): number;
-    weekday(): Moment;
+    weekday(): number;
     weekday(d: number): Moment;
-    isoWeekday(): Moment;
+    isoWeekday(): number;
     isoWeekday(d: number): Moment;
-    weekYear(): Moment;
+    weekYear(): number;
     weekYear(d: number): Moment;
-    isoWeekYear(): Moment;
+    isoWeekYear(): number;
     isoWeekYear(d: number): Moment;
 
     from(f: Moment): string;
@@ -123,6 +124,7 @@ interface Moment {
     daysInMonth(): number;
     isDST(): boolean;
 
+    isBefore(): boolean;
     isBefore(b: Moment): boolean;
     isBefore(b: string): boolean;
     isBefore(b: Number): boolean;
@@ -134,6 +136,7 @@ interface Moment {
     isBefore(b: Date, granularity: string): boolean;
     isBefore(b: Array, granularity: string): boolean;
 
+    isAfter(): boolean;
     isAfter(b: Moment): boolean;
     isAfter(b: string): boolean;
     isAfter(b: Number): boolean;
@@ -156,8 +159,8 @@ interface Moment {
     isSame(b: Date, granularity: string): boolean;
     isSame(b: Array, granularity: string): boolean;
 
-    lang(language: string);
-    lang(reset: boolean);
+    lang(language: string): void;
+    lang(reset: boolean): void;
     lang(): string;
 
 }
@@ -232,7 +235,6 @@ interface MomentStatic {
     (date: number[]): Moment;
     (clone: Moment): Moment;
 
-    clone(): Moment;
     unix(timestamp: number): Moment;
 
     utc(): Moment; // current date/time in UTC mode
@@ -243,8 +245,8 @@ interface MomentStatic {
 
     isMoment(): boolean;
     isMoment(m: any): boolean;
-    lang(language: string);
-    lang(language: string, definition: MomentLanguage);
+    lang(language: string): any;
+    lang(language: string, definition: MomentLanguage): any;
     months: string[];
     monthsShort: string[];
     weekdays: string[];

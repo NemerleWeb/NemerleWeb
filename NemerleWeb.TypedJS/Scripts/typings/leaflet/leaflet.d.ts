@@ -1898,12 +1898,20 @@ declare module L {
 
     }
 
+    interface IconDefaults {
+      imagePath: string;
+    }
+
     export class Icon {
         /**
           * Creates an icon instance with the given options.
           */
         constructor(options: IconOptions);
 
+        /**
+          * Default properties for newly constructed icons.
+          */
+        public static Default : IconDefaults;
     }
 
     export interface DivIconOptions {
@@ -2926,7 +2934,7 @@ declare module L {
       * This method restores the L global variale to the original value it had
       * before Leaflet inclusion, and returns the real Leaflet namespace.
       */
-    export var noConflict: () => L;
+    export var noConflict: () => typeof L;
 
     /**
       * A constant that represents the Leaflet version in use.

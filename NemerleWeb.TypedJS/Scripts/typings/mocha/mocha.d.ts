@@ -3,6 +3,17 @@
 // Definitions by: Kazi Manzur Rashid <https://github.com/kazimanzurrashid/>
 // DefinitelyTyped: https://github.com/borisyankov/DefinitelyTyped
 
+interface Mocha {
+    setup(options: MochaSetupOptions);
+    run(callback: () => void);
+}
+
+interface MochaSetupOptions {
+    slow: number;
+    timeout: number;
+    ui: string;
+}
+
 declare var describe : {
     (description: string, spec: () => void): void;
     only(description: string, spec: () => void): void;
@@ -12,11 +23,11 @@ declare var describe : {
 
 declare var it: {
     (expectation: string, assertion?: () => void): void;
-    (expectation: string, assertion?: (done: (failReason?) => void) => void): void;
+    (expectation: string, assertion?: (done: (error?: Error) => void) => void): void;
     only(expectation: string, assertion?: () => void): void;
-	only(expectation: string, assertion?: (done: (failReason?) => void) => void): void;
+    only(expectation: string, assertion?: (done: (error?: Error) => void) => void): void;
     skip(expectation: string, assertion?: () => void): void;
-	skip(expectation: string, assertion?: (done: (failReason?) => void) => void): void;
+    skip(expectation: string, assertion?: (done: (error?: Error) => void) => void): void;
     timeout(ms: number);
 };
 

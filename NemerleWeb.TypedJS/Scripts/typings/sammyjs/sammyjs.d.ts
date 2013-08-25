@@ -62,13 +62,13 @@ declare module Sammy {
         escapeHTML(s: string): string;
         h(s: string): string;
 
-        has(key: string): bool;
+        has(key: string): boolean;
         join(...args: any[]): string;
-        keys(attributes_only?: bool): string[];
+        keys(attributes_only?: boolean): string[];
         log(...args: any[]): void;
         toHTML(): string;
         toHash(): any;
-        toString(include_functions?: bool): string;
+        toString(include_functions?: boolean): string;
     }
 
     export interface Application extends Object {
@@ -81,14 +81,13 @@ declare module Sammy {
         $element(selector?: string): JQuery;
         after(callback: Function): Application;
         any(verb: string, path: string, callback: Function): void;
-        route(verb: string, path: string, callback: Function): void;
         around(callback: Function): Application;
         before(options: any, callback: Function): Application;
         bind(name: string, callback: Function): Application;
         bind(name: string, data: any, callback: Function): Application;
         bindToAllEvents(callback: Function): Application;
         clearTemplateCache(): any;
-        contextMatchesOptions(context: any, match_options: any, positive?: bool): bool;
+        contextMatchesOptions(context: any, match_options: any, positive?: boolean): boolean;
         del(path: string, callback: Function): Application;
         del(path: RegExp, callback: Function): Application;
         destroy(): Application;
@@ -99,7 +98,7 @@ declare module Sammy {
         getLocation(): string;
         helper(name: string, method: Function): Application;
         helpers(extensions: any): Application;
-        isRunning(): bool;
+        isRunning(): boolean;
         log(...params: any[]): void;
         lookupRoute(verb: string, path: string): any;
         mapRoutes(route_array: any[]): Application;
@@ -192,8 +191,8 @@ declare module Sammy {
         new (event_context);
 
         appendTo(selector: string): RenderContext;
-        collect(array: any[], callback: Function, now?: bool): RenderContext;
-        interpolate(data: any, engine?: any, retain?: bool): RenderContext;
+        collect(array: any[], callback: Function, now?: boolean): RenderContext;
+        interpolate(data: any, engine?: any, retain?: boolean): RenderContext;
         load(location: string, options?: any, callback?: Function): RenderContext;
         loadPartials(partials?: any): RenderContext;
         next(content: any): void;
@@ -233,13 +232,13 @@ declare module Sammy {
 
         clear(key: string): any;
         clearAll(): void;
-        each(callback: Function): bool;
-        exists(key: string): bool;
+        each(callback: Function): boolean;
+        exists(key: string): boolean;
         fetch(key: string, callback: Function): any;
-        filter(callback: Function): bool;
-        first(callback: Function): bool;
+        filter(callback: Function): boolean;
+        first(callback: Function): boolean;
         get(key: string): any;
-        isAvailable(): bool;
+        isAvailable(): boolean;
         keys(): string[];
         load(key: string, path: string, callback: Function): void;
         set(key: string, value: any): any;

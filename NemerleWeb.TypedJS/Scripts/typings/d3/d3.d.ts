@@ -58,9 +58,9 @@ declare module D3 {
 
     export interface Base extends Selectors {
         /**
-        * Create a behaviour
+        * Create a behavior
         */
-        behavior: Behaviour.Behavior;
+        behavior: Behavior.Behavior;
         /**
         * Access the current user event for interaction
         */
@@ -167,7 +167,7 @@ declare module D3 {
         /**
         * Randomize the order of an array.
         *
-        * @param arr Array to randomise
+        * @param arr Array to randomize
         */
         shuffle<T>(arr: T[]): T[];
         /**
@@ -183,6 +183,12 @@ declare module D3 {
         * @param arrs Arrays to transpose
         */
         zip(...arrs: any[]): any[];
+        /**
+        * Parse the given 2D affine transform string, as defined by SVG's transform attribute.
+        *
+        * @param definition 2D affine transform string
+        */
+        transform(definition: string): any;
         /**
         * Transpose an array of arrays.
         *
@@ -344,15 +350,15 @@ declare module D3 {
         */
         interpolateString: Transition.BaseInterpolate;
         /*
-        * Interpolate two RGB colours
+        * Interpolate two RGB colors
         */
         interpolateRgb: Transition.BaseInterpolate;
         /*
-        * Interpolate two HSL colours
+        * Interpolate two HSL colors
         */
         interpolateHsl: Transition.BaseInterpolate;
         /*
-        * Interpolate two HCL colours
+        * Interpolate two HCL colors
         */
         interpolateHcl: Transition.BaseInterpolate;
         /*
@@ -505,6 +511,8 @@ declare module D3 {
             flush(): void;
         }
         transition(): Transition.Transition;
+
+        round(x: number, n: number): number;
     }
 
     export interface Dispatch {
@@ -1124,41 +1132,41 @@ declare module D3 {
             };
             linkDistance: {
                 (): number;
-                (number): ForceLayout;
+                (number:number): ForceLayout;
                 (accessor: (d: any, index: number) => number): ForceLayout;
             };
             linkStrength:
             {
                 (): number;
-                (number): ForceLayout;
+                (number:number): ForceLayout;
                 (accessor: (d: any, index: number) => number): ForceLayout;
             };
             friction:
             {
                 (): number;
-                (number): ForceLayout;
+                (number:number): ForceLayout;
                 (accessor: (d: any, index: number) => number): ForceLayout;
             };
             alpha: {
                 (): number;
-                (number): ForceLayout;
+                (number:number): ForceLayout;
                 (accessor: (d: any, index: number) => number): ForceLayout;
             };
             charge: {
                 (): number;
-                (number): ForceLayout;
+                (number:number): ForceLayout;
                 (accessor: (d: any, index: number) => number): ForceLayout;
             };
 
             theta: {
                 (): number;
-                (number): ForceLayout;
+                (number:number): ForceLayout;
                 (accessor: (d: any, index: number) => number): ForceLayout;
             };
 
             gravity: {
                 (): number;
-                (number): ForceLayout;
+                (number:number): ForceLayout;
                 (accessor: (d: any, index: number) => number): ForceLayout;
             };
 
@@ -1366,7 +1374,7 @@ declare module D3 {
         }
     }
 
-    // Colour
+    // Color
     export module Color {
         export interface Color {
             /**
@@ -1380,7 +1388,7 @@ declare module D3 {
             /**
             * convert the color to a string.
             */
-            toString(): Color;
+            toString(): string;
         }
 
         export interface RGBColor extends Color{
@@ -1463,8 +1471,8 @@ declare module D3 {
         }
 
         export interface Symbol {
-            type: (string) => Symbol;
-            size: (number) => Symbol;
+            type: (string:string) => Symbol;
+            size: (number:number) => Symbol;
         }
 
         export interface Brush {
@@ -1553,6 +1561,16 @@ declare module D3 {
             ticks: {
                 (): any[];
                 (...arguments: any[]): Axis;
+            };
+
+            tickPadding: {
+                (): number;
+                (padding: number): Axis;
+            };
+
+            tickValues: {
+                (): any[];
+                (values: any[]): Axis;
             };
 
             tickSubdivide(count: number): Axis;
@@ -2585,7 +2603,7 @@ declare module D3 {
     }
 
     // Behaviour
-    export module Behaviour {
+    export module Behavior {
         export interface Behavior{
             /**
             * Constructs a new drag behaviour
@@ -2905,15 +2923,15 @@ declare module D3 {
             /**
             * Computes the projected area
             */
-            area(feature: any);
+            area(feature: any): any;
             /**
             * Computes the projected centroid
             */
-            centroid(feature: any);
+            centroid(feature: any): any;
             /**
             * Computes the projected bounding box
             */
-            bounds(feature: any);
+            bounds(feature: any): any;
             /**
             * get or set the radius to display point features.
             */

@@ -8,6 +8,11 @@
 
 declare var angular: ng.IAngularStatic;
 
+// Support for painless dependency injection
+interface Function {
+    $inject:string[];
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // ng module (angular.js)
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,7 +36,7 @@ declare module ng {
         element: JQueryStatic;
         equals(value1: any, value2: any): boolean;
         extend(destination: any, ...sources: any[]): any;
-        forEach(obj: any, iterator: (value, key) => any, context?: any): any;
+        forEach(obj: any, iterator: (value: any, key: any) => any, context?: any): any;
         fromJson(json: string): any;
         identity(arg?: any): any;
         injector(modules?: any[]): auto.IInjectorService;
@@ -234,8 +239,8 @@ declare module ng {
     // see http://docs.angularjs.org/api/ng.$timeout
     ///////////////////////////////////////////////////////////////////////////
     interface ITimeoutService {
-        (func: Function, delay?: number, invokeApply?: boolean): IPromise;
-        cancel(promise: IPromise): boolean;
+        (func: Function, delay?: number, invokeApply?: boolean): IPromise<any>;
+        cancel(promise: IPromise<any>): boolean;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -394,20 +399,20 @@ declare module ng {
     // see http://docs.angularjs.org/api/ng.$q
     ///////////////////////////////////////////////////////////////////////////
     interface IQService {
-        all(promises: IPromise[]): IPromise;
-        defer(): IDeferred;
-        reject(reason?: any): IPromise;
-        when(value: any): IPromise;
+        all(promises: IPromise<any>[]): IPromise<any[]>;
+        defer<T>(): IDeferred<T>;
+        reject(reason?: any): IPromise<void>;
+        when<T>(value: T): IPromise<T>;
     }
 
-    interface IPromise {
-        then(successCallback: (promiseValue: any) => any, errorCallback?: (reason: any) => any): IPromise;
+    interface IPromise<T> {
+        then(successCallback: (promiseValue: T) => any, errorCallback?: (reason: any) => any): IPromise<any>;
     }
 
-    interface IDeferred {
-        resolve(value?: any): void;
+    interface IDeferred<T> {
+        resolve(value?: T): void;
         reject(reason?: any): void;
-        promise: IPromise;
+        promise: IPromise<T>;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -532,21 +537,21 @@ declare module ng {
         transformResponse?: any;
     }
 
-    interface IHttpPromiseCallback {
-        (data: any, status: number, headers: (headerName: string) => string, config: IRequestConfig): any;
+    interface IHttpPromiseCallback<T> {
+        (data: T, status: number, headers: (headerName: string) => string, config: IRequestConfig): any;
     }
 
-    interface IHttpPromiseCallbackArg {
-        data?: any;
+    interface IHttpPromiseCallbackArg<T> {
+        data?: T;
         status?: number;
         headers?: (headerName: string) => string;
         config?: IRequestConfig;
     }
 
-    interface IHttpPromise extends IPromise {
-        success(callback: IHttpPromiseCallback): IHttpPromise;
-        error(callback: IHttpPromiseCallback): IHttpPromise;
-        then(successCallback: (response: IHttpPromiseCallbackArg) => any, errorCallback?: (response: IHttpPromiseCallbackArg) => any): IPromise;
+    interface IHttpPromise<T> extends IPromise<T> {
+        success(callback: IHttpPromiseCallback<T>): IHttpPromise;
+        error(callback: IHttpPromiseCallback<T>): IHttpPromise;
+        then(successCallback: (response: IHttpPromiseCallbackArg<T>) => any, errorCallback?: (response: IHttpPromiseCallbackArg<T>) => any): IPromise<any>;
     }
 
     interface IHttpProvider extends IServiceProvider {
@@ -621,8 +626,9 @@ declare module ng {
     // see http://docs.angularjs.org/api/ng.$routeProvider#when for options explanations
     interface IRoute {
         controller?: any;
+        name?: string;
         template?: string;
-        templateUrl?: string;
+        templateUrl?: any;
         resolve?: any;
         redirectTo?: any;
         reloadOnSearch?: boolean;
@@ -634,6 +640,8 @@ declare module ng {
             $scope: IScope;
             $template: string;
         };
+
+        params: any;
     }
 
     interface IRouteProvider extends IServiceProvider {
@@ -688,6 +696,7 @@ declare module ng {
             constant(name: string, value: any): void;
 
             decorator(name: string, decorator: Function): void;
+            decorator(name: string, decoratorInline: any[]): void;
             factory(name: string, serviceFactoryFunction: Function): ng.IServiceProvider;
             provider(name: string, provider: ng.IServiceProvider): ng.IServiceProvider;
             provider(name: string, serviceProviderConstructor: Function): ng.IServiceProvider;

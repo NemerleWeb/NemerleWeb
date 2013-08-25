@@ -6,28 +6,26 @@
 /// <reference path="../chai/chai.d.ts" />
 
 declare module chai {
-    interface Been {
-        called: bool;
-        calledOnce: bool;
-        calledTwice: bool;
-        calledThrice: bool;
-        calledBefore(spy: any): bool;
-        calledAfter(spy: any): bool;
-        calledOn(context: any): bool;
-        alwaysCalledOn(context: any): bool;
-        calledWith(...args: any[]): bool;
-        alwaysCalledWith(...args: any[]): bool;
-        calledWithExactly(...args: any[]): bool;
-        alwaysCalledWithExactly(...args: any[]): bool;
-        calledWithMatch(...args: any[]): bool;
-        alwaysCalledWithMatch(...args: any[]): bool;
-        returned(returnVal: any): bool;
-        alwaysReturned(returnVal: any): bool;
-        threw(errorObjOrErrorTypeStringOrNothing: any): bool;
-        alwaysThrew(errorObjOrErrorTypeStringOrNothing: any): bool;
-    }
-
-    interface Have {
-        been: Been;
+    interface Expect {
+        called: Expect;
+        calledOnce: Expect;
+        calledTwice: Expect;
+        calledThrice: Expect;
+        calledBefore(spy: Function): Expect;
+        calledAfter(spy: Function): Expect;
+        calledWithNew: Expect;
+        alwaysCalledWithNew: Expect;
+        calledOn(context: any): Expect;
+        alwaysCalledOn(context: any): Expect;
+        calledWith(...args: any[]): Expect;
+        alwaysCalledWith(...args: any[]): Expect;
+        calledWithExactly(...args: any[]): Expect;
+        alwaysCalledWithExactly(...args: any[]): Expect;
+        calledWithMatch(...args: any[]): Expect;
+        alwaysCalledWithMatch(...args: any[]): Expect;
+        returned(returnVal: any): Expect;
+        alwaysReturned(returnVal: any): Expect;
+        threw(errorObjOrErrorTypeStringOrNothing: any): Expect;
+        alwaysThrew(errorObjOrErrorTypeStringOrNothing: any): Expect;
     }
 }
