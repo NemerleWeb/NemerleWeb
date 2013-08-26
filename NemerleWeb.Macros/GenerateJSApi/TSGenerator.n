@@ -154,7 +154,7 @@ namespace NemerleWeb
     {
       def fullPrefix = string.Join(Separator, prefix, Call);
       def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
-      def realReturnType = <[ object ]>;//ConvertType(returnTypePrefix, returnType, scope);
+      def realReturnType = ConvertType(scope, call.ReturnType, returnTypePrefix);
       
       def functionParams = ConvertParameters(scope, call.Parameters, fullPrefix);
       
@@ -172,7 +172,7 @@ namespace NemerleWeb
     {
       def fullPrefix = string.Join(Separator, prefix, New);
       def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
-      def realReturnType = <[ object ]>;;//ConvertType(returnTypePrefix, type, scope);
+      def realReturnType = ConvertType(scope, construct.ReturnType, returnTypePrefix);
     
       def functionParams = ConvertParameters(scope, construct.Parameters, fullPrefix);
       
@@ -197,7 +197,7 @@ namespace NemerleWeb
         
       def fullPrefix = string.Join(Separator, prefix, typeName, Index);
       def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
-      def realReturnType = <[ object ]>;//ConvertType(returnTypePrefix, returnType, scope);
+      def realReturnType = ConvertType(scope, index.ReturnType, returnTypePrefix);
       
       _ = scope.DefineWithSource(
         if(scope.IsInterface)
@@ -227,7 +227,7 @@ namespace NemerleWeb
     {
       def fullPrefix = string.Join(Separator, prefix, property.Name);
       def typePrefix = string.Join(Separator, fullPrefix, Property);
-      def propertyType = <[ object ]>; // ConvertType(typePrefix, type, scope);
+      def propertyType = ConvertType(scope, property.Type, typePrefix);
       
       _ = scope.DefineWithSource(
         if(scope.IsInterface)
@@ -243,7 +243,7 @@ namespace NemerleWeb
     {
       def fullPrefix = string.Join(Separator, prefix, method.Name);
       def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
-      def realReturnType = <[ object ]>;;//ConvertType(returnTypePrefix, returnType, scope);
+      def realReturnType = ConvertType(scope, method.Signature.ReturnType, returnTypePrefix);
     
       def functionParams = ConvertParameters(scope, method.Signature.Parameters, fullPrefix);
     
@@ -314,12 +314,41 @@ namespace NemerleWeb
       }
     }    
     
+    /// <summary>
+    /// Convert function parameters
+    /// </summary>
     private ConvertParameters(
       scope : TypeBuilder,
       parms : IEnumerable[ScriptParameter],
       prefix : string) : IEnumerable[PParameter]
-    {      
-      parms.Select(_ => <[ parameter: _ : object ]>)
+    {
+      def makePrefix(name) { string.Join(Separator, prefix, Parameter) }
+      
+      def convert(p : ScriptParameter)
+      {
+        //| Required(RequiredParameter.Literal(name, value)) =>
+        //  <[ parameter: o : object ]>
+        | Required(RequiredParameter.Regular(name, type, _))
+        | Optional(name, type, _, _) => 
+          def realType = ConvertType(scope, type, makePrefix(name));
+          <[ parameter: $(name : usesite) : $realType ]>
+        | Rest(name, type) =>
+          def realType = ConvertType(scope, type, makePrefix(name));
+          <[ parameter: params $(name : usesite) : $realType ]>
+      }
+      
+      def ret = parms.Select(convert);
+      ret
+    }
+    
+    private ConvertType(scope : TypeBuilder, type : option[ScriptType], prefix : string) : PExpr
+    {
+      if(type is Some(t)) ConvertType(scope, t, prefix) else <[ object ]>
+    }
+    
+    private ConvertType(scope : TypeBuilder, type : ScriptType, prefix : string) : PExpr
+    {
+      <[ object ]>
     }
     
     #endregion
