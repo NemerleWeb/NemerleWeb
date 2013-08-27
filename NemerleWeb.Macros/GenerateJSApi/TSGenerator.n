@@ -97,12 +97,10 @@ namespace NemerleWeb
       scope : Scope,
       tsInterface : InterfaceDeclaration) : void
     {
-      def typeParameters = tsInterface.TypeParameters
-        .Select(e => PT.Splicable.Name(PT.Name(e.Name)))
-        .NToList();
+      def typeParameters = ConvertTypeParameters(tsInterface.TypeParameters);
         
       def extends = tsInterface.Extends
-        .Select(e => ConvertTypeArgument(scope, e, typeParameters));
+        .Select(e => MakeFullType(scope, e, typeParameters));
         
       def interfaceType = scope.Define(
         <[ decl:
@@ -141,11 +139,11 @@ namespace NemerleWeb
     {
       match(obj)
       {
-      | Call(value)      => CreateCall(scope, value, prefix)
-      | Construct(value) => CreateConstruct(scope, value, prefix)
+      //| Call(value)      => CreateCall(scope, value, prefix)
+      //| Construct(value) => CreateConstruct(scope, value, prefix)
       | Index(value)     => CreateIndex(scope, value, prefix)
       | Property(value)  => CreateProperty(scope, value, prefix)
-      | Method(value)    => CreateMethod(scope, value, prefix)
+      //| Method(value)    => CreateMethod(scope, value, prefix)
       | _ => ()
       }
     }
@@ -157,13 +155,15 @@ namespace NemerleWeb
       def realReturnType = ConvertType(scope, call.ReturnType, returnTypePrefix);
       
       def functionParams = ConvertParameters(scope, call.Parameters, fullPrefix);
+      def typeParameters = ConvertTypeParameters(call.TypeParameters);
       
       _ = scope.DefineWithSource(
         if(scope.IsInterface)
-          <[ decl: new $(JSApiSpecial.Call : usesite)(..$functionParams) : $realReturnType; ]>
+          <[ decl:
+            new $(JSApiSpecial.Call : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>
         else
           <[ decl:
-             public $(JSApiSpecial.Call : usesite)(..$functionParams) : $realReturnType
+             public $(JSApiSpecial.Call : usesite)[..$typeParameters](..$functionParams) : $realReturnType
               $DefaultImplementation
           ]>);
     }
@@ -175,13 +175,14 @@ namespace NemerleWeb
       def realReturnType = ConvertType(scope, construct.ReturnType, returnTypePrefix);
     
       def functionParams = ConvertParameters(scope, construct.Parameters, fullPrefix);
+      def typeParameters = ConvertTypeParameters(construct.TypeParameters);
       
       _ = scope.DefineWithSource(
           if(scope.IsInterface)
-            <[ decl: new $(JSApiSpecial.New : usesite)(..$functionParams) : $realReturnType; ]>
+            <[ decl: new $(JSApiSpecial.New : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>
           else
             <[ decl:
-              public $(JSApiSpecial.New : usesite)(..$functionParams) : $realReturnType
+              public $(JSApiSpecial.New : usesite)[..$typeParameters](..$functionParams) : $realReturnType
                 $DefaultImplementation
             ]>);
     }
@@ -246,13 +247,14 @@ namespace NemerleWeb
       def realReturnType = ConvertType(scope, method.Signature.ReturnType, returnTypePrefix);
     
       def functionParams = ConvertParameters(scope, method.Signature.Parameters, fullPrefix);
+      def typeParameters = ConvertTypeParameters(method.Signature.TypeParameters);
     
       _ = scope.DefineWithSource(
         if(scope.IsInterface)
-          <[ decl: new $(method.Name : usesite)(..$functionParams) : $realReturnType; ]>
+          <[ decl: new $(method.Name : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>
         else
           <[ decl: 
-            $(method.Name : usesite)(..$functionParams) : $realReturnType
+            $(method.Name : usesite)[..$typeParameters](..$functionParams) : $realReturnType
               $DefaultImplementation
           ]>);
     }
@@ -261,7 +263,10 @@ namespace NemerleWeb
     
     #region Converters
     
-    private ConvertTypeArgument(
+    /// <summary>
+    /// Makes type with type argument for base type
+    /// </summary>
+    private MakeFullType(
       scope : Scope,
       typeRef : ScriptType.Ref,
       typeParameters : IEnumerable[PT.Splicable]) : PExpr
@@ -278,7 +283,7 @@ namespace NemerleWeb
       else
       {
         def typeArguments = typeRef.TypeArguments
-          .Select(tyArg => ConvertTypeArgumentImpl(scope, tyArg, typeParameters));
+          .Select(tyArg => MakeFullTypeImpl(scope, tyArg, typeParameters));
         <[ $name.[..$typeArguments] ]>
       }
     }
@@ -286,7 +291,7 @@ namespace NemerleWeb
     /// <summary>
     /// Get PExpr from TS type
     /// </summary>
-    private ConvertTypeArgumentImpl(
+    private MakeFullTypeImpl(
       scope : Scope,
       type : ScriptType,
       typeParameters : IEnumerable[PT.Splicable]) : PExpr
@@ -298,7 +303,7 @@ namespace NemerleWeb
       | Boolean => <[ bool ]>
       | String => <[ string ]>
       | Void => <[ void ]>
-      | Ref as r => ConvertTypeArgument(scope, r, typeParameters)
+      | Ref as r => MakeFullType(scope, r, typeParameters)
       | Query => Message.Error("Query type argument unsupported"); <[ ]>
       | Array => Message.Error("Array type argument unsupported"); <[ ]>
       | Object as o =>
@@ -312,7 +317,13 @@ namespace NemerleWeb
       | Constructor => Message.Error("Constructor type argument unsupported"); <[ ]>
       | _ => Message.Error($"Unsupport type argument $type");  <[]>
       }
-    }    
+    }
+    
+    private ConvertTypeParameters(typeParameters : IEnumerable[ScriptTypeParameter])
+      : list[PT.Splicable]
+    {
+      typeParameters.Select(e => PT.Splicable.Name(PT.Name(e.Name))).NToList()
+    }
     
     private GetParameterPrefix(prefix : string, name : string) : string
     {
@@ -404,10 +415,6 @@ namespace NemerleWeb
       | Void => <[ void ]>
       }
     }
-    
-    #endregion
-    
-    #region Helpers
     
     /// <summary>
     /// We cannot simply put type as is because it leads to compilation problems.
