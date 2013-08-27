@@ -94,12 +94,21 @@ namespace NemerleWeb
         def isIncluded(s) { if (arg.Exclude == "") true else !re.IsMatch(s) }
       
         def fullDir = Path.Combine(projectDir, arg.Directory);          
-        def tsFiles = Directory.EnumerateFiles(fullDir, "*.d.ts", SearchOption.AllDirectories);
+        try
+        {
+          def tsFiles = Directory.EnumerateFiles(fullDir, "*.d.ts", SearchOption.AllDirectories);
 
-        // Add all files and references, do not scan files twice.
-        foreach(tsFile in tsFiles)
-          when(isIncluded(tsFile) && tsFilesToParse.Add(tsFile))
-           tsFilesToParse.UnionWith(PreParseTS(tsFile).Where(_ != ""))
+          // Add all files and references, do not scan files twice.
+          foreach(tsFile in tsFiles)
+            when(isIncluded(tsFile) && tsFilesToParse.Add(tsFile))
+             tsFilesToParse.UnionWith(PreParseTS(tsFile).Where(_ != ""))
+        }
+        catch
+        {
+        | _ =>
+          // Skip this directory
+          ()
+        }
       }
       
       tsFilesToParse
@@ -116,25 +125,26 @@ namespace NemerleWeb
         {
           | e => Message.Hint($"Caught exception $e"); ""
         };
-      when(text == "") yield "";
       
-      match(tsParser.TryParse(text))
-      {
-      | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>
-        // Add file
-        yield tsFile;
-        
-        // Check all references
-        foreach(DeclarationElement.Reference(Reference.Lib(path)) in result)
+      if(text == "") yield "";
+      else
+        match(tsParser.TryParse(text))
         {
-          def reference = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(tsFile), path));
-          yield reference;
+        | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>
+          // Add file
+          yield tsFile;
           
-          foreach(r in PreParseTS(reference)) yield r;
+          // Check all references
+          foreach(DeclarationElement.Reference(Reference.Lib(path)) in result)
+          {
+            def reference = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(tsFile), path));
+            yield reference;
+            
+            foreach(r in PreParseTS(reference)) yield r;
+          }
+        | (pos, _) =>
+          FailedParsing(tsFile, tsParser.ParsingSource.OriginalText, pos);
         }
-      | (pos, _) =>
-        FailedParsing(tsFile, tsParser.ParsingSource.OriginalText, pos);
-      }
     }
     
     #endregion   
@@ -143,14 +153,26 @@ namespace NemerleWeb
     
     private ParseTS(tsFile : string) : IEnumerable[DeclarationElement]
     {
-      match(tsParser.TryParse(File.ReadAllText(tsFile)))
-      {
-      | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>
-        result
-      | (pos, _) =>
-        FailedParsing(tsFile, tsParser.ParsingSource.OriginalText, pos);
-        []
-      }
+      def text =
+        try
+        {
+          File.ReadAllText(tsFile);
+        }
+        catch
+        {
+          | e => Message.Hint($"Caught exception $e"); ""
+        };
+      
+      if(text == "") [];
+      else        
+        match(tsParser.TryParse(File.ReadAllText(tsFile)))
+        {
+        | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>
+          result
+        | (pos, _) =>
+          FailedParsing(tsFile, tsParser.ParsingSource.OriginalText, pos);
+          []
+        }
     }
     
     #endregion    

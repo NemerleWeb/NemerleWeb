@@ -25,99 +25,84 @@ namespace NemerleWeb
     /// <summary>
     /// Take all elements and remove duplicates
     /// </summary>
+    /// <remark
     public AnalyzeTSAst(tsAsts : IEnumerable[DeclarationElement]) : IEnumerable[DeclarationElement]
     {
-      def filter(ast : DeclarationElement) : bool
-      {        
-        | DeclarationElement.InterfaceDeclaration => true
+      tsAsts.GroupBy(GroupAst).SelectMany(SelectAst)
+    }
+    
+    private GroupAst(ast : DeclarationElement) : Type * string
+    {
+        def name =
+        match(ast)
+        {
+        | DeclarationElement.InterfaceDeclaration(v) => v.Name
         | DeclarationElement.AmbientDeclaration(v) =>
           match(v)
           {
-          | AmbientDeclaration.VariableDeclaration
-          | AmbientDeclaration.FunctionDeclaration
-          | AmbientDeclaration.ClassDeclaration
-          | AmbientDeclaration.EnumDeclaration
-          | AmbientDeclaration.ModuleDeclaration => true
-          | AmbientDeclaration.ExternalModuleDeclaration => false
-          }
-        | DeclarationElement.Reference
-        | DeclarationElement.ExportAssignment
-        | DeclarationElement.ExternalImportDeclaration
-        | DeclarationElement.ImportDeclaration => false
-      }
-      def group(ast : DeclarationElement) : Type * string
-      {
-         def name =
-          match(ast)
-          {
-          | DeclarationElement.InterfaceDeclaration(v) => v.Name
-          | DeclarationElement.AmbientDeclaration(v) =>
-            match(v)
-            {
-            | AmbientDeclaration.VariableDeclaration(v) => v.Name
-            | AmbientDeclaration.FunctionDeclaration(v) => v.Name
-            | AmbientDeclaration.ClassDeclaration   (v) => v.Name
-            | AmbientDeclaration.EnumDeclaration    (v) => v.Name
-            | AmbientDeclaration.ModuleDeclaration  (v) => v.Name
+          | AmbientDeclaration.VariableDeclaration(v) => v.Name
+          | AmbientDeclaration.FunctionDeclaration(v) => v.Name
+          | AmbientDeclaration.ClassDeclaration   (v) => v.Name
+          | AmbientDeclaration.EnumDeclaration    (v) => v.Name
+          | AmbientDeclaration.ModuleDeclaration  (v) => v.Name
             
-            | _ => ""
-            }
           | _ => ""
-          };
-        
-        // Group by type and name
-        (ast.GetType(), name)
-      }
-      def select(typeAndNameGroup : IGrouping[Type * string, DeclarationElement]) : IEnumerable[DeclarationElement]
-      {
-        def type = typeAndNameGroup.Key[0];
-        
-        if(type.Equals(typeof(DeclarationElement.InterfaceDeclaration)))
-        {
-          AnalyzeInterface(
-            typeAndNameGroup
-              .Cast.[DeclarationElement.InterfaceDeclaration]()
-              .Select(i => i.Value))
-          .Select(i => DeclarationElement.InterfaceDeclaration(i))
-        }
-        else
-        if(type.Equals(typeof(AmbientDeclaration.VariableDeclaration)))
-        {
-          [typeAndNameGroup.First()]
-          //AnalyzeInterface(typeAndNameGroup.Cast.[TSGlobal.Interface]())
-        }
-        else
-        if(type.Equals(typeof(AmbientDeclaration.FunctionDeclaration)))
-        {
-          [typeAndNameGroup.First()]
-          //AnalyzeModule(typeAndNameGroup.Cast.[TSGlobal.Module]())
-        }
-        else
-        if(type.Equals(typeof(AmbientDeclaration.ClassDeclaration)))
-        {
-          [typeAndNameGroup.First()]
-          //AnalyzeEnum(typeAndNameGroup.Cast.[TSGlobal.Enum]())
-        }
-        else
-        if(type.Equals(typeof(AmbientDeclaration.EnumDeclaration)))
-        {
-          [typeAndNameGroup.First()]
-          //AnalyzeFunction(typeAndNameGroup.Cast.[TSGlobal.Function]())
-        }
-        else
-        if(type.Equals(typeof(AmbientDeclaration.ModuleDeclaration)))
-        {
-          [typeAndNameGroup.First()]
-          //AnalyzeModule
-        }
-        // By default take first and skip others        
-        else
-        {
-          [typeAndNameGroup.First()]
-        }
-      }
+          }
+        | _ => ""
+        };
       
-       tsAsts.Where(filter).GroupBy(group).SelectMany(select)
+      // Group by type and name
+      (ast.GetType(), name)
+    }
+    
+    private SelectAst(typeAndNameGroup : IGrouping[Type * string, DeclarationElement]) :
+      IEnumerable[DeclarationElement]
+    {
+      def type = typeAndNameGroup.Key[0];
+        
+      if(type.Equals(typeof(DeclarationElement.InterfaceDeclaration)))
+      {
+        AnalyzeInterface(
+          typeAndNameGroup
+            .Cast.[DeclarationElement.InterfaceDeclaration]()
+            .Select(i => i.Value))
+        .Select(i => DeclarationElement.InterfaceDeclaration(i))
+      }
+      else
+      if(type.Equals(typeof(AmbientDeclaration.VariableDeclaration)))
+      {
+        [typeAndNameGroup.First()]
+        //AnalyzeInterface(typeAndNameGroup.Cast.[TSGlobal.Interface]())
+      }
+      else
+      if(type.Equals(typeof(AmbientDeclaration.FunctionDeclaration)))
+      {
+        [typeAndNameGroup.First()]
+        //AnalyzeModule(typeAndNameGroup.Cast.[TSGlobal.Module]())
+      }
+      else
+      if(type.Equals(typeof(AmbientDeclaration.ClassDeclaration)))
+      {
+        [typeAndNameGroup.First()]
+        //AnalyzeEnum(typeAndNameGroup.Cast.[TSGlobal.Enum]())
+      }
+      else
+      if(type.Equals(typeof(AmbientDeclaration.EnumDeclaration)))
+      {
+        [typeAndNameGroup.First()]
+        //AnalyzeFunction(typeAndNameGroup.Cast.[TSGlobal.Function]())
+      }
+      else
+      if(type.Equals(typeof(AmbientDeclaration.ModuleDeclaration)))
+      {
+        [typeAndNameGroup.First()]
+        //AnalyzeModule
+      }
+      // By default take first and skip others        
+      else
+      {
+        [typeAndNameGroup.First()]
+      }
     }
         
     /// <summary>
@@ -143,7 +128,9 @@ namespace NemerleWeb
         .NToList();
       
       def members = ast
-        .SelectMany(x => x.Type.Members.SelectMany(m => [m]))/*AnalyzeObject*/ 
+        .SelectMany(x => x.Type.Members
+          .Where(m => NoLiteralParameters(m))
+          .SelectMany(m => [m]))/*AnalyzeObject*/ 
         .Distinct()
         .NToList();
       
@@ -151,6 +138,23 @@ namespace NemerleWeb
         
       yield InterfaceDeclaration(name, typeParameters, extends, @type)
     }
+    
+    #region Helpers
+    
+    private NoLiteralParameters(parms : IEnumerable[ScriptParameter]) : bool
+    {
+      !parms.Any(p => p is ScriptParameter.Required(RequiredParameter.Literal))
+    }
+    
+    private NoLiteralParameters(m : ScriptObject) : bool
+    {
+      | ScriptObject.Call(value) => NoLiteralParameters(value.Parameters)
+      | ScriptObject.Construct(value) => NoLiteralParameters(value.Parameters)
+      | ScriptObject.Method(value) => NoLiteralParameters(value.Signature.Parameters)
+      | _ => true
+    }
+    
+    #endregion
     
    #if A
   

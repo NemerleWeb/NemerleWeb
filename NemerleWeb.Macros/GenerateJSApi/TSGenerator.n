@@ -34,7 +34,7 @@ namespace NemerleWeb
       GenerateTypes(Scope(jsApiNamespace), tsAst);
             
       // Generate types members
-      //GenerateTypesMembers(Scope(jsApiNamespace), tsAst);
+      GenerateTypesMembers(Scope(jsApiNamespace), tsAst);
       
       // Then generate the rest: variables, functions.
       //GenerateRestMembers(Scope(jsApiNamespace), jsApiModule, tsAst);
@@ -314,6 +314,11 @@ namespace NemerleWeb
       }
     }    
     
+    private GetParameterPrefix(prefix : string, name : string) : string
+    {
+      string.Join(Separator, prefix, name, Parameter)
+    }
+    
     /// <summary>
     /// Convert function parameters
     /// </summary>
@@ -322,22 +327,45 @@ namespace NemerleWeb
       parms : IEnumerable[ScriptParameter],
       prefix : string) : IEnumerable[PParameter]
     {
-      def makePrefix(name) { string.Join(Separator, prefix, Parameter) }
-      
       def convert(p : ScriptParameter)
       {
-        //| Required(RequiredParameter.Literal(name, value)) =>
-        //  <[ parameter: o : object ]>
+        // Literal parameters are not supported now
+        | Required(RequiredParameter.Literal) =>
+          throw InvalidOperationException("Literal parameters are not supported")
         | Required(RequiredParameter.Regular(name, type, _))
         | Optional(name, type, _, _) => 
-          def realType = ConvertType(scope, type, makePrefix(name));
+          def realType = ConvertType(scope, type, GetParameterPrefix(prefix, name));
           <[ parameter: $(name : usesite) : $realType ]>
         | Rest(name, type) =>
-          def realType = ConvertType(scope, type, makePrefix(name));
+          def realType = ConvertType(scope, type, GetParameterPrefix(prefix, name));
           <[ parameter: params $(name : usesite) : $realType ]>
       }
       
       def ret = parms.Select(convert);
+      ret
+    }
+    
+    /// <summary>
+    /// Return parameters types
+    /// </summary>
+    private GetParametersType(
+      scope : TypeBuilder, 
+      parms : list[ScriptParameter],
+      prefix : string) : list[PExpr]
+    {
+      def convertParamsType(p : ScriptParameter)
+      {
+        // Literal parameters are not supported now
+        | Required(RequiredParameter.Literal) =>
+          throw InvalidOperationException("Literal parameters are not supported")
+        | Required(RequiredParameter.Regular(name, type, _))
+        | Optional(name, type, _, _) => 
+          ConvertType(scope, type, GetParameterPrefix(prefix, name))
+        | Rest(name, type) =>
+          ConvertType(scope, type, GetParameterPrefix(prefix, name))
+      }
+    
+      def ret = parms.Map(convertParamsType);
       ret
     }
     
@@ -348,7 +376,33 @@ namespace NemerleWeb
     
     private ConvertType(scope : TypeBuilder, type : ScriptType, prefix : string) : PExpr
     {
-      <[ object ]>
+      match(type)
+      {
+      | Any => <[ object ]>
+      | Array(t, 0) => <[ $(ConvertType(scope, t, prefix)) ]>
+      | Array(t, rank) => <[ array[$(ConvertType(scope, ScriptType.Array(t, rank - 1), prefix))] ]>
+      | Boolean => <[ bool ]>
+      | Constructor => <[ object ]>
+      | Function(parms, ret) =>
+        mutable lambdaParams = GetParametersType(scope, parms, prefix);
+        def type =
+          if(ret is ScriptType.Void())
+            <[ System.Action ]>
+          else
+          {
+            lambdaParams = lambdaParams.Concat([ConvertType(scope, ret, prefix)]);
+            <[ System.Func ]>
+          };
+        
+        <[ $type.[..$lambdaParams] ]>
+        
+      | Number => <[ float ]>
+      | Object(_members) => <[ object ]> // CreateAnonymousType(scope, members, prefix)
+      | Query => assert2(false); <[ object ]>
+      | Ref(name, tyArgs) => ConvertTypeInScope(Scope(scope), name, tyArgs, prefix)
+      | String => <[ string ]>
+      | Void => <[ void ]>
+      }
     }
     
     #endregion
@@ -369,26 +423,41 @@ namespace NemerleWeb
     /// TypeScript behaves like C# and allows this code with choosing internal module.
     /// We must do same lookup and find out all types starting from the current scope.
     /// </summary>
-    private LookupTypeInScope(name : string, scope : Scope) : PExpr
+    private ConvertTypeInScope(
+      scope : Scope,
+      name : string,
+      tyArgs : list[ScriptType],
+      prefix : string) : PExpr
     {
+      def typeArgumentPrefix = string.Join(Separator, prefix, TypeArgument);
+      def realTypeArguments = tyArgs.Map(
+        type => ConvertType(scope.TypeBuilder, type, typeArgumentPrefix));
+      
       // Try finding type going up in hierarcy of scope.
       def scopeFullName = scope.FullNameParts.ToArray();
       for(mutable i = 0; i < scopeFullName.Length - 1; i++)
       {
         def qid = scopeFullName.Take(scopeFullName.Length - i).JoinDot() + "." + name;
         when(scope.LookupType(qid) is Some(type))
-          return type;
+        {
+          return <[ $type.[..$realTypeArguments] ]>;
+        }
       }
       
       // If type has not been found use name
-      <[ $(name : usesite) ]>
+      // Handle array as special case
+      if (name == "Array")
+        <[ {..$realTypeArguments}[] ]>
+      else
+        <[ $(name : usesite).[..$realTypeArguments] ]>
     }
-
+    
     #endregion
     
     #region Special constants
     
-    DefaultImplementation : PExpr = <[ { IgnoreParams(); throw ClientCodeCalledInServerException(); } ]>;
+    DefaultImplementation : PExpr =
+      <[ { IgnoreParams(); throw ClientCodeCalledInServerException(); } ]>;
     
     private Call = "Call";
     private New = "New";
@@ -398,6 +467,7 @@ namespace NemerleWeb
     private Return = "Return";
     private Parameter = "Parameter";
     private AnonymousType = "AnonymousType";
+    private TypeArgument = "TypeArgument";
     private Separator = "_";
         
     #endregion
