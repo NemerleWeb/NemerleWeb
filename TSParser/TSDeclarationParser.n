@@ -472,9 +472,8 @@ namespace TSParser
         // Return list instead of option
         TypeParametersOpt : list[Ast.ScriptTypeParameter] = TypeParameters?;
         TypeParameterList : list[Ast.ScriptTypeParameter] = TypeParameter (comma_s TypeParameter)*;
-        TypeParameter : Ast.ScriptTypeParameter = Identifier Contraint?;
-        // Compiler allows here array literal (WTF?), so we use ScriptType for simplicity
-        Contraint : Ast.ScriptType = extends_s (TypeReference !'[' / ScriptType);
+        TypeParameter : Ast.ScriptTypeParameter = Identifier Contraint?;        
+        Contraint : Ast.ScriptType = extends_s ScriptType;
         
         #endregion
         
