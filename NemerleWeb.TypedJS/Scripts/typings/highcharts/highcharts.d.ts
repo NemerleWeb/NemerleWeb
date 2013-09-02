@@ -3,6 +3,8 @@
 // Definitions by: Damiano Gambarotto <http://github.com/damianog>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
+/// <reference path="../jquery/jquery.d.ts" />
+
 interface HighchartsPosition {
     align?: string;
     verticalAlign?: string;
@@ -1049,7 +1051,8 @@ interface HighchartsStatic {
 
     dateFormat(format: string, time?: number, capitalize?: boolean): string;
     numberFormat(value: number, decimals?: number, decimalPoint?: string, thousandsSep?: string): string;
-    setOptions(options: HighchartsOptions): any;
+    setOptions(options: HighchartsOptions): HighchartsOptions;
+    getOptions(): HighchartsOptions;
 }
 declare var Highcharts: HighchartsStatic;
 
@@ -1105,4 +1108,8 @@ interface HighchartsSeriesObject {
     visible: boolean;
     xAxis: HighchartsAxisObject;
     yAxis: HighchartsAxisObject;
+}
+
+interface JQuery {
+    highcharts(options: HighchartsOptions): HighchartsChart;
 }

@@ -1040,9 +1040,8 @@ declare module _ {
 	* @param keys The key/value pairs to remove on `object`.
 	* @return Copy of `object` without the `keys` properties.
 	**/
-	export function omit(
-		object: any,
-		...keys: string[]): any;
+	export function omit(object: any, ...keys: string[]): any;
+	export function omit(object: any, keys: string[]): any;
 
 	/**
 	* Fill in null and undefined properties in object with values from the defaults objects,
@@ -2655,6 +2654,7 @@ interface _Chain<T> {
 	* @see _.omit
 	**/
 	omit(...keys: string[]): _Chain;
+	omit(keys: string[]): _Chain;
 
 	/**
 	* Wrapped type `object`.

@@ -511,8 +511,10 @@ namespace TSParser
         TypeLiteral : Ast.ScriptType = ObjectType / FunctionType / ConstructorType;        
         
         ArrayType : Ast.ScriptType = Type ('['s ']'s)+;
-        FunctionType : Ast.ScriptType = lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
-        ConstructorType : Ast.ScriptType = new_s lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
+        FunctionType : Ast.ScriptType =
+          TypeParametersOpt lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
+        ConstructorType : Ast.ScriptType =
+          new_s TypeParametersOpt lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
         
         #endregion
                  
@@ -1031,14 +1033,20 @@ namespace TSParser
       Ast.ScriptType.Array(type, rank.Count)
     }
     
-    FunctionType(parms : list[Ast.ScriptParameter], returnType : Ast.ScriptType) : Ast.ScriptType
+    FunctionType(
+      typeParams : list[Ast.ScriptTypeParameter],
+      parms : list[Ast.ScriptParameter],
+      returnType : Ast.ScriptType) : Ast.ScriptType
     {
-      Ast.ScriptType.Function(parms, returnType)
+      Ast.ScriptType.Function(Ast.ScriptTypeCallSignature(typeParams, parms, returnType))
     }
     
-    ConstructorType(parms : list[Ast.ScriptParameter], returnType : Ast.ScriptType) : Ast.ScriptType
+    ConstructorType(
+      typeParams : list[Ast.ScriptTypeParameter],
+      parms : list[Ast.ScriptParameter],
+      returnType : Ast.ScriptType) : Ast.ScriptType
     {
-      Ast.ScriptType.Constructor(parms, returnType)
+      Ast.ScriptType.Constructor(Ast.ScriptTypeCallSignature(typeParams, parms, returnType))
     }
    
     IdentifierPath(first : string, rest : List[string]) : string

@@ -27,9 +27,7 @@ namespace NemerleWeb
     
     public GenerateCode(typer : Typer, root : string, tsAst : IEnumerable[DeclarationElement]) : void
     {
-      //def jsApiNamespace = typer.Env.EnterIntoNamespace(root.SplitDot());
-      
-      // TODO: Replace this code with just CreateModule(root.SplitDot(), typer.Env);
+      // Create namespaces and the last will be module      
       def splittedRoot = root.Split('.');      
       def surroundingNamespace = typer.Env.EnterIntoNamespace(
         splittedRoot.Take(splittedRoot.Length - 1).NToList());
@@ -402,14 +400,15 @@ namespace NemerleWeb
       | Array(t, rank) => <[ array[$(ConvertType(scope, ScriptType.Array(t, rank - 1), prefix))] ]>
       | Boolean => <[ bool ]>
       | Constructor => <[ object ]>
-      | Function(parms, ret) =>
-        mutable lambdaParams = GetParametersType(scope, parms, prefix);
+      | Function(value) =>
+        // TODO: Handle generic function
+        mutable lambdaParams = GetParametersType(scope, value.Parameters, prefix);
         def type =
-          if(ret is ScriptType.Void())
+          if(value.ReturnType is ScriptType.Void())
             <[ System.Action ]>
           else
           {
-            lambdaParams = lambdaParams.Concat([ConvertType(scope, ret, prefix)]);
+            lambdaParams = lambdaParams.Concat([ConvertType(scope, value.ReturnType, prefix)]);
             <[ System.Func ]>
           };
         

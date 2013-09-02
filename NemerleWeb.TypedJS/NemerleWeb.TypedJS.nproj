@@ -164,7 +164,9 @@
     <Folder Include="Scripts\typings\jasmine-jquery\" />
     <Folder Include="Scripts\typings\jasmine-matchers\" />
     <Folder Include="Scripts\typings\jasmine\" />
+    <Folder Include="Scripts\typings\jointjs\" />
     <Folder Include="Scripts\typings\jqrangeslider\" />
+    <Folder Include="Scripts\typings\jquery.are-you-sure\" />
     <Folder Include="Scripts\typings\jquery.autosize\" />
     <Folder Include="Scripts\typings\jquery.bbq\" />
     <Folder Include="Scripts\typings\jquery.bootstrap.wizard\" />
@@ -177,6 +179,7 @@
     <Folder Include="Scripts\typings\jquery.dynatree\" />
     <Folder Include="Scripts\typings\jquery.elang\" />
     <Folder Include="Scripts\typings\jquery.form\" />
+    <Folder Include="Scripts\typings\jquery.gridster\" />
     <Folder Include="Scripts\typings\jquery.jnotify\" />
     <Folder Include="Scripts\typings\jquery.livestampjs\" />
     <Folder Include="Scripts\typings\jquery.menuaim\" />
@@ -224,19 +227,24 @@
     <Folder Include="Scripts\typings\logg\" />
     <Folder Include="Scripts\typings\marionette\" />
     <Folder Include="Scripts\typings\marked\" />
+    <Folder Include="Scripts\typings\meteor\" />
     <Folder Include="Scripts\typings\mocha\" />
     <Folder Include="Scripts\typings\modernizr\" />
     <Folder Include="Scripts\typings\moment\" />
+    <Folder Include="Scripts\typings\mongodb\" />
     <Folder Include="Scripts\typings\mousetrap\" />
     <Folder Include="Scripts\typings\msnodesql\" />
     <Folder Include="Scripts\typings\mustache\" />
     <Folder Include="Scripts\typings\node-azure\" />
+    <Folder Include="Scripts\typings\node-fibers\" />
     <Folder Include="Scripts\typings\nodemailer\" />
     <Folder Include="Scripts\typings\node\" />
     <Folder Include="Scripts\typings\node_redis\" />
     <Folder Include="Scripts\typings\node_zeromq\" />
     <Folder Include="Scripts\typings\noVNC\" />
     <Folder Include="Scripts\typings\numeraljs\" />
+    <Folder Include="Scripts\typings\parallel\" />
+    <Folder Include="Scripts\typings\pdf\" />
     <Folder Include="Scripts\typings\persona\" />
     <Folder Include="Scripts\typings\phantomjs\" />
     <Folder Include="Scripts\typings\phonegap\" />
@@ -282,6 +290,7 @@
     <Folder Include="Scripts\typings\tween.js\" />
     <Folder Include="Scripts\typings\tweenjs\" />
     <Folder Include="Scripts\typings\underscore-ko\" />
+    <Folder Include="Scripts\typings\underscore.string\" />
     <Folder Include="Scripts\typings\underscore\" />
     <Folder Include="Scripts\typings\unity-webapi\" />
     <Folder Include="Scripts\typings\urijs\" />
@@ -290,6 +299,8 @@
     <Folder Include="Scripts\typings\vimeo\" />
     <Folder Include="Scripts\typings\webaudioapi\" />
     <Folder Include="Scripts\typings\webrtc\" />
+    <Folder Include="Scripts\typings\winjs\" />
+    <Folder Include="Scripts\typings\winrt\" />
     <Folder Include="Scripts\typings\youtube\" />
     <Folder Include="Scripts\typings\zepto\" />
     <Folder Include="Scripts\typings\zeroclipboard\" />
@@ -385,6 +396,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\breeze\breeze-1.0.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\breeze\breeze-1.2.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\breeze\breeze.d.ts">
@@ -606,7 +620,13 @@
     <Content Include="Scripts\typings\jasmine\jasmine.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\jointjs\jointjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\jqrangeslider\jqrangeslider.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.are-you-sure\jquery.are-you-sure.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.autosize\jquery.autosize.d.ts">
@@ -643,6 +663,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.form\jquery.form.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.gridster\gridster.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.jnotify\jquery.jnotify.d.ts">
@@ -792,6 +815,9 @@
     <Content Include="Scripts\typings\marked\marked.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\meteor\meteor.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\mocha\mocha.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -799,6 +825,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\moment\moment.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\mongodb\mongodb.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\mousetrap\mousetrap.d.ts">
@@ -811,6 +840,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\node-azure\azure.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\node-fibers\node-fibers.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\nodemailer\nodemailer.d.ts">
@@ -832,6 +864,12 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\numeraljs\numeraljs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\parallel\parallel.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\pdf\pdf.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\persona\persona.d.ts">
@@ -999,6 +1037,9 @@
     <Content Include="Scripts\typings\underscore-ko\underscore-ko.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\underscore.string\underscore.string.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\underscore\underscore.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -1030,6 +1071,12 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\webrtc\RTCPeerConnection.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\winjs\winjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\winrt\winrt.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\youtube\youtube.d.ts">

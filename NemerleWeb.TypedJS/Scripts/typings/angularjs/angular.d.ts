@@ -356,7 +356,7 @@ declare module ng {
         port(): number;
         protocol(): string;
         replace(): ILocationService;
-        search(): string;
+        search(): any;
         search(parametersMap: any): ILocationService;
         search(parameter: string, parameterValue: any): ILocationService;
         url(): string;
@@ -406,7 +406,9 @@ declare module ng {
     }
 
     interface IPromise<T> {
-        then(successCallback: (promiseValue: T) => any, errorCallback?: (reason: any) => any): IPromise<any>;
+        then<TResult>(successCallback: (promiseValue: T) => IHttpPromise<TResult>, errorCallback?: (reason: any) => any): IPromise<TResult>;
+        then<TResult>(successCallback: (promiseValue: T) => IPromise<TResult>, errorCallback?: (reason: any) => any): IPromise<TResult>;
+        then<TResult>(successCallback: (promiseValue: T) => TResult, errorCallback?: (reason: any) => TResult): IPromise<TResult>;
     }
 
     interface IDeferred<T> {
@@ -503,13 +505,13 @@ declare module ng {
     ///////////////////////////////////////////////////////////////////////////
     interface IHttpService {
         // At least moethod and url must be provided...
-        (config: IRequestConfig): IHttpPromise;
-        get (url: string, RequestConfig?: any): IHttpPromise;
-        delete (url: string, RequestConfig?: any): IHttpPromise;
-        head(url: string, RequestConfig?: any): IHttpPromise;
-        jsonp(url: string, RequestConfig?: any): IHttpPromise;
-        post(url: string, data: any, RequestConfig?: any): IHttpPromise;
-        put(url: string, data: any, RequestConfig?: any): IHttpPromise;
+        (config: IRequestConfig): IHttpPromise<any>;
+        get (url: string, RequestConfig?: any): IHttpPromise<any>;
+        delete (url: string, RequestConfig?: any): IHttpPromise<any>;
+        head(url: string, RequestConfig?: any): IHttpPromise<any>;
+        jsonp(url: string, RequestConfig?: any): IHttpPromise<any>;
+        post(url: string, data: any, RequestConfig?: any): IHttpPromise<any>;
+        put(url: string, data: any, RequestConfig?: any): IHttpPromise<any>;
         defaults: IRequestConfig;
 
         // For debugging, BUT it is documented as public, so...
@@ -538,7 +540,7 @@ declare module ng {
     }
 
     interface IHttpPromiseCallback<T> {
-        (data: T, status: number, headers: (headerName: string) => string, config: IRequestConfig): any;
+        (data: T, status: number, headers: (headerName: string) => string, config: IRequestConfig): void;
     }
 
     interface IHttpPromiseCallbackArg<T> {
@@ -548,10 +550,10 @@ declare module ng {
         config?: IRequestConfig;
     }
 
-    interface IHttpPromise<T> extends IPromise<T> {
-        success(callback: IHttpPromiseCallback<T>): IHttpPromise;
-        error(callback: IHttpPromiseCallback<T>): IHttpPromise;
-        then(successCallback: (response: IHttpPromiseCallbackArg<T>) => any, errorCallback?: (response: IHttpPromiseCallbackArg<T>) => any): IPromise<any>;
+    interface IHttpPromise<T> extends IPromise<T> {        
+        success(callback: IHttpPromiseCallback<T>): IHttpPromise<T>;
+        error(callback: IHttpPromiseCallback<T>): IHttpPromise<T>;
+        then<TResult>(successCallback: (response: IHttpPromiseCallbackArg<T>) => TResult, errorCallback?: (response: IHttpPromiseCallbackArg<T>) => any): IPromise<TResult>;
     }
 
     interface IHttpProvider extends IServiceProvider {

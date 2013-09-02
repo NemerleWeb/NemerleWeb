@@ -126,8 +126,16 @@ namespace TSParser.Ast
     | Query { Name : string; }
     | Array { Type : ScriptType; Rank : int; }
     | Object { Members : list[ScriptObject]; }
-    | Function { Parameters : list[ScriptParameter]; ReturnType : ScriptType; }
-    | Constructor { Parameters : list[ScriptParameter]; ReturnType : ScriptType; }
+    | Function { Value : ScriptTypeCallSignature; }
+    | Constructor { Value : ScriptTypeCallSignature; }
+  }
+  
+  [Record]
+  public class ScriptTypeCallSignature
+  {
+    public TypeParameters : list[ScriptTypeParameter];
+    public Parameters : list[ScriptParameter];
+    public ReturnType : ScriptType;
   }
   
   public variant ScriptObject
@@ -159,7 +167,7 @@ namespace TSParser.Ast
     public TypeParameters : list[ScriptTypeParameter];
     public Parameters : list[ScriptParameter];
     public ReturnType : option[ScriptType];
-  }  
+  }
   
   [Record]
   public class Property
