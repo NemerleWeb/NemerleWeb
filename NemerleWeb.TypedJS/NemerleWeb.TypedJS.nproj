@@ -154,6 +154,7 @@
     <Folder Include="Scripts\typings\hammerjs\" />
     <Folder Include="Scripts\typings\handlebars\" />
     <Folder Include="Scripts\typings\highcharts\" />
+    <Folder Include="Scripts\typings\highlightjs\" />
     <Folder Include="Scripts\typings\history\" />
     <Folder Include="Scripts\typings\humane\" />
     <Folder Include="Scripts\typings\i18next\" />
@@ -166,6 +167,7 @@
     <Folder Include="Scripts\typings\jasmine\" />
     <Folder Include="Scripts\typings\jointjs\" />
     <Folder Include="Scripts\typings\jqrangeslider\" />
+    <Folder Include="Scripts\typings\jquery.address\" />
     <Folder Include="Scripts\typings\jquery.are-you-sure\" />
     <Folder Include="Scripts\typings\jquery.autosize\" />
     <Folder Include="Scripts\typings\jquery.bbq\" />
@@ -184,9 +186,11 @@
     <Folder Include="Scripts\typings\jquery.livestampjs\" />
     <Folder Include="Scripts\typings\jquery.menuaim\" />
     <Folder Include="Scripts\typings\jquery.noty\" />
+    <Folder Include="Scripts\typings\jquery.payment\" />
     <Folder Include="Scripts\typings\jquery.pickadate\" />
     <Folder Include="Scripts\typings\jquery.scrollTo\" />
     <Folder Include="Scripts\typings\jquery.simplePagination\" />
+    <Folder Include="Scripts\typings\jquery.superLink\" />
     <Folder Include="Scripts\typings\jquery.tagsmanager\" />
     <Folder Include="Scripts\typings\jquery.timeago\" />
     <Folder Include="Scripts\typings\jquery.timepicker\" />
@@ -202,6 +206,7 @@
     <Folder Include="Scripts\typings\js-fixtures\" />
     <Folder Include="Scripts\typings\jscrollpane\" />
     <Folder Include="Scripts\typings\jsdeferred\" />
+    <Folder Include="Scripts\typings\jsfl\" />
     <Folder Include="Scripts\typings\jsoneditoronline\" />
     <Folder Include="Scripts\typings\jsplumb\" />
     <Folder Include="Scripts\typings\jstorage\" />
@@ -222,6 +227,7 @@
     <Folder Include="Scripts\typings\leaflet\" />
     <Folder Include="Scripts\typings\leapmotionTS\" />
     <Folder Include="Scripts\typings\less\" />
+    <Folder Include="Scripts\typings\levelup\" />
     <Folder Include="Scripts\typings\libxmljs\" />
     <Folder Include="Scripts\typings\linq\" />
     <Folder Include="Scripts\typings\logg\" />
@@ -236,6 +242,7 @@
     <Folder Include="Scripts\typings\msnodesql\" />
     <Folder Include="Scripts\typings\mustache\" />
     <Folder Include="Scripts\typings\node-azure\" />
+    <Folder Include="Scripts\typings\node-ffi\" />
     <Folder Include="Scripts\typings\node-fibers\" />
     <Folder Include="Scripts\typings\nodemailer\" />
     <Folder Include="Scripts\typings\node\" />
@@ -257,10 +264,12 @@
     <Folder Include="Scripts\typings\qunit\" />
     <Folder Include="Scripts\typings\q\" />
     <Folder Include="Scripts\typings\raphael\" />
+    <Folder Include="Scripts\typings\ravenjs\" />
     <Folder Include="Scripts\typings\requirejs\" />
     <Folder Include="Scripts\typings\restangular\" />
     <Folder Include="Scripts\typings\restify\" />
     <Folder Include="Scripts\typings\reveal\" />
+    <Folder Include="Scripts\typings\rickshaw\" />
     <Folder Include="Scripts\typings\routie\" />
     <Folder Include="Scripts\typings\royalslider\" />
     <Folder Include="Scripts\typings\rx.js" />
@@ -269,6 +278,8 @@
     <Folder Include="Scripts\typings\select2\" />
     <Folder Include="Scripts\typings\sencha_touch\" />
     <Folder Include="Scripts\typings\sharepoint\" />
+    <Folder Include="Scripts\typings\should\" />
+    <Folder Include="Scripts\typings\siesta\" />
     <Folder Include="Scripts\typings\signalr\" />
     <Folder Include="Scripts\typings\sinon-chai\" />
     <Folder Include="Scripts\typings\sinon\" />
@@ -279,7 +290,10 @@
     <Folder Include="Scripts\typings\spin\" />
     <Folder Include="Scripts\typings\state-machine\" />
     <Folder Include="Scripts\typings\storejs\" />
+    <Folder Include="Scripts\typings\stripe\" />
     <Folder Include="Scripts\typings\sugar\" />
+    <Folder Include="Scripts\typings\superagent\" />
+    <Folder Include="Scripts\typings\supertest\" />
     <Folder Include="Scripts\typings\swiper\" />
     <Folder Include="Scripts\typings\swipeview\" />
     <Folder Include="Scripts\typings\teechart\" />
@@ -294,6 +308,7 @@
     <Folder Include="Scripts\typings\underscore\" />
     <Folder Include="Scripts\typings\unity-webapi\" />
     <Folder Include="Scripts\typings\urijs\" />
+    <Folder Include="Scripts\typings\uuid\" />
     <Folder Include="Scripts\typings\videojs\" />
     <Folder Include="Scripts\typings\viewporter\" />
     <Folder Include="Scripts\typings\vimeo\" />
@@ -467,6 +482,9 @@
     <Content Include="Scripts\typings\dropzone\dropzone.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\durandal\durandal-1.x.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\durandal\durandal.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -587,6 +605,9 @@
     <Content Include="Scripts\typings\highcharts\highcharts.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\highlightjs\highlightjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\history\history.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -624,6 +645,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jqrangeslider\jqrangeslider.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.address\jquery.address.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.are-you-sure\jquery.are-you-sure.d.ts">
@@ -680,6 +704,9 @@
     <Content Include="Scripts\typings\jquery.noty\jquery.noty.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\jquery.payment\jquery.payment.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\jquery.pickadate\jquery.pickadate.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -687,6 +714,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.simplePagination\jquery.simplePagination.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jquery.superLink\jquery.superLink.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jquery.tagsmanager\jquery.tagsmanager.d.ts">
@@ -734,6 +764,12 @@
     <Content Include="Scripts\typings\jsdeferred\jsdeferred.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\jsfl\jsfl.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\jsfl\xJSFL.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\jsoneditoronline\jsoneditoronline.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -776,6 +812,9 @@
     <Content Include="Scripts\typings\knockout.viewmodel\knockout.viewmodel.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\knockout\knockout.amd.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\knockout\knockout.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -792,6 +831,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\less\less.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\levelup\levelup.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\libxmljs\libxmljs.d.ts">
@@ -840,6 +882,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\node-azure\azure.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\node-ffi\node-ffi.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\node-fibers\node-fibers.d.ts">
@@ -911,6 +956,9 @@
     <Content Include="Scripts\typings\raphael\raphael.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\ravenjs\ravenjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\requirejs\require.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -921,6 +969,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\reveal\reveal.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\rickshaw\rickshaw.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\routie\routie.d.ts">
@@ -971,6 +1022,12 @@
     <Content Include="Scripts\typings\sharepoint\SharePoint.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\should\should.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\siesta\siesta.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\signalr\signalr.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -1001,7 +1058,16 @@
     <Content Include="Scripts\typings\storejs\storejs.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\stripe\stripe.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\sugar\sugar.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\superagent\superagent.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\supertest\supertest.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\swiper\swiper.d.ts">
@@ -1047,6 +1113,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\urijs\URI.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\uuid\UUID.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\videojs\videojs.d.ts">

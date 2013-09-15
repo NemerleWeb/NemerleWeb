@@ -774,6 +774,7 @@ interface JQuery {
 
     nextUntil(selector?: string, filter?: string): JQuery;
     nextUntil(element?: Element, filter?: string): JQuery;
+    nextUntil(obj?: JQuery, filter?: string): JQuery;
 
     not(selector: string): JQuery;
     not(func: (index: any) => any): JQuery;
@@ -796,6 +797,7 @@ interface JQuery {
 
     prevUntil(selector?: string, filter?: string): JQuery;
     prevUntil(element?: Element, filter?: string): JQuery;
+    prevUntil(obj?: JQuery, filter?: string): JQuery;
 
     siblings(selector?: string): JQuery;
 
@@ -807,6 +809,8 @@ interface JQuery {
     queue(queueName: string, newQueueOrCallback: any): JQuery;
     queue(newQueueOrCallback: any): JQuery;
 }
-
+declare module "jquery" {
+    export = $;
+}
 declare var jQuery: JQueryStatic;
 declare var $: JQueryStatic;
