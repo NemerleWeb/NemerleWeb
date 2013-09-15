@@ -446,8 +446,7 @@ namespace NemerleWeb
       prefix : string) : PExpr
     {
       def typeArgumentPrefix = string.Join(Separator, prefix, TypeArgument);
-      def realTypeArguments = tyArgs.Map(
-        type => ConvertType(scope, type, typeArgumentPrefix));
+      def realTypeArguments = tyArgs.Map(type => ConvertType(scope, type, typeArgumentPrefix));
       
       // Try finding type going up in hierarcy of scope.
       def scopeFullName = scope.FullName.Split('.');

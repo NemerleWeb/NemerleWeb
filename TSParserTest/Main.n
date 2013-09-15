@@ -15,7 +15,7 @@ module Program
   parseText(text : string) : bool
   {
     def parser = TSDeclarationParser();
-    def (pos, ret) = parser.TryParse(text);
+    def (pos, _ret) = parser.TryParse(text);
     if(pos == text.Length) true
     else
     {
