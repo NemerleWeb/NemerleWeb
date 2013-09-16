@@ -31,12 +31,8 @@ namespace NemerleWeb
       def splittedRoot = root.Split('.');      
       def surroundingNamespace = typer.Env.EnterIntoNamespace(
         splittedRoot.Take(splittedRoot.Length - 1).NToList());
-      def jsApiRoot = surroundingNamespace.Define(<[
-        decl: partial module $(splittedRoot.Last() : usesite)
-        {
-        }]>);
-      
-      //def jsApiModule = CreateModule(root.SplitDot(), Scope(typer.Env), [], true, true);
+      def jsApiRoot = surroundingNamespace.Define(
+        <[ decl: partial module $(splittedRoot.Last() : usesite) {} ]>);
       
       // First generate all types
       GenerateTypes(jsApiRoot, tsAst);
@@ -134,6 +130,8 @@ namespace NemerleWeb
         ]>);
         
       CreateObject(interfaceType, tsInterface.Type, tsInterface.Name);
+      
+      interfaceType.Compile();
     }
     
     CreateObject(scope : TypeBuilder, obj : ScriptType.Object, prefix : string) : void
@@ -148,7 +146,7 @@ namespace NemerleWeb
       //| Call(value)      => CreateCall(scope, value, prefix)
       //| Construct(value) => CreateConstruct(scope, value, prefix)
       | Index(value)     => CreateIndex(scope, value, prefix)
-      | Property(value)  => CreateProperty(scope, value, prefix)
+      //| Property(value)  => CreateProperty(scope, value, prefix)
       //| Method(value)    => CreateMethod(scope, value, prefix)
       | _ => ()
       }
@@ -391,6 +389,7 @@ namespace NemerleWeb
       if(type is Some(t)) ConvertType(scope, t, prefix) else <[ object ]>
     }
     
+    mutable i =0;
     private ConvertType(scope : TypeBuilder, type : ScriptType, prefix : string) : PExpr
     {
       match(type)
@@ -417,7 +416,7 @@ namespace NemerleWeb
       | Number => <[ float ]>
       | Object(_members) => <[ object ]> // CreateAnonymousType(scope, members, prefix)
       | Query => assert2(false); <[ object ]>
-      | Ref(name, tyArgs) => ConvertTypeInScope(scope, name, tyArgs, prefix)
+      | Ref(name, tyArgs) => <[object]>//ConvertTypeInScope(scope, name, tyArgs, prefix)
       | String => <[ string ]>
       | Void => <[ void ]>
       }

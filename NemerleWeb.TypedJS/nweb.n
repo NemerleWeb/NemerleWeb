@@ -1,25 +1,23 @@
 using NemerleWeb;
 
-// a function parameter was never used
-#pragma warning disable 168
-// method is not externally visible and has never been referenced
-#pragma warning disable 10003
-
-namespace NemerleWeb.TypedJS
+namespace NemerleWeb
 {
-  [JSApiImpl]
-  public partial module nweb
+  public partial module TypedJS
   {
-    public invalidate() : void;
-    
-    public setCookie(name : string, value : object, days : int) : void;
-    public getCookie[T](name : string) : T;
-    public removeCookie(name : string) : void;
-    
     [JSApiImpl]
-    public partial module utils
+    public partial module nweb
     {
-      public areArraysEqual[TL, TR](l : array[TL], r : array[TR]) : bool;
+      public invalidate() : void;
+      
+      public setCookie(name : string, value : object, days : int) : void;
+      public getCookie[T](name : string) : T;
+      public removeCookie(name : string) : void;
+      
+      [JSApiImpl]
+      public partial module utils
+      {
+        public areArraysEqual[TL, TR](l : array[TL], r : array[TR]) : bool;
+      }
     }
   }
 }

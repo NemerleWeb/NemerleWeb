@@ -7,17 +7,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NemerleWeb.TypedJS
+namespace NemerleWeb
 {
-  // HACK: Remove
-  public partial interface RegExp {}
-  
-  public module JSStringExtensions
+  public partial module TypedJS
   {
-    public Replace(this str : string, reg : RegExp, replacement : string) : string
+    // HACK: Remove
+    public partial interface RegExp {}
+    
+    public module JSStringExtensions
     {
-      IgnoreParams();
-      throw ClientCodeCalledInServerException()
+      public Replace(this str : string, reg : RegExp, replacement : string) : string
+      {
+        IgnoreParams();
+        throw ClientCodeCalledInServerException()
+      }
     }
   }
 }
