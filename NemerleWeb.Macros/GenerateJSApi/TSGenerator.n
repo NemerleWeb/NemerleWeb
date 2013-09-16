@@ -149,13 +149,8 @@ namespace NemerleWeb
       def functionParams = ConvertParameters(scope, call.Parameters, fullPrefix);
       def typeParameters = ConvertTypeParameters(call.TypeParameters);
       
-      _ = scope.DefineWithSource(
-        if(scope.IsInterface)
-          <[ decl:
-            new $(Name(JSApiSpecial.Call) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>
-        else
-          <[ decl:
-             public $(Name(JSApiSpecial.Call) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
+      Define(scope,
+        <[ decl: $(Name(JSApiSpecial.Call) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
    
     CreateConstruct(scope : TypeBuilder, construct : Construct, prefix : string) : void
@@ -167,12 +162,8 @@ namespace NemerleWeb
       def functionParams = ConvertParameters(scope, construct.Parameters, fullPrefix);
       def typeParameters = ConvertTypeParameters(construct.TypeParameters);
       
-      _ = scope.DefineWithSource(
-          if(scope.IsInterface)
-            <[ decl: new $(Name(JSApiSpecial.New) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>
-          else
-            <[ decl:
-              public $(Name(JSApiSpecial.New) : name)[..$typeParameters](..$functionParams) : $realReturnType ]>);
+      Define(scope,
+        <[ decl: $(Name(JSApiSpecial.New) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
     
     CreateIndex(scope : TypeBuilder, index : IndexSignature , prefix : string) : void
@@ -188,15 +179,14 @@ namespace NemerleWeb
       def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
       def realReturnType = ConvertType(scope, index.ReturnType, returnTypePrefix);
       
-      _ = scope.DefineWithSource(
-          <[ decl:
-            new Item[$(Name(index.ParameterName) : name) : $realParamType] : $realReturnType
-            {
-              get;
-              set;
-            }
-          ]>
-          );
+      Define(scope,
+        <[ decl:
+          new Item[$(Name(index.ParameterName) : name) : $realParamType] : $realReturnType
+          {
+            get;
+            set;
+          }
+        ]>);
     }
 
     /// <summary>
@@ -208,11 +198,8 @@ namespace NemerleWeb
       def typePrefix = string.Join(Separator, fullPrefix, Property);
       def propertyType = ConvertType(scope, property.Type, typePrefix);
       
-      _ = scope.DefineWithSource(
-        if(scope.IsInterface)
-          <[ decl: new $(Name(property.Name) : name) : $propertyType { get; set; }; ]>
-        else
-          <[ decl: public $(Name(property.Name) : name) : $propertyType { get; set; } ]>);
+      Define(scope,
+        <[ decl: $(Name(property.Name) : name) : $propertyType { get; set; }; ]>);
     }
     
     /// <summary>
@@ -227,11 +214,17 @@ namespace NemerleWeb
       def functionParams = ConvertParameters(scope, method.Signature.Parameters, fullPrefix);
       def typeParameters = ConvertTypeParameters(method.Signature.TypeParameters);
     
-      _ = scope.DefineWithSource(
-        if(scope.IsInterface)
-          <[ decl: new $(Name(method.Name) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>
-        else
-          <[ decl:     $(Name(method.Name) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
+      Define(scope,
+        <[ decl: $(Name(method.Name) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
+    }
+    
+    Define(scope : TypeBuilder, expr : ClassMember) : void
+    {
+      expr.modifiers.mods |= NemerleModifiers.New;        
+      when(!scope.IsInterface)
+        expr.modifiers.mods |= NemerleModifiers.Public;
+      
+      _ = scope.DefineWithSource(expr);
     }
     
     #endregion
