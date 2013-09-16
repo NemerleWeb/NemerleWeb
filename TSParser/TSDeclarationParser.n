@@ -480,7 +480,7 @@ namespace TSParser
         #region Specifying Types (3.6)
         
         // Array is specified here, because otherwise we have left recursion.
-        Type : Ast.ScriptType = (TypeQuery / TypeReference / TypeLiteral / PredefinedType) s;
+        Type : Ast.ScriptType = (TypeQuery / TypeLiteral / TypeReference / PredefinedType) s;
         ScriptType : Ast.ScriptType = Type ('['s ']'s)*;
         
         // Note: bool is not a valid type in TypeScript 0.9 but many libraries still use it.

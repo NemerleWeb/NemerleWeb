@@ -47,7 +47,7 @@ module Program
   Main() : void
   {
     parseTextWithResult(<#
-#>);
+    #>);
     
     foreach(f in Directory.EnumerateFiles(@"..\..\..\NemerleWeb.TypedJS\Scripts\", "*.*", SearchOption.AllDirectories))
       parseFile(f);
