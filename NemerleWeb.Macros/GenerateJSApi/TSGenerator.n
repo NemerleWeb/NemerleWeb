@@ -32,7 +32,7 @@ namespace NemerleWeb
       def surroundingNamespace = typer.Env.EnterIntoNamespace(
         splittedRoot.Take(splittedRoot.Length - 1).NToList());
       def jsApiRoot = surroundingNamespace.Define(
-        <[ decl: partial module $(splittedRoot.Last() : usesite) {} ]>);
+        <[ decl: partial module $(Name(splittedRoot.Last()) : name) {} ]>);
       
       // First generate all types
       GenerateTypes(jsApiRoot, tsAst);
@@ -55,7 +55,7 @@ namespace NemerleWeb
     {
       foreach(mem in members) 
       { 
-      | InterfaceDeclaration(value) => CreateInterface(scope, value)
+      | InterfaceDeclaration(value) => CreateInterface(scope, value, false)
       | AmbientDeclaration(value) => GenerateTypesAmbient(scope, value)
       | _ => ()
       }
@@ -87,7 +87,7 @@ namespace NemerleWeb
     {
       foreach(mem in members) 
       { 
-      | InterfaceDeclaration(value) => CreateInterfaceMembers(scope, value)
+      | InterfaceDeclaration(value) => CreateInterface(scope, value, true)
       //| AmbientDeclaration(value) => GenerateTypesAmbient(scope, value)
       | _ => ()
       }
@@ -99,38 +99,26 @@ namespace NemerleWeb
     
     private CreateInterface(
       scope : TypeBuilder,
-      tsInterface : InterfaceDeclaration) : void
+      tsInterface : InterfaceDeclaration,
+      generateMembers : bool) : void
     {
       def typeParameters = ConvertTypeParameters(tsInterface.TypeParameters);
         
-      def extends = tsInterface.Extends
-        .Select(e => MakeFullType(scope, e, typeParameters));
+      def extends = 
+        if (generateMembers)
+          tsInterface.Extends.Select(e => MakeFullType(scope, e, typeParameters));
+        else
+          [];
         
       def interfaceType = scope.DefineNestedTypeWithSource(
         <[ decl:
-          [JSApi]
+          [JSApiImpl]
           public partial interface $(tsInterface.Name : usesite)[..$typeParameters] : ..$extends {}
         ]>);
-        
-      interfaceType.Compile();
-    }
-    
-    private CreateInterfaceMembers(
-      scope : TypeBuilder,
-      tsInterface : InterfaceDeclaration) : void
-    {
-      def typeParameters = tsInterface.TypeParameters
-        .Select(e => PT.Splicable.Name(PT.Name(e.Name)))
-        .NToList();
-        
-      def interfaceType = scope.DefineNestedTypeWithSource(
-        <[ decl:
-          [JSApi]
-          public partial interface $(tsInterface.Name : usesite)[..$typeParameters] {}
-        ]>);
-        
-      CreateObject(interfaceType, tsInterface.Type, tsInterface.Name);
       
+      when (generateMembers)
+        CreateObject(interfaceType, tsInterface.Type, tsInterface.Name);
+        
       interfaceType.Compile();
     }
     
@@ -164,12 +152,10 @@ namespace NemerleWeb
       _ = scope.DefineWithSource(
         if(scope.IsInterface)
           <[ decl:
-            new $(JSApiSpecial.Call : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>
+            new $(Name(JSApiSpecial.Call) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>
         else
           <[ decl:
-             public $(JSApiSpecial.Call : usesite)[..$typeParameters](..$functionParams) : $realReturnType
-              $DefaultImplementation
-          ]>);
+             public $(Name(JSApiSpecial.Call) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
    
     CreateConstruct(scope : TypeBuilder, construct : Construct, prefix : string) : void
@@ -183,12 +169,10 @@ namespace NemerleWeb
       
       _ = scope.DefineWithSource(
           if(scope.IsInterface)
-            <[ decl: new $(JSApiSpecial.New : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>
+            <[ decl: new $(Name(JSApiSpecial.New) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>
           else
             <[ decl:
-              public $(JSApiSpecial.New : usesite)[..$typeParameters](..$functionParams) : $realReturnType
-                $DefaultImplementation
-            ]>);
+              public $(Name(JSApiSpecial.New) : name)[..$typeParameters](..$functionParams) : $realReturnType ]>);
     }
     
     CreateIndex(scope : TypeBuilder, index : IndexSignature , prefix : string) : void
@@ -205,24 +189,14 @@ namespace NemerleWeb
       def realReturnType = ConvertType(scope, index.ReturnType, returnTypePrefix);
       
       _ = scope.DefineWithSource(
-        if(scope.IsInterface)
           <[ decl:
-            new Item[$(index.ParameterName : usesite) : $realParamType] : $realReturnType
+            new Item[$(Name(index.ParameterName) : name) : $realParamType] : $realReturnType
             {
               get;
               set;
             }
           ]>
-        else
-          <[ decl:
-            public Item[$(index.ParameterName : usesite) : $realParamType] : $realReturnType
-            {
-              get
-                $DefaultImplementation;
-              set
-                $DefaultImplementation;
-            }
-          ]>);
+          );
     }
 
     /// <summary>
@@ -236,9 +210,9 @@ namespace NemerleWeb
       
       _ = scope.DefineWithSource(
         if(scope.IsInterface)
-          <[ decl: new $(property.Name : usesite) : $propertyType { get; set; }; ]>
+          <[ decl: new $(Name(property.Name) : name) : $propertyType { get; set; }; ]>
         else
-          <[ decl: public $(property.Name : usesite) : $propertyType { get; set; } ]>);
+          <[ decl: public $(Name(property.Name) : name) : $propertyType { get; set; } ]>);
     }
     
     /// <summary>
@@ -255,12 +229,9 @@ namespace NemerleWeb
     
       _ = scope.DefineWithSource(
         if(scope.IsInterface)
-          <[ decl: new $(method.Name : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>
+          <[ decl: new $(Name(method.Name) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>
         else
-          <[ decl: 
-            $(method.Name : usesite)[..$typeParameters](..$functionParams) : $realReturnType
-              $DefaultImplementation
-          ]>);
+          <[ decl:     $(Name(method.Name) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
     
     #endregion
@@ -326,7 +297,7 @@ namespace NemerleWeb
     private ConvertTypeParameters(typeParameters : IEnumerable[ScriptTypeParameter])
       : list[PT.Splicable]
     {
-      typeParameters.Select(e => PT.Splicable.Name(PT.Name(e.Name))).NToList()
+      typeParameters.Select(e => PT.Splicable.Name(Name(e.Name))).NToList()
     }
     
     private GetParameterPrefix(prefix : string, name : string) : string
@@ -350,10 +321,10 @@ namespace NemerleWeb
         | Required(RequiredParameter.Regular(name, type, _))
         | Optional(name, type, _, _) => 
           def realType = ConvertType(scope, type, GetParameterPrefix(prefix, name));
-          <[ parameter: $(name : usesite) : $realType ]>
+          <[ parameter: $(Name(name) : name) : $realType ]>
         | Rest(name, type) =>
           def realType = ConvertType(scope, type, GetParameterPrefix(prefix, name));
-          <[ parameter: params $(name : usesite) : $realType ]>
+          <[ parameter: params $(Name(name) : name) : $realType ]>
       }
       
       def ret = parms.Select(convert);
@@ -469,15 +440,12 @@ namespace NemerleWeb
       if (name == "Array")
         <[ {..$realTypeArguments}[] ]>
       else
-        <[ $(name : usesite).[..$realTypeArguments] ]>
+        <[ $(Name(name) : name).[..$realTypeArguments] ]>
     }
     
     #endregion
     
     #region Special constants
-    
-    DefaultImplementation : PExpr =
-      <[ { IgnoreParams(); throw ClientCodeCalledInServerException(); } ]>;
     
     private Call = "Call";
     private New = "New";
@@ -539,7 +507,7 @@ namespace NemerleWeb
       def typePrefix = $"$(var.Name)_Variable";
       def varType = ConvertType(typePrefix, var.Type, scope);
       
-      _ = othersScope.Define(<[ decl: public mutable $(var.Name : usesite) : $varType = default($varType); ]>);
+      _ = othersScope.Define(<[ decl: public mutable $(Name(var.Name) : name) : $varType = default($varType); ]>);
     }
   
     /// <summary>
@@ -554,9 +522,7 @@ namespace NemerleWeb
       def functionParams = ConvertParameters(function.Name, function.Params, scope);
         
       _ = othersScope.Define(<[ decl: 
-        public $(function.Name : usesite)(..$functionParams) : $returnType
-          $DefaultImplementation
-      ]>);   
+        public $(Name(function.Name) : name)(..$functionParams) : $returnType; ]>);   
     }
     
     private CreateTSGlobalInterface(tsInterface : TSGlobal.Interface, scope : Scope, typeMembers : bool) : void
@@ -565,14 +531,14 @@ namespace NemerleWeb
         if (typeMembers || tsInterface.Extends is [])
           scope.Define(
             <[ decl: 
-              [JSApi] public partial interface $(tsInterface.Name : usesite) {}
+              [JSApi] public partial interface $(Name(tsInterface.Name) : name) {}
             ]>)
         else
         {
           def extends = tsInterface.Extends.Select(scope.FromQualifiedIdentifier);
           scope.Define(
             <[ decl:
-              [JSApi] public partial interface $(tsInterface.Name : usesite) : ..$extends {}
+              [JSApi] public partial interface $(Name(tsInterface.Name) : name) : ..$extends {}
             ]>)
         };
       
