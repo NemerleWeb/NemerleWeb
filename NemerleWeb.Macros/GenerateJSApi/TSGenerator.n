@@ -29,10 +29,15 @@ namespace NemerleWeb
     {
       // Create namespaces and the last will be module      
       def splittedRoot = root.Split('.');      
-      def surroundingNamespace = typer.Env.EnterIntoNamespace(
-        splittedRoot.Take(splittedRoot.Length - 1).NToList());
+      def surroundingNamespace =
+        typer.Env.EnterIntoNamespace(
+          if(splittedRoot.Length == 0)
+            [root]
+          else
+            splittedRoot.Take(splittedRoot.Length - 1).NToList());
+      
       def jsApiRoot = surroundingNamespace.Define(
-        <[ decl: partial module $(Name(splittedRoot.Last()) : name) {} ]>);
+        <[ decl: public partial module $(splittedRoot.Last() : usesite) {} ]>);
       
       // First generate all types
       GenerateTypes(jsApiRoot, tsAst);
@@ -54,7 +59,7 @@ namespace NemerleWeb
     private GenerateTypes(scope : TypeBuilder, members : IEnumerable[DeclarationElement]) : void
     {
       foreach(mem in members) 
-      { 
+      {
       | InterfaceDeclaration(value) => CreateInterface(scope, value, false)
       | AmbientDeclaration(value) => GenerateTypesAmbient(scope, value)
       | _ => ()
@@ -149,8 +154,8 @@ namespace NemerleWeb
       def functionParams = ConvertParameters(scope, call.Parameters, fullPrefix);
       def typeParameters = ConvertTypeParameters(call.TypeParameters);
       
-      Define(scope,
-        <[ decl: $(Name(JSApiSpecial.Call) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
+      scope.DefinePublicNewWithSource(
+        <[ decl: $(JSApiSpecial.Call : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
    
     CreateConstruct(scope : TypeBuilder, construct : Construct, prefix : string) : void
@@ -162,8 +167,8 @@ namespace NemerleWeb
       def functionParams = ConvertParameters(scope, construct.Parameters, fullPrefix);
       def typeParameters = ConvertTypeParameters(construct.TypeParameters);
       
-      Define(scope,
-        <[ decl: $(Name(JSApiSpecial.New) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
+      scope.DefinePublicNewWithSource(
+        <[ decl: $(JSApiSpecial.New : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
     
     CreateIndex(scope : TypeBuilder, index : IndexSignature , prefix : string) : void
@@ -179,9 +184,9 @@ namespace NemerleWeb
       def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
       def realReturnType = ConvertType(scope, index.ReturnType, returnTypePrefix);
       
-      Define(scope,
+      scope.DefinePublicNewWithSource(
         <[ decl:
-          new Item[$(Name(index.ParameterName) : name) : $realParamType] : $realReturnType
+          new Item[$(index.ParameterName : usesite) : $realParamType] : $realReturnType
           {
             get;
             set;
@@ -198,8 +203,8 @@ namespace NemerleWeb
       def typePrefix = string.Join(Separator, fullPrefix, Property);
       def propertyType = ConvertType(scope, property.Type, typePrefix);
       
-      Define(scope,
-        <[ decl: $(Name(property.Name) : name) : $propertyType { get; set; }; ]>);
+      scope.DefinePublicNewWithSource(
+        <[ decl: $(property.Name : usesite) : $propertyType { get; set; }; ]>);
     }
     
     /// <summary>
@@ -214,17 +219,38 @@ namespace NemerleWeb
       def functionParams = ConvertParameters(scope, method.Signature.Parameters, fullPrefix);
       def typeParameters = ConvertTypeParameters(method.Signature.TypeParameters);
     
-      Define(scope,
-        <[ decl: $(Name(method.Name) : name)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
+      scope.DefinePublicNewWithSource(
+        <[ decl: $(method.Name : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
     
-    Define(scope : TypeBuilder, expr : ClassMember) : void
+    static mutable anonymousTypeIndex : int = 0;
+    
+    private CreateAnonymousType(
+      scope : TypeBuilder,
+      obj : ScriptType.Object,
+      prefix : string) : PExpr
     {
-      expr.modifiers.mods |= NemerleModifiers.New;        
-      when(!scope.IsInterface)
-        expr.modifiers.mods |= NemerleModifiers.Public;
-      
-      _ = scope.DefineWithSource(expr);
+      // Filter out pseudo types
+      if(obj.Members is [])
+        <[ object ]>
+      else
+      {
+        anonymousTypeIndex++;
+        
+        def name = string.Join(Separator, prefix, AnonymousType, anonymousTypeIndex.ToString());
+        
+        def type = scope.DefineNestedTypeWithSource(
+          <[ decl: 
+            [JSApiImpl] public sealed class $(name : usesite) { }
+          ]>);
+          
+        // Suppress warning
+        type.HasBeenUsed = true;
+        
+        CreateObject(type, obj, name);
+          
+        <[ $(name : usesite) ]>
+      }
     }
     
     #endregion
@@ -232,28 +258,16 @@ namespace NemerleWeb
     #region Converters
     
     /// <summary>
-    /// Makes type with type argument for base type
+    /// Makes type with type argument
     /// </summary>
     private MakeFullType(
       scope : TypeBuilder,
       typeRef : ScriptType.Ref,
       typeParameters : IEnumerable[PT.Splicable]) : PExpr
     {
-      // Name is either global or local, local is prefered
-      def name =
-        if(typeParameters.Cast.[PT.Splicable.Name]().Any(t => t.GetName().Id == typeRef.Name))
-          PExpr.Ref(Name(typeRef.Name));
-        else
-          PExpr.FromQualifiedIdentifier(scope.Manager, typeRef.Name);
-      
-      if(typeRef.TypeArguments is [])
-        name
-      else
-      {
-        def typeArguments = typeRef.TypeArguments
-          .Select(tyArg => MakeFullTypeImpl(scope, tyArg, typeParameters));
-        <[ $name.[..$typeArguments] ]>
-      }
+      def typeArguments = typeRef.TypeArguments.Select(
+        tyArg => MakeFullTypeImpl(scope, tyArg, typeParameters));
+      <[ $(typeRef.Name : usesite).[..$typeArguments] ]>
     }
     
     /// <summary>
@@ -290,7 +304,7 @@ namespace NemerleWeb
     private ConvertTypeParameters(typeParameters : IEnumerable[ScriptTypeParameter])
       : list[PT.Splicable]
     {
-      typeParameters.Select(e => PT.Splicable.Name(Name(e.Name))).NToList()
+      typeParameters.Select(e => PT.Splicable.Name(<[ $(e.Name : dyn) ]>)).NToList()
     }
     
     private GetParameterPrefix(prefix : string, name : string) : string
@@ -314,10 +328,10 @@ namespace NemerleWeb
         | Required(RequiredParameter.Regular(name, type, _))
         | Optional(name, type, _, _) => 
           def realType = ConvertType(scope, type, GetParameterPrefix(prefix, name));
-          <[ parameter: $(Name(name) : name) : $realType ]>
+          <[ parameter: $(name : usesite) : $realType ]>
         | Rest(name, type) =>
           def realType = ConvertType(scope, type, GetParameterPrefix(prefix, name));
-          <[ parameter: params $(Name(name) : name) : $realType ]>
+          <[ parameter: params $(name : usesite) : $realType ]>
       }
       
       def ret = parms.Select(convert);
@@ -353,7 +367,6 @@ namespace NemerleWeb
       if(type is Some(t)) ConvertType(scope, t, prefix) else <[ object ]>
     }
     
-    mutable i =0;
     private ConvertType(scope : TypeBuilder, type : ScriptType, prefix : string) : PExpr
     {
       match(type)
@@ -378,62 +391,21 @@ namespace NemerleWeb
         <[ $type.[..$lambdaParams] ]>
         
       | Number => <[ float ]>
-      | Object(_members) => <[ object ]> // CreateAnonymousType(scope, members, prefix)
+      | Object => CreateAnonymousType(scope, type :> ScriptType.Object, prefix)
       | Query => assert2(false); <[ object ]>
-      | Ref(name, tyArgs) => <[object]>//ConvertTypeInScope(scope, name, tyArgs, prefix)
+      | Ref(name, tyArgs) => 
+        def typeArgumentPrefix = string.Join(Separator, prefix, TypeArgument);
+        def realTypeArguments = tyArgs.Map(type => ConvertType(scope, type, typeArgumentPrefix));
+      
+        // Array is a special case
+        // It can be a problem if user defines its own class with name 'Array', but it won't happen.
+        if (name == "Array")
+          <[ {..$realTypeArguments}[] ]>
+        else
+          <[ $(name : usesite).[..$realTypeArguments] ]>
       | String => <[ string ]>
       | Void => <[ void ]>
       }
-    }
-    
-    /// <summary>
-    /// We cannot simply put type as is because it leads to compilation problems.
-    /// Assume following situation:
-    /// module A { export module B { export class C { y : number; } } }
-    ///
-    /// module X {
-    ///  export module A { export module B { export class C { x : number; } } }
-    ///	
-    ///  export var c : A.B.C;
-    /// }
-    ///
-    /// TypeScript behaves like C# and allows this code with choosing internal module.
-    /// We must do same lookup and find out all types starting from the current scope.
-    ///
-    /// This method also handles generics.
-    /// </summary>
-    private ConvertTypeInScope(
-      scope : TypeBuilder,
-      name : string,
-      tyArgs : list[ScriptType],
-      prefix : string) : PExpr
-    {
-      def typeArgumentPrefix = string.Join(Separator, prefix, TypeArgument);
-      def realTypeArguments = tyArgs.Map(type => ConvertType(scope, type, typeArgumentPrefix));
-      
-      // Try finding type going up in hierarcy of scope.
-      def scopeFullName = scope.FullName.Split('.');
-      for(mutable i = 0; i < scopeFullName.Length - 1; i++)
-      {
-        // Get full type name
-        def qid = scopeFullName.Take(scopeFullName.Length - i).ToList();
-        qid.Add(name);
-        def qid = qid.NToList();
-        
-        // Find type
-        when(scope.Manager.NameTree.LookupExactType(qid) is Some())
-        {
-          def type = PExpr.FromQualifiedIdentifier(scope.Manager, qid.JoinDot());
-          return <[ $type.[..$realTypeArguments] ]>;
-        }
-      }
-      
-      // If type has not been found use name
-      // Handle array as special case
-      if (name == "Array")
-        <[ {..$realTypeArguments}[] ]>
-      else
-        <[ $(Name(name) : name).[..$realTypeArguments] ]>
     }
     
     #endregion

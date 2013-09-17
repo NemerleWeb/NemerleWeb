@@ -169,6 +169,9 @@
     <Compile Include="Throttle.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="TypeBuilderExtensions.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Unit.n">
       <SubType>Code</SubType>
     </Compile>
