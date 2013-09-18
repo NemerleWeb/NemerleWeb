@@ -52,8 +52,6 @@ interface Object {
     hasOwnProperty(v: string): boolean;
     isPrototypeOf(v: Object): boolean;
     propertyIsEnumerable(v: string): boolean;
-
-    [s: string]: any;
 }
 
 declare var Object: {
@@ -132,6 +130,8 @@ interface String {
     length: number;
 
     substr(from: number, length?: number): string;
+
+    [index: number]: string;
 }
 
 declare var String: {
@@ -782,20 +782,20 @@ declare module Intl {
     }
 }
 
-interface String {
-    localeCompare(that: string, locales: string[], options?: Intl.CollatorOptions): number;
-    localeCompare(that: string, locale: string, options?: Intl.CollatorOptions): number;
-}
+//interface String {
+//    localeCompare(that: string, locales: string[], options?: Intl.CollatorOptions): number;
+//    localeCompare(that: string, locale: string, options?: Intl.CollatorOptions): number;
+//}
 
-interface Number {
-    toLocaleString(locales: string[], options?: Intl.NumberFormatOptions): string;
-    toLocaleString(locale: string, options?: Intl.NumberFormatOptions): string;
-}
+//interface Number {
+//    toLocaleString(locales: string[], options?: Intl.NumberFormatOptions): string;
+//    toLocaleString(locale: string, options?: Intl.NumberFormatOptions): string;
+//}
 
-interface Date {
-    toLocaleString(locales: string[], options?: Intl.DateTimeFormatOptions): string;
-    toLocaleString(locale: string, options?: Intl.DateTimeFormatOptions): string;
-}
+//interface Date {
+//    toLocaleString(locales: string[], options?: Intl.DateTimeFormatOptions): string;
+//    toLocaleString(locale: string, options?: Intl.DateTimeFormatOptions): string;
+//}
 
 
 /////////////////////////////

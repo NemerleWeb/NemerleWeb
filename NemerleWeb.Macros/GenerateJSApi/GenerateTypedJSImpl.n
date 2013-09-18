@@ -39,7 +39,7 @@ namespace NemerleWeb
       
       // Step 1: PreParse
       def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
-      def tsFilesToParse = PreParseTSAll(projectDir, args.Lib, args.Args);
+      def tsFilesToParse = PreParseTSAll(projectDir, args.Libs, args.Args);
       
       // Step 2: Parse
       def tsAsts = tsFilesToParse.SelectMany(ParseTS);
@@ -55,8 +55,10 @@ namespace NemerleWeb
     {
       match(options)
       {
-      | [<[ Root = $(root : string) ]>, <[ Files = [..$files] ]> ] with lib = ""
-      | [<[ Root = $(root : string) ]>, <[ Lib = $(lib : string) ]>, <[ Files = [..$files] ]>] =>
+      | [<[ Root = $(root : string) ]>, <[ Files = [..$files] ]> ] with libs = []
+      | [<[ Root = $(root : string) ]>, <[ Lib = $(lib : string) ]>, <[ Files = [..$files] ]>]
+        with libs = [ <[ $(lib : string) ]> ]
+      | [<[ Root = $(root : string) ]>, <[ Lib = [..$libs] ]>, <[ Files = [..$files] ]>] =>
         // Convert PExpr sequence to regular type
         def filesArg =
           files.Select(
@@ -69,7 +71,19 @@ namespace NemerleWeb
               null
             })
           .ToArray();
-        GenerateArgs(root, lib, filesArg)
+          
+        def libsArg =
+          libs.Select(
+            l => match(l)
+            {
+            | <[ $(lib : string) ]> => lib
+            | _ =>
+              Message.Error("Lib must be a list of strings");
+              null
+            })
+          .ToArray();
+          
+        GenerateArgs(root, libsArg, filesArg)
       | _ =>
         Message.Error("Specify Root, Files parameter and optional Lib. Files parameter must not be empty.");
         null
@@ -80,12 +94,16 @@ namespace NemerleWeb
     
     #region PreParse
     
-    private PreParseTSAll(projectDir : string, lib : string, args : IEnumerable[DirectoryArg]) : HashSet[string]
+    private PreParseTSAll(
+      projectDir : string,
+      libs : IEnumerable[string],
+      args : IEnumerable[DirectoryArg]) : HashSet[string]
     {      
       def tsFilesToParse = HashSet();
       
-      // Add lib if exists
-      when(lib != "") _ = tsFilesToParse.Add(Path.Combine(projectDir, lib));
+      // Add libs if specified
+      foreach(lib in libs)
+        _ = tsFilesToParse.Add(Path.Combine(projectDir, lib));
       
       // Resolve all references        
       foreach(arg in args)
@@ -153,29 +171,24 @@ namespace NemerleWeb
     
     private ParseTS(tsFile : string) : IEnumerable[DeclarationElement]
     {
-      def text =
-        try
-        {
-          File.ReadAllText(tsFile);
-        }
-        catch
-        {
-          | e => Message.Hint($"Caught exception $e"); ""
-        };
-      
-      if(text == "") [];
-      else        
-        match(tsParser.TryParse(File.ReadAllText(tsFile)))
+      try
+      {
+        def text = File.ReadAllText(tsFile);
+        
+        match(tsParser.TryParse(text))
         {
         | (pos, result) when pos == tsParser.ParsingSource.OriginalText.Length =>
           result
         | (pos, _) =>
           FailedParsing(tsFile, tsParser.ParsingSource.OriginalText, pos);
-          []
+          List()
         }
+      }
+      catch
+      {
+      | e => Message.Hint($"Caught exception $e"); List()
+      }
     }
-    
-    #endregion    
     
     private FailedParsing(tsFile : string, text : string, pos : int) : void
     {
@@ -187,23 +200,25 @@ namespace NemerleWeb
       Message.Error(Location(tsFile, 1, 1, 1, 1), $"Failed to parse $tsFile, somewhere here: $errorText...");
     }
   }
-
-  #region Data types
-  
-  [Record]
-  class DirectoryArg
-  {    
-    public Directory : string { get; }
-    public Exclude : string { get; }
-  }
-  
-  [Record]
-  class GenerateArgs
-  {
-    public Root : string { get; }
-    public Lib : string { get; }
-    public Args : array[DirectoryArg] { get; }
-  }
-  
+    
   #endregion
+
+    #region Data types
+    
+    [Record]
+    class DirectoryArg
+    {    
+      public Directory : string { get; }
+      public Exclude : string { get; }
+    }
+    
+    [Record]
+    class GenerateArgs
+    {
+      public Root : string { get; }
+      public Libs : array[string] { get; }
+      public Args : array[DirectoryArg] { get; }
+    }
+    
+    #endregion
 }

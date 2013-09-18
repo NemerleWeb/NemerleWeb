@@ -136,11 +136,11 @@ namespace NemerleWeb
     {
       match(obj)
       {
-      //| Call(value)      => CreateCall(scope, value, prefix)
-      //| Construct(value) => CreateConstruct(scope, value, prefix)
+      | Call(value)      => CreateCall(scope, value, prefix)
+      | Construct(value) => CreateConstruct(scope, value, prefix)
       | Index(value)     => CreateIndex(scope, value, prefix)
-      //| Property(value)  => CreateProperty(scope, value, prefix)
-      //| Method(value)    => CreateMethod(scope, value, prefix)
+      | Property(value)  => CreateProperty(scope, value, prefix)
+      | Method(value)    => CreateMethod(scope, value, prefix)
       | _ => ()
       }
     }
@@ -248,6 +248,7 @@ namespace NemerleWeb
         type.HasBeenUsed = true;
         
         CreateObject(type, obj, name);
+        type.Compile();
           
         <[ $(name : usesite) ]>
       }
@@ -329,7 +330,7 @@ namespace NemerleWeb
         | Optional(name, type, _, _) => 
           def realType = ConvertType(scope, type, GetParameterPrefix(prefix, name));
           <[ parameter: $(name : usesite) : $realType ]>
-        | Rest(name, type) =>
+        | Rest(name, type) =>          
           def realType = ConvertType(scope, type, GetParameterPrefix(prefix, name));
           <[ parameter: params $(name : usesite) : $realType ]>
       }
@@ -393,16 +394,24 @@ namespace NemerleWeb
       | Number => <[ float ]>
       | Object => CreateAnonymousType(scope, type :> ScriptType.Object, prefix)
       | Query => assert2(false); <[ object ]>
+      // TODO: Support local Array type
+      | Ref("Array", [_] as tyArgs)
+      | Ref("Array", tyArgs) =>
+        // Array cannot receive more than one argument
+        when (tyArgs is [_])
+          Message.Warning("Array cannot receive more than one type argument, using the first one." + 
+            $" Type: $(scope.FullName)");
+          
+        def typeArgumentPrefix = string.Join(Separator, prefix, TypeArgument);
+        def realType = ConvertType(scope, tyArgs.Head, typeArgumentPrefix);
+        
+        <[ array[$realType] ]>
+          
       | Ref(name, tyArgs) => 
         def typeArgumentPrefix = string.Join(Separator, prefix, TypeArgument);
         def realTypeArguments = tyArgs.Map(type => ConvertType(scope, type, typeArgumentPrefix));
       
-        // Array is a special case
-        // It can be a problem if user defines its own class with name 'Array', but it won't happen.
-        if (name == "Array")
-          <[ {..$realTypeArguments}[] ]>
-        else
-          <[ $(name : usesite).[..$realTypeArguments] ]>
+        <[ $(name : usesite).[..$realTypeArguments] ]>
       | String => <[ string ]>
       | Void => <[ void ]>
       }
