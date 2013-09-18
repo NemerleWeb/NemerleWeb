@@ -131,7 +131,7 @@ namespace NemerleWeb
         
       def interfaceType = scope.DefineNestedTypeWithSource(
         <[ decl:
-          [JSApiImpl]
+          [JSApi]
           public partial interface $(tsInterface.Name : usesite)[..$typeParameters] : ..$extends {}
         ]>);
       
@@ -147,7 +147,7 @@ namespace NemerleWeb
       def varType = ConvertType(scope, var.Type, typePrefix);
       
       _ = scope.Define(
-        <[ decl: public mutable $(var.Name : usesite) : $varType = default($varType); ]>);
+        <[ decl: public new mutable $(var.Name : usesite) : $varType = default($varType); ]>);
     }
   
     private CreateFunction(scope : TypeBuilder, function : AmbientFunctionDeclaration) : void
@@ -185,7 +185,7 @@ namespace NemerleWeb
       
       def typeParameters = ConvertTypeParameters(call.TypeParameters);
       
-      _ = scope.DefinePublicNewWithSource(
+      DefinePublicNew(scope,
         <[ decl: $(JSApiSpecial.Call : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
    
@@ -201,7 +201,7 @@ namespace NemerleWeb
       
       def typeParameters = ConvertTypeParameters(construct.TypeParameters);
       
-      _ = scope.DefinePublicNewWithSource(
+      DefineMemberPublicNew(scope,
         <[ decl: $(JSApiSpecial.New : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
     
@@ -218,7 +218,7 @@ namespace NemerleWeb
       def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
       def realReturnType = ConvertType(scope, index.ReturnType, returnTypePrefix);
       
-      _ = scope.DefinePublicNewWithSource(
+      DefineMemberPublicNew(scope,
         <[ decl:
           new Item[$(index.ParameterName : usesite) : $realParamType] : $realReturnType
           {
@@ -237,7 +237,7 @@ namespace NemerleWeb
       def typePrefix = string.Join(Separator, fullPrefix, Property);
       def propertyType = ConvertType(scope, property.Type, typePrefix);
       
-      _ = scope.DefinePublicNewWithSource(
+      DefineMemberPublicNew(scope,
         <[ decl: $(property.Name : usesite) : $propertyType { get; set; }; ]>);
     }
     
@@ -265,12 +265,8 @@ namespace NemerleWeb
       
       def typeParameters = ConvertTypeParameters(signature.TypeParameters);
     
-      def method =
-        <[ decl: $(name : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>;
-      when(!scope.IsInterface)
-      method.body = FunBody.Parsed(DefaultImplementation);
-        
-      _ = scope.DefinePublicNewWithSource(method);
+      DefineMemberPublicNew(scope,
+        <[ decl: $(name : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
     
     static mutable anonymousTypeIndex : int = 0;
@@ -291,7 +287,7 @@ namespace NemerleWeb
         
         def type = scope.DefineNestedTypeWithSource(
           <[ decl: 
-            [JSApiImpl] public sealed class $(name : usesite) { }
+            [JSApi] public sealed class $(name : usesite) { }
           ]>);
           
         // Suppress warning
@@ -458,15 +454,20 @@ namespace NemerleWeb
       | Object => CreateAnonymousType(scope, type :> ScriptType.Object, prefix)
       | Query => assert2(false); <[ object ]>
       // TODO: Support local Array type
-      | Ref("Array", [_] as tyArgs)
       | Ref("Array", tyArgs) =>
-        // Array cannot receive more than one argument
-        when (!(tyArgs is []) && !(tyArgs is [_]))
-          Message.Warning("Array cannot receive more than one type argument, using the first one." + 
-            $" Type: $(scope.FullName)");
+        def tyArg =
+          match(tyArgs)
+          {
+          | [] => ScriptType.Any()
+          | [tyArg] => tyArg
+          | _ =>
+            Message.Warning("Array cannot receive more than one type argument, using the first one." + 
+              $" Type: $(scope.FullName)");
+            tyArgs.Head
+          };
           
         def typeArgumentPrefix = string.Join(Separator, prefix, TypeArgument);
-        def realType = ConvertType(scope, tyArgs.Head, typeArgumentPrefix);
+        def realType = ConvertType(scope, tyArg, typeArgumentPrefix);
         
         <[ array[$realType] ]>
           
@@ -497,6 +498,32 @@ namespace NemerleWeb
     
     private DefaultImplementation : PExpr =
       <[ { IgnoreParams(); throw NemerleWeb.ClientCodeCalledInServerException(); } ]>;
+    private DefaultFunctionImplementation : FunBody.Parsed =
+      FunBody.Parsed(DefaultImplementation);
+    
+    #endregion
+    
+    #region Helpers
+    
+    DefineMemberPublicNew(scope : TypeBuilder, member : ClassMember) : void
+    {
+      when(!scope.IsInterface)
+      {
+        match(member)
+        {
+        | f is ClassMember.Function =>
+          f.body = DefaultFunctionImplementation;
+        | p is ClassMember.Property =>
+          when(p.getter is Some(getter))
+            getter.body = DefaultFunctionImplementation;
+          when(p.setter is Some(setter))
+            setter.body = DefaultFunctionImplementation;
+        | _ => ()
+        }
+      }
+      
+      _ = scope.DefinePublicNewWithSource(member);
+    }
     
     #endregion
   }
