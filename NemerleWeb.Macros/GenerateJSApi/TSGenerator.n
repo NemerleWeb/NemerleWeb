@@ -398,7 +398,7 @@ namespace NemerleWeb
       | Ref("Array", [_] as tyArgs)
       | Ref("Array", tyArgs) =>
         // Array cannot receive more than one argument
-        when (tyArgs is [_])
+        when (!(tyArgs is []) && !(tyArgs is [_]))
           Message.Warning("Array cannot receive more than one type argument, using the first one." + 
             $" Type: $(scope.FullName)");
           
