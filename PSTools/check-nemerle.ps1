@@ -6,7 +6,7 @@ if($env:NemerleBinPathRoot -eq "" -or ![System.IO.Directory]::Exists($nemerlePat
 } else {
 	$nccPath = Join-Path $nemerlePath "ncc.exe"
 	$version = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($nccPath).FileVersion
-	$requiredVersion = '1.2.0.0'
+	$requiredVersion = '1.2.0.26'
 
 	if($version -lt $requiredVersion) {
 		do {
