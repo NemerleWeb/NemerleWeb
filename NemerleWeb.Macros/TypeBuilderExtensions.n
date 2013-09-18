@@ -14,13 +14,13 @@ namespace NemerleWeb
 {   
   internal module TypeBuilderExtensions
   {
-    public DefinePublicNewWithSource(this tb : TypeBuilder, expr : ClassMember) : void
+    public DefinePublicNewWithSource(this tb : TypeBuilder, expr : ClassMember) : MemberBuilder
     {
       expr.modifiers.mods |= NemerleModifiers.New;        
       when(!tb.IsInterface)
         expr.modifiers.mods |= NemerleModifiers.Public;
       
-      _ = tb.DefineWithSource(expr);
+      tb.DefineWithSource(expr);
     }
   }
 }

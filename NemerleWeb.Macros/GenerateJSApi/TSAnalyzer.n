@@ -127,9 +127,7 @@ namespace NemerleWeb
         .NToList();
       
       def members = ast
-        .SelectMany(x => x.Type.Members
-          .Where(m => NoLiteralParameters(m))
-          .SelectMany(m => [m]))/*AnalyzeObject*/ 
+        .SelectMany(x => x.Type.Members)
         .Distinct()
         .NToList();
       

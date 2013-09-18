@@ -11,16 +11,10 @@ namespace NemerleWeb
 {
   public partial module TypedJS
   {
-    // HACK: Remove
-    public partial interface RegExp {}
-    
+    [JSApiImpl]
     public module JSStringExtensions
     {
       public Replace(this str : string, reg : RegExp, replacement : string) : string
-      {
-        IgnoreParams();
-        throw ClientCodeCalledInServerException()
-      }
     }
   }
 }
