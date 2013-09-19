@@ -185,7 +185,7 @@ namespace NemerleWeb
       
       def typeParameters = ConvertTypeParameters(call.TypeParameters);
       
-      DefinePublicNew(scope,
+      DefineMemberPublicNew(scope,
         <[ decl: $(JSApiSpecial.Call : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
    
