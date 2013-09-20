@@ -434,21 +434,24 @@ namespace NemerleWeb
       | Constructor => <[ object ]>
       | Function(value) =>
         // TODO: Handle generic function literals
-        when(!(value.TypeParameters is []))
-          Message.Warning("Function literal type parameters are not supported." + 
-            $" Type: $(scope.FullName)");
-      
-        mutable lambdaParams = GetParametersType(scope, value.Parameters, prefix);
-        def type =
-          if(value.ReturnType is ScriptType.Void())
-            <[ System.Action ]>
-          else
-          {
-            lambdaParams = lambdaParams.Concat([ConvertType(scope, value.ReturnType, prefix)]);
-            <[ System.Func ]>
-          };
-        
-        <[ $type.[..$lambdaParams] ]>
+        if(value.TypeParameters is [])
+        {
+          mutable lambdaParams = GetParametersType(scope, value.Parameters, prefix);
+          def type =
+            if(value.ReturnType is ScriptType.Void())
+              <[ System.Action ]>
+            else
+            {
+              lambdaParams = lambdaParams.Concat([ConvertType(scope, value.ReturnType, prefix)]);
+              <[ System.Func ]>
+            };
+          
+          <[ $type.[..$lambdaParams] ]>
+        }
+        else
+        {
+          <[object]>
+        }
         
       | Number => <[ float ]>
       | Object => CreateAnonymousType(scope, type :> ScriptType.Object, prefix)
