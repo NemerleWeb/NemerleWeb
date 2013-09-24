@@ -1,0 +1,95 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using NemerleWeb;
+
+
+namespace NemerleWeb.Samples
+{
+  [Unit]
+  public class ListsAndCollectionsPage
+  {
+    [Record][Unit]
+    public class SeatReservation 
+    {
+        public Name : string { get; set; }
+        public Meal : Meal { get; set; }        
+        public FormattedPrice : string 
+        { 
+            get { if(Meal != null) Meal.Price.ToString() else "None" } 
+        }
+    }
+    
+    [Record][Unit]
+    public class Meal 
+    {
+        public MealName : string { get; set; }
+        public Price : decimal { get; set; }
+    }
+    
+    public AvailableMeals : List[Meal] { get; set; }
+    public Seats          : List[SeatReservation] { get; set; }
+    public SeatCount      : int;
+    public TotalSurcharge : decimal 
+    { 
+        get { 
+            mutable total = 0m;
+            foreach(seat in Seats) {
+                total = total + seat.Meal.Price;
+            }
+            total
+        } 
+    }
+    
+    public this() 
+    {
+        AvailableMeals = [Meal("Potatoes", 1), Meal("Tomatoes", 2)].ToList();
+        Seats = [SeatReservation("Steve", AvailableMeals[0]), 
+                 SeatReservation("Roger", AvailableMeals[1])].ToList();
+        SeatCount = Seats.Count();
+    }
+    
+    public AddSeat() : void 
+    {
+        Seats.Add(SeatReservation("", AvailableMeals[0]))
+    }
+    
+    public RemoveSeat(seat : SeatReservation) : bool 
+    {        
+        Seats.Remove(seat)
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+            <div>
+                <h3>Lists and collections</h3>
+                <h2>Your seat reservations (<span>$(Seats.Count())</span>)</h2>
+                <table>
+                    <thead><tr>
+                        <th>Passenger name</th><th>Meal</th><th>Surcharge</th><th></th>
+                    </tr></thead>
+                    <tbody>
+                        <tr $foreach(s in Seats)>
+                            <td><input value="$(s.Name)" /></td>
+                            <td>
+                              <select value="$(s.Meal)">
+                                <option $foreach(meal in AvailableMeals) value="$meal">$(meal.MealName)</option>
+                              </select>
+                            </td>
+                            <td>$(s.FormattedPrice)</td>
+                            <td><a href="#" click="$RemoveSeat">Remove</a></td>
+                        </tr>    
+                    </tbody>
+                </table>
+
+                <button $when(Seats.Count() < 6) click="$AddSeat" enable="$(Seats.Count() < 5)">Reserve another seat</button>
+
+                <h3 visible="$(TotalSurcharge > 0)">
+                    Total surcharge: <span>$TotalSurcharge</span>
+                </h3>
+            </div>
+      #>
+    }
+  }
+}

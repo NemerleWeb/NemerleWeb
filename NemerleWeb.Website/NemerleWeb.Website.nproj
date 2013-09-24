@@ -185,7 +185,66 @@
     <Compile Include="Global.asax.n">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\Helpers.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Infrastructure\HtmlHelperExtensions.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\MainPage.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\Samples\CompListPage.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples\Knockout\Tutorial_1_Introduction.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples\Knockout\Tutorial_2_ListsAndCollections.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples\Knockout\Tutorial_3_SinglePageApps.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples\Knockout\Tutorial_5_LoadingAndSaving.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples\NameListPage.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples\Samples.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples\SignalPage.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples\TestPage.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples\TypedJS.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples\VariantsAndMatchingPage.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Tests\ServerTestPage.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\Tests\TemplateTestPage.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\Tests\UnitTestPage.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
@@ -193,6 +252,10 @@
   <ItemGroup>
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Compile Include="MVVM\Samples\NameListCSharpPage.cs">
+      <SubType>Content</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
@@ -217,7 +280,16 @@
     <Content Include="Scripts\markdown.js">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\prettify.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\sammy-0.7.4.min.js">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Views\Home\Content.cshtml">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Views\Home\Index.cshtml">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Web.config" />
@@ -236,7 +308,11 @@
     <Folder Include="bin\" />
     <Folder Include="Content\" />
     <Folder Include="Controllers\" />
+    <Folder Include="Infrastructure\" />
     <Folder Include="MVVM" />
+    <Folder Include="MVVM\Samples\" />
+    <Folder Include="MVVM\Samples\Knockout\" />
+    <Folder Include="MVVM\Tests\" />
     <Folder Include="Properties\" />
     <Folder Include="Scripts\" />
     <Folder Include="Views\" />
@@ -260,6 +336,20 @@
       <HintPath>$(Nemerle)\Nemerle.ComputationExpressions.Macros.dll</HintPath>
       <Private>False</Private>
     </MacroReference>
+  </ItemGroup>
+  <ItemGroup>
+    <MacroProjectReference Include="..\NemerleWeb.Tests.Macro\NemerleWeb.Tests.Macro.nproj">
+      <Name>NemerleWeb.Tests.Macro</Name>
+      <Project>{1d616985-5e18-44e1-8f74-d2ac69c3dc6f}</Project>
+      <Private>False</Private>
+    </MacroProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NemerleWeb.TypedJS\NemerleWeb.TypedJS.nproj">
+      <Name>NemerleWeb.TypedJS</Name>
+      <Project>{65c01c91-f57a-4281-b09f-15baa5ac3cc6}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
