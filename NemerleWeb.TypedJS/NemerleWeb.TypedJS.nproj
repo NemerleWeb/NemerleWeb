@@ -111,6 +111,7 @@
     <Folder Include="Scripts\typings\colors\" />
     <Folder Include="Scripts\typings\commander\" />
     <Folder Include="Scripts\typings\convert-source-map\" />
+    <Folder Include="Scripts\typings\crossroads\" />
     <Folder Include="Scripts\typings\d3\" />
     <Folder Include="Scripts\typings\docCookies\" />
     <Folder Include="Scripts\typings\domo\" />
@@ -190,6 +191,7 @@
     <Folder Include="Scripts\typings\jquery.pickadate\" />
     <Folder Include="Scripts\typings\jquery.scrollTo\" />
     <Folder Include="Scripts\typings\jquery.simplePagination\" />
+    <Folder Include="Scripts\typings\jquery.sortElements\" />
     <Folder Include="Scripts\typings\jquery.superLink\" />
     <Folder Include="Scripts\typings\jquery.tagsmanager\" />
     <Folder Include="Scripts\typings\jquery.timeago\" />
@@ -204,6 +206,7 @@
     <Folder Include="Scripts\typings\jqueryui\" />
     <Folder Include="Scripts\typings\jquery\" />
     <Folder Include="Scripts\typings\js-fixtures\" />
+    <Folder Include="Scripts\typings\js-signals\" />
     <Folder Include="Scripts\typings\jscrollpane\" />
     <Folder Include="Scripts\typings\jsdeferred\" />
     <Folder Include="Scripts\typings\jsfl\" />
@@ -467,6 +470,9 @@
     <Content Include="Scripts\typings\convert-source-map\convert-source-map.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\crossroads\crossroads.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\d3\d3.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -716,6 +722,9 @@
     <Content Include="Scripts\typings\jquery.simplePagination\jquery.simplePagination.d.ts">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\typings\jquery.sortElements\jquery.sortElement.d.ts">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\typings\jquery.superLink\jquery.superLink.d.ts">
       <SubType>Content</SubType>
     </Content>
@@ -756,6 +765,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\js-fixtures\fixtures.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\js-signals\js-signals.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\jscrollpane\jscrollpane.d.ts">
@@ -1035,6 +1047,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\sinon\sinon-1.5.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\sinon\sinon.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\slickgrid\SlickGrid.d.ts">

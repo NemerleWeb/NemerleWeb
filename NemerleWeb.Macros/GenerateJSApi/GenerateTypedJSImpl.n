@@ -65,7 +65,8 @@ namespace NemerleWeb
             f => match(f)
             {
             | <[ $(dir : string) ]> with exclude = ""
-            | <[ ($(dir : string), $(exclude : string)) ]> => DirectoryArg(dir, exclude)
+            | <[ ($(dir : string), $(exclude : string)) ]> =>
+              DirectoryArg(dir, exclude)
             | _ =>
               Message.Error("You must specify at most 1 or 2 arguments: directory and exclude pattern");
               null
@@ -78,7 +79,7 @@ namespace NemerleWeb
             {
             | <[ $(lib : string) ]> => lib
             | _ =>
-              Message.Error("Lib must be a list of strings");
+              Message.Error("Lib must be a string or a list of strings");
               null
             })
           .ToArray();
@@ -102,7 +103,7 @@ namespace NemerleWeb
       def tsFilesToParse = HashSet();
       
       // Add libs if specified
-      foreach(lib in libs)
+      foreach(lib when !lib.IsEmpty() in libs)
         _ = tsFilesToParse.Add(Path.Combine(projectDir, lib));
       
       // Resolve all references        
@@ -111,7 +112,7 @@ namespace NemerleWeb
         def re = Regex(arg.Exclude);
         def isIncluded(s) { if (arg.Exclude == "") true else !re.IsMatch(s) }
       
-        def fullDir = Path.Combine(projectDir, arg.Directory);          
+        def fullDir = Path.Combine(projectDir, arg.Directory);
         try
         {
           def tsFiles = Directory.EnumerateFiles(fullDir, "*.d.ts", SearchOption.AllDirectories);

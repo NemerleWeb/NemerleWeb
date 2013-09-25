@@ -25,19 +25,18 @@ namespace NemerleWeb
   {
     #region Public
     
-    public GenerateCode(typer : Typer, root : string, tsAst : IEnumerable[DeclarationElement]) : void
+    /// <summary>
+    /// Create namespace and module 
+    /// </summary>
+    public GenerateCode(
+      [NotNull] typer : Typer,
+      [NotNull] root : string,
+      [NotNull] tsAst : IEnumerable[DeclarationElement]) : void
     {
-      // Create namespaces and the last will be module      
-      def splittedRoot = root.Split('.');      
-      def surroundingNamespace =
-        typer.Env.EnterIntoNamespace(
-          if(splittedRoot.Length == 0)
-            [root]
-          else
-            splittedRoot.Take(splittedRoot.Length - 1).NToList());
+      def rootDot = root.SplitDot();
       
-      def jsApiRoot = surroundingNamespace.Define(
-        <[ decl: public partial module $(splittedRoot.Last() : usesite) {} ]>);
+      def jsApiRoot = typer.Env.EnterIntoNamespace(rootDot);
+      def jsApiRoot = jsApiRoot.Define(<[decl:module A{}]>);
       
       // First generate all types
       GenerateTypes(jsApiRoot, tsAst);
@@ -48,7 +47,6 @@ namespace NemerleWeb
       // Then generate the rest: variables, functions.
       //GenerateRestMembers(jsApiRoot, tsAst);
       
-      // Finalize
       jsApiRoot.Compile();
     }
     
@@ -129,7 +127,7 @@ namespace NemerleWeb
         else
           [];
         
-      def interfaceType = scope.DefineNestedTypeWithSource(
+      def interfaceType = scope.DefineNestedType(
         <[ decl:
           [JSApi]
           public partial interface $(tsInterface.Name : usesite)[..$typeParameters] : ..$extends {}
@@ -185,7 +183,7 @@ namespace NemerleWeb
       
       def typeParameters = ConvertTypeParameters(call.TypeParameters);
       
-      DefineMemberPublicNew(scope,
+      scope.DefineMemberPublicNew(
         <[ decl: $(JSApiSpecial.Call : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
    
@@ -201,7 +199,7 @@ namespace NemerleWeb
       
       def typeParameters = ConvertTypeParameters(construct.TypeParameters);
       
-      DefineMemberPublicNew(scope,
+      scope.DefineMemberPublicNew(
         <[ decl: $(JSApiSpecial.New : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
     
@@ -218,7 +216,7 @@ namespace NemerleWeb
       def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
       def realReturnType = ConvertType(scope, index.ReturnType, returnTypePrefix);
       
-      DefineMemberPublicNew(scope,
+      scope.DefineMemberPublicNew(
         <[ decl:
           new Item[$(index.ParameterName : usesite) : $realParamType] : $realReturnType
           {
@@ -237,7 +235,7 @@ namespace NemerleWeb
       def typePrefix = string.Join(Separator, fullPrefix, Property);
       def propertyType = ConvertType(scope, property.Type, typePrefix);
       
-      DefineMemberPublicNew(scope,
+      scope.DefineMemberPublicNew(
         <[ decl: $(property.Name : usesite) : $propertyType { get; set; }; ]>);
     }
     
@@ -265,7 +263,7 @@ namespace NemerleWeb
       
       def typeParameters = ConvertTypeParameters(signature.TypeParameters);
     
-      DefineMemberPublicNew(scope,
+      scope.DefineMemberPublicNew(
         <[ decl: $(name : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
     
@@ -285,7 +283,7 @@ namespace NemerleWeb
         
         def name = string.Join(Separator, prefix, AnonymousType, anonymousTypeIndex.ToString());
         
-        def type = scope.DefineNestedTypeWithSource(
+        def type = scope.DefineNestedType(
           <[ decl: 
             [JSApi] public sealed class $(name : usesite) { }
           ]>);
@@ -298,6 +296,11 @@ namespace NemerleWeb
           
         <[ $(name : usesite) ]>
       }
+    }
+    
+    private CreateModule() : TypeBuilder
+    {
+      null
     }
     
     #endregion
@@ -333,18 +336,19 @@ namespace NemerleWeb
       | String => <[ string ]>
       | Void => <[ void ]>
       | Ref as r => MakeFullType(scope, r, typeParameters)
-      | Query => Message.Error("Query type argument unsupported"); <[ ]>
-      | Array => Message.Error("Array type argument unsupported"); <[ ]>
+      | Query => Message.Warning("Query type argument unsupported"); <[ object ]>
+      | Array => Message.Warning("Array type argument unsupported"); <[ object ]>
       | Object as o =>
         if(o.Members is [])
           <[ object ]>
         else
         {
-          Message.Error("Object type argument is supported only without members"); <[ ]>
+          Message.Warning("Object type argument is supported only without members");
+          <[ object ]>
         }        
-      | Function => Message.Error("Function type argument unsupported"); <[ ]>
-      | Constructor => Message.Error("Constructor type argument unsupported"); <[ ]>
-      | _ => Message.Error($"Unsupport type argument $type");  <[]>
+      | Function => Message.Warning("Function type argument unsupported"); <[ object ]>
+      | Constructor => Message.Warning("Constructor type argument unsupported"); <[ object ]>
+      | _ => Message.Warning($"Unsupport type argument $type");  <[ object ]>
       }
     }
     
@@ -454,7 +458,7 @@ namespace NemerleWeb
         }
         
       | Number => <[ float ]>
-      | Object => CreateAnonymousType(scope, type :> ScriptType.Object, prefix)
+      | Object as type => CreateAnonymousType(scope, type, prefix)
       | Query => assert2(false); <[ object ]>
       // TODO: Support local Array type
       | Ref("Array", tyArgs) =>
@@ -499,16 +503,17 @@ namespace NemerleWeb
     private TypeArgument = "TypeArgument";
     private Separator = "_";
     
-    private DefaultImplementation : PExpr =
-      <[ { IgnoreParams(); throw NemerleWeb.ClientCodeCalledInServerException(); } ]>;
-    private DefaultFunctionImplementation : FunBody.Parsed =
-      FunBody.Parsed(DefaultImplementation);
-    
     #endregion
     
     #region Helpers
     
-    DefineMemberPublicNew(scope : TypeBuilder, member : ClassMember) : void
+    
+    #endregion
+  }
+  
+  internal module ScopeExtensions
+  {
+    public DefineMemberPublicNew(this scope : TypeBuilder, member : ClassMember) : void
     {
       when(!scope.IsInterface)
       {
@@ -525,9 +530,16 @@ namespace NemerleWeb
         }
       }
       
-      _ = scope.DefinePublicNewWithSource(member);
+      member.modifiers.mods |= NemerleModifiers.New;
+      when(!scope.IsInterface)
+        member.modifiers.mods |= NemerleModifiers.Public;
+      
+      _ = scope.DefineWithSource(member);
     }
     
-    #endregion
+    private DefaultImplementation : PExpr =
+      <[ { IgnoreParams(); throw NemerleWeb.ClientCodeCalledInServerException(); } ]>;
+    private DefaultFunctionImplementation : FunBody.Parsed =
+      FunBody.Parsed(DefaultImplementation);
   }
 }

@@ -25,7 +25,7 @@ namespace NemerleWeb
     /// <summary>
     /// Take all elements and remove duplicates
     /// </summary>
-    public AnalyzeTSAst(tsAsts : IEnumerable[DeclarationElement]) : IEnumerable[DeclarationElement]
+    public AnalyzeTSAst([NotNull] tsAsts : IEnumerable[DeclarationElement]) : IEnumerable[DeclarationElement]
     {
       tsAsts.GroupBy(GroupAst).SelectMany(SelectAst)
     }

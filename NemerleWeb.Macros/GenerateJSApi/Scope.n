@@ -13,7 +13,8 @@ using System.Linq;
 namespace NemerleWeb
 {
   /// <summary>
-  /// Wraps GlobalEnv or TypeBuilder for type creation
+  /// Wraps GlobalEnv or TypeBuilder in one interface
+  /// Converts one to another.
   /// </summary>
   internal sealed class Scope
   {
@@ -30,50 +31,20 @@ namespace NemerleWeb
       TypeBuilder = typeBuilder;
     }
     
-    public Define(typeDeclaration : ClassMember.TypeDeclaration) : TypeBuilder
+    public DefineGlobal(typeDeclaration : ClassMember.TypeDeclaration) : TypeBuilder
     {
-      if(GlobalEnv != null) GlobalEnv.Define(typeDeclaration)
-      else                  TypeBuilder.DefineNestedType(typeDeclaration)
+      GlobalEnv.Define(typeDeclaration)
     }
     
-    public FullNameParts : list[string]
+    public DefineMember(typeDeclaration : ClassMember) : MemberBuilder
     {
-      [Memoize]
-      get
-      {
-        if(GlobalEnv != null) GlobalEnv.CurrentNamespace.FullName
-        else                  TypeBuilder.FullName.SplitDot()
-      }
+      TypeBuilder.DefineWithSource(typeDeclaration)
     }
     
-    public LookupType(qid : string) : option[PExpr]
+    public Compile() : void
     {
-      if(IsTypeExist(qid))
-        Some(FromQualifiedIdentifier(qid))
-      else
-        None()
-    }
-
-    public FromQualifiedIdentifier(qid : string) : PExpr
-    {
-      PExpr.FromQualifiedIdentifier(Manager, qid)
-    }
-    
-    private IsTypeExist(typeName : string) : bool
-    {
-      if(GlobalEnv != null)
-        GlobalEnv.LookupType(typeName.SplitDot()).HasValue
-      else
-        TypeBuilder.Manager.NameTree.LookupExactType(typeName.SplitDot()).HasValue
-    }
-    
-    private Manager : ManagerClass
-    {
-      get
-      {
-        if(GlobalEnv != null) GlobalEnv.Manager
-        else                  TypeBuilder.Manager
-      }
+      if(GlobalEnv != null) {}
+      else TypeBuilder.Compile();
     }
   }
 }
