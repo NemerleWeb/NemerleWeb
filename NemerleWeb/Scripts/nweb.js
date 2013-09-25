@@ -260,7 +260,8 @@ var nweb = {
     }
 
     //$el = nweb.utils.replaceWith($el, $("<!-- repeat " + expr + " -->"));
-    $el.html("<!-- repeat " + expr + " -->");
+    $el.html("<!-- repeat " + expr + " -->")
+       .hide();
     el.__nw_is_template = true;
     el.__nw_is_repeat = true;
 

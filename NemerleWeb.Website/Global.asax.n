@@ -23,7 +23,19 @@ namespace NemerleWeb.SC2Score
         public static RegisterRoutes(routes : RouteCollection) : void
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+            
+            _ = routes.MapRoute(
+                "Samples", // Route name
+                "samples", // URL with parameters
+                new (controller = "Home", action = "Samples", id = UrlParameter.Optional) // Parameter defaults
+            );
 
+            _ = routes.MapRoute(
+                "Tutorial", // Route name
+                "tutorial", // URL with parameters
+                new (controller = "Home", action = "Tutorial", id = UrlParameter.Optional) // Parameter defaults
+            );
+            
             _ = routes.MapRoute(
                 "Default", // Route name
                 "{controller}/{action}/{id}", // URL with parameters

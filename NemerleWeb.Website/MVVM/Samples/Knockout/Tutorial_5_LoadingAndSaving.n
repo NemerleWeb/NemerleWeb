@@ -1,0 +1,112 @@
+﻿using Nemerle.Extensions;
+using System.Collections.Generic;
+using System.Linq;
+using NemerleWeb;
+
+
+namespace NemerleWeb.Samples
+{
+  [Unit]
+  public class LoadingAndSavingPage
+  {
+    [Unit]
+    public class Task
+    {
+      public Title : string { get; set; }
+      public IsDone : bool { get; set; }
+      public IsDestroyed : bool { get; set; }
+    }
+
+    public Tasks : List[Task] { get; set; default List.[Task]() }
+    public NewTaskText : string { get; set; }
+    public IncompleteTasks : IEnumerable[Task]
+    {
+      get
+      {
+        Tasks.Where(t => !t.IsDone)
+      }
+    }
+    
+    public ActiveTasks : IEnumerable[Task] 
+    {
+      get
+      {
+        Tasks.Where(t => !t.IsDestroyed)
+      }
+    }
+
+    public this()
+    {
+      server.Load(tasks => { Tasks = tasks.ToList(); });
+    }
+
+    AddTask() : void
+    {
+      Tasks.Add(Task() <- (Title = NewTaskText, IsDone = false, IsDestroyed = false));
+      NewTaskText = "";
+    }
+
+    RemoveTask(task : Task) : void
+    {
+      task.IsDestroyed = true;
+    }
+
+    Save() : void
+    {
+      server.Save(Tasks, _result =>
+      {
+        js alert(_result);
+      });
+    }
+
+    public class Server
+    {
+      public Save(tasks : IEnumerable[Task]) : string
+      {
+        if(tasks == null)
+          "Seems like you don't have any unfinished tasks left!"
+        else
+        $<#
+          Server received $(tasks.Count()) task(s). 
+          $(tasks.Count(t => t.IsDone)) of which are marked as done. 
+          $(tasks.Count(t => t.IsDestroyed)) of which are marked for deletion.#>;
+      }
+
+      public Load() : IEnumerable[Task]
+      {
+        yield Task() <- (Title = "Wire the money to Panama", IsDone = true, IsDestroyed = false);
+        yield Task() <- (Title = "Get hair dye, beard trimmer, dark glasses and \"passport\"", IsDone = false, IsDestroyed = false);
+        yield Task() <- (Title = "Book taxi to airport", IsDone = false, IsDestroyed = false);
+        yield Task() <- (Title = "Arrange for someone to look after the cat", IsDone = false, IsDestroyed = false);
+      }
+    }
+
+    [Html]
+    public View() : string
+    {
+            <# 
+            <div xmlns="">
+                <h3>Loading and saving</h3>
+
+                <form submit="$AddTask">
+                    Add task: <input value="$NewTaskText" placeholder="What needs to be done?" />
+                    <button type="submit">Add</button>
+                </form>
+
+                <ul visible="$(Tasks.Count() > 0)">
+                    <li $foreach(t in ActiveTasks)>
+                        <input type="checkbox" checked="$(t.IsDone)" />
+                        <input value="$(t.Title)" disable="$(t.IsDone)" />
+                        <a href="#" click="$RemoveTask">Delete</a>
+                    </li> 
+                </ul>
+
+                You have <b>$(IncompleteTasks.Count())</b> incomplete task(s)
+                <span visible="$(IncompleteTasks.Count() == 0)"> - it's beer time!</span>
+
+                <button click="$Save">Save</button>
+            </div>
+          #>
+    }
+  }
+}

@@ -47,7 +47,7 @@ $methods
 
 setTimeout(function() {
 $$.connection.hub.start({}, function() {
-  $$.get('$(declaringType.Name)/__SetSignalRConnectionId', {id: this.id});
+  $$.get('/$(declaringType.Name)/__SetSignalRConnectionId', {id: this.id});
 });
 }, 1000);#>;
 

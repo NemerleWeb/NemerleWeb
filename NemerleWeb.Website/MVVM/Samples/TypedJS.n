@@ -1,0 +1,12 @@
+﻿using NemerleWeb;
+
+[assembly: JSApiRoot("NemerleWeb.Samples.TypedJS")]
+
+namespace NemerleWeb.Samples
+{
+  [JSApiImpl]
+  module TypedJS
+  {
+    public prettyPrint() : void;
+  }
+}

@@ -1,0 +1,60 @@
+﻿using NemerleWeb;
+using NemerleWeb.Tests;
+
+using System.Linq;
+using System.Collections.Generic;
+
+namespace NemerleWeb.Samples
+{
+  [Unit]
+  class NameListPage
+  {
+    mutable Names = List.[string]();
+    SearchPattern : string { get; set; }    
+    FilteredNames : List[string]
+    {
+      get
+      {
+        if(SearchPattern == null)
+          Names;
+        else
+        {
+          def result = List();
+            foreach(name in Names)
+              when(name.ToUpper().Contains(SearchPattern.ToUpper()))
+                result.Add(name);
+          result
+        }
+      }
+    }    
+    
+    public this()
+    {
+      server.GetNames(l => Names = l);
+    }
+    
+    public class Server
+    {
+      public GetNames() : List[string]
+      {
+        Helpers.GetNames().ToList();
+      }
+    }
+    
+    [Html]
+    public View() : string 
+    {
+      <#
+        <div>
+          <h3>List of names</h3>
+          Filter: <input value="$SearchPattern" />
+          <div class="name-list">
+            <span $foreach(n in FilteredNames)>
+              $(n + ", ")
+            </span>
+          </div>
+        </div>
+      #>
+    }
+  }
+}

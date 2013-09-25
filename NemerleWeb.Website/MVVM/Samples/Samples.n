@@ -1,0 +1,168 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Collections.Concurrent;
+using Nemerle;
+using NemerleWeb;
+using NemerleWeb.TypedJS;
+using NemerleWeb.Tests;
+using NemerleWeb.Samples.TypedJS;
+
+namespace NemerleWeb.Samples
+{
+  [Unit, Record]  
+  class Sample
+  {
+    public Name : string { get; set; }
+    public SourceFiles : list[string] { get; set; }
+    public Source : string { get; set; }
+    public Instance : object { get; set; }
+  }
+  
+  [Unit]
+  class SamplesPage
+  {      
+    SelectedSample : Sample { get; set; }
+    
+    Samples = List.[Sample]();
+    KnockoutSamples = List.[Sample]();
+    PegSamples = List.[Sample]();
+    AllSamples : array[Sample] 
+    {
+      get
+      {
+        Samples.Concat(KnockoutSamples).Concat(PegSamples).ToArray()
+      }
+    }
+    
+    NameList : NameListPage { get; set; }
+    NameListCSharp : NameListCSharpPage { get; set; }
+    CompList : CompListPage { get; set; }
+    Signal : SignalPage { get; set; }
+    Variants : VariantsAndMatchingPage { get; set; }    
+    Introduction : IntroductionPage { get; set; }
+    ListsAndCollections : ListsAndCollectionsPage { get; set; }
+    LoadingAndSaving : LoadingAndSavingPage { get; set; }
+    SinglePageApps : SPAPage { get; set; }
+        
+    Sources : List[string * string] { get; set; }
+    ThisPageSource : string { get; set; }
+        
+    public this()
+    {
+      NameList = NameListPage();
+      NameListCSharp = NameListCSharpPage();
+      CompList = CompListPage();
+      Signal = SignalPage();
+      Variants = VariantsAndMatchingPage();
+      Introduction = IntroductionPage("John", "Silver");
+      ListsAndCollections = ListsAndCollectionsPage();
+      LoadingAndSaving = LoadingAndSavingPage();
+      SinglePageApps = SPAPage();
+            
+      Samples = 
+      [
+        Sample("Filtering", ["MVVM/Samples/NameListPage.n"], "", NameList),  // in tname template(_.NameList) second parameter is View by default
+        Sample("Filtering C#", ["MVVM/Samples/NameListCSharpPage.cs"], "", NameListCSharp), 
+        Sample("Alphabet (Computation Expressions)", ["MVVM/Samples/CompListPage.n"], "", CompList), 
+        Sample("Chat using SignalR", ["MVVM/Samples/SignalPage.n"], "", Signal),
+        Sample("Variants and Pattern Matching", ["MVVM/Samples/VariantsAndMatchingPage.n"], "", Variants)
+      ].ToList();
+      
+      KnockoutSamples =
+      [
+        Sample("Introduction", ["MVVM/Samples/Knockout/Tutorial_1_Introduction.n"], "", Introduction), 
+        Sample("Lists and collections", ["MVVM/Samples/Knockout/Tutorial_2_ListsAndCollections.n"], "", ListsAndCollections), 
+        Sample("Single page applications", ["MVVM/Samples/Knockout/Tutorial_3_SinglePageApps.n"], "", SinglePageApps), 
+        Sample("Loading and saving", ["MVVM/Samples/Knockout/Tutorial_5_LoadingAndSaving.n"], "", LoadingAndSaving)
+      ].ToList();
+                       
+      SelectedSample = Samples[2];
+            
+      LoadSamples(Samples);
+      LoadSamples(KnockoutSamples);
+      LoadSamples(PegSamples);
+            
+      server.LoadSourceFor("MVVM/Samples/Samples.n", source =>
+      {
+        ThisPageSource = source;
+        prettyPrint();
+      });
+    }
+    
+    LoadSamples(samples : List[Sample]) : void
+    {
+      for(mutable i = 0; i < samples.Count; i++)      
+        LoadSample(samples, i)
+    }
+    
+    LoadSample(samples : List[Sample], index : int) : void
+    {
+      server.LoadSourceForList(samples[index].SourceFiles, source =>
+      {          
+        samples[index].Source = source;
+        prettyPrint();
+      });  
+    }
+    
+    SelectSample(sample : Sample) : void 
+    {
+      SelectedSample = sample;
+      nweb.invalidate();
+      prettyPrint();
+    }
+    
+    public class Server
+    {
+      public static _lastMessages : ConcurrentQueue[Sample] = ConcurrentQueue.[Sample]();
+      
+      public LoadSourceFor(sample : string) : string
+      {
+        Helpers.LoadSourceFor(sample);
+      }
+      
+      public LoadSourceForList(samples : IEnumerable[string]) : string
+      {
+        $<#..$(samples; "\n---------------------------------\n"; Helpers.LoadSourceFor)#>
+      }
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <# 
+        <div>
+          <div class="row samples-nav">
+            <div class="col-xs-6">
+              <h4>NemerleWeb Samples</h4>
+              <ul class="nav nav-stacked">
+                <li $foreach(s in Samples) css-selected="$(SelectedSample.Name == s.Name)">
+                  <a href="#" click="$SelectSample">$(s.Name)</a>
+                </li>
+              </ul>
+            </div>
+            <div class="col-xs-6">
+              <h4>KnockoutJS Samples</h4>
+              <ul class="nav nav-stacked">
+                <li $foreach(s in KnockoutSamples) css-selected="$(SelectedSample.Name == s.Name)">
+                  <a href="#" click="$SelectSample">$(s.Name)</a>
+                </li>            
+              </ul>
+            </div>
+          </div>
+          <div $foreach(s in AllSamples)>
+            <div $when(SelectedSample.Name == s.Name) class="current-sample">
+              <div class="sample">
+                <div template="$(template(s.Instance))"></div>
+              </div>
+              <h3>Source</h3>
+              <pre class="prettyprint lang-n prettyprinted">$(s.Source)</pre>
+            </div>
+          </div>
+          <h3>Main page source</h3>
+          <pre class="prettyprint lang-n prettyprinted">$ThisPageSource</pre>
+        </div>
+      #>
+    }    
+  }
+}
