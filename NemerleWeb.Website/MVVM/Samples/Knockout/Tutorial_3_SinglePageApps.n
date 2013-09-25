@@ -39,7 +39,7 @@ namespace NemerleWeb.Samples
       Folders = ["Inbox", "Archive", "Sent", "Spam"].ToList();            
       js <#
           Sammy(function() {
-              this.get("#:folder", function() {
+              this.get("#spa/:folder", function() {
                   self.set_ChosenFolderId(this.params.folder);
                   self.set_ChosenMailData(null);
                   $.get("/SPAPage/Folder", { folder: this.params.folder }, function(result) { 
@@ -48,7 +48,7 @@ namespace NemerleWeb.Samples
                   });
               });
                     
-              this.get("#:folder/:mailId", function() {
+              this.get("#spa/:folder/:mailId", function() {
                   self.set_ChosenFolderId(this.params.folder);
                   self.set_ChosenMailData(null);
                   $.get("/SPAPage/Mail", { mailId: this.params.mailId }, function(result) { 
@@ -56,20 +56,20 @@ namespace NemerleWeb.Samples
                       nweb.invalidate();
                   });
               });
-                    
-              this.get('', function() { this.app.runRoute('get', '#Inbox') });
+              
+              this.get('samples', function() { this.app.runRoute('get', '#spa/Inbox') });
           }).run();
       #>;
     }
    
     public GoToFolder(folder : string) : void
     {
-      window.location.hash = folder;
+      window.location.hash = "spa/" + folder;
     }
         
     public GoToMail(mail : Mail) : void
     {
-      window.location.hash = mail.Folder + '/' + mail.Id;
+      window.location.hash = "spa/" + mail.Folder + '/' + mail.Id;
     }   
         
     public class Server

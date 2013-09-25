@@ -62,9 +62,9 @@ namespace NemerleWeb.Samples
             
       Samples = 
       [
-        Sample("List of names", ["MVVM/Samples/NameListPage.n"], "", NameList),  // in tname template(_.NameList) second parameter is View by default
-        Sample("List of names C#", ["MVVM/Samples/NameListCSharpPage.cs"], "", NameListCSharp), 
-        Sample("Computation Expressions", ["MVVM/Samples/CompListPage.n"], "", CompList), 
+        Sample("Filtering", ["MVVM/Samples/NameListPage.n"], "", NameList),  // in tname template(_.NameList) second parameter is View by default
+        Sample("Filtering C#", ["MVVM/Samples/NameListCSharpPage.cs"], "", NameListCSharp), 
+        Sample("Alphabet (Computation Expressions)", ["MVVM/Samples/CompListPage.n"], "", CompList), 
         Sample("Chat using SignalR", ["MVVM/Samples/SignalPage.n"], "", Signal),
         Sample("Variants and Pattern Matching", ["MVVM/Samples/VariantsAndMatchingPage.n"], "", Variants)
       ].ToList();
@@ -131,25 +131,35 @@ namespace NemerleWeb.Samples
     public View() : string
     {
       <# 
-        <div class="container">
-          <ul class="samples-menu">
-            <li class="header">Samples</li>
-            <li $foreach(s in Samples) css-selected="$(SelectedSample.Name == s.Name)"><span click="$SelectSample">$(s.Name)</span></li>
-            <li class="split"></li>
-            <li class="header">Samples from KnockoutJS</li>
-            <li $foreach(s in KnockoutSamples) css-selected="$(SelectedSample.Name == s.Name)"><span click="$SelectSample">$(s.Name)</span></li>
-            <li class="split"></li>
-            <li class="header">Peg Samples</li>
-            <li $foreach(s in PegSamples) css-selected="$(SelectedSample.Name == s.Name)"><span click="$SelectSample">$(s.Name)</span></li>
-          </ul>
+        <div>
+          <div class="row samples-nav">
+            <div class="col-xs-6">
+              <h4>NemerleWeb Samples</h4>
+              <ul class="nav nav-stacked">
+                <li $foreach(s in Samples) css-selected="$(SelectedSample.Name == s.Name)">
+                  <a href="#" click="$SelectSample">$(s.Name)</a>
+                </li>
+              </ul>
+            </div>
+            <div class="col-xs-6">
+              <h4>KnockoutJS Samples</h4>
+              <ul class="nav nav-stacked">
+                <li $foreach(s in KnockoutSamples) css-selected="$(SelectedSample.Name == s.Name)">
+                  <a href="#" click="$SelectSample">$(s.Name)</a>
+                </li>            
+              </ul>
+            </div>
+          </div>
           <div $foreach(s in AllSamples)>
             <div $when(SelectedSample.Name == s.Name) class="current-sample">
-              <div template="$(template(s.Instance))"></div>
-              <h2>Source</h2>
+              <div class="sample">
+                <div template="$(template(s.Instance))"></div>
+              </div>
+              <h3>Source</h3>
               <pre class="prettyprint lang-n prettyprinted">$(s.Source)</pre>
             </div>
           </div>
-          <h2>Main page source</h2>
+          <h3>Main page source</h3>
           <pre class="prettyprint lang-n prettyprinted">$ThisPageSource</pre>
         </div>
       #>

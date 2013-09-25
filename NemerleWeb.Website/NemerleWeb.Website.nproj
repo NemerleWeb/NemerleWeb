@@ -84,16 +84,6 @@
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="NemerleWeb, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <Name>NemerleWeb</Name>
-      <AssemblyName>NemerleWeb.dll</AssemblyName>
-      <HintPath>..\packages\NemerleWeb.1.0.0\lib\net45\NemerleWeb.dll</HintPath>
-    </Reference>
-    <Reference Include="NemerleWeb.Macros, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <Name>NemerleWeb.Macros</Name>
-      <AssemblyName>NemerleWeb.Macros.dll</AssemblyName>
-      <HintPath>..\packages\NemerleWeb.1.0.0\lib\net45\NemerleWeb.Macros.dll</HintPath>
-    </Reference>
     <Reference Include="NemerleWeb.TypedJS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <Name>NemerleWeb.TypedJS</Name>
       <AssemblyName>NemerleWeb.TypedJS.dll</AssemblyName>
@@ -173,11 +163,6 @@
     <Reference Include="System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
-    </Reference>
-    <Reference Include="TSParser, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <Name>TSParser</Name>
-      <AssemblyName>TSParser.dll</AssemblyName>
-      <HintPath>..\packages\NemerleWeb.1.0.0\lib\net45\TSParser.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -277,6 +262,9 @@
     <Content Include="Scripts\jquery.signalR-1.1.2.min.js">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\lang-n.js">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\markdown.js">
       <SubType>Content</SubType>
     </Content>
@@ -320,10 +308,6 @@
     <Folder Include="Views\Shared\" />
   </ItemGroup>
   <ItemGroup>
-    <MacroReference Include="NemerleWeb.Macros">
-      <Private>True</Private>
-      <HintPath>..\packages\NemerleWeb.1.0.0\lib\net45\NemerleWeb.Macros.dll</HintPath>
-    </MacroReference>
     <MacroReference Include="NemerleWeb.Peg.Macros">
       <Name>Nemerle.Peg.Macros</Name>
       <AssemblyName>Nemerle.Peg.Macros.dll</AssemblyName>
@@ -345,9 +329,19 @@
     </MacroProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <MacroProjectReference Include="..\NemerleWeb.Macros\NemerleWeb.Macros.nproj">
+      <Name>NemerleWeb.Macros</Name>
+      <Project>{b1454534-cabd-4abe-cc8e-ddff34f51b14}</Project>
+      <Private>False</Private>
+    </MacroProjectReference>
     <ProjectReference Include="..\NemerleWeb.TypedJS\NemerleWeb.TypedJS.nproj">
       <Name>NemerleWeb.TypedJS</Name>
       <Project>{65c01c91-f57a-4281-b09f-15baa5ac3cc6}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\NemerleWeb\NemerleWeb.nproj">
+      <Name>NemerleWeb</Name>
+      <Project>{b1635fea-c0cd-4c8e-a18e-d97d59f21b14}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
