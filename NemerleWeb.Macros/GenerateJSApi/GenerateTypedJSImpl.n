@@ -35,7 +35,7 @@ namespace NemerleWeb
         <[ NemerleWeb.JSApiRootAttribute($(args.Root : string)) ]>);
         
       // Add JSApi root
-      _ = JSClassSettings.JSApiRoots.Add(args.Root);        
+      _ = JSClassSettings.JSApiRoots.Add(args.Root);
       
       // Step 1: PreParse
       def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
@@ -201,10 +201,10 @@ namespace NemerleWeb
           text.Substring(pos)
         else
           text.Substring(pos, 55);
-      Message.Error(Location(tsFile, 1, 1, 1, 1), $"Failed to parse $tsFile, somewhere here: $errorText...");
+      Message.Warning(Location(tsFile, 1, 1, 1, 1), $"Failed to parse $tsFile, somewhere here: $errorText...");
     }
   }
-    
+  
   #endregion
 
     #region Data types

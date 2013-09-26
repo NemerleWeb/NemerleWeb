@@ -59,14 +59,14 @@
     <Compile Include="JSStringExtensions.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="markdown.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="nweb.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
     <Compile Include="Properties\NWebProperties.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ScriptsLib\markdown.d.ts">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ScriptsLib\nweb.d.ts">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Undefined.n">
@@ -74,6 +74,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="ScriptsLib" />
     <Folder Include="Properties\" />
     <Folder Include="Scripts\" />
     <Folder Include="Scripts\typings\" />
@@ -335,10 +336,16 @@
     </MacroReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="lib.d.ts">
+    <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="packages.config">
+    <Content Include="ScriptsLib\lib.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="ScriptsLib\winjs.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="ScriptsLib\winrt.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\ace\ace.d.ts">

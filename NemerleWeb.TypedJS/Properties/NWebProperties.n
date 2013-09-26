@@ -2,6 +2,13 @@
 
 [assembly: GenerateTypedJS(
   Root = "NemerleWeb.TypedJS",
-  Lib = ["lib.d.ts", "winjs.d.ts", "winrt.d.ts"],
+  Lib = 
+    [
+      @"ScriptsL\lib.d.ts",
+      @"ScriptsLib\winjs.d.ts",
+      @"ScriptsLib\winrt.d.ts",
+      @"ScriptsLib\markdown.d.ts",
+      @"ScriptsLib\nweb.d.ts",
+    ],
   Files = [ ("Scripts", @"typings\\(node\\node-0.8.8|linq\\linq)\.d\.ts") ]
 )]
