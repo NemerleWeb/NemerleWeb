@@ -176,7 +176,7 @@ namespace NemerleWeb
       | Switch(expr, defCase, cases)      =>
         JSAst.Switch(
           build(expr),
-          cases.Map((id, ex) => JSAst.SwitchCase(id.ToString(), build(ex))),
+          cases.Map((id, ex) => JSAst.SwitchCase(JSAst.Literal(JSLiteral.Integer(id)), build(ex))),
           if(defCase.IsSome) build(defCase.Value) else JSAst.Void())
       | This                              => JSAst.This()
       | Throw(expr)                       => JSAst.Throw(build(expr))

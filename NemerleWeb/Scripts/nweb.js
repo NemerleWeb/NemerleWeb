@@ -139,7 +139,11 @@ var nweb = {
         return nweb.getParsedValue(model, expr, loopStack);
       },
       apply: function (value) {
-        el[attr[1]] = value;
+        if (attr[1] === "class") {
+          el.className = value;
+        } else {
+          el[attr[1]] = value;
+        }
       }
     };
   },
@@ -151,7 +155,7 @@ var nweb = {
       getValue: function() {
         return nweb.getParsedValue(model, expr, loopStack);
       },
-      apply: function(value) {        
+      apply: function(value) {
         $(el).css(style[1], value);
       }
     };

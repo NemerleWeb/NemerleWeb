@@ -176,6 +176,9 @@
     <Compile Include="Infrastructure\HtmlHelperExtensions.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MVVM\ButtonDropdown.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\MainPage.n">
       <SubType>Code</SubType>
     </Compile>
@@ -230,6 +233,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MVVM\Tests\UnitTestPage.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\WorkbenchPage.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />

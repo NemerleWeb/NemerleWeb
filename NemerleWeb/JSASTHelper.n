@@ -243,7 +243,7 @@ namespace NemerleWeb
           JSAst.WhileNamed(JSAst.Literal(JSLiteral.Bool(true)), 
             JSAst.Switch(
               JSAst.LocalRef(currentLabelVar, None()),               
-              exprListCombined.Select(e => JSAst.SwitchCase(e.label, createSwitchCase(e))).NToList(),
+              exprListCombined.Select(e => JSAst.SwitchCase(JSAst.Literal(JSLiteral.String(e.label)), createSwitchCase(e))).NToList(),
               JSAst.Void()),
             loopName)
         ]);

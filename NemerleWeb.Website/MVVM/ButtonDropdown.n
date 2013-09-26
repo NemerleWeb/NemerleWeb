@@ -1,0 +1,55 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NemerleWeb;
+
+namespace NemerleWeb.Website
+{
+  public enum ButtonStyle { | Default | Primary | Success | Info | Warning | Danger }
+    
+  [Unit]
+  class ButtonDropdown
+  {    
+    _buttons : list[(string * string)];
+    _buttonStyle : ButtonStyle;
+    
+    public ButtonClass : string {
+      get {
+        match(_buttonStyle) {
+        | Default => "btn-default"
+        | Primary => "btn-primary"
+        | Success => "btn-success"
+        | Info => "btn-info"
+        | Warning => "btn-warning"
+        | Danger => "btn-danger"
+        }
+      }
+    }
+    
+    public this(buttons : list[(string * string)], buttonStyle : ButtonStyle) {
+      _buttons = buttons;
+      _buttonStyle = buttonStyle;
+    }
+    
+    [Html]
+    public View() : string {
+      <#
+      <div class="btn-group">
+        <button type="button" attr-class="$("btn dropdown-toggle " + ButtonClass)" data-toggle="dropdown">
+          Action <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li $foreach(button in _buttons)> 
+            <a attr-href="$(button[1])">$(button[0])</a>
+          </li>
+        </ul>
+      </div>
+      #>
+    }
+  }
+}
