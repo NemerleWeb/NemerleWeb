@@ -662,9 +662,9 @@ $(DefaultExpr.Write(indent + "  "))
 $(indent)}#>
             }
         }
-        | SwitchCase     { Id : string; Body : JSAst;
+        | SwitchCase     { Id : JSAst.Literal; Body : JSAst;
             public override Write(indent = "" : string) : string {
-$<#$(indent)case "$Id":
+$<#$(indent)case $(Id.Write()):
 $(Body.Write(indent + "  "))
 $(indent)break;#>
             }

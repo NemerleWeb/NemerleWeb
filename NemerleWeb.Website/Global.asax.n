@@ -37,6 +37,12 @@ namespace NemerleWeb.SC2Score
             );
             
             _ = routes.MapRoute(
+                "Workbench", // Route name
+                "workbench", // URL with parameters
+                new (controller = "Home", action = "Workbench", id = UrlParameter.Optional) // Parameter defaults
+            );
+            
+            _ = routes.MapRoute(
                 "Default", // Route name
                 "{controller}/{action}/{id}", // URL with parameters
                 new (controller = "Home", action = "Index", id = UrlParameter.Optional) // Parameter defaults

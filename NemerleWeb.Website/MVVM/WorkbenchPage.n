@@ -1,0 +1,29 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NemerleWeb;
+
+namespace NemerleWeb.Website
+{
+  [Unit]
+  class WorkbenchPage
+  {
+    _buttonDropdown : ButtonDropdown;
+        
+    public this() {
+      _buttonDropdown = ButtonDropdown([("google.com", "http://www.google.com"), ("rsdn.ru", "http://www.rsdn.ru")], ButtonStyle.Danger);
+    }
+    
+    [Html]
+    public View() : string {
+      <#
+        <div template="$(template(_buttonDropdown))"></div>
+      #>
+    }
+  }
+}
