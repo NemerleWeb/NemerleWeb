@@ -63,12 +63,12 @@
     <Compile Include="Properties\NWebProperties.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ScriptsLib\markdown.d.ts">
+    <Content Include="ScriptsLib\markdown.d.ts">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ScriptsLib\nweb.d.ts">
+    </Content>
+    <Content Include="ScriptsLib\nweb.d.ts">
       <SubType>Code</SubType>
-    </Compile>
+    </Content>
     <Compile Include="Undefined.n">
       <SubType>Code</SubType>
     </Compile>
