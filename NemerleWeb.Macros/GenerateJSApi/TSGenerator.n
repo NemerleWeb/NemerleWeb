@@ -41,8 +41,8 @@ namespace NemerleWeb
       // Generate types members
       GenerateTypesMembers(jsApiRoot, tsAst);
       
-      // Then generate the rest: variables, functions.
-      //GenerateRestMembers(jsApiRoot, tsAst);
+      // Then generate the rest: variables, functions...
+      GenerateRest(jsApiRoot, tsAst);
     }
     
     #endregion
@@ -92,17 +92,41 @@ namespace NemerleWeb
     }
     
     private GenerateTypesMembersAmbient(typesScope : GlobalEnv, ambient : AmbientDeclaration) : void
-    { 
+    {
+      match(ambient)
+      {
+      | VariableDeclaration
+      | FunctionDeclaration
+      | ClassDeclaration         
+      | EnumDeclaration          
+      | ExternalModuleDeclaration => ()
+      | ModuleDeclaration(value) => ()
+      | _ => ()
+      }
+    }
+    
+    #endregion
+    
+    #region Generate rest
+    
+    private GenerateRest(typesScope : GlobalEnv, members : IEnumerable[DeclarationElement]) : void
+    {
+      foreach(mem in members) 
+      { 
+      | AmbientDeclaration(value) => GenerateRestAmbient(typesScope, value)
+      | _ => ()
+      }
+    }
+    
+    private GenerateRestAmbient(typesScope : GlobalEnv, ambient : AmbientDeclaration) : void
+    {
       // Create module
-    //TODO: Maybe change?
       def membersScope = Scope(typesScope).GetTypeBuilder();
       
       match(ambient)
       {
       | VariableDeclaration(value) => CreateVariable(typesScope, membersScope, value)
       | FunctionDeclaration(value) => CreateFunction(typesScope, membersScope, value)
-      | ClassDeclaration         
-      | EnumDeclaration          
       | ExternalModuleDeclaration => ()
       | ModuleDeclaration(value) => ()
       | _ => ()
