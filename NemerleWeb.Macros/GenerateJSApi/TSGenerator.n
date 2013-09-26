@@ -33,38 +33,33 @@ namespace NemerleWeb
       [NotNull] root : string,
       [NotNull] tsAst : IEnumerable[DeclarationElement]) : void
     {
-      def rootDot = root.SplitDot();
-      
-      def jsApiRoot = typer.Env.EnterIntoNamespace(rootDot);
-      def jsApiRoot = jsApiRoot.Define(<[decl:module A{}]>);
+      def jsApiRoot = typer.Env.EnterIntoNamespace(root.SplitDot());
       
       // First generate all types
       GenerateTypes(jsApiRoot, tsAst);
-            
+      
       // Generate types members
       GenerateTypesMembers(jsApiRoot, tsAst);
       
       // Then generate the rest: variables, functions.
       //GenerateRestMembers(jsApiRoot, tsAst);
-      
-      jsApiRoot.Compile();
     }
     
     #endregion
     
     #region Generate types
     
-    private GenerateTypes(scope : TypeBuilder, members : IEnumerable[DeclarationElement]) : void
+    private GenerateTypes(typesScope : GlobalEnv, members : IEnumerable[DeclarationElement]) : void
     {
       foreach(mem in members) 
       {
-      | InterfaceDeclaration(value) => CreateInterface(scope, value, false)
-      | AmbientDeclaration(value) => GenerateTypesAmbient(scope, value)
+      | InterfaceDeclaration(value) => CreateInterface(typesScope, value, false)
+      | AmbientDeclaration(value) => GenerateTypesAmbient(typesScope, value)
       | _ => ()
       }
     }
     
-    private GenerateTypesAmbient(scope : TypeBuilder, ambient : AmbientDeclaration) : void
+    private GenerateTypesAmbient(typesScope : GlobalEnv, ambient : AmbientDeclaration) : void
     {
       match(ambient)
       {
@@ -86,28 +81,35 @@ namespace NemerleWeb
     
     #region Generate types members
     
-    private GenerateTypesMembers(scope : TypeBuilder, members : IEnumerable[DeclarationElement]) : void
+    private GenerateTypesMembers(typesScope : GlobalEnv, members : IEnumerable[DeclarationElement]) : void
     {
       foreach(mem in members) 
       { 
-      | InterfaceDeclaration(value) => CreateInterface(scope, value, true)
-      | AmbientDeclaration(value) => GenerateTypesMembersAmbient(scope, value)
+      | InterfaceDeclaration(value) => CreateInterface(typesScope, value, true)
+      | AmbientDeclaration(value) => GenerateTypesMembersAmbient(typesScope, value)
       | _ => ()
       }
     }
     
-    private GenerateTypesMembersAmbient(scope : TypeBuilder, ambient : AmbientDeclaration) : void
-    {
+    private GenerateTypesMembersAmbient(typesScope : GlobalEnv, ambient : AmbientDeclaration) : void
+    { 
+      // Create module
+    //TODO: Maybe change?
+      def membersScope = Scope(typesScope).GetTypeBuilder();
+      
       match(ambient)
       {
-      | VariableDeclaration(value) => ()//CreateVariable(scope, value)
-      | FunctionDeclaration(value) => CreateFunction(scope, value)
+      | VariableDeclaration(value) => CreateVariable(typesScope, membersScope, value)
+      | FunctionDeclaration(value) => CreateFunction(typesScope, membersScope, value)
       | ClassDeclaration         
       | EnumDeclaration          
       | ExternalModuleDeclaration => ()
       | ModuleDeclaration(value) => ()
       | _ => ()
       }
+      
+      // Compile module
+      membersScope.Compile();
     }
     
     #endregion
@@ -115,7 +117,7 @@ namespace NemerleWeb
     #region Code Generation
     
     private CreateInterface(
-      scope : TypeBuilder,
+      typesScope : GlobalEnv,
       tsInterface : InterfaceDeclaration,
       generateMembers : bool) : void
     {
@@ -123,87 +125,112 @@ namespace NemerleWeb
         
       def extends = 
         if (generateMembers)
-          tsInterface.Extends.Select(e => MakeFullType(scope, e, typeParameters));
+          tsInterface.Extends.Select(e => MakeFullType(e, typeParameters));
         else
           [];
         
-      def interfaceType = scope.DefineNestedType(
+      def interfaceType = typesScope.Define(
         <[ decl:
           [JSApi]
           public partial interface $(tsInterface.Name : usesite)[..$typeParameters] : ..$extends {}
         ]>);
       
       when (generateMembers)
-        CreateObject(interfaceType, tsInterface.Type, tsInterface.Name);
+        CreateObject(typesScope, interfaceType, tsInterface.Type, tsInterface.Name);
         
       interfaceType.Compile();
     }
 
-    private CreateVariable(scope : TypeBuilder, var : AmbientVariableDeclaration) : void
+    private CreateVariable(
+      typesScope : GlobalEnv,
+      membersScope : TypeBuilder,
+      var : AmbientVariableDeclaration) : void
     {
       def typePrefix = string.Join(Separator, var.Name, Variable);
-      def varType = ConvertType(scope, var.Type, typePrefix);
+      def varType = ConvertType(typesScope, var.Type, typePrefix);
       
-      _ = scope.Define(
+      _ = membersScope.Define(
         <[ decl: public new mutable $(var.Name : usesite) : $varType = default($varType); ]>);
     }
   
-    private CreateFunction(scope : TypeBuilder, function : AmbientFunctionDeclaration) : void
+    private CreateFunction(
+      typesScope : GlobalEnv,
+      membersScope : TypeBuilder,
+      function : AmbientFunctionDeclaration) : void
     {
-      CreateMethod(scope, function.Name, function.Signature, "");
+      CreateMethod(typesScope, membersScope, function.Name, function.Signature, "");
     }
     
-    CreateObject(scope : TypeBuilder, obj : ScriptType.Object, prefix : string) : void
+    CreateObject(
+      typesScope : GlobalEnv,
+      membersScope : TypeBuilder,
+      obj : ScriptType.Object,
+      prefix : string) : void
     {
-      foreach(mem in obj.Members) CreateObject(scope, mem, prefix);
+      foreach(mem in obj.Members) CreateObject(typesScope, membersScope, mem, prefix);
     }
     
-    CreateObject(scope : TypeBuilder, obj : ScriptObject, prefix : string) : void
+    CreateObject(
+      typesScope : GlobalEnv,
+      membersScope : TypeBuilder,
+      obj : ScriptObject,
+      prefix : string) : void
     {
       match(obj)
       {
-      | Call(value)      => CreateCall(scope, value, prefix)
-      | Construct(value) => CreateConstruct(scope, value, prefix)
-      | Index(value)     => CreateIndex(scope, value, prefix)
-      | Property(value)  => CreateProperty(scope, value, prefix)
-      | Method(value)    => CreateMethod(scope, value, prefix)
+      | Call(value)      => CreateCall(typesScope, membersScope, value, prefix)
+      | Construct(value) => CreateConstruct(typesScope, membersScope, value, prefix)
+      | Index(value)     => CreateIndex(typesScope, membersScope, value, prefix)
+      | Property(value)  => CreateProperty(typesScope, membersScope, value, prefix)
+      | Method(value)    => CreateMethod(typesScope, membersScope, value, prefix)
       | _ => ()
       }
     }
     
-    CreateCall(scope : TypeBuilder, call : CallSignature, prefix : string) : void
+    CreateCall(
+      typesScope : GlobalEnv,
+      membersScope : TypeBuilder,
+      call : CallSignature,prefix : string) : void
     {
       def fullPrefix = string.Join(Separator, prefix, Call);
       def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
-      def realReturnType = ConvertType(scope, call.ReturnType, returnTypePrefix);
+      def realReturnType = ConvertType(typesScope, call.ReturnType, returnTypePrefix);
       
-      def functionParams = ConvertParameters(scope, call.Parameters, fullPrefix);
+      def functionParams = ConvertParameters(typesScope, call.Parameters, fullPrefix);
       when(functionParams is None()) return;      
       def functionParams = functionParams.Value;
       
       def typeParameters = ConvertTypeParameters(call.TypeParameters);
       
-      scope.DefineMemberPublicNew(
+      membersScope.DefineMemberPublicNew(
         <[ decl: $(JSApiSpecial.Call : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
    
-    CreateConstruct(scope : TypeBuilder, construct : Construct, prefix : string) : void
+    CreateConstruct(
+      typesScope : GlobalEnv,
+      membersScope : TypeBuilder,
+      construct : Construct,
+      prefix : string) : void
     {
       def fullPrefix = string.Join(Separator, prefix, New);
       def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
-      def realReturnType = ConvertType(scope, construct.ReturnType, returnTypePrefix);
+      def realReturnType = ConvertType(typesScope, construct.ReturnType, returnTypePrefix);
     
-      def functionParams = ConvertParameters(scope, construct.Parameters, fullPrefix);
+      def functionParams = ConvertParameters(typesScope, construct.Parameters, fullPrefix);
       when(functionParams is None()) return;      
       def functionParams = functionParams.Value;
       
       def typeParameters = ConvertTypeParameters(construct.TypeParameters);
       
-      scope.DefineMemberPublicNew(
+      membersScope.DefineMemberPublicNew(
         <[ decl: $(JSApiSpecial.New : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
     
-    CreateIndex(scope : TypeBuilder, index : IndexSignature , prefix : string) : void
+    CreateIndex(
+      typesScope : GlobalEnv,
+      membersScope : TypeBuilder,
+      index : IndexSignature,
+      prefix : string) : void
     {
       def (realParamType, typeName) =
         match(index.ParameterType)
@@ -214,9 +241,9 @@ namespace NemerleWeb
         
       def fullPrefix = string.Join(Separator, prefix, typeName, Index);
       def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
-      def realReturnType = ConvertType(scope, index.ReturnType, returnTypePrefix);
+      def realReturnType = ConvertType(typesScope, index.ReturnType, returnTypePrefix);
       
-      scope.DefineMemberPublicNew(
+      membersScope.DefineMemberPublicNew(
         <[ decl:
           new Item[$(index.ParameterName : usesite) : $realParamType] : $realReturnType
           {
@@ -229,48 +256,57 @@ namespace NemerleWeb
     /// <summary>
     /// Don't pay attention to optional, always generate property
     /// </summary>
-    CreateProperty(scope : TypeBuilder, property : Property, prefix : string) : void
+    CreateProperty(
+      typesScope : GlobalEnv,
+      membersScope : TypeBuilder,
+      property : Property,
+      prefix : string) : void
     {
       def fullPrefix = string.Join(Separator, prefix, property.Name);
       def typePrefix = string.Join(Separator, fullPrefix, Property);
-      def propertyType = ConvertType(scope, property.Type, typePrefix);
+      def propertyType = ConvertType(typesScope, property.Type, typePrefix);
       
-      scope.DefineMemberPublicNew(
+      membersScope.DefineMemberPublicNew(
         <[ decl: $(property.Name : usesite) : $propertyType { get; set; }; ]>);
     }
     
     /// <summary>
     /// Don't pay attention to optional, always generate method
     /// </summary>
-    CreateMethod(scope : TypeBuilder, method : Method, prefix : string) : void
+    CreateMethod(
+      typesScope : GlobalEnv,
+      membersScope : TypeBuilder,
+      method : Method,
+      prefix : string) : void
     {
-      CreateMethod(scope, method.Name, method.Signature, prefix);
+      CreateMethod(typesScope, membersScope, method.Name, method.Signature, prefix);
     }
     
     CreateMethod(
-      scope : TypeBuilder,
+      typesScope : GlobalEnv,
+      membersScope : TypeBuilder,
       name : string,
       signature : CallSignature,
       prefix : string) : void
     {
       def fullPrefix = string.Join(Separator, prefix, name);
       def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
-      def realReturnType = ConvertType(scope, signature.ReturnType, returnTypePrefix);
+      def realReturnType = ConvertType(typesScope, signature.ReturnType, returnTypePrefix);
     
-      def functionParams = ConvertParameters(scope, signature.Parameters, fullPrefix);
+      def functionParams = ConvertParameters(typesScope, signature.Parameters, fullPrefix);
       when(functionParams is None()) return;      
       def functionParams = functionParams.Value;
       
       def typeParameters = ConvertTypeParameters(signature.TypeParameters);
     
-      scope.DefineMemberPublicNew(
+      membersScope.DefineMemberPublicNew(
         <[ decl: $(name : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
     
     static mutable anonymousTypeIndex : int = 0;
     
     private CreateAnonymousType(
-      scope : TypeBuilder,
+      typesScope : GlobalEnv,
       obj : ScriptType.Object,
       prefix : string) : PExpr
     {
@@ -283,15 +319,15 @@ namespace NemerleWeb
         
         def name = string.Join(Separator, prefix, AnonymousType, anonymousTypeIndex.ToString());
         
-        def type = scope.DefineNestedType(
+        def type = typesScope.Define(
           <[ decl: 
-            [JSApi] public sealed class $(name : usesite) { }
+            [JSApi] public partial class $(name : usesite) { }
           ]>);
           
         // Suppress warning
         type.HasBeenUsed = true;
         
-        CreateObject(type, obj, name);
+        CreateObject(typesScope, type, obj, name);
         type.Compile();
           
         <[ $(name : usesite) ]>
@@ -311,12 +347,12 @@ namespace NemerleWeb
     /// Makes type with type argument
     /// </summary>
     private MakeFullType(
-      scope : TypeBuilder,
       typeRef : ScriptType.Ref,
       typeParameters : IEnumerable[PT.Splicable]) : PExpr
     {
       def typeArguments = typeRef.TypeArguments.Select(
-        tyArg => MakeFullTypeImpl(scope, tyArg, typeParameters));
+        tyArg => MakeFullTypeImpl(tyArg, typeParameters));
+      
       <[ $(typeRef.Name : usesite).[..$typeArguments] ]>
     }
     
@@ -324,7 +360,6 @@ namespace NemerleWeb
     /// Get PExpr from TS type
     /// </summary>
     private MakeFullTypeImpl(
-      scope : TypeBuilder,
       type : ScriptType,
       typeParameters : IEnumerable[PT.Splicable]) : PExpr
     {
@@ -335,7 +370,7 @@ namespace NemerleWeb
       | Boolean => <[ bool ]>
       | String => <[ string ]>
       | Void => <[ void ]>
-      | Ref as r => MakeFullType(scope, r, typeParameters)
+      | Ref as r => MakeFullType(r, typeParameters)
       | Query => Message.Warning("Query type argument unsupported"); <[ object ]>
       | Array => Message.Warning("Array type argument unsupported"); <[ object ]>
       | Object as o =>
@@ -368,7 +403,7 @@ namespace NemerleWeb
     /// If there is a literal parameter, None is returned.
     /// </summary>
     private ConvertParameters(
-      scope : TypeBuilder,
+      typesScope : GlobalEnv,
       parms : IEnumerable[ScriptParameter],
       prefix : string) : option[List[PParameter]]
     {
@@ -378,10 +413,10 @@ namespace NemerleWeb
         | Required(RequiredParameter.Literal) => None()          
         | Required(RequiredParameter.Regular(name, type, _))
         | Optional(name, type, _, _) => 
-          def realType = ConvertType(scope, type, GetParameterPrefix(prefix, name));
+          def realType = ConvertType(typesScope, type, GetParameterPrefix(prefix, name));
           Some(<[ parameter: $(name : usesite) : $realType ]>)
         | Rest(name, type) =>          
-          def realType = ConvertType(scope, type, GetParameterPrefix(prefix, name));
+          def realType = ConvertType(typesScope, type, GetParameterPrefix(prefix, name));
           Some(<[ parameter: params $(name : usesite) : $realType ]>)
       }
       
@@ -402,7 +437,7 @@ namespace NemerleWeb
     /// Return parameters types
     /// </summary>
     private GetParametersType(
-      scope : TypeBuilder, 
+      typesScope : GlobalEnv,
       parms : list[ScriptParameter],
       prefix : string) : list[PExpr]
     {
@@ -413,40 +448,40 @@ namespace NemerleWeb
           throw InvalidOperationException("Literal parameters are not supported")
         | Required(RequiredParameter.Regular(name, type, _))
         | Optional(name, type, _, _) => 
-          ConvertType(scope, type, GetParameterPrefix(prefix, name))
+          ConvertType(typesScope, type, GetParameterPrefix(prefix, name))
         | Rest(name, type) =>
-          ConvertType(scope, type, GetParameterPrefix(prefix, name))
+          ConvertType(typesScope, type, GetParameterPrefix(prefix, name))
       }
     
       def ret = parms.Map(convertParamsType);
       ret
     }
     
-    private ConvertType(scope : TypeBuilder, type : option[ScriptType], prefix : string) : PExpr
+    private ConvertType(typesScope : GlobalEnv, type : option[ScriptType], prefix : string) : PExpr
     {
-      if(type is Some(t)) ConvertType(scope, t, prefix) else <[ object ]>
+      if(type is Some(t)) ConvertType(typesScope, t, prefix) else <[ object ]>
     }
     
-    private ConvertType(scope : TypeBuilder, type : ScriptType, prefix : string) : PExpr
+    private ConvertType(typesScope : GlobalEnv, type : ScriptType, prefix : string) : PExpr
     {
       match(type)
       {
       | Any => <[ object ]>
-      | Array(t, 0) => <[ $(ConvertType(scope, t, prefix)) ]>
-      | Array(t, rank) => <[ array[$(ConvertType(scope, ScriptType.Array(t, rank - 1), prefix))] ]>
+      | Array(t, 0) => <[ $(ConvertType(typesScope, t, prefix)) ]>
+      | Array(t, rank) => <[ array[$(ConvertType(typesScope, ScriptType.Array(t, rank - 1), prefix))] ]>
       | Boolean => <[ bool ]>
       | Constructor => <[ object ]>
       | Function(value) =>
         // TODO: Handle generic function literals
         if(value.TypeParameters is [])
         {
-          mutable lambdaParams = GetParametersType(scope, value.Parameters, prefix);
+          mutable lambdaParams = GetParametersType(typesScope, value.Parameters, prefix);
           def type =
             if(value.ReturnType is ScriptType.Void())
               <[ System.Action ]>
             else
             {
-              lambdaParams = lambdaParams.Concat([ConvertType(scope, value.ReturnType, prefix)]);
+              lambdaParams = lambdaParams.Concat([ConvertType(typesScope, value.ReturnType, prefix)]);
               <[ System.Func ]>
             };
           
@@ -458,7 +493,7 @@ namespace NemerleWeb
         }
         
       | Number => <[ float ]>
-      | Object as type => CreateAnonymousType(scope, type, prefix)
+      | Object as type => CreateAnonymousType(typesScope, type, prefix)
       | Query => assert2(false); <[ object ]>
       // TODO: Support local Array type
       | Ref("Array", tyArgs) =>
@@ -468,19 +503,19 @@ namespace NemerleWeb
           | [] => ScriptType.Any()
           | [tyArg] => tyArg
           | _ =>
-            Message.Warning("Array cannot receive more than one type argument, using the first one." + 
-              $" Type: $(scope.FullName)");
+            Message.Warning(@"Array generic type cannot receive more than one type argument,"
+                            @"using the first one.");
             tyArgs.Head
           };
           
         def typeArgumentPrefix = string.Join(Separator, prefix, TypeArgument);
-        def realType = ConvertType(scope, tyArg, typeArgumentPrefix);
+        def realType = ConvertType(typesScope, tyArg, typeArgumentPrefix);
         
         <[ array[$realType] ]>
           
       | Ref(name, tyArgs) => 
         def typeArgumentPrefix = string.Join(Separator, prefix, TypeArgument);
-        def realTypeArguments = tyArgs.Map(type => ConvertType(scope, type, typeArgumentPrefix));
+        def realTypeArguments = tyArgs.Map(type => ConvertType(typesScope, type, typeArgumentPrefix));
       
         <[ $(name : usesite).[..$realTypeArguments] ]>
       | String => <[ string ]>

@@ -59,6 +59,9 @@ namespace NemerleWeb
       | [<[ Root = $(root : string) ]>, <[ Lib = $(lib : string) ]>, <[ Files = [..$files] ]>]
         with libs = [ <[ $(lib : string) ]> ]
       | [<[ Root = $(root : string) ]>, <[ Lib = [..$libs] ]>, <[ Files = [..$files] ]>] =>
+        when (root.IsEmpty())
+          Message.Error("Root must not be empty");
+        
         // Convert PExpr sequence to regular type
         def filesArg =
           files.Select(

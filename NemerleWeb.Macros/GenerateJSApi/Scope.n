@@ -13,38 +13,39 @@ using System.Linq;
 namespace NemerleWeb
 {
   /// <summary>
-  /// Wraps GlobalEnv or TypeBuilder in one interface
-  /// Converts one to another.
+  /// A scope is a namespace with possibility to define members using module with the same name.
   /// </summary>
   internal sealed class Scope
   {
-    public GlobalEnv : GlobalEnv { get; }
-    public TypeBuilder : TypeBuilder { get; }
-    
+    private _globalEnv : GlobalEnv;
+        
     public this([NotNull] globalEnv : GlobalEnv)
     {
-      GlobalEnv = globalEnv;
+      _globalEnv = globalEnv;
     }
     
-    public this([NotNull] typeBuilder : TypeBuilder)
+    public Define([NotNull] member : ClassMember) : TypeBuilder
     {
-      TypeBuilder = typeBuilder;
+      _globalEnv.Define(member)
     }
     
-    public DefineGlobal(typeDeclaration : ClassMember.TypeDeclaration) : TypeBuilder
+    public InnerScope([NotNull] inner : string) : Scope
     {
-      GlobalEnv.Define(typeDeclaration)
+      if(!inner.IsEmpty()) Scope(_globalEnv.EnterIntoNamespace([inner])) else this;
     }
     
-    public DefineMember(typeDeclaration : ClassMember) : MemberBuilder
-    {
-      TypeBuilder.DefineWithSource(typeDeclaration)
-    }
-    
-    public Compile() : void
-    {
-      if(GlobalEnv != null) {}
-      else TypeBuilder.Compile();
+    /// <summary>
+    /// Go one level up and create module with the last part
+    /// </summary>
+    [Memoize]
+    public GetTypeBuilder() : TypeBuilder
+    { 
+      def moduleName = _globalEnv.CurrentNamespace.PartName;
+      
+      def parent =
+        _globalEnv.Manager.CoreEnv.EnterIntoNamespace(_globalEnv.CurrentNamespace.Parent);
+      
+      parent.Define(<[ decl: public partial module $(moduleName : usesite) {} ]>)
     }
   }
 }
