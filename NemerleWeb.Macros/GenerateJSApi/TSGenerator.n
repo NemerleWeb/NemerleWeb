@@ -518,9 +518,12 @@ namespace NemerleWeb
         
       | Number => <[ float ]>
       | Object as type => CreateAnonymousType(typesScope, type, prefix)
-      | Query => assert2(false); <[ object ]>
-      // TODO: Support local Array type
+      | Query as q =>
+        // TODO: Support query
+        Message.Hint($"Query is not supported, typeof $(q.Name)");
+        <[ object ]>      
       | Ref("Array", tyArgs) =>
+        // TODO: Support local Array type
         def tyArg =
           match(tyArgs)
           {
