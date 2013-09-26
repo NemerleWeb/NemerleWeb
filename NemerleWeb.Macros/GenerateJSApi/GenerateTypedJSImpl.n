@@ -207,22 +207,22 @@ namespace NemerleWeb
   
   #endregion
 
-    #region Data types
+  #region Data types
     
-    [Record]
-    class DirectoryArg
-    {    
-      public Directory : string { get; }
-      public Exclude : string { get; }
-    }
+  [Record]
+  class DirectoryArg
+  {    
+    public Directory : string { get; }
+    public Exclude : string { get; }
+  }
     
-    [Record]
-    class GenerateArgs
-    {
-      public Root : string { get; }
-      public Libs : array[string] { get; }
-      public Args : array[DirectoryArg] { get; }
-    }
+  [Record]
+  class GenerateArgs
+  {
+    public Root : string { get; }
+    public Libs : array[string] { get; }
+    public Args : array[DirectoryArg] { get; }
+  }
     
-    #endregion
+  #endregion
 }

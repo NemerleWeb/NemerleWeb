@@ -4,7 +4,7 @@
   Root = "NemerleWeb.TypedJS",
   Lib = 
     [
-      @"ScriptsL\lib.d.ts",
+      @"ScriptsLib\lib.d.ts",
       @"ScriptsLib\winjs.d.ts",
       @"ScriptsLib\winrt.d.ts",
       @"ScriptsLib\markdown.d.ts",
