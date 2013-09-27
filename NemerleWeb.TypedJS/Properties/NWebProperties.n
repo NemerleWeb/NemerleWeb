@@ -5,8 +5,8 @@
   Lib = 
     [
       @"ScriptsLib\lib.d.ts",
-      //@"ScriptsLib\winjs.d.ts",
-      //@"ScriptsLib\winrt.d.ts",
+      @"ScriptsLib\winjs.d.ts",
+      @"ScriptsLib\winrt.d.ts",
       @"ScriptsLib\markdown.d.ts",
       @"ScriptsLib\nweb.d.ts",
     ],

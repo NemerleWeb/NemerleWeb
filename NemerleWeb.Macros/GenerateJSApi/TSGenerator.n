@@ -81,9 +81,9 @@ namespace NemerleWeb
       {
         | VariableDeclaration
         | FunctionDeclaration => ()
-        | ClassDeclaration(value) => CreateClass(typesScope, value, false)
+        | ClassDeclaration(value) => CreateClass(moduleScope, value, false)
         | InterfaceDeclaration(value) => CreateInterface(moduleScope, value, false)
-        | EnumDeclaration(value) => CreateEnum(typesScope, value)
+        | EnumDeclaration(value) => CreateEnum(moduleScope, value)
         | ModuleDeclaration(value) => GenerateTypesModule(moduleScope, value)
         | _ => ()
       }
@@ -125,7 +125,7 @@ namespace NemerleWeb
       {
         | VariableDeclaration
         | FunctionDeclaration => ()
-        | ClassDeclaration(value) => CreateClass(typesScope, value, true)
+        | ClassDeclaration(value) => CreateClass(moduleScope, value, true)
         | InterfaceDeclaration(value) => CreateInterface(moduleScope, value, true)
         | EnumDeclaration => ()
         | ModuleDeclaration(value) => GenerateTypesMembersModule(moduleScope, value)
@@ -469,7 +469,7 @@ namespace NemerleWeb
       def typeArguments = typeRef.TypeArguments.Select(
         tyArg => MakeFullTypeImpl(typesScope, tyArg));
       
-      def realType = PExpr.FromQualifiedIdentifier(typesScope.Manager, typeRef.Name);
+      def realType = PExprHelper.FromQualifiedIdentifierNonHygienic(typeRef.Name);
         
       <[ $realType.[..$typeArguments] ]>
     }
@@ -509,7 +509,7 @@ namespace NemerleWeb
     private ConvertTypeParameters(typeParameters : IEnumerable[ScriptTypeParameter])
       : list[PT.Splicable]
     {
-      typeParameters.Select(e => PT.Splicable.Name(<[ $(e.Name : dyn) ]>)).NToList()
+      typeParameters.Select(e => PT.Splicable.Name(<[ $(Name(e.Name) : name) ]>)).NToList()
     }
     
     private GetParameterPrefix(prefix : string, name : string) : string
@@ -638,7 +638,7 @@ namespace NemerleWeb
       | Ref(name, tyArgs) => 
         def typeArgumentPrefix = string.Join(Separator, prefix, TypeArgument);
         def realTypeArguments = tyArgs.Map(type => ConvertType(typesScope, type, typeArgumentPrefix));      
-        def realType = PExpr.FromQualifiedIdentifier(typesScope.Manager, name);
+        def realType = PExprHelper.FromQualifiedIdentifierNonHygienic(name);
         
         <[ $realType.[..$realTypeArguments] ]>
       | String => <[ string ]>
@@ -706,5 +706,26 @@ namespace NemerleWeb
       <[ { IgnoreParams(); throw NemerleWeb.ClientCodeCalledInServerException(); } ]>;
     private DefaultFunctionImplementation : FunBody.Parsed =
       FunBody.Parsed(DefaultImplementation);
+  }
+
+  internal module PExprHelper
+  {
+    /// <summary>
+    /// Transforms dot-separated identifier to the parse-tree expression
+    /// Unlike PExpr.FromQualifiedIdentifier, this method breaks higiene.
+    /// Use with caution.
+    /// </summary>
+    public static FromQualifiedIdentifierNonHygienic(qid : string) : PExpr
+    {
+      if (string.IsNullOrEmpty(qid)) null
+      else
+      {
+        def split = qid.Split('.');
+        mutable expr = <[ $(Name(split[0]) : name) ]>;
+        for (mutable i = 1; i < split.Length; i++)
+          expr = <[ $expr . $(Name(split[i]) : name) ]>;
+        expr
+      }
+    }
   }
 }
