@@ -65,8 +65,8 @@ namespace NemerleWeb
       {
       | VariableDeclaration
       | FunctionDeclaration
-      | ClassDeclaration         
-      | EnumDeclaration          
+      | ClassDeclaration         => ()
+      | EnumDeclaration(value) => CreateEnum(typesScope, value)
       | ExternalModuleDeclaration => ()
       | ModuleDeclaration(value) => GenerateTypesModule(typesScope, value)
       | _ => ()
@@ -83,7 +83,7 @@ namespace NemerleWeb
         | FunctionDeclaration
         | ClassDeclaration => ()
         | InterfaceDeclaration(value) => CreateInterface(moduleScope, value, false)
-        | EnumDeclaration => ()
+        | EnumDeclaration(value) => CreateEnum(typesScope, value)
         | ModuleDeclaration(value) => GenerateTypesModule(moduleScope, value)
         | _ => ()
       }
@@ -149,7 +149,7 @@ namespace NemerleWeb
     private GenerateRestAmbient(typesScope : GlobalEnv, ambient : AmbientDeclaration) : void
     {
       // Create module
-      def membersScope = Scope(typesScope).GetTypeBuilder();
+      def membersScope = GetTypeBuilder(typesScope);
       
       match(ambient)
       {
@@ -169,7 +169,7 @@ namespace NemerleWeb
       def moduleScope = typesScope.EnterIntoNamespace(@module.Name.SplitDot());
       
       // Create module
-      def membersScope = Scope(moduleScope).GetTypeBuilder();
+      def membersScope = GetTypeBuilder(moduleScope);
       
       foreach (member in @module.Members)
       {
@@ -407,9 +407,18 @@ namespace NemerleWeb
       }
     }
     
-    private CreateModule() : TypeBuilder
+    private CreateEnum(typesScope : GlobalEnv, tsEnum : AmbientEnumDeclaration) : void
     {
-      null
+      def members = tsEnum.Members
+        .Select(member => 
+          {
+            if(member.Value is Some(enumValue))
+              <[ decl: | $(member.Name : usesite) = $enumValue ]>
+            else
+              <[ decl: | $(member.Name : usesite) ]>
+          });
+      
+      typesScope.Define(<[ decl: public enum $(tsEnum.Name : usesite) { ..$members } ]>).Compile();
     }
     
     #endregion
@@ -623,6 +632,13 @@ namespace NemerleWeb
     
     #region Helpers
     
+    public GetTypeBuilder(globalEnv : GlobalEnv) : TypeBuilder
+    { 
+      def moduleName = globalEnv.CurrentNamespace.PartName;
+      def parent = globalEnv.Manager.CoreEnv.EnterIntoNamespace(globalEnv.CurrentNamespace.Parent);
+      
+      parent.Define(<[ decl: public partial module $(moduleName : usesite) {} ]>)
+    }
     
     #endregion
   }

@@ -133,9 +133,6 @@
     <Compile Include="GenerateJSApi\JSCallNewAttribute.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GenerateJSApi\Scope.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="GenerateJSApi\TSAnalyzer.n">
       <SubType>Code</SubType>
     </Compile>
