@@ -198,7 +198,7 @@ namespace NemerleWeb
         
       def extends = 
         if (generateMembers)
-          tsInterface.Extends.Select(e => MakeFullType(e, typeParameters));
+          tsInterface.Extends.Select(e => MakeFullType(typesScope, e, typeParameters));
         else
           [];
         
@@ -420,19 +420,23 @@ namespace NemerleWeb
     /// Makes type with type argument
     /// </summary>
     private MakeFullType(
+      typesScope : GlobalEnv,
       typeRef : ScriptType.Ref,
       typeParameters : IEnumerable[PT.Splicable]) : PExpr
     {
       def typeArguments = typeRef.TypeArguments.Select(
-        tyArg => MakeFullTypeImpl(tyArg, typeParameters));
+        tyArg => MakeFullTypeImpl(typesScope, tyArg, typeParameters));
       
-      <[ $(typeRef.Name : usesite).[..$typeArguments] ]>
+      def realType = PExpr.FromQualifiedIdentifier(typesScope.Manager, typeRef.Name);
+        
+      <[ $realType.[..$typeArguments] ]>
     }
     
     /// <summary>
     /// Get PExpr from TS type
     /// </summary>
     private MakeFullTypeImpl(
+      typesScope : GlobalEnv,
       type : ScriptType,
       typeParameters : IEnumerable[PT.Splicable]) : PExpr
     {
@@ -443,7 +447,7 @@ namespace NemerleWeb
       | Boolean => <[ bool ]>
       | String => <[ string ]>
       | Void => <[ void ]>
-      | Ref as r => MakeFullType(r, typeParameters)
+      | Ref as r => MakeFullType(typesScope, r, typeParameters)
       | Query => Message.Warning("Query type argument unsupported"); <[ object ]>
       | Array => Message.Warning("Array type argument unsupported"); <[ object ]>
       | Object as o =>
@@ -591,9 +595,10 @@ namespace NemerleWeb
           
       | Ref(name, tyArgs) => 
         def typeArgumentPrefix = string.Join(Separator, prefix, TypeArgument);
-        def realTypeArguments = tyArgs.Map(type => ConvertType(typesScope, type, typeArgumentPrefix));
-      
-        <[ $(name : usesite).[..$realTypeArguments] ]>
+        def realTypeArguments = tyArgs.Map(type => ConvertType(typesScope, type, typeArgumentPrefix));      
+        def realType = PExpr.FromQualifiedIdentifier(typesScope.Manager, name);
+        
+        <[ $realType.[..$realTypeArguments] ]>
       | String => <[ string ]>
       | Void => <[ void ]>
       }
