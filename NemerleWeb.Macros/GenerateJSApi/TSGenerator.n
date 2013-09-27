@@ -64,8 +64,8 @@ namespace NemerleWeb
       match(ambient)
       {
       | VariableDeclaration
-      | FunctionDeclaration
-      | ClassDeclaration         => ()
+      | FunctionDeclaration => ()
+      | ClassDeclaration(value) => CreateClass(typesScope, value, false)
       | EnumDeclaration(value) => CreateEnum(typesScope, value)
       | ExternalModuleDeclaration => ()
       | ModuleDeclaration(value) => GenerateTypesModule(typesScope, value)
@@ -80,8 +80,8 @@ namespace NemerleWeb
       foreach (member in @module.Members)
       {
         | VariableDeclaration
-        | FunctionDeclaration
-        | ClassDeclaration => ()
+        | FunctionDeclaration => ()
+        | ClassDeclaration(value) => CreateClass(typesScope, value, false)
         | InterfaceDeclaration(value) => CreateInterface(moduleScope, value, false)
         | EnumDeclaration(value) => CreateEnum(typesScope, value)
         | ModuleDeclaration(value) => GenerateTypesModule(moduleScope, value)
@@ -108,8 +108,8 @@ namespace NemerleWeb
       match(ambient)
       {
       | VariableDeclaration
-      | FunctionDeclaration
-      | ClassDeclaration         
+      | FunctionDeclaration => ()
+      | ClassDeclaration(value) => CreateClass(typesScope, value, true)
       | EnumDeclaration          
       | ExternalModuleDeclaration => ()
       | ModuleDeclaration(value) => GenerateTypesMembersModule(typesScope, value)
@@ -124,8 +124,8 @@ namespace NemerleWeb
       foreach (member in @module.Members)
       {
         | VariableDeclaration
-        | FunctionDeclaration
-        | ClassDeclaration => ()
+        | FunctionDeclaration => ()
+        | ClassDeclaration(value) => CreateClass(typesScope, value, true)
         | InterfaceDeclaration(value) => CreateInterface(moduleScope, value, true)
         | EnumDeclaration => ()
         | ModuleDeclaration(value) => GenerateTypesMembersModule(moduleScope, value)
@@ -195,10 +195,10 @@ namespace NemerleWeb
       generateMembers : bool) : void
     {
       def typeParameters = ConvertTypeParameters(tsInterface.TypeParameters);
-        
+      
       def extends = 
         if (generateMembers)
-          tsInterface.Extends.Select(e => MakeFullType(typesScope, e, typeParameters));
+          tsInterface.Extends.Select(e => MakeFullType(typesScope, e));
         else
           [];
         
@@ -421,6 +421,42 @@ namespace NemerleWeb
       typesScope.Define(<[ decl: public enum $(tsEnum.Name : usesite) { ..$members } ]>).Compile();
     }
     
+    private CreateClass(
+      typesScope : GlobalEnv,
+      tsClass : AmbientClassDeclaration,
+      generateMembers : bool) : void
+    {
+      def typeParameters = ConvertTypeParameters(tsClass.TypeParameters);
+        
+      def extends = 
+        if (generateMembers)
+        {
+          def baseClass = if(tsClass.Heritage.Base is Some(baseClass)) [baseClass] else [];
+          baseClass.Concat(tsClass.Heritage.Interfaces).Select(e => MakeFullType(typesScope, e));
+        }
+        else
+          [];
+      
+      def classType = typesScope.Define(
+        <[ decl:
+          [JSApi]
+          public partial interface $(tsClass.Name : usesite)[..$typeParameters] : ..$extends {}
+        ]>);
+      
+      when (generateMembers)
+        CreateClassMembers(typesScope, classType, tsClass, tsClass.Name);
+        
+      classType.Compile();
+    }
+    
+    private CreateClassMembers(
+      typesScope : GlobalEnv,
+      membersScope : TypeBuilder,
+      tsClass : AmbientClassDeclaration,
+      prefix : string) : void
+    {
+    }
+    
     #endregion
     
     #region Converters
@@ -428,13 +464,10 @@ namespace NemerleWeb
     /// <summary>
     /// Makes type with type argument
     /// </summary>
-    private MakeFullType(
-      typesScope : GlobalEnv,
-      typeRef : ScriptType.Ref,
-      typeParameters : IEnumerable[PT.Splicable]) : PExpr
+    private MakeFullType(typesScope : GlobalEnv, typeRef : ScriptType.Ref) : PExpr
     {
       def typeArguments = typeRef.TypeArguments.Select(
-        tyArg => MakeFullTypeImpl(typesScope, tyArg, typeParameters));
+        tyArg => MakeFullTypeImpl(typesScope, tyArg));
       
       def realType = PExpr.FromQualifiedIdentifier(typesScope.Manager, typeRef.Name);
         
@@ -444,10 +477,7 @@ namespace NemerleWeb
     /// <summary>
     /// Get PExpr from TS type
     /// </summary>
-    private MakeFullTypeImpl(
-      typesScope : GlobalEnv,
-      type : ScriptType,
-      typeParameters : IEnumerable[PT.Splicable]) : PExpr
+    private MakeFullTypeImpl(typesScope : GlobalEnv, type : ScriptType) : PExpr
     {
       match(type)
       {
@@ -456,7 +486,7 @@ namespace NemerleWeb
       | Boolean => <[ bool ]>
       | String => <[ string ]>
       | Void => <[ void ]>
-      | Ref as r => MakeFullType(typesScope, r, typeParameters)
+      | Ref as r => MakeFullType(typesScope, r)
       | Query => Message.Warning("Query type argument unsupported"); <[ object ]>
       | Array => Message.Warning("Array type argument unsupported"); <[ object ]>
       | Object as o =>
@@ -473,6 +503,9 @@ namespace NemerleWeb
       }
     }
     
+    /// <summary>
+    /// Type parameters are used in the type itself.
+    /// </summary>
     private ConvertTypeParameters(typeParameters : IEnumerable[ScriptTypeParameter])
       : list[PT.Splicable]
     {
