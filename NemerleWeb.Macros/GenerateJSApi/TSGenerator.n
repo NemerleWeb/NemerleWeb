@@ -68,13 +68,25 @@ namespace NemerleWeb
       | ClassDeclaration         
       | EnumDeclaration          
       | ExternalModuleDeclaration => ()
-      | ModuleDeclaration(value) => ()
+      | ModuleDeclaration(value) => GenerateTypesModule(typesScope, value)
       | _ => ()
       }
     }
     
-    private GenerateTypesModule() : void
+    private GenerateTypesModule(typesScope : GlobalEnv, @module : AmbientModuleDeclaration) : void
     {
+      def moduleScope = typesScope.EnterIntoNamespace(@module.Name.SplitDot());
+      
+      foreach (member in @module.Members)
+      {
+        | VariableDeclaration
+        | FunctionDeclaration
+        | ClassDeclaration => ()
+        | InterfaceDeclaration(value) => CreateInterface(moduleScope, value, false)
+        | EnumDeclaration => ()
+        | ModuleDeclaration(value) => GenerateTypesModule(moduleScope, value)
+        | _ => ()
+      }
     }
     
     #endregion
@@ -100,8 +112,24 @@ namespace NemerleWeb
       | ClassDeclaration         
       | EnumDeclaration          
       | ExternalModuleDeclaration => ()
-      | ModuleDeclaration(value) => ()
+      | ModuleDeclaration(value) => GenerateTypesMembersModule(typesScope, value)
       | _ => ()
+      }
+    }
+     
+    private GenerateTypesMembersModule(typesScope : GlobalEnv, @module : AmbientModuleDeclaration) : void
+    {
+      def moduleScope = typesScope.EnterIntoNamespace(@module.Name.SplitDot());
+      
+      foreach (member in @module.Members)
+      {
+        | VariableDeclaration
+        | FunctionDeclaration
+        | ClassDeclaration => ()
+        | InterfaceDeclaration(value) => CreateInterface(moduleScope, value, true)
+        | EnumDeclaration => ()
+        | ModuleDeclaration(value) => GenerateTypesMembersModule(moduleScope, value)
+        | _ => ()
       }
     }
     
@@ -128,11 +156,32 @@ namespace NemerleWeb
       | VariableDeclaration(value) => CreateVariable(typesScope, membersScope, value)
       | FunctionDeclaration(value) => CreateFunction(typesScope, membersScope, value)
       | ExternalModuleDeclaration => ()
-      | ModuleDeclaration(value) => ()
+      | ModuleDeclaration(value) => GenerateRestModule(typesScope, value)
       | _ => ()
       }
       
       // Compile module
+      membersScope.Compile();
+    }
+    
+    private GenerateRestModule(typesScope : GlobalEnv, @module : AmbientModuleDeclaration) : void
+    {
+      def moduleScope = typesScope.EnterIntoNamespace(@module.Name.SplitDot());
+      
+      // Create module
+      def membersScope = Scope(moduleScope).GetTypeBuilder();
+      
+      foreach (member in @module.Members)
+      {
+        | VariableDeclaration(value) => CreateVariable(moduleScope, membersScope, value)
+        | FunctionDeclaration(value) => CreateFunction(moduleScope, membersScope, value)
+        | ClassDeclaration
+        | InterfaceDeclaration
+        | EnumDeclaration => ()
+        | ModuleDeclaration(value) => GenerateRestModule(moduleScope, value)
+        | _ => ()
+      }
+      
       membersScope.Compile();
     }
     
