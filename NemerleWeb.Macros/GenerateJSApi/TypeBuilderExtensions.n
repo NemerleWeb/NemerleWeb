@@ -1,18 +1,60 @@
-﻿using Nemerle;
-using Nemerle.Collections;
-using Nemerle.Text;
-using Nemerle.Utility;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NemerleWeb.Macros
-{
-  /// <summary>
-  /// Description of TypeBuilderExtensions.
-  /// </summary>
-  module TypeBuilderExtensions
+using Nemerle.Imperative;
+using Nemerle.Macros;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
+using PT = Nemerle.Compiler.Parsetree;
+using Nemerle.Collections;
+using Nemerle.Utility;
+using Nemerle.Assertions;
+using System.IO;
+using System.Text.RegularExpressions;
+using TSParser;
+using TSParser.Ast;
+using NemerleWeb;
+
+namespace NemerleWeb
+{  
+  internal module TypeBuilderExtensions
   {
+    public DefineMember(
+      this scope : TypeBuilder,
+      member : ClassMember,
+      classModifiers : NemerleModifiers) : void
+    {
+      when(!scope.IsInterface)
+      {
+        match(member)
+        {
+        | f is ClassMember.Function =>
+          f.body = DefaultFunctionImplementation;
+        | p is ClassMember.Property =>
+          when(p.getter is Some(getter))
+            getter.body = DefaultFunctionImplementation;
+          when(p.setter is Some(setter))
+            setter.body = DefaultFunctionImplementation;
+        | _ => ()
+        }
+      }
+      
+      member.modifiers.mods |= NemerleModifiers.New;
+      when(!scope.IsInterface)
+        member.modifiers.mods |= classModifiers;
+      
+      _ = scope.DefineWithSource(member);
+    } 
+    
+    public DefineMemberPublicNew(this scope : TypeBuilder, member : ClassMember) : void
+    {
+      DefineMember(scope, member, NemerleModifiers.Public)
+    }
+    
+    private DefaultImplementation : PExpr =
+      <[ { IgnoreParams(); throw NemerleWeb.ClientCodeCalledInServerException(); } ]>;
+    private DefaultFunctionImplementation : FunBody.Parsed =
+      FunBody.Parsed(DefaultImplementation);
   }
 }

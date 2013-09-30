@@ -1,0 +1,41 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Nemerle.Imperative;
+using Nemerle.Macros;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
+using PT = Nemerle.Compiler.Parsetree;
+using Nemerle.Collections;
+using Nemerle.Utility;
+using Nemerle.Assertions;
+using System.IO;
+using System.Text.RegularExpressions;
+using TSParser;
+using TSParser.Ast;
+using NemerleWeb;
+
+namespace NemerleWeb
+{  
+  internal module PExprHelper
+  {
+    /// <summary>
+    /// Transforms dot-separated identifier to the parse-tree expression
+    /// Unlike PExpr.FromQualifiedIdentifier, this method breaks higiene.
+    /// Use with caution.
+    /// </summary>
+    public static FromQualifiedIdentifierNonHygienic(qid : string) : PExpr
+    {
+      if (string.IsNullOrEmpty(qid)) null
+      else
+      {
+        def split = qid.Split('.');
+        mutable expr = <[ $(Name(split[0]) : name) ]>;
+        for (mutable i = 1; i < split.Length; i++)
+          expr = <[ $expr . $(Name(split[i]) : name) ]>;
+        expr
+      }
+    }
+  }
+}

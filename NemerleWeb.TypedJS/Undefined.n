@@ -9,16 +9,19 @@ using System;
 
 namespace NemerleWeb
 {
-  // Define 'undefined' variable using special class
-  [JSApiImpl]
-  public sealed class Undefined
+  namespace TypedJS
   {
-    public static @:[T](_ : this) : T;
+    // Define 'undefined' variable using special class
+    [JSApiImpl]
+    public sealed class __Undefined__
+    {
+      public static @:[T](_ : this) : T;
+    }
   }
     
   [JSApi]
   public partial module TypedJS
   {
-    public static undefined : Undefined;
+    public static undefined : __Undefined__;
   }
 }

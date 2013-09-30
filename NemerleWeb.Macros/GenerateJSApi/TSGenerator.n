@@ -752,7 +752,7 @@ namespace NemerleWeb
     private TypeArgument = "TypeArgument";
     private Separator = "_";
     
-    private UnitClass = "$Unit";
+    private UnitClass = "__Unit__";
     
     #endregion
     
@@ -767,66 +767,5 @@ namespace NemerleWeb
     }
     
     #endregion
-  }
-  
-  internal module ScopeExtensions
-  {
-    public DefineMember(
-      this scope : TypeBuilder,
-      member : ClassMember,
-      classModifiers : NemerleModifiers) : void
-    {
-      when(!scope.IsInterface)
-      {
-        match(member)
-        {
-        | f is ClassMember.Function =>
-          f.body = DefaultFunctionImplementation;
-        | p is ClassMember.Property =>
-          when(p.getter is Some(getter))
-            getter.body = DefaultFunctionImplementation;
-          when(p.setter is Some(setter))
-            setter.body = DefaultFunctionImplementation;
-        | _ => ()
-        }
-      }
-      
-      member.modifiers.mods |= NemerleModifiers.New;
-      when(!scope.IsInterface)
-        member.modifiers.mods |= classModifiers;
-      
-      _ = scope.DefineWithSource(member);
-    } 
-    
-    public DefineMemberPublicNew(this scope : TypeBuilder, member : ClassMember) : void
-    {
-      DefineMember(scope, member, NemerleModifiers.Public)
-    }
-    
-    private DefaultImplementation : PExpr =
-      <[ { IgnoreParams(); throw NemerleWeb.ClientCodeCalledInServerException(); } ]>;
-    private DefaultFunctionImplementation : FunBody.Parsed =
-      FunBody.Parsed(DefaultImplementation);
-  }
-
-  internal module PExprHelper
-  {
-    /// <summary>
-    /// Transforms dot-separated identifier to the parse-tree expression
-    /// Unlike PExpr.FromQualifiedIdentifier, this method breaks higiene.
-    /// Use with caution.
-    /// </summary>
-    public static FromQualifiedIdentifierNonHygienic(qid : string) : PExpr
-    {
-      if (string.IsNullOrEmpty(qid)) null
-      else
-      {
-        def split = qid.Split('.');
-        mutable expr = <[ $(Name(split[0]) : name) ]>;
-        for (mutable i = 1; i < split.Length; i++)
-          expr = <[ $expr . $(Name(split[i]) : name) ]>;
-        expr
-      }
-    }
   }
 }
