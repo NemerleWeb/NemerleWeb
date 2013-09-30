@@ -123,6 +123,7 @@
     <Folder Include="Scripts\typings\ember\" />
     <Folder Include="Scripts\typings\epiceditor\" />
     <Folder Include="Scripts\typings\expect.js\" />
+    <Folder Include="Scripts\typings\express-validator\" />
     <Folder Include="Scripts\typings\express\" />
     <Folder Include="Scripts\typings\extjs\" />
     <Folder Include="Scripts\typings\fabricjs\" />
@@ -514,6 +515,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\expect.js\expect.js.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\express-validator\express-validator.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\express\express.d.ts">

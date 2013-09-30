@@ -215,6 +215,10 @@ declare module ng {
         $parent: IScope;
 
         $id: number;
+        
+        // Hidden members
+        $$isolateBindings: any;
+        $$phase: any;
     }
 
     interface IAngularEvent {
@@ -500,7 +504,7 @@ declare module ng {
         (controllerName: string, locals?: any): any;
     }
 
-    interface IControlerProvider extends IServiceProvider {
+    interface IControllerProvider extends IServiceProvider {
         register(name: string, controllerConstructor: Function): void;
         register(name: string, dependencyAnnotadedConstructor: any[]): void;
     }
@@ -697,6 +701,10 @@ declare module ng {
     interface IAugmentedJQuery extends JQuery {
         // TODO: events, how to define?
         //$destroy
+
+        find(selector: string): IAugmentedJQuery;
+        find(element: any): IAugmentedJQuery;
+        find(obj: JQuery): IAugmentedJQuery;
 
         controller(name: string): any;
         injector(): any;
