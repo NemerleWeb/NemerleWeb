@@ -203,9 +203,9 @@ namespace NemerleWeb
           text.Substring(pos, 55);
       Message.Warning(Location(tsFile, 1, 1, 1, 1), $"Failed to parse $tsFile, somewhere here: $errorText...");
     }
+    
+    #endregion
   }
-  
-  #endregion
 
   #region Data types
     
