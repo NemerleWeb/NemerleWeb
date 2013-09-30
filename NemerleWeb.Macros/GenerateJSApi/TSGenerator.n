@@ -265,7 +265,7 @@ namespace NemerleWeb
       def realReturnType = ConvertType(membersScope, call.ReturnType, returnTypePrefix);
       
       def functionParams = ConvertParameters(membersScope, call.Parameters, fullPrefix);
-      when(functionParams is None()) return;      
+      when(functionParams is None()) return;
       def functionParams = functionParams.Value;
       
       def typeParameters = ConvertTypeParameters(call.TypeParameters);
@@ -292,12 +292,7 @@ namespace NemerleWeb
     
     CreateIndex(membersScope : TypeBuilder, index : IndexSignature, prefix : string) : void
     {
-      def (realParamType, typeName) =
-        match(index.ParameterType)
-        {
-        | Number => (<[ float ]>, "Number")
-        | String => (<[ string ]>, "String")
-        };
+      def (realParamType, typeName) = GetIndexTypes(index);
         
       def fullPrefix = string.Join(Separator, prefix, typeName, Index);
       def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
@@ -305,13 +300,23 @@ namespace NemerleWeb
       
       membersScope.DefineMemberPublicNew(
         <[ decl:
-          new Item[$(index.ParameterName : usesite) : $realParamType] : $realReturnType
+          Item[$(index.ParameterName : usesite) : $realParamType] : $realReturnType
           {
             get;
             set;
           }
         ]>);
     }
+    
+    GetIndexTypes(index : IndexSignature) : PExpr * string
+    {
+      match(index.ParameterType)
+      {
+      | Number => (<[ float ]>, "Number")
+      | String => (<[ string ]>, "String")
+      };
+    }
+
 
     /// <summary>
     /// Don't pay attention to optional, always generate property
@@ -422,21 +427,105 @@ namespace NemerleWeb
       def classType = typesScope.Define(
         <[ decl:
           [JSApi]
-          public partial interface $(tsClass.Name : usesite)[..$typeParameters] : ..$extends {}
+          public partial class $(tsClass.Name : usesite)[..$typeParameters] : ..$extends {}
         ]>);
       
       when (generateMembers)
-        CreateClassMembers(typesScope, classType, tsClass, tsClass.Name);
+        CreateClassMembers(classType, tsClass, tsClass.Name);
         
       classType.Compile();
     }
     
-    private CreateClassMembers(
-      typesScope : GlobalEnv,
+    private CreateClassMembers(membersScope : TypeBuilder, tsClass : AmbientClassDeclaration, prefix : string) : void
+    {
+      foreach(member in tsClass.Members)
+      {
+        | Constructor as value => CreateClassConstructor(membersScope, value, prefix)
+        | Property    as value => CreateClassProperty   (membersScope, value, prefix)
+        | Method      as value => CreateClassMethod     (membersScope, value, prefix)
+        | Index       as value => CreateClassIndex      (membersScope, value, prefix)
+      }
+    }
+    
+    private CreateClassConstructor(
       membersScope : TypeBuilder,
-      tsClass : AmbientClassDeclaration,
+      constructor : AmbientClassBodyElement.Constructor,
       prefix : string) : void
     {
+      def fullPrefix = string.Join(Separator, prefix, Constructor);
+      
+      def functionParams = ConvertParameters(membersScope, constructor.Parameters, fullPrefix);
+      when(functionParams is None()) return;
+      def functionParams = functionParams.Value;
+      
+      membersScope.DefineMemberPublicNew(<[ decl: this(..$functionParams) ]>);
+    }
+    
+    private CreateClassProperty(
+      membersScope : TypeBuilder,
+      property : AmbientClassBodyElement.Property,
+      prefix : string) : void
+    {
+      def fullPrefix = string.Join(Separator, prefix, property.Name);
+      def typePrefix = string.Join(Separator, fullPrefix, Property);
+      def propertyType = ConvertType(membersScope, property.Type, typePrefix);
+      
+      CreateClassMember(
+        membersScope,
+        <[ decl: $(property.Name : usesite) : $propertyType { get; set; }; ]>,
+        property.Access,
+        property.Static);
+    }
+    
+    private CreateClassMethod(
+      membersScope : TypeBuilder,
+      method : AmbientClassBodyElement.Method,
+      prefix : string) : void
+    {
+      def fullPrefix = string.Join(Separator, prefix, method.Name);
+      def returnTypePrefix = string.Join(Separator, fullPrefix, Return);
+      def realReturnType = ConvertType(membersScope, method.Signature.ReturnType, returnTypePrefix);
+    
+      def functionParams = ConvertParameters(membersScope, method.Signature.Parameters, fullPrefix);
+      when(functionParams is None()) return;
+      def functionParams = functionParams.Value;
+      
+      def typeParameters = ConvertTypeParameters(method.Signature.TypeParameters);
+    
+      CreateClassMember(
+        membersScope,
+        <[ decl: $(method.Name : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>,
+        method.Access,
+        method.Static);
+    }
+    
+    private CreateClassIndex(
+      membersScope : TypeBuilder,
+      index : AmbientClassBodyElement.Index,
+      prefix : string) : void
+    {
+      CreateIndex(membersScope, index.Value, prefix);
+    }
+    
+    private CreateClassMember(
+      membersScope : TypeBuilder,
+      member : ClassMember,
+      access : option[MemberAccess],
+      isStatic : bool) : void
+    {
+       def accessModifier =
+        if(access is Some(MemberAccess.Private))
+          NemerleModifiers.Private
+        else
+          NemerleModifiers.Public;
+      
+      def instanceModifier =
+        if(isStatic)
+          NemerleModifiers.Static
+        else
+          NemerleModifiers.None;
+          
+      membersScope.DefineMember(member, accessModifier | instanceModifier);
     }
     
     #endregion
@@ -682,7 +771,10 @@ namespace NemerleWeb
   
   internal module ScopeExtensions
   {
-    public DefineMemberPublicNew(this scope : TypeBuilder, member : ClassMember) : void
+    public DefineMember(
+      this scope : TypeBuilder,
+      member : ClassMember,
+      classModifiers : NemerleModifiers) : void
     {
       when(!scope.IsInterface)
       {
@@ -701,9 +793,14 @@ namespace NemerleWeb
       
       member.modifiers.mods |= NemerleModifiers.New;
       when(!scope.IsInterface)
-        member.modifiers.mods |= NemerleModifiers.Public;
+        member.modifiers.mods |= classModifiers;
       
       _ = scope.DefineWithSource(member);
+    } 
+    
+    public DefineMemberPublicNew(this scope : TypeBuilder, member : ClassMember) : void
+    {
+      DefineMember(scope, member, NemerleModifiers.Public)
     }
     
     private DefaultImplementation : PExpr =

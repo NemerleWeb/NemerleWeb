@@ -136,23 +136,6 @@ namespace NemerleWeb
       yield InterfaceDeclaration(name, typeParameters, extends, @type)
     }
     
-    #region Helpers
-    
-    private NoLiteralParameters(parms : IEnumerable[ScriptParameter]) : bool
-    {
-      !parms.Any(p => p is ScriptParameter.Required(RequiredParameter.Literal))
-    }
-    
-    private NoLiteralParameters(m : ScriptObject) : bool
-    {
-      | ScriptObject.Call(value) => NoLiteralParameters(value.Parameters)
-      | ScriptObject.Construct(value) => NoLiteralParameters(value.Parameters)
-      | ScriptObject.Method(value) => NoLiteralParameters(value.Signature.Parameters)
-      | _ => true
-    }
-    
-    #endregion
-    
    #if A
   
     
