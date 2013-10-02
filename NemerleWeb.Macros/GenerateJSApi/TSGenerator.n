@@ -161,7 +161,7 @@ namespace NemerleWeb
     private GenerateRestAmbient(typesScope : GlobalEnv, ambient : AmbientDeclaration) : void
     {
       // Create module
-      def membersScope = GetTypeBuilder(typesScope);
+      def membersScope = GetMembersScope(typesScope);
       
       match(ambient)
       {
@@ -181,7 +181,7 @@ namespace NemerleWeb
       def moduleScope = typesScope.EnterIntoNamespace(@module.Name.SplitDot());
       
       // Create module
-      def membersScope = GetTypeBuilder(moduleScope);
+      def membersScope = GetMembersScope(moduleScope);
       
       foreach (member in @module.Members)
       {
@@ -758,12 +758,12 @@ namespace NemerleWeb
     
     #region Helpers
     
-    public GetTypeBuilder(globalEnv : GlobalEnv) : TypeBuilder
+    public GetMembersScope(globalEnv : GlobalEnv) : TypeBuilder
     { 
       def moduleName = globalEnv.CurrentNamespace.PartName;
       def parent = globalEnv.Manager.CoreEnv.EnterIntoNamespace(globalEnv.CurrentNamespace.Parent);
       
-      parent.Define(<[ decl: public partial module $(moduleName : usesite) {} ]>)
+      parent.Define(<[ decl: [JSApi] public partial module $(moduleName : usesite) {} ]>)
     }
     
     #endregion
