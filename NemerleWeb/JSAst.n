@@ -18,6 +18,7 @@ namespace NemerleWeb
     // Some string that cannot be found in code
     public static DoNotEscapeMarker = "\u0001";
   }
+ 
   
     public variant JSAst
     {           
@@ -120,7 +121,7 @@ namespace NemerleWeb
                 
                 | Call(MethodRef(obj, method, Some) as f, parms) when
                   !JSAstHelper.IsSpecialMethod(method) =>
-                  $<#$(f.Write()).call$(writeParams(obj :: parms))#>
+                  $<#$(JSApiSpecial.JSUnescapeName(f.Write())).call$(writeParams(obj :: parms))#>
                 
                 | Call(Function as f, parms) => $<#($(f.Write()))$(writeParams(parms))#>
                 | Call(f, parms)             => $<#$(f.Write())$(writeParams(parms))#>    

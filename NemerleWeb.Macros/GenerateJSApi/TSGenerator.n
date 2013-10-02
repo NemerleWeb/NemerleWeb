@@ -355,8 +355,9 @@ namespace NemerleWeb
       
       def typeParameters = ConvertTypeParameters(signature.TypeParameters);
     
+      def escapedName = JSApiSpecial.JSEscapeName(name);
       membersScope.DefineMemberPublicNew(
-        <[ decl: $(name : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
+        <[ decl: $(escapedName : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
     
     // TODO: Remove
@@ -492,9 +493,10 @@ namespace NemerleWeb
       
       def typeParameters = ConvertTypeParameters(method.Signature.TypeParameters);
     
+      def escapedName = JSApiSpecial.JSEscapeName(method.Name);
       CreateClassMember(
         membersScope,
-        <[ decl: $(method.Name : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>,
+        <[ decl: $(escapedName : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>,
         method.Access,
         method.Static);
     }

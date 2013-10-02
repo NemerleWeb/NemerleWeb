@@ -41,6 +41,21 @@ namespace NemerleWeb
     /// <summary>
     /// Used for properties.
     /// </summary>
-    public Property  = "<>Property";
+    public Property = "<>Property";
+    
+    /// <summary>
+    /// '$' in name
+    /// </summary>
+    public Dollar = "__DOLLAR__"; 
+    
+    public JSEscapeName(name : string) : string
+    {
+      name.Replace("$", Dollar)
+    }
+    
+    public JSUnescapeName(name : string) : string
+    {
+      name.Replace(Dollar, "$")
+    }
   }
 }
