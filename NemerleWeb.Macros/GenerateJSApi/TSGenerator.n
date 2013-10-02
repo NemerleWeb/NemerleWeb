@@ -673,12 +673,12 @@ namespace NemerleWeb
           mutable lambdaParams = GetParametersType(membersScope, value.Parameters, prefix);
           def type =
             if(value.ReturnType is ScriptType.Void())
-              <[ System.Action ]>
+              <[ Nemerle.Builtins.FunctionVoid ]>
             else
             {
               lambdaParams = lambdaParams.Concat(
                 [ConvertType(membersScope, value.ReturnType, prefix)]);
-              <[ System.Func ]>
+              <[ Nemerle.Builtins.Function ]>
             };
           
           <[ $type.[..$lambdaParams] ]>
