@@ -19,8 +19,8 @@ namespace NemerleWeb.NemerleWeb.Website
     {
       <#
         <div class="welcome">
-          <h1>This is a page created using Beyond Framework</h1>
-          You just started a new project using Beyond. 
+          <h1>This is a page created using NemerleWeb Framework</h1>
+          You just started a new project using NemerleWeb. 
           To add logic, go to MVVM/MainPage.n file, remove unnecessary code and add yours.
           For help, please refer to <a href="https://github.com/NemerleWeb/NemerleWeb">github page</a>.
         </div>

@@ -16,7 +16,7 @@ namespace NemerleWeb.NemerleWeb.Website.Controllers
 {
   public class HomeController : Controller
   {
-    static mutable _content = Dictionary.[string, string]();
+    static _content = Dictionary.[string, string]();
     
     static this() 
     {
