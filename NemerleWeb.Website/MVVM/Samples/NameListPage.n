@@ -30,7 +30,7 @@ namespace NemerleWeb.Samples
     
     public this()
     {
-      server.GetNames(l => Names = l);
+      _ = server.GetNames(l => Names = l);
     }
     
     public class Server

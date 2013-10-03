@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NemerleWeb;
-
+using NemerleWeb.TypedJS;
 
 namespace NemerleWeb.Samples
 {
@@ -37,7 +37,7 @@ namespace NemerleWeb.Samples
 
     public this()
     {
-      server.Load(tasks => { Tasks = tasks.ToList(); });
+      _ = server.Load(tasks => { Tasks = tasks.ToList(); });
     }
 
     AddTask() : void
@@ -53,9 +53,9 @@ namespace NemerleWeb.Samples
 
     Save() : void
     {
-      server.Save(Tasks, _result =>
+      _ = server.Save(Tasks, _result =>
       {
-        js alert(_result);
+        window.alert(_result);
       });
     }
 

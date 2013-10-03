@@ -29,7 +29,7 @@ namespace NemerleWeb.Samples
     
     public this()
     {
-      server.GetLastMessages(messages => {
+      _ = server.GetLastMessages(messages => {
         foreach(msg in messages)
           AddMessage(msg);
       });
@@ -37,7 +37,7 @@ namespace NemerleWeb.Samples
     
     SendMessage() : void
     {
-      server.SendMessage(Name, CurrentMessage, _ => {});
+      _ = server.SendMessage(Name, CurrentMessage, _ => {});
       CurrentMessage = "";
     }
   

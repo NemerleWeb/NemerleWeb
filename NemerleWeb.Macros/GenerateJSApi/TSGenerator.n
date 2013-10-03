@@ -711,7 +711,9 @@ namespace NemerleWeb
         def realType = ConvertType(membersScope, tyArg, typeArgumentPrefix);
         
         <[ array[$realType] ]>
-          
+      | Ref("Function", []) =>
+        // TODO: Support local Function type
+        <[ Nemerle.Builtins.FunctionBase ]>
       | Ref(name, tyArgs) => 
         def typeArgumentPrefix = string.Join(Separator, prefix, TypeArgument);
         def realTypeArguments = ConvertTypeArguments(membersScope, tyArgs, typeArgumentPrefix);

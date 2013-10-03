@@ -83,7 +83,7 @@ namespace NemerleWeb.Samples
       LoadSamples(KnockoutSamples);
       LoadSamples(PegSamples);
             
-      server.LoadSourceFor("MVVM/Samples/Samples.n", source =>
+      _ = server.LoadSourceFor("MVVM/Samples/Samples.n", source =>
       {
         ThisPageSource = source;
         prettyPrint();
@@ -98,7 +98,7 @@ namespace NemerleWeb.Samples
     
     LoadSample(samples : List[Sample], index : int) : void
     {
-      server.LoadSourceForList(samples[index].SourceFiles, source =>
+      _ = server.LoadSourceForList(samples[index].SourceFiles, source =>
       {          
         samples[index].Source = source;
         prettyPrint();
