@@ -16,14 +16,20 @@
     <div class="container-narrow">
         <div class="header">
             <ul class="nav nav-pills pull-right">
+                <li>@Html.ActionLink("Home", "Index", "Home")</li>
                 <li>@Html.ActionLink("Tutorial", "Tutorial", "Home")</li>
                 <li>@Html.ActionLink("Samples", "Samples", "Home")</li>
                 <li><a href="https://github.com/NemerleWeb/NemerleWeb">Github repo</a></li>
-            </ul>
-            <ul class="nav nav-pills pull-right">
-                <li>@Html.ActionLink("UnitTests", "Index", "UnitTests")</li>
-                <li>@Html.ActionLink("TemplateTests", "Index", "TemplateTests")</li>
-                <li>@Html.ActionLink("ServerTests", "Index", "ServerTests")</li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                      Tests <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>@Html.ActionLink("Unit tests", "Index", "UnitTests")</li>
+                        <li>@Html.ActionLink("Template tests", "Index", "TemplateTests")</li>
+                        <li>@Html.ActionLink("Server tests", "Index", "ServerTests")</li>
+                    </ul>
+                </li>                
             </ul>
             <h2 class="text-muted">Nemerle Web</h2>
         </div>
