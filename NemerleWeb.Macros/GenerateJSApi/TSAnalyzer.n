@@ -27,80 +27,85 @@ namespace NemerleWeb
     /// </summary>
     public AnalyzeTSAst([NotNull] tsAsts : IEnumerable[DeclarationElement]) : IEnumerable[DeclarationElement]
     {
-      tsAsts.GroupBy(GroupAst).SelectMany(SelectAst)
+      tsAsts.Where(FilterAst).GroupBy(GroupAst).SelectMany(SelectAst).ToList()
     }
     
-    private GroupAst(ast : DeclarationElement) : Type * string
+    private FilterAst(ast : DeclarationElement) : bool
     {
-        def name =
-        match(ast)
+      | DeclarationElement.InterfaceDeclaration => true
+      | DeclarationElement.AmbientDeclaration(v) =>
+        match(v)
         {
-        | DeclarationElement.InterfaceDeclaration(v) => v.Name
-        | DeclarationElement.AmbientDeclaration(v) =>
-          match(v)
+        | AmbientDeclaration.VariableDeclaration
+        | AmbientDeclaration.FunctionDeclaration
+        | AmbientDeclaration.ClassDeclaration   
+        | AmbientDeclaration.EnumDeclaration 
+        | AmbientDeclaration.ModuleDeclaration  => true             
+        | _ => false
+        }
+      | _ => false
+    }
+    
+    private GroupAst(ast : DeclarationElement) : list[Type] * string
+    {
+      | DeclarationElement.InterfaceDeclaration(v) => ([ast.GetType()], v.Name)
+      | DeclarationElement.AmbientDeclaration(ambient) =>
+        def name =
+          match(ambient)
           {
           | AmbientDeclaration.VariableDeclaration(v) => v.Name
           | AmbientDeclaration.FunctionDeclaration(v) => v.Name
           | AmbientDeclaration.ClassDeclaration   (v) => v.Name
           | AmbientDeclaration.EnumDeclaration    (v) => v.Name
           | AmbientDeclaration.ModuleDeclaration  (v) => v.Name
-            
-          | _ => ""
-          }
-        | _ => ""
-        };
-      
-      // Group by type and name
-      (ast.GetType(), name)
+          | _ => throw Exception()
+          };
+          
+        ([ast.GetType(), ambient.GetType()], name)
+      | _ => throw Exception()
     }
     
-    private SelectAst(typeAndNameGroup : IGrouping[Type * string, DeclarationElement]) :
+    private SelectAst(typeAndNameGroup : IGrouping[list[Type] * string, DeclarationElement]) :
       IEnumerable[DeclarationElement]
     {
-      def type = typeAndNameGroup.Key[0];
+      def types = typeAndNameGroup.Key[0];
+      match(types)
+      {
+      | [type] when type.Equals(typeof(DeclarationElement.InterfaceDeclaration)) =>
+          AnalyzeInterface(
+            typeAndNameGroup
+              .Cast.[DeclarationElement.InterfaceDeclaration]()
+              .Select(i => i.Value))
+          .Select(i => DeclarationElement.InterfaceDeclaration(i))
+          
+      | [type, ambientType] when type.Equals(typeof(DeclarationElement.AmbientDeclaration)) =>
+        match(ambientType)
+        {
+        | type when type.Equals(typeof(AmbientDeclaration.VariableDeclaration)) =>
+          [typeAndNameGroup.First()]
+          //AnalyzeInterface(typeAndNameGroup.Cast.[TSGlobal.Interface]())
+      
+        | type when type.Equals(typeof(AmbientDeclaration.FunctionDeclaration)) =>
+          [typeAndNameGroup.First()]
+          //AnalyzeModule(typeAndNameGroup.Cast.[TSGlobal.Module]())
         
-      if(type.Equals(typeof(DeclarationElement.InterfaceDeclaration)))
-      {
-        AnalyzeInterface(
-          typeAndNameGroup
-            .Cast.[DeclarationElement.InterfaceDeclaration]()
-            .Select(i => i.Value))
-        .Select(i => DeclarationElement.InterfaceDeclaration(i))
-      }
-      else
-      if(type.Equals(typeof(AmbientDeclaration.VariableDeclaration)))
-      {
-        [typeAndNameGroup.First()]
-        //AnalyzeInterface(typeAndNameGroup.Cast.[TSGlobal.Interface]())
-      }
-      else
-      if(type.Equals(typeof(AmbientDeclaration.FunctionDeclaration)))
-      {
-        [typeAndNameGroup.First()]
-        //AnalyzeModule(typeAndNameGroup.Cast.[TSGlobal.Module]())
-      }
-      else
-      if(type.Equals(typeof(AmbientDeclaration.ClassDeclaration)))
-      {
-        [typeAndNameGroup.First()]
-        //AnalyzeEnum(typeAndNameGroup.Cast.[TSGlobal.Enum]())
-      }
-      else
-      if(type.Equals(typeof(AmbientDeclaration.EnumDeclaration)))
-      {
-        [typeAndNameGroup.First()]
-        //AnalyzeFunction(typeAndNameGroup.Cast.[TSGlobal.Function]())
-      }
-      else
-      if(type.Equals(typeof(AmbientDeclaration.ModuleDeclaration)))
-      {
-        [typeAndNameGroup.First()]
-        //AnalyzeModule
-      }
+        | type when type.Equals(typeof(AmbientDeclaration.ClassDeclaration)) =>
+          [typeAndNameGroup.First()]
+          //AnalyzeEnum(typeAndNameGroup.Cast.[TSGlobal.Enum]())
+        
+        | type when type.Equals(typeof(AmbientDeclaration.EnumDeclaration)) =>
+          [typeAndNameGroup.First()]
+          //AnalyzeFunction(typeAndNameGroup.Cast.[TSGlobal.Function]())
+      
+        | type when type.Equals(typeof(AmbientDeclaration.ModuleDeclaration)) =>
+          [typeAndNameGroup.First()]
+          //AnalyzeModule(typeAndNameGroup.Cast.[TSGlobal.Function]())
+          
+        // By default take first and skip others        
+        | _ =>  [typeAndNameGroup.First()]
+        }
       // By default take first and skip others        
-      else
-      {
-        [typeAndNameGroup.First()]
+      | _ =>  [typeAndNameGroup.First()]
       }
     }
         

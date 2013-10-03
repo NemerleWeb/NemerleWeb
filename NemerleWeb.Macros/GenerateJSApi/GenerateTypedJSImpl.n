@@ -42,7 +42,7 @@ namespace NemerleWeb
       def tsFilesToParse = PreParseTSAll(projectDir, args.Libs, args.Args);
       
       // Step 2: Parse
-      def tsAsts = tsFilesToParse.SelectMany(ParseTS);
+      def tsAsts = tsFilesToParse.SelectMany(ParseTS).ToList();
       
       // Step 3: Analyze
       def finalAst = TSAnalyzer.AnalyzeTSAst(tsAsts).ToList();

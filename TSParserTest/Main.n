@@ -48,9 +48,14 @@ module Program
   Main() : void
   {
     parseTextWithResult(<#
+    declare function Q() : Q.A;
+    declare module Q {
+      export class A {
+      }
+    }
     #>);
 
-    def parse(dir)
+    def parse(dir : string) : void
     {
       try
       {
@@ -64,8 +69,8 @@ module Program
       }
     }
     
-    parse("ScriptsLib");
-    parse("Scripts");
+    //parse("ScriptsLib");
+    //parse("Scripts");
     
     WriteLine("Press any key to continue");
     _ = ReadKey();
