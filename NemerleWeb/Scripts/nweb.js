@@ -30,7 +30,7 @@ var nweb = {
       "nw-enable": nweb.getEnableBinding,
       "nw-click": nweb.getClickBinding,
       "nw-submit": nweb.getSubmitBinding,
-      "nw-events": nweb.getEventsBinding,
+      "nw-apply": nweb.getEventsBinding,
       "nw-event": nweb.getEventBinding
     };
     return binds[name];

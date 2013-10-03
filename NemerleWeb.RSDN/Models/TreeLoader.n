@@ -48,7 +48,7 @@ namespace NemerleWeb.Rsdn
           );
         }
       }
-      
+            
       _tree = readNodes(XDocument.Parse(xml).Root, 0);
       _leaves = _tree.Children.SelectMany(c => GetLeaves(c, [])).ToArray();
     }

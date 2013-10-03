@@ -319,6 +319,9 @@
     <Content Include="Scripts\deprecated.js">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\splitter.js">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

@@ -23,7 +23,9 @@ namespace NemerleWeb.Rsdn
     
     ActiveNodes : list[TreeNode] { get; set; }
     SelectedUrl : string { get; set; }
-
+    
+    mutable _splitterAdded : bool;
+    
     public this() 
     {
       MainPage.Instance = this;
@@ -35,8 +37,15 @@ namespace NemerleWeb.Rsdn
       Search = Search();
                        
       UpdatePinned();
+      
+      _ = jscall jQuery(window).resize(_ => {
+        when(window.outerWidth < 500) {
+          js <# $(".page").splitterSetOption("sizeLeft", window.outerWidth).trigger("resize") #>
+        }
+        null;
+      });
     }
-    
+        
     public LoadTopNodes() : void
     {
       server.GetTopNodes(nodes => {
@@ -93,6 +102,10 @@ namespace NemerleWeb.Rsdn
       
       SelectedUrl = "http://www.rsdn.ru" + node.Href;
       ActiveNodes = node :: getAllParents(node);
+      
+      when(window.innerWidth < 800) {
+        js <# $(".page").trigger("dock"); #>;
+      }
     }
     
     public IsActiveNode(node : TreeNode) : bool 
@@ -105,7 +118,7 @@ namespace NemerleWeb.Rsdn
     {
       <#
         <div class="page">
-          <div class="left">          
+          <div class="left">
             <div $when(Root != null) class="root">
               <div template="$(template(Search))" />
               <div $when(string.IsNullOrEmpty(Search.SearchTerm))>

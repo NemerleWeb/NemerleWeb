@@ -8,7 +8,7 @@
     <script src="@Url.Action("NemerleWebJs", "NemerleWebResource")" type="text/javascript"></script>
 	<script src="~/Scripts/deprecated.js" type="text/javascript"></script>
     <script src="~/Scripts/jquery.cookie.js" type="text/javascript"></script>
-    <script src="~/Scripts/jquery.splitter.js" type="text/javascript"></script>
+    <script src="~/Scripts/splitter.js" type="text/javascript"></script>
     <script src="/signalr/hubs" type="text/javascript"></script>
 </head>
     <body>
@@ -19,11 +19,13 @@
             $(function() {
                 $(".page").splitter({
                     type: "v",
-                    sizeLeft: 100,
-                    dock: "left",
-                    cookie: "rsdn-docksplitter",
+                    sizeLeft: 300,
+                    dock: true,
                     dockKey: 'Z',
-                    accessKey: 'I'
+                    cookie: "rsdn-docksplitter",
+                    //accessKey: 'I',
+                    splitbarKey: 'I',
+                    resizeToWidth: true
                 });
             });
         </script>
