@@ -161,7 +161,7 @@ namespace NemerleWeb
     private GenerateRestAmbient(typesScope : GlobalEnv, ambient : AmbientDeclaration) : void
     {
       // Create module
-      def membersScope = GetTypeBuilder(typesScope);
+      def membersScope = GetMembersScope(typesScope);
       
       match(ambient)
       {
@@ -181,7 +181,7 @@ namespace NemerleWeb
       def moduleScope = typesScope.EnterIntoNamespace(@module.Name.SplitDot());
       
       // Create module
-      def membersScope = GetTypeBuilder(moduleScope);
+      def membersScope = GetMembersScope(moduleScope);
       
       foreach (member in @module.Members)
       {
@@ -355,8 +355,9 @@ namespace NemerleWeb
       
       def typeParameters = ConvertTypeParameters(signature.TypeParameters);
     
+      def escapedName = JSApiSpecial.JSEscapeName(name);
       membersScope.DefineMemberPublicNew(
-        <[ decl: $(name : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
+        <[ decl: $(escapedName : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
     
     // TODO: Remove
@@ -492,9 +493,10 @@ namespace NemerleWeb
       
       def typeParameters = ConvertTypeParameters(method.Signature.TypeParameters);
     
+      def escapedName = JSApiSpecial.JSEscapeName(method.Name);
       CreateClassMember(
         membersScope,
-        <[ decl: $(method.Name : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>,
+        <[ decl: $(escapedName : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>,
         method.Access,
         method.Static);
     }
@@ -671,12 +673,12 @@ namespace NemerleWeb
           mutable lambdaParams = GetParametersType(membersScope, value.Parameters, prefix);
           def type =
             if(value.ReturnType is ScriptType.Void())
-              <[ System.Action ]>
+              <[ Nemerle.Builtins.FunctionVoid ]>
             else
             {
               lambdaParams = lambdaParams.Concat(
                 [ConvertType(membersScope, value.ReturnType, prefix)]);
-              <[ System.Func ]>
+              <[ Nemerle.Builtins.Function ]>
             };
           
           <[ $type.[..$lambdaParams] ]>
@@ -758,7 +760,7 @@ namespace NemerleWeb
     
     #region Helpers
     
-    public GetTypeBuilder(globalEnv : GlobalEnv) : TypeBuilder
+    public GetMembersScope(globalEnv : GlobalEnv) : TypeBuilder
     { 
       def moduleName = globalEnv.CurrentNamespace.PartName;
       def parent = globalEnv.Manager.CoreEnv.EnterIntoNamespace(globalEnv.CurrentNamespace.Parent);

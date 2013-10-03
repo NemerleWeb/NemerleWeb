@@ -343,12 +343,6 @@
     <Content Include="ScriptsLib\lib.d.ts">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="ScriptsLib\winjs.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="ScriptsLib\winrt.d.ts">
-      <SubType>Content</SubType>
-    </Content>
     <Content Include="Scripts\typings\ace\ace.d.ts">
       <SubType>Content</SubType>
     </Content>
