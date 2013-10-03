@@ -3,12 +3,9 @@ It uses reactive data model which allows creating rich internet applications.
 
 ##New to NemerleWeb ?
 
-Read [tutorial](https://docs.google.com/document/d/1-6O562WH7XCpILAP_4j0RGpB7VV4nV01ZK2brQiWf_Q/edit).
-It is not complete yet. Feel free to comment.
+http://www.nemerleweb.com
 
-Watch samples on [Demo site](http:/nemerlewebsamples.apphb.com/), and [tests](http://nemerlewebtests.apphb.com/)
-
-Currently there is no documentation wiki, you are free to help us.
+The site contains all you need: tutorial and samples.
 
 ##Downloading or building NemerleWeb
 
