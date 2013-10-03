@@ -585,7 +585,7 @@ namespace NemerleWeb
       def convert(p : ScriptTypeParameter) : PT.Splicable
       {
         def realName = if(p.Name != "void") p.Name else UnitClass;
-        PT.Splicable.Name(<[ $(Name(realName) : name) ]>)  
+        PT.Splicable.Name(<[ $(Name(realName) : name) ]>)
       }
       
       typeParameters.Select(p => convert(p)).NToList()
@@ -713,7 +713,7 @@ namespace NemerleWeb
         <[ array[$realType] ]>
       | Ref("Function", []) =>
         // TODO: Support local Function type
-        <[ Nemerle.Builtins.FunctionBase ]>
+        <[ void -> void ]>
       | Ref(name, tyArgs) => 
         def typeArgumentPrefix = string.Join(Separator, prefix, TypeArgument);
         def realTypeArguments = ConvertTypeArguments(membersScope, tyArgs, typeArgumentPrefix);
