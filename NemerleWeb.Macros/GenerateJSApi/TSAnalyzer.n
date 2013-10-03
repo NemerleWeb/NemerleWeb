@@ -79,6 +79,8 @@ namespace NemerleWeb
           .Select(i => DeclarationElement.InterfaceDeclaration(i))
           
       | [type, ambientType] when type.Equals(typeof(DeclarationElement.AmbientDeclaration)) =>
+        def ambientGroup = typeAndNameGroup.Cast.[DeclarationElement.AmbientDeclaration]().Select(v => v.Value);
+      
         match(ambientType)
         {
         | type when type.Equals(typeof(AmbientDeclaration.VariableDeclaration)) =>
@@ -86,9 +88,12 @@ namespace NemerleWeb
           //AnalyzeInterface(typeAndNameGroup.Cast.[TSGlobal.Interface]())
       
         | type when type.Equals(typeof(AmbientDeclaration.FunctionDeclaration)) =>
-          [typeAndNameGroup.First()]
-          //AnalyzeModule(typeAndNameGroup.Cast.[TSGlobal.Module]())
-        
+          AnalyzeFunction(
+            ambientGroup
+              .Cast.[AmbientDeclaration.FunctionDeclaration]()
+              .Select(a => a.Value))
+            .Select(f => DeclarationElement.AmbientDeclaration(AmbientDeclaration.FunctionDeclaration(f)))
+          
         | type when type.Equals(typeof(AmbientDeclaration.ClassDeclaration)) =>
           [typeAndNameGroup.First()]
           //AnalyzeEnum(typeAndNameGroup.Cast.[TSGlobal.Enum]())
@@ -139,6 +144,22 @@ namespace NemerleWeb
       def @type = ScriptType.Object(members);
         
       yield InterfaceDeclaration(name, typeParameters, extends, @type)
+    }
+    
+     
+    /// <summary>
+    /// Select all dictinct function overloads
+    /// </summary>
+    private AnalyzeFunction(ast : IEnumerable[AmbientFunctionDeclaration]) : IEnumerable[AmbientFunctionDeclaration]
+    {
+      def name = ast.First().Name;
+      
+      def ret = ast
+        .Select(f => AmbientFunctionDeclaration(name, f.Signature));
+        //.Distinct();
+      // ;
+        
+      ret
     }
     
    #if A
