@@ -25,7 +25,10 @@ module Program
     def result = NWeb Test();
     
     foreach (s in NWebData.GetAllScriptNames())
+    {
       WriteLine(NWebData.GetScript(s));
+      WriteLine(NWebData.GetLambdasScript(s));
+    }    
     
     WriteLine(result);
     _ = Console.ReadKey();
@@ -34,7 +37,12 @@ module Program
 
 [Unit]
 public class Test
-{  
+{
+  public F() : void
+  {
+    Sammy( () => {} );
+  }
+  
   [Html]
   public View() : string
   {

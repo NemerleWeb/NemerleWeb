@@ -35,9 +35,6 @@ namespace NemerleWeb
     {
       def jsApiRoot = typer.Env.EnterIntoNamespace(root.SplitDot());
       
-      // Predefined types
-      GeneratePredefined(jsApiRoot);
-      
       // First generate all types
       GenerateTypes(jsApiRoot, tsAst);
       
@@ -46,15 +43,6 @@ namespace NemerleWeb
       
       // Then generate the rest: variables, functions...
       GenerateRest(jsApiRoot, tsAst);
-    }
-    
-    /// <summary>
-    /// Define some predefined types:
-    /// * $Unit - a simple type for faking void types in generics.
-    /// </summary>
-    private GeneratePredefined(typesScope : GlobalEnv) : void
-    {
-      typesScope.Define(<[ decl: [JSApi] public class $(UnitClass : usesite) {} ]>).Compile();
     }
     
     #endregion

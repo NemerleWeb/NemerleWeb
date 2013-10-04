@@ -1,0 +1,36 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+/// <summary>
+/// Declares some predefined Javascript types.
+/// </summary>
+
+namespace NemerleWeb
+{
+  // Define 'undefined' variable using special class
+  [JSApi]
+  public sealed class __Undefined__
+  {
+    public static @:[T](_ : this) : T
+    {
+      throw ClientCodeCalledInServerException();
+    }
+  }
+  
+  [JSApi]
+  public sealed class __Unit__
+  {
+  }
+}
+
+[NemerleWeb.JSApi]
+public module NemerleWeb
+{
+  public static undefined : __Undefined__;
+}

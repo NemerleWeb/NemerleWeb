@@ -69,9 +69,6 @@
     <Content Include="ScriptsLib\nweb.d.ts">
       <SubType>Code</SubType>
     </Content>
-    <Compile Include="Undefined.n">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ScriptsLib" />

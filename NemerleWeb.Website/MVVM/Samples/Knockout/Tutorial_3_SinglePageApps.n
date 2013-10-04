@@ -36,7 +36,7 @@ namespace NemerleWeb.Samples
       
     public this() 
     {
-      Folders = ["Inbox", "Archive", "Sent", "Spam"].ToList();            
+      Folders = ["Inbox", "Archive", "Sent", "Spam"].ToList();   
       js <#
           Sammy(function() {
               this.get("#spa/:folder", function() {

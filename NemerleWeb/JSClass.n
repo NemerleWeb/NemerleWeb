@@ -31,7 +31,7 @@ namespace NemerleWeb
   /// Defines settings for JSclass 
   internal module JSClassSettings
   {
-    public JSApiRoots : SortedSet[string] = SortedSet(InvertedComparer());
+    public JSApiRoots : SortedSet[string] = SortedSet(["NemerleWeb"], InvertedComparer());
   }
   
   [Record(NotNull = [".*"])]
@@ -41,7 +41,7 @@ namespace NemerleWeb
       public Indent : string    { get; }      
       public Typer : Typer { get; }
       
-      // HACK for using types from JSClass
+      // HACK: for using types from JSClass
       #region Types
       public static StringType : TypeVar { get; set; }
       public static IEnumerableType : TypeVar { get; set; }        
