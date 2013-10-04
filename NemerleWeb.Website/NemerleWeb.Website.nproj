@@ -241,6 +241,9 @@
     <Compile Include="Properties\AssemblyInfo.n" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\prettify.css">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Compile Include="MVVM\Samples\NameListCSharpPage.cs">
