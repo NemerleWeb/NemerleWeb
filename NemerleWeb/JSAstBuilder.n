@@ -78,7 +78,7 @@ namespace NemerleWeb
                     ])
         }
       | Delayed                           => JSAst.NotImpl("Delayed")
-      | Error                             => Message.Error(expr.Location, "Error not implemented"); JSAst.NotImpl("Error")
+      | Error                             => Message.Error(expr.Location, "Error in the code"); JSAst.NotImpl("Error")
       | EventMember                       => Message.Error(expr.Location, "EventMember not implemented"); JSAst.NotImpl("EventMember")
       | FieldMember(obj, fld)             => JSKnownMembers.ConvertField(obj, fld, build)
       | FieldOf                           => Message.Error(expr.Location, "FieldOf not implemented"); JSAst.NotImpl("FieldOf")

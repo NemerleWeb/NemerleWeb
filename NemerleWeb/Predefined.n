@@ -13,11 +13,27 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  // Define 'undefined' variable using special class
+  /// <summary>
+  /// Class for 'undefined'
+  /// Can be converted to anything.
+  /// </summary>
   [JSApi]
   public sealed class __Undefined__
   {
     public static @:[T](_ : this) : T
+    {
+      throw ClientCodeCalledInServerException();
+    }
+  }
+
+  /// <summary>
+  /// Class for real 'this' in javascript code
+  /// Since this is object, it can be converted only to classes or interfaces.
+  /// </summary>
+  [JSApi]
+  public sealed class __JSThis__
+  {
+    public static @:[T](_ : this) : T where T : class
     {
       throw ClientCodeCalledInServerException();
     }
@@ -33,4 +49,6 @@ namespace NemerleWeb
 public module NemerleWeb
 {
   public static undefined : __Undefined__;
+  
+  public static jsthis : __JSThis__;
 }

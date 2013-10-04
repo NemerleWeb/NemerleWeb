@@ -48,6 +48,8 @@ namespace NemerleWeb
     /// </summary>
     public Dollar = "__DOLLAR__"; 
     
+    public JSThis = "jsthis";
+    
     public JSEscapeName(name : string) : string
     {
       name.Replace("$", Dollar)

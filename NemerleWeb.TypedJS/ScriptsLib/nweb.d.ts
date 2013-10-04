@@ -6,6 +6,7 @@ declare module nweb {
     function removeCookie(name : string) : void ;
 
     module utils {
-        function areArraysEqual<TL, TR>(l : Array<TL>, r : Array<TR>) : boolean;
+        function areArraysEqual<TL, TR>(l: Array<TL>, r: Array<TR>): boolean;
+        function toTypedObject(obj: any): any;
     }
 }

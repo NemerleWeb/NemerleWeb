@@ -301,8 +301,8 @@ namespace NemerleWeb
           public override Write(indent = "" : string) : string {            
             match(this)
             {
-            | DefValue(name, Void) => indent + $<#var $(name.Replace(".", "_"))#>
-            | DefValue(name, val)  => indent + $<#var $(name.Replace(".", "_")) = $(val.Write())#>
+            | DefValue(name, Void) => indent + $<#var $(GetJSName(name))#>
+            | DefValue(name, val)  => indent + $<#var $(GetJSName(name)) = $(val.Write())#>
             }
           }
           public override Transform() : JSAst
@@ -355,7 +355,7 @@ $(indent)}#>
           
             public override Write(_ = "" : string) : string
             {
-                Member
+              GetDefinedJSName(Member)
             }
           }
         | Goto           { LabelId : string;
@@ -536,14 +536,19 @@ $(Body.Write(indent + "  "))
               }
             }
         }
-        | LocalRef       { Name : string; Type : option[TypeVar];
-            public override Write(_ = "" : string) : string {
-                $<#$(Name.Replace(".", "_"))#>
+        | LocalRef       
+          {
+            Name : string;
+            Type : option[TypeVar];
+            
+            public override Write(_ = "" : string) : string
+            {
+              GetDefinedJSName(Name)
             }
-        }
+          }
         | ParamRef       { Name : string; Type : option[TypeVar];
             public override Write(_ = "" : string) : string {
-                $<#$(Name.Replace(".", "_")).value#>
+                $<#$(GetDefinedJSName(Name)).value#>
             }
         }
         | MethodRef
@@ -587,7 +592,7 @@ $(Body.Write(indent + "  "))
             public override Write(_ = "" : string) : string 
             {
               def type = if (Type.IsEmpty()) "" else $"$Type.";
-              $"$type$Member"
+              $"$type$(GetDefinedJSName(Member))"
             }
           }
         | FieldRef       { Obj : JSAst; Parameter : string;
@@ -798,6 +803,14 @@ $(indent)}
             }
         }
         
+        | Error
+          {
+            public override Write(_ = "" : string) : string
+            {
+              <# Error in the code #>
+            }
+          }
+        
         public abstract Write(_indent = "" : string) : string { string.Empty; };
         public virtual Transform() : JSAst { this }        
         public static AllowedForAssignment : HashSet[Type] =
@@ -846,6 +859,7 @@ $(indent)}
             | Continue(loopname)          => JSAst.Continue(loopname)            
             | DefValue(name, val)         => JSAst.DefValue(name, recurse(val))
             | Delete                      => ast'
+            | Error                       => ast'
             | FieldRef(obj, parm)         => JSAst.FieldRef(recurse(obj), parm)
             | For(it, coll, body)         => JSAst.For(it, recurse(coll), recurse(body))
             | Function(name, ps, bdy)     => JSAst.Function(name, ps.Map(recurse), recurse(bdy))            
@@ -896,6 +910,16 @@ $(indent)}
         private IsAllowedForAssignment(ast : JSAst) : bool
         {
           AllowedForAssignment.Contains(ast.GetType())
+        }
+        
+        private GetJSName(name : string) : string
+        {
+          name.Replace('.', '_')
+        }
+        
+        private GetDefinedJSName(name : string) : string
+        {
+          if(name == JSApiSpecial.JSThis) "this" else GetJSName(name)
         }
     }
 }
