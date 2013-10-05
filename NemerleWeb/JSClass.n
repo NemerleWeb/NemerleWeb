@@ -149,7 +149,8 @@ namespace NemerleWeb
         def properTypeName = GetProperName(ClassType);
         def parentPtr = "this";
         def bodyIndent = Indent + "  ";
-        def properties = GetProperties(bodyIndent, parentPtr, meta);        
+        def properties = GetProperties(bodyIndent, parentPtr, meta);
+        def definedProperties = GetDefinedProperties(bodyIndent, parentPtr, meta);
         def staticProperties = GetStaticProperties(Indent, meta);        
         def fields = GetFields(bodyIndent, parentPtr, meta);        
         def staticFields = GetStaticFields(Indent);
@@ -157,6 +158,7 @@ namespace NemerleWeb
         def callConstrutor = GetCallConstructor(bodyIndent);
         def staticConstructorBody = GetStaticConstructorBody(Indent);
         def methods = GetMethods(bodyIndent, parentPtr, true);
+        def definedMethods = GetDefinedMethods(bodyIndent, parentPtr, true);
         def staticMethods = GetStaticMethods(Indent);
         def nestedClassesString = GenerateNestedClasses();
         
@@ -186,8 +188,8 @@ $properties
 $methods
 $fields
 $callConstrutor
-$properties
-$methods
+$definedProperties
+$definedMethods
 {{{SignalR}}}
 $(meta.WriteToJS(Indent))
 $returning
@@ -199,39 +201,40 @@ $staticConstructorBody
 #>
       }
       
-      GenerateProperties(indent : string, parentPtr : string, properties : IEnumerable[IProperty], meta : JSClassMeta) : string 
+      GenerateProperties(indent : string, parentPtr : string, properties : IEnumerable[IProperty], meta : JSClassMeta, generate : bool) : string 
       {
         def propStrings = properties.Select(p =>
           {
             when (p.IsIndexer)
               Message.Error(p.Location, $"Indexed properties are not supported, $p");
             
-            meta.Properties.Add(JSClassMemberMeta(p.Name, p.GetModifiers()
-                                                           .CustomAttributes
-                                                           .Select(a => a.ToString())
-                                                           .ToList()));
-              
+            when(generate)
+              meta.Properties.Add(
+                JSClassMemberMeta(
+                  p.Name,
+                  p.GetModifiers().CustomAttributes.Select(a => a.ToString()).ToList()));
+            
             def sb = StringBuilder();
             
-            when (p.GetGetter() != null)
+            def addProperty(prop, prefix : string, value : string) : void
             {
-              def getterBody = TranslateMethodBody(p.GetGetter(), indent + "  ");
+              def body = TranslateMethodBody(prop, indent + "  ");
+              
+              _ = sb.Append(
+                $"$indent$parentPtr.$(prefix)_$(p.Name) = $parentPtr.$(prefix)_$(p.Name)$(DefinedSuffix)");
+
               _ = sb.AppendLine(
-$<#$indent$parentPtr.get_$(p.Name) = function() {
+                if(generate)
+$<#= function($value) {
 $(indent)  var self = this;
-$getterBody
-$indent};#>);
+$body
+$indent};#>
+                else
+                  ";");
             }
-          
-            when (p.GetSetter() != null)
-            {
-              def setterBody = TranslateMethodBody(p.GetSetter(), indent + "  ");
-              _ = sb.AppendLine(
-$<#$indent$parentPtr.set_$(p.Name) = function(value) {
-$(indent)  var self = this;
-$setterBody
-$indent};#>);
-            }
+            
+            when (p.GetGetter() != null) addProperty(p.GetGetter(), "get", "");
+            when (p.GetSetter() != null) addProperty(p.GetSetter(), "set", "value");
             
             sb.ToString()
           });
@@ -241,12 +244,17 @@ $indent};#>);
       
       GetProperties(indent : string, parentPtr : string, meta : JSClassMeta) : string
       {
-        GenerateProperties(indent, parentPtr, Properties, meta)
+        GenerateProperties(indent, parentPtr, Properties, meta, true)
+      }
+      
+      GetDefinedProperties(indent : string, parentPtr : string, meta : JSClassMeta) : string
+      {
+        GenerateProperties(indent, parentPtr, Properties, meta, false)
       }
       
       GetStaticProperties(indent : string, meta : JSClassMeta) : string 
       {
-        GenerateProperties(indent, GetProperName(ClassType), StaticProperties, meta)
+        GenerateProperties(indent, GetProperName(ClassType), StaticProperties, meta, true)
       }
       
       FieldValue(field : IField) : string
@@ -396,7 +404,7 @@ $indent#>
             ""
       }
       
-      GenerateMethods(indent : string, parentPtr : string, hasSelf : bool, methods : IEnumerable[IMethod]) : string
+      GenerateMethods(indent : string, parentPtr : string, hasSelf : bool, methods : IEnumerable[IMethod], generate : bool) : string
       {
         def self = if(hasSelf) "" else "var self = this;";
         def methodParms(method) { method.GetParameters().Select(p => p.Name); }
@@ -410,9 +418,18 @@ $indent#>
           def methodVariable =
             if (generatedMethods.ContainsKey(m.Name)) ""
             else
-              $<#$(indent)$parentPtr.$(m.Name) = {};#>;
+            {
+              if(generate)
+              {
+                $<#$(indent)$parentPtr.$(m.Name) = {};
+$(indent)$parentPtr.$(m.Name)$DefinedSuffix = {};#>;
+              }
+              else
+                ""
+            }
           
           def methodWithSignature = JSAstHelper.Method(m.Name, Some(m.Header.Parameters));
+          def definedMethodWithSignature = JSAstHelper.Method(m.Name + DefinedSuffix, Some(m.Header.Parameters));
           
           if (generatedMethods.ContainsKey(m.Name))
           {
@@ -428,12 +445,17 @@ $indent#>
               generatedMethods.Add(m.Name, Some(methodWithSignature))
           }
           
+          def defineMethod = $"$(indent)$parentPtr.$methodWithSignature = $parentPtr.$definedMethodWithSignature";
+          
           if (!m.IsAbstract)
+            if(generate)
 $<#$methodVariable
-$(indent)$parentPtr.$methodWithSignature = function(..$(methodParms(m))) {
+$defineMethod = function(..$(methodParms(m))) {
 $(indent)  $self
 $(TranslateMethodBody(m, indent + "  "))
 $(indent)}#>
+          else
+            $"$defineMethod;"
         else
           ""
         });
@@ -452,12 +474,17 @@ $(indent)}#>
         
       GetMethods(indent : string, parentPtr : string, hasSelf : bool) : string 
       {
-        GenerateMethods(indent, parentPtr, hasSelf, Methods)
+        GenerateMethods(indent, parentPtr, hasSelf, Methods, true)
+      }
+      
+      GetDefinedMethods(indent : string, parentPtr : string, hasSelf : bool) : string 
+      {
+        GenerateMethods(indent, parentPtr, hasSelf, Methods, false)
       }
       
       GetStaticMethods(indent : string) : string 
       {
-        GenerateMethods(indent, GetProperName(ClassType), false, StaticMethods)
+        GenerateMethods(indent, GetProperName(ClassType), false, StaticMethods, true)
       }
       
       GenerateNestedClasses() : string
@@ -537,6 +564,8 @@ $(indent)}#>
                .Where(m => !(m.Name.StartsWith("_N__") && m.Name.EndsWith("____")))
       }
       
+      private static DefinedSuffix = "$$";
+      
       public class JSClassMeta
       {
         public Properties : List[JSClassMemberMeta];
@@ -557,7 +586,7 @@ $(indent)    properties: [..$(Properties; ","; _.Write())],
 $(indent)    fields:     [..$(Fields;     ","; _.Write())],
 $(indent)    methods:    [..$(Methods;    ","; _.Write())]
 $(indent)  };#>;
-        }
+        }        
       }
         
       [Record]
