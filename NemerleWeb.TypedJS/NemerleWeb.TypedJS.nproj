@@ -69,6 +69,30 @@
     <Content Include="ScriptsLib\nweb.d.ts">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="Scripts\typings\appframework\appframework.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\cometd\cometd.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\giraffe\giraffe.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\knockout.mapper\knockout.mapper.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\mCustomScrollbar\mCustomScrollbar.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\titanium\titanium.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\when\when.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\zeroclipboard\zeroclipboard.d.ts">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ScriptsLib" />
@@ -79,6 +103,7 @@
     <Folder Include="Scripts\typings\amcharts\" />
     <Folder Include="Scripts\typings\amplifyjs\" />
     <Folder Include="Scripts\typings\angularjs\" />
+    <Folder Include="Scripts\typings\appframework\" />
     <Folder Include="Scripts\typings\arbiter\" />
     <Folder Include="Scripts\typings\async\" />
     <Folder Include="Scripts\typings\azure-mobile-services-client\" />
@@ -107,6 +132,7 @@
     <Folder Include="Scripts\typings\chrome\" />
     <Folder Include="Scripts\typings\codemirror\" />
     <Folder Include="Scripts\typings\colors\" />
+    <Folder Include="Scripts\typings\cometd\" />
     <Folder Include="Scripts\typings\commander\" />
     <Folder Include="Scripts\typings\convert-source-map\" />
     <Folder Include="Scripts\typings\crossroads\" />
@@ -142,6 +168,7 @@
     <Folder Include="Scripts\typings\gapi.youtubeAnalytics\" />
     <Folder Include="Scripts\typings\gapi.youtube\" />
     <Folder Include="Scripts\typings\gapi\" />
+    <Folder Include="Scripts\typings\giraffe\" />
     <Folder Include="Scripts\typings\gldatepicker\" />
     <Folder Include="Scripts\typings\globalize\" />
     <Folder Include="Scripts\typings\goJS\" />
@@ -219,6 +246,7 @@
     <Folder Include="Scripts\typings\knockout.deferred.updates\" />
     <Folder Include="Scripts\typings\knockout.editables\" />
     <Folder Include="Scripts\typings\knockout.es5\" />
+    <Folder Include="Scripts\typings\knockout.mapper\" />
     <Folder Include="Scripts\typings\knockout.mapping\" />
     <Folder Include="Scripts\typings\knockout.postbox\" />
     <Folder Include="Scripts\typings\knockout.validation\" />
@@ -235,6 +263,7 @@
     <Folder Include="Scripts\typings\logg\" />
     <Folder Include="Scripts\typings\marionette\" />
     <Folder Include="Scripts\typings\marked\" />
+    <Folder Include="Scripts\typings\mCustomScrollbar\" />
     <Folder Include="Scripts\typings\meteor\" />
     <Folder Include="Scripts\typings\mocha\" />
     <Folder Include="Scripts\typings\modernizr\" />
@@ -301,6 +330,7 @@
     <Folder Include="Scripts\typings\teechart\" />
     <Folder Include="Scripts\typings\threejs\" />
     <Folder Include="Scripts\typings\through\" />
+    <Folder Include="Scripts\typings\titanium\" />
     <Folder Include="Scripts\typings\toastr\" />
     <Folder Include="Scripts\typings\trunk8\" />
     <Folder Include="Scripts\typings\tween.js\" />
@@ -316,6 +346,7 @@
     <Folder Include="Scripts\typings\vimeo\" />
     <Folder Include="Scripts\typings\webaudioapi\" />
     <Folder Include="Scripts\typings\webrtc\" />
+    <Folder Include="Scripts\typings\when\" />
     <Folder Include="Scripts\typings\winjs\" />
     <Folder Include="Scripts\typings\winrt\" />
     <Folder Include="Scripts\typings\youtube\" />
@@ -452,6 +483,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\chosen\chosen.jquery.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\typings\chrome\chrome-app.d.ts">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\chrome\chrome.d.ts">
@@ -1169,9 +1203,6 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\typings\zepto\zepto.d.ts">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\typings\zeroclipboard\zeroclipboard.d.ts">
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>
