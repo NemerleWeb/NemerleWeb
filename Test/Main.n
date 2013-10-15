@@ -38,9 +38,17 @@ module Program
 [Unit]
 public class Test
 {
-  public F() : void
+  public Tester(f : void -> int) : void{}
+  
+  public Run() : void
   {
-    Sammy( () => {} );
+    Tester( () => {
+      def a = 1;
+      
+      def g = x => a + x;
+      
+      g(1)
+    } );
   }
   
   [Html]
@@ -48,8 +56,6 @@ public class Test
   {
     <# 
        <div>
-        <div></div>
-        <div></div>
        </div>
     #>
   }

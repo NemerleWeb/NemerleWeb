@@ -48,7 +48,16 @@ namespace NemerleWeb
       public static IPageType : TypeVar { get; set; }
       public static ObjectType : TypeVar { get; set; }
       #endregion
-                    
+      
+      public static Self : string = "_NW$_self";
+      public static LambdaMarker : string = "_NW$_lambda";
+      
+      /// <summary>
+      /// Initialize self either by this or by empty object for lambdas.
+      /// </summary>
+      public static SelfInit : string =
+        $<#var $Self = (typeof this.$LambdaMarker === "undefined") ? this : {};#>;
+      
       public Fields : IEnumerable[IField]
       {
         [Memoize]
@@ -147,7 +156,7 @@ namespace NemerleWeb
       {
         def meta = JSClassMeta();
         def properTypeName = GetProperName(ClassType);
-        def parentPtr = "this";
+        def parentPtr = Self;
         def bodyIndent = Indent + "  ";
         def properties = GetProperties(bodyIndent, parentPtr, meta);
         def definedProperties = GetDefinedProperties(bodyIndent, parentPtr, meta);
@@ -169,12 +178,12 @@ namespace NemerleWeb
 /*<#return function() {
 return self.apply.apply(self, arguments);
 }#>*/
-<#return self.apply;#>
+$<#return $Self.apply;#>
         | "FunctionVoid" => bodyIndent + 
 /*<#return function() {
 return self.apply_void.apply(self, arguments);
 }#>*/
-<#return self.apply_void;#>
+$<#return $Self.apply_void;#>
         | _ => ""
         };
 
@@ -183,7 +192,7 @@ $nestedClassesString
 $(Indent)var $properTypeName$$ctor = {};
 $constructorsBody
 $(Indent)function $properTypeName() {
-$(bodyIndent)var self = this;
+$(bodyIndent)$SelfInit
 $properties
 $methods
 $fields
@@ -226,7 +235,7 @@ $staticConstructorBody
               _ = sb.AppendLine(
                 if(generate)
 $<#= function($value) {
-$(indent)  var self = this;
+$(indent)  $SelfInit
 $body
 $indent};#>
                 else
@@ -360,7 +369,7 @@ $indent};#>
               def makeBody(body)
               {
                 $<#
-$(bodyIndent)var self = this;
+$(bodyIndent)$SelfInit
 $body
 $indent#>
               }
@@ -372,7 +381,7 @@ $indent#>
                   if (ctor.Header.Parameters is [] && JSClassHelper.HasBase(ClassType))
                   {
                     def baseName = GetProperName(ClassType.BaseType.FullName);
-                    makeBody($<#$bodyIndent$baseName.call(self, "");#>)
+                    makeBody($<#$bodyIndent$baseName.call($Self, "");#>)
                   }
                   else
                     ""
@@ -406,7 +415,7 @@ $indent#>
       
       GenerateMethods(indent : string, parentPtr : string, hasSelf : bool, methods : IEnumerable[IMethod], generate : bool) : string
       {
-        def self = if(hasSelf) "" else "var self = this;";
+        def self = if(hasSelf) "" else SelfInit;
         def methodParms(method) { method.GetParameters().Select(p => p.Name); }
         
         // Method name => signature
@@ -581,7 +590,7 @@ $(indent)}#>
         
         public WriteToJS(indent : string) : string
         {
-$<#$(indent)  this.__nweb_meta = {
+$<#$(indent)  $Self.__nweb_meta = {
 $(indent)    properties: [..$(Properties; ","; _.Write())],
 $(indent)    fields:     [..$(Fields;     ","; _.Write())],
 $(indent)    methods:    [..$(Methods;    ","; _.Write())]

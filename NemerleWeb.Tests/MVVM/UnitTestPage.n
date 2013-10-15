@@ -1673,8 +1673,19 @@ namespace NemerleWeb.Tests
       });
       
       test("server call should return XHR object", () => {
-        def xhr = server.A(res => ());
+        def xhr = server.A(_res => ());
+        xhr.abort();
         true
+      });
+      
+      test("original this in lambda", () => {
+        def testThis = _ => _ => {
+          def _this : NemerleWeb.TypedJS.Window = jsthis;
+          
+          _this.document != null
+        }
+        
+        testThis(1)(2)
       });
     }    
     

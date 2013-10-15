@@ -89,6 +89,8 @@ namespace NemerleWeb
             Fun : JSAst;
             Parameters : list[JSAst];
             
+            private static LambdaThis : string = $"{$(JSClass.LambdaMarker):0}";
+            
             public override Write(indent = "" : string) : string
             {
               def writeParam(p) { p.Write("") }
@@ -101,12 +103,27 @@ namespace NemerleWeb
                 | Call(OpCode as op, [e1, e2])         =>
                   $<#($(e1.Write("")) $(op.Write("")) $(e2.Write("")))#>
                 
-                | Call(Constructor(type, None), parms) => $<#new $(type)$(writeParams(parms))#>
-                | Call(Constructor(type, Some(paramsType)), parms) => 
+                | Call(Constructor(type, None), parms) =>
+                  def callParams = writeParamsRaw(parms);
+                
+                  if (!IsLambda(type))
+                    $<#new $(type)($callParams)#>
+                  else
+                  {
+                    def comma = if (parms is []) "" else ", ";
+                    $<#nweb.utils.createLambda($type, $LambdaThis$comma$callParams)#>
+                  }
+                  
+                | Call(Constructor(type, Some(paramsType)), parms) =>
                   def methodSignature = JSAstHelper.MethodSignature(paramsType);
                   def comma = if (parms is []) "" else ", ";
-                  $<#new $(type)($methodSignature$comma$(writeParamsRaw(parms)))#>
-                
+                  def callParams = $"$methodSignature$comma$(writeParamsRaw(parms))";
+                  
+                  if (!IsLambda(type))
+                    $<#new $(type)($callParams)#>
+                  else     
+                    $<#nweb.utils.createLambda($type, $LambdaThis, $callParams)#>
+                  
                 | Call(ConstructorRef(type, None), parms) =>
                   $<#$(type).call$(writeParams(JSAst.This() :: parms))#>
                 
@@ -703,7 +720,7 @@ $(indent)})#>
         }
         | This           {
             public override Write(_ = "" : string) : string {
-                "self"
+                JSClass.Self
             }
         }
         | Throw          { Obj : JSAst;
@@ -902,7 +919,7 @@ $(indent)}
             | WhileNamed(cnd, bdy, nme)   => JSAst.WhileNamed(recurse(cnd), recurse(bdy), nme)
             | Pack                        => ast'
             | Unpack                      => ast'
-            }
+            };
             
             if(topdown) result else selector(result, currentDepth)
         }
@@ -920,6 +937,11 @@ $(indent)}
         private GetDefinedJSName(name : string) : string
         {
           if(name == JSApiSpecial.JSThis) "this" else GetJSName(name)
+        }
+        
+        private IsLambda(type : string) : bool
+        {
+          type.Contains("__N__N_lambda__")
         }
     }
 }

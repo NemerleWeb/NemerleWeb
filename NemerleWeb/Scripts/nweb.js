@@ -44,7 +44,7 @@ var nweb = {
   applyBindings: function (model, el, bindings, loopStack, isInsideTemplate) {
     if (!el)
       throw "Argument null or undefined exception: el in applyBindings";
-    if(el.nodeType != 1)
+    if(el.nodeType !== 1)
       return;
     
     var attrs = nweb.utils.getElementAttributes(el);
@@ -65,7 +65,7 @@ var nweb = {
           var attrValue = attrs[i].nodeValue;
           
           if (nweb.doesAllowMultipleBindings(attrName)) {
-            var matches = attrValue.match(/<\[{.+?}\]>/g);
+            var matches = attrValue.match(/<\[\{.+?\}\]>/g);
             for (var k = 0; k < matches.length; k++) {
               var b = binder(model, el, bindings, loopStack, matches[k].substr(3, matches[k].length - 6));
               if (typeof b !== 'undefined')
@@ -213,7 +213,7 @@ var nweb = {
           eval(nweb.utils.makeAssignExpression(expr, "newVal"));
         });
       });
-    };
+    }
 
     $el.val(eval(expr));
     
@@ -255,7 +255,7 @@ var nweb = {
     var isExprTuple = false;
     var tupleDecls = [];
     
-    if (repeat[1].indexOf("{") == 0) {
+    if (repeat[1].indexOf("{") === 0) {
       isExprTuple = true;
       var tupleObj = JSON.parse(repeat[1]);
       for (var k in tupleObj)
@@ -276,7 +276,7 @@ var nweb = {
       getValue: function() {
           var ret = nweb.getParsedValue(model, expr, loopStack);
 
-          if (ret != undefined && ret != null && ret.toArray)
+          if (ret !== undefined && ret !== null && ret.toArray)
               return ret.toArray();
           else
               return ret;
@@ -309,7 +309,7 @@ var nweb = {
           
           
           binding.generatedEls.push($newEl);
-        };
+        }
       }
     };
     return binding;
@@ -382,7 +382,7 @@ var nweb = {
     return binding;
   },
   getUnlessBinding: function (model, el, bindings, loopStack, attrVal) {
-    return getWhenBinding(model, el, bindings, loopStack, attrVal, true);
+    return nweb.getWhenBinding(model, el, bindings, loopStack, attrVal, true);
   },
   getClickBinding: function(model, el, bindings, loopStack, attrVal) {
     var parsed = nweb.parseExpression(model, attrVal, loopStack);
@@ -451,7 +451,7 @@ var nweb = {
           index = indexEnd;
         }
       }
-    };
+    }
     return expr;
   },
   parseExpression: function(model, expr, loopStack) {
@@ -493,8 +493,8 @@ var nweb = {
   },
   eraseGeneratedElements: function (binding) {
     if(!!binding.generatedEls)
-      for (var j = 0; j < binding.generatedEls.length; j++)
-        binding.generatedEls[j].remove();
+      for (var i = 0; i < binding.generatedEls.length; i++)
+        binding.generatedEls[i].remove();
     if (!!binding.subBindings)
       for (var j = 0; j < binding.subBindings.length; j++)
         nweb.eraseGeneratedElements(binding.subBindings[j]);
@@ -523,11 +523,11 @@ var nweb = {
         var binding = bindings[i];
         var newValue = binding.getValue();
 
-        if(typeof newValue === 'undefined')
+        if (typeof newValue === 'undefined')
           continue;
 
-        if(nweb.utils.isArray(newValue)) {
-          if(!binding.oldValue || !nweb.utils.areArraysEqual(newValue, binding.oldValue)) {
+        if (nweb.utils.isArray(newValue)) {
+          if (!binding.oldValue || !nweb.utils.areArraysEqual(newValue, binding.oldValue)) {
             changeFound = true;
             binding.apply(newValue);
           }
@@ -541,11 +541,11 @@ var nweb = {
         }
 
         if (binding.subBindings) {
-          changeFound |= nweb.invalidate(binding.subBindings, indent + "  ", true);
+          changeFound = changeFound || nweb.invalidate(binding.subBindings, indent + "  ", true);
         }
       }
       //Repeat only on top level, so every binding will be invalidated exactly once per invalidation cycle
-    } while (changeFound && !selfCall) 
+    } while (changeFound && !selfCall); 
     
     return changeFound;
   },
@@ -646,11 +646,11 @@ nweb.utils = {
         return obj;
 
       var excludedFields = [];
-      var meta = obj["__nweb_meta"];
+      var meta = obj.__nweb_meta;
       if (meta !== null && typeof meta !== 'undefined') {
         for (var i = 0; i < meta.properties.length; i++) {
           var property = meta.properties[i];
-          if (property.attrs.indexOf("ClientOnly") != -1)
+          if (property.attrs.indexOf("ClientOnly") !== -1)
             excludedFields.push("get_" + property.name);
         }
         
@@ -754,6 +754,17 @@ nweb.utils = {
     },
     loadTemplate: function(modelName) {
       
+    },
+    
+    // Creates lambda and returns what the function returns.
+    // You can pass arguments to the constructor in the rest.
+    // Pay attention, second argument is starting object.
+    createLambda: function (func, res) {
+      res = (typeof res !== "undefined") ? res : {};
+      if (func.prototype !== null) {
+        res.__proto__ = func.prototype;
+      }
+      return func.apply(res, Array.prototype.slice.call(arguments, 2));
     }
 };
 
@@ -771,8 +782,8 @@ nweb.getCookie = function(name) {
   var ca = document.cookie.split(';');
   for (var i = 0; i < ca.length; i++) {
     var c = ca[i];
-    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-    if (c.indexOf(name + "=") == 0) return c.substring(name.length + 1, c.length);
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(name + "=") === 0) return c.substring(name.length + 1, c.length);
   }
   return null;
 };
@@ -783,7 +794,7 @@ nweb.removeCookie = function(name) {
 
 if (nweb["debugger"]) {
     nweb.utils.areArraysEqual = function(l, r) {
-        if (l.length != r.length)
+        if (l.length !== r.length)
             return false;
         return JSON.stringify(l) === JSON.stringify(r);
     };
@@ -842,7 +853,7 @@ Array.prototype.remove = function() {
     var what, ax;
     while (arguments.length && this.length) {
         what = arguments[--arguments.length];
-        while ((ax = this.indexOf(what)) != -1) {
+        while ((ax = this.indexOf(what)) !== -1) {
             this.splice(ax, 1);
         }
     }
@@ -862,7 +873,7 @@ if (!Array.prototype.indexOf) {
 
 // Implement Object.keys for browser which doesn't support
 Object.keys = Object.keys || (function () {
-    var hasOwnProperty = Object.prototype.hasOwnProperty,
+    var _hasOwnProperty = Object.prototype.hasOwnProperty,
         hasDontEnumBug = !{toString:null}.propertyIsEnumerable("toString"),
         DontEnums = [ 
             'toString', 'toLocaleString', 'valueOf', 'hasOwnProperty',
@@ -876,13 +887,13 @@ Object.keys = Object.keys || (function () {
 
         var result = [];
         for (var name in o) {
-            if (hasOwnProperty.call(o, name))
+          if (_hasOwnProperty.call(o, name))
                 result.push(name);
         }
 
         if (hasDontEnumBug) {
             for (var i = 0; i < DontEnumsLength; i++) {
-                if (hasOwnProperty.call(o, DontEnums[i]))
+              if (_hasOwnProperty.call(o, DontEnums[i]))
                     result.push(DontEnums[i]);
             }   
         }
@@ -1015,11 +1026,11 @@ System_Environment.get_NewLine = function() {
 
 nweb.collection = {
     areArrayEqual : function(arr1, arr2) {
-        if (arr1.length != arr2.length)
+        if (arr1.length !== arr2.length)
             return false;
 
         for (var i = 0; i < arr1.length; i++)
-            if (arr1[i] != arr2[i])
+            if (arr1[i] !== arr2[i])
                 return false;
 
         return true;
