@@ -110,6 +110,11 @@ namespace NemerleWeb
             ""
         }
         
+        def getSpliceNoNewLine()
+        {
+          getSplice().Replace("\r\n", "").Replace("\n", "")
+        }
+        
         match (xmlAst) {
         | Attr(name, Splicable.Expr as value)             => 
             match(name, value) {
@@ -133,29 +138,32 @@ namespace NemerleWeb
                 | <[ template($_model) ]> with view = <[ View ]>
                 | <[ template($_model, _.$view) ]>
                 | <[ template($_model, _.$view()) ]> => 
-                  def splice = getSplice();
-                  def p = regexp match(splice.Replace(System.Environment.NewLine, ""))
-                  {
-                  | <#self.template\((?<p>.+),.+#> => p
-                  | <#self.template\((?<p>.+).+#> => p
-                  | _ => Message.Error(pexpr.Location, $"Incorrect xml: $xmlAst"); ""
-                  };
+                  def splice = getSpliceNoNewLine();
+                  def p =
+                    regexp match(splice)
+                    {
+                    | @"_NW\$_self\.template\((?<p>.+),.+" => p
+                    | @"_NW\$_self\.template\((?<p>.+).+" => p
+                    | _ => Message.Error(pexpr.Location, $"Incorrect xml, template(model, _.view): $xmlAst"); ""
+                    };
                   $<#nweb.utils.getTemplateName($p, "$view"): $p#>
                 | <[ template(_.$model, $_r) ]> =>
-                  def splice = getSplice();
-                  def p = regexp match(splice.Replace(System.Environment.NewLine, ""))
-                  {
-                  | <#self.template\((.+),(?<p>.+)\)#> => p
-                  | _ => Message.Error(pexpr.Location, $"Incorrect xml: $xmlAst"); ""
-                  };
+                  def splice = getSpliceNoNewLine();
+                  def p =
+                    regexp match(splice)
+                    {
+                    | @"_NW\$_self\.template\((.+),(?<p>.+)\)" => p
+                    | _ => Message.Error(pexpr.Location, $"Incorrect xml, template(_.model, view): $xmlAst"); ""
+                    };
                   $<#nweb.utils.getTemplateName(self.$model, $p): self.$model#>
                 | <[ template($_model, $_r) ]> => 
-                  def splice = getSplice();
-                  def (p1, p2) = regexp match(splice)
-                  {
-                  | <#self.template\((?<p1>.+),(?<p2>.+)\)#> => (p1, p2)
-                  | _ => Message.Error(pexpr.Location, $"Incorrect xml: $xmlAst"); ("", "")
-                  };
+                  def splice = getSpliceNoNewLine();
+                  def (p1, p2) =
+                    regexp match(splice)
+                    {
+                    | @"_NW\$_self\.template\((?<p1>.+),(?<p2>.+)\)" => (p1, p2)
+                    | _ => Message.Error(pexpr.Location, $"Incorrect xml, template(model, view): $xmlAst"); ("", "")
+                    };
                   $<#nweb.utils.getTemplateName($p1, $p2): $p1#>
                 | _ => Message.FatalError($"Invalid patter expression: $pexpr")
               }

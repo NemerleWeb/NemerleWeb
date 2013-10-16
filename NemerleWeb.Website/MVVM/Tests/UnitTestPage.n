@@ -1674,9 +1674,20 @@ namespace NemerleWeb.Tests
       
       test("server call should return XHR object", () => {
         def xhr = server.A(res => ());
+        _ = xhr.status;
         true
       });
-    }    
+      
+      test("original this in lambda", () => {
+        def testThis = _ => _ => {
+          def _this : Window = jsthis;
+          
+          _this.document != null
+        }
+        
+        testThis(1)(2)
+      });
+    }
     
     [Html]
     public View() : string

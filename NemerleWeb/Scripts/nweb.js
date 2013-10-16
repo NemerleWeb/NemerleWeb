@@ -455,10 +455,10 @@ var nweb = {
     return expr;
   },
   parseExpression: function(model, expr, loopStack) {
-    if(expr == "self")
+    if(expr === "_NW$_self")
       return "model";
     var e = nweb.applyLoopStackToExpr(expr, loopStack);
-    return e.replace(/self\./g, "model.");
+    return e.replace(/_NW\$_self\./g, "model.");
   },
   parsedValueCache: {},
   getParsedValue: function(model, parsedExpr, loopStack, returnFunction) {
