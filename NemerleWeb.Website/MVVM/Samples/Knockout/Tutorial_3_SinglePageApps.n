@@ -33,10 +33,41 @@ namespace NemerleWeb.Samples
     public ChosenFolderId : string { get; set; }
     public ChosenFolderData : FolderData { get; set; }
     public ChosenMailData : Mail { get; set; }
+    
+    class Params
+    {
+      public folder : string;
+      public mailId : string;
+    }
+    
+    [Record]
+    class FolderParam
+    {
+      public folder : string;
+    }
       
     public this() 
     {
-      Folders = ["Inbox", "Archive", "Sent", "Spam"].ToList();   
+      Folders = ["Inbox", "Archive", "Sent", "Spam"].ToList();
+      
+      Sammy(() => {
+        def _this : Sammy.Application = jsthis;
+        _ = _this.@get("spa/:folder", () => {
+          def _this : Sammy.EventContext = jsthis;
+          this.ChosenFolderId = (_this.@params :> Params).folder;
+          this.ChosenMailData = null;
+          _ = (@$).@get("/SPAPage/Folder", FolderParam((_this.@params :> Params).folder), result => { 
+            this.ChosenFolderData = nweb.utils.toTypedObject(JSON.parse(result)) :> FolderData;
+            _ = nweb.invalidate();
+          });
+        });
+          
+        _ = _this.@get("samples", () => {
+          def _this : Sammy.Application = jsthis;
+          _ = _this.runRoute("get", "#spa/Inbox");
+        });
+      }).run();
+      
       js <#
           Sammy(function() {
               this.get("#spa/:folder", function() {

@@ -13,10 +13,11 @@ interface SammyFunc {
     (selector: string, handler: Function): Sammy.Application;
 }
 
-declare function Sammy(): Sammy.Application;
-declare function Sammy(selector: string): Sammy.Application;
+// HACK: Uncomment
+//declare function Sammy(): Sammy.Application;
+//declare function Sammy(selector: string): Sammy.Application;
 declare function Sammy(handler: Function): Sammy.Application;
-declare function Sammy(selector: string, handler: Function): Sammy.Application;
+//declare function Sammy(selector: string, handler: Function): Sammy.Application;
 
 interface JQueryStatic {
     sammy: SammyFunc;
@@ -118,7 +119,15 @@ declare module Sammy {
         route(verb: string, path: string, callback: Function): Application;
         route(verb: string, path: RegExp, callback: Function): Application;
         run(start_url?: string): Application;
+		// HACK: Remove
+		run(): Application;
+		// HACK: /Remove		
         runRoute(verb: string, path?: string, params?: any, target?: any): any;
+		// HACK: Remove
+		runRoute(verb: string, path?: string, params?: any): any;
+		runRoute(verb: string, path?: string): any;
+		runRoute(verb: string): any;
+		// HACK: /Remove
         send(...params: any[]);
         setLocation(new_location: string): string;
         setLocationProxy(new_proxy: DataLocationProxy): void;

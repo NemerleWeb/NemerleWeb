@@ -243,6 +243,11 @@ interface JQueryStatic {
     ajaxSetup(options: JQueryAjaxSettings): void;
 
     get(url: string, data?: any, success?: any, dataType?: any): JQueryXHR;
+	// HACK: Remove
+	get(url: string, data?: any, success?: any): JQueryXHR;
+	get(url: string, data?: any): JQueryXHR;
+	get(url: string): JQueryXHR;
+	// HACK: Remove	
     getJSON(url: string, data?: any, success?: any): JQueryXHR;
     getScript(url: string, success?: any): JQueryXHR;
 
