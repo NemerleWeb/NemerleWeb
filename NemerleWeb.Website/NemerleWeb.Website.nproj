@@ -84,7 +84,7 @@
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="NemerleWeb.TypedJS>
+    <Reference Include="NemerleWeb.TypedJS">
       <Name>NemerleWeb.TypedJS</Name>
       <AssemblyName>NemerleWeb.TypedJS.dll</AssemblyName>
     </Reference>
