@@ -50,17 +50,17 @@
     <Reference Include="Microsoft.AspNet.SignalR.Owin, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>Microsoft.AspNet.SignalR.Owin</Name>
       <AssemblyName>Microsoft.AspNet.SignalR.Owin.dll</AssemblyName>
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.Owin.1.1.2\lib\net45\Microsoft.AspNet.SignalR.Owin.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Owin.1.1.2\lib\net40\Microsoft.AspNet.SignalR.Owin.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>Microsoft.AspNet.SignalR.SystemWeb</Name>
       <AssemblyName>Microsoft.AspNet.SignalR.SystemWeb.dll</AssemblyName>
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.1.1.2\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.1.1.2\lib\net40\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>Microsoft.Owin.Host.SystemWeb</Name>
       <AssemblyName>Microsoft.Owin.Host.SystemWeb.dll</AssemblyName>
-      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.1.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.1.0.1\lib\net40\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
     </Reference>
     <Reference Include="Nemerle">
       <SpecificVersion>False</SpecificVersion>
@@ -84,10 +84,9 @@
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="NemerleWeb.TypedJS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="NemerleWeb.TypedJS>
       <Name>NemerleWeb.TypedJS</Name>
       <AssemblyName>NemerleWeb.TypedJS.dll</AssemblyName>
-      <HintPath>..\packages\NemerleWeb.1.0.0\lib\net45\NemerleWeb.TypedJS.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5">
       <Name>Owin</Name>
