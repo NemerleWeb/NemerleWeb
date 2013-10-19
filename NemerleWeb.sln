@@ -22,8 +22,6 @@ Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Tests.Macro", "N
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Website", "NemerleWeb.Website\NemerleWeb.Website.nproj", "{837F8D8F-B2B7-4BFB-81D3-3C168F86173C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NemerleWeb.VSIX", "NemerleWeb.VSIX\NemerleWeb.VSIX.csproj", "{47789AB8-5ACC-47DA-BDF7-78A47286A1E3}"
-EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "TSParserTest", "TSParserTest\TSParserTest.nproj", "{30999709-92BD-40AB-859C-CDC9BFDF39CB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NemerleWeb.ItemTemplate", "NemerleWeb.ItemTemplate\NemerleWeb.ItemTemplate.csproj", "{C63B6C30-7D00-4367-9B48-DF06232D3E9B}"
@@ -66,10 +64,6 @@ Global
 		{837F8D8F-B2B7-4BFB-81D3-3C168F86173C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{837F8D8F-B2B7-4BFB-81D3-3C168F86173C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{837F8D8F-B2B7-4BFB-81D3-3C168F86173C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{47789AB8-5ACC-47DA-BDF7-78A47286A1E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{47789AB8-5ACC-47DA-BDF7-78A47286A1E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{47789AB8-5ACC-47DA-BDF7-78A47286A1E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{47789AB8-5ACC-47DA-BDF7-78A47286A1E3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{30999709-92BD-40AB-859C-CDC9BFDF39CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{30999709-92BD-40AB-859C-CDC9BFDF39CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30999709-92BD-40AB-859C-CDC9BFDF39CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
