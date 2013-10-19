@@ -6,7 +6,6 @@
     <VsSDKInstall>$(MSBuildProjectDirectory)\..\ExternalDependences\vssdk2012\</VsSDKInstall>
     <VsixSchemaPath>$(VsSDKInstall)\Schemas\VSIXManifestSchema.xsd</VsixSchemaPath>
   </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
