@@ -504,7 +504,7 @@ var nweb = {
     nweb.invalidate(nweb.bindings);
   },
   invalidationCount: 0,
-  invalidate: function(bindings, indent, selfCall) {
+  invalidate: function (bindings, indent, selfCall) {
     if(typeof bindings === 'undefined')
       bindings = nweb.bindings;
     nweb.invalidationCount++;

@@ -17,6 +17,10 @@ body {
     padding: 10px;
 }
 
+a {    
+    text-decoration: none;
+}
+
 a img {
     border: none;
 }
@@ -35,7 +39,6 @@ a img {
 
 .node a {
     color: #1e90ff;
-    text-decoration: none;
 }
 
 .node a:hover {
@@ -158,4 +161,14 @@ a img {
     margin: 0;
     width: 100%;
     height: 99%;
+}
+
+.search-cat-header {
+    font-size: 16px;
+    color: #1A6AB8;
+    margin-left: 15px;
+}
+
+.search-cat-header:hover {
+    color: #1e90ff;
 }

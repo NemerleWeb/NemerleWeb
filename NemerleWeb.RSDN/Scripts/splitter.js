@@ -36,11 +36,18 @@ var splitterCounter = 0;
 
 $.fn.splitterSetOption = function(option, value) {
   return this.each(function () {
-    if(this.setOption != null)
+    if(this.setOption)
       this.setOption(option, value);
   });
 };
 
+$.fn.splitterSetWidth = function (width) {
+  return this.each(function () {
+    if (this.setWidth) {
+      this.setWidth(width);
+    }
+  });
+}
 $.fn.splitter = function(args){
 	args = args || {};
 	return this.each(function() {
@@ -199,6 +206,10 @@ $.fn.splitter = function(args){
 	  this.setOption = function(option, value) {
 	    opts[option] = value;
 	  };
+
+	  this.setWidth = function (width) {
+	    resplit(width);
+	  }
 
 		opts.barStateClasses = [opts.barNormalClass, opts.barHoverClass, opts.barActiveClass, opts.barLimitClass].join(' ');
 

@@ -1689,6 +1689,8 @@ namespace NemerleWeb.Tests
       });
     }
     
+    public TemplateLambdaTest : list[string] = ["failed", "passed"];
+    
     [Html]
     public View() : string
     {
@@ -1698,6 +1700,9 @@ namespace NemerleWeb.Tests
             <tr $foreach(r in Results) css-succeeded='$(r[1].ToString() == "true")'>
               <td>$(r[0])</td>
               <td>$(r[1])</td>
+            </tr>
+            <tr $foreach(l in TemplateLambdaTest.Where(l => l == "passed"))>
+              $l
             </tr>
           </tbody>
         </table>

@@ -15,9 +15,14 @@ namespace NemerleWeb.Rsdn
   [Unit]
   public class Search
   { 
-    public IsLimited : bool { get; set; }
-    public SearchResults : TreeNode;
+    public SearchResultsForums : TreeNode;
+    public SearchResultsArticles : TreeNode;
+    public SearchResultsOthers : TreeNode;
         
+    mutable _showForums = true;
+    mutable _showArticles = false;
+    mutable _showOthers = false;
+    
     mutable _searchTerm : string;
     public SearchTerm : string { 
       get { _searchTerm; }
@@ -25,33 +30,56 @@ namespace NemerleWeb.Rsdn
         throttle(500, {
           when(_searchTerm != value) {
             _searchTerm = value;
-            Search(value, true);
+            Search(value);
           }
         });
       }; 
-    }
-        
-    public this() 
-    {
-      SearchResults = TreeNode() <- ( Children = List() );
-    }
-        
-    public Search(term : string, limitedSearch : bool) : void
-    {
-      if(!string.IsNullOrWhiteSpace(term)) {        
-        server.Search(term, limitedSearch, nodes => {
-          SearchResults.Children = nodes.ToList();
-          
-          IsLimited = limitedSearch && nodes.Length == 40;
-        });
-      } else SearchResults.Children.Clear();
     }
     
     public static SelectNode(node : TreeNode) : void
     {
       MainPage.Instance.SelectNode(node);
     }
-        
+
+    public this() 
+    {
+      SearchResultsForums = TreeNode() <- (Children = List());
+      SearchResultsArticles = TreeNode() <- (Children = List());
+      SearchResultsOthers = TreeNode() <- (Children = List());
+    }
+    
+    public Search(term : string) : void
+    {
+      ClearResults();
+      
+      when(!string.IsNullOrWhiteSpace(term)) {        
+        server.Search(term, nodes => {
+                    
+          js <# console.log(nodes.length); #>;
+          
+          foreach(node in nodes) {
+            match(node.Icon) {
+            | "fr" => SearchResultsForums.Children.Add(node)
+            | "qna"
+            | "at" => SearchResultsArticles.Children.Add(node)
+            | _ => SearchResultsOthers.Children.Add(node)
+            }
+          }
+        });
+      }
+    }
+    
+    public ClearResults() : void 
+    {
+        SearchResultsForums.Children.Clear();
+        SearchResultsArticles.Children.Clear();
+        SearchResultsOthers.Children.Clear();
+    }
+    
+    public ToggleForums() : void { _showForums = !_showForums }
+    public ToggleArticles() : void { _showArticles = !_showArticles }
+    public ToggleOthers() : void { _showOthers = !_showOthers }
+    
     [Html]
     public View() : string
     {
@@ -60,9 +88,25 @@ namespace NemerleWeb.Rsdn
           <input id="search-input" value="$SearchTerm" />
         </div>
         <div $when(!string.IsNullOrEmpty(SearchTerm)) class="search-results"> 
-          <div template="$(template(SearchResults))" />          
-          <div $when(IsLimited) click="$(Search(SearchTerm, false))" class="search-show-all">
-            showing first 40 results, click for rest
+          <a href="#" click="$ToggleForums">
+            <h3 class="search-cat-header">Forums ($(SearchResultsForums.Children.Count))</h3>
+          </a>
+          <div $when(_showForums)>
+            <div template="$(template(SearchResultsForums))" />
+          </div>
+          
+          <a href="#" click="$ToggleArticles">
+            <h3 class="search-cat-header">Articles ($(SearchResultsArticles.Children.Count))</h3>
+          </a>
+          <div $when(_showArticles)>
+            <div template="$(template(SearchResultsArticles))" />
+          </div>
+          
+          <a href="#" click="$ToggleOthers">
+            <h3 class="search-cat-header">Others ($(SearchResultsOthers.Children.Count))</h3>
+          </a>
+          <div $when(_showOthers)>
+            <div template="$(template(SearchResultsOthers))" />
           </div>
         </div>
       #>
@@ -70,9 +114,9 @@ namespace NemerleWeb.Rsdn
     
     public class Server
     {
-      public Search(term : string, limitedSearch : bool = false) : array[TreeNode]
+      public Search(term : string) : array[TreeNode]
       {
-        TreeLoader.Search(term, limitedSearch)
+        TreeLoader.Search(term)
       }
     }
   }

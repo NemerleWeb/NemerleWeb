@@ -37,25 +37,14 @@ module Program
 
 [Unit]
 public class Test
-{
-  public Tester(f : void -> int) : void{}
-  
-  public Run() : void
-  {
-    Tester( () => {
-      def a = 1;
-      
-      def g = x => a + x;
-      
-      g(1)
-    } );
-  }
-  
+{  
+  public Children : string = "abcdefghijklm";
+    
   [Html]
   public View() : string
   {
     <# 
-       <div>
+       <div $foreach(c in Children.Where(c => c == 'f'))>
        </div>
     #>
   }

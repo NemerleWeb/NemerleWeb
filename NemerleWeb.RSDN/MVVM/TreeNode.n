@@ -16,7 +16,6 @@ namespace NemerleWeb.Rsdn
   {
     public Id : string { get; set; }
     public Caption : string { get; set; }
-    public Href : string { get; set; }
     public Icon : string { get; set; }
     public Hide : bool { get; set; }
     public Depth : int { get; set; }
@@ -27,6 +26,13 @@ namespace NemerleWeb.Rsdn
     public Parent : TreeNode { get; set; }
     public IsLoading : bool { get; set; }    
     public IsSelected : bool { get; set; }
+    
+    mutable _href : string;
+    public Href : string 
+    { 
+      get { if(_href == null || _href.StartsWith("http://")) _href else "http://www.rsdn.ru" + _href }; 
+      set { _href = value }; 
+    }
     
     public IconUrl : string 
     {      
@@ -39,7 +45,7 @@ namespace NemerleWeb.Rsdn
         "http://rsdn.ru/images/tree/" + Icon + suffix;
       }
     }
-    
+        
     public TogglePin() : void
     {            
       if(!MainPage.Instance.IsPinned(this)) MainPage.Instance.AddPinned(Id)
@@ -52,7 +58,7 @@ namespace NemerleWeb.Rsdn
         if(Children == null) {
           IsLoading = true;
           IsOpened = !IsOpened;
-          server.LoadNodeChildren(Id, children => {           
+          server.LoadNodeChildren(Id, children => {
             Children = children;
             
             foreach(child in Children)
@@ -65,7 +71,7 @@ namespace NemerleWeb.Rsdn
       }
       else { 
         if(window.@event.ctrlKey)
-          _ = window.open("http://www.rsdn.ru" + this.Href, "_blank", null, false);
+          _ = window.open(Href, "_blank", null, false);
         else
           MainPage.Instance.SelectNode(this);
       }

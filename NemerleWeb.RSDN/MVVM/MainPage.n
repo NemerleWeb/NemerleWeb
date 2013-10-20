@@ -38,12 +38,11 @@ namespace NemerleWeb.Rsdn
                        
       UpdatePinned();
       
-      _ = jscall jQuery(window).resize(_ => {
-        when(window.outerWidth < 500) {
-          js <# $(".page").splitterSetOption("sizeLeft", window.outerWidth).trigger("resize") #>
-        }
-        null;
-      });
+      window.setTimeout(_ => 
+        when(window.innerWidth < 800) {
+          js <# $(".page").splitterSetWidth(window.innerWidth) #>;
+        }, 
+        50);
     }
         
     public LoadTopNodes() : void
@@ -100,11 +99,11 @@ namespace NemerleWeb.Rsdn
       | _ => [];
       };
       
-      SelectedUrl = "http://www.rsdn.ru" + node.Href;
+      SelectedUrl = node.Href;
       ActiveNodes = node :: getAllParents(node);
-      
+           
       when(window.innerWidth < 800) {
-        js <# $(".page").trigger("dock"); #>;
+        js <# $(".page").splitterSetWidth(0); #>;
       }
     }
     

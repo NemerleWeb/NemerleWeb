@@ -56,7 +56,7 @@ namespace NemerleWeb
       /// Initialize self either by this or by empty object for lambdas.
       /// </summary>
       public static SelfInit : string =
-        $<#var $Self = (typeof this.$LambdaMarker === "undefined") ? this : {};#>;
+        $<#var $Self = (typeof this.$LambdaMarker === "undefined") ? this : this;#>;
       
       public Fields : IEnumerable[IField]
       {

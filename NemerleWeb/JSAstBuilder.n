@@ -269,6 +269,8 @@ namespace NemerleWeb
     public BuildJSAstForSplices(expr : TExpr, methodHeader : TFunHeader) : IEnumerable[JSAst.DefValue]
     {
       def ast = JSAstBuilder.Build(expr, [], methodHeader);
+      
+      def ast = JSAstHelper.TransformBottomUp(ast);
       def ast = JSAstHelper.FlattenAndRemoveVoids(ast);      
       def ast = JSAst.Recurse(ast, (a, _) => {
         match(a : JSAst) {
