@@ -38,16 +38,16 @@ namespace NemerleWeb.Rsdn
                        
       UpdatePinned();
       
-      window.setTimeout(_ => 
+      _ = window.setTimeout(_ => 
         when(window.innerWidth < 800) {
-          js <# $(".page").splitterSetWidth(window.innerWidth) #>;
+          _ = jscall (@$)(".page").splitterSetWidth(window.innerWidth);
         }, 
         50);
     }
         
     public LoadTopNodes() : void
     {
-      server.GetTopNodes(nodes => {
+      _ = server.GetTopNodes(nodes => {
         Root = TreeNode() <- (
           Children = nodes
         );
@@ -56,7 +56,7 @@ namespace NemerleWeb.Rsdn
     
     UpdatePinned() : void
     {
-      server.LoadByIds(GetPinned(), nodes => {
+      _ = server.LoadByIds(GetPinned(), nodes => {
         Pinned.Children = nodes.ToList()
       });
     }
@@ -103,7 +103,7 @@ namespace NemerleWeb.Rsdn
       ActiveNodes = node :: getAllParents(node);
            
       when(window.innerWidth < 800) {
-        js <# $(".page").splitterSetWidth(0); #>;
+        _ = jscall (@$)(".page").splitterSetWidth(0);
       }
     }
     

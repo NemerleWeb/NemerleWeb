@@ -53,9 +53,9 @@ namespace NemerleWeb.Rsdn
       ClearResults();
       
       when(!string.IsNullOrWhiteSpace(term)) {        
-        server.Search(term, nodes => {
-                    
-          js <# console.log(nodes.length); #>;
+        _ = server.Search(term, nodes => {
+          
+          _ = console.log(nodes.Length);
           
           foreach(node in nodes) {
             match(node.Icon) {
