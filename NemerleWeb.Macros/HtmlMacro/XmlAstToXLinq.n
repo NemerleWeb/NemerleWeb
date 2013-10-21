@@ -132,9 +132,9 @@ namespace NemerleWeb
               def pexpr = SplicablePExprStr(value);              
               def binding = match(pexpr)
               {
-                | <[ template(_.$model) ]>             => $<#nweb.utils.getTemplateName(self.$model, "View"): self.$model#>
+                | <[ template(_.$model) ]>             => $<#nweb.utils.getTemplateName($(JSClass.Self).$model, "View"): $(JSClass.Self).$model#>
                 | <[ template(_.$model, _.$view) ]>
-                | <[ template(_.$model, _.$view()) ]>  => $<#nweb.utils.getTemplateName(self.$model, "$view"): self.$model#>
+                | <[ template(_.$model, _.$view()) ]>  => $<#nweb.utils.getTemplateName($(JSClass.Self).$model, "$view"): $(JSClass.Self).$model#>
                 | <[ template($_model) ]> with view = <[ View ]>
                 | <[ template($_model, _.$view) ]>
                 | <[ template($_model, _.$view()) ]> => 
@@ -155,7 +155,7 @@ namespace NemerleWeb
                     | @"_NW\$_self\.template\((.+),(?<p>.+)\)" => p
                     | _ => Message.Error(pexpr.Location, $"Incorrect xml, template(_.model, view): $xmlAst"); ""
                     };
-                  $<#nweb.utils.getTemplateName(self.$model, $p): self.$model#>
+                  $<#nweb.utils.getTemplateName($(JSClass.Self).$model, $p): $(JSClass.Self).$model#>
                 | <[ template($_model, $_r) ]> => 
                   def splice = getSpliceNoNewLine();
                   def (p1, p2) =
@@ -340,7 +340,7 @@ namespace NemerleWeb
           }).NToList())
       | Define(p, Ref(name)) when _methodNames.Contains(name.Id) =>
         // HACK: We add special string, because we don't know here exact type of the method
-        PExpr.Define(p, PExpr.Literal(Literal.String("self." + name.Id + <#[""]#> + StringLiteral.DoNotEscapeMarker)))
+        PExpr.Define(p, PExpr.Literal(Literal.String($"$(JSClass.Self)." + name.Id + <#[""]#> + StringLiteral.DoNotEscapeMarker)))
       | _ => expr
     }
     

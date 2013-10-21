@@ -40,19 +40,19 @@ namespace NemerleWeb.Samples
       js <#
           Sammy(function() {
               this.get("#spa/:folder", function() {
-                  self.set_ChosenFolderId(this.params.folder);
-                  self.set_ChosenMailData(null);
+                  _NW$_self.set_ChosenFolderId(this.params.folder);
+                  _NW$_self.set_ChosenMailData(null);
                   $.get("/SPAPage/Folder", { folder: this.params.folder }, function(result) { 
-                      self.set_ChosenFolderData(nweb.utils.toTypedObject(JSON.parse(result)));
+                      _NW$_self.set_ChosenFolderData(nweb.utils.toTypedObject(JSON.parse(result)));
                       nweb.invalidate();
                   });
               });
                     
               this.get("#spa/:folder/:mailId", function() {
-                  self.set_ChosenFolderId(this.params.folder);
-                  self.set_ChosenMailData(null);
+                  _NW$_self.set_ChosenFolderId(this.params.folder);
+                  _NW$_self.set_ChosenMailData(null);
                   $.get("/SPAPage/Mail", { mailId: this.params.mailId }, function(result) { 
-                      self.set_ChosenMailData(nweb.utils.toTypedObject(JSON.parse(result)));
+                      _NW$_self.set_ChosenMailData(nweb.utils.toTypedObject(JSON.parse(result)));
                       nweb.invalidate();
                   });
               });
