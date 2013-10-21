@@ -58,7 +58,7 @@ namespace NemerleWeb.Rsdn
         if(Children == null) {
           IsLoading = true;
           IsOpened = !IsOpened;
-          server.LoadNodeChildren(Id, children => {
+          _ = server.LoadNodeChildren(Id, children => {
             Children = children;
             
             foreach(child in Children)
