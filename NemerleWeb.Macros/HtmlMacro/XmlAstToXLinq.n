@@ -233,8 +233,7 @@ namespace NemerleWeb
                           } else {
                             content.Select(x => <[ $(TransformImpl(x, splices, loopStack)) ]>);
                           }
-            <[ [L.XElement($nameExpr2, 
-                  [..$(cont.NToList())].SelectMany(c => c).CombineAttributes().ToArray())] ]>;            
+            <[ [L.XElement($nameExpr2, [..$(cont)].SelectMany(c => c).CombineAttributes().ToArray())] ]>;
         | TagSplice(_t, false)               => 
           <[ [L.XAttribute("nw-text", $(getSplice()))] ]>
         | TagSplice(expr, true)             => <[ [NColl.NToArray($(Parse(ToLocation(xmlAst), expr)))] ]>

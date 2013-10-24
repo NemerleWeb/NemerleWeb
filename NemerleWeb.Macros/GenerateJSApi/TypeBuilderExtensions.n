@@ -25,26 +25,27 @@ namespace NemerleWeb
       member : ClassMember,
       classModifiers : NemerleModifiers) : void
     {
-      when(!scope.IsInterface)
+      def isStatic = member.Attributes %&& NemerleModifiers.Static;
+      def isInterface = scope.IsInterface;
+      def publicFunction = !isInterface || isStatic;
+      
+      match(member)
       {
-        match(member)
-        {
-        | f is ClassMember.Function =>
-          f.body = DefaultFunctionImplementation;
-        | p is ClassMember.Property =>
-          when(p.getter is Some(getter))
-            getter.body = DefaultFunctionImplementation;
-          when(p.setter is Some(setter))
-            setter.body = DefaultFunctionImplementation;
-        | _ => ()
-        }
+      | f is ClassMember.Function when publicFunction =>
+        f.body = DefaultFunctionImplementation;
+      | p is ClassMember.Property when !scope.IsInterface =>
+        when(p.getter is Some(getter))
+          getter.body = DefaultFunctionImplementation;
+        when(p.setter is Some(setter))
+          setter.body = DefaultFunctionImplementation;
+      | _ => ()
       }
       
       member.modifiers.mods |= NemerleModifiers.New;
-      when(!scope.IsInterface)
+      when(publicFunction)
         member.modifiers.mods |= classModifiers;
       
-      _ = scope.DefineWithSource(member);
+      _ = scope.Define(member);
     } 
     
     public DefineMemberPublicNew(this scope : TypeBuilder, member : ClassMember) : void

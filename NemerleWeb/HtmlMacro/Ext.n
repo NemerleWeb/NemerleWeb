@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using System.Linq;
@@ -19,8 +18,9 @@ namespace NemerleWeb
                           .Concat(if(!string.IsNullOrWhiteSpace(cssValue)) [XAttribute("data-bind", css)] else [])
                           .Concat(if(!string.IsNullOrWhiteSpace(styleValue)) [XAttribute("data-bind", style)] else [])
                           .GroupBy(a => a.Name.LocalName)
-                          .Select(a => XAttribute(a.Key, string.Join(", ", a.Select(x => x.Value))));
-        instance.Where(x : object => !(x is XAttribute)).Concat(attrs);
+                          .Select(a => XAttribute(a.Key, string.Join(", ", a.Select(x => x.Value))))
+                          .Cast.[object]();
+        instance.Cast.[object]().Where(x  => !(x is XAttribute)).Concat(attrs);
       }
   }
 }

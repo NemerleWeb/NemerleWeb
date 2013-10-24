@@ -174,16 +174,8 @@ namespace NemerleWeb
         // This is needed to make labmda object behave as regular function
         def returning = match(ClassType.BaseType?.Name)
         {
-        | "Function" => bodyIndent + 
-/*<#return function() {
-return self.apply.apply(self, arguments);
-}#>*/
-$<#return $Self.apply;#>
-        | "FunctionVoid" => bodyIndent + 
-/*<#return function() {
-return self.apply_void.apply(self, arguments);
-}#>*/
-$<#return $Self.apply_void;#>
+        | "Function" => bodyIndent + $<#return $Self.apply;#>
+        | "FunctionVoid" => bodyIndent + $<#return $Self.apply_void;#>
         | _ => ""
         };
 

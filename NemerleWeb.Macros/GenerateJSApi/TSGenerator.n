@@ -368,7 +368,7 @@ namespace NemerleWeb
         
         def name = string.Join(Separator, prefix, AnonymousType, anonymousTypeIndex.ToString());
         
-        def type = membersScope.DefineNestedTypeWithSource(
+        def type = membersScope.DefineNestedType(
           <[ decl: 
             [JSApi] public partial class $(name : usesite) { }
           ]>);
@@ -591,7 +591,7 @@ namespace NemerleWeb
     private ConvertParameters(
       membersScope : TypeBuilder,
       parms : IEnumerable[ScriptParameter],
-      prefix : string) : option[List[PParameter]]
+      prefix : string) : option[list[PParameter]]
     {
       def convert(p : ScriptParameter) : option[PParameter]
       {
@@ -606,17 +606,17 @@ namespace NemerleWeb
           Some(<[ parameter: params $(name : usesite) : $realType ]>)
       }
       
-      def ret = List();
+      mutable ret = [];
       foreach(parm in parms)
       {
         def maybeRealParam = convert(parm);
         if(maybeRealParam is Some(realParam))
-          ret.Add(realParam);
+          ret ::= realParam;
         else
           return None();
       }
       
-      Some(ret);
+      Some(ret.Reverse());
     }
     
     /// <summary>
