@@ -7,14 +7,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NemerleWeb
+namespace NemerleWeb.TypedJS
 {
-  public partial module TypedJS
+  [JSApiImpl]
+  public module JSStringExtensions
   {
-    [JSApiImpl]
-    public module JSStringExtensions
-    {
-      public Replace(this str : string, reg : RegExp, replacement : string) : string
-    }
+    public Replace(this str : string, reg : RegExp, replacement : string) : string
   }
 }

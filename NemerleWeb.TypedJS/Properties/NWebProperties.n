@@ -4,10 +4,10 @@
   Root = "NemerleWeb.TypedJS",
   Lib = 
     [
-      @"ScriptsLib\lib.d.ts",
-      @"ScriptsLib\markdown.d.ts",
-      @"ScriptsLib\nweb.d.ts",
+      //@"ScriptsLib\lib.d.ts",
+      //@"ScriptsLib\markdown.d.ts",
+      //@"ScriptsLib\nweb.d.ts",
     ],
-  Files = [ ("ScriptsWork") ]
+  Files = [ /*("ScriptsWork")*/ ]
   //Files = [ ("Scripts", @"typings\\(node\\node-0.8.8|linq\\linq)\.d\.ts") ]
 )]

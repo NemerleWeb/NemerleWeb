@@ -63,6 +63,9 @@
     <Compile Include="Properties\NWebProperties.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="RegExp.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Content Include="ScriptsLib\markdown.d.ts">
       <SubType>Code</SubType>
     </Content>
