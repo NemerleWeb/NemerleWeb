@@ -39,6 +39,11 @@ module Program
 public class Test
 {  
   public Children : string = "abcdefghijklm";
+  
+  F() : void  
+  {
+    
+  }
     
   [Html]
   public View() : string
