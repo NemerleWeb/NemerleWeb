@@ -40,7 +40,7 @@ namespace NemerleWeb.Rsdn
       
       _ = window.setTimeout(_ => 
         when(window.innerWidth < 800) {
-          _ = jscall (@$)(".page").splitterSetWidth(window.innerWidth);
+          _ = jQuery(".page").splitterSetWidth(window.innerWidth);
         }, 
         50);
     }
