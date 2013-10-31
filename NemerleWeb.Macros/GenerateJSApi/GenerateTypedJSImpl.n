@@ -45,7 +45,7 @@ namespace NemerleWeb
       def tsAsts = tsFilesToParse.SelectMany(ParseTS).ToList();
       
       // Step 3: Analyze
-      def finalAst = TSAnalyzer.AnalyzeTSAst(tsAsts).ToList();
+      def finalAst = TSAnalyzer.AnalyzeTSAst(tsAsts);
       
       // Step 4: Generate
       TSGenerator.GenerateCode(typer, args.Root, finalAst);

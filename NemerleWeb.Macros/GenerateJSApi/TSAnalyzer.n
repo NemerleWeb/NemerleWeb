@@ -25,7 +25,7 @@ namespace NemerleWeb
     /// <summary>
     /// Take all elements and remove duplicates
     /// </summary>
-    public AnalyzeTSAst([NotNull] tsAsts : IEnumerable[DeclarationElement]) : IEnumerable[DeclarationElement]
+    public AnalyzeTSAst([NotNull] tsAsts : List[DeclarationElement]) : List[DeclarationElement]
     {
       tsAsts.Where(FilterAst).GroupBy(GroupAst).SelectMany(SelectAst).ToList()
     }
@@ -84,8 +84,8 @@ namespace NemerleWeb
         match(ambientType)
         {
         | type when type.Equals(typeof(AmbientDeclaration.VariableDeclaration)) =>
+          // Take first variable, skip others
           [typeAndNameGroup.First()]
-          //AnalyzeInterface(typeAndNameGroup.Cast.[TSGlobal.Interface]())
       
         | type when type.Equals(typeof(AmbientDeclaration.FunctionDeclaration)) =>
           AnalyzeFunction(
@@ -95,22 +95,28 @@ namespace NemerleWeb
             .Select(f => DeclarationElement.AmbientDeclaration(AmbientDeclaration.FunctionDeclaration(f)))
           
         | type when type.Equals(typeof(AmbientDeclaration.ClassDeclaration)) =>
-          [typeAndNameGroup.First()]
-          //AnalyzeEnum(typeAndNameGroup.Cast.[TSGlobal.Enum]())
+          AnalyzeСlass(
+            ambientGroup
+              .Cast.[AmbientDeclaration.ClassDeclaration]()
+              .Select(c => c.Value))
+          .Select(c => DeclarationElement.AmbientDeclaration(AmbientDeclaration.ClassDeclaration(c)))
         
         | type when type.Equals(typeof(AmbientDeclaration.EnumDeclaration)) =>
-          [typeAndNameGroup.First()]
-          //AnalyzeFunction(typeAndNameGroup.Cast.[TSGlobal.Function]())
+          AnalyzeEnum(
+            ambientGroup
+              .Cast.[AmbientDeclaration.EnumDeclaration]()
+              .Select(c => c.Value))
+          .Select(c => DeclarationElement.AmbientDeclaration(AmbientDeclaration.EnumDeclaration(c)))          
       
         | type when type.Equals(typeof(AmbientDeclaration.ModuleDeclaration)) =>
-          [typeAndNameGroup.First()]
+          [DeclarationElement.AmbientDeclaration(ambientGroup.First())]
           //AnalyzeModule(typeAndNameGroup.Cast.[TSGlobal.Function]())
           
         // By default take first and skip others        
-        | _ =>  [typeAndNameGroup.First()]
+        | _ => [DeclarationElement.AmbientDeclaration(ambientGroup.First())]
         }
       // By default take first and skip others        
-      | _ =>  [typeAndNameGroup.First()]
+      | _ => [typeAndNameGroup.First()]
       }
     }
         
@@ -146,7 +152,49 @@ namespace NemerleWeb
       yield InterfaceDeclaration(name, typeParameters, extends, @type)
     }
     
-     
+    private AnalyzeСlass(ast : IEnumerable[AmbientClassDeclaration]) : IEnumerable[AmbientClassDeclaration]
+    {
+      def name = ast.First().Name;
+      
+      def typeParameters = ast
+        .SelectMany(x => x.TypeParameters)
+        .Distinct()
+        .NToList();
+      
+      // Extends can be only once
+      def firstExtends = ast.FirstOrDefault(c => c.Heritage.Base.IsSome);
+      def firstExtends = if (firstExtends != null) firstExtends.Heritage.Base else None();      
+      
+      // Implements is not limited
+      def @implements = ast
+        .SelectMany(x => x.Heritage.Interfaces)
+        .Distinct()
+        .NToList();
+      
+      def members = ast
+        .SelectMany(x => x.Members)
+        .Distinct()
+        .NToList();
+      
+      yield AmbientClassDeclaration(
+        name,
+        typeParameters,
+        ClassHeritage(firstExtends, @implements),
+        members);
+    }
+    
+    private AnalyzeEnum(ast : IEnumerable[AmbientEnumDeclaration]) : IEnumerable[AmbientEnumDeclaration]
+    {
+      def name = ast.First().Name;
+      
+      def members = ast
+        .SelectMany(x => x.Members)
+        .Distinct()
+        .NToList();
+      
+      yield AmbientEnumDeclaration(name, members)
+    }
+         
     /// <summary>
     /// Select all dictinct function overloads
     /// </summary>
@@ -155,11 +203,17 @@ namespace NemerleWeb
       def name = ast.First().Name;
       
       def ret = ast
-        .Select(f => AmbientFunctionDeclaration(name, f.Signature));
-        //.Distinct();
-      // ;
+        .SelectMany(f =>
+          GenerateOverloads(f.Signature)
+            .Select(s => AmbientFunctionDeclaration(name, s)))
+        .Distinct();
         
       ret
+    }
+    
+    private GenerateOverloads(signature : CallSignature) : IEnumerable[CallSignature]
+    {
+      [signature]
     }
     
    #if A
