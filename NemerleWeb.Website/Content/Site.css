@@ -170,3 +170,7 @@ body {
     border: 1px solid #666;
     margin-bottom: 20px;
 }
+
+ul.nav li.dropdown:hover > ul.dropdown-menu {
+    display: block;    
+}
