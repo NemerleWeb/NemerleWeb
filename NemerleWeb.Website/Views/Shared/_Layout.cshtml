@@ -21,7 +21,18 @@
                 <li>@Html.ActionLink("Tutorial", "Tutorial", "Home")</li>
                 <li>@Html.ActionLink("Samples", "Samples", "Home")</li>
                 <li><a href="https://github.com/NemerleWeb/NemerleWeb">Github repo</a></li>
-                <li><a href="https://groups.google.com/forum/?fromgroups=#!forum/nemerleweb">Forum</a></li>
+                
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                      Contacts <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="https://www.rsdn.ru/forum/nemerle">Russian Forum</a></li>
+                        <li><a href="https://groups.google.com/forum/?fromgroups=#!forum/nemerleweb">English Forum</a></li>
+                        @*<li>@Html.ActionLink("About us", "Index", "About us")</li>*@
+                    </ul>
+                </li>                
+
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                       Tests <span class="caret"></span>
