@@ -11,23 +11,21 @@ using System.Collections.Generic;
 
 namespace NemerleWeb
 {
-  //tb.GetModifiers().AddCustomAttribute(<[ NemerleWeb.UnitAttribute ]>);
-  
   [MacroUsage(MacroPhase.BeforeTypedMembers, MacroTargets.Method)]
-  public macro Html(_ : TypeBuilder, meth : ParsedMethod)
-  {
-    meth.AddCustomAttribute(<[ NemerleWeb.IgnoreAttribute ]>);
-  }
-  
-  [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Method)]
-  public macro Html(_tb : TypeBuilder, mb : MethodBuilder)
+  public macro Html(_tb : TypeBuilder, mb : ParsedMethod)
   {
     HtmlImpl.ToXLinq(Nemerle.Macros.ImplicitCTX(), mb)
   }
 
+  [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Method)]
+  public macro Html(_tb : TypeBuilder, mb : MethodBuilder)
+  {
+    HtmlImpl.GenerateSplices(Nemerle.Macros.ImplicitCTX(), mb)
+  }
+  
   internal module HtmlImpl
   {
-    internal ToXLinq(typer : Typer, mb : MethodBuilder) : void
+    internal ToXLinq(typer : Typer, mb : ClassMember.Function) : void
     {
       Macros.DefineCTX(typer);
        
@@ -36,54 +34,89 @@ namespace NemerleWeb
       JSClass.IPageType = <[ ttype: IPage ]>;
       JSClass.ObjectType = <[ ttype: System.Object ]>;
       
-      match (mb.Header.body)
+      match (mb.body)
       {
       | FunBody.Parsed(PExpr.Sequence([PExpr.Literal(Literal.String(str)) as lit]))
       | FunBody.Parsed(PExpr.Literal(Literal.String(str)) as lit) =>
       
-        if (str.IsEmpty())
+        if (str.IsEmpty()) 
         {
-          Message.FatalError(
-            mb.Location,
-            "You must write html string.");
+          Message.FatalError(mb.Location, "You must write html string.");
         }
         else
         {
           def litLoc = lit.Location;
-          def loc = Location(
-            litLoc.FileIndex,
-            litLoc.Line,
-            litLoc.Column + 2,
-            litLoc.EndLine,
-            litLoc.EndColumn - 2);
-        
+          def loc = Location(litLoc.FileIndex, litLoc.Line, litLoc.Column + 2, litLoc.EndLine, litLoc.EndColumn - 2);
           def parser = XmlQuotParser(loc, str);
-                        
+
           match (parser.Parse(str))
           {
-          | Some(result) => 
-            def transformer = XmlAstToXLinq(typer, parser);
-            def res = transformer.Transform(result);
-            UnitImpl.AddTemplateData(mb.DeclaringType, JSClass.GetProperName(mb.DeclaringType) + "_" + mb.Name, res);
+          | Some(result) =>
+              typer.CurrentType.UserData.Add(mb.Name, XmlAstToXLinq(typer, parser).Transform(result));
           | _ =>
             def (pos, expected) = parser.GetMaxRollbackPosAndNames();
-          
-            def msg = 
-              if (expected.IsEmpty()) "Unexpected character."
-              else
-              if (expected.Count == 1) $"Expected $(expected.Last())";
-              else
-              {
-                //assert2(false);
-                $"Expected ..$(expected.Take(expected.Count -1)) $(expected.Last())";
-              }
+            def msg = if (expected.IsEmpty()) "Unexpected character."
+                      else if (expected.Count == 1) $"Expected $(expected.Last())";
+                      else $"Expected ..$(expected.Take(expected.Count -1)) $(expected.Last())";
           
             Message.FatalError(parser.ToLocation(pos, pos + 1), msg)
           }
         }
       | FunBody.Abstract => Message.FatalError("Abstract method is not supported")
-      | _ => Message.FatalError(mb.Header.Location, "You must return XML literal string.")
+      | _ => Message.FatalError(mb.header.Location, "You must return XML literal string.")
       }
+    }
+    
+    internal GenerateSplices(typer : Typer, mb : MethodBuilder) : void
+    {
+      Macros.DefineCTX(typer);
+      assert2(false);
+      
+      def (html, splices) = typer.CurrentType.UserData[mb.Name] :> (PExpr * XmlAstToXLinq.SpliceNode);      
+      def nwebDataCtor = UnitImpl.GetNWebDataConstructor(typer.Manager.Options.OutputFileName, typer.Manager.CoreEnv);
+      
+      UnitImpl.AddTemplateData(typer.CurrentType.FullName, mb.Name, html, nwebDataCtor);
+            
+      def liftLoopFlag(splice : XmlAstToXLinq.SpliceNode, parent : option[XmlAstToXLinq.SpliceNode]) : void  {
+      | (s, Some(parent)) when s.IsForeach => parent.IsForeach = true;
+      | (s, _) => s.Children.Iter(c => liftLoopFlag(c, Some(s)))
+      | _ => ()
+      }
+      
+      def typeSplice(splice : XmlAstToXLinq.SpliceNode, loopStack : list[(string * TypeInfo)]) : string {
+        match(splice.PExpression) {
+        | None() => ""
+        | Some(pexpr) => 
+          def parms = if(splice.IsForeach) { 
+                        
+                        [<[ parameter: a : string ]>]                         
+                      }
+                      else 
+                        [<[ parameter: b : int ]>];
+          
+          def method = <[ decl: typeHelperMethod(..$(parms)) : void { $pexpr } ]>;
+          ""           
+        }
+      }
+      
+      def getLoopVarNameAndType(expr) : (string * TypeInfo) {
+      | Some(<[ $a in $b ]>) =>         
+        def toType = <[ $b.First() ]>;
+        def typed = typer.TypeExpr(toType);
+        (a.ToString(), typed.Type)
+      | _ => Message.FatalError("Unexpected foreach pattern " + expr)
+      }
+      
+      def typeSplices(splice : XmlAstToXLinq.SpliceNode, loopStack : list[(string * TypeInfo)]) : list[string] {
+      | (splice, loopStack) when splice.IsForeach => 
+        def loopStack' = getLoopVarNameAndType(splice.PExpression) :: loopStack;
+        typeSplice(splice, loopStack') :: splice.Children.NToList().Flatten(s => typeSplices(s, loopStack'))
+      | (splice, loopStack) => 
+        typeSplice(splice, loopStack) :: splice.Children.NToList().Flatten(s => typeSplices(s, loopStack))
+      }
+      
+      liftLoopFlag(splices, None());
+      typeSplices(splices, []);
     }
   }
 }

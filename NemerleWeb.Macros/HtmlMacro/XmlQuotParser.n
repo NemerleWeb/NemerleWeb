@@ -188,7 +188,7 @@ namespace NemerleWeb
     //tagFull        : Tag       = tagOpen content* tagClose;
     tagFull(tagOpen : TagOpen, content : List[XmlAst], tagClose: TagClose) : XmlAst
     {
-      def open = tagOpen;
+      def open = tagOpen;      
       def closeIdent = tagClose.ident;
       
       unless (closeIdent is Splicable.Value("") || open.ident.Equals(tagClose.ident))

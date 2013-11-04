@@ -52,8 +52,65 @@ namespace NemerleWeb
       
       unless (superTypes != null && superTypes.Exists(t => t.Equals(vmInterface)))
         tb.AddImplementedInterface(<[ NemerleWeb.IPage ]>);
+             
+      //assert2(false);
+      
+      def substituteLambdas(expr) {
+      | PExpr.DefMutable (name, val) => PExpr.DefMutable(substituteLambdas(name), substituteLambdas(val))
+      | PExpr.Define (name, val) => PExpr.Define(substituteLambdas(name), substituteLambdas(val))
+      | PExpr.DefFunctions (functions) => 
+        PExpr.Sequence(functions.Map(f => PExpr.MacroCall(Name("DefineJsFunctions"), NamespaceTree.Node(null, "a", null), [SyntaxElement.Function(f)])))
+      | PExpr.Lambda (d) => substituteLambdas(PExpr.DefFunctions([d]))
+      | PExpr.Array (rank, args) => PExpr.Array(substituteLambdas(rank), substituteLambdas(args))
+      | PExpr.EmptyArray (sizes) => PExpr.EmptyArray(sizes.Map(s => substituteLambdas(s)))
+      | PExpr.Indexer(obj, args) => PExpr.Indexer(substituteLambdas(obj), args.Map(a => substituteLambdas(a)))
+      | PExpr.TryFinally (e1, e2) => PExpr.TryFinally(substituteLambdas(e1), substituteLambdas(e2))
+      | PExpr.Try(body, cases) =>         
+        def handleCase(case) {
+        | TryCase.Catch(exn, exn_ty, handler) => TryCase.Catch(exn, substituteLambdas(exn_ty), substituteLambdas(handler))
+        | TryCase.Filter(exn, exn_ty, filter, handler) => TryCase.Filter(exn, substituteLambdas(exn_ty), substituteLambdas(filter), substituteLambdas(handler))
+        | TryCase.Ellipsis(body) => TryCase.Ellipsis(substituteLambdas(body))
+        } 
+        PExpr.Try(substituteLambdas(body), cases.Map(c : TryCase => handleCase(c)))
+      | PExpr.Typeof (t) =>  PExpr.Typeof(substituteLambdas(t))      
+      | PExpr.TypeConversion (expr, typeAst) => PExpr.TypeConversion(substituteLambdas(expr), substituteLambdas(typeAst))
+      | PExpr.TypeEnforcement (e, ty) => PExpr.TypeEnforcement(substituteLambdas(e), substituteLambdas(ty))      
+      | PExpr.Member (obj, name) => PExpr.Member(substituteLambdas(obj), name)
+      | PExpr.Call(fnc, parms) => PExpr.Call(substituteLambdas(fnc), parms.Map(p => substituteLambdas(p)))
+      | PExpr.Assign(e1, e2) => PExpr.Assign(substituteLambdas(e1), substituteLambdas(e2))
+      | PExpr.GenericSpecifier(fnc, gen_params) => PExpr.GenericSpecifier(substituteLambdas(fnc), gen_params.Map(p => substituteLambdas(p)))
+      | <[ _ is $pat ]> => <[ _ is $(substituteLambdas(pat)) ]>
+      | PExpr.ListLiteral (elems) => PExpr.ListLiteral(elems.Map(e => substituteLambdas(e)))
+      | PExpr.Throw(exceptionExpr) => PExpr.Throw(substituteLambdas(exceptionExpr))      
+      | PExpr.Base (forced_type_expr) => PExpr.Base(if(forced_type_expr is Some(e)) Some(substituteLambdas(e)) else forced_type_expr)      
+      | PExpr.Sequence (seq) => PExpr.Sequence(seq.Map(e => substituteLambdas(e)))
+      | PExpr.Tuple (seq) => PExpr.Tuple(seq.Map(e => substituteLambdas(e)))
+      | PExpr.Match(expr, cases, loc) => 
+        def handleCase(case) {
+          MatchCase(case.Location, case.patterns.Map(p => substituteLambdas(p)), substituteLambdas(case.body), case.disable_warnings)
+        } 
+        PExpr.Match(substituteLambdas(expr), cases.Map(c : MatchCase => handleCase(c)), loc)            
+      | PExpr.Spliced(body) => PExpr.Spliced(substituteLambdas(body))
+      | PExpr.Where(name, fields) => PExpr.Where(substituteLambdas(name), substituteLambdas(fields))
+      | PExpr.As(pat, name) => PExpr.As(substituteLambdas(pat), name)            
+      | PExpr.Ellipsis(body) => PExpr.Ellipsis(substituteLambdas(body))
+      | PExpr.MacroCall  => assert2(false); expr;
+      | _ => expr
+      }
+      
+      def members = tb.AstParts.OfType.[TopDeclaration.Class]().SelectMany(p => p.GetMembers());
+      
+      foreach(member in members) {
+      | x is ClassMember.Function => 
+        if(x.body is FunBody.Parsed(expr)) {
+          x.body = FunBody.Parsed(substituteLambdas(expr))
+        } else {}
+          
+          
+      | _ => ()
+      }
     }
-    
+     
     public DoTransformBeforeTypedMembers(tb : TypeBuilder, typer : Typer) : void
     {
       CreateResourceController(tb, typer);
@@ -266,7 +323,7 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
     
     public AddMainData(tb : TypeBuilder, data : string) : void
     {
-      def ctor = GetNWebDataConstructor(tb);
+      def ctor = GetNWebDataConstructor(tb.Manager.Options.OutputFileName, tb.Manager.CoreEnv);
       
       ctor.Body = <[ 
         $(ctor.Body);
@@ -276,7 +333,7 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
     
     public AddLambdasData(tb : TypeBuilder, data : string) : void
     {
-      def ctor = GetNWebDataConstructor(tb);
+      def ctor = GetNWebDataConstructor(tb.Manager.Options.OutputFileName, tb.Manager.CoreEnv);
       
       ctor.Body = <[ 
         $(ctor.Body);
@@ -286,7 +343,7 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
     
     public AddSignalrData(tb : TypeBuilder, data : string) : void
     {
-      def ctor = GetNWebDataConstructor(tb);
+      def ctor = GetNWebDataConstructor(tb.Manager.Options.OutputFileName, tb.Manager.CoreEnv);
       
       ctor.Body = <[ 
         $(ctor.Body);
@@ -294,12 +351,11 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       ]>;
     }
     
-    public AddTemplateData(tb : TypeBuilder, template : string, data : PExpr) : void
+    public AddTemplateData(typeName : string, template : string, data : PExpr, nwebDataConstructor : MethodBuilder) : void
     {      
-      def ctor = GetNWebDataConstructor(tb);      
-      ctor.Body = <[ 
-        $(ctor.Body);
-        AddUnitTemplate($(JSClass.GetProperName(tb) : string), $(template : string), NWebUtils.GetHtml($data));
+      nwebDataConstructor.Body = <[ 
+        $(nwebDataConstructor.Body);
+        AddUnitTemplate($(JSClass.GetProperName(typeName) : string), $(template : string), NWebUtils.GetHtml($data));
       ]>;
     }
     
@@ -312,11 +368,11 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       | x => x :> MethodBuilder
       }
     }
-    
-    GetNWebDataConstructor(tb : TypeBuilder) : MethodBuilder
+        
+    public GetNWebDataConstructor(outputFileName : string, env : GlobalEnv) : MethodBuilder
     {
-      def assemblyName = Path.GetFileNameWithoutExtension(tb.Manager.Options.OutputFileName);
-      def env = tb.Manager.CoreEnv.EnterIntoNamespace([assemblyName]);
+      def assemblyName = Path.GetFileNameWithoutExtension(outputFileName);
+      def env = env.EnterIntoNamespace([assemblyName]);
       match(env.LookupType(["NWebDataPerAssembly"])) 
       {
       | Some(type) => 
@@ -325,7 +381,8 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
         def t = env.Define(<[ decl:
           public class NWebDataPerAssembly : NemerleWeb.NWebDataInstance
           {
-            public this() {}
+            public this() {
+            }
           }
         ]>);
         t.Compile();

@@ -39,12 +39,25 @@ module Program
 public class Test
 {  
   public Children : string = "abcdefghijklm";
-    
+  public Children2 : string = "nopqrstuvwxyz";
+  
   [Html]
   public View() : string
   {
     <# 
-       <div $foreach(c in Children.Where(c => c == 'f'))>
+       <div>
+         <div $foreach(c in Children.Where(c => c != 'f'))>
+           <strong data-id="1">$(c + 'a')</strong>
+           <span $foreach(c2 in Children2.Where(c => c != 'z'))>
+             $c2
+             <div $when(c2 == 'p')>
+              it's p $c2
+             </div>
+           </span>
+         </div>
+       </div>
+       <div>
+        2
        </div>
     #>
   }
