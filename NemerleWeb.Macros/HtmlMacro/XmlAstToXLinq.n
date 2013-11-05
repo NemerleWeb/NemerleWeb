@@ -72,48 +72,42 @@ namespace NemerleWeb
         })
     }
     
-    public Transform([NotNull] xmlAsts : XmlAst.Seq) : (PExpr * SpliceNode)
+    public Transform([NotNull] xmlAsts : XmlAst.Seq) : PExpr
     { 
       def res = Util.locate(ToLocation(xmlAsts), TransformImpl(xmlAsts, _splice));
-      (<[ $(res : string) ]>, _splice);
+      res;
     }
     
-    public TransformImpl([NotNull] xmlAst : XmlAst, spliceNode : SpliceNode, depth = 0 : int) : string
+    public TransformImpl([NotNull] xmlAst : XmlAst, spliceNode : SpliceNode, depth = 0 : int) : PExpr
     {              
         def transformImpl(ast) {
           def newNode = SpliceNode(None(), None(), List(), false);
           spliceNode.Children.Add(newNode);
           TransformImpl(ast, newNode, depth + 1);
-        }
-        def ident = string.Join("", Enumerable.Repeat("  ", depth));
-        
-        def generateSplice(spliceExpr : string, isForeach = false : bool) : string {
-          _spliceCounter++;
-          def spliceId = _spliceCounter.ToString();
-          def node = SpliceNode(Some(spliceId), Some(Parse(ToLocation(xmlAst), spliceExpr)), List(), isForeach);
-          spliceNode.Children.Add(node);
-          spliceId
-        }
+        }        
         
         match (xmlAst) {
-        | Attr(name, Splicable.Expr as value) => $"nw-$name='$(generateSplice(value.expr))'"
-        | Attr(Splicable.Value(name), value)  => $"$name='$value'"
-        | Text(Splicable.Value(value))        => ident + value
+        | Attr(Splicable.Value(name), Splicable.Expr(expr)) => <[ attr_macro($(name : string), () => $expr) ]>
+        | Attr(Splicable.Value(name), Splicable.Value(value))  => <[ attr_macro($(name : string), $value) ]>
+        | Text(Splicable.Value(value))        => <[ text_macro($(value : string)) ]>
         | Tag(Splicable.Value(name), content) =>
           def isInsideTag(c) { c is XmlAst.AttrSplice || c is XmlAst.Attr }
           def attrs = content.Where(c => isInsideTag(c)).Map(c => TransformImpl(c, spliceNode));          
-          def children = content.Where(c => !isInsideTag(c)).Map(c => transformImpl(c));
+          def childTags = content.Where(c => !isInsideTag(c)).Map(c => transformImpl(c));
                                   
-$<#
-$ident<$name ..$(attrs; " ")>..$(children; "")
-$ident</$name>#>
-        | TagSplice(expr, false)                 => $"<nwsplice nw-splice='$(generateSplice(expr))' />"
-        | TagSplice(expr, true)                  => $"<nwsplice nw-splice='$(generateSplice(expr))' />"
-        | AttrSplice(s, SpliceType.Foreach)      => $"nw-repeat='$(generateSplice(s, true))'"
-        | AttrSplice(s, SpliceType.When)         => $"nw-when='$(generateSplice(s))'"
-        | AttrSplice(s, SpliceType.Unless)       => $"nw-unless='$(generateSplice(s))'"
-        | Seq(items)                             => string.Join("", items.Map(i => transformImpl(i)));
-        | _                                      => Message.FatalError(ToLocation(xmlAst), "Unrecognized syntax in Html"); ""
+<[
+tag_macro($(name : string), () => {
+  
+  ([..$(attrs)],
+   [..$(childTags)])
+})
+]>
+        | TagSplice(expr, _)                     => <[ text_macro(() => $expr) ]>
+        | AttrSplice(s, SpliceType.Foreach)      => <[ attr_macro("nw-foreach", () => $s) ]>
+        | AttrSplice(s, SpliceType.When)         => <[ attr_macro("nw-when", () => $s) ]>
+        | AttrSplice(s, SpliceType.Unless)       => <[ attr_macro("nw-unless", () => $s) ]>
+        | Seq(items)                             => <[ [..$(items.Map(transformImpl))] ]>;
+        | _                                      => Message.FatalError(ToLocation(xmlAst), "Unrecognized syntax in Html"); <[]>
         }
     }
     
