@@ -204,17 +204,177 @@ namespace NemerleWeb
       
       def ret = ast
         .SelectMany(f =>
-          GenerateOverloads(f.Signature)
-            .Select(s => AmbientFunctionDeclaration(name, s)))
+          GenerateOverloads(f.Signature).Select(s => AmbientFunctionDeclaration(name, s)))
         .Distinct();
         
       ret
     }
     
+    #region Function overloads
+    
     private GenerateOverloads(signature : CallSignature) : IEnumerable[CallSignature]
     {
-      [signature]
+      //def res = GenerateLambdaOverloads(signature);
+      
+      //def res = GenerateLambdaOverloads(signature.Parameters.ToList()).ToList();
+      def res = [signature];
+      def res = res.SelectMany(s => GenerateOverloadsImpl(s));
+      
+      res
     }
+    
+    private GenerateOverloadsImpl(signature : CallSignature) : IEnumerable[CallSignature]
+    {
+      GenerateOverloadsList(
+        signature.TypeParameters,
+        signature.Parameters,
+        signature.ReturnType)
+    }
+    
+    /// <summary>
+    /// Create all possible overloads according to the rules
+    /// Go through all parameters and start generating overloads if needed    
+    /// </summary>
+    private GenerateOverloadsList(
+      typeParams : list[ScriptTypeParameter],
+      parms : list[ScriptParameter],
+      returnType : option[ScriptType]) : IEnumerable[CallSignature]
+    {
+      when(!(parms is []))
+      {
+        def revParms = parms.Reverse();
+        match(revParms.Head)
+        {
+        | Optional(_, _, _, true) 
+        | Rest =>
+          // Process all without last parameter
+          def newParams = revParms.Tail;
+          
+          // Collect all types that are used
+          def newParamsTypes = CollectParametersTypes(newParams).Distinct();
+          // Only used types from type parameters are needed
+          def newTypeParams = typeParams.Filter(tyParam => newParamsTypes.Contains(tyParam.Name));
+          
+          foreach(res in GenerateOverloadsList(newTypeParams, revParms.Tail, returnType)) yield res;
+          
+        | _ => ()
+        }
+      }
+      
+      // Generate current parameters and stop
+      yield CallSignature(typeParams, parms, returnType)
+    }
+    
+    /// <summary>
+    /// Generate lambda arguments and create Action/Func overload if return type is any.
+    /// </summary>
+    private GenerateLambdaOverloads(parms : List[CallSignature]) : IEnumerable[list[CallSignature]]
+    {
+      if(parms.Count == 0)
+        []
+      else
+        GenerateLambdaOverloadsImpl(parms, 0)
+    }
+    
+    private GenerateLambdaOverloadsImpl(
+      parms : List[CallSignature],
+      index : int) : IEnumerable[list[CallSignature]]
+    {
+      []
+    }
+    
+     private GenerateLambdaOverloadsImplGenerate(
+      parms : List[CallSignature],
+      index : int,
+      f : void -> CallSignature) : IEnumerable[list[CallSignature]]
+    {
+      []
+    }
+    
+    
+    #endregion
+    
+    #region Types collection
+    
+    private GetObjectTypes(obj : option[ScriptObject]) : IEnumerable[string]
+    {
+      | Some(o) => GetObjectTypes(o)
+      | _ => []
+    }
+    
+    private GetObjectTypes(obj : ScriptObject) : IEnumerable[string]
+    {
+      | Property(value) => GetObjectTypes(obj)
+      | Call(signature) => GetCallSignatureTypes(signature)
+      | Construct(value) => 
+        GetCallSignatureTypes(
+          value.TypeParameters,
+          value.Parameters,
+          GetScriptTypeTypes(value.ReturnType))
+      | Index(value) => GetScriptTypeTypes(value.ReturnType)
+      | Method(value) => GetCallSignatureTypes(value.Signature)
+    }
+    
+    private GetCallSignatureTypes(signature : ScriptTypeCallSignature) : IEnumerable[string]
+    {
+      GetCallSignatureTypes(
+        signature.TypeParameters,
+        signature.Parameters,
+        GetScriptTypeTypes(signature.ReturnType))
+    }
+    
+    private GetCallSignatureTypes(signature : CallSignature) : IEnumerable[string]
+    {
+      GetCallSignatureTypes(
+        signature.TypeParameters,
+        signature.Parameters,
+        GetScriptTypeTypes(signature.ReturnType))
+    }
+    
+    private GetCallSignatureTypes(
+      typeParameters : list[ScriptTypeParameter],
+      parameters : list[ScriptParameter],
+      returnTypes : IEnumerable[string]) : IEnumerable[string]
+    {
+      def paramsTypes = CollectParametersTypes(parameters);          
+      def tyParameters = typeParameters.Select(_.Name);
+        
+      returnTypes.Union(paramsTypes).Except(tyParameters)
+    }
+    
+    private GetScriptTypeTypes(type : option[ScriptType]) : IEnumerable[string]
+    {
+      if(type is Some(t)) GetScriptTypeTypes(t) else []
+    }
+    
+    // Collect types recursively
+    private GetScriptTypeTypes(type : ScriptType) : IEnumerable[string]
+    {
+      | Array(t, _) => GetScriptTypeTypes(t)
+      | Function(signature) => GetCallSignatureTypes(signature)
+      | Object(members) => members.SelectMany(GetObjectTypes)        
+      | Ref(name, tyArgs) => [name].Union(tyArgs.SelectMany(GetScriptTypeTypes))        
+      | _ => []
+    }
+    
+    /// <summary>
+    /// Collects all named types.
+    /// Predefined types are not collected.
+    /// </summary>
+    private CollectParametersTypes(parms : list[ScriptParameter]) : IEnumerable[string]
+    {
+      parms.SelectMany(param =>
+        match(param)
+        {
+        | ScriptParameter.Required(Regular(_, Some(type), _))
+        | ScriptParameter.Optional(_, Some(type), _, _)
+        | ScriptParameter.Rest(_, Some(type)) =>
+          GetScriptTypeTypes(type)
+        | _ => []
+        })
+    }
+    
+    #endregion
     
    #if A
   
