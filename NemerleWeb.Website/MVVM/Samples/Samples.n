@@ -5,10 +5,10 @@ using System.Collections.Concurrent;
 using Nemerle;
 using NemerleWeb;
 using NemerleWeb.TypedJS;
-using NemerleWeb.Tests;
-using NemerleWeb.Samples.TypedJS;
+using NemerleWeb.Website.Tests;
+using NemerleWeb.Website.Samples.TypedJS;
 
-namespace NemerleWeb.Samples
+namespace NemerleWeb.Website.Samples
 {
   [Unit, Record]  
   class Sample
@@ -102,7 +102,7 @@ namespace NemerleWeb.Samples
       {          
         samples[index].Source = source;
         prettyPrint();
-      });  
+      });
     }
     
     SelectSample(sample : Sample) : void 

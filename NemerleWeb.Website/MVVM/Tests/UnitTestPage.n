@@ -11,7 +11,7 @@ using Nemerle.Peg;
 using NemerleWeb.Tests.Macro;
 using NemerleWeb.TypedJS;
 
-namespace NemerleWeb.Tests
+namespace NemerleWeb.Website.Tests
 {
   [Unit]
   public class UnitTestPage
@@ -1673,7 +1673,7 @@ namespace NemerleWeb.Tests
       });
       
       test("server call should return XHR object", () => {
-        def xhr = server.A(res => ());
+        def xhr = server.A(_ => ());
         _ = xhr.status;
         true
       });

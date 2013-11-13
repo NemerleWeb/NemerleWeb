@@ -14,10 +14,13 @@ using Nemerle.Xml;
 using NemerleWeb;
 using NemerleWeb.Tests;
 
-public module HtmlHelperExtensions
+namespace NemerleWeb.Website
 {
-  public static FileContents(this _helper : HtmlHelper, [NotNull] filename : string) : string
-  { 
-    Helpers.LoadSourceFor(filename);
-  }  
+  public module HtmlHelperExtensions
+  {
+    public static FileContents(this _helper : HtmlHelper, [NotNull] filename : string) : string
+    { 
+      Helpers.LoadSourceFor(filename);
+    }  
+  }
 }

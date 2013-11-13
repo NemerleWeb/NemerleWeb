@@ -244,6 +244,51 @@
     <Compile Include="Properties\AssemblyInfo.n" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\PSTools\check-nemerle.ps1">
+      <SubType>Content</SubType>
+      <Link>installer\check-nemerle.ps1</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\PSTools\dl-install-nemerle.ps1">
+      <SubType>Content</SubType>
+      <Link>installer\dl-install-nemerle.ps1</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\PSTools\dl-install-net45.ps1">
+      <SubType>Content</SubType>
+      <Link>installer\dl-install-net45.ps1</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\PSTools\IISExpress.zip">
+      <SubType>Content</SubType>
+      <Link>installer\IISExpress.zip</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\PSTools\install-nweb.ps1">
+      <SubType>Content</SubType>
+      <Link>installer\install-nweb.ps1</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\PSTools\nuget.exe">
+      <SubType>Content</SubType>
+      <Link>installer\nuget.exe</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\PSTools\nweb.cmd">
+      <SubType>Content</SubType>
+      <Link>installer\nweb.cmd</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\PSTools\nweb.ps1">
+      <SubType>Content</SubType>
+      <Link>installer\nweb.ps1</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\PSTools\standalone-install.ps1">
+      <SubType>Content</SubType>
+      <Link>installer\standalone-install.ps1</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\prettify.css">
       <SubType>Content</SubType>
     </Content>
@@ -305,10 +350,10 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="bin\" />
     <Folder Include="Content\" />
     <Folder Include="Controllers\" />
     <Folder Include="Infrastructure\" />
+    <Folder Include="installer\" />
     <Folder Include="MVVM" />
     <Folder Include="MVVM\Samples\" />
     <Folder Include="MVVM\Samples\Knockout\" />

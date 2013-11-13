@@ -5,7 +5,7 @@ using System.Web.Mvc;
 using NemerleWeb;
 using NemerleWeb.TypedJS;
 
-namespace NemerleWeb.Samples
+namespace NemerleWeb.Website.Samples
 {
   [Unit]
   public class SPAPage

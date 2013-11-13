@@ -1,7 +1,7 @@
 ﻿using NemerleWeb;
 
 
-namespace NemerleWeb.Samples
+namespace NemerleWeb.Website.Samples
 {
   [Record, Unit]
   public class IntroductionPage

@@ -3,7 +3,7 @@ using System.Linq;
 using NemerleWeb;
 
 
-namespace NemerleWeb.Samples
+namespace NemerleWeb.Website.Samples
 {
   [Unit]
   public class ListsAndCollectionsPage
