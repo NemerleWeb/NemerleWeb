@@ -244,51 +244,10 @@
     <Compile Include="Properties\AssemblyInfo.n" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\PSTools\check-nemerle.ps1">
+    <None Include="..\PSTools\*.*">
       <SubType>Content</SubType>
-      <Link>installer\check-nemerle.ps1</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\PSTools\dl-install-nemerle.ps1">
-      <SubType>Content</SubType>
-      <Link>installer\dl-install-nemerle.ps1</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\PSTools\dl-install-net45.ps1">
-      <SubType>Content</SubType>
-      <Link>installer\dl-install-net45.ps1</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\PSTools\IISExpress.zip">
-      <SubType>Content</SubType>
-      <Link>installer\IISExpress.zip</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\PSTools\install-nweb.ps1">
-      <SubType>Content</SubType>
-      <Link>installer\install-nweb.ps1</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\PSTools\nuget.exe">
-      <SubType>Content</SubType>
-      <Link>installer\nuget.exe</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\PSTools\nweb.cmd">
-      <SubType>Content</SubType>
-      <Link>installer\nweb.cmd</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\PSTools\nweb.ps1">
-      <SubType>Content</SubType>
-      <Link>installer\nweb.ps1</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\PSTools\standalone-install.ps1">
-      <SubType>Content</SubType>
-      <Link>installer\standalone-install.ps1</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+      <Link>PSTools\*.*</Link>
+    </None>
     <Content Include="Content\prettify.css">
       <SubType>Content</SubType>
     </Content>
@@ -359,6 +318,7 @@
     <Folder Include="MVVM\Samples\Knockout\" />
     <Folder Include="MVVM\Tests\" />
     <Folder Include="Properties\" />
+    <Folder Include="PSTools\" />
     <Folder Include="Scripts\" />
     <Folder Include="Views\" />
     <Folder Include="Views\Home\" />
