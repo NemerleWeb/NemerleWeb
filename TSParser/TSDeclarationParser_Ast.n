@@ -148,7 +148,7 @@ namespace TSParser.Ast
     | Method    { Value : Ast.Method; }
   }
   
-  [Record][StructuralEquality]
+  [Record][StructuralEquality(Ignore = [ParameterName])]
   public class IndexSignature
   {
     public ParameterName : string;
@@ -170,7 +170,7 @@ namespace TSParser.Ast
     public ReturnType : option[ScriptType];
   }
   
-  [Record][StructuralEquality]
+  [Record][StructuralEquality(Ignore = [Optional])]
   public class Property
   {
     public Name : string;
@@ -178,6 +178,10 @@ namespace TSParser.Ast
     public Type : option[ScriptType];
   }
   
+  public type Construct = CallSignature;
+  
+  /*
+  // Same as CallSignature
   [Record][StructuralEquality]
   public class Construct
   {
@@ -185,8 +189,9 @@ namespace TSParser.Ast
     public Parameters : list[ScriptParameter];
     public ReturnType : option[ScriptType];      
   }
+  */
   
-  [Record][StructuralEquality]
+  [Record][StructuralEquality(Ignore = [Name, Optional])]
   public class Method
   {
     public Name : string;
@@ -201,7 +206,7 @@ namespace TSParser.Ast
     public Constraint : option[ScriptType];
   }
   
-  [StructuralEquality(Ignore = [Access, Optional])]
+  [StructuralEquality(Ignore = [Name, Access, Optional])]
   public variant ScriptParameter
   {
     | Required
@@ -224,7 +229,7 @@ namespace TSParser.Ast
       }
   }
   
-  [StructuralEquality(Ignore = Access)]
+  [StructuralEquality(Ignore = [Name, Value, Access])]
   public variant RequiredParameter
   {
     | Literal { Name : string; Value : string; }

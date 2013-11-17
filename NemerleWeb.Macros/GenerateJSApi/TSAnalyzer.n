@@ -147,8 +147,19 @@ namespace NemerleWeb
     
     private AnalyzeScriptObject(obj : ScriptObject) : IEnumerable[ScriptObject]
     {
-      // TODOK: Write
-      [obj]
+      | ScriptObject.Call(value) => 
+        GenerateOverloads(value).Select(ScriptObject.Call)
+    
+      | ScriptObject.Construct(value) =>
+        GenerateOverloads(value).Select(ScriptObject.Construct)
+        
+      | ScriptObject.Method(value) =>
+        GenerateOverloads(value.Signature)
+        .Select(sig => ScriptObject.Method(Method(value.Name, value.Optional, sig)))
+      
+      | ScriptObject.Index
+      | ScriptObject.Property
+      | _ => [obj]
     }
     
     private AnalyzeСlass(ast : IEnumerable[AmbientClassDeclaration]) : IEnumerable[AmbientClassDeclaration]
@@ -254,11 +265,20 @@ namespace NemerleWeb
         {
         | Optional(_, _, _, true) 
         | Rest =>
+          def returnTypeParametersUsed =
+            if(returnType is Some(r))
+              GetScriptTypeTypes(r)
+            else
+              [];
+        
           // Process all without last parameter
           def newParams = revParms.Tail;
           
           // Collect all types that are used
-          def newParamsTypes = CollectParametersTypes(newParams).Distinct();
+          def newParamsTypes = CollectParametersTypes(newParams)
+            .Concat(returnTypeParametersUsed)
+            .Distinct();
+          
           // Only used types from type parameters are needed
           def newTypeParams = typeParams.Filter(tyParam => newParamsTypes.Contains(tyParam.Name));
           
