@@ -132,24 +132,23 @@ namespace NemerleWeb
     {
       def name = ast.First().Name;
       
-      def typeParameters = ast
-        .SelectMany(x => x.TypeParameters)
-        .Distinct()
-        .NToList();
-      
-      def extends = ast
-        .SelectMany(x => x.Extends)
-        .Distinct()
-        .NToList();
+      def typeParameters = ast.SelectMany(x => x.TypeParameters).Distinct().NToList();      
+      def extends = ast.SelectMany(x => x.Extends).Distinct().NToList();
       
       def members = ast
-        .SelectMany(x => x.Type.Members)
+        .SelectMany(x => x.Type.Members.SelectMany(AnalyzeScriptObject))
         .Distinct()
         .NToList();
       
       def @type = ScriptType.Object(members);
         
       yield InterfaceDeclaration(name, typeParameters, extends, @type)
+    }
+    
+    private AnalyzeScriptObject(obj : ScriptObject) : IEnumerable[ScriptObject]
+    {
+      // TODOK: Write
+      [obj]
     }
     
     private AnalyzeСlass(ast : IEnumerable[AmbientClassDeclaration]) : IEnumerable[AmbientClassDeclaration]
@@ -210,14 +209,22 @@ namespace NemerleWeb
       ret
     }
     
+    private AnalyzeModule(ast : IEnumerable[AmbientModuleDeclaration]) : IEnumerable[AmbientModuleDeclaration]
+    {
+      //def name = ast.First().Name;
+      //def members = ast.SelectMany(a =>
+      //  AnalyzeTSAst(a.Members)])).NToList();
+      
+      //def ret = AmbientModuleDeclaration(name, members);
+      //[ret]
+      []
+    }
+    
     #region Function overloads
     
     private GenerateOverloads(signature : CallSignature) : IEnumerable[CallSignature]
     {
-      //def res = GenerateLambdaOverloads(signature);
-      
-      //def res = GenerateLambdaOverloads(signature.Parameters.ToList()).ToList();
-      def res = [signature];
+      def res = GenerateLambdaOverloads(signature);
       def res = res.SelectMany(s => GenerateOverloadsImpl(s));
       
       res
@@ -262,35 +269,105 @@ namespace NemerleWeb
       }
       
       // Generate current parameters and stop
-      yield CallSignature(typeParams, parms, returnType)
+      yield CallSignature(typeParams, parms, returnType);
     }
     
     /// <summary>
-    /// Generate lambda arguments and create Action/Func overload if return type is any.
+    /// Generate lambda arguments and create additional ?->void overload if return type is any.
     /// </summary>
-    private GenerateLambdaOverloads(parms : List[CallSignature]) : IEnumerable[list[CallSignature]]
-    {
-      if(parms.Count == 0)
-        []
-      else
-        GenerateLambdaOverloadsImpl(parms, 0)
+    private GenerateLambdaOverloads(signature : CallSignature) : IEnumerable[CallSignature]
+    { 
+      // For any lambda parameter return any type, return list of two possibilities:
+      // one with any return type, second with void return type.
+      def process(x)
+      {
+        | ScriptParameter.Required(
+            RequiredParameter.Regular(
+              _,
+              Some(
+                ScriptType.Function(
+                  ScriptTypeCallSignature(typ, parms, ScriptType.Any()))), _) as p) =>
+          
+          [
+            x,
+            ScriptParameter.Required(
+              RequiredParameter.Regular(
+                p.Name,
+                Some(ScriptType.Function(ScriptTypeCallSignature(typ, parms, ScriptType.Void()))),
+                p.Access))
+          ]
+          
+        | ScriptParameter.Optional(
+              _,
+              Some(ScriptType.Function(ScriptTypeCallSignature(typ, parms, ScriptType.Any()))),
+              _,
+              _) as p =>
+          
+          [
+            x,
+            ScriptParameter.Optional(
+              p.Name,
+              Some(ScriptType.Function(ScriptTypeCallSignature(typ, parms, ScriptType.Void()))),
+              p.Access,
+              p.Optional)
+          ]
+        
+        | ScriptParameter.Rest(
+            _,
+            Some(
+              ScriptType.Array(
+                ScriptType.Function(
+                  ScriptTypeCallSignature(typ, parms, ScriptType.Any())), _) as a)) as p =>
+          [
+            x,
+            ScriptParameter.Rest(
+              p.Name,
+              Some(
+                ScriptType.Array(
+                  ScriptType.Function(
+                    ScriptTypeCallSignature(typ, parms, ScriptType.Void())),
+                    a.Rank)))
+          ]
+                
+
+        | ScriptParameter.Rest(
+            _,
+            Some(
+              ScriptType.Ref(
+                "Array",
+                [ScriptType.Function(ScriptTypeCallSignature(typ, parms, ScriptType.Any()))]))) as p =>
+                
+          [
+            x,
+            ScriptParameter.Rest(
+              p.Name,
+              Some(
+                ScriptType.Ref(
+                  "Array",
+                  [ScriptType.Function(
+                    ScriptTypeCallSignature(typ, parms, ScriptType.Void()))])))
+          ]
+              
+        | _ => [x]
+      }
+      
+      def parametersList = GenerateListPermutation(signature.Parameters, process);
+      parametersList.Select(parms => CallSignature(signature.TypeParameters, parms, signature.ReturnType))
     }
     
-    private GenerateLambdaOverloadsImpl(
-      parms : List[CallSignature],
-      index : int) : IEnumerable[list[CallSignature]]
+    private GenerateListPermutation[T](l : list[T], f : T -> list[T]) : list[list[T]]
     {
-      []
-    }
+      def impl(l, acc)
+      {
+        match(l)
+        {
+        | [] => [acc]
+        | h :: t => f(h).Map(h' => impl(t, acc + [h'])).Flatten()
+        }
+      }
     
-     private GenerateLambdaOverloadsImplGenerate(
-      parms : List[CallSignature],
-      index : int,
-      f : void -> CallSignature) : IEnumerable[list[CallSignature]]
-    {
-      []
+      impl(l, [])
     }
-    
     
     #endregion
     

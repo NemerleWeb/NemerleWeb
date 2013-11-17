@@ -1,7 +1,7 @@
 declare module nweb {
     function invalidate() : void;
 
-    function setCookie(name : string, value : any, days : number) : void ;
+    function setCookie(name : string, value : any, days : number) : void;
     function getCookie<T>(name : string) : T;
     function removeCookie(name : string) : void ;
 
