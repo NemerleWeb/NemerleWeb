@@ -182,7 +182,7 @@ namespace NemerleWeb
         .NToList();
       
       def members = ast
-        .SelectMany(x => x.Members)
+        .SelectMany(x => x.Members.SelectMany(AnalyzeClassElement))
         .Distinct()
         .NToList();
       
@@ -191,6 +191,21 @@ namespace NemerleWeb
         typeParameters,
         ClassHeritage(firstExtends, @implements),
         members);
+    }
+    
+    private AnalyzeClassElement(elem : AmbientClassBodyElement) : IEnumerable[AmbientClassBodyElement]
+    {
+      | AmbientClassBodyElement.Constructor(parms) => 
+        GenerateOverloads(CallSignature([], parms, None()))
+        .Select(sig => AmbientClassBodyElement.Constructor(sig.Parameters))
+    
+      | AmbientClassBodyElement.Method(name, signature, access, @static) =>
+        GenerateOverloads(signature)
+          .Select(sig => AmbientClassBodyElement.Method(name, sig, access, @static))
+        
+      | AmbientClassBodyElement.Index
+      | AmbientClassBodyElement.Property
+      | _ => [elem]
     }
     
     private AnalyzeEnum(ast : IEnumerable[AmbientEnumDeclaration]) : IEnumerable[AmbientEnumDeclaration]
