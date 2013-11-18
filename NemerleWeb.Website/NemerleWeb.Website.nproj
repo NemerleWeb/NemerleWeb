@@ -209,6 +209,22 @@
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="MVVM\Samples\Peg\CalculatorPage.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples\Peg\CSPage.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples\Peg\JsonPage.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples\Peg\JSPage.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="MVVM\Samples\Samples.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -316,6 +332,7 @@
     <Folder Include="MVVM" />
     <Folder Include="MVVM\Samples\" />
     <Folder Include="MVVM\Samples\Knockout\" />
+    <Folder Include="MVVM\Samples\Peg" />
     <Folder Include="MVVM\Tests\" />
     <Folder Include="Properties\" />
     <Folder Include="PSTools\" />
@@ -359,6 +376,31 @@
     <ProjectReference Include="..\NemerleWeb\NemerleWeb.nproj">
       <Name>NemerleWeb</Name>
       <Project>{b1635fea-c0cd-4c8e-a18e-d97d59f21b14}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\peg-parser\Calculator\Calculator-VS_2010.nproj">
+      <Name>Calculator-VS_2010</Name>
+      <Project>{dbabc305-af6e-40d6-8e79-1e3f36fbd879}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\peg-parser\CSharpParser\CSharpParser-VS_2010.nproj">
+      <Name>CSharpParser-VS_2010</Name>
+      <Project>{3965af53-ce45-4e96-bc7f-0795f67382f4}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <MacroProjectReference Include="..\peg-parser\Json\Nemerle.Json.Macros\Nemerle.Json.Macros-VS_2010.nproj">
+      <Name>Nemerle.Json.Macros-VS_2010</Name>
+      <Project>{e5e664d3-29a2-41a9-a4dc-a44ac0c386a3}</Project>
+      <Private>False</Private>
+    </MacroProjectReference>
+    <ProjectReference Include="..\peg-parser\Json\Nemerle.Json\Nemerle.Json-VS_2010.nproj">
+      <Name>Nemerle.Json-VS_2010</Name>
+      <Project>{5f0fee19-6857-47d6-b669-ee0a03e5d047}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\peg-parser\JSParser\JSParser-VS_2010.nproj">
+      <Name>JSParser-VS_2010</Name>
+      <Project>{f440f161-d644-4004-b4f0-a9dfa001039e}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>

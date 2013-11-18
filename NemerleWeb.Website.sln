@@ -17,6 +17,16 @@ Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "Nemerle.Peg-VS_2010", "peg-
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "Nemerle.Peg.Macros-VS_2010", "peg-parser\Nemerle.Peg.Macros\Nemerle.Peg.Macros-VS_2010.nproj", "{388424BD-C3A5-4C01-B84B-6C1BB9A9CC8E}"
 EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "Calculator-VS_2010", "peg-parser\Calculator\Calculator-VS_2010.nproj", "{DBABC305-AF6E-40D6-8E79-1E3F36FBD879}"
+EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "CSharpParser-VS_2010", "peg-parser\CSharpParser\CSharpParser-VS_2010.nproj", "{3965AF53-CE45-4E96-BC7F-0795F67382F4}"
+EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "Nemerle.Json.Macros-VS_2010", "peg-parser\Json\Nemerle.Json.Macros\Nemerle.Json.Macros-VS_2010.nproj", "{E5E664D3-29A2-41A9-A4DC-A44AC0C386A3}"
+EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "Nemerle.Json-VS_2010", "peg-parser\Json\Nemerle.Json\Nemerle.Json-VS_2010.nproj", "{5F0FEE19-6857-47D6-B669-EE0A03E5D047}"
+EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "JSParser-VS_2010", "peg-parser\JSParser\JSParser-VS_2010.nproj", "{F440F161-D644-4004-B4F0-A9DFA001039E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +65,26 @@ Global
 		{388424BD-C3A5-4C01-B84B-6C1BB9A9CC8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{388424BD-C3A5-4C01-B84B-6C1BB9A9CC8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{388424BD-C3A5-4C01-B84B-6C1BB9A9CC8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBABC305-AF6E-40D6-8E79-1E3F36FBD879}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBABC305-AF6E-40D6-8E79-1E3F36FBD879}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBABC305-AF6E-40D6-8E79-1E3F36FBD879}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBABC305-AF6E-40D6-8E79-1E3F36FBD879}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3965AF53-CE45-4E96-BC7F-0795F67382F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3965AF53-CE45-4E96-BC7F-0795F67382F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3965AF53-CE45-4E96-BC7F-0795F67382F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3965AF53-CE45-4E96-BC7F-0795F67382F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5E664D3-29A2-41A9-A4DC-A44AC0C386A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5E664D3-29A2-41A9-A4DC-A44AC0C386A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5E664D3-29A2-41A9-A4DC-A44AC0C386A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5E664D3-29A2-41A9-A4DC-A44AC0C386A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F0FEE19-6857-47D6-B669-EE0A03E5D047}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F0FEE19-6857-47D6-B669-EE0A03E5D047}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F0FEE19-6857-47D6-B669-EE0A03E5D047}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F0FEE19-6857-47D6-B669-EE0A03E5D047}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F440F161-D644-4004-B4F0-A9DFA001039E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F440F161-D644-4004-B4F0-A9DFA001039E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F440F161-D644-4004-B4F0-A9DFA001039E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F440F161-D644-4004-B4F0-A9DFA001039E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
