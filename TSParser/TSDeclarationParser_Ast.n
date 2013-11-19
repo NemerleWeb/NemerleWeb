@@ -162,7 +162,7 @@ namespace TSParser.Ast
     | String
   }
   
-  [Record][StructuralEquality]
+  [Record][StructuralEquality(Ignore = ReturnType)]
   public class CallSignature
   {
     public TypeParameters : list[ScriptTypeParameter];
@@ -191,7 +191,7 @@ namespace TSParser.Ast
   }
   */
   
-  [Record][StructuralEquality(Ignore = [Name, Optional])]
+  [Record][StructuralEquality(Ignore = [Optional])]
   public class Method
   {
     public Name : string;

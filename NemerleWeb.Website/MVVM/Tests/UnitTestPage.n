@@ -1687,6 +1687,11 @@ namespace NemerleWeb.Website.Tests
         
         testThis(1)(2)
       });
+ 
+     test("typed js test", () => {
+       _ = window.console.log;
+       true
+     });
     }
     
     public TemplateLambdaTest : list[string] = ["failed", "passed"];
