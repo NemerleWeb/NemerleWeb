@@ -408,11 +408,30 @@
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
+       Other similar extension points exist, see Microsoft.Common.targets. -->
+  <PropertyGroup>
+    <YourDestinationDirectory>$(TargetDir)MVVM\Samples</YourDestinationDirectory> 
+  </PropertyGroup>
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
-  </Target> -->
+    <ItemGroup>
+      <CalculatorParser Include="$(ProjectDir)..\peg-parser\Calculator\*.n" />
+    </ItemGroup>
+    <Copy SourceFiles="@(CalculatorParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\CalculatorParser" />
+    <ItemGroup>
+      <JsonParser Include="$(ProjectDir)..\peg-parser\Json\Nemerle.Json\*.n" />
+    </ItemGroup>
+    <Copy SourceFiles="@(JsonParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\JsonParser" />
+    <ItemGroup>
+      <JSParser Include="$(ProjectDir)..\peg-parser\JSParser\*.n" />
+    </ItemGroup>
+    <Copy SourceFiles="@(JSParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\JSParser" />
+    <ItemGroup>
+      <TypeScriptInterfaceParser Include="$(ProjectDir)..\peg-parser\TypeScriptInterfaceParser\*.n" />
+    </ItemGroup>
+    <Copy SourceFiles="@(TypeScriptInterfaceParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\TypeScriptInterfaceParser" />
+  </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
   </Target>

@@ -88,9 +88,35 @@ namespace NemerleWeb.Website.Samples
       
       PegSamples =
       [
-        Sample("Calculator", ["MVVM/Samples/Peg/CalculatorPage.n"], "", PegCalculator), 
-        Sample("JSON", ["MVVM/Samples/Peg/JSonPage.n"], "", PegJson), 
-        Sample("JS", ["MVVM/Samples/Peg/JSPage.n"], "", PegJS), 
+        Sample(
+          "Calculator", 
+          [
+            "MVVM/Samples/Peg/CalculatorParser/CalcParser.n",
+            "MVVM/Samples/Peg/CalculatorPage.n"
+          ],
+          "",
+          PegCalculator),
+          
+        Sample(
+          "Json",
+          [
+            "MVVM/Samples/Peg/JsonParser/JsonParser.n",
+            "MVVM/Samples/Peg/JsonPage.n",
+            "MVVM/Samples/Peg/JsonParser/Ast.n",
+            "MVVM/Samples/Peg/JsonParser/JsonUtils.n"
+          ],
+          "",
+          PegJson),
+        
+        Sample(
+          "JavaScript",
+          [
+            "MVVM/Samples/Peg/JSParser/JSParser.n",
+            "MVVM/Samples/Peg/JSPage.n",
+          ],
+          "",
+          PegJS),
+          
         //Sample("C#", ["MVVM/Samples/Peg/CSPage.n"], "", PegCS)
       ].ToList();
                        
@@ -140,7 +166,7 @@ namespace NemerleWeb.Website.Samples
       
       public LoadSourceForList(samples : IEnumerable[string]) : string
       {
-        $<#..$(samples; "\n---------------------------------\n"; Helpers.LoadSourceFor)#>
+        $<#..$(samples; "\n--------------------------------------------------\n"; Helpers.LoadSourceFor)#>
       }
     }
     
