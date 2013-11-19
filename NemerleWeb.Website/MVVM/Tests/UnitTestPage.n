@@ -1689,7 +1689,7 @@ namespace NemerleWeb.Website.Tests
       });
  
      test("typed js test", () => {
-       _ = window.console.log;
+       _ = window.console.log : void -> void;
        true
      });
     }
