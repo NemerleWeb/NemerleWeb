@@ -52,7 +52,11 @@
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function () {
-            $('.header a[href="' + this.location.pathname + '"]').parent().addClass('active');
+            if (window.location == null) {
+                $('.header a[href="' + '"]').parent().addClass('active');
+            } else {
+                $('.header a[href="' + window.location.pathname + '"]').parent().addClass('active');
+            }
         });
     </script>
 </body>

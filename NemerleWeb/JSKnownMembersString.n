@@ -32,20 +32,20 @@ namespace NemerleWeb
         match (member.Name)
         {        
         | "get_Length" => Some(JSAst.FieldRef(left, "length"))
-        | "Clone" => Some(left)        
+        | "Clone" => Some(left)
         | "GetEnumerator" => Some(left.JSMethodCall(member.Name, parms))
-        | "GetHashCode"
+        | "GetHashCode" => Some(JSAst.Call(JSAst.GlobalRef("System_String_GetHashCode"), [left]))
         | "GetType"
-        | "GetTypeCode"        
+        | "GetTypeCode"
         | "IsNormalized"
         | "Normalize"
         | "ToCharArray" => None()
-        | "ToLower" => Some(left.JSMethodCall("toLowerCase", []))
-        | "ToLowerInvariant" => None()
+        | "ToLower" => Some(left.JSMethodCall("toLowerCase", parms))
+        | "ToLowerInvariant" => Some(left.JSMethodCall("toLowerCase", parms))
         | "ToString" => Some(JSAstHelper.JSToString(left))
-        | "ToUpper" => Some(left.JSMethodCall("toUpperCase", []))
-        | "ToUpperInvariant"
-        | "Trim"
+        | "ToUpper" => Some(left.JSMethodCall("toUpperCase", parms))
+        | "ToUpperInvariant" => Some(left.JSMethodCall("toUpperCase", parms))
+        | "Trim" => Some(left.JSMethodCall("trim", parms))
         | "TrimEnd"
         | "TrimStart"
         | _ => None()

@@ -925,6 +925,24 @@ String.prototype.current = function () {
     return this[this.__enumeratorIndex];
 };
 
+function System_String_GetHashCode(s) {
+  var len = s.length;
+
+  if (len === 0) {
+    return 0;
+  }
+
+  var hash = 0;
+
+  for (var i = 0; i < len; i++) {
+    var c = s.charCodeAt(i);
+    hash = ((hash << 5) - hash) + c;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+
+  return hash;
+}
+
 // TODO: Maybe move
 var Nemerle_Utility_Identity_$A$$B$_ = {
     Instance: function (x) {
@@ -950,6 +968,67 @@ Nemerle_Core_None_$T$__$T$_._N_constant_object = new Nemerle_Core_None_$T$__$T$_
 function Nemerle_Core_option_$T$__$T$_(sig, val) {
   this.val = val;
 }
+
+function _compareObjects_(x, y) {
+  // remember that NaN === NaN returns false
+  // and isNaN(undefined) returns true
+  if (isNaN(x) && isNaN(y) && typeof x === 'number' && typeof y === 'number') {
+    return true;
+  }
+
+  // Compare primitives and functions.     
+  // Check if both arguments link to the same object.
+  // Especially useful on step when comparing prototypes
+  if (x === y) {
+    return true;
+  }
+
+  // Works in case when functions are created in constructor.
+  // Comparing dates is a common scenario. Another built-ins?
+  // We can even handle functions passed across iframes
+  if ((typeof x === 'function' && typeof y === 'function') ||
+     (x instanceof Date && y instanceof Date) ||
+     (x instanceof RegExp && y instanceof RegExp) ||
+     (x instanceof String && y instanceof String) ||
+     (x instanceof Number && y instanceof Number)) {
+    return x.toString() === y.toString();
+  }
+
+  // At last checking prototypes as good a we can
+  if (!(x instanceof Object && y instanceof Object)) {
+    return false;
+  }
+
+  if (x.isPrototypeOf(y) || y.isPrototypeOf(x)) {
+    return false;
+  }
+
+  if (x.constructor !== y.constructor) {
+    return false;
+  }
+
+  if (x.prototype !== y.prototype) {
+    return false;
+  }
+
+  if (typeof x.equals === 'function') {
+    return x.equals(y);
+  }
+
+  if (typeof x.Equals === 'function') {
+    return x.Equals(y);
+  }
+
+  return x == y;
+}
+
+var System_Collections_Generic_EqualityComparer_$T$_ = {
+  get_Default: function() {
+    return {
+      Equals: _compareObjects_
+    };
+  }
+};
 
 function System_Text_StringBuilder() {
     this.string = "";

@@ -1,0 +1,1367 @@
+﻿/**
+** Copyright by NN from NemerleWeb team (C) 2013
+*/
+
+using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using NemerleWeb.Peg;
+using Nemerle.Extensions;
+
+using NemerleWeb;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace TSParserPeg
+{
+  [Unit]
+  [PegGrammar(Options = EmitDebugSources,
+      start,
+      grammar
+      {
+        // We create void rules to write less code in handler and even skip writing handler.
+        #region Literals
+        
+        Spacing : void = WhiteSpace / LineTerminatorSequence / Comment;
+        s : void = Spacing*;
+        S : void = Spacing+;
+        
+        // String ending, this is not defined in specification, but real TS parser works that way.
+        // Maybe think about better rule.
+        // Using this rule it parses "a /**/ b /**/" while it must not.
+        endS : void = s semicolon? s (s semicolon)*;        
+        
+        // HeaderSpacing is used for finding references
+        HeaderSpacing : void = WhiteSpace / LineTerminatorSequence / GlobalComment;
+        HS : void = (HeaderSpacing / semicolon)*;
+        
+        import_s : void   = "import"s;
+        export_s : void   = "export"s;
+        module_s : void   = "module"s;
+        declare_s : void  = "declare"s;
+        var_s : void      = "var"s;
+        function_s : void = "function"s;
+        new_s : void      = "new"s;
+        delete_s : void = "delete"s;
+        void_s : void = "void"s;
+        typeof_S : void = "typeof"S;
+        constructor_s : void = "constructor"s;
+        enum_s : void = "enum"s;
+        class_s : void = "class"s;
+        implements_s : void = "implements"s;
+        extends_s : void = "extends"s;
+        get_s : void = "get"s;
+        set_s : void = "set"s;
+        interface_s : void = "interface"s;
+        require_s : void = "require"s;
+        
+        dot : void = '.';
+        dot_s : void = dot s;
+        comma : void = ',';
+        comma_s : void = comma s;
+        colon : void = ':';
+        colon_s : void = colon s;
+        semicolon : void = ';';
+        semicolon_s : void = semicolon s;
+        lbrace : void = '{';
+        lbrace_s : void = lbrace s;
+        rbrace : void = '}';
+        rbrace_s : void = rbrace s;
+        lbrack : void = '[';
+        lbrack_s : void = lbrack s;
+        rbrack : void = ']';
+        rbrack_s : void = rbrack s;
+        lparen : void = '(';
+        lparen_s : void = lparen s;
+        rparen : void = ')';
+        less : void = '<';
+        less_s : void = less s;
+        greater : void = '>';
+        greater_s : void = greater s;
+        rparen_s : void = rparen s;
+        assign : void = '=';
+        assign_s : void = assign s;
+        squote : void = '\'';
+        squote_s : void = squote s;
+        dquote : void = '"';
+        dquote_s : void = dquote s;
+        
+        ellipsis : void = "...";
+        ellipsis_s : void = ellipsis s;
+        
+        arrow : void = "=>";
+        arrow_s : void = arrow s;
+        
+        Array : void = "Array";
+        Array_s : void = Array s;
+        
+        #endregion
+        
+        #region Special rules
+        
+        required : void = !'?';
+        optional : bool = ('?' s)?;
+        static_ = "static";
+        static_s_ : bool = static_? s;
+        
+        #endregion
+        
+        #region EcmaScript
+        
+        #region SourceCharacter (6)
+
+        SourceCharacter = [Any];
+
+        #endregion
+
+        #region WhiteSpace (7.2)
+
+        NBSP = '\u00A0';
+        BOM = '\uFEFF';
+        WhiteSpace = [Zs] / '\t' / '\v' / '\f' / ' ' / NBSP / BOM;        
+
+        #endregion
+
+        #region Line terminators (7.3)
+
+        LineSeparator = '\u2028';
+        ParagraphSeparator = '\u2029';
+        LineTerminator = '\n' / '\r' / LineSeparator / ParagraphSeparator;
+        LineTerminatorSequence = "\r\n" / LineTerminator;
+
+        #endregion
+
+        #region Comment (7.4)
+        
+        Comment = MultiLineComment / SingleLineComment;
+        MultiLineComment = "/*" (!"*/" [Any])* "*/";
+        SingleLineComment = "//" (!LineTerminator [Any])*;
+        
+        // Support for /// <reference
+        GlobalComment = MultiLineComment / GlobalSingleLineComment;
+        GlobalSingleLineComment = "//" !('/'s ReferenceElement s) (!LineTerminator [Any])*;
+
+        #endregion
+        
+        #region Identifier (7.6)
+        
+        ZWNJ = '\u200C';
+        ZWJ = '\u200D';        
+        
+        // Any name
+        AnyIdentifier : string = IdentifierName s;
+        Identifier : string = !(ReservedWord Spacing+) IdentifierName s;
+        IdentifierName : string = IdentifierStart+ IdentifierPart*;
+        IdentifierStart = UnicodeLetter / '$' / '_' / '\\' UnicodeEscapeSequence;
+        IdentifierPart =
+          IdentifierStart /
+          UnicodeCombiningMark /
+          UnicodeDigit /
+          UnicodeConnectorPunctuation /
+          ZWNJ /
+          ZWJ;
+          
+        UnicodeLetter = [Lu, Ll, Lt, Lm, Lo, Nl];
+        UnicodeCombiningMark = [Mn, Mc];
+        UnicodeDigit = [Nd];
+        UnicodeConnectorPunctuation = [Pc];        
+        
+        #endregion
+        
+        #region ReservedWord (7.6.1)
+        
+        ReservedWord = Keyword / FutureReservedWord / StrictReservedWord / NullLiteral / BooleanLiteral;
+        StrictModeReservedWord = ReservedWord / StrictReservedWord;
+        
+        Keyword =
+          "break" / "do" / "instanceof" / "typeof" / "case" / "else" / 
+          "new" / "var" / "catch" / "finally" / "return" / "void" / "continue" /
+          "for" / "switch" / "while" / "debugger" / "function" / "this" / "with" / 
+          "default" / "if" / "throw" / "delete" / "in" / "try";
+          
+        // 7.6.1.2          
+        FutureReservedWord =
+          "class" / "enum" / "extends" / "super" / "const" / "export" / "import";
+          
+        // 10.1.1  
+        StrictReservedWord =
+          "implements" / "let" / "private" / "public" / "yield" / "interface" /
+          "package" / "protected" / "static";
+        
+        #endregion
+        
+        #region Literals (7.8)
+
+        Literal = NullLiteral / BooleanLiteral / NumericLiteral / StringLiteral / RegularExpressionLiteral;
+
+        #endregion
+        
+        #region NullLiteral (7.8.1)
+        
+        NullLiteral = "null";
+        
+        #endregion
+        
+        #region BooleanLiteral (7.8.2)
+        
+        BooleanLiteral = "true" / "false";
+        
+        #endregion
+
+        #region NumericLiteral (7.8.3)
+
+        NumericLiteral : string = (DecimalLiteral / HexIntegerLiteral) !(IdentifierStart / DecimalDigit);
+
+        DecimalLiteral =
+          DecimalIntegerLiteral dot DecimalDigit* ExponentPart? /
+          dot DecimalDigit+ ExponentPart? /
+          DecimalIntegerLiteral ExponentPart?;
+
+        DecimalIntegerLiteral = '0' / NonZeroDigit DecimalDigit*;
+        DecimalDigit = ['0'..'9'];
+        NonZeroDigit = ['1'..'9'];        
+        ExponentPart = ExponentIndicator SignedInteger;
+        ExponentIndicator = 'e' / 'E';
+        SignedInteger = DecimalDigit+ / '+' DecimalDigit+ / '-' DecimalDigit+;
+        HexIntegerLiteral = ("0x" / "0X") HexDigit+;
+        HexDigit = ['0'..'9', 'a'..'f', 'A'..'F'];        
+
+        #endregion
+
+        #region StringLiteral (7.8.4)
+        
+        StringLiteral : string =
+          dquote DoubleStringCharacter* dquote /
+          squote SingleStringCharacter* squote;
+        DoubleStringCharacter = 
+          !('"' / '\\' / LineTerminator) SourceCharacter /
+          '\\' EscapeSequence /
+          LineContinuation;                 
+        SingleStringCharacter =
+          !('\'' / '\\' / LineTerminator) SourceCharacter /
+          '\\' EscapeSequence /
+          LineContinuation;
+        LineContinuation = '\\' LineTerminatorSequence ;
+        
+        EscapeSequence = 
+          CharacterEscapeSequence /
+          '0' !DecimalDigit /
+          HexEscapeSequence /
+          UnicodeEscapeSequence;
+        
+        CharacterEscapeSequence = SingleEscapeCharacter / NonEscapeCharacter;
+        SingleEscapeCharacter = '\'' / '\"' / '\\' / 'b' / 'f' / 'n' / 'r' / 't' / 'v';
+        NonEscapeCharacter = !(EscapeCharacter / LineTerminator) SourceCharacter;        
+        EscapeCharacter = SingleEscapeCharacter / DecimalDigit / 'x' / 'u';
+        HexEscapeSequence = 'x' HexDigit HexDigit;
+        UnicodeEscapeSequence = 'u' HexDigit HexDigit HexDigit HexDigit;
+        
+        #endregion
+        
+        #region Regular Expression Literals (7.8.5)
+        
+        RegularExpressionLiteral = '/'s RegularExpressionBody '/'s RegularExpressionFlags s;
+        RegularExpressionBody = RegularExpressionFirstChar RegularExpressionChars;
+        RegularExpressionChars = RegularExpressionChar*;
+        RegularExpressionFirstChar =
+          !'*' !'\\' !'/' !'[' RegularExpressionNonTerminator /
+          RegularExpressionBackslashSequence /
+          RegularExpressionClass;
+        RegularExpressionChar =
+          !'\\' !'/' !'[' RegularExpressionNonTerminator /
+          RegularExpressionBackslashSequence /
+          RegularExpressionClass;
+        RegularExpressionBackslashSequence = '\\'s RegularExpressionNonTerminator;
+        RegularExpressionNonTerminator = !LineTerminator SourceCharacter;
+        RegularExpressionClass = lbrack_s RegularExpressionClassChars rbrack_s;
+        RegularExpressionClassChars = RegularExpressionClassChar*;
+        RegularExpressionClassChar = 
+          !']' !'\\' RegularExpressionNonTerminator /
+          RegularExpressionBackslashSequence;        
+        RegularExpressionFlags = IdentifierPart?;
+        
+        #endregion
+        
+        #region Primary Expressions (11.1)
+        
+        PrimaryExpression =
+          "this" /
+          Identifier /
+          Literal /
+          ArrayLiteral /
+          ObjectLiteral /
+          lparen_s Expression rparen_s;
+          
+        #endregion
+        
+        #region Array Initialiser (11.1.4)
+        
+        ArrayLiteral = lbrack_s (ElementList / ElementList comma_s Elision? / Elision?) rbrack_s;
+        ElementList = Elision? AssignmentExpression (comma_s Elision? AssignmentExpression)*;
+        Elision = (comma_s)+;
+        
+        #endregion
+        
+        #region Object Initialiser (11.1.5)
+
+        ObjectLiteral =
+          lbrace_s rbrace_s /
+          lbrace_s PropertyNameAndValueList rbrace_s /
+          lbrace_s PropertyNameAndValueList comma_s rbrace_s;
+        PropertyNameAndValueList = PropertyAssignment (comma_s PropertyAssignment)*;
+        
+        // Modified in TypeScript (4.5)
+        //PropertyAssignment =
+        //  PropertyName colon_s AssignmentExpression /
+        //  get_s PropertyName lparen_s rparen_s lbrace_s FunctionBody rbrace_s /
+        //  set_s PropertyName lparen_s PropertySetParameterList rparen_s lbrace_s FunctionBody rbrace_s;
+          
+        PropertyName : string = (IdentifierName / StringLiteral / NumericLiteral) s;
+        PropertySetParameterList = Identifier;
+        
+        #endregion
+        
+        #region Left-Hand-Side Expressions (11.2)
+        
+        MemberExpression =
+          (new_s)? (PrimaryExpression / FunctionExpression) (lbrack_s Expression rbrack_s / dot_s IdentifierName)+ Arguments?;
+        NewExpression = MemberExpression / new_s NewExpression;
+        CallExpression = MemberExpression (Arguments+ / lbrack_s Expression rbrack_s / dot_s IdentifierName);
+        Arguments = lparen_s ArgumentList? rparen_s;
+        ArgumentList = AssignmentExpression (comma_s AssignmentExpression)*;
+
+        LeftHandSideExpression = NewExpression / CallExpression;
+        
+        #endregion
+        
+        #region Postfix Expression
+        
+        PostfixExpression =
+          LeftHandSideExpression /
+          LeftHandSideExpression !LineTerminator "++" /
+          LeftHandSideExpression !LineTerminator "--";
+        
+        #endregion
+        
+        #region Unary Operators (11.4)
+        
+        UnaryExpression =
+          PostfixExpression /
+          "delete"s UnaryExpression /
+          "void"s UnaryExpression /
+          "typeof"s UnaryExpression /
+          "++"s UnaryExpression /
+          "--"s UnaryExpression /
+          '+'s UnaryExpression /
+          '-'s UnaryExpression /
+          '~'s UnaryExpression /
+          '!'s UnaryExpression;
+        
+        #endregion
+        
+        #region Multiplicative Operators (11.5)
+        
+        MultiplicativeExpression = UnaryExpression (('*' / '/' / '%')s UnaryExpression)*;
+        
+        #endregion
+        
+        #region Additive Operators (11.6)
+        
+        AdditiveExpression = MultiplicativeExpression (('+' / '-')s MultiplicativeExpression)*;
+        
+        #endregion
+        
+        #region Bitwise Shift Operators (11.7)
+        
+        ShiftExpression = AdditiveExpression (("<<" / ">>" / ">>>")s AdditiveExpression)*;
+        
+        #endregion
+        
+        #region Relational Operators (11.8)
+        
+        RelationalExpression =
+          ShiftExpression (('<' / '>' / "<=" / ">=" / "instanceof" / "in")s ShiftExpression)*;
+        
+        #endregion
+        
+        #region Equality Operators (11.9)
+        
+        EqualityExpression = RelationalExpression (("==" / "!=" / "===" / "!==")s RelationalExpression)*;
+        
+        #endregion
+        
+        #region Binary Bitwise Operators (11.10)
+        
+        BitwiseANDExpression = EqualityExpression ('&'s EqualityExpression)*;        
+        BitwiseXORExpression = BitwiseANDExpression ('^'s BitwiseANDExpression)*;   
+        BitwiseORExpression = BitwiseXORExpression ('|'s BitwiseXORExpression)*;
+        
+        #endregion
+        
+        #region Binary Logical Expression (11.11)
+        
+        LogicalANDExpression = BitwiseORExpression ("&&"s BitwiseORExpression)*;        
+        LogicalORExpression = LogicalANDExpression ("||"s LogicalANDExpression)*;
+        
+        #endregion
+        
+        #region Conditional Operator (11.12)
+        
+        ConditionalExpression =
+          LogicalORExpression /
+          LogicalORExpression '?'s AssignmentExpression ':'s AssignmentExpression;
+        
+        #endregion
+        
+        #region Assignement Operators (11.13)
+        
+        AssignmentExpression =
+          ConditionalExpression /
+          LeftHandSideExpression assign AssignmentExpression /
+          LeftHandSideExpression AssignmentOperator AssignmentExpression;
+        
+        AssignmentOperator = "*=" / "/=" / "%=" / "+=" / "-=" / "<<=" / ">>=" / ">>>=" / "&=" / "^=" / "|=";
+        
+        #endregion
+        
+        #region Comma Operator (11.14)
+        
+        Expression = AssignmentExpression (comma_s AssignmentExpression)*;
+        
+        #endregion
+
+        #region Statement (12)
+        
+        // TODO: Add other statements
+        Statement = VariableStatement;
+        
+        #endregion
+        
+        #region Variable Statement (12.2)
+        
+        VariableStatement = var_s VariableDeclarationList endS;
+        VariableDeclarationList = VariableDeclaration (comma_s VariableDeclaration)*;
+        // This rule is modified in TypeSript see: 5.1
+        //VariableDeclaration = Identifier;
+        Initialiser /*: string*/ = assign AssignmentExpression;
+        
+        #endregion
+        
+        #region Function Definition (13)
+        
+        FunctionExpression = function_s Identifier? lparen_s FormalParameterListOpt rparen_s lbrace_s FunctionBody rbrace_s;
+        FormalParameterList = Identifier (comma_s Identifier)*;
+        FormalParameterListOpt = FormalParameterList?;
+        FunctionBody = SourceElement*;
+        
+        #endregion
+        
+        #region Program (14)
+        
+        SourceElement = Statement / FunctionDeclaration;
+        
+        #endregion
+        
+        #endregion
+        
+        #region TypeScript
+        
+        #region Type Parameter Lists (3.5.1)
+        
+        TypeParameters : list[Ast.ScriptTypeParameter] = less_s TypeParameterList greater_s;
+        // Return list instead of option
+        TypeParametersOpt : list[Ast.ScriptTypeParameter] = TypeParameters?;
+        TypeParameterList : list[Ast.ScriptTypeParameter] = TypeParameter (comma_s TypeParameter)*;
+        TypeParameter : Ast.ScriptTypeParameter = Identifier Contraint?;        
+        Contraint : Ast.ScriptType = extends_s ScriptType;
+        
+        #endregion
+        
+        #region Specifying Types (3.6)
+        
+        // Array is specified here, because otherwise we have left recursion.
+        Type : Ast.ScriptType = (TypeQuery / TypeLiteral / TypeReference / PredefinedType) s;
+        ScriptType : Ast.ScriptType = Type ('['s ']'s)*;
+        
+        // Note: bool is not a valid type in TypeScript 0.9 but many libraries still use it.
+        PredefinedType : Ast.ScriptType =
+          ("any" / "number" / "boolean" / "bool" / "string" / "void");
+        
+        TypeReference : Ast.ScriptType = !(PredefinedType s) TypeName TypeArguments?;
+        TypeReferenceRef : Ast.ScriptType.Ref = TypeReference;
+        TypeName : string = Identifier (dot_s Identifier)*;        
+        ModuleName : string = TypeName;
+        
+        TypeArguments : list[Ast.ScriptType] = less_s TypeArgumentList greater_s;
+        TypeArgumentList : list[Ast.ScriptType] = TypeArgument (comma_s TypeArgument)*;
+        TypeArgument : Ast.ScriptType = ScriptType;
+        
+        #endregion
+        
+        #region Type Queries
+        
+        TypeQuery : Ast.ScriptType = typeof_S TypeQueryExpression;
+        TypeQueryExpression : string = Identifier (dot_s IdentifierName)*;
+        
+        #endregion
+        
+        #region Type Literals (3.6.4)
+        
+        // Array is excluded to prevent left recursion.
+        TypeLiteral : Ast.ScriptType = ObjectType / FunctionType / ConstructorType;        
+        
+        ArrayType : Ast.ScriptType = Type ('['s ']'s)+;
+        FunctionType : Ast.ScriptType =
+          TypeParametersOpt lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
+        ConstructorType : Ast.ScriptType =
+          new_s TypeParametersOpt lparen_s ParameterListOpt rparen_s arrow_s ScriptType s;
+        
+        #endregion
+                 
+        #region Object Type Literals (3.7)
+        
+        ObjectType : Ast.ScriptType = ObjectTypeStrict;
+        ObjectTypeStrict : Ast.ScriptType.Object = lbrace_s TypeBody? rbrace_s;
+        TypeBody : list[Ast.ScriptObject] = TypeMemberList;
+        TypeMemberList : list[Ast.ScriptObject] = TypeMember (endS TypeMember)* endS;
+        TypeMember : Ast.ScriptObject =
+          CallSignatureObject /
+          ConstructSignature /
+          MethodSignature /          
+          IndexSignature /
+          PropertySignature;
+          
+        #endregion
+          
+        #region Property Signatures (3.7.1)
+
+        PropertySignature : Ast.ScriptObject = PropertyName optional TypeAnnotation?;
+        
+        #endregion
+        
+        #region Call Signatures (3.7.2)
+        
+        CallSignatureObject : Ast.ScriptObject = CallSignature;
+        CallSignature : Ast.CallSignature =
+          TypeParametersOpt lparen_s ParameterListOpt rparen_s TypeAnnotation?;
+          
+        #endregion
+        
+        #region Parameter List (3.7.2.2)
+        
+        // According to spec, additional comma is forbiden, but TS compiler handles it.
+        ParameterList : list[Ast.ScriptParameter] =
+          ParameterListROR /
+          ParameterListRR /
+          ParameterListRO /
+          ParameterListOR /          
+          RequiredParameterList /
+          OptionalParameterList /
+          RestParameter;
+          
+        // Return empty list instead of option
+        ParameterListOpt : list[Ast.ScriptParameter] = ParameterList?;
+        
+        ParameterListROR : list[Ast.ScriptParameter] =
+          RequiredParameterList comma_s OptionalParameterList comma_s RestParameter;
+        ParameterListOR  : list[Ast.ScriptParameter] =
+          OptionalParameterList comma_s RestParameter;
+        ParameterListRO  : list[Ast.ScriptParameter] =
+          RequiredParameterList comma_s OptionalParameterList;
+        ParameterListRR  : list[Ast.ScriptParameter] =
+          RequiredParameterList comma_s RestParameter;
+          
+        RequiredParameterList : list[Ast.ScriptParameter] = RequiredParameter (comma_s RequiredParameter)*;
+        RequiredParameter : Ast.ScriptParameter =
+          RequiredParameterStringLiteral / RequiredParameterRegular;
+          
+        RequiredParameterStringLiteral : Ast.ScriptParameter = Identifier colon_s StringLiteral s;
+        RequiredParameterRegular : Ast.ScriptParameter = PublicOrPrivate? Identifier required TypeAnnotation?;
+          
+        Public : Ast.MemberAccess = "public";
+        Private : Ast.MemberAccess = "private";
+        PublicOrPrivate : Ast.MemberAccess = (Public/Private)s;
+        OptionalParameterList : list[Ast.ScriptParameter] = OptionalParameter (comma_s OptionalParameter)*;
+        // Optional parameter must not have Initialiser in declaration files.
+        OptionalParameter : Ast.ScriptParameter = PublicOrPrivate? Identifier optional TypeAnnotation?;
+        // This is not defined explicitely in grammar but implies
+        RestArrayType : Ast.ScriptType = Array_s less_s ScriptType greater_s;
+        RestParameter : list[Ast.ScriptParameter] = ellipsis_s Identifier (colon_s (RestArrayType / ArrayType))?;
+        
+        #endregion
+        
+        #region Construct/Index/Method Signatures (3.7.3, 3.7.4, 3.7.5)
+        
+        ConstructSignature : Ast.ScriptObject =
+          new_s TypeParametersOpt lparen_s ParameterListOpt rparen_s TypeAnnotation?;
+        IndexSignature     : Ast.ScriptObject =
+          lbrack_s Identifier required colon_s ("number" / "string") s rbrack_s TypeAnnotation;
+        MethodSignature  : Ast.ScriptObject = PropertyName optional CallSignature;
+        
+        #endregion
+        
+        #region Object Literals (4.5)
+        
+        PropertyAssignment =
+          PropertyName colon_s AssignmentExpression /
+          PropertyName CallSignature lbrace_s FunctionBody rbrace_s /
+          GetAccessor /
+          SetAccessor;
+          
+        GetAccessor =
+          get_s PropertyName lbrack_s rbrack_s TypeAnnotation? lbrace_s FunctionBody rbrace_s;
+        SetAccessor =
+          set_s PropertyName lbrack_s Identifier TypeAnnotation? rbrack_s;
+        
+        #endregion
+        
+        #region Variable Statements (5.1)
+        
+        VariableDeclaration = Identifier TypeAnnotation?;
+        TypeAnnotation : Ast.ScriptType = colon_s ScriptType s;
+        
+        #endregion
+        
+        #region Function Declarations (6.1)
+        
+        // Modified
+        FunctionDeclaration = FunctionOverload+;
+        FunctionOverload = function_s Identifier CallSignature endS;
+        
+        #endregion       
+        
+        #region Interface Declarations (7.1)
+        
+        InterfaceDeclaration : Ast.DeclarationElement =
+          interface_s Identifier TypeParametersOpt InterfaceExtendsClause? ObjectTypeStrict;
+        InterfaceExtendsClause : list[Ast.ScriptType.Ref] = extends_s ClassOrInterfaceTypeList;
+        ClassOrInterfaceTypeList : list[Ast.ScriptType.Ref] =
+          ClassOrInterfaceType (comma_s ClassOrInterfaceType)*;
+        ClassOrInterfaceType : Ast.ScriptType.Ref = TypeReferenceRef;
+        
+        #endregion
+        
+        #region Class Declarations (8.1)
+        
+        ClassDeclaration =
+          class_s Identifier TypeParametersOpt ClassHeritage lbrace_s ClassBody rbrace_s;
+        
+        ClassHeritage : Ast.ClassHeritage = ClassExtendsClause? ImplementsClause?;
+        ClassExtendsClause : Ast.ScriptType.Ref = extends_s ClassType;
+        ClassType : Ast.ScriptType.Ref = TypeReferenceRef;
+        ImplementsClause : list[Ast.ScriptType.Ref] = implements_s ClassOrInterfaceTypeList;
+        
+        ClassBody = ClassElement*;
+        ClassElement =
+          ConstructorDeclaration /
+          MemberDeclaration /
+          IndexSignature;
+        
+        #endregion
+        
+        #region Constructor Declaration (8.3)
+        
+        ConstructorDeclaration = ConstructorOverload+;
+        ConstructorOverload = constructor_s lparen_s ParameterListOpt rparen_s endS;
+        
+        #endregion
+        
+        #region Member Declarations (8.4)
+        
+        MemberDeclaration =
+          MemberFunctionDeclaration /
+          MemberVariableDeclaration /
+          MemberAccessorDeclaration;
+        
+        MemberVariableDeclaration =
+          PublicOrPrivate? static_s_ PropertyName TypeAnnotation? endS;
+        
+        MemberFunctionDeclaration = MemberFunctionOverload+;
+        MemberFunctionOverload = PublicOrPrivate? static_s_ PropertyName CallSignature endS;
+        
+        MemberAccessorDeclaration = PublicOrPrivate? static_s_ (GetAccessor / SetAccessor);
+        
+        #endregion
+        
+        #region Enums (9)
+        
+        EnumDeclaration = enum_s Identifier lbrace_s EnumBody? rbrace_s endS;
+        EnumBody =
+          ConstantEnumMember (comma_s ConstantEnumMember)* comma_s?;
+        ConstantEnumMember = PropertyName (assign_s IntegerLiteral)?;
+        IntegerLiteral = SignedInteger / HexIntegerLiteral;
+        ComputedEnumMemberList = ComputedEnumMember (comma_s ComputedEnumMember)*;
+        ComputedEnumMember = PropertyName assign_s AssignmentExpression;
+        
+        #endregion
+        
+        #region Module Declarations (10.1)
+        
+        ModuleDeclaration = module_s IdentifierPath lbrace_s ModuleBody rbrace_s;
+        IdentifierPath : string = Identifier (dot_s Identifier)*;        
+        
+        #endregion
+        
+        #region Module Body (10.2)
+        
+        ModuleBody = ModuleElement*;
+        
+        ModuleElement =
+          Statement /
+          export_s?
+          (
+            FunctionDeclaration /
+            ClassDeclaration /
+            InterfaceDeclaration /
+            ModuleDeclaration /
+            EnumDeclaration /
+            ImportDeclaration
+          ) endS;
+          
+        #endregion
+        
+        #region Import Declarations (10.3)
+        
+        ImportDeclaration : Ast.DeclarationElement =
+          import_s Identifier assign_s EntityName endS;
+        EntityName : string = ModuleName (dot Identifier)?;
+        
+        #endregion
+
+        #region Source Files (11)
+        
+        SourceFile = DeclarationSourceFile;
+        DeclarationSourceFile : List[Ast.DeclarationElement] = HS (DeclarationElement endS)*;
+        DeclarationElement : Ast.DeclarationElement =
+          Reference /
+          ExportAssignment /
+          export_s? InterfaceDeclaration /
+          export_s? ExternalImportDeclaration /
+          export_s? ImportDeclaration/          
+          export_s? AmbientDeclaration;
+        
+        #endregion
+        
+        #region External Import Declarations (11.2.2)
+        
+        ExternalImportDeclaration : Ast.DeclarationElement =
+          import_s Identifier assign_s ExternalModuleReference endS;        
+        ExternalModuleReference : string = require_s lparen_s StringLiteral s rparen_s;
+        
+        #endregion
+        
+        #region Export Assignments (11.2.4)
+        
+        ExportAssignment : Ast.DeclarationElement = export_s assign_s Identifier endS;
+        
+        #endregion
+        
+        #region Ambient Declarations (12.1)
+                
+        AmbientDeclaration : Ast.DeclarationElement =
+          declare_s
+           (
+            AmbientVariableDeclaration /
+            AmbientFunctionDeclaration /
+            AmbientClassDeclaration /
+            AmbientEnumDeclaration /
+            AmbientExternalModuleDeclaration /
+            AmbientModuleDeclaration
+           ) endS;
+        
+        AmbientVariableDeclaration : Ast.AmbientDeclaration = var_s Identifier TypeAnnotation?;
+        AmbientFunctionDeclaration : Ast.AmbientDeclaration = function_s Identifier CallSignature;
+        
+        // Class
+        AmbientClassDeclaration : Ast.AmbientDeclaration = 
+          class_s Identifier TypeParametersOpt ClassHeritage
+          lbrace_s AmbientClassBody rbrace_s endS;
+        AmbientClassBody : list[Ast.AmbientClassBodyElement] = AmbientClassBodyElement*;
+        AmbientClassBodyElement : Ast.AmbientClassBodyElement =
+          (
+            AmbientConstructorDeclaration /
+            AmbientMemberDeclaration /
+            IndexSignature_AmbientClassBodyElement
+          ) endS;
+        AmbientConstructorDeclaration : Ast.AmbientClassBodyElement =
+          constructor_s lparen_s ParameterListOpt rparen_s;
+        AmbientMemberDeclaration : Ast.AmbientClassBodyElement =
+          AmbientMemberDeclarationMethod / AmbientMemberDeclarationProperty;
+          
+        AmbientMemberDeclarationProperty : Ast.AmbientClassBodyElement =
+          PublicOrPrivate? static_s_ PropertyName TypeAnnotation?;
+        AmbientMemberDeclarationMethod : Ast.AmbientClassBodyElement =
+          PublicOrPrivate? static_s_ PropertyName CallSignature;
+          
+        // Special translation rules for AmbientClassBodyElement
+        IndexSignature_AmbientClassBodyElement : Ast.AmbientClassBodyElement = IndexSignature;
+                
+        // Enum
+        AmbientEnumDeclaration : Ast.AmbientDeclaration =
+          enum_s Identifier lbrace_s AmbientEnumBody? rbrace_s;
+        AmbientEnumBody : list[Ast.AmbientEnumMember] = AmbientEnumMember (comma_s AmbientEnumMember)* comma_s?;
+        AmbientEnumMember : Ast.AmbientEnumMember = PropertyName AmbientEnumMemberInitialiser? s;
+        AmbientEnumMemberInitialiser : int = assign_s IntegerLiteral;
+        
+        // Module
+        AmbientModuleDeclaration : Ast.AmbientDeclaration =
+          module_s IdentifierPath lbrace_s AmbientModuleBody rbrace_s;
+        AmbientModuleBody : list[Ast.AmbientModuleElement] = AmbientModuleElement*;
+        AmbientModuleElement : Ast.AmbientModuleElement =
+          export_s?
+          (
+            AmbientVariableDeclaration_AmbientModuleElement /
+            AmbientFunctionDeclaration_AmbientModuleElement /
+            AmbientClassDeclaration_AmbientModuleElement /
+            InterfaceDeclaration_AmbientModuleElement /
+            AmbientEnumDeclaration_AmbientModuleElement /
+            AmbientModuleDeclaration_AmbientModuleElement /
+            ImportDeclaration_AmbientModuleElement
+          ) endS;
+          
+        // Special translation rules for AmbientModuleElement
+        AmbientVariableDeclaration_AmbientModuleElement : Ast.AmbientModuleElement = AmbientVariableDeclaration;
+        AmbientFunctionDeclaration_AmbientModuleElement : Ast.AmbientModuleElement = AmbientFunctionDeclaration;
+        AmbientClassDeclaration_AmbientModuleElement    : Ast.AmbientModuleElement = AmbientClassDeclaration;
+        InterfaceDeclaration_AmbientModuleElement       : Ast.AmbientModuleElement = InterfaceDeclaration;
+        AmbientEnumDeclaration_AmbientModuleElement     : Ast.AmbientModuleElement = AmbientEnumDeclaration;
+        AmbientModuleDeclaration_AmbientModuleElement   : Ast.AmbientModuleElement = AmbientModuleDeclaration;
+        ImportDeclaration_AmbientModuleElement          : Ast.AmbientModuleElement = ImportDeclaration;
+          
+        // External
+        AmbientExternalModuleDeclaration : Ast.AmbientDeclaration =
+          module_s StringLiteral s lbrace_s s AmbientExternalModuleBody rbrace_s endS;
+        AmbientExternalModuleBody : list[Ast.AmbientExternalModuleElement] = AmbientExternalModuleElement*;
+        AmbientExternalModuleElement : Ast.AmbientExternalModuleElement =
+          ExportAssignment_AmbientExternalModuleElement /
+          export_s? ExternalImportDeclaration_AmbientExternalModuleElement /
+          AmbientModuleElement_AmbientExternalModuleElement;
+          
+        // Special translation rules for AmbientExternalModuleElement
+        ExportAssignment_AmbientExternalModuleElement : Ast.AmbientExternalModuleElement =
+          ExportAssignment;
+        ExternalImportDeclaration_AmbientExternalModuleElement : Ast.AmbientExternalModuleElement =
+          ExternalImportDeclaration;
+        AmbientModuleElement_AmbientExternalModuleElement : Ast.AmbientExternalModuleElement =
+          AmbientModuleElement;
+        
+        #endregion               
+        
+        #region Reference
+
+        /// <reference path="..." />
+        ReferencePath : Ast.Reference = "path"s assign_s StringLiteral;
+        ReferenceNoDefaultLib : Ast.Reference =
+          "no-default-lib"s assign_s ("\"true\"" / "'true'");
+        ReferenceElement : Ast.DeclarationElement =
+          less_s "reference"s (ReferencePath / ReferenceNoDefaultLib)s '/'s greater_s;
+        xmlComment : void = "///";
+        Reference : Ast.DeclarationElement = xmlComment s ReferenceElement;
+        
+        #endregion
+        
+        #endregion
+        
+        start : List[Ast.DeclarationElement] = DeclarationSourceFile;
+      }
+    )]
+  public class TSDeclarationParser
+  {
+    #region Helpers
+    
+    static Id(first : string, rest : List[string]) : string
+    {
+      if (rest.Count == 0) first else $<#$first...$(rest; ".")#>
+    }
+    
+    static Id(first : string, rest : list[string]) : string
+    {
+      if (rest is []) first else $<#$first...$(rest; ".")#>
+    }
+    
+    static Id(first : string, rest : option[list[string]]) : string
+    {
+      Id(first, rest.WithDefault([]))
+    }
+    
+    static Id(first : string, rest : option[string]) : string
+    {
+      if(rest is Some(r)) $"$(first).$r" else first
+    }
+    
+    static MakeList[T](first : T, rest : List[T]) : list[T]
+    {
+      first :: rest.NToList()
+    }
+    
+    static MakeList[T](first : T) : list[T]
+    {
+      [first]
+    }
+    
+    #endregion
+    
+    optional(n : NToken) : bool
+    {
+      !n.IsEmpty
+    }
+    
+    static_s_(n : NToken) : bool
+    {
+      !n.IsEmpty
+    }
+    
+    StringLiteral(s : NToken) : string
+    {
+      GetText(s)
+    }
+    
+    NumericLiteral(n : NToken) : string
+    {
+      GetText(n)
+    }
+    
+    IdentifierName(first : NToken, rest : NToken) : string
+    {
+      GetText(first) + GetText(rest)
+    }   
+  
+    TypeParametersOpt(l : option[list[Ast.ScriptTypeParameter]]) : list[Ast.ScriptTypeParameter]
+    {
+      l.WithDefault([])
+    }
+
+    TypeParameterList(first : Ast.ScriptTypeParameter, rest : List[Ast.ScriptTypeParameter]) : list[Ast.ScriptTypeParameter]
+    {
+      MakeList(first, rest)
+    }
+
+    TypeParameter(id : string, constraint : option[Ast.ScriptType]) : Ast.ScriptTypeParameter
+    {
+      Ast.ScriptTypeParameter(id, constraint)
+    }
+
+    TypeArgumentList(first : Ast.ScriptType, rest : List[Ast.ScriptType]) : list[Ast.ScriptType]
+    {
+      MakeList(first, rest)
+    }
+
+    ScriptType(type : Ast.ScriptType, rank : List[NToken * NToken]) : Ast.ScriptType
+    {
+      if (rank.Count == 0) type else Ast.ScriptType.Array(type, rank.Count)
+    }
+    
+    PredefinedType(type : NToken) : Ast.ScriptType
+    {
+      match(GetText(type))
+      {
+      | "any" => Ast.ScriptType.Any()
+      | "number" => Ast.ScriptType.Number()
+      | "boolean" | "bool" => Ast.ScriptType.Boolean()
+      | "string" => Ast.ScriptType.String()
+      | "void" => Ast.ScriptType.Void()
+      | _ => assert(false);
+      }
+    }
+    
+    TypeName(first : string, rest : List[string]) : string
+    {
+      Id(first, rest)
+    }
+    
+    ObjectType(o : Ast.ScriptType.Object) : Ast.ScriptType
+    {
+      o
+    }
+    
+    ObjectTypeStrict(members : option[list[Ast.ScriptObject]]) : Ast.ScriptType.Object
+    {
+      Ast.ScriptType.Object(members.WithDefault([]))
+    }
+    
+    TypeMemberList(first : Ast.ScriptObject, rest : List[Ast.ScriptObject]) : list[Ast.ScriptObject]
+    {
+      MakeList(first, rest)
+    }
+           
+    PropertySignature(id : string, optional : bool, type : option[Ast.ScriptType]) : Ast.ScriptObject
+    {
+      Ast.ScriptObject.Property(Ast.Property(id, optional, type))
+    }
+    
+    CallSignatureObject(c : Ast.CallSignature) : Ast.ScriptObject
+    {
+      Ast.ScriptObject.Call(c)
+    }
+    
+    CallSignature(
+      typeParams : list[Ast.ScriptTypeParameter],
+      parms : list[Ast.ScriptParameter],
+      returnType : option[Ast.ScriptType]) : Ast.CallSignature
+    {
+      Ast.CallSignature(typeParams, parms, returnType)
+    }
+
+    ConstructSignature(
+      typeParams : list[Ast.ScriptTypeParameter],
+      parms : list[Ast.ScriptParameter],
+      type : option[Ast.ScriptType]) : Ast.ScriptObject
+    {
+      Ast.ScriptObject.Construct(Ast.Construct(typeParams, parms, type))
+    }
+    
+    IndexSignature(paramName : string, paramType : NToken, returnType : Ast.ScriptType) : Ast.ScriptObject
+    {
+      def indexParamType = 
+        match(GetText(paramType))
+        {
+        | "number" => Ast.IndexParameterType.Number()
+        | "string" => Ast.IndexParameterType.String()
+        | _ => assert(false);
+        };
+      
+      Ast.ScriptObject.Index(Ast.IndexSignature(paramName, indexParamType, returnType))
+    }
+
+    MethodSignature(id : string, optional : bool, signature : Ast.CallSignature) : Ast.ScriptObject
+    {
+      Ast.ScriptObject.Method(Ast.Method(id, optional, signature))
+    }
+    
+    ArrayType(type : Ast.ScriptType, rank : List[NToken * NToken]) : Ast.ScriptType
+    {
+      Ast.ScriptType.Array(type, rank.Count)
+    }
+    
+    FunctionType(
+      typeParams : list[Ast.ScriptTypeParameter],
+      parms : list[Ast.ScriptParameter],
+      returnType : Ast.ScriptType) : Ast.ScriptType
+    {
+      Ast.ScriptType.Function(Ast.ScriptTypeCallSignature(typeParams, parms, returnType))
+    }
+    
+    ConstructorType(
+      typeParams : list[Ast.ScriptTypeParameter],
+      parms : list[Ast.ScriptParameter],
+      returnType : Ast.ScriptType) : Ast.ScriptType
+    {
+      Ast.ScriptType.Constructor(Ast.ScriptTypeCallSignature(typeParams, parms, returnType))
+    }
+   
+    IdentifierPath(first : string, rest : List[string]) : string
+    {
+      Id(first, rest)
+    }
+    
+    Public(_ : NToken) : Ast.MemberAccess
+    {
+      Ast.MemberAccess.Public()
+    }
+    
+    Private(_ : NToken) : Ast.MemberAccess
+    {
+      Ast.MemberAccess.Private()
+    }
+    
+    ParameterListOpt(parms : option[list[Ast.ScriptParameter]]) : list[Ast.ScriptParameter]
+    {
+      parms.WithDefault([])
+    }
+    
+    ParameterListROR(required : list[Ast.ScriptParameter], optional : list[Ast.ScriptParameter], rest : list[Ast.ScriptParameter]) : list[Ast.ScriptParameter]
+    {
+      required.Concat(optional).Concat(rest).NToList()
+    }
+    
+    ParameterListOR(optional : list[Ast.ScriptParameter], rest : list[Ast.ScriptParameter]) : list[Ast.ScriptParameter]
+    {
+      optional.Concat(rest).NToList()
+    }
+    
+    ParameterListRO(required : list[Ast.ScriptParameter], optional : list[Ast.ScriptParameter]) : list[Ast.ScriptParameter]
+    {
+      required.Concat(optional).NToList()
+    }
+    
+    RequiredParameterStringLiteral(id : string, value : string) : Ast.ScriptParameter
+    {
+      Ast.ScriptParameter.Required(Ast.RequiredParameter.Literal(id, value))
+    }
+    
+    RequiredParameterRegular(access : option[Ast.MemberAccess], id : string, type : option[Ast.ScriptType]) : Ast.ScriptParameter
+    {
+      Ast.ScriptParameter.Required(Ast.RequiredParameter.Regular(id, type, access))
+    }
+    
+    ParameterListRR(required : list[Ast.ScriptParameter], rest : list[Ast.ScriptParameter]) : list[Ast.ScriptParameter]
+    {
+      required.Concat(rest).NToList()
+    }
+    
+    OptionalParameter(access : option[Ast.MemberAccess], id : string, optional : bool, type : option[Ast.ScriptType]) : Ast.ScriptParameter
+    {
+      Ast.ScriptParameter.Optional(id, type, access, optional)
+    }
+    
+    RequiredParameterList(first : Ast.ScriptParameter, rest : List[Ast.ScriptParameter]) : list[Ast.ScriptParameter]
+    {
+      MakeList(first, rest)
+    }
+    
+    OptionalParameterList(first : Ast.ScriptParameter, rest : List[Ast.ScriptParameter]) : list[Ast.ScriptParameter]
+    {
+      MakeList(first, rest)
+    }
+    
+    RestArrayType(type : Ast.ScriptType) : Ast.ScriptType
+    {
+      Ast.ScriptType.Ref("Array", [type]);
+    }
+    
+    RestParameter(id : string, type : option[Ast.ScriptType]) : list[Ast.ScriptParameter]
+    {
+      MakeList(Ast.ScriptParameter.Rest(id, type) : Ast.ScriptParameter)
+    }
+    
+    TypeQuery(query : string) : Ast.ScriptType
+    {
+      Ast.ScriptType.Query(query)
+    }
+    
+    TypeQueryExpression(first : string, rest : List[string]) : string
+    {
+      Id(first, rest)
+    }
+    
+    TypeReference(typeName : string, typeArguments : option[list[Ast.ScriptType]]) : Ast.ScriptType
+    {
+      Ast.ScriptType.Ref(typeName, typeArguments.WithDefault([]))
+    }
+    
+    TypeReferenceRef(t : Ast.ScriptType) : Ast.ScriptType.Ref
+    {
+      t :> Ast.ScriptType.Ref
+    }
+    
+    InterfaceDeclaration(
+      id : string,
+      typeParameters : list[Ast.ScriptTypeParameter],
+      extends : option[list[Ast.ScriptType.Ref]],
+      type : Ast.ScriptType.Object) : Ast.DeclarationElement
+    {
+      Ast.DeclarationElement.InterfaceDeclaration(
+        Ast.InterfaceDeclaration(id, typeParameters, extends.WithDefault([]), type))
+    }
+    
+    ClassOrInterfaceTypeList(first : Ast.ScriptType.Ref, rest : List[Ast.ScriptType.Ref]) : list[Ast.ScriptType.Ref]
+    {
+      MakeList(first, rest)
+    }
+    
+    ClassHeritage(baseClass : option[Ast.ScriptType.Ref], interfaces : option[list[Ast.ScriptType.Ref]]) : Ast.ClassHeritage
+    {
+      Ast.ClassHeritage(baseClass, interfaces.WithDefault([]))
+    }
+    
+    AmbientVariableDeclaration(name : string, type : option[Ast.ScriptType]) : Ast.AmbientDeclaration
+    {
+      Ast.AmbientDeclaration.VariableDeclaration(Ast.AmbientVariableDeclaration(name, type))
+    }
+    
+    AmbientFunctionDeclaration(name : string, signature : Ast.CallSignature) : Ast.AmbientDeclaration
+    {
+      Ast.AmbientDeclaration.FunctionDeclaration(Ast.AmbientFunctionDeclaration(name, signature))
+    }
+    
+    AmbientClassDeclaration(
+      name : string,
+      typeParameters : list[Ast.ScriptTypeParameter],
+      heritage : Ast.ClassHeritage,
+      members : list[Ast.AmbientClassBodyElement]) : Ast.AmbientDeclaration
+    {
+      Ast.AmbientDeclaration.ClassDeclaration(
+        Ast.AmbientClassDeclaration(name, typeParameters, heritage, members))
+    }
+    
+    AmbientClassBody(members : List[Ast.AmbientClassBodyElement]) : list[Ast.AmbientClassBodyElement]
+    {
+      members.NToList()
+    }
+    
+    AmbientConstructorDeclaration(parms : list[Ast.ScriptParameter]) : Ast.AmbientClassBodyElement
+    {
+      Ast.AmbientClassBodyElement.Constructor(parms)
+    }
+    
+    AmbientMemberDeclarationProperty(
+      access : option[Ast.MemberAccess],
+      isStatic : bool,
+      name : string,
+      type : option[Ast.ScriptType]) : Ast.AmbientClassBodyElement
+    {
+      Ast.AmbientClassBodyElement.Property(name, type, access, isStatic)
+    }
+    
+    AmbientMemberDeclarationMethod(
+      access : option[Ast.MemberAccess],
+      isStatic : bool,
+      name : string,
+      signature : Ast.CallSignature) : Ast.AmbientClassBodyElement
+    {
+      Ast.AmbientClassBodyElement.Method(name, signature, access, isStatic)
+    }
+    
+    IndexSignature_AmbientClassBodyElement(v : Ast.ScriptObject) : Ast.AmbientClassBodyElement
+    {
+      Ast.AmbientClassBodyElement.Index((v :> Ast.ScriptObject.Index).Value)
+    }
+    
+    AmbientExternalModuleDeclaration(
+      name : string,
+      members : list[Ast.AmbientExternalModuleElement]) : Ast.AmbientDeclaration
+    {
+      Ast.AmbientDeclaration.ExternalModuleDeclaration(
+        Ast.AmbientExternalModuleDeclaration(name, members))
+    }
+    
+    AmbientExternalModuleBody(members : List[Ast.AmbientExternalModuleElement]) : list[Ast.AmbientExternalModuleElement]
+    {
+      members.NToList()
+    }
+    
+    ExportAssignment_AmbientExternalModuleElement(v : Ast.DeclarationElement) : Ast.AmbientExternalModuleElement
+    {
+      Ast.AmbientExternalModuleElement.ExportAssignment(
+        (v :> Ast.DeclarationElement.ExportAssignment).Value)
+    }
+    
+    ExternalImportDeclaration_AmbientExternalModuleElement(v : Ast.DeclarationElement) : Ast.AmbientExternalModuleElement
+    {
+      Ast.AmbientExternalModuleElement.ExternalImportDeclaration(
+        (v :> Ast.DeclarationElement.ExternalImportDeclaration).Value)
+    }
+    
+    AmbientModuleElement_AmbientExternalModuleElement(v : Ast.AmbientModuleElement) : Ast.AmbientExternalModuleElement
+    {
+      Ast.AmbientExternalModuleElement.ModuleElement(v)
+    }
+
+    AmbientModuleDeclaration(name : string , members : list[Ast.AmbientModuleElement]) : Ast.AmbientDeclaration
+    {
+      Ast.AmbientDeclaration.ModuleDeclaration(Ast.AmbientModuleDeclaration(name, members))
+    }
+    
+    AmbientModuleBody(members : List[Ast.AmbientModuleElement]) : list[Ast.AmbientModuleElement]
+    {
+      members.NToList()
+    }
+    
+    AmbientVariableDeclaration_AmbientModuleElement(v : Ast.AmbientDeclaration) : Ast.AmbientModuleElement
+    {
+      Ast.AmbientModuleElement.VariableDeclaration(
+        (v :> Ast.AmbientDeclaration.VariableDeclaration).Value)
+    }
+    
+    AmbientFunctionDeclaration_AmbientModuleElement(v : Ast.AmbientDeclaration) : Ast.AmbientModuleElement
+    {
+      Ast.AmbientModuleElement.FunctionDeclaration(
+        (v :> Ast.AmbientDeclaration.FunctionDeclaration).Value)
+    }
+    
+    AmbientClassDeclaration_AmbientModuleElement(v : Ast.AmbientDeclaration) : Ast.AmbientModuleElement
+    {
+      Ast.AmbientModuleElement.ClassDeclaration(
+        (v :> Ast.AmbientDeclaration.ClassDeclaration).Value)
+    }
+    
+    InterfaceDeclaration_AmbientModuleElement(v : Ast.DeclarationElement) : Ast.AmbientModuleElement
+    {
+      Ast.AmbientModuleElement.InterfaceDeclaration(
+        (v :> Ast.DeclarationElement.InterfaceDeclaration).Value)
+    }
+    
+    AmbientEnumDeclaration_AmbientModuleElement(v : Ast.AmbientDeclaration) : Ast.AmbientModuleElement
+    {
+      Ast.AmbientModuleElement.EnumDeclaration(
+        (v :> Ast.AmbientDeclaration.EnumDeclaration).Value)
+    }
+    
+    AmbientModuleDeclaration_AmbientModuleElement(v : Ast.AmbientDeclaration) : Ast.AmbientModuleElement
+    {
+      Ast.AmbientModuleElement.ModuleDeclaration(
+        (v :> Ast.AmbientDeclaration.ModuleDeclaration).Value)
+    }
+    
+    ImportDeclaration_AmbientModuleElement(v : Ast.DeclarationElement) : Ast.AmbientModuleElement
+    {
+      Ast.AmbientModuleElement.ImportDeclaration(
+        (v :> Ast.DeclarationElement.ImportDeclaration).Value)
+    }
+   
+    AmbientEnumDeclaration(name : string, members : option[list[Ast.AmbientEnumMember]]) : Ast.AmbientDeclaration
+    {
+      Ast.AmbientDeclaration.EnumDeclaration(
+        Ast.AmbientEnumDeclaration(name, members.WithDefault([])))
+    }
+    
+    AmbientEnumBody(first : Ast.AmbientEnumMember, rest : List[Ast.AmbientEnumMember]) : list[Ast.AmbientEnumMember]
+    {
+      MakeList(first, rest)
+    }
+    
+    AmbientEnumMember(id : string, initialiser : option[int]) : Ast.AmbientEnumMember
+    {
+      Ast.AmbientEnumMember(id, initialiser)
+    }
+    
+    AmbientEnumMemberInitialiser(i : NToken) : int
+    {
+      int.Parse(GetText(i))
+    }
+    
+    EntityName(first : string, rest : option[string]) : string
+    {
+      Id(first, rest)
+    }
+    
+    AmbientDeclaration(value : Ast.AmbientDeclaration) : Ast.DeclarationElement
+    {
+      Ast.DeclarationElement.AmbientDeclaration(value)
+    }
+    
+    ImportDeclaration(id : string, entity : string) : Ast.DeclarationElement
+    {
+      Ast.DeclarationElement.ImportDeclaration(Ast.ImportDeclaration(id, entity))
+    }
+    
+    ExternalImportDeclaration(id : string, moduleReference : string) : Ast.DeclarationElement
+    {
+      Ast.DeclarationElement.ExternalImportDeclaration(
+        Ast.ExternalImportDeclaration(id, moduleReference))
+    }
+    
+    ExportAssignment(id : string) : Ast.DeclarationElement
+    {
+      Ast.DeclarationElement.ExportAssignment(Ast.ExportAssignment(id))
+    }    
+    
+    ReferencePath(_ : NToken, path : string) : Ast.Reference
+    {
+      Ast.Reference.Lib(path)
+    }
+    
+    ReferenceNoDefaultLib(_ : NToken, _ : NToken) : Ast.Reference
+    {
+      Ast.Reference.NoDefaultLib()
+    }
+    
+    ReferenceElement(_ : NToken, reference : Ast.Reference, _ : NToken) : Ast.DeclarationElement
+    {
+      Ast.DeclarationElement.Reference(reference)
+    }
+  }
+}

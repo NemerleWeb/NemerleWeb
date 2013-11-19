@@ -96,7 +96,7 @@ namespace NemerleWeb
         def transformJsExpr(expr)
         {
           def res = if(expr.StartsWith("\"") && expr.EndsWith("\"")) expr.Trim('\"') else expr;
-          //def res = Regex.Replace(res, <#(^(?<b>)_self\W|(?<b>\W)_self\W)#>, "${b}");
+          //def res = Regex.Replace(res, <#(^(?<b>)_NW\$_self\W|(?<b>\W)_NW\$_self\W)#>, "${b}");
           def res = if(res.EndsWith(";")) res.Substring(0, res.Length - 1) else res;          
           res
         }
@@ -132,9 +132,11 @@ namespace NemerleWeb
               def pexpr = SplicablePExprStr(value);              
               def binding = match(pexpr)
               {
-                | <[ template(_.$model) ]>             => $<#nweb.utils.getTemplateName($(JSClass.Self).$model, "View"): $(JSClass.Self).$model#>
+                | <[ template(_.$model) ]> =>
+                  $<#nweb.utils.getTemplateName($(JSClass.Self).$model, "View"): $(JSClass.Self).$model#>
                 | <[ template(_.$model, _.$view) ]>
-                | <[ template(_.$model, _.$view()) ]>  => $<#nweb.utils.getTemplateName($(JSClass.Self).$model, "$view"): $(JSClass.Self).$model#>
+                | <[ template(_.$model, _.$view()) ]> =>
+                  $<#nweb.utils.getTemplateName($(JSClass.Self).$model, "$view"): $(JSClass.Self).$model#>
                 | <[ template($_model) ]> with view = <[ View ]>
                 | <[ template($_model, _.$view) ]>
                 | <[ template($_model, _.$view()) ]> => 
@@ -152,6 +154,7 @@ namespace NemerleWeb
                   def p =
                     regexp match(splice)
                     {
+                    | @"_NW\$_self\.template\((.+),.+\..+\(.+,(?<p>.+)\)\)" => p
                     | @"_NW\$_self\.template\((.+),(?<p>.+)\)" => p
                     | _ => Message.Error(pexpr.Location, $"Incorrect xml, template(_.model, view): $xmlAst"); ""
                     };
@@ -161,6 +164,7 @@ namespace NemerleWeb
                   def (p1, p2) =
                     regexp match(splice)
                     {
+                    | @"_NW\$_self\.template\((?<p1>.+),.+\..+\(.+,(?<p2>.+)\)\)" => (p1, p2)
                     | @"_NW\$_self\.template\((?<p1>.+),(?<p2>.+)\)" => (p1, p2)
                     | _ => Message.Error(pexpr.Location, $"Incorrect xml, template(model, view): $xmlAst"); ("", "")
                     };

@@ -1,0 +1,337 @@
+/*
+** Copyright by NN from NemerleWeb team (C) 2013
+*/
+
+using Nemerle;
+using Nemerle.Extensions;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using NemerleWeb.Peg;
+using NemerleWeb;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace TSParserPeg.Ast
+{
+  [Unit]
+  public variant DeclarationElement
+  {
+    | Reference                 { Value : Ast.Reference; }
+    | ExportAssignment          { Value : Ast.ExportAssignment; }
+    | InterfaceDeclaration      { Value : Ast.InterfaceDeclaration; }
+    | ExternalImportDeclaration { Value : Ast.ExternalImportDeclaration; }
+    | ImportDeclaration         { Value : Ast.ImportDeclaration; }
+    | AmbientDeclaration        { Value : Ast.AmbientDeclaration; }
+  }
+  
+  [Unit]
+  public variant Reference
+  {
+    | NoDefaultLib
+    | Lib { Path : string; }
+  }
+  
+  [Unit]
+  [Record]
+  public class ExportAssignment
+  {
+    public Name : string;
+  }
+  
+  [Unit]
+  [Record]
+  public class ExternalImportDeclaration
+  {
+    public Name : string;
+    public ModuleReference : string;
+  }
+  
+  [Unit]
+  [Record]
+  public class ImportDeclaration
+  {
+    public Name : string;
+    public Entity : string;
+  }
+  
+  [Unit]
+  [Record]
+  public class InterfaceDeclaration
+  {
+    public Name : string;
+    public TypeParameters : list[ScriptTypeParameter];
+    public Extends : list[ScriptType.Ref];
+    public Type : ScriptType.Object;
+  }
+  
+  [Unit]
+  public variant AmbientDeclaration
+  {
+    | VariableDeclaration       { Value : Ast.AmbientVariableDeclaration; }
+    | FunctionDeclaration       { Value : Ast.AmbientFunctionDeclaration; }
+    | ClassDeclaration          { Value : Ast.AmbientClassDeclaration; }
+    | EnumDeclaration           { Value : Ast.AmbientEnumDeclaration; }
+    | ExternalModuleDeclaration { Value : Ast.AmbientExternalModuleDeclaration; }
+    | ModuleDeclaration         { Value : Ast.AmbientModuleDeclaration; }
+  }
+  
+  [Unit]
+  [Record]
+  public class AmbientVariableDeclaration
+  {
+    public Name : string;
+    public Type : option[ScriptType];
+  }
+
+  [Unit]
+  [Record]
+  public class AmbientFunctionDeclaration
+  {
+    public Name : string;
+    public Signature : CallSignature;
+  }
+
+  [Unit]
+  [Record]
+  public class AmbientClassDeclaration
+  {
+    public Name : string;
+    public TypeParameters : list[ScriptTypeParameter];
+    public Heritage : ClassHeritage;
+    public Members : list[AmbientClassBodyElement];
+  }
+
+  [Unit]
+  [Record]
+  public class AmbientEnumDeclaration
+  {
+    public Name : string;
+    public Members : list[AmbientEnumMember];
+  }
+
+  [Unit]
+  [Record]
+  public class AmbientExternalModuleDeclaration
+  {
+    public Name : string;
+    public Members : list[AmbientExternalModuleElement];
+   }
+
+  [Unit]
+  [Record]
+  public class AmbientModuleDeclaration
+  {
+    public Name : string;
+    public Members : list[AmbientModuleElement];
+  }
+  
+  [Unit]
+  [StructuralEquality(Ignore = [ReturnType])]
+  public variant ScriptType
+  {
+    | Any
+    | Number
+    | Boolean
+    | String
+    | Void
+    | Ref { Name : string; TypeArguments : list[ScriptType]; }
+    | Query { Name : string; }
+    | Array { Type : ScriptType; Rank : int; }
+    | Object { Members : list[ScriptObject]; }
+    | Function { Value : ScriptTypeCallSignature; }
+    | Constructor { Value : ScriptTypeCallSignature; }
+  }
+  
+  [Unit]
+  [Record][StructuralEquality]
+  public class ScriptTypeCallSignature
+  {
+    public TypeParameters : list[ScriptTypeParameter];
+    public Parameters : list[ScriptParameter];
+    public ReturnType : ScriptType;
+  }
+  
+  [Unit]
+  [StructuralEquality]
+  public variant ScriptObject
+  {
+    | Property  { Value : Ast.Property; }
+    | Call      { Value : Ast.CallSignature; }
+    | Construct { Value : Ast.Construct; }      
+    | Index     { Value : Ast.IndexSignature; }
+    | Method    { Value : Ast.Method; }
+  }
+  
+  [Unit]
+  [Record][StructuralEquality(Ignore = [ParameterName])]
+  public class IndexSignature
+  {
+    public ParameterName : string;
+    public ParameterType : IndexParameterType;
+    public ReturnType : ScriptType;
+  }
+  
+  [Unit]
+  public variant IndexParameterType
+  {
+    | Number
+    | String
+  }
+  
+  [Unit]
+  [Record][StructuralEquality(Ignore = ReturnType)]
+  public class CallSignature
+  {
+    public TypeParameters : list[ScriptTypeParameter];
+    public Parameters : list[ScriptParameter];
+    public ReturnType : option[ScriptType];
+  }
+  
+  [Unit]
+  [Record][StructuralEquality(Ignore = [Optional])]
+  public class Property
+  {
+    public Name : string;
+    public Optional : bool;
+    public Type : option[ScriptType];
+  }
+  
+  public type Construct = CallSignature;
+  
+  /*
+  // Same as CallSignature
+  [Unit]
+  [Record][StructuralEquality]
+  public class Construct
+  {
+    public TypeParameters : list[ScriptTypeParameter];
+    public Parameters : list[ScriptParameter];
+    public ReturnType : option[ScriptType];      
+  }
+  */
+  
+  [Unit]
+  [Record][StructuralEquality(Ignore = [Optional])]
+  public class Method
+  {
+    public Name : string;
+    public Optional : bool;
+    public Signature : CallSignature;
+  }  
+  
+  [Unit]
+  [Record][StructuralEquality]
+  public class ScriptTypeParameter
+  {
+    public Name : string;
+    public Constraint : option[ScriptType];
+  }
+  
+  [Unit]
+  [StructuralEquality(Ignore = [Name, Access, Optional])]
+  public variant ScriptParameter
+  {
+    | Required
+      {
+        Value : Ast.RequiredParameter;
+      }
+    | Optional
+      {
+        Name : string;
+        Type : option[ScriptType];
+        Access : option[MemberAccess];
+        
+        // Always true in Ambient context
+        new Optional : bool;
+      }
+    | Rest
+      {
+        Name : string;
+        Type : option[ScriptType];
+      }
+  }
+  
+  [Unit]
+  [StructuralEquality(Ignore = [Name, Value, Access])]
+  public variant RequiredParameter
+  {
+    | Literal { Name : string; Value : string; }
+    | Regular
+      {
+        Name : string;
+        Type : option[ScriptType];
+        Access : option[MemberAccess];
+      }
+  }
+  
+  [Unit]
+  public variant MemberAccess
+  {
+    | Public
+    | Private
+  }
+  
+  [Unit]
+  [Record]
+  [StructuralEquality(Ignore = Value)]
+  public class AmbientEnumMember
+  {
+    public Name : string;
+    public Value : option[int];
+  }
+  
+  [Unit]
+  [StructuralEquality]
+  public variant AmbientModuleElement
+  {
+    | VariableDeclaration  { Value : Ast.AmbientVariableDeclaration; }
+    | FunctionDeclaration  { Value : Ast.AmbientFunctionDeclaration; }
+    | ClassDeclaration     { Value : Ast.AmbientClassDeclaration; }
+    | InterfaceDeclaration { Value : Ast.InterfaceDeclaration; }
+    | EnumDeclaration      { Value : Ast.AmbientEnumDeclaration; }
+    | ModuleDeclaration    { Value : Ast.AmbientModuleDeclaration; }
+    | ImportDeclaration    { Value : Ast.ImportDeclaration; }
+  }
+  
+  [Unit]
+  [StructuralEquality]
+  public variant AmbientExternalModuleElement
+  {
+    | ExportAssignment          { Value : Ast.ExportAssignment; }
+    | ExternalImportDeclaration { Value : Ast.ExternalImportDeclaration; }
+    | ModuleElement             { Value : Ast.AmbientModuleElement; }
+  }
+  
+  [Unit]
+  [StructuralEquality(Ignore = [Access])]
+  public variant AmbientClassBodyElement
+  {
+    | Constructor { Parameters : list[Ast.ScriptParameter]; }
+    | Property
+      {
+        Name : string;
+        Type : option[ScriptType];
+        Access : option[MemberAccess];
+        Static : bool;
+      }
+    | Method
+      {
+        Name : string;
+        Signature : CallSignature;
+        Access : option[MemberAccess];
+        Static : bool;
+      }
+    | Index { Value : Ast.IndexSignature; }
+  }
+  
+  [Unit]
+  [Record][StructuralEquality]
+  public class ClassHeritage
+  {
+    public Base : option[ScriptType.Ref];
+    public Interfaces : list[ScriptType.Ref];
+  }
+}

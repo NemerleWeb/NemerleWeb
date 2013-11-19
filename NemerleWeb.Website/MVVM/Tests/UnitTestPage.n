@@ -687,6 +687,11 @@ namespace NemerleWeb.Website.Tests
         "123" == string.Concat(1, 2, 3)
       });
       
+      test("string GetHashCode", () =>
+      {
+        "1".GetHashCode() == "1".GetHashCode()
+      });
+      
       test("using", () =>
       {
         using (s = SomeDisposable())
@@ -1691,6 +1696,18 @@ namespace NemerleWeb.Website.Tests
      test("typed js test", () => {
        _ = window.console.log : void -> void;
        true
+     });
+     
+     test("System.Collections.Generic.EqualityComparer[int].Default", () => {
+       EqualityComparer.[int].Default.Equals(1, 1)
+     });
+     
+     test("System.Collections.Generic.EqualityComparer[string].Default", () => {
+       EqualityComparer.[string].Default.Equals("a", "b")
+     });
+     
+     test("System.Collections.Generic.EqualityComparer[list[string]].Default", () => {
+       EqualityComparer.[list[string]].Default.Equals(["a"], ["b"])
      });
     }
     

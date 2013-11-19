@@ -155,10 +155,10 @@ namespace JSEngine {
                     expr.ToString(sb, tab, current_tab);
                     _ = sb.Append($"[..$args]");
                     
-                // TODO: Restor, Failed typing method ?!
+                // TODO: Restore, Failed typing method ?!
                 // | Call(Operator(op, OperatorKind.Infix), [a, b])
 
-                | Call(Operator(op, kind), [a, b]) when kind == OperatorKind.Infix=>
+                | Call(Operator(op, kind), [a, b]) when kind == OperatorKind.Infix =>
                     _ = sb.Append("(");
                     a.ToString(sb, tab, current_tab);
                     _ = sb.Append(" ").Append(op).Append(" ");

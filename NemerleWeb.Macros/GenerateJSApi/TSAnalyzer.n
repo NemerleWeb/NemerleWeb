@@ -434,7 +434,7 @@ namespace NemerleWeb
     
     private GetObjectTypes(obj : ScriptObject) : IEnumerable[string]
     {
-      | Property(value) => GetObjectTypes(obj)
+      | Property(value) => if(value.Type is Some(t)) GetScriptTypeTypes(t) else []
       | Call(signature) => GetCallSignatureTypes(signature)
       | Construct(value) => 
         GetCallSignatureTypes(
