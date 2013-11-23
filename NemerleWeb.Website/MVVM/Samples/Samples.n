@@ -48,6 +48,7 @@ namespace NemerleWeb.Website.Samples
     PegCalculator : CalculatorPage { get; set; }
     PegJson       : JsonPage { get; set; }
     PegJS         : JSPage { get; set; }
+    PegTsd        : TsdPage { get; set; }
     PegCS         : CSPage { get; set; }
     
     Sources : List[string * string] { get; set; }
@@ -67,7 +68,8 @@ namespace NemerleWeb.Website.Samples
       PegCalculator = CalculatorPage();
       PegJson       = JsonPage();
       PegJS         = JSPage();
-      PegCS         = CSPage();
+      PegTsd        = TsdPage();
+      PegCS         = CSPage();      
             
       Samples = 
       [
@@ -116,6 +118,16 @@ namespace NemerleWeb.Website.Samples
           ],
           "",
           PegJS),
+          
+        Sample(
+          "TypeScript Declarations",
+          [
+            "MVVM/Samples/Peg/TSParserPeg/TSDeclarationParser.n",
+            "MVVM/Samples/Peg/TsdPage.n",
+            "MVVM/Samples/Peg/TSParserPeg/TSDeclarationParser_Ast.n",
+          ],
+          "",
+          PegTsd),
           
         //Sample("C#", ["MVVM/Samples/Peg/CSPage.n"], "", PegCS)
       ].ToList();

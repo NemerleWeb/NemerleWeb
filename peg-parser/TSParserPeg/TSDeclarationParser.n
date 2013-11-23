@@ -1150,11 +1150,12 @@ namespace TSParserPeg
     InterfaceDeclaration(
       id : string,
       typeParameters : list[Ast.ScriptTypeParameter],
-      extends : option[list[Ast.ScriptType.Ref]],
+      // TODO: Restore #52
+      extends_ : option[list[Ast.ScriptType.Ref]],
       type : Ast.ScriptType.Object) : Ast.DeclarationElement
     {
       Ast.DeclarationElement.InterfaceDeclaration(
-        Ast.InterfaceDeclaration(id, typeParameters, extends.WithDefault([]), type))
+        Ast.InterfaceDeclaration(id, typeParameters, extends_.WithDefault([]), type))
     }
     
     ClassOrInterfaceTypeList(first : Ast.ScriptType.Ref, rest : List[Ast.ScriptType.Ref]) : list[Ast.ScriptType.Ref]

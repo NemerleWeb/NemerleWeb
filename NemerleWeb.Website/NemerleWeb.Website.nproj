@@ -225,6 +225,9 @@
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="MVVM\Samples\Peg\TsdPage.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\Samples\Samples.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -403,6 +406,11 @@
       <Project>{f440f161-d644-4004-b4f0-a9dfa001039e}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\peg-parser\TSParserPeg\TSParserPeg.nproj">
+      <Name>TSParserPeg</Name>
+      <Project>{cfcb42e2-c0cd-4c83-a18e-d97149f21b14}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
@@ -410,7 +418,7 @@
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets. -->
   <PropertyGroup>
-    <YourDestinationDirectory>$(TargetDir)MVVM\Samples</YourDestinationDirectory> 
+    <YourDestinationDirectory>$(TargetDir)MVVM\Samples</YourDestinationDirectory>
   </PropertyGroup>
   <Target Name="BeforeBuild">
   </Target>

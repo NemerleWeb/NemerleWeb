@@ -1,0 +1,52 @@
+using NemerleWeb;
+
+using Nemerle.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.Website.Samples
+{
+  [Unit]
+  public class TsdPage
+  {
+    _parser : TSParserPeg.TSDeclarationParser;
+    
+    public this()
+    {
+      _parser = TSParserPeg.TSDeclarationParser();
+    }
+         
+    ParserOutput : string
+    {
+      get
+      {
+        if (!string.IsNullOrEmpty(ParserInput))
+          if (_parser.Parse(ParserInput) is Some(res))
+            $"Has $(res.Count) declaration elements"
+          else
+            "Incorrect input"
+        else
+          "";
+      }
+    }
+     
+    public ParserInput : string { get; set; }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+        <div>
+          <span>This is demonstration of TypeScrpit declarations parser</span><br />
+          <div class="output">
+            <span class="output-text">$ParserOutput</span> 
+          </div>
+          <div class="parser-input">
+            <textarea rows="6" cols="50" value="$ParserInput"/>
+          </div>
+        </div>
+      #>
+    }    
+  }
+}

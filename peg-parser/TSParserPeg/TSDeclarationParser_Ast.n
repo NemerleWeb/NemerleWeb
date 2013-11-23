@@ -63,7 +63,8 @@ namespace TSParserPeg.Ast
   {
     public Name : string;
     public TypeParameters : list[ScriptTypeParameter];
-    public Extends : list[ScriptType.Ref];
+    // TODO: Restore #52    
+    public Extendss : list[ScriptType.Ref];
     public Type : ScriptType.Object;
   }
   
@@ -129,7 +130,8 @@ namespace TSParserPeg.Ast
   }
   
   [Unit]
-  [StructuralEquality(Ignore = [ReturnType])]
+  // TODO: Restore
+  //[StructuralEquality(Ignore = [ReturnType])]
   public variant ScriptType
   {
     | Any
@@ -146,7 +148,9 @@ namespace TSParserPeg.Ast
   }
   
   [Unit]
-  [Record][StructuralEquality]
+  [Record]
+  // TODO: Restore
+  //[StructuralEquality]
   public class ScriptTypeCallSignature
   {
     public TypeParameters : list[ScriptTypeParameter];
@@ -155,7 +159,8 @@ namespace TSParserPeg.Ast
   }
   
   [Unit]
-  [StructuralEquality]
+  // TODO: Restore
+  //[StructuralEquality]
   public variant ScriptObject
   {
     | Property  { Value : Ast.Property; }
@@ -166,7 +171,9 @@ namespace TSParserPeg.Ast
   }
   
   [Unit]
-  [Record][StructuralEquality(Ignore = [ParameterName])]
+  [Record]
+  // TODO: Restore
+  //[StructuralEquality(Ignore = [ParameterName])]
   public class IndexSignature
   {
     public ParameterName : string;
@@ -182,7 +189,9 @@ namespace TSParserPeg.Ast
   }
   
   [Unit]
-  [Record][StructuralEquality(Ignore = ReturnType)]
+  [Record]
+  // TODO: Restore
+  //[StructuralEquality(Ignore = ReturnType)]
   public class CallSignature
   {
     public TypeParameters : list[ScriptTypeParameter];
@@ -191,7 +200,9 @@ namespace TSParserPeg.Ast
   }
   
   [Unit]
-  [Record][StructuralEquality(Ignore = [Optional])]
+  [Record]
+  // TODO: Restore
+  //[StructuralEquality(Ignore = [Optional])]
   public class Property
   {
     public Name : string;
@@ -204,7 +215,9 @@ namespace TSParserPeg.Ast
   /*
   // Same as CallSignature
   [Unit]
-  [Record][StructuralEquality]
+  [Record]
+  // TODO: Restore
+  //[StructuralEquality]
   public class Construct
   {
     public TypeParameters : list[ScriptTypeParameter];
@@ -214,7 +227,9 @@ namespace TSParserPeg.Ast
   */
   
   [Unit]
-  [Record][StructuralEquality(Ignore = [Optional])]
+  [Record]
+  // TODO: Restore
+  //[StructuralEquality(Ignore = [Optional])]
   public class Method
   {
     public Name : string;
@@ -223,7 +238,9 @@ namespace TSParserPeg.Ast
   }  
   
   [Unit]
-  [Record][StructuralEquality]
+  [Record]
+  // TODO: Restore
+  //[StructuralEquality]
   public class ScriptTypeParameter
   {
     public Name : string;
@@ -231,7 +248,8 @@ namespace TSParserPeg.Ast
   }
   
   [Unit]
-  [StructuralEquality(Ignore = [Name, Access, Optional])]
+  // TODO: Restore
+  //[StructuralEquality(Ignore = [Name, Access, Optional])]
   public variant ScriptParameter
   {
     | Required
@@ -255,7 +273,8 @@ namespace TSParserPeg.Ast
   }
   
   [Unit]
-  [StructuralEquality(Ignore = [Name, Value, Access])]
+  // TODO: Restore
+  //[StructuralEquality(Ignore = [Name, Value, Access])]
   public variant RequiredParameter
   {
     | Literal { Name : string; Value : string; }
@@ -276,7 +295,8 @@ namespace TSParserPeg.Ast
   
   [Unit]
   [Record]
-  [StructuralEquality(Ignore = Value)]
+  // TODO: Restore
+  //[StructuralEquality(Ignore = Value)]
   public class AmbientEnumMember
   {
     public Name : string;
@@ -284,7 +304,8 @@ namespace TSParserPeg.Ast
   }
   
   [Unit]
-  [StructuralEquality]
+  // TODO: Restore
+  //[StructuralEquality]
   public variant AmbientModuleElement
   {
     | VariableDeclaration  { Value : Ast.AmbientVariableDeclaration; }
@@ -297,7 +318,8 @@ namespace TSParserPeg.Ast
   }
   
   [Unit]
-  [StructuralEquality]
+  // TODO: Restore
+  //[StructuralEquality]
   public variant AmbientExternalModuleElement
   {
     | ExportAssignment          { Value : Ast.ExportAssignment; }
@@ -306,7 +328,8 @@ namespace TSParserPeg.Ast
   }
   
   [Unit]
-  [StructuralEquality(Ignore = [Access])]
+  // TODO: Restore
+  //[StructuralEquality(Ignore = [Access])]
   public variant AmbientClassBodyElement
   {
     | Constructor { Parameters : list[Ast.ScriptParameter]; }
@@ -328,7 +351,9 @@ namespace TSParserPeg.Ast
   }
   
   [Unit]
-  [Record][StructuralEquality]
+  [Record]
+  // TODO: Restore
+  //[StructuralEquality]
   public class ClassHeritage
   {
     public Base : option[ScriptType.Ref];
