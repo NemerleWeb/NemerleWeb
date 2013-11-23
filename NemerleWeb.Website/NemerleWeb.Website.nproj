@@ -436,9 +436,9 @@
     </ItemGroup>
     <Copy SourceFiles="@(JSParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\JSParser" />
     <ItemGroup>
-      <TypeScriptInterfaceParser Include="$(ProjectDir)..\peg-parser\TypeScriptInterfaceParser\*.n" />
+      <TSParserPeg Include="$(ProjectDir)..\peg-parser\TSParserPeg\*.n" />
     </ItemGroup>
-    <Copy SourceFiles="@(TypeScriptInterfaceParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\TypeScriptInterfaceParser" />
+    <Copy SourceFiles="@(TSParserPeg)" DestinationFolder="$(YourDestinationDirectory)\Peg\TSParserPeg" />
   </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
