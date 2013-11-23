@@ -471,7 +471,7 @@ var nweb = {
 
         if (!cachedFunc) {
           //var newFunc = eval("(function(model, loopStack) { return " + parsedExpr + "; } )");
-          var newFunc = new Function('model', 'loopStack', "var self = model; return " + parsedExpr + ";");
+          var newFunc = new Function('model', 'loopStack', "var _NW$_self = model; return " + parsedExpr + ";");
           nweb.parsedValueCache[parsedExpr] = newFunc;
           val = newFunc(model, loopStack);
         } else {
