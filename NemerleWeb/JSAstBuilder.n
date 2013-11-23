@@ -89,7 +89,13 @@ namespace NemerleWeb
             | _ =>
               // Call object's constructor if the type is known
               if(d.Type.TypeInfo != null)
-                JSAst.Call(JSAst.Constructor(JSClass.GetProperName(d.Type.TypeInfo), None()), []);
+              {
+                if(d.Type.TypeInfo.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute") ||
+                   d.Type.TypeInfo.DeclaringType?.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
+                  JSAst.Literal(JSLiteral.Null())
+                else
+                  JSAst.Call(JSAst.Constructor(JSClass.GetProperName(d.Type.TypeInfo), Some([])), [])
+              }
               else
               {
                 Message.Warning($"Setting null value for type $(d.Type)");
