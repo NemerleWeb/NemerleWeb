@@ -6,7 +6,7 @@ using Nemerle;
 using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
-using NemerleWeb.Peg;
+using Nemerle.Peg.Web;
 using Nemerle.Extensions;
 
 using NemerleWeb;

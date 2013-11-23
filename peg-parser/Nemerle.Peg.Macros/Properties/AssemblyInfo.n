@@ -6,11 +6,11 @@ using Nemerle.Utility;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("NemerleWeb.Peg.Macros")]
+[assembly: AssemblyTitle("Nemerle.Peg.Web.Macros")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("RSDN.ru")]
-[assembly: AssemblyProduct("NemerleWeb.Peg")]
+[assembly: AssemblyProduct("Nemerle.Peg.Web")]
 [assembly: AssemblyCopyright("Copyright RSDN.ru 2009")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

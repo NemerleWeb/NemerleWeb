@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NemerleWeb.Peg
+namespace Nemerle.Peg.Web
 {
   public variant RuleDefinitionType
   {

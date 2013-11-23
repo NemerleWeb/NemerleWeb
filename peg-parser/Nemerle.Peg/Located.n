@@ -8,7 +8,7 @@ using Nemerle.Imperative;
 using NemerleWeb;
 using TypedJS = NemerleWeb.TypedJS;
 
-namespace NemerleWeb.Peg
+namespace Nemerle.Peg.Web
 {
   [Unit]
   public class Located : IToken

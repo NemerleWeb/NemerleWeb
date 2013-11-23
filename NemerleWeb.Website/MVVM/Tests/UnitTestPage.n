@@ -423,6 +423,13 @@ namespace NemerleWeb.Website.Tests
         "Virtual2"
       }
     }
+
+    [Unit]
+    public struct SimpleStruct
+    {
+      public X : int;
+      public Y : string;
+    }
     
     public this()
     {
@@ -893,7 +900,7 @@ namespace NemerleWeb.Website.Tests
       
       test("regexp exec 1", () =>
       {
-        def res = jsnew RegExp("pattern", undefined).exec("pattern");
+        def res = jsnew RegExp("pattern").exec("pattern");
         res[0] == "pattern"
       });
       
@@ -905,12 +912,12 @@ namespace NemerleWeb.Website.Tests
       
       test("regexp test", () =>
       {
-        jsnew RegExp("pattern", undefined).test("pattern")
+        jsnew RegExp("pattern").test("pattern")
       });
       
       test("regexp exec 1", () =>
       {
-        def pat = jsnew RegExp(".+", undefined);        
+        def pat = jsnew RegExp(".+");        
         def result = pat.exec("hello world");
         result.length == 1 && result[0] == "hello world"
       });
@@ -1693,22 +1700,27 @@ namespace NemerleWeb.Website.Tests
         testThis(1)(2)
       });
  
-     test("typed js test", () => {
-       _ = window.console.log : void -> void;
-       true
-     });
-     
-     test("System.Collections.Generic.EqualityComparer[int].Default", () => {
-       EqualityComparer.[int].Default.Equals(1, 1)
-     });
-     
-     test("System.Collections.Generic.EqualityComparer[string].Default", () => {
-       EqualityComparer.[string].Default.Equals("a", "b")
-     });
-     
-     test("System.Collections.Generic.EqualityComparer[list[string]].Default", () => {
-       EqualityComparer.[list[string]].Default.Equals(["a"], ["b"])
-     });
+      test("typed js test", () => {
+        _ = window.console.log : void -> void;
+        true
+      });
+      
+      test("System.Collections.Generic.EqualityComparer[int].Default", () => {
+        EqualityComparer.[int].Default.Equals(1, 1)
+      });
+      
+      test("System.Collections.Generic.EqualityComparer[string].Default", () => {
+        EqualityComparer.[string].Default.Equals("a", "b")
+      });
+      
+      test("System.Collections.Generic.EqualityComparer[list[string]].Default", () => {
+        EqualityComparer.[list[string]].Default.Equals(["a"], ["b"])
+      });
+
+      test("Struct default initialization", () => {
+        mutable s : SimpleStruct;
+        s.X == 0
+      });
     }
     
     public TemplateLambdaTest : list[string] = ["failed", "passed"];

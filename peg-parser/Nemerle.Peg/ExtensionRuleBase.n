@@ -1,6 +1,6 @@
 ﻿using NemerleWeb;
 
-namespace NemerleWeb.Peg
+namespace Nemerle.Peg.Web
 {
   [Unit]
   public abstract class ExtensionRuleBase[ReturnType]

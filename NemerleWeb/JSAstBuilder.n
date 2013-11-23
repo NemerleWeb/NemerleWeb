@@ -53,17 +53,53 @@ namespace NemerleWeb
       | CtorOf                            => Message.Error(expr.Location, "CtorOf not implemented"); JSAst.NotImpl("CtorOf")
       | DebugInfo(expr = expr)            => build(expr)
       | Def                               => Message.Error(expr.Location, "Def not implemented"); JSAst.NotImpl("Def")
-      | DefaultValue as d                 =>       
-        match(d?.Type?.TypeInfo?.FullName)
+      | DefaultValue as d                 =>
+        if (d.Type != null)
         {
-        | "System.Int32" => JSAst.Literal(JSLiteral.Integer(0))
-        | "System.Double" => JSAst.Literal(JSLiteral.Float(0f)); 
-        | "System.Boolean" => JSAst.Literal(JSLiteral.Bool(false));         
-        | "System.String" => JSAst.Literal(JSLiteral.String(""))
-        | _ => JSAst.Void()
+          // Is reference or nullable
+          if (!d.Type.IsValueType || d.Type.IsNullable)
+            JSAst.Literal(JSLiteral.Null())
+          else
+          if(d.Type.IsEnum)
+          {
+            JSAst.Literal(JSLiteral.Integer(0))
+          }
+          else
+          if(d.Type.IsPointer)
+          {
+            JSAst.Literal(JSLiteral.Integer(0))
+          }
+          else
+            // Check predefined types
+            match(d.Type.TypeInfo?.FullName)
+            {
+            | "System.Char"
+            | "System.Byte"
+            | "System.SByte"
+            | "System.Int16"
+            | "System.UInt16"
+            | "System.Int32"
+            | "System.UInt32"
+            | "System.Int64"
+            | "System.UInt64" => JSAst.Literal(JSLiteral.Integer(0))
+            | "System.Decimal" => JSAst.Literal(JSLiteral.Integer(0))
+            | "System.Single" 
+            | "System.Double" => JSAst.Literal(JSLiteral.Float(0f)); 
+            | "System.Boolean" => JSAst.Literal(JSLiteral.Bool(false));         
+            | _ =>
+              // Call object's constructor if the type is known
+              if(d.Type.TypeInfo != null)
+                JSAst.Call(JSAst.Constructor(JSClass.GetProperName(d.Type.TypeInfo), None()), []);
+              else
+              {
+                Message.Warning($"Setting null value for type $(d.Type)");
+                JSAst.Literal(JSLiteral.Null())
+              }
+            }
         }
+        else JSAst.Void()
       | DefFunctionsIn                    => Message.Error(expr.Location, "DefFunctionsIn not implemented"); JSAst.NotImpl("DefFunctionsIn")
-      | DefValIn(name, val, body)         => 
+      | DefValIn(name, val, body)         =>
         def newName = name.Name + "_" + name.Id;
         
         match(Build(val, currentScopeDefs, methodHeader)) 
