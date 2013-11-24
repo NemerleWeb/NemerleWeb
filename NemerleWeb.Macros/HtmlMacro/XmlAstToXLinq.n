@@ -87,25 +87,36 @@ namespace NemerleWeb
         }        
         
         match (xmlAst) {
-        | Attr(Splicable.Value(name), Splicable.Expr(expr)) => <[ attr_macro($(name : string), () => $expr) ]>
-        | Attr(Splicable.Value(name), Splicable.Value(value))  => <[ attr_macro($(name : string), $value) ]>
-        | Text(Splicable.Value(value))        => <[ text_macro($(value : string)) ]>
+        | Attr(Splicable.Value(name), Splicable.Expr(expr)) => <[ attr_splice($(name : string), $expr) ]>
+        | Attr(Splicable.Value(name), Splicable.Value(value))  => <[ attr($(name : string), $value) ]>
+        | Text(Splicable.Value(value))        => <[ text($(value : string)) ]>
         | Tag(Splicable.Value(name), content) =>
           def isInsideTag(c) { c is XmlAst.AttrSplice || c is XmlAst.Attr }
           def attrs = content.Where(c => isInsideTag(c)).Map(c => TransformImpl(c, spliceNode));          
           def childTags = content.Where(c => !isInsideTag(c)).Map(c => transformImpl(c));
-                                  
-<[
-tag_macro($(name : string), () => {
-  
-  ([..$(attrs)],
-   [..$(childTags)])
-})
-]>
-        | TagSplice(expr, _)                     => <[ text_macro(() => $expr) ]>
-        | AttrSplice(s, SpliceType.Foreach)      => <[ attr_macro("nw-foreach", () => $s) ]>
-        | AttrSplice(s, SpliceType.When)         => <[ attr_macro("nw-when", () => $s) ]>
-        | AttrSplice(s, SpliceType.Unless)       => <[ attr_macro("nw-unless", () => $s) ]>
+          def each = content.Where(c => if(c is XmlAst.AttrSplice(_, SpliceType.Foreach)) true else false)
+                            .FirstOrDefault() :> XmlAst.AttrSplice;
+          
+          def eachDefines = 
+            if(each != null) {            
+              match(Parse(ToLocation(each), each.expr)) {
+              | <[ $x in $xs ]> => <[ def from = $xs; def $x = from.FirstOrDefault(); ]>
+              | _ => Message.FatalError("Unrecognized foreach syntax");
+              }            
+            } else <[ ]>;
+          
+          <[
+            tag($(name : string), {
+              $eachDefines;
+              ([..$(attrs)],
+               [..$(childTags)])
+            })
+          ]>
+
+        | TagSplice(expr, _)                     => <[ text_splice($expr) ]>
+        | AttrSplice(s, SpliceType.Foreach)      => <[ attr_splice("foreach", $s) ]>
+        | AttrSplice(s, SpliceType.When)         => <[ attr_splice("when", $s) ]>
+        | AttrSplice(s, SpliceType.Unless)       => <[ attr_splice("unless", $s) ]>
         | Seq(items)                             => <[ [..$(items.Map(transformImpl))] ]>;
         | _                                      => Message.FatalError(ToLocation(xmlAst), "Unrecognized syntax in Html"); <[]>
         }

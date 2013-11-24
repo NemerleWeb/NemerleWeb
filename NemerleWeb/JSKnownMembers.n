@@ -118,6 +118,7 @@ namespace NemerleWeb
           else
             JSAst.Void()
         | Call(Delayed, _, _) => JSAst.Void()
+        | Call(LocalFunRef(decl, _), parms, _isTail) => JSAst.Call(JSAst.LocalRef(decl.Name, None()), parms.Map(paramBuilder))
         | Call(s, _, _) => Message.Error(s.Location, $"Unsupported call to $s"); JSAst.Void()          
         }
       

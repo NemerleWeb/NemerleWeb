@@ -3,6 +3,7 @@ using Nemerle.Collections;
 using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
 using Nemerle.IO;
+using Nemerle.Compiler.Typedtree;
 
 using System;
 using System.Linq;
@@ -18,29 +19,9 @@ namespace NemerleWeb
   }
 
   [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Method)]
-  public macro Html(_tb : TypeBuilder, mb : MethodBuilder)
+  public macro HtmlTyped(_tb : TypeBuilder, mb : MethodBuilder)
   {
-  }
-  
-  macro tag_macro (name, body) 
-  syntax ("tag_macro", "(", name, body, ")") {
-    <[ 
-      tag_impl($name, $body)
-    ]>
-  }
-  
-  macro attr_macro (name, value) 
-  syntax ("attr_macro", "(", name, value, ")") {
-    <[ 
-      attr_impl($name, $value)
-    ]>
-  }
-  
-  macro text_macro (name, value) 
-  syntax ("text_macro", "(", name, value, ")") {
-    <[ 
-      text_impl($name, $value)
-    ]>
+    HtmlImpl.FromTypedToString(Nemerle.Macros.ImplicitCTX(), mb)
   }
   
   internal module HtmlImpl
@@ -71,7 +52,21 @@ namespace NemerleWeb
 
           _ = match (parser.Parse(str))
           {
-          | Some(result) => XmlAstToXLinq(typer, parser).Transform(result)              
+          | Some(result) => 
+            def pexpr = JSAstBuilder.SubstituteLambdas(XmlAstToXLinq(typer, parser).Transform(result));
+            def tempMethodName = Name("__n__" + mb.Name);
+            typer.CurrentTypeBuilder.Define(<[ decl:
+              [HtmlTyped]
+              public $(tempMethodName : name)() : list[string] {
+                def tag(name, expr) : string { "" }
+                def attr(name, expr) : string { "" }
+                def attr_splice(name, expr) : string { "" }
+                def text(expr) : string { "" }
+                def text_splice(expr) : string { "" }
+                
+                $pexpr
+              }
+            ]>);
           | _ =>
             def (pos, expected) = parser.GetMaxRollbackPosAndNames();
             def msg = if (expected.IsEmpty()) "Unexpected character."
@@ -85,5 +80,64 @@ namespace NemerleWeb
       | _ => Message.FatalError(mb.header.Location, "You must return XML literal string.")
       }
     }    
+    
+    internal FromTypedToString(typer : Typer, mb : MethodBuilder) : void
+    {
+      Macros.DefineCTX(typer);
+      
+      def htmlFromTExpr(expr, indent) : string {
+        match(expr) {
+        | TExpr.Block(_, body) => htmlFromTExpr(body, indent)
+        | TExpr.Label(_, body) => htmlFromTExpr(body, indent)
+        | TExpr.TypeConversion(expr, _, _, _) => htmlFromTExpr(expr, indent)
+        | Call(StaticRef(lst, mem, _), parms, _) 
+          when lst.TypeInfo.FullName == "Nemerle.Core.Cons[T]" && mem.Name == ".ctor" =>
+          string.Join("", parms.Map(p => htmlFromTExpr(p.expr, indent)));
+          
+        | StaticRef(lst, mem, _) 
+          when lst.TypeInfo.FullName == "Nemerle.Core.Nil[T]" && mem.Name == "_N_constant_object" =>         
+          ""
+          
+        | Call(StaticRef(_, mem, _), [Parm(_, Literal(Literal.String(tagName)), _, _), tagExprExpr], _) when mem.Name.StartsWith("_N_tag_") => 
+          assert2(false);
+          def (attrs, children) = match(tagExprExpr.expr) {
+          | Tuple([attrs, tags]) => 
+            def a = htmlFromTExpr(attrs, indent);
+            def t = htmlFromTExpr(tags, indent + "  ");
+            (a, t)
+          | _ => assert2(false); ("", "");
+          }
+        
+          indent + $"<$(tagName) $attrs>$children</$(tagName)>"
+        
+        | Call(StaticRef(_, mem, _), [textExprExpr], _) when mem.Name.StartsWith("_N_text_splice_") => 
+          def splice = JSAstBuilder.BuildJSAst(textExprExpr.expr, false, mb.Header).Write();
+          def splice = splice.Trim(array['\"']);
+          $"<span nw-text=\"$splice\" />"        
+        
+        | Call(StaticRef(_, mem, _), [Parm(_, Literal(Literal.String(textValue)), _, _)], _) 
+          when mem.Name.StartsWith("_N_text_") => 
+          indent + textValue
+        
+        | Call(StaticRef(_, mem, _), [Parm(_, Literal(Literal.String(attrName)), _, _), attrExprExpr], _) 
+          when mem.Name.StartsWith("_N_attr_splice") => 
+          assert2(false);
+          def attrSplice = JSAstBuilder.BuildJSAst(attrExprExpr.expr, false, mb.Header).Write();
+          $"nw-$attrName=\"$attrSplice\""
+        | Call(StaticRef(_, mem, _), [Parm(_, Literal(Literal.String(attrName)), _, _), Parm(_, Literal(Literal.String(attrValue)), _, _)], _) 
+          when mem.Name.StartsWith("_N_attr_") => 
+          assert2(false);
+          $"$attrName=\"$attrValue\""
+        
+        | _ => 
+          //assert2(false); 
+          ""
+        }
+      }
+      
+      def texpr = TyperHelper.GetTypedBody(mb, typer, typer.CurrentTypeBuilder, true);
+      def html = htmlFromTExpr(texpr, "");
+      _ = html;
+    }
   }
 }

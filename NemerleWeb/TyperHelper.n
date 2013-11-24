@@ -61,14 +61,16 @@ namespace NemerleWeb
             texpr,
             !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor,
             method.Header);
+            
           /*def tempFileName = System.IO.Path.GetTempFileName();
           System.IO.File.WriteAllText(tempFileName, texpr.ToString());
           System.IO.File.AppendAllText(tempFileName, jsast.Write());
           Message.Hint(method.Name + ": " + tempFileName);*/
+          
           jsast;
         }
         
-        GetTypedBody(method : IMethod, typer : Typer, tb : TypeBuilder, fullTyping : bool = true) : TExpr
+        public GetTypedBody(method : IMethod, typer : Typer, tb : TypeBuilder, fullTyping : bool = true) : TExpr
         {
           if (method.Header.Name.Contains("_N_GetVariantCodeSafe"))
           {
@@ -98,8 +100,11 @@ namespace NemerleWeb
                 }
                 else
                 {
-                  def methodTyper = Typer(tb, null, mb, env);
-                                  
+                  def methodTyper = Typer(tb, null, mb, env);                  
+                  
+                  mutable body;
+                                   
+                  
                   if(fullTyping)
                   {
                     try
@@ -118,9 +123,10 @@ namespace NemerleWeb
                     def runTyper = methodTyper.GetType().GetMethod("RunTyper", BindingFlags.NonPublic | BindingFlags.Instance);
                     _ = runTyper.Invoke(methodTyper, array[]);
                   }                
-              
+                                    
                   typer.Manager.Options.EmitDebug = oldEmitDebug;
-                  GetTypedBody(method, typer, tb);
+                  body
+                  //GetTypedBody(method, typer, tb);
                 }
               }
             | FunBody.Abstract => TExpr.Literal(Literal.Void())
