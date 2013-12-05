@@ -144,12 +144,12 @@ namespace TSParser.Ast
     | Property  { Value : Ast.Property; }
     | Call      { Value : Ast.CallSignature; }
     | Construct { Value : Ast.Construct; }      
-    | Index     { Value : Ast.IndexSignature; }
+    | Index     { Value : Ast.IndexMemberDeclaration; }
     | Method    { Value : Ast.Method; }
   }
   
   [Record][StructuralEquality(Ignore = [ParameterName])]
-  public class IndexSignature
+  public class IndexMemberDeclaration
   {
     public ParameterName : string;
     public ParameterType : IndexParameterType;
@@ -293,7 +293,7 @@ namespace TSParser.Ast
         Access : option[MemberAccess];
         Static : bool;
       }
-    | Index { Value : Ast.IndexSignature; }
+    | Index { Value : Ast.IndexMemberDeclaration; }
   }
   
   [Record][StructuralEquality]

@@ -10,6 +10,7 @@ using Nemerle.Peg;
 using Nemerle.Extensions;
 
 using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -210,7 +211,8 @@ namespace TSParser
 
         #region NumericLiteral (7.8.3)
 
-        NumericLiteral : string = (DecimalLiteral / HexIntegerLiteral) !(IdentifierStart / DecimalDigit);
+        NumericLiteral : string =
+          (DecimalLiteral / HexIntegerLiteral) !(IdentifierStart / DecimalDigit);
 
         DecimalLiteral =
           DecimalIntegerLiteral dot DecimalDigit* ExponentPart? /
@@ -224,8 +226,12 @@ namespace TSParser
         ExponentIndicator = 'e' / 'E';
         SignedInteger = DecimalDigit+ / '+' DecimalDigit+ / '-' DecimalDigit+;
         HexIntegerLiteral = ("0x" / "0X") HexDigit+;
-        HexDigit = ['0'..'9', 'a'..'f', 'A'..'F'];        
+        HexDigit = ['0'..'9', 'a'..'f', 'A'..'F'];
 
+        // This doesn't exists in specification
+        IntegerLiteral : int =
+          (DecimalIntegerLiteral / HexIntegerLiteral) !(IdentifierStart / DecimalDigit);
+        
         #endregion
 
         #region StringLiteral (7.8.4)
@@ -466,7 +472,7 @@ namespace TSParser
         
         #region TypeScript
         
-        #region Type Parameter Lists (3.5.1)
+        #region Type Parameter Lists (3.4.1)
         
         TypeParameters : list[Ast.ScriptTypeParameter] = less_s TypeParameterList greater_s;
         // Return list instead of option
@@ -528,7 +534,7 @@ namespace TSParser
           CallSignatureObject /
           ConstructSignature /
           MethodSignature /          
-          IndexSignature /
+          IndexMemberDeclaration /
           PropertySignature;
           
         #endregion
@@ -594,7 +600,7 @@ namespace TSParser
         
         ConstructSignature : Ast.ScriptObject =
           new_s TypeParametersOpt lparen_s ParameterListOpt rparen_s TypeAnnotation?;
-        IndexSignature     : Ast.ScriptObject =
+        IndexMemberDeclaration     : Ast.ScriptObject =
           lbrack_s Identifier required colon_s ("number" / "string") s rbrack_s TypeAnnotation;
         MethodSignature  : Ast.ScriptObject = PropertyName optional CallSignature;
         
@@ -654,21 +660,22 @@ namespace TSParser
         ClassBody = ClassElement*;
         ClassElement =
           ConstructorDeclaration /
-          MemberDeclaration /
-          IndexSignature;
+          PropertyMemberDeclaration /
+          IndexMemberDeclaration;
         
         #endregion
         
         #region Constructor Declaration (8.3)
         
         ConstructorDeclaration = ConstructorOverload+;
-        ConstructorOverload = constructor_s lparen_s ParameterListOpt rparen_s endS;
+        ConstructorOverload =
+          PublicOrPrivate? constructor_s lparen_s ParameterListOpt rparen_s endS;
         
         #endregion
         
         #region Member Declarations (8.4)
         
-        MemberDeclaration =
+        PropertyMemberDeclaration =
           MemberFunctionDeclaration /
           MemberVariableDeclaration /
           MemberAccessorDeclaration;
@@ -687,10 +694,20 @@ namespace TSParser
         
         EnumDeclaration = enum_s Identifier lbrace_s EnumBody? rbrace_s endS;
         EnumBody =
-          ConstantEnumMember (comma_s ConstantEnumMember)* comma_s?;
-        ConstantEnumMember = PropertyName (assign_s IntegerLiteral)?;
-        IntegerLiteral = SignedInteger / HexIntegerLiteral;
-        ComputedEnumMemberList = ComputedEnumMember (comma_s ComputedEnumMember)*;
+          ((ConstantEnumMembers (comma_s EnumMemberSections)?) / EnumMemberSections) comma_s?;
+        
+        ConstantEnumMembers =
+            PropertyName (comma_s PropertyName)*;
+  
+        EnumMemberSections = EnumMemberSection (comma_s EnumMemberSection)*;
+            
+        EnumMemberSection =           
+            ConstantEnumMemberSection /
+            ComputedEnumMember;
+        
+        ConstantEnumMemberSection =
+            PropertyName assign_s IntegerLiteral (comma_s ConstantEnumMembers)?;
+          
         ComputedEnumMember = PropertyName assign_s AssignmentExpression;
         
         #endregion
@@ -794,7 +811,7 @@ namespace TSParser
           PublicOrPrivate? static_s_ PropertyName CallSignature;
           
         // Special translation rules for AmbientClassBodyElement
-        IndexSignature_AmbientClassBodyElement : Ast.AmbientClassBodyElement = IndexSignature;
+        IndexSignature_AmbientClassBodyElement : Ast.AmbientClassBodyElement = IndexMemberDeclaration;
                 
         // Enum
         AmbientEnumDeclaration : Ast.AmbientDeclaration =
@@ -921,6 +938,11 @@ namespace TSParser
       GetText(n)
     }
     
+    IntegerLiteral(n : NToken) : int
+    {
+      int.Parse(GetText(n), NumberStyles.AllowHexSpecifier)
+    }
+    
     IdentifierName(first : NToken, rest : NToken) : string
     {
       GetText(first) + GetText(rest)
@@ -1010,7 +1032,7 @@ namespace TSParser
       Ast.ScriptObject.Construct(Ast.Construct(typeParams, parms, type))
     }
     
-    IndexSignature(paramName : string, paramType : NToken, returnType : Ast.ScriptType) : Ast.ScriptObject
+    IndexMemberDeclaration(paramName : string, paramType : NToken, returnType : Ast.ScriptType) : Ast.ScriptObject
     {
       def indexParamType = 
         match(GetText(paramType))
@@ -1020,7 +1042,7 @@ namespace TSParser
         | _ => assert(false);
         };
       
-      Ast.ScriptObject.Index(Ast.IndexSignature(paramName, indexParamType, returnType))
+      Ast.ScriptObject.Index(Ast.IndexMemberDeclaration(paramName, indexParamType, returnType))
     }
 
     MethodSignature(id : string, optional : bool, signature : Ast.CallSignature) : Ast.ScriptObject
@@ -1313,11 +1335,6 @@ namespace TSParser
     AmbientEnumMember(id : string, initialiser : option[int]) : Ast.AmbientEnumMember
     {
       Ast.AmbientEnumMember(id, initialiser)
-    }
-    
-    AmbientEnumMemberInitialiser(i : NToken) : int
-    {
-      int.Parse(GetText(i))
     }
     
     EntityName(first : string, rest : option[string]) : string
