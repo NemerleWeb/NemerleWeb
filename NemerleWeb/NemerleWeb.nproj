@@ -116,6 +116,9 @@
     <Compile Include="Comparer.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DefaultValueInitializer.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="EventsDSL\EventData.n">
       <SubType>Code</SubType>
     </Compile>

@@ -1,6 +1,7 @@
 ﻿using Nemerle.Collections;
 using Nemerle.Xml;
 using Nemerle.Extensions;
+using Nemerle.Utility;
 using Nemerle.ComputationExpressions;
 
 using System;
@@ -36,20 +37,18 @@ module Program
 }
 
 [Unit]
+struct A
+{
+}
+
+[Unit]
 public class Test
-{  
-  public Children : string = "abcdefghijklm";
-  
-  F() : void  
-  {
-    
-  }
-    
+{
   [Html]
   public View() : string
   {
     <# 
-       <div $foreach(c in Children.Where(c => c == 'f'))>
+       <div>
        </div>
     #>
   }

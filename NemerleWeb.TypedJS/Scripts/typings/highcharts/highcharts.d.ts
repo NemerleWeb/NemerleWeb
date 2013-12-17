@@ -230,7 +230,7 @@ interface HighchartsChartOptions {
     spacingTop?: number;
     style?: HighchartsCSSObject;
     type?: string;
-    whidth?: number;
+    width?: number;
     zoomType?: string;
 }
 
@@ -1011,7 +1011,7 @@ interface HighchartsChartObject {
     setTitle(title: HighchartsTitleOptions): void;
     setTitle(title: HighchartsTitleOptions, subtitle: HighchartsSubtitleOptions): void;
     showLoading(): void;
-    showLoading(str: string);
+    showLoading(str: string): void;
     xAxis: HighchartsAxisObject[];
     yAxis: HighchartsAxisObject[];
 
@@ -1020,7 +1020,7 @@ interface HighchartsChartObject {
 
 interface HighchartsChart {
     new (options: HighchartsOptions): HighchartsChartObject;
-    new (options: HighchartsOptions, callback: (event: Event) => void ): HighchartsChartObject;
+    new (options: HighchartsOptions, callback: (chart: HighchartsChartObject) => void ): HighchartsChartObject;
 }
 
 interface HighchartsElementObject {
@@ -1058,7 +1058,7 @@ interface HighchartsStatic {
     setOptions(options: HighchartsOptions): HighchartsOptions;
     getOptions(): HighchartsOptions;
     
-    map(array: Array, any): Array;
+    map(array: any[], fn: Function): any[];
 }
 declare var Highcharts: HighchartsStatic;
 
@@ -1088,16 +1088,16 @@ interface HighchartsPointObject {
 }
 
 interface HighchartsSeriesObject {
-    addPoint(options: any);
-    addPoint(options: any, redraw: boolean, shift: boolean);
-    addPoint(options: any, redraw: boolean, shift: boolean, animation: boolean);
-    addPoint(options: any, redraw: boolean, shift: boolean, animation: HighchartsAnimation);
+    addPoint(options: any): void;
+    addPoint(options: any, redraw: boolean, shift: boolean): void;
+    addPoint(options: any, redraw: boolean, shift: boolean, animation: boolean): void;
+    addPoint(options: any, redraw: boolean, shift: boolean, animation: HighchartsAnimation): void;
     chart: HighchartsChartObject;
     data: HighchartsDataPoint[];
     hide(): void;
     options: HighchartsSeriesOptions;
     remove(): void;
-    remove(redraw: boolean);
+    remove(redraw: boolean): void;
     name: string;
     points: HighchartsPointObject[];
     select(): void;

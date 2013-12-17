@@ -1,0 +1,91 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Compiler;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  /// <summary>
+  /// Description of DefaultValueInitializer.
+  /// </summary>
+  internal module DefaultValueInitializer
+  {
+    /// <summary>
+    /// Return js ast for type initialization.
+    /// The type parameter can be null, in that case JSAst.Void is returned.
+    /// <summary>
+    public GetJSAst(type : TypeVar) : JSAst
+    {
+      if(type != null)
+      {
+        if(type.Hint is Some(fixedType)) GetJSAst(fixedType)
+        else JSAst.Void()
+      }
+      else JSAst.Void()
+    }
+    
+    /// <summary>
+    /// Return js ast for type initialization.
+    /// The type parameter can be null, in that case JSAst.Void is returned.
+    /// <summary>
+    public GetJSAst(type : FixedType) : JSAst
+    {
+      if (type != null)
+      {
+        // Is reference or nullable
+        if (!type.IsValueType || type.IsNullable)
+          JSAst.Literal(JSLiteral.Null())
+        else
+        if(type.IsEnum)
+        {
+          JSAst.Literal(JSLiteral.Integer(0))
+        }
+        else
+        if(type.IsPointer)
+        {
+          JSAst.Literal(JSLiteral.Integer(0))
+        }
+        else
+          // Check predefined types
+          match(type.TypeInfo?.FullName)
+          {
+          | "System.Char"
+          | "System.Byte"
+          | "System.SByte"
+          | "System.Int16"
+          | "System.UInt16"
+          | "System.Int32"
+          | "System.UInt32"
+          | "System.Int64"
+          | "System.UInt64" => JSAst.Literal(JSLiteral.Integer(0))
+          | "System.Decimal" => JSAst.Literal(JSLiteral.Integer(0))
+          | "System.Single" 
+          | "System.Double" => JSAst.Literal(JSLiteral.Float(0f)); 
+          | "System.Boolean" => JSAst.Literal(JSLiteral.Bool(false));         
+          | _ =>
+            // Call object's constructor if the type is known
+            if(type.TypeInfo != null)
+            {
+              if(type.TypeInfo.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute") ||
+                  type.TypeInfo.DeclaringType?.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
+                JSAst.Literal(JSLiteral.Null())
+              else
+                JSAst.Call(JSAst.Constructor(JSClass.GetProperName(type.TypeInfo), Some([])), [])
+            }
+            else
+            {
+              Message.Warning($"Setting null value for type $(type)");
+              JSAst.Literal(JSLiteral.Null())
+            }
+          }
+      }
+      else JSAst.Void()
+    }
+    
+  }
+}
