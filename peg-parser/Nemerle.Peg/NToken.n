@@ -5,7 +5,7 @@ using NemerleWeb;
 namespace Nemerle.Peg.Web
 {
   [Record, StructuralEquality(EmitDebugSources = false), StructuralHashCode, Unit]
-  public class NToken : IToken
+  public struct NToken : IToken
   {
     [Accessor]  private _startPos : int;
     [Accessor]  private _endPos   : int;
