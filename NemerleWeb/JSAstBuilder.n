@@ -77,7 +77,7 @@ namespace NemerleWeb
       | Goto(target, _)                   => JSAst.Goto(target.ToString())
       | HasType(expr, type)               => JSAst.HasType(build(expr), JSClass.GetProperName(type.TypeInfo))
       | If(cond, then, els, _, _)         => JSAst.If(build(cond), build(then), build(els))
-      | ImplicitValueTypeCtor             => JS Message.Error(expr.Location, "ImplicitValueTypeCtor not implemented"); JSAst.NotImpl("ImplicintValueTypeCtor")
+      | ImplicitValueTypeCtor as i        => DefaultValueInitializer.GetJSAst(i.Type)
       | Label(id, body)                   => JSAst.Label(id, build(body))
       | Literal(val)                      => 
           match(val)
@@ -168,7 +168,7 @@ namespace NemerleWeb
       | Switch(expr, defCase, cases)      =>
         JSAst.Switch(
           build(expr),
-          cases.Map((id, ex) => JSAst.SwitchCase(JSAst.Literal(JSLiteral.Number(id)), build(ex))),
+          cases.Map((id, ex) => JSAst.SwitchCase(JSAst.Literal(JSLiteral.Number(id :> double)), build(ex))),
           if(defCase.IsSome) build(defCase.Value) else JSAst.Void())
       | This                              => JSAst.This()
       | Throw(expr)                       => JSAst.Throw(build(expr))

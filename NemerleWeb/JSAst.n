@@ -669,7 +669,7 @@ $(Body.Write(indent + "  "))
             public override Write(indent = "" : string) : string {                
                 def ss = Items.Where(i => !(i is JSAst.Void))
                               .Select(i => i.Write(indent));                
-                $<#..$(ss; ";" + Environment.NewLine);$(Environment.NewLine)#>
+                $<#..$(ss; ";" + Environment.NewLine);#>
             }
             public override Transform() : JSAst {
                 match(Items) {

@@ -39,22 +39,17 @@ module Program
 [Unit]
 struct A
 {
-  x : int;
-  y : string;
-  z : double;
-  
-  public this(_ : int) { this(); }
 }
 
-[Unit]
-struct B
-{
-  a : A;
-}
 
 [Unit]
 public class Test
 {
+  F() : void
+  {
+    def a = A();
+  }
+  
   [Html]
   public View() : string
   {
