@@ -431,6 +431,12 @@ namespace NemerleWeb.Website.Tests
       public Y : string;
     }
     
+    [Unit]
+    public struct AggregatedStruct
+    {
+      public S : SimpleStruct;
+    }
+    
     public this()
     {
       def test(description, res)
@@ -1719,7 +1725,22 @@ namespace NemerleWeb.Website.Tests
 
       test("Struct default initialization", () => {
         mutable s : SimpleStruct;
-        s.X == 0
+        s.X == 0 && s.Y == null
+      });
+      
+      test("Struct explicit default initialization", () => {
+        def s = SimpleStruct();
+        s.X == 0 && s.Y == null
+      });
+      
+      test("Struct aggregated default initialization", () => {
+        mutable s : AggregatedStruct;
+        s.S.X == 0 && s.S.Y == null
+      });
+      
+      test("Struct explicit aggregated default initialization", () => {
+        def s = AggregatedStruct();
+        s.S.X == 0 && s.S.Y == null
       });
     }
     

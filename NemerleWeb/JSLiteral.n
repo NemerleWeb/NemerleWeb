@@ -12,11 +12,12 @@ namespace NemerleWeb
 {
   public variant JSLiteral : System.IEquatable[JSLiteral]
   {
-    | Integer { val : int; }
-    | Float { val : float; }
+    | Number { val : double; }
     | Bool { val : bool; }
     | String { val : string; }
     | Regexp { pattern : JSAst; modifiers : JSAst; }
+    | NaN
+    | Infinity
     | Null
     
     [OverrideObjectEquals]
@@ -28,8 +29,7 @@ namespace NemerleWeb
       | (Null, Null) => true
       | (String (x1), String (x2)) => x1 == x2
       | (Bool (x1), Bool (x2)) => x1 == x2
-      | (Integer (val), Integer (val')) => val == val'
-      | (Float (val), Float (val')) => val == val'      
+      | (Number (val), Number (val')) => val == val'    
       | _ => false      
       }
     }

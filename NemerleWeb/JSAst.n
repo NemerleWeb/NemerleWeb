@@ -147,7 +147,7 @@ namespace NemerleWeb
               indent + output
             }
             
-            static private Literal_Int1 : JSAst.Literal = JSAst.Literal(JSLiteral.Integer(1));
+            static private Literal_Int1 : JSAst.Literal = JSAst.Literal(JSLiteral.Number(1));
             
             public override Transform() : JSAst
             {
@@ -195,7 +195,7 @@ namespace NemerleWeb
               | Call(OpCode("===") as op, [JSAst.Array([]), something])
               | Call(OpCode("!==") as op, [something, JSAst.Array([])])
               | Call(OpCode("!==") as op, [JSAst.Array([]), something]) => 
-                JSAst.Call(op, [something.Field("length"), JSAst.Literal(JSLiteral.Integer(0))])
+                JSAst.Call(op, [something.Field("length"), JSAst.Literal(JSLiteral.Number(0))])
               
               | Call(OpCode("!=="), something :: Literal(Null) :: []) 
               | Call(OpCode("!=="), [Literal(Null), something]) => 
@@ -389,7 +389,7 @@ $(indent)}#>
             | HasType(l, "Nemerle_Core_Cons_$T$__$T$_")
             | HasType(l, "Nemerle_Core_Cons_$T$_") => 
               JSAst.Call(JSAst.OpCode(">"),
-                        [JSAst.FieldRef(l, "length"), JSAst.Literal(JSLiteral.Integer(0))]);
+                        [JSAst.FieldRef(l, "length"), JSAst.Literal(JSLiteral.Number(0))]);
             | _ => this                
             }
           }   
@@ -534,23 +534,27 @@ $(Body.Write(indent + "  "))
             
             public override Write(indent = "" : string) : string
             {
-              match(this)
-              {
-              | Literal(Null)         => indent + "null"
-              | Literal(Integer(val)) => indent + $"$(val.ToString(CultureInfo.InvariantCulture))"
-              | Literal(Float(val))   => indent + $"$(val.ToString(CultureInfo.InvariantCulture))"
-              | Literal(String(val))  =>        
-                def escaping = val.IndexOf(StringLiteral.DoNotEscapeMarker);
-                def str = 
-                  if(escaping != -1)
-                    val.Substring(0, escaping)
-                  else
-                    JSAstHelper.EscapeString(val);
+              def val =
+                match(this)
+                {
+                | Literal(Null)         => "null"
+                | Literal(Number(val) ) => $"$(val.ToString(CultureInfo.InvariantCulture))"
+                | Literal(String(val))  =>        
+                  def escaping = val.IndexOf(StringLiteral.DoNotEscapeMarker);
+                  def str = 
+                    if(escaping != -1)
+                      val.Substring(0, escaping)
+                    else
+                      JSAstHelper.EscapeString(val);
                     
-                indent + str                
-              | Literal(Bool(val))    => indent + $"$(val.ToString(CultureInfo.InvariantCulture).ToLower())"
-              | Literal(Regexp(pat, mod)) => indent + $<#new RegExp($(pat.Write()), $(mod.Write()))#>
-              }
+                  str                
+                | Literal(Bool(val))    => $"$(val.ToString(CultureInfo.InvariantCulture).ToLower())"
+                | Literal(Regexp(pat, mod)) => $<#new RegExp($(pat.Write()), $(mod.Write()))#>
+                | Literal(NaN)          => "NaN"
+                | Literal(Infinity)     => "Infinity"
+                };
+              
+              indent + val
             }
         }
         | LocalRef       
@@ -576,7 +580,7 @@ $(Body.Write(indent + "  "))
             
             public override Write(_ = "" : string) : string
             {
-              def delimiter = if (Obj is Literal(JSLiteral.Integer)) " " else "";
+              def delimiter = if (Obj is Literal(JSLiteral.Number)) " " else "";
               // HACK: Lambda support
               if (Method == "apply" || Method == "apply_void")
                 $"$(Obj.Write())"

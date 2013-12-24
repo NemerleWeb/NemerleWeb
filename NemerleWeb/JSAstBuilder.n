@@ -77,23 +77,23 @@ namespace NemerleWeb
       | Goto(target, _)                   => JSAst.Goto(target.ToString())
       | HasType(expr, type)               => JSAst.HasType(build(expr), JSClass.GetProperName(type.TypeInfo))
       | If(cond, then, els, _, _)         => JSAst.If(build(cond), build(then), build(els))
-      | ImplicitValueTypeCtor             => Message.Error(expr.Location, "ImplicitValueTypeCtor not implemented"); JSAst.NotImpl("ImplicintValueTypeCtor")
+      | ImplicitValueTypeCtor             => JS Message.Error(expr.Location, "ImplicitValueTypeCtor not implemented"); JSAst.NotImpl("ImplicintValueTypeCtor")
       | Label(id, body)                   => JSAst.Label(id, build(body))
       | Literal(val)                      => 
           match(val)
           {
           | Null          => JSAst.Literal(JSLiteral.Null())
           | String (val)  => JSAst.Literal(JSLiteral.String(val))
-          | Float (val)   => JSAst.Literal(JSLiteral.Float(val))
-          | Double (val)  => JSAst.Literal(JSLiteral.Float(val))
-          | Decimal (val) => JSAst.Literal(JSLiteral.Float(Convert.ToDouble(val)))
+          | Float (val)   => JSAst.Literal(JSLiteral.Number(val))
+          | Double (val)  => JSAst.Literal(JSLiteral.Number(val))
+          | Decimal (val) => JSAst.Literal(JSLiteral.Number(Convert.ToDouble(val)))
           | Char (val)    => JSAst.Literal(JSLiteral.String(val.ToString()))
           | Bool (val)    => JSAst.Literal(JSLiteral.Bool(val))
-          | Integer (val, isneg, _) => JSAst.Literal(JSLiteral.Integer((val :> int) * (if(isneg) -1 else 1)))
+          | Integer (val, isneg, _) => JSAst.Literal(JSLiteral.Number((val :> int) * (if(isneg) -1 else 1)))
           | Enum (val, _, _) => 
             if (val.val < int.MaxValue :> ulong)
             {
-              JSAst.Literal(JSLiteral.Integer(val.val :> int))
+              JSAst.Literal(JSLiteral.Number(val.val :> int))
             }  
             else
             {
@@ -168,7 +168,7 @@ namespace NemerleWeb
       | Switch(expr, defCase, cases)      =>
         JSAst.Switch(
           build(expr),
-          cases.Map((id, ex) => JSAst.SwitchCase(JSAst.Literal(JSLiteral.Integer(id)), build(ex))),
+          cases.Map((id, ex) => JSAst.SwitchCase(JSAst.Literal(JSLiteral.Number(id)), build(ex))),
           if(defCase.IsSome) build(defCase.Value) else JSAst.Void())
       | This                              => JSAst.This()
       | Throw(expr)                       => JSAst.Throw(build(expr))

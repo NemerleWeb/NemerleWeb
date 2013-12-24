@@ -43,12 +43,12 @@ namespace NemerleWeb
         else
         if(type.IsEnum)
         {
-          JSAst.Literal(JSLiteral.Integer(0))
+          JSAst.Literal(JSLiteral.Number(0))
         }
         else
         if(type.IsPointer)
         {
-          JSAst.Literal(JSLiteral.Integer(0))
+          JSAst.Literal(JSLiteral.Number(0))
         }
         else
           // Check predefined types
@@ -62,10 +62,10 @@ namespace NemerleWeb
           | "System.Int32"
           | "System.UInt32"
           | "System.Int64"
-          | "System.UInt64" => JSAst.Literal(JSLiteral.Integer(0))
-          | "System.Decimal" => JSAst.Literal(JSLiteral.Integer(0))
+          | "System.UInt64" => JSAst.Literal(JSLiteral.Number(0))
+          | "System.Decimal" => JSAst.Literal(JSLiteral.Number(0))
           | "System.Single" 
-          | "System.Double" => JSAst.Literal(JSLiteral.Float(0f)); 
+          | "System.Double" => JSAst.Literal(JSLiteral.Number(0f)); 
           | "System.Boolean" => JSAst.Literal(JSLiteral.Bool(false));         
           | _ =>
             // Call object's constructor if the type is known

@@ -63,7 +63,7 @@ namespace NemerleWeb
             JSAst.OpCode("!=="),
             [
               left.JSMethodCall("indexOf", parms),
-              JSAst.Literal(JSLiteral.Integer(-1))
+              JSAst.Literal(JSLiteral.Number(-1))
             ]))
             
         | "EndsWith" => None()       
@@ -79,7 +79,7 @@ namespace NemerleWeb
         | "PadRight"
         | "Remove" => None()
         | "Split" => Some(left.JSMethodCall("split", parms))
-        | "StartsWith" => Some(JSAst.Call(JSAst.OpCode("==="), [left.JSMethodCall("indexOf", parms), JSAst.Literal(JSLiteral.Integer(0))]))
+        | "StartsWith" => Some(JSAst.Call(JSAst.OpCode("==="), [left.JSMethodCall("indexOf", parms), JSAst.Literal(JSLiteral.Number(0))]))
         | "Substring" => Some(left.JSMethodCall("substr", parms))
         | "ToLower"
         | "ToUpper"
