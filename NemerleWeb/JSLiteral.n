@@ -12,11 +12,11 @@ namespace NemerleWeb
 {
   public variant JSLiteral : System.IEquatable[JSLiteral]
   {
-    | Integer { val : int }
-    | Float { val : double }
+    | Integer { val : int; }
+    | Float { val : float; }
     | Bool { val : bool; }
     | String { val : string; }
-    | Regexp { pattern : JSAst; modifiers : JSAst }
+    | Regexp { pattern : JSAst; modifiers : JSAst; }
     | Null
     
     [OverrideObjectEquals]

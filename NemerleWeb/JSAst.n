@@ -361,7 +361,7 @@ $(Body.Write("  "))
           
             public override Write(indent = "" : string) : string
             {
-$<#$(indent)function $Name(..$(Parameters; ";"; p => p.Write(""))) {
+$<#$(indent)function $Name(..$(Parameters; ", "; p => p.Write(""))) {
 $(Body.Write(indent + "  "))
 $(indent)}#>
             }
@@ -665,11 +665,11 @@ $(Body.Write(indent + "  "))
             public override Write(indent = "" : string) : string {                
                 def ss = Items.Where(i => !(i is JSAst.Void))
                               .Select(i => i.Write(indent));                
-                $<#..$(ss; ";" + Environment.NewLine)#>
+                $<#..$(ss; ";" + Environment.NewLine);$(Environment.NewLine)#>
             }
             public override Transform() : JSAst {
                 match(Items) {
-                | x :: [] => x
+                | [x] => x
                 //| xs => JSAst.Seq(xs.Map(x => x.Transform()))
                 | _ => this
                 }

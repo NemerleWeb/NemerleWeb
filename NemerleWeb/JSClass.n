@@ -10,176 +10,164 @@ using Nemerle.Compiler.Typedtree;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using SR = System.Reflection;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 
 namespace NemerleWeb
 {
-  module JSClassHelper
-  {
-    public HasBase(ti : TypeInfo) : bool 
-    {
-      ti.BaseType != null &&
-      ti.BaseType.FullName != "System.Object" &&
-      ti.BaseType.FullName != "Nemerle.Builtins.Function" &&
-      ti.BaseType.FullName != "Nemerle.Builtins.FunctionVoid" &&
-      !ti.BaseType.IsInterface
-    }
-  }
-    
-  /// Defines settings for JSclass 
-  internal module JSClassSettings
-  {
-    public JSApiRoots : SortedSet[string] = SortedSet(["NemerleWeb"], InvertedComparer());
-  }
-  
   [Record(NotNull = [".*"])]
   internal class JSClass
   {
-      public ClassType : TypeBuilder { get; }
-      public Indent : string    { get; }      
-      public Typer : Typer { get; }
+    public ClassType : TypeBuilder { get; }
+    public Indent : string    { get; }      
+    public Typer : Typer { get; }
       
-      // HACK: for using types from JSClass
-      #region Types
-      public static StringType : TypeVar { get; set; }
-      public static IEnumerableType : TypeVar { get; set; }        
-      public static IPageType : TypeVar { get; set; }
-      public static ObjectType : TypeVar { get; set; }
-      #endregion
+    // HACK: for using types from JSClass
+    #region Types
+    public static StringType : TypeVar { get; set; }
+    public static IEnumerableType : TypeVar { get; set; }        
+    public static IPageType : TypeVar { get; set; }
+    public static ObjectType : TypeVar { get; set; }
+    #endregion
       
-      public static Self : string = "_NW$_self";
-      public static LambdaMarker : string = "_NW$_lambda";
+    public static Self : string = "_NW$_self";
+    public static LambdaMarker : string = "_NW$_lambda";
       
-      /// <summary>
-      /// Initialize self either by this or by empty object for lambdas.
-      /// </summary>
-      public static SelfInit : string =
-        $<#var $Self = (typeof this.$LambdaMarker === "undefined") ? this : this;#>;
+    /// <summary>
+    /// Initialize self either by this or by empty object for lambdas.
+    /// </summary>
+    public static SelfInit : string =
+      $<#var $Self = (typeof this.$LambdaMarker === "undefined") ? this : this;#>;
       
-      public Fields : IEnumerable[IField]
+    public Fields : IEnumerable[IField]
+    {
+      [Memoize]
+      get
       {
-        [Memoize]
-        get
-        {
-          ClassType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                   .Where(f => f.Name != "server" && f.Name != "__constructorParams")
-        }
+        ClassType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                  .Where(f => f.Name != "server" && f.Name != "__constructorParams")
+                  .Where(f => !f.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
       }
+    }
       
-      public StaticFields : IEnumerable[IField]
+    public StaticFields : IEnumerable[IField]
+    {
+      get
       {
-        get
-        {
-          ClassType.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
-                   .Where(f => f.Name != "server" && f.Name != "__constructorParams")
-        }
+        ClassType.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                  .Where(f => !f.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
+                  .Where(f => f.Name != "server" && f.Name != "__constructorParams")
       }
+    }
               
-      public Properties : IEnumerable[IProperty] 
+    public Properties : IEnumerable[IProperty] 
+    {
+      [Memoize]
+      get
       {
-        [Memoize]
-        get
-        {
-          ClassType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                   .Where(_ is PropertyBuilder)
-                   .Where(prop =>
-                     {
-                       // Filter out properties not belonging to this class
-                       if (!JSClassHelper.HasBase(ClassType)) true
-                       else
-                       {                          
-                         def declaringType =
-                           prop.GetGetter()?.DeclaringType ?? prop.GetSetter()?.DeclaringType;
+        ClassType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                  .Where(p => !p.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
+                  .Where(_ is PropertyBuilder)
+                  .Where(prop =>
+                    {
+                      // Filter out properties not belonging to this class
+                      if (!JSClassHelper.HasBase(ClassType)) true
+                      else
+                      {                          
+                        def declaringType =
+                          prop.GetGetter()?.DeclaringType ?? prop.GetSetter()?.DeclaringType;
                          
-                         ClassType.FullName == declaringType.FullName
-                       }
-                     })
-                   .Where(p => p.Name != "server")
-        }
+                        ClassType.FullName == declaringType.FullName
+                      }
+                    })
+                  .Where(p => p.Name != "server")
       }
+    }
       
-      public StaticProperties : IEnumerable[IProperty] 
+    public StaticProperties : IEnumerable[IProperty] 
+    {
+      get
       {
-        get
-        {
-          ClassType.GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
-                    .Where(_ is PropertyBuilder)
-                    .Where(p => p.Name != "server")
-        }
-      }      
+        ClassType.GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                  .Where(p => !p.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
+                  .Where(_ is PropertyBuilder)
+                  .Where(p => p.Name != "server")
+      }
+    }      
               
-      public Methods : IEnumerable[IMethod] 
-      {
-        [Memoize]
-        get
-        {            
-          def methods = ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-          FilterMethods(methods);
-        }
-      }
-      
-      public StaticMethods : IEnumerable[IMethod] 
-      {
-        get
-        {            
-          def methods = ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Static| BindingFlags.Public | BindingFlags.NonPublic);
-          FilterMethods(methods);
-        }
-      }
-      
-      NestedClasses : IEnumerable[JSClass]
+    public Methods : IEnumerable[IMethod] 
+    {
+      [Memoize]
+      get
       {            
-        get
-        {
-          def nested = ClassType.DeclaredNestedTypes
-                                .Where(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server
-                                .Where(c => !c.Name.StartsWith("_N__N_")) //Not generated class
-                                .Select(c => JSClass(c, Indent, Typer));
-          nested
-        }
+        def methods = ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        FilterMethods(methods);
       }
+    }
+      
+    public StaticMethods : IEnumerable[IMethod] 
+    {
+      get
+      {            
+        def methods = ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Static| BindingFlags.Public | BindingFlags.NonPublic);            
+        FilterMethods(methods);
+      }
+    }
+      
+    NestedClasses : IEnumerable[JSClass]
+    {            
+      get
+      {
+        def nested = ClassType.DeclaredNestedTypes
+          .Where(c => !c.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
+          .Where(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server
+          .Where(c => !c.Name.StartsWith("_N__N_")) //Not generated class
+          .Select(c => JSClass(c, Indent, Typer));
+        nested
+      }
+    }
               
-      IsPage : bool { get { !ClassType.Name.StartsWith("_N_") } }
+    IsPage : bool { get { !ClassType.Name.StartsWith("_N_") } }
         
-      public Constructors : IEnumerable[IMethod]
+    public Constructors : IEnumerable[IMethod]
+    {
+      get
       {
-        get
-        {
-          def constructors = ClassType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);              
-          constructors
-        }
+        def constructors = ClassType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);              
+        constructors
       }
+    }
         
-      public Write() : string 
+    public Write() : string 
+    {
+      def meta = JSClassMeta();
+      def properTypeName = GetProperName(ClassType);
+      def parentPtr = Self;
+      def bodyIndent = Indent + "  ";
+      def properties = GetProperties(bodyIndent, parentPtr, meta);
+      def definedProperties = GetDefinedProperties(bodyIndent, parentPtr, meta);
+      def staticProperties = GetStaticProperties(Indent, meta);        
+      def fields = GetFields(bodyIndent, parentPtr, meta);        
+      def staticFields = GetStaticFields(Indent);
+      def constructorsBody = GetConstructorsBody(Indent, bodyIndent);
+      def callConstrutor = GetCallConstructor(bodyIndent);
+      def staticConstructorBody = GetStaticConstructorBody(Indent);
+      def methods = GetMethods(bodyIndent, parentPtr, true);
+      def definedMethods = GetDefinedMethods(bodyIndent, parentPtr, true);
+      def staticMethods = GetStaticMethods(Indent);
+      def nestedClassesString = GenerateNestedClasses();
+        
+      // This is needed to make labmda object behave as regular function
+      def returning = match(ClassType.BaseType?.Name)
       {
-        def meta = JSClassMeta();
-        def properTypeName = GetProperName(ClassType);
-        def parentPtr = Self;
-        def bodyIndent = Indent + "  ";
-        def properties = GetProperties(bodyIndent, parentPtr, meta);
-        def definedProperties = GetDefinedProperties(bodyIndent, parentPtr, meta);
-        def staticProperties = GetStaticProperties(Indent, meta);        
-        def fields = GetFields(bodyIndent, parentPtr, meta);        
-        def staticFields = GetStaticFields(Indent);
-        def constructorsBody = GetConstructorsBody(Indent, bodyIndent);
-        def callConstrutor = GetCallConstructor(bodyIndent);
-        def staticConstructorBody = GetStaticConstructorBody(Indent);
-        def methods = GetMethods(bodyIndent, parentPtr, true);
-        def definedMethods = GetDefinedMethods(bodyIndent, parentPtr, true);
-        def staticMethods = GetStaticMethods(Indent);
-        def nestedClassesString = GenerateNestedClasses();
-        
-        // This is needed to make labmda object behave as regular function
-        def returning = match(ClassType.BaseType?.Name)
-        {
-        | "Function" => bodyIndent + $<#return $Self.apply;#>
-        | "FunctionVoid" => bodyIndent + $<#return $Self.apply_void;#>
-        | _ => ""
-        };
+      | "Function" => bodyIndent + $<#return $Self.apply;#>
+      | "FunctionVoid" => bodyIndent + $<#return $Self.apply_void;#>
+      | _ => ""
+      };
 
- $<#
+$<#
 $nestedClassesString
 $(Indent)var $properTypeName$$ctor = {};
 $constructorsBody
@@ -200,387 +188,428 @@ $staticMethods
 $staticProperties
 $staticConstructorBody
 #>
-      }
+    }
       
-      GenerateProperties(indent : string, parentPtr : string, properties : IEnumerable[IProperty], meta : JSClassMeta, generate : bool) : string 
-      {
-        def propStrings = properties.Select(p =>
+    GenerateProperties(indent : string, parentPtr : string, properties : IEnumerable[IProperty], meta : JSClassMeta, generate : bool) : string 
+    {
+      def propStrings = properties.Select(p =>
+        {
+          when (p.IsIndexer)
+            Message.Error(p.Location, $"Indexed properties are not supported, $p");
+            
+          when(generate)
+            meta.Properties.Add(
+              JSClassMemberMeta(
+                p.Name,
+                p.GetModifiers().CustomAttributes.Select(a => a.ToString()).ToList(),
+                p.GetMemType().IsValueType));
+            
+          def sb = StringBuilder();
+            
+          def addProperty(prop, prefix : string, value : string) : void
           {
-            when (p.IsIndexer)
-              Message.Error(p.Location, $"Indexed properties are not supported, $p");
-            
-            when(generate)
-              meta.Properties.Add(
-                JSClassMemberMeta(
-                  p.Name,
-                  p.GetModifiers().CustomAttributes.Select(a => a.ToString()).ToList(),
-                  p.GetMemType().IsValueType));
-            
-            def sb = StringBuilder();
-            
-            def addProperty(prop, prefix : string, value : string) : void
-            {
-              def body = TranslateMethodBody(prop, indent + "  ");
+            def body = TranslateMethodBody(prop, indent + "  ");
               
-              _ = sb.Append(
-                $"$indent$parentPtr.$(prefix)_$(p.Name) = $parentPtr.$(prefix)_$(p.Name)$(DefinedSuffix)");
+            _ = sb.Append(
+              $"$indent$parentPtr.$(prefix)_$(p.Name) = $parentPtr.$(prefix)_$(p.Name)$(DefinedSuffix)");
 
-              _ = sb.AppendLine(
-                if(generate)
+            _ = sb.AppendLine(
+              if(generate)
 $<#= function($value) {
 $(indent)  $SelfInit
 $body
 $indent};#>
-                else
-                  ";");
-            }
-            
-            when (p.GetGetter() != null) addProperty(p.GetGetter(), "get", "");
-            when (p.GetSetter() != null) addProperty(p.GetSetter(), "set", "value");
-            
-            sb.ToString()
-          });
-          
-        $<#..$(propStrings; "\n")#>;
-      }
-      
-      GetProperties(indent : string, parentPtr : string, meta : JSClassMeta) : string
-      {
-        GenerateProperties(indent, parentPtr, Properties, meta, true)
-      }
-      
-      GetDefinedProperties(indent : string, parentPtr : string, meta : JSClassMeta) : string
-      {
-        GenerateProperties(indent, parentPtr, Properties, meta, false)
-      }
-      
-      GetStaticProperties(indent : string, meta : JSClassMeta) : string 
-      {
-        GenerateProperties(indent, GetProperName(ClassType), StaticProperties, meta, true)
-      }
-      
-      FieldValue(field : IField) : string
-      {
-        def field = field :> FieldBuilder;
-        if(field.Ast.Initializer != null)
-        {
-          def integer(v)
-          {
-            if (v.is_negative)
-              (unchecked(v.val :> long) * -1).ToString(CultureInfo.InvariantCulture)
-            else
-              v.val.ToString(CultureInfo.InvariantCulture)
+              else
+                ";");
           }
-          
-          def makeInitializer(expr)
-          {
-          | PExpr.Literal(Literal.Bool(val)) => val.ToString(CultureInfo.InvariantCulture).ToLower()
-          | PExpr.Literal(Literal.Char(val)) => val.ToString()
-          | PExpr.Literal(Literal.Decimal(val)) => (val :> ulong).ToString()
-          | PExpr.Literal(Literal.Double(val)) => val.ToString(CultureInfo.InvariantCulture)
-          | PExpr.Literal(Literal.Enum(Integer as i, _, _)) => integer(i)
-          | PExpr.Literal(Literal.Float(val)) => val.ToString(CultureInfo.InvariantCulture)
-          | PExpr.Literal(Literal.Integer as i) => integer(i)
-          | PExpr.Literal(Literal.String(val)) => JSAstHelper.EscapeString(val)
-          | PExpr.ListLiteral(elements) => $<#[..$(elements; ", "; makeInitializer)]#>
-          | PExpr.Tuple(elements) => $<#[..$(elements; ", "; makeInitializer)]#>
-          | PExpr.Literal(Literal.Void)          
-          | PExpr.Literal(Literal.Null)          
-          | _ => "null"
-          }
-          
-          makeInitializer(field.Ast.Initializer)
-        }
-        else
-        {
-          DefaultValueInitializer.GetJSAst(field.GetMemType()).Write("")
-        }
-      }
-      
-      GenerateFields(indent : string, parentPtr : string, fields: IEnumerable[IField], meta : JSClassMeta) : string
-      {
-        def fieldStrings = fields.Select(f => {
-          meta.Fields.Add(
-          JSClassMemberMeta(
-            f.Name,
-            f.GetModifiers().GetCustomAttributes().Select(a => a.ToString()).ToList(),
-            f.GetMemType().IsValueType));
-          $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>;
+            
+          when (p.GetGetter() != null) addProperty(p.GetGetter(), "get", "");
+          when (p.GetSetter() != null) addProperty(p.GetSetter(), "set", "value");
+            
+          sb.ToString()
         });
-                
-        $<#..$(fieldStrings; ";\n")#>;
-      }
-        
-      GetFields(indent : string, parentPtr : string, meta : JSClassMeta) : string 
-      {
-        GenerateFields(indent, parentPtr, Fields, meta)
-      }
-        
-      GetStaticFields(indent : string) : string 
-      {
-        def parentPtr = GetProperName(ClassType);
-        def fieldStrings = StaticFields.Select(f => 
-          $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>);
-        
-        $<#..$(fieldStrings; ";\n")#>;
-      }
-
-      GetConstructorsBody(indent : string, bodyIndent : string) : string
-      {
-          def ctors = Constructors;
-          def properTypeName = GetProperName(ClassType);
-          def ctorObject = properTypeName + "$ctor";
           
-          def ctorsCode = ctors.Select(
-            ctor => 
-            {
-              def ctorBody = TranslateMethodBody(ctor, bodyIndent);              
-              def ctorParameters = ctor.GetParameters().Select(p => p.Name);
-              def signature = JSAstHelper.Method("", Some(ctor.Header.Parameters));
-              
-              def makeBody(body)
-              {
-                $<#
+      $<#..$(propStrings; "\n")#>;
+    }
+      
+    GetProperties(indent : string, parentPtr : string, meta : JSClassMeta) : string
+    {
+      GenerateProperties(indent, parentPtr, Properties, meta, true)
+    }
+      
+    GetDefinedProperties(indent : string, parentPtr : string, meta : JSClassMeta) : string
+    {
+      GenerateProperties(indent, parentPtr, Properties, meta, false)
+    }
+      
+    GetStaticProperties(indent : string, meta : JSClassMeta) : string 
+    {
+      GenerateProperties(indent, GetProperName(ClassType), StaticProperties, meta, true)
+    }
+      
+    FieldValue(field : IField) : string
+    {
+      def field = field :> FieldBuilder;
+      if(field.Ast.Initializer != null)
+      {
+        def integer(v)
+        {
+          if (v.is_negative)
+            (unchecked(v.val :> long) * -1).ToString(CultureInfo.InvariantCulture)
+          else
+            v.val.ToString(CultureInfo.InvariantCulture)
+        }
+          
+        def makeInitializer(expr)
+        {
+        | PExpr.Literal(Literal.Bool(val)) => val.ToString(CultureInfo.InvariantCulture).ToLower()
+        | PExpr.Literal(Literal.Char(val)) => val.ToString(CultureInfo.InvariantCulture)
+        | PExpr.Literal(Literal.Decimal(val)) => val.ToString(CultureInfo.InvariantCulture)
+        | PExpr.Literal(Literal.Double(val)) => val.ToString(CultureInfo.InvariantCulture)
+        | PExpr.Literal(Literal.Enum(Integer as i, _, _)) => integer(i)
+        | PExpr.Literal(Literal.Float(val)) => val.ToString(CultureInfo.InvariantCulture)
+        | PExpr.Literal(Literal.Integer as i) => integer(i)
+        | PExpr.Literal(Literal.String(val)) => JSAstHelper.EscapeString(val)
+        | PExpr.ListLiteral(elements) => $<#[..$(elements; ", "; makeInitializer)]#>
+        | PExpr.Tuple(elements) => $<#[..$(elements; ", "; makeInitializer)]#>
+        | PExpr.Literal(Literal.Void)
+        | PExpr.Literal(Literal.Null)          
+        | _ => "null"
+        }
+          
+        makeInitializer(field.Ast.Initializer)
+      }
+      else
+      {
+        DefaultValueInitializer.GetJSAst(field.GetMemType()).Write()
+      }
+    }
+      
+    GenerateFields(indent : string, parentPtr : string, fields: IEnumerable[IField], meta : JSClassMeta) : string
+    {
+      def fieldStrings = fields.Select(f => {
+        meta.Fields.Add(
+        JSClassMemberMeta(
+          f.Name,
+          f.GetModifiers().GetCustomAttributes().Select(a => a.ToString()).ToList(),
+          f.GetMemType().IsValueType));
+        $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>;
+      });
+                
+      $<#..$(fieldStrings; ";\n")#>;
+    }
+        
+    GetFields(indent : string, parentPtr : string, meta : JSClassMeta) : string 
+    {
+      GenerateFields(indent, parentPtr, Fields, meta)
+    }
+        
+    GetStaticFields(indent : string) : string 
+    {
+      def parentPtr = GetProperName(ClassType);
+      def fieldStrings = StaticFields.Select(f => 
+        $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>);
+        
+      $<#..$(fieldStrings; ";\n")#>;
+    }
+
+    GetConstructorsBody(indent : string, bodyIndent : string) : string
+    {
+      def valueTypeCtorCode =
+        if(ClassType.IsValueType) [GetValueTypeDefaultConstructor(indent, bodyIndent)] else [];
+        
+      def ctors = Constructors;
+      def ctorsCode = ctors.Select(
+        ctor => 
+        {
+          def ctorBody = TranslateMethodBody(ctor, bodyIndent);            
+          MakeCtor(indent, bodyIndent, ctorBody, ctor.Header.Parameters)
+        });        
+        
+      def allCtorsCode = valueTypeCtorCode.Concat(ctorsCode);        
+      $<#..$(allCtorsCode; ";\n")#>
+    }
+      
+    private MakeCtor(indent : string, bodyIndent : string, ctorBody : string, parameters : list[TParameter]) : string
+    {
+      def ctorParameters = parameters.Map(p => p.Name);
+      def signature = JSAstHelper.Method("", Some(parameters));
+            
+      def makeBody(body)
+        {
+          $<#
 $(bodyIndent)$SelfInit
 $body
 $indent#>
-              }
-              
-              def writeBody =
-                if(ctorBody.Trim().Length == 0)
-                {
-                  // Call empty base constructor if exists
-                  if (ctor.Header.Parameters is [] && JSClassHelper.HasBase(ClassType))
-                  {
-                    def baseName = GetProperName(ClassType.BaseType.FullName);
-                    makeBody($<#$bodyIndent$baseName.call($Self, "");#>)
-                  }
-                  else
-                    ""
-                }
-                else
-                  makeBody(ctorBody);
-              
-              $<#$indent$ctorObject$signature = function(..$ctorParameters) {$writeBody}#>
-            });
-         
-         $<#..$(ctorsCode; ";\n")#>
-      }
-      
-      GetCallConstructor(indent : string) : string
-      {
-        def properTypeName = GetProperName(ClassType);
-        def ctorObject = properTypeName + "$ctor";
-          
-        $"$indent$ctorObject[arguments[0]].apply(this, Array.prototype.slice.call(arguments, 1))"
-      }
-        
-      GetStaticConstructorBody(indent : string) : string 
-      {
-          def ctors = ClassType.GetConstructors(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-          def ctor = ctors.FirstOrDefault();
-          if(ctor != null)
-            TranslateMethodBody(ctor, indent)
+        }
+            
+      def writeBody =
+        if(ctorBody.Trim().Length == 0)
+        {
+          // Call empty base constructor if exists
+          if (parameters is [] && JSClassHelper.HasBase(ClassType))
+          {
+            def baseName = GetProperName(ClassType.BaseType.FullName);
+            makeBody($<#$bodyIndent$baseName.call($Self, "");#>)
+          }
           else
             ""
-      }
+        }
+        else
+          makeBody(ctorBody);
+            
+      def properTypeName = GetProperName(ClassType);
+      def ctorObject = properTypeName + "$ctor";
+      $<#$indent$ctorObject$signature = function(..$ctorParameters) {$writeBody}#>
+    }
+              
+    private GetValueTypeDefaultConstructor(indent : string, bodyIndent : string) : string
+    {
+      // Generate JSAst.Seq([Assign(FieldRef(field1, default value)), ...])
+      def fieldsAssign = Fields.Map(f =>
+        JSAst.Assign(
+          JSAst.FieldRef(JSAst.This(), f.Name),
+          DefaultValueInitializer.GetJSAst(f.GetMemType()))
+        );
+      def ctorBody = JSAst.Seq(fieldsAssign).Write(bodyIndent);
+            
+      MakeCtor(indent, bodyIndent, ctorBody, [])
+    }
       
-      GenerateMethods(indent : string, parentPtr : string, hasSelf : bool, methods : IEnumerable[IMethod], generate : bool) : string
+    GetCallConstructor(indent : string) : string
+    {
+      def properTypeName = GetProperName(ClassType);
+      def ctorObject = properTypeName + "$ctor";
+          
+      $"$indent$ctorObject[arguments[0]].apply(this, Array.prototype.slice.call(arguments, 1))"
+    }
+        
+    GetStaticConstructorBody(indent : string) : string 
+    {
+        def ctors = ClassType.GetConstructors(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+        def ctor = ctors.FirstOrDefault();
+        if(ctor != null)
+          TranslateMethodBody(ctor, indent)
+        else
+          ""
+    }
+      
+    GenerateMethods(indent : string, parentPtr : string, hasSelf : bool, methods : IEnumerable[IMethod], generate : bool) : string
+    {
+      def self = if(hasSelf) "" else SelfInit;
+      def methodParms(method) { method.GetParameters().Select(p => p.Name); }
+        
+      // Method name => signature
+      def generatedMethods = Dictionary();
+        
+      def methodsCode = methods.Select(m =>
       {
-        def self = if(hasSelf) "" else SelfInit;
-        def methodParms(method) { method.GetParameters().Select(p => p.Name); }
-        
-        // Method name => signature
-        def generatedMethods = Dictionary();
-        
-        def methodsCode = methods.Select(m =>
-        {
-          // Add method variable and default signature in first time
-          def methodVariable =
-            if (generatedMethods.ContainsKey(m.Name)) ""
-            else
-            {
-              if(generate)
-              {
-                $<#$(indent)$parentPtr.$(m.Name) = {};
-$(indent)$parentPtr.$(m.Name)$DefinedSuffix = {};#>;
-              }
-              else
-                ""
-            }
-          
-          def methodWithSignature = JSAstHelper.Method(m.Name, Some(m.Header.Parameters));
-          def definedMethodWithSignature = JSAstHelper.Method(m.Name + DefinedSuffix, Some(m.Header.Parameters));
-          
-          if (generatedMethods.ContainsKey(m.Name))
-          {
-            // Do not add default method signature
-            when (m.Header.Parameters is [])
-              generatedMethods[m.Name] = None();
-          }
+        // Add method variable and default signature in first time
+        def methodVariable =
+          if (generatedMethods.ContainsKey(m.Name)) ""
           else
           {
-            if (m.Header.Parameters is [])
-              generatedMethods.Add(m.Name, None())
+            if(generate)
+            {
+              $<#$(indent)$parentPtr.$(m.Name) = {};
+$(indent)$parentPtr.$(m.Name)$DefinedSuffix = {};#>;
+            }
             else
-              generatedMethods.Add(m.Name, Some(methodWithSignature))
+              ""
           }
           
-          def defineMethod = $"$(indent)$parentPtr.$methodWithSignature = $parentPtr.$definedMethodWithSignature";
+        def methodWithSignature = JSAstHelper.Method(m.Name, Some(m.Header.Parameters));
+        def definedMethodWithSignature = JSAstHelper.Method(m.Name + DefinedSuffix, Some(m.Header.Parameters));
           
-          if (!m.IsAbstract)
-            if(generate)
+        if (generatedMethods.ContainsKey(m.Name))
+        {
+          // Do not add default method signature
+          when (m.Header.Parameters is [])
+            generatedMethods[m.Name] = None();
+        }
+        else
+        {
+          if (m.Header.Parameters is [])
+            generatedMethods.Add(m.Name, None())
+          else
+            generatedMethods.Add(m.Name, Some(methodWithSignature))
+        }
+          
+        def defineMethod = $"$(indent)$parentPtr.$methodWithSignature = $parentPtr.$definedMethodWithSignature";
+          
+        if (!m.IsAbstract)
+          if(generate)
 $<#$methodVariable
 $defineMethod = function(..$(methodParms(m))) {
 $(indent)  $self
 $(TranslateMethodBody(m, indent + "  "))
 $(indent)}#>
-          else
-            $"$defineMethod;"
         else
-          ""
-        });
+          $"$defineMethod;"
+      else
+        ""
+      });
         
-        // Default methods signature for first method if there are no methods without parameters
-        def defaultMethodsCode = generatedMethods
-          .Where(kv => kv.Value.IsSome)
-          .Select(kv =>
-            {
-              $<#$indent$parentPtr.$(kv.Key)[""] = $parentPtr.$(kv.Value.Value)#>
-            });
+      // Default methods signature for first method if there are no methods without parameters
+      def defaultMethodsCode = generatedMethods
+        .Where(kv => kv.Value.IsSome)
+        .Select(kv =>
+          {
+            $<#$indent$parentPtr.$(kv.Key)[""] = $parentPtr.$(kv.Value.Value)#>
+          });
 
-        $<#..$(methodsCode; "\n")
+      $<#..$(methodsCode; "\n")
 ..$(defaultMethodsCode; "\n")#>
-      }
+    }
         
-      GetMethods(indent : string, parentPtr : string, hasSelf : bool) : string 
-      {
-        GenerateMethods(indent, parentPtr, hasSelf, Methods, true)
-      }
+    GetMethods(indent : string, parentPtr : string, hasSelf : bool) : string 
+    {
+      GenerateMethods(indent, parentPtr, hasSelf, Methods, true)
+    }
       
-      GetDefinedMethods(indent : string, parentPtr : string, hasSelf : bool) : string 
-      {
-        GenerateMethods(indent, parentPtr, hasSelf, Methods, false)
-      }
+    GetDefinedMethods(indent : string, parentPtr : string, hasSelf : bool) : string 
+    {
+      GenerateMethods(indent, parentPtr, hasSelf, Methods, false)
+    }
       
-      GetStaticMethods(indent : string) : string 
-      {
-        GenerateMethods(indent, GetProperName(ClassType), false, StaticMethods, true)
-      }
+    GetStaticMethods(indent : string) : string 
+    {
+      GenerateMethods(indent, GetProperName(ClassType), false, StaticMethods, true)
+    }
       
-      GenerateNestedClasses() : string
-      {
-        $"..$(NestedClasses; Environment.NewLine; _.Write())"
-      }
+    GenerateNestedClasses() : string
+    {
+      $"..$(NestedClasses; Environment.NewLine; _.Write())"
+    }
       
-      public TranslateMethodBody([NotNull] meth : IMethod, [NotNull] indent = "" : string) : string
-      {
-        def ast = TyperHelper.GetMethodJSAst(meth, Typer, ClassType);
-        ast.Write(indent);
-      }
+    public TranslateMethodBody([NotNull] meth : IMethod, [NotNull] indent = "" : string) : string
+    {
+      def ast = TyperHelper.GetMethodJSAst(meth, Typer, ClassType);
+      ast.Write(indent);
+    }
       
-      public static TypeIsArray([NotNull] typeVar : TypeVar) : bool 
-      {
-        typeVar.TryRequire(IEnumerableType) && !typeVar.TryRequire(StringType);
-      }
+    public static TypeIsArray([NotNull] typeVar : TypeVar) : bool 
+    {
+      typeVar.TryRequire(IEnumerableType) && !typeVar.TryRequire(StringType);
+    }
       
-      /// <summary>
-      /// Take full name, remove prefix specified in JSClassSettings.JSApiRoots.
-      /// </summary>
-      public static GetProperNameForJS([NotNull] typeInfo : TypeInfo) : string
-      {
-        def fullName = typeInfo.FullName;
+    /// <summary>
+    /// Take full name, remove prefix specified in JSClassSettings.JSApiRoots.
+    /// </summary>
+    public static GetProperNameForJS([NotNull] typeInfo : TypeInfo) : string
+    {
+      def fullName = typeInfo.FullName;
         
-        // Check default, if doesn't fit, check other roots.
-        def root = JSClassSettings.JSApiRoots.FirstOrDefault(root => fullName.StartsWith(root));
+      // Check default, if doesn't fit, check other roots.
+      def root = JSClassSettings.JSApiRoots.FirstOrDefault(root => fullName.StartsWith(root));
         
-        if(root != null)
-          if(fullName.Length == root.Length)
-            ""
-          else
-            fullName.Substring(root.Length + 1)
+      if(root != null)
+        if(fullName.Length == root.Length)
+          ""
         else
-          fullName
-      }
+          fullName.Substring(root.Length + 1)
+      else
+        fullName
+    }
       
-      public static GetProperName([NotNull] typeInfo : TypeInfo) : string 
+    public static GetProperName([NotNull] typeInfo : TypeInfo) : string 
+    {
+      // If type or declaring has JSApi attribute, get proper name using special method
+      if(typeInfo.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute") ||
+          typeInfo.DeclaringType?.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
       {
-        // If type or declaring has JSApi attribute, get proper name using special method
-        if(typeInfo.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute") ||
-           typeInfo.DeclaringType?.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
-        {
-          GetProperNameForJS(typeInfo)
-        }
-        else
-        {
-          def typeParams = if(typeInfo.Typarms.IsEmpty) "";
-                           else $"[..$(typeInfo.Typarms.Select(_.ToString()))]";
-          GetProperName(typeInfo.FullName + typeParams)
-        }
+        GetProperNameForJS(typeInfo)
       }
-        
-      public static GetProperName([NotNull] type : Type) : string 
+      else
       {
-        GetProperName(type.FullName)
+        def typeParams = if(typeInfo.Typarms.IsEmpty) "";
+                          else $"[..$(typeInfo.Typarms.Select(_.ToString()))]";
+        GetProperName(typeInfo.FullName + typeParams)
       }
+    }
         
-      public static GetProperName([NotNull] fullName : string) : string
-      {          
-        fullName.Replace(" ", "")
-                .Replace(".", "_")
-                .Replace("+", "_")
-                .Replace("[", "_$")
-                .Replace("]", "$_")
-                .Replace(",", "$$")
-      }
+    public static GetProperName([NotNull] type : Type) : string 
+    {
+      GetProperName(type.FullName)
+    }
         
-      public static FilterMethods([NotNull] methods : IEnumerable[IMethod]) : IEnumerable[IMethod]
-      {
-        def pageMethods = typeof(IPage).GetMethods().Select(m => m.Name);
-        methods.Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
-               .Where(m => !m.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
-               .Where(m => !m.IsConstructor)
-               .Where(m => !pageMethods.Contains(m.Name))
-               .Where(m => m.Name != "View")
-               .Where(m => !(m.Name.StartsWith("_N__") && m.Name.EndsWith("____")))
-      }
+    public static GetProperName([NotNull] fullName : string) : string
+    {          
+      fullName.Replace(" ", "")
+              .Replace(".", "_")
+              .Replace("+", "_")
+              .Replace("[", "_$")
+              .Replace("]", "$_")
+              .Replace(",", "$$")
+    }
+        
+    public static FilterMethods([NotNull] methods : IEnumerable[IMethod]) : IEnumerable[IMethod]
+    {
+      def pageMethods = typeof(IPage).GetMethods().Select(m => m.Name);
+      methods.Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
+              .Where(m => !m.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
+              .Where(m => !m.IsConstructor)
+              .Where(m => !pageMethods.Contains(m.Name))
+              .Where(m => m.Name != "View")
+              .Where(m => !(m.Name.StartsWith("_N__") && m.Name.EndsWith("____")))
+    }
       
-      private static DefinedSuffix = "$$";
+    private static DefinedSuffix = "$$";
       
-      public class JSClassMeta
+    public class JSClassMeta
+    {
+      public Properties : List[JSClassMemberMeta];
+      public Fields : List[JSClassMemberMeta];
+      public Methods : List[JSClassMemberMeta];
+        
+      public this() 
       {
-        public Properties : List[JSClassMemberMeta];
-        public Fields : List[JSClassMemberMeta];
-        public Methods : List[JSClassMemberMeta];
+        Properties = List();
+        Fields = List();
+        Methods = List();
+      }
         
-        public this() 
-        {
-          Properties = List();
-          Fields = List();
-          Methods = List();
-        }
-        
-        public WriteToJS(indent : string) : string
-        {
+      public WriteToJS(indent : string) : string
+      {
 $<#$(indent)  $Self.__nweb_meta = {
 $(indent)    properties: [..$(Properties; ","; _.Write())],
 $(indent)    fields:     [..$(Fields;     ","; _.Write())],
 $(indent)    methods:    [..$(Methods;    ","; _.Write())]
 $(indent)  };#>;
-        }        
-      }
+      }        
+    }
         
-      [Record]
-      public class JSClassMemberMeta
-      {
-        Name : string { get; }
-        Attributes : List[string] { get; }
-        IsValueType : bool { get; }
+    [Record]
+    public class JSClassMemberMeta
+    {
+      Name : string { get; }
+      Attributes : List[string] { get; }
+      IsValueType : bool { get; }
                     
-        public Write() : string
-        {
-          $<#{ name: "$Name", attrs: ['..$(Attributes; "','")'], ValueType: $IsValueType }#>
-        }
+      public Write() : string
+      {
+        $<#{ name: "$Name", attrs: ['..$(Attributes; "','")'], #> +
+        $<#ValueType: $(if(IsValueType) "true" else "false") }#>
       }
+    }
   }
+  
+  module JSClassHelper
+  {
+    public HasBase(ti : TypeInfo) : bool 
+    {
+      ti.BaseType != null &&      
+      ti.BaseType.FullName != "System.Object" &&
+      ti.BaseType.FullName != "System.ValueType" &&
+      ti.BaseType.FullName != "Nemerle.Builtins.Function" &&
+      ti.BaseType.FullName != "Nemerle.Builtins.FunctionVoid" &&
+      !ti.BaseType.IsInterface
+    }
+  }
+    
+  /// Defines settings for JSclass 
+  internal module JSClassSettings
+  {
+    public JSApiRoots : SortedSet[string] = SortedSet(["NemerleWeb"], InvertedComparer());
+  }  
 }

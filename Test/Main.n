@@ -39,6 +39,17 @@ module Program
 [Unit]
 struct A
 {
+  x : int;
+  y : string;
+  z : double;
+  
+  public this(_ : int) { this(); }
+}
+
+[Unit]
+struct B
+{
+  a : A;
 }
 
 [Unit]
