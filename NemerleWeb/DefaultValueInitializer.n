@@ -51,6 +51,16 @@ namespace NemerleWeb
           JSAst.Literal(JSLiteral.Number(0))
         }
         else
+        if(type.TypeInfo?.FullName?.StartsWith("Nemerle.Builtins.Tuple"))
+        {
+          Message.Warning($"Tuples default initialization is not implemented for type $(type)");
+          JSAst.Object([
+            ("Field0", JSAst.Literal(JSLiteral.Null())),
+            ("Field1", JSAst.Literal(JSLiteral.Null())),
+            ("Field2", JSAst.Literal(JSLiteral.Null())),
+          ]);
+        }
+        else
           // Check predefined types
           match(type.TypeInfo?.FullName)
           {
@@ -64,9 +74,9 @@ namespace NemerleWeb
           | "System.Int64"
           | "System.UInt64" => JSAst.Literal(JSLiteral.Number(0))
           | "System.Decimal" => JSAst.Literal(JSLiteral.Number(0))
-          | "System.Single" 
-          | "System.Double" => JSAst.Literal(JSLiteral.Number(0f)); 
-          | "System.Boolean" => JSAst.Literal(JSLiteral.Bool(false));         
+          | "System.Single"
+          | "System.Double" => JSAst.Literal(JSLiteral.Number(0f));
+          | "System.Boolean" => JSAst.Literal(JSLiteral.Bool(false));
           | _ =>
             // Call object's constructor if the type is known
             if(type.TypeInfo != null)

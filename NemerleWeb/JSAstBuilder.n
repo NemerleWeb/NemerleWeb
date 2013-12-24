@@ -54,7 +54,19 @@ namespace NemerleWeb
       | DebugInfo(expr = expr)            => build(expr)
       | Def                               => Message.Error(expr.Location, "Def not implemented"); JSAst.NotImpl("Def")
       | DefaultValue as d                 => DefaultValueInitializer.GetJSAst(d.Type)
-      | DefFunctionsIn                    => Message.Error(expr.Location, "DefFunctionsIn not implemented"); JSAst.NotImpl("DefFunctionsIn")
+      | DefFunctionsIn(header :: _, body) =>               
+        def typedBody = header.body :> FunBody.Typed;
+        
+        def funBody = BuildJSAst(typedBody.expr, header.ReturnType.ToString() != "void", header);
+        def function = JSAst.Function("", header.Parameters.Map(p => p.name), funBody);
+        
+        match(body) 
+        {
+        | TExpr.LocalFunRef => function
+        | _ => 
+          def defFunction = JSAst.DefValue(header.Name, function);          
+          JSAst.Seq([defFunction, build(body)])
+        }
       | DefValIn(name, val, body)         =>
         def newName = name.Name + "_" + name.Id;
         

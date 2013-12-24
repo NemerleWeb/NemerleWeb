@@ -356,14 +356,12 @@ $(Body.Write("  "))
         | Function
           {
             Name : string;
-            Parameters : list[JSAst];
+            Parameters : list[string];
             Body : JSAst;
           
             public override Write(indent = "" : string) : string
             {
-$<#$(indent)function $Name(..$(Parameters; ", "; p => p.Write(""))) {
-$(Body.Write(indent + "  "))
-$(indent)}#>
+$<#function $Name(..$(Parameters; ",")) { $(Body.Write(indent + "  ")) }#>
             }
           }
         | GlobalRef
@@ -669,7 +667,7 @@ $(Body.Write(indent + "  "))
             public override Write(indent = "" : string) : string {                
                 def ss = Items.Where(i => !(i is JSAst.Void))
                               .Select(i => i.Write(indent));                
-                $<#..$(ss; ";" + Environment.NewLine);#>
+                $<#..$(ss; ";" + Environment.NewLine)#>
             }
             public override Transform() : JSAst {
                 match(Items) {
@@ -883,7 +881,7 @@ $(indent)}
             | Error                       => ast'
             | FieldRef(obj, parm)         => JSAst.FieldRef(recurse(obj), parm)
             | For(it, coll, body)         => JSAst.For(it, recurse(coll), recurse(body))
-            | Function(name, ps, bdy)     => JSAst.Function(name, ps.Map(recurse), recurse(bdy))            
+            | Function(name, ps, bdy)     => JSAst.Function(name, ps, recurse(bdy))
             | GlobalRef                   => ast'
             | Goto                        => ast'
             | HasType(obj, type)          => JSAst.HasType(recurse(obj), type)

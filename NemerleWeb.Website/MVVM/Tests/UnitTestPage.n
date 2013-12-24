@@ -423,6 +423,8 @@ namespace NemerleWeb.Website.Tests
         "Virtual2"
       }
     }
+    
+    #pragma warning disable 649
 
     [Unit]
     public struct SimpleStruct
@@ -436,6 +438,8 @@ namespace NemerleWeb.Website.Tests
     {
       public S : SimpleStruct;
     }
+    
+    #pragma warning restore
     
     public this()
     {
