@@ -1485,12 +1485,11 @@ namespace NemerleWeb.Website.Tests
         i = i + 1;
         mutable d;
         d = 0.0f;
-        mutable s;
-        s += "";
+        mutable s : string;
         mutable b;
-        b = b && false;
+        b = b || false;
         
-        i == 1 && d == 0.0f && s == "" && b == false
+        i == 1 && d == 0.0f && s == null && b == false
       });
       
       test("list append", () =>
