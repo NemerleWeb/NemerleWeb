@@ -21,7 +21,7 @@ namespace NemerleWeb
   [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Method)]
   public macro HtmlTyped(_tb : TypeBuilder, mb : MethodBuilder)
   {
-    HtmlImpl.FromTypedToString(Nemerle.Macros.ImplicitCTX(), mb)
+    //HtmlImpl.FromTypedToString(Nemerle.Macros.ImplicitCTX(), mb)
   }
   
   internal module HtmlImpl
@@ -53,7 +53,7 @@ namespace NemerleWeb
           _ = match (parser.Parse(str))
           {
           | Some(result) => 
-            def pexpr = JSAstBuilder.SubstituteLambdas(XmlAstToXLinq(typer, parser).Transform(result));
+            def pexpr = XmlAstToXLinq(typer, parser).Transform(result);
             def tempMethodName = Name("__n__" + mb.Name);
             typer.CurrentTypeBuilder.Define(<[ decl:
               [HtmlTyped]

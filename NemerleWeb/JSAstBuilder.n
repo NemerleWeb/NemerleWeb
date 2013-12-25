@@ -35,7 +35,7 @@ namespace NemerleWeb
         def isFromMainMethodParams = methodHeader.Parameters.Any(p => p.decl.Id == localVal.Id);
         if(isFromMainMethodParams) localVal.Name else localVal.Name + "_" + localVal.Id
       }
-      
+            
       match(expr) 
       {
       | Array(args, _dims)                => JSAst.Array(args.Map(build))
@@ -46,6 +46,8 @@ namespace NemerleWeb
       | Block(body = body)                => build(body) 
       | Cache                             => Message.Error(expr.Location, "Cache not implemented"); JSAst.NotImpl("Cache")
       | CacheRef                          => Message.Error(expr.Location, "CacheRef not implemented"); JSAst.NotImpl("CacheRef")
+      | Call(Delayed(susp), parms, istail) when susp.IsResolved 
+                                          => JSKnownMembers.Convert(TExpr.Call(susp.ResolutionResult, parms, istail), Build(_, currentScopeDefs, methodHeader, _))
       | Call as call                      => JSKnownMembers.Convert(call, Build(_, currentScopeDefs, methodHeader, _))
       | ClosureFieldOf                    => Message.Error(expr.Location, "ClosureFieldOf not implemented"); JSAst.NotImpl("ClosureFieldOf")
       | ClosureObjectOf                   => Message.Error(expr.Location, "ClosureObjectOf not implemented"); JSAst.NotImpl("ClosureObjectOf")
@@ -62,7 +64,7 @@ namespace NemerleWeb
         | "System.String" => JSAst.Literal(JSLiteral.String(""))
         | _ => JSAst.Void()
         }
-      | DefFunctionsIn(header :: _, body) =>               
+      | DefFunctionsIn(header :: _, body) =>
         def typedBody = header.body :> FunBody.Typed;
         
         def funBody = BuildJSAst(typedBody.expr, header.ReturnType.ToString() != "void", header);
@@ -74,7 +76,7 @@ namespace NemerleWeb
         | _ => 
           def defFunction = JSAst.DefValue(header.Name, function);          
           JSAst.Seq([defFunction, build(body)])
-        }      
+        }
       | DefValIn(name, val, body)         => 
         def newName = name.Name + "_" + name.Id;
         
@@ -126,7 +128,7 @@ namespace NemerleWeb
             JSAst.NotImpl();
           }
       | LocalFunRef                       => Message.Error(expr.Location, "LocalFunRef not implemented"); JSAst.NotImpl("LocalFunRef")
-      | LocalRef(decl)                    =>                    
+      | LocalRef(decl)                    => 
         def name = getLocalValueName(decl);
         
         if(System.Text.RegularExpressions.Regex.IsMatch(name, <#_N_closurised_this_ptr_\d{4}#>))
@@ -149,34 +151,25 @@ namespace NemerleWeb
           | _ => JSAst.LocalRef(name, type)
           }
         }
-      | MacroEnvelope(expanded = ex, original = org, the_macro = _) => 
-          match(org)
-          { 
-          | <[ foreach($it in $coll) $body  ]> => 
-              def it = it.ToString();
-              def coll = if(coll.TypedObject is TExpr) build(coll.TypedObject :> TExpr) else JSAst.LocalRef(coll.ToString(), None());
-              def body = match(body) {
-              | Sequence(h :: _) => if(h.TypedObject is TExpr) build(h.TypedObject :> TExpr) else JSAst.Code(h.ToString());
-              | pexpr => if(pexpr.TypedObject is TExpr) build(pexpr.TypedObject :> TExpr) else JSAst.Code(pexpr.ToString());
-              }
-                    
-              JSAst.For(it, coll, body);                    
-          | MacroCall(Name(Id = "js"), _, p :: []) => 
-              match(p)
-              {
-              | SyntaxElement.Expression(Literal(Literal.String(val))) => JSAst.Code(val)
-              | _ => JSAst.Code(p.ToString().Trim('\"'));
-              }                    
-          | _ => build(ex)
-          }                
-      | Match(_, _)                       => JSAst.NotImpl("Match")
+      | MacroEnvelope(expanded = ex, original = org, the_macro = _) =>                  
+        match(org) 
+        {         
+        | MacroCall(Name(Id = "js"), _, [p]) => 
+          match(p)
+          {
+          | SyntaxElement.Expression(Literal(Literal.String(val))) => JSAst.Code(val)
+          | _ => JSAst.Code(p.ToString().Trim('\"'));
+          }             
+        | _ => build(ex)
+        }          
+      | Match(_, _) as m                  => build(DecisionTreeCompiler.Run(m.Type, m.expr, m.cases, null))
       | MethodAddress(_, meth, _, _)      => JSAst.MethodRef(JSAst.This(), meth.Name, JSAstHelper.MethodParameters(meth))
       | MethodOf                          => Message.Error(expr.Location, "MethodOf not implemented"); JSAst.NotImpl("MethodOf")
       | MethodRef(obj, meth, _, _)        => JSAst.MethodRef(build(obj), meth.Name, JSAstHelper.MethodParameters(meth))
       | MultipleAssign(assigns)           => JSAst.Seq(assigns.Map((l, e) => JSAst.Assign(JSAst.LocalRef(getLocalValueName(l), None()), build(e))))
       | OpCode(name)                      => ConvertToJSOpCode(name)
       | PropertyMember(obj, prop)         => JSAst.PropertyGet(build(obj), prop.Name)
-      | SelfTailCall                      => Message.Error(expr.Location, "SelfTailCall not implemented"); JSAst.NotImpl("SelfTailCall")
+      | SelfTailCall(func, parms)         => build(TExpr.Call(func, parms, true))
       | Sequence(e1, e2)                  => JSAst.Seq([build(e1), build(e2)])
       | StaticEventRef                    => Message.Error(expr.Location, "StaticEventRef not implemented"); JSAst.NotImpl("StaticEventRef")
       | StaticPropertyRef(from, prop)     => JSAst.PropertyGet(JSAst.LocalRef(from.tycon.Name, None()), prop.Name)
@@ -206,7 +199,8 @@ namespace NemerleWeb
       | TypeConversion(e, _, _, _)        => build(e)
       | TypeOf                            => Message.Error("TypeOf is not implemented"); JSAst.NotImpl("TypeOf")
       | Use                               => Message.Error("Use is not implemented"); JSAst.NotImpl("Use")
-      | _ => Message.Error($"Unmatched TExpr: $expr"); JSAst.NotImpl("unmatched");
+      | null                              => JSAst.Void()      
+      | _ => assert2(false); Message.Error($"Unmatched TExpr: $expr"); JSAst.NotImpl("unmatched");
       }
     } 
       
@@ -335,50 +329,6 @@ namespace NemerleWeb
       | Seq => ast
       | _ => JSAst.Seq([ast])
       }
-    }
-    
-    public SubstituteLambdas(expr : PExpr) : PExpr
-    {
-      | PExpr.DefMutable (name, val) => PExpr.DefMutable(SubstituteLambdas(name), SubstituteLambdas(val))
-      | PExpr.Define (name, val) => PExpr.Define(SubstituteLambdas(name), SubstituteLambdas(val))
-      | PExpr.DefFunctions (functions) => 
-        PExpr.Sequence(functions.Map(f => PExpr.MacroCall(Name("DefineJsFunctions"), NamespaceTree.Node(null, "a", null), [SyntaxElement.Function(f)])))
-      | PExpr.Lambda (d) => SubstituteLambdas(PExpr.DefFunctions([d]))
-      | PExpr.Array (rank, args) => PExpr.Array(SubstituteLambdas(rank), SubstituteLambdas(args))
-      | PExpr.EmptyArray (sizes) => PExpr.EmptyArray(sizes.Map(s => SubstituteLambdas(s)))
-      | PExpr.Indexer(obj, args) => PExpr.Indexer(SubstituteLambdas(obj), args.Map(a => SubstituteLambdas(a)))
-      | PExpr.TryFinally (e1, e2) => PExpr.TryFinally(SubstituteLambdas(e1), SubstituteLambdas(e2))
-      | PExpr.Try(body, cases) =>         
-        def handleCase(case) {
-        | TryCase.Catch(exn, exn_ty, handler) => TryCase.Catch(exn, SubstituteLambdas(exn_ty), SubstituteLambdas(handler))
-        | TryCase.Filter(exn, exn_ty, filter, handler) => TryCase.Filter(exn, SubstituteLambdas(exn_ty), SubstituteLambdas(filter), SubstituteLambdas(handler))
-        | TryCase.Ellipsis(body) => TryCase.Ellipsis(SubstituteLambdas(body))
-        } 
-        PExpr.Try(SubstituteLambdas(body), cases.Map(c : TryCase => handleCase(c)))
-      | PExpr.Typeof (t) =>  PExpr.Typeof(SubstituteLambdas(t))      
-      | PExpr.TypeConversion (expr, typeAst) => PExpr.TypeConversion(SubstituteLambdas(expr), SubstituteLambdas(typeAst))
-      | PExpr.TypeEnforcement (e, ty) => PExpr.TypeEnforcement(SubstituteLambdas(e), SubstituteLambdas(ty))      
-      | PExpr.Member (obj, name) => PExpr.Member(SubstituteLambdas(obj), name)
-      | PExpr.Call(fnc, parms) => PExpr.Call(SubstituteLambdas(fnc), parms.Map(p => SubstituteLambdas(p)))
-      | PExpr.Assign(e1, e2) => PExpr.Assign(SubstituteLambdas(e1), SubstituteLambdas(e2))
-      | PExpr.GenericSpecifier(fnc, gen_params) => PExpr.GenericSpecifier(SubstituteLambdas(fnc), gen_params.Map(p => SubstituteLambdas(p)))
-      | <[ _ is $pat ]> => <[ _ is $(SubstituteLambdas(pat)) ]>
-      | PExpr.ListLiteral (elems) => PExpr.ListLiteral(elems.Map(e => SubstituteLambdas(e)))
-      | PExpr.Throw(exceptionExpr) => PExpr.Throw(SubstituteLambdas(exceptionExpr))      
-      | PExpr.Base (forced_type_expr) => PExpr.Base(if(forced_type_expr is Some(e)) Some(SubstituteLambdas(e)) else forced_type_expr)      
-      | PExpr.Sequence (seq) => PExpr.Sequence(seq.Map(e => SubstituteLambdas(e)))
-      | PExpr.Tuple (seq) => PExpr.Tuple(seq.Map(e => SubstituteLambdas(e)))
-      | PExpr.Match(expr, cases, loc) => 
-        def handleCase(case) {
-          MatchCase(case.Location, case.patterns.Map(p => SubstituteLambdas(p)), SubstituteLambdas(case.body), case.disable_warnings)
-        } 
-        PExpr.Match(SubstituteLambdas(expr), cases.Map(c : MatchCase => handleCase(c)), loc)            
-      | PExpr.Spliced(body) => PExpr.Spliced(SubstituteLambdas(body))
-      | PExpr.Where(name, fields) => PExpr.Where(SubstituteLambdas(name), SubstituteLambdas(fields))
-      | PExpr.As(pat, name) => PExpr.As(SubstituteLambdas(pat), name)            
-      | PExpr.Ellipsis(body) => PExpr.Ellipsis(SubstituteLambdas(body))
-      | PExpr.MacroCall  => assert2(false); expr;
-      | _ => expr
     }
   }
 }

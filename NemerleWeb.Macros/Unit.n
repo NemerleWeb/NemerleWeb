@@ -51,23 +51,13 @@ namespace NemerleWeb
       def superTypes = tb.GetDirectSuperTypes();
       
       unless (superTypes != null && superTypes.Exists(t => t.Equals(vmInterface)))
-        tb.AddImplementedInterface(<[ NemerleWeb.IPage ]>);
-      
-      /*
-      def members = tb.AstParts.OfType.[TopDeclaration.Class]().SelectMany(p => p.GetMembers());
-      foreach(member in members) {
-      | x is ClassMember.Function => 
-        if(x.body is FunBody.Parsed(expr)) {
-          x.body = FunBody.Parsed(JSAstBuilder.SubstituteLambdas(expr))          
-        } else {}
-      | _ => ()
-      }\
-      */
+        tb.AddImplementedInterface(<[ NemerleWeb.IPage ]>);      
     }
      
     public DoTransformBeforeTypedMembers(tb : TypeBuilder, typer : Typer) : void
-    {
+    {      
       CreateResourceController(tb, typer);
+      
       tb.MethodBeforeStage3 += (_, e) => {
         def typer = e.Typer;
         match(typer.CurrentFunction.body) {

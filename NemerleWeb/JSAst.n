@@ -345,12 +345,10 @@ namespace NemerleWeb
             }
           }
         | For            { ItName : string; Collection : JSAst; Body : JSAst;
-            public override Write(_indent = "" : string) : string {
-$<#
-for(var $ItName in $(Collection.Write())) {
-var $ItName = $(Collection.Write())[$ItName];
-$(Body.Write("  "))
-}#> 
+            public override Write(indent = "" : string) : string {
+$<#for(var $ItName in $(Collection.Write())) {
+$indent$(Body.Write("  "))
+$indent}#> 
             }
         }
         | Function
@@ -849,6 +847,7 @@ $(indent)}
             typeof(JSAst.StaticRef), 
             typeof(JSAst.This), 
             typeof(JSAst.Tuple),
+            typeof(JSAst.TypeOf),
             typeof(JSAst.TupleIndexer), 
             typeof(JSAst.FieldRef),
             typeof(JSAst.PropertyGet),
