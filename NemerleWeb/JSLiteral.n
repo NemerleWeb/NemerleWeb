@@ -19,6 +19,7 @@ namespace NemerleWeb
     | NaN
     | Infinity
     | Null
+    | Undefined
     
     [OverrideObjectEquals]
     public Equals (lit : JSLiteral) : bool
@@ -30,6 +31,9 @@ namespace NemerleWeb
       | (String (x1), String (x2)) => x1 == x2
       | (Bool (x1), Bool (x2)) => x1 == x2
       | (Number (val), Number (val')) => val == val'    
+      | (NaN, NaN) => true
+      | (Infinity, Infinity) => true
+      | (Undefined, Undefined) => true
       | _ => false      
       }
     }

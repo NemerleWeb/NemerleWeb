@@ -536,7 +536,7 @@ $(Body.Write(indent + "  "))
                 match(this)
                 {
                 | Literal(Null)         => "null"
-                | Literal(Number(val) ) => $"$(val.ToString(CultureInfo.InvariantCulture))"
+                | Literal(Number(val) ) => val.ToString(CultureInfo.InvariantCulture)
                 | Literal(String(val))  =>        
                   def escaping = val.IndexOf(StringLiteral.DoNotEscapeMarker);
                   def str = 
@@ -546,10 +546,11 @@ $(Body.Write(indent + "  "))
                       JSAstHelper.EscapeString(val);
                     
                   str                
-                | Literal(Bool(val))    => $"$(val.ToString(CultureInfo.InvariantCulture).ToLower())"
+                | Literal(Bool(val))    => val.ToString(CultureInfo.InvariantCulture).ToLower()
                 | Literal(Regexp(pat, mod)) => $<#new RegExp($(pat.Write()), $(mod.Write()))#>
                 | Literal(NaN)          => "NaN"
                 | Literal(Infinity)     => "Infinity"
+                | Literal(Undefined)    => "undefined"
                 };
               
               indent + val

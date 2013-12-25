@@ -47,7 +47,10 @@ public class Test
 {
   F() : void
   {
-    def a = A();
+    //def a = A();
+    mutable q : (int*int);
+    
+    def w : int*int = default(int*int);
   }
   
   [Html]

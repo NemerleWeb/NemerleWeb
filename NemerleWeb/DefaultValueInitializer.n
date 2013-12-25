@@ -51,14 +51,15 @@ namespace NemerleWeb
           JSAst.Literal(JSLiteral.Number(0))
         }
         else
-        if(type.TypeInfo?.FullName?.StartsWith("Nemerle.Builtins.Tuple"))
+        if(type is FixedType.Void())
         {
-          Message.Warning($"Tuples default initialization is not implemented for type $(type)");
-          JSAst.Object([
-            ("Field0", JSAst.Literal(JSLiteral.Null())),
-            ("Field1", JSAst.Literal(JSLiteral.Null())),
-            ("Field2", JSAst.Literal(JSLiteral.Null())),
-          ]);
+          JSAst.Void()
+        }
+        else
+        if(type is FixedType.Tuple(args))
+        {
+          def asts = args.Map(arg => GetJSAst(arg));          
+          JSAst.Object(asts.MapI((i, ast) => ($"Field$i", ast)))
         }
         else
           // Check predefined types
@@ -78,18 +79,18 @@ namespace NemerleWeb
           | "System.Double" => JSAst.Literal(JSLiteral.Number(0f));
           | "System.Boolean" => JSAst.Literal(JSLiteral.Bool(false));
           | _ =>
-            // Call object's constructor if the type is known
+            // Call object's constructor
             if(type.TypeInfo != null)
             {
-              if(type.TypeInfo.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute") ||
-                  type.TypeInfo.DeclaringType?.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
-                JSAst.Literal(JSLiteral.Null())
-              else
-                JSAst.Call(JSAst.Constructor(JSClass.GetProperName(type.TypeInfo), Some([])), [])
+            if(type.TypeInfo.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute") ||
+                type.TypeInfo.DeclaringType?.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
+              JSAst.Literal(JSLiteral.Undefined())
+            else
+              JSAst.Call(JSAst.Constructor(JSClass.GetProperName(type.TypeInfo), Some([])), [])
             }
             else
             {
-              Message.Warning($"Setting null value for type $(type)");
+              Message.Warning($"Setting default value null to type $type");
               JSAst.Literal(JSLiteral.Null())
             }
           }

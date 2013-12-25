@@ -589,7 +589,7 @@ $(indent)  };#>;
       public Write() : string
       {
         $<#{ name: "$Name", attrs: ['..$(Attributes; "','")'], #> +
-        $<#ValueType: $(if(IsValueType) "true" else "false") }#>
+        $<#ValueType: $(IsValueType.ToString(CultureInfo.InvariantCulture).ToLower()) }#>
       }
     }
   }
