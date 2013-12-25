@@ -143,9 +143,7 @@ namespace Nemerle.Json
       };
       def exponent = exponent.WithDefault("");
 
-      // TODO: Check whether this bug in PEG
-      def m = if (minus != null) GetText(minus) else "";
-      m + GetText(mantissa) + fracPart + exponent
+      GetText(minus) + GetText(mantissa) + fracPart + exponent
     }
 
     private HexDigit(t : NToken) : int
