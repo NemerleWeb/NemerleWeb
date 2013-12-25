@@ -443,11 +443,11 @@ namespace NemerleWeb.Website.Tests
     
     public this()
     {
-      def test(description, res)
+      def test(description : string, res : void -> bool) : void
       {
         Results.Add((description, res()));
       }
-      Results = [].ToList();
+      Results = List();
       
       test("simple", () =>
       {
@@ -1745,6 +1745,36 @@ namespace NemerleWeb.Website.Tests
       test("Struct explicit aggregated default initialization", () => {
         def s = AggregatedStruct();
         s.S.X == 0 && s.S.Y == null
+      });
+      
+      test("tuples 2 default initialization", () => {
+        def t = default(int * int);
+        t[0] == 0 && t[1] == 0
+      });
+      
+      test("tuples 2 implicit default initialization", () => {
+        mutable t : int * int;
+        t[0] == 0 && t[1] == 0
+      });
+      
+      test("tuples 3 default initialization", () => {
+        def t = default(int * int * int);
+        t[0] == 0 && t[1] == 0 && t[2] == 0
+      });
+      
+      test("tuples 3 implicit default initialization", () => {
+        mutable t : int * int * int;
+        t[0] == 0 && t[1] == 0 && t[2] == 0
+      });
+      
+      test("tuples 4 default initialization", () => {
+        def t = default(int * int * int * int);
+        t == null
+      });
+      
+      test("tuples 4 implicit default initialization", () => {
+        mutable t : int * int * int * int;
+        t == null
       });
     }
     
