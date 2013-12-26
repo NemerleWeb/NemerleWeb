@@ -93,8 +93,8 @@ namespace NemerleWeb
     public UnitLambdas : Dictionary[string, string] = Dictionary.[string, string]();
              
     public AddUnitMainDefinition(unitName : string, definition : string) : void
-    {
-      UnitDefinitions.Add(unitName, definition);
+    {      
+      UnitDefinitions[unitName] = definition;
     }
     
     public AddUnitLambdas(unitName : string, lambdas : string) : void

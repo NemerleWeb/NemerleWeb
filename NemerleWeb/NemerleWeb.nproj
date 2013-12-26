@@ -146,6 +146,9 @@
     <Compile Include="JSAstBuilder.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JSAstCache.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JSAstExtensions.n">
       <SubType>Code</SubType>
     </Compile>

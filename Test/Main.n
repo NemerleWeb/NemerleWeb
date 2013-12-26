@@ -46,8 +46,8 @@ public class Test
       
     }
        
-    //f1(Children);
-    //def a1 = Children.Where(c => c == 'a');
+    f1(Children);
+    def a1 = Children.Where(c => c == 'a');
     
     foreach(a2 in Children2.Select(c : char => c + "1")) {
       def b = a2;
@@ -64,7 +64,7 @@ public class Test
     def a3 = f1(Children);
     def a4 = f2(Children2, c : char => c + "2");
   }
-  /*
+  
   [Html]
   public View() : string
   {
@@ -84,6 +84,5 @@ public class Test
         2
        </div>
     #>
-  }
-  */
+  }  
 }

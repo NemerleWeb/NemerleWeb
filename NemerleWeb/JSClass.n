@@ -261,7 +261,7 @@ $indent};#>
       FieldValue(field : IField) : string
       {
         def field = field :> FieldBuilder;
-        if(field.Ast.Initializer != null)
+        if(field.Ast?.Initializer != null)
         {
           def integer(v)
           {
@@ -495,8 +495,11 @@ $(indent)}#>
       
       public TranslateMethodBody([NotNull] meth : IMethod, [NotNull] indent = "" : string) : string
       {
-        def ast = TyperHelper.GetMethodJSAst(meth, Typer, ClassType);
-        ast.Write(indent);
+        match(JSAstCache.Get(ClassType, meth.Header))
+        {
+        | Some(ast) => ast.Write(indent)
+        | None => "/* No translation found */"
+        }
       }
       
       public static TypeIsArray([NotNull] typeVar : TypeVar) : bool 

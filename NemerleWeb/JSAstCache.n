@@ -1,0 +1,41 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{  
+  module JSAstCache
+  {
+    _cache : Dictionary[string, Dictionary[string, JSAst]] = Dictionary();
+        
+    public Add(tb : TypeBuilder, func : TFunHeader, jsAst : JSAst) : void 
+    {
+      mutable funcDictionary;
+      
+      when(!_cache.TryGetValue(tb.FullName, out funcDictionary))
+      {
+        funcDictionary = Dictionary();
+        _cache[tb.FullName] = funcDictionary;
+      }
+      
+      funcDictionary[func.Name] = jsAst;
+    }
+    
+    public Get(tb : TypeBuilder, func : TFunHeader) : option[JSAst]
+    {
+      mutable funcDictionary;
+      mutable ast; 
+      
+      if(_cache.TryGetValue(tb.FullName, out funcDictionary) && funcDictionary.TryGetValue(func.Name, out ast))
+        Some(ast)
+      else None()
+    }
+  }
+}

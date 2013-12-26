@@ -56,19 +56,24 @@ namespace NemerleWeb
      
     public DoTransformBeforeTypedMembers(tb : TypeBuilder, typer : Typer) : void
     {      
-      CreateResourceController(tb, typer);
+      Macros.DefineCTX(typer);
       
+      JSClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
+      JSClass.StringType = <[ ttype : System.String ]>;
+      JSClass.IPageType = <[ ttype: IPage ]>;
+      JSClass.ObjectType = <[ ttype: System.Object ]>;
+        
+      CreateResourceController(tb, typer);
+            
       tb.MethodBeforeStage3 += (_, e) => {
         def typer = e.Typer;
         match(typer.CurrentFunction.body) {
         | FunBody.Typed(body) =>
-          //assert2(false);
-          //System.Diagnostics.Debugger.Launch();
-          Message.Hint(body.ToString());
           def methodBuilder = typer.CurrentMethodBuilder;
           def shouldReturn = !(methodBuilder.Header.ReturnType is FixedType.Void()) && !methodBuilder.IsConstructor;
-          def ast = JSAstBuilder.BuildJSAst(body, shouldReturn, methodBuilder.Header);          
-          Message.Hint(string.Format("{0}{1}{0}{2}", Environment.NewLine, methodBuilder.Name, ast.Write()));          
+          def ast = JSAstBuilder.BuildJSAst(body, shouldReturn, methodBuilder.Header);
+          JSAstCache.Add(tb, typer.CurrentFunction, ast);          
+          AddMainData(tb, JSClass(tb, "  ", typer).Write());
         | _ => ()
         }
       };
@@ -211,11 +216,6 @@ namespace NemerleWeb
         server.HasBeenUsed = true;
         server.Compile();
       }
-          
-      JSClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
-      JSClass.StringType = <[ ttype : System.String ]>;
-      JSClass.IPageType = <[ ttype: IPage ]>;
-      JSClass.ObjectType = <[ ttype: System.Object ]>;
       
       tb.Manager.TypeTreeBuildFinish += _ => {
           def lambdas = tb.DeclaredNestedTypes
