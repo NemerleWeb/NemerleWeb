@@ -33,13 +33,11 @@ namespace NemerleWeb
     #endregion
       
     public static Self : string = "_NW$_self";
-    public static LambdaMarker : string = "_NW$_lambda";
       
     /// <summary>
-    /// Initialize self either by this or by empty object for lambdas.
+    /// Initialize self either
     /// </summary>
-    public static SelfInit : string =
-      $<#var $Self = (typeof this.$LambdaMarker === "undefined") ? this : this;#>;
+    public static SelfInit : string = $<#var $Self = this;#>;
       
     public Fields : IEnumerable[IField]
     {

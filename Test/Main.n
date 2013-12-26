@@ -36,19 +36,26 @@ module Program
   }
 }
 
-[Unit]
-struct A
+[Unit][Record]
+class A[T]
 {
+  Value : T {get;}
+     
+  public static @:(x : A[T]) : T
+  {
+    x.Value
+  }
 }
-
 
 [Unit]
 public class Test
 {
-  F() : void
+  F():void
   {
+    def a = A("A");
+    def b : string = a;
   }
-  
+ 
   [Html]
   public View() : string
   {

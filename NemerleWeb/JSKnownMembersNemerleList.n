@@ -44,7 +44,7 @@ namespace NemerleWeb
               JSAst.StaticMethodRef("nweb.collection", "areArrayEqual", None()),
               [left, arg1]))        
         | "MapToArray" => 
-          Some(left.AsEnumerable().JSMethodCall("select", [arg1]).JSMethodCall("toArray", []))
+          Some(left.AsJSEnumerable().JSMethodCall("select", [arg1]).JSMethodCall("toArray", []))
         | _ => None()
         }
       | _ => None()

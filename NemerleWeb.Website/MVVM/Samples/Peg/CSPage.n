@@ -53,6 +53,6 @@ Members count: $(res.Members.Length)
           </div>
         </div>
       #>
-    }    
+    }
   }
 }

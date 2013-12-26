@@ -78,12 +78,15 @@ namespace NemerleWeb
               if(typeInfo.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
                 Some(arg)
               else
+              {
+                // Handle some names
                 match(typeInfo.FullName)
                 {
                 | "System.Decimal" => Some(arg)
                 | "System.String" => Some(JSAstHelper.CallToString(typeInfo, left, member, parms))
-                | _ => Some(JSAst.Call(left, []))
+                | _ => Some(JSClass.GetProperName(typeInfo).StaticCall(member, parms))
                 }
+              }
             | _ => None()
             }
           });

@@ -132,11 +132,11 @@ namespace NemerleWeb.Website.Samples
         Sample(
           "C#",
           [
-            "MVVM/Samples/Peg/CSPage.n"
-            "MVVM/Samples/CSharpParser/Parser.n"
+            "MVVM/Samples/Peg/CSPage.n",
+            "MVVM/Samples/CSharpParser/Parser.n",
           ],
           "",
-          PegCS)
+          PegCS),
       ].ToList();
                        
       SelectedSample = Samples[2];
