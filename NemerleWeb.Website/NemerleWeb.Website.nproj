@@ -440,6 +440,10 @@
       <TSParserPeg Include="$(ProjectDir)..\peg-parser\TSParserPeg\*.n" />
     </ItemGroup>
     <Copy SourceFiles="@(TSParserPeg)" DestinationFolder="$(YourDestinationDirectory)\Peg\TSParserPeg" />
+    <ItemGroup>
+      <CSParserPeg Include="$(ProjectDir)..\peg-parser\CSharpParser\*.n" />
+    </ItemGroup>
+    <Copy SourceFiles="@(CSParserPeg)" DestinationFolder="$(YourDestinationDirectory)\Peg\CSharpParser" />
   </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />

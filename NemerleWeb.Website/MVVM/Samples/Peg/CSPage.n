@@ -10,11 +10,11 @@ namespace NemerleWeb.Website.Samples
   [Unit]
   public class CSPage
   {
-    _parser : JSEngine.JSParser;
+    _parser : CSharpParser.Parser;
     
     public this()
     {
-      _parser = JSEngine.JSParser();
+      _parser = CSharpParser.Parser();
     }
          
     ParserOutput : string
@@ -23,7 +23,13 @@ namespace NemerleWeb.Website.Samples
       {
         if (!string.IsNullOrEmpty(ParserInput))
           if (_parser.Parse(ParserInput) is Some(res))
-            $<#..$(res; "\n"; _.ToString())#>
+          {
+            $<#Extern aliases count: $(res.ExternAliases.Length),
+Usings count: $(res.UsingDirectives.Length),
+Global attributes count: $(res.GlobalAttributes.Length),
+Members count: $(res.Members.Length)
+#>
+          }
           else
             "Incorrect input"
         else
@@ -38,9 +44,7 @@ namespace NemerleWeb.Website.Samples
     {
       <#
         <div>
-          <span>This is demonstration of JavaScript parser</span><br />
-          <span>When you write JavaScript code, the parser parses it and creates AST.</span><br />
-          <span>Afterwards this AST is converted to human readable string</span>
+          <span>This is demonstration of C# parser</span><br />
           <div class="output">
             <span class="output-text">$ParserOutput</span> 
           </div>

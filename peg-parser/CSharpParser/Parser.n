@@ -639,7 +639,7 @@ namespace CSharpParser
       #endregion
     }
   )]
-  //[Unit]
+  [Unit]
   public partial class Parser
   {
   }
