@@ -29,7 +29,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>None</DebugType>
-    <Optimize>False</Optimize>
+    <Optimize>True</Optimize>
     <DefineConstants>TRACE</DefineConstants>
     <DocumentationFile>$(OutputPath)\$(MSBuildProjectName).xml</DocumentationFile>
   </PropertyGroup>
