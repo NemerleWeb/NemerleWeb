@@ -93,7 +93,7 @@ namespace NemerleWeb
         //Debug.WriteLine(_transformCounter + ": " + xmlAst.ToString());
         def loopStack = if(loopStack == null) [] else loopStack;
         
-        def transformJsExpr(expr)
+        def transformJsExpr(expr : string) : string
         {
           def res = if(expr.StartsWith("\"") && expr.EndsWith("\"")) expr.Trim('\"') else expr;
           //def res = Regex.Replace(res, <#(^(?<b>)_NW\$_self\W|(?<b>\W)_NW\$_self\W)#>, "${b}");
@@ -101,16 +101,16 @@ namespace NemerleWeb
           res
         }
                 
-        def getSplice()
+        def getSplice() : string
         {
           mutable splice;
           if(splices.TryGetValue(_transformCounter, out splice))
-            transformJsExpr(splice ?? "");
+             transformJsExpr(splice ?? "");
           else 
             ""
         }
         
-        def getSpliceNoNewLine()
+        def getSpliceNoNewLine() : string
         {
           getSplice().Replace("\r\n", "").Replace("\n", "")
         }
@@ -146,7 +146,7 @@ namespace NemerleWeb
                     {
                     | @"_NW\$_self\.template\((?<p>.+),.+" => p
                     | @"_NW\$_self\.template\((?<p>.+).+" => p
-                    | _ => Message.Error(pexpr.Location, $"Incorrect xml, template(model, _.view): $xmlAst"); ""
+                    | _ => Message.Error(pexpr.Location, $"Incorrect xml, template(model, _.view). AST: $xmlAst, splice: $splice"); ""
                     };
                   $<#nweb.utils.getTemplateName($p, "$view"): $p#>
                 | <[ template(_.$model, $_r) ]> =>
@@ -156,7 +156,7 @@ namespace NemerleWeb
                     {
                     | @"_NW\$_self\.template\((.+),.+\..+\(.+,(?<p>.+)\)\)" => p
                     | @"_NW\$_self\.template\((.+),(?<p>.+)\)" => p
-                    | _ => Message.Error(pexpr.Location, $"Incorrect xml, template(_.model, view): $xmlAst"); ""
+                    | _ => Message.Error(pexpr.Location, $"Incorrect xml, template(_.model, view). AST: $xmlAst, splice: $splice"); ""
                     };
                   $<#nweb.utils.getTemplateName($(JSClass.Self).$model, $p): $(JSClass.Self).$model#>
                 | <[ template($_model, $_r) ]> => 
@@ -166,7 +166,7 @@ namespace NemerleWeb
                     {
                     | @"_NW\$_self\.template\((?<p1>.+),.+\..+\(.+,(?<p2>.+)\)\)" => (p1, p2)
                     | @"_NW\$_self\.template\((?<p1>.+),(?<p2>.+)\)" => (p1, p2)
-                    | _ => Message.Error(pexpr.Location, $"Incorrect xml, template(model, view): $xmlAst"); ("", "")
+                    | _ => Message.Error(pexpr.Location, $"Incorrect xml, template(model, view). AST: $xmlAst, splice: $splice"); ("", "")
                     };
                   $<#nweb.utils.getTemplateName($p1, $p2): $p1#>
                 | _ => Message.FatalError($"Invalid patter expression: $pexpr")

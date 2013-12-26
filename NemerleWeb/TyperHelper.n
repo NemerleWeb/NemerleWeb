@@ -46,11 +46,12 @@ namespace NemerleWeb
                       def values = args.MapI((i, a) => $<#"$i": "$(normalize(a.Write()))"#>);
                       [(index, $<#{..$values}#>)]
                     | _ => [(index, normalize(j.Val.Write()))]
-                    }                  
+                    }
                   | _ => []
                   })
                 .GroupBy((i, _) => i)
                 .ToDictionary(g => g.Key, g => g.FirstOrDefault((_, v) => !string.IsNullOrEmpty(v))[1]);
+          
           ret
         }
         

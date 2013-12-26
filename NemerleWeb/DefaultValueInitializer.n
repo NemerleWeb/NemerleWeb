@@ -18,7 +18,7 @@ namespace NemerleWeb
     /// <summary>
     /// Return js ast for type initialization.
     /// The type parameter can be null, in that case JSAst.Void is returned.
-    /// <summary>
+    /// </summary>
     public GetJSAst(type : TypeVar) : JSAst
     {
       if(type != null)
@@ -32,7 +32,7 @@ namespace NemerleWeb
     /// <summary>
     /// Return js ast for type initialization.
     /// The type parameter can be null, in that case JSAst.Void is returned.
-    /// <summary>
+    /// </summary>
     public GetJSAst(type : FixedType) : JSAst
     {
       if (type != null)
