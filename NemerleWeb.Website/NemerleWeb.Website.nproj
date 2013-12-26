@@ -77,11 +77,6 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Nemerle.ComputationExpressions">
-      <Name>Nemerle.ComputationExpressions</Name>
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(Nemerle)\Nemerle.ComputationExpressions.dll</HintPath>
-    </Reference>
-    <Reference Include="Nemerle.ComputationExpressions">
       <Name>Nemerle.Peg</Name>
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(Nemerle)\Nemerle.Peg.dll</HintPath>

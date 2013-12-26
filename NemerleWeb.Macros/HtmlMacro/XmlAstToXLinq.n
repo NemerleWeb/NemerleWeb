@@ -92,9 +92,12 @@ namespace NemerleWeb
         | Text(Splicable.Value(value))        => <[ text($(value : string)) ]>
         | Tag(Splicable.Value(name), content) =>
           def isInsideTag(c) { c is XmlAst.AttrSplice || c is XmlAst.Attr }
-          def attrs = content.Where(c => isInsideTag(c)).Map(c => TransformImpl(c, spliceNode));          
-          def childTags = content.Where(c => !isInsideTag(c)).Map(c => transformImpl(c));
-          def each = content.Where(c => if(c is XmlAst.AttrSplice(_, SpliceType.Foreach)) true else false)
+          def attrs = content.Where(c => isInsideTag(c))
+                             .Where(c => !(c is XmlAst.AttrSplice(_, SpliceType.Foreach)))
+                             .Map(c => TransformImpl(c, spliceNode));          
+          def childTags = content.Where(c => !isInsideTag(c))
+                                 .Map(c => transformImpl(c));
+          def each = content.Where(c => c is XmlAst.AttrSplice(_, SpliceType.Foreach))
                             .FirstOrDefault() :> XmlAst.AttrSplice;
           
           def eachDefines = 

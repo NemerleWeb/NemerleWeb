@@ -16,61 +16,8 @@ namespace NemerleWeb
     public module TyperHelper
     {
         static mutable _index : int = 0;
-        
-        public GetSplices(expr : PExpr, typer : Typer) : Dictionary[int, string]
-        {
-          // Normalize string for slices.
-          // New line symbol must not appear.
-          def normalize(s)
-          {
-            s.Replace("\r", " ").Replace("\n", " ")
-          }
-          
-          def method = BuildMethod(expr, typer);
-          def oldBody = method.Header.body;
-          def typedBody = GetTypedBody(method, typer, typer.CurrentTypeBuilder, false);
-          def defs = JSAstBuilder.BuildJSAstForSplices(typedBody, method.Header);
-          method.Header.body = oldBody;
-          def tt = GetTypedBody(method, typer, typer.CurrentTypeBuilder);
-          def defs2 = JSAstBuilder.BuildJSAstForSplices(tt, method.Header);
-          
-          def ret =
-            defs.Concat(defs2)
-                .SelectMany(j =>
-                  regexp match(j.Name)
-                  {
-                  | <#^_var(?<index : int>\d+)_\d+$#> => 
-                    match(j.Val)
-                    {
-                    | JSAst.Tuple(args) =>
-                      def values = args.MapI((i, a) => $<#"$i": "$(normalize(a.Write()))"#>);
-                      [(index, $<#{..$values}#>)]
-                    | _ => [(index, normalize(j.Val.Write()))]
-                    }                  
-                  | _ => []
-                  })
-                .GroupBy((i, _) => i)
-                .ToDictionary(g => g.Key, g => g.FirstOrDefault((_, v) => !string.IsNullOrEmpty(v))[1]);
-          ret
-        }
-        
-        public GetMethodJSAst(method : IMethod, typer : Typer, tb : TypeBuilder) : JSAst 
-        {
-          def texpr = GetTypedBody(method, typer, tb);
-          def jsast = JSAstBuilder.BuildJSAst(
-            texpr,
-            !(method.Header.ReturnType is FixedType.Void()) && !method.IsConstructor,
-            method.Header);
-            
-          /*def tempFileName = System.IO.Path.GetTempFileName();
-          System.IO.File.WriteAllText(tempFileName, texpr.ToString());
-          System.IO.File.AppendAllText(tempFileName, jsast.Write());
-          Message.Hint(method.Name + ": " + tempFileName);*/
-          
-          jsast;
-        }
-        
-        public GetTypedBody(method : IMethod, typer : Typer, tb : TypeBuilder, fullTyping : bool = true) : TExpr
+                
+        public GetTypedBody(method : IMethod, typer : Typer, tb : TypeBuilder, bodyHandler : TExpr -> void, fullTyping : bool = true) : void
         {
           if (method.Header.Name.Contains("_N_GetVariantCodeSafe"))
           {
@@ -100,10 +47,16 @@ namespace NemerleWeb
                 }
                 else
                 {
-                  def methodTyper = Typer(tb, null, mb, env);                  
+                  def methodTyper = Typer(tb, null, mb, env);
                   
-                  mutable body;
-                                   
+                  methodTyper.BeforeStage3 += (_, e) => {
+                    def typer = e.Typer;
+                    match(typer.CurrentFunction.body) {
+                    | FunBody.Typed(body) =>
+                      bodyHandler(body);
+                    | _ => ()
+                    }
+                  }
                   
                   if(fullTyping)
                   {
@@ -125,8 +78,6 @@ namespace NemerleWeb
                   }                
                                     
                   typer.Manager.Options.EmitDebug = oldEmitDebug;
-                  body
-                  //GetTypedBody(method, typer, tb);
                 }
               }
             | FunBody.Abstract => TExpr.Literal(Literal.Void())
@@ -135,8 +86,7 @@ namespace NemerleWeb
               def mi = method :> LibraryReference.ExternalMethodInfo;
               
               Message.Error($"External methods are not implemented: $(mi.GetName())");
-              TExpr.Error();
-          
+              TExpr.Error();          
             | _ =>
               Message.Error("Couldn't type body"); 
               TExpr.Error();

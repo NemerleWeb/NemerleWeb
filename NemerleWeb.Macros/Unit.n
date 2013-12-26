@@ -306,11 +306,14 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       ]>;
     }
     
-    public AddTemplateData(typeName : string, template : string, data : PExpr, nwebDataConstructor : MethodBuilder) : void
+    public AddTemplateData(tb : TypeBuilder, templateName : string, templateContent : string) : void
     {      
-      nwebDataConstructor.Body = <[ 
-        $(nwebDataConstructor.Body);
-        AddUnitTemplate($(JSClass.GetProperName(typeName) : string), $(template : string), NWebUtils.GetHtml($data));
+      def typeName = tb.Name;
+      def ctor = GetNWebDataConstructor(tb.Manager.Options.OutputFileName, tb.Manager.CoreEnv);
+      
+      ctor.Body = <[ 
+        $(ctor.Body);
+        AddUnitTemplate($(JSClass.GetProperName(typeName) : string), $(templateName : string), $(templateContent : string));
       ]>;
     }
     

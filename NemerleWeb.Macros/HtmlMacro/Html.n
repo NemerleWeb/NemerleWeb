@@ -21,7 +21,7 @@ namespace NemerleWeb
   [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Method)]
   public macro HtmlTyped(_tb : TypeBuilder, mb : MethodBuilder)
   {
-    //HtmlImpl.FromTypedToString(Nemerle.Macros.ImplicitCTX(), mb)
+    HtmlImpl.FromTypedToString(Nemerle.Macros.ImplicitCTX(), mb)
   }
   
   internal module HtmlImpl
@@ -58,11 +58,19 @@ namespace NemerleWeb
             typer.CurrentTypeBuilder.Define(<[ decl:
               [HtmlTyped]
               public $(tempMethodName : name)() : list[string] {
-                def tag(name, expr) : string { "" }
-                def attr(name, expr) : string { "" }
-                def attr_splice(name, expr) : string { "" }
-                def text(expr) : string { "" }
-                def text_splice(expr) : string { "" }
+                def tag(name, expr) : string { "" };
+                def attr(name, expr) : string { "" };
+                def attr_splice(name, expr) : string { "" };
+                def text(expr) : string { "" };
+                def text_splice(expr) : string { "" };
+                
+                def skip = {
+                  tag("", ([], []));
+                  attr("", "");
+                  attr_splice("", "");
+                  text("");
+                  text_splice("");
+                };
                 
                 $pexpr
               }
@@ -84,7 +92,9 @@ namespace NemerleWeb
     internal FromTypedToString(typer : Typer, mb : MethodBuilder) : void
     {
       Macros.DefineCTX(typer);
-      
+      def escape(code) {
+        code.Replace("\"", <#\"#>)
+      }
       def htmlFromTExpr(expr, indent) : string {
         match(expr) {
         | TExpr.Block(_, body) => htmlFromTExpr(body, indent)
@@ -98,46 +108,51 @@ namespace NemerleWeb
           when lst.TypeInfo.FullName == "Nemerle.Core.Nil[T]" && mem.Name == "_N_constant_object" =>         
           ""
           
-        | Call(StaticRef(_, mem, _), [Parm(_, Literal(Literal.String(tagName)), _, _), tagExprExpr], _) when mem.Name.StartsWith("_N_tag_") => 
-          assert2(false);
-          def (attrs, children) = match(tagExprExpr.expr) {
-          | Tuple([attrs, tags]) => 
+        | Call(LocalFunRef(decl, _), [Parm(_, Literal(Literal.String(tagName)), _, _), tagExprExpr], _) when decl.Name == "tag" =>           
+          def (attrs, children) = match(tagExprExpr.expr) {          
+          | Sequence(foreachExpr, Tuple([attrs, childTags])) =>            
+            def foreachEnum = match(foreachExpr) 
+            {
+            | DefValIn(name, val, DefValIn(loopValName, _, _)) => 
+              "nw-foreach=\"" + loopValName.Name + " in " + escape(JSAstBuilder.BuildJSAst(val, false, mb.Header).Write()) + "\" "
+            | _ => ""
+            };            
             def a = htmlFromTExpr(attrs, indent);
-            def t = htmlFromTExpr(tags, indent + "  ");
-            (a, t)
+            def t = htmlFromTExpr(childTags, indent + "  ");
+            (foreachEnum + a, t)
           | _ => assert2(false); ("", "");
           }
         
           indent + $"<$(tagName) $attrs>$children</$(tagName)>"
         
-        | Call(StaticRef(_, mem, _), [textExprExpr], _) when mem.Name.StartsWith("_N_text_splice_") => 
+        | Call(LocalFunRef(decl, _), [textExprExpr], _) when decl.Name == "text_splice" => 
           def splice = JSAstBuilder.BuildJSAst(textExprExpr.expr, false, mb.Header).Write();
-          def splice = splice.Trim(array['\"']);
-          $"<span nw-text=\"$splice\" />"        
+          def splice = escape(splice.Trim(array['\"']));          
+          $"<span nw-text=\"$splice\" />"
         
-        | Call(StaticRef(_, mem, _), [Parm(_, Literal(Literal.String(textValue)), _, _)], _) 
-          when mem.Name.StartsWith("_N_text_") => 
+        | Call(LocalFunRef(decl, _), [Parm(_, Literal(Literal.String(textValue)), _, _)], _) 
+          when decl.Name == "text" => 
           indent + textValue
         
-        | Call(StaticRef(_, mem, _), [Parm(_, Literal(Literal.String(attrName)), _, _), attrExprExpr], _) 
-          when mem.Name.StartsWith("_N_attr_splice") => 
-          assert2(false);
-          def attrSplice = JSAstBuilder.BuildJSAst(attrExprExpr.expr, false, mb.Header).Write();
-          $"nw-$attrName=\"$attrSplice\""
-        | Call(StaticRef(_, mem, _), [Parm(_, Literal(Literal.String(attrName)), _, _), Parm(_, Literal(Literal.String(attrValue)), _, _)], _) 
-          when mem.Name.StartsWith("_N_attr_") => 
-          assert2(false);
-          $"$attrName=\"$attrValue\""
+        | Call(LocalFunRef(decl, _), [Parm(_, Literal(Literal.String(attrName)), _, _), attrExprExpr], _) 
+          when decl.Name == "attr_splice" =>
+          def attrSplice = escape(JSAstBuilder.BuildJSAst(attrExprExpr.expr, false, mb.Header).Write());
+          $"nw-$attrName=$attrSplice"
+          
+        | Call(LocalFunRef(decl, _), [Parm(_, Literal(Literal.String(attrName)), _, _), Parm(_, Literal(Literal.String(attrValue)), _, _)], _) 
+          when decl.Name == "attr" => 
+          $"$attrName=$attrValue"
         
-        | _ => 
-          //assert2(false); 
-          ""
+        | DefFunctionsIn(_, body) => htmlFromTExpr(body, indent);
+        | DefValIn(name, _, body) when name.Name == "skip" => htmlFromTExpr(body, indent);
+        | _ => assert2(false); ""
         }
       }
       
-      def texpr = TyperHelper.GetTypedBody(mb, typer, typer.CurrentTypeBuilder, true);
-      def html = htmlFromTExpr(texpr, "");
-      _ = html;
+      TyperHelper.GetTypedBody(mb, typer, typer.CurrentTypeBuilder, body => {
+        def html = htmlFromTExpr(body, "");          
+        UnitImpl.AddTemplateData(mb.DeclaringType, JSClass.GetProperName(mb.DeclaringType) + "_" + mb.Name, html);
+      }, true);      
     }
   }
 }
