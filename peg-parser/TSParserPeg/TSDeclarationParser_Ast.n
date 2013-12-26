@@ -7,14 +7,16 @@ using Nemerle.Extensions;
 using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
-using Nemerle.Peg;
+using NemerleWeb.Peg;
+using NemerleWeb;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TSParser.Ast
-{  
+namespace TSParserPeg.Ast
+{
+  [Unit]
   public variant DeclarationElement
   {
     | Reference                 { Value : Ast.Reference; }
@@ -25,18 +27,21 @@ namespace TSParser.Ast
     | AmbientDeclaration        { Value : Ast.AmbientDeclaration; }
   }
   
+  [Unit]
   public variant Reference
   {
     | NoDefaultLib
     | Lib { Path : string; }
   }
   
+  [Unit]
   [Record]
   public class ExportAssignment
   {
     public Name : string;
   }
   
+  [Unit]
   [Record]
   public class ExternalImportDeclaration
   {
@@ -44,6 +49,7 @@ namespace TSParser.Ast
     public ModuleReference : string;
   }
   
+  [Unit]
   [Record]
   public class ImportDeclaration
   {
@@ -51,6 +57,7 @@ namespace TSParser.Ast
     public Entity : string;
   }
   
+  [Unit]
   [Record]
   public class InterfaceDeclaration
   {
@@ -60,6 +67,7 @@ namespace TSParser.Ast
     public Type : ScriptType.Object;
   }
   
+  [Unit]
   public variant AmbientDeclaration
   {
     | VariableDeclaration       { Value : Ast.AmbientVariableDeclaration; }
@@ -70,6 +78,7 @@ namespace TSParser.Ast
     | ModuleDeclaration         { Value : Ast.AmbientModuleDeclaration; }
   }
   
+  [Unit]
   [Record]
   public class AmbientVariableDeclaration
   {
@@ -77,6 +86,7 @@ namespace TSParser.Ast
     public Type : option[ScriptType];
   }
 
+  [Unit]
   [Record]
   public class AmbientFunctionDeclaration
   {
@@ -84,6 +94,7 @@ namespace TSParser.Ast
     public Signature : CallSignature;
   }
 
+  [Unit]
   [Record]
   public class AmbientClassDeclaration
   {
@@ -93,13 +104,15 @@ namespace TSParser.Ast
     public Members : list[AmbientClassBodyElement];
   }
 
-  [Record][StructuralEquality]
+  [Unit]
+  [Record]
   public class AmbientEnumDeclaration
   {
     public Name : string;
     public Members : list[AmbientEnumMember];
   }
 
+  [Unit]
   [Record]
   public class AmbientExternalModuleDeclaration
   {
@@ -107,6 +120,7 @@ namespace TSParser.Ast
     public Members : list[AmbientExternalModuleElement];
    }
 
+  [Unit]
   [Record]
   public class AmbientModuleDeclaration
   {
@@ -114,6 +128,7 @@ namespace TSParser.Ast
     public Members : list[AmbientModuleElement];
   }
   
+  [Unit]
   [StructuralEquality(Ignore = [ReturnType])]
   public variant ScriptType
   {
@@ -130,6 +145,7 @@ namespace TSParser.Ast
     | Constructor { Value : ScriptTypeCallSignature; }
   }
   
+  [Unit]
   [Record][StructuralEquality]
   public class ScriptTypeCallSignature
   {
@@ -138,6 +154,7 @@ namespace TSParser.Ast
     public ReturnType : ScriptType;
   }
   
+  [Unit]
   [StructuralEquality]
   public variant ScriptObject
   {
@@ -148,6 +165,7 @@ namespace TSParser.Ast
     | Method    { Value : Ast.Method; }
   }
   
+  [Unit]
   [Record][StructuralEquality(Ignore = [ParameterName])]
   public class IndexSignature
   {
@@ -156,12 +174,14 @@ namespace TSParser.Ast
     public ReturnType : ScriptType;
   }
   
+  [Unit]
   public variant IndexParameterType
   {
     | Number
     | String
   }
   
+  [Unit]
   [Record][StructuralEquality(Ignore = ReturnType)]
   public class CallSignature
   {
@@ -170,6 +190,7 @@ namespace TSParser.Ast
     public ReturnType : option[ScriptType];
   }
   
+  [Unit]
   [Record][StructuralEquality(Ignore = [Optional])]
   public class Property
   {
@@ -182,6 +203,7 @@ namespace TSParser.Ast
   
   /*
   // Same as CallSignature
+  [Unit]
   [Record][StructuralEquality]
   public class Construct
   {
@@ -191,6 +213,7 @@ namespace TSParser.Ast
   }
   */
   
+  [Unit]
   [Record][StructuralEquality(Ignore = [Optional])]
   public class Method
   {
@@ -199,6 +222,7 @@ namespace TSParser.Ast
     public Signature : CallSignature;
   }  
   
+  [Unit]
   [Record][StructuralEquality]
   public class ScriptTypeParameter
   {
@@ -206,6 +230,7 @@ namespace TSParser.Ast
     public Constraint : option[ScriptType];
   }
   
+  [Unit]
   [StructuralEquality(Ignore = [Name, Access, Optional])]
   public variant ScriptParameter
   {
@@ -229,6 +254,7 @@ namespace TSParser.Ast
       }
   }
   
+  [Unit]
   [StructuralEquality(Ignore = [Name, Value, Access])]
   public variant RequiredParameter
   {
@@ -241,12 +267,14 @@ namespace TSParser.Ast
       }
   }
   
+  [Unit]
   public variant MemberAccess
   {
     | Public
     | Private
   }
   
+  [Unit]
   [Record]
   [StructuralEquality(Ignore = Value)]
   public class AmbientEnumMember
@@ -255,6 +283,7 @@ namespace TSParser.Ast
     public Value : option[int];
   }
   
+  [Unit]
   [StructuralEquality]
   public variant AmbientModuleElement
   {
@@ -267,6 +296,7 @@ namespace TSParser.Ast
     | ImportDeclaration    { Value : Ast.ImportDeclaration; }
   }
   
+  [Unit]
   [StructuralEquality]
   public variant AmbientExternalModuleElement
   {
@@ -275,6 +305,7 @@ namespace TSParser.Ast
     | ModuleElement             { Value : Ast.AmbientModuleElement; }
   }
   
+  [Unit]
   [StructuralEquality(Ignore = [Access])]
   public variant AmbientClassBodyElement
   {
@@ -296,6 +327,7 @@ namespace TSParser.Ast
     | Index { Value : Ast.IndexSignature; }
   }
   
+  [Unit]
   [Record][StructuralEquality]
   public class ClassHeritage
   {

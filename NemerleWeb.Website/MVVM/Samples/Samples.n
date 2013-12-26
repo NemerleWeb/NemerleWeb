@@ -5,10 +5,10 @@ using System.Collections.Concurrent;
 using Nemerle;
 using NemerleWeb;
 using NemerleWeb.TypedJS;
-using NemerleWeb.Tests;
-using NemerleWeb.Samples.TypedJS;
+using NemerleWeb.Website.Tests;
+using NemerleWeb.Website.Samples.TypedJS;
 
-namespace NemerleWeb.Samples
+namespace NemerleWeb.Website.Samples
 {
   [Unit, Record]  
   class Sample
@@ -44,7 +44,12 @@ namespace NemerleWeb.Samples
     ListsAndCollections : ListsAndCollectionsPage { get; set; }
     LoadingAndSaving : LoadingAndSavingPage { get; set; }
     SinglePageApps : SPAPage { get; set; }
-        
+    
+    PegCalculator : CalculatorPage { get; set; }
+    PegJson       : JsonPage { get; set; }
+    PegJS         : JSPage { get; set; }
+    PegCS         : CSPage { get; set; }
+    
     Sources : List[string * string] { get; set; }
     ThisPageSource : string { get; set; }
         
@@ -59,6 +64,10 @@ namespace NemerleWeb.Samples
       ListsAndCollections = ListsAndCollectionsPage();
       LoadingAndSaving = LoadingAndSavingPage();
       SinglePageApps = SPAPage();
+      PegCalculator = CalculatorPage();
+      PegJson       = JsonPage();
+      PegJS         = JSPage();
+      PegCS         = CSPage();
             
       Samples = 
       [
@@ -75,6 +84,40 @@ namespace NemerleWeb.Samples
         Sample("Lists and collections", ["MVVM/Samples/Knockout/Tutorial_2_ListsAndCollections.n"], "", ListsAndCollections), 
         Sample("Single page applications", ["MVVM/Samples/Knockout/Tutorial_3_SinglePageApps.n"], "", SinglePageApps), 
         Sample("Loading and saving", ["MVVM/Samples/Knockout/Tutorial_5_LoadingAndSaving.n"], "", LoadingAndSaving)
+      ].ToList();
+      
+      PegSamples =
+      [
+        Sample(
+          "Calculator", 
+          [
+            "MVVM/Samples/Peg/CalculatorParser/CalcParser.n",
+            "MVVM/Samples/Peg/CalculatorPage.n"
+          ],
+          "",
+          PegCalculator),
+          
+        Sample(
+          "Json",
+          [
+            "MVVM/Samples/Peg/JsonParser/JsonParser.n",
+            "MVVM/Samples/Peg/JsonPage.n",
+            "MVVM/Samples/Peg/JsonParser/Ast.n",
+            "MVVM/Samples/Peg/JsonParser/JsonUtils.n"
+          ],
+          "",
+          PegJson),
+        
+        Sample(
+          "JavaScript",
+          [
+            "MVVM/Samples/Peg/JSParser/JSParser.n",
+            "MVVM/Samples/Peg/JSPage.n",
+          ],
+          "",
+          PegJS),
+          
+        //Sample("C#", ["MVVM/Samples/Peg/CSPage.n"], "", PegCS)
       ].ToList();
                        
       SelectedSample = Samples[2];
@@ -102,7 +145,7 @@ namespace NemerleWeb.Samples
       {          
         samples[index].Source = source;
         prettyPrint();
-      });  
+      });
     }
     
     SelectSample(sample : Sample) : void 
@@ -123,7 +166,7 @@ namespace NemerleWeb.Samples
       
       public LoadSourceForList(samples : IEnumerable[string]) : string
       {
-        $<#..$(samples; "\n---------------------------------\n"; Helpers.LoadSourceFor)#>
+        $<#..$(samples; "\n--------------------------------------------------\n"; Helpers.LoadSourceFor)#>
       }
     }
     
@@ -145,6 +188,14 @@ namespace NemerleWeb.Samples
               <h4>KnockoutJS Samples</h4>
               <ul class="nav nav-stacked">
                 <li $foreach(s in KnockoutSamples) css-selected="$(SelectedSample.Name == s.Name)">
+                  <a href="#" click="$SelectSample">$(s.Name)</a>
+                </li>            
+              </ul>
+            </div>
+            <div class="col-xs-6">
+              <h4>Peg Samples</h4>
+              <ul class="nav nav-stacked">
+                <li $foreach(s in PegSamples) css-selected="$(SelectedSample.Name == s.Name)">
                   <a href="#" click="$SelectSample">$(s.Name)</a>
                 </li>            
               </ul>

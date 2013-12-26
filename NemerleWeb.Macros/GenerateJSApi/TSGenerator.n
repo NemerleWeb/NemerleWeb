@@ -260,6 +260,10 @@ namespace NemerleWeb
       
       membersScope.DefineMemberPublicNew(
         <[ decl: $(JSApiSpecial.Call : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
+        
+      def callParameters = <[ parameter: this _ : this ]> :: functionParams;
+      membersScope.DefineMemberPublicNew(
+        <[ decl: static @()[..$typeParameters](..$callParameters) : $realReturnType; ]>);
     }
    
     CreateConstruct(membersScope : TypeBuilder, construct : Construct, prefix : string) : void

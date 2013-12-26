@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.n" Inherits="NemerleWeb.SC2Score.MvcApplication" Language="Nemerle" %>
+﻿<%@ Application Codebehind="Global.asax.n" Inherits="NemerleWeb.Website.MvcApplication" Language="Nemerle" %>

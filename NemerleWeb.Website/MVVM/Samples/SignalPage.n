@@ -10,7 +10,7 @@ using Nemerle.Late;
 using Microsoft.AspNet.SignalR.Hubs;
 using Microsoft.AspNet.SignalR;
 
-namespace NemerleWeb.Samples
+namespace NemerleWeb.Website.Samples
 {
   [Unit]
   public class SignalPage 

@@ -25,7 +25,7 @@ namespace NemerleWeb
     /// <summary>
     /// Take all elements and remove duplicates
     /// </summary>
-    public AnalyzeTSAst([NotNull] tsAsts : IEnumerable[DeclarationElement]) : IEnumerable[DeclarationElement]
+    public AnalyzeTSAst([NotNull] tsAsts : List[DeclarationElement]) : List[DeclarationElement]
     {
       tsAsts.Where(FilterAst).GroupBy(GroupAst).SelectMany(SelectAst).ToList()
     }
@@ -83,9 +83,12 @@ namespace NemerleWeb
       
         match(ambientType)
         {
-        | type when type.Equals(typeof(AmbientDeclaration.VariableDeclaration)) =>
-          [typeAndNameGroup.First()]
-          //AnalyzeInterface(typeAndNameGroup.Cast.[TSGlobal.Interface]())
+        | type when type.Equals(typeof(AmbientDeclaration.VariableDeclaration)) =>          
+          AnalyzeVariable(
+            ambientGroup
+              .Cast.[AmbientDeclaration.VariableDeclaration]()
+              .Select(a => a.Value))
+            .Select(f => DeclarationElement.AmbientDeclaration(AmbientDeclaration.VariableDeclaration(f)))
       
         | type when type.Equals(typeof(AmbientDeclaration.FunctionDeclaration)) =>
           AnalyzeFunction(
@@ -95,22 +98,31 @@ namespace NemerleWeb
             .Select(f => DeclarationElement.AmbientDeclaration(AmbientDeclaration.FunctionDeclaration(f)))
           
         | type when type.Equals(typeof(AmbientDeclaration.ClassDeclaration)) =>
-          [typeAndNameGroup.First()]
-          //AnalyzeEnum(typeAndNameGroup.Cast.[TSGlobal.Enum]())
+          AnalyzeСlass(
+            ambientGroup
+              .Cast.[AmbientDeclaration.ClassDeclaration]()
+              .Select(c => c.Value))
+          .Select(c => DeclarationElement.AmbientDeclaration(AmbientDeclaration.ClassDeclaration(c)))
         
         | type when type.Equals(typeof(AmbientDeclaration.EnumDeclaration)) =>
-          [typeAndNameGroup.First()]
-          //AnalyzeFunction(typeAndNameGroup.Cast.[TSGlobal.Function]())
+          AnalyzeEnum(
+            ambientGroup
+              .Cast.[AmbientDeclaration.EnumDeclaration]()
+              .Select(c => c.Value))
+          .Select(c => DeclarationElement.AmbientDeclaration(AmbientDeclaration.EnumDeclaration(c)))
       
         | type when type.Equals(typeof(AmbientDeclaration.ModuleDeclaration)) =>
-          [typeAndNameGroup.First()]
-          //AnalyzeModule(typeAndNameGroup.Cast.[TSGlobal.Function]())
+          AnalyzeModule(
+            ambientGroup
+              .Cast.[AmbientDeclaration.ModuleDeclaration]()
+              .Select(m => m.Value))
+          .Select(m => DeclarationElement.AmbientDeclaration(AmbientDeclaration.ModuleDeclaration(m)))
           
         // By default take first and skip others        
-        | _ =>  [typeAndNameGroup.First()]
+        | _ => [DeclarationElement.AmbientDeclaration(ambientGroup.First())]
         }
       // By default take first and skip others        
-      | _ =>  [typeAndNameGroup.First()]
+      | _ => [typeAndNameGroup.First()]
       }
     }
         
@@ -126,18 +138,11 @@ namespace NemerleWeb
     {
       def name = ast.First().Name;
       
-      def typeParameters = ast
-        .SelectMany(x => x.TypeParameters)
-        .Distinct()
-        .NToList();
-      
-      def extends = ast
-        .SelectMany(x => x.Extends)
-        .Distinct()
-        .NToList();
+      def typeParameters = ast.SelectMany(x => x.TypeParameters).Distinct().NToList();      
+      def extends = ast.SelectMany(x => x.Extends).Distinct().NToList();
       
       def members = ast
-        .SelectMany(x => x.Type.Members)
+        .SelectMany(x => x.Type.Members.SelectMany(AnalyzeScriptObject))
         .Distinct()
         .NToList();
       
@@ -146,7 +151,101 @@ namespace NemerleWeb
       yield InterfaceDeclaration(name, typeParameters, extends, @type)
     }
     
+    private AnalyzeScriptObject(obj : ScriptObject) : IEnumerable[ScriptObject]
+    {
+      | ScriptObject.Call(value) => 
+        GenerateOverloads(value).Select(ScriptObject.Call)
+    
+      | ScriptObject.Construct(value) =>
+        GenerateOverloads(value).Select(ScriptObject.Construct)
+        
+      | ScriptObject.Method(value) =>
+        GenerateOverloads(value.Signature)
+        .Select(sig => ScriptObject.Method(Method(value.Name, value.Optional, sig)))
+      
+      | ScriptObject.Index
+      | ScriptObject.Property
+      | _ => [obj]
+    }
+    
+    private AnalyzeСlass(ast : IEnumerable[AmbientClassDeclaration]) : IEnumerable[AmbientClassDeclaration]
+    {
+      def name = ast.First().Name;
+      
+      def typeParameters = ast
+        .SelectMany(x => x.TypeParameters)
+        .Distinct()
+        .NToList();
+      
+      // Extends can be only once
+      def firstExtends = ast.FirstOrDefault(c => c.Heritage.Base.IsSome);
+      def firstExtends = if (firstExtends != null) firstExtends.Heritage.Base else None();      
+      
+      // Implements is not limited
+      def @implements = ast
+        .SelectMany(x => x.Heritage.Interfaces)
+        .Distinct()
+        .NToList();
+      
+      def members = ast
+        .SelectMany(x => x.Members.SelectMany(AnalyzeClassElement))
+        .Distinct()
+        .NToList();
+      
+      yield AmbientClassDeclaration(
+        name,
+        typeParameters,
+        ClassHeritage(firstExtends, @implements),
+        members);
+    }
+    
+    private AnalyzeClassElement(elem : AmbientClassBodyElement) : IEnumerable[AmbientClassBodyElement]
+    {
+      | AmbientClassBodyElement.Constructor(parms) => 
+        GenerateOverloads(CallSignature([], parms, None()))
+        .Select(sig => AmbientClassBodyElement.Constructor(sig.Parameters))
+    
+      | AmbientClassBodyElement.Method(name, signature, access, @static) =>
+        GenerateOverloads(signature)
+          .Select(sig => AmbientClassBodyElement.Method(name, sig, access, @static))
+        
+      | AmbientClassBodyElement.Index
+      | AmbientClassBodyElement.Property
+      | _ => [elem]
+    }
+    
+    private AnalyzeEnum(ast : IEnumerable[AmbientEnumDeclaration]) : IEnumerable[AmbientEnumDeclaration]
+    {
+      def name = ast.First().Name;
+      
+      def members = ast
+        .SelectMany(x => x.Members)
+        .Distinct()
+        .NToList();
+      
+      yield AmbientEnumDeclaration(name, members)
+    }
+    
+    /// <summary>
+    /// Select first and generate overloads
+    /// </summary>
+    private AnalyzeVariable(ast : IEnumerable[AmbientVariableDeclaration]) : IEnumerable[AmbientVariableDeclaration]
+    {
+      def first = ast.First();
+      def name = first.Name;
      
+      match (first.Type)
+      {
+      | Some(Object(value)) =>
+        def members = value.SelectMany(v => AnalyzeScriptObject(v)).Distinct().NToList();
+        [AmbientVariableDeclaration(
+          name,
+          Some(ScriptType.Object(members)))]
+        
+      | _ => [AmbientVariableDeclaration(name, first.Type)]
+      }
+    }
+         
     /// <summary>
     /// Select all dictinct function overloads
     /// </summary>
@@ -155,185 +254,256 @@ namespace NemerleWeb
       def name = ast.First().Name;
       
       def ret = ast
-        .Select(f => AmbientFunctionDeclaration(name, f.Signature));
-        //.Distinct();
-      // ;
-        
-      ret
-    }
-    
-   #if A
-  
-    
-    private AnalyzeClass(ast : IEnumerable[TSGlobal.Class]) : IEnumerable[TSGlobal]
-    {
-      def name = ast.First().Name;
-      // Extends can be only once
-      def firstExtends = ast.FirstOrDefault(c => c.Extends.IsSome);
-      def extends = if(firstExtends != null) firstExtends.Extends else None();
-      // Implements is not limited
-      def @implements = ast.SelectMany(c => c.Implements).Distinct().NToList();
-      
-      def members = ast
-        .SelectMany(a => a.Members)
-        .Distinct(TSClassMemberEqualityComparer())
-        .NToList();
-      
-      def ret = TSGlobal.Class(name, extends, @implements, members);
-      [ret]
-    }
-    
-
-    private AnalyzeTSObject(obj : TSObject) : IEnumerable[TSObject]
-    {
-      | Call as c =>
-        def calls = AnalyzeOverloads(c.Params)
-          .Select(p => TSObject.Call(p, c.ReturnType));
-        foreach(res in calls) yield res;
-      
-      | Construct as c =>
-        def constructs = AnalyzeOverloads(c.Params)
-          .Select(p => TSObject.Construct(p, c.Type));
-        foreach(res in constructs) yield res;
-      
-      | Function as f => 
-        def funcs = AnalyzeOverloads(f.Params)
-          .Select(p => TSObject.Function(f.Name, f.Optional, p, f.ReturnType));
-        foreach(res in funcs) yield res;
-        
-      | Index
-      | Property => yield obj
-    }
-    
-    private AnalyzeModule(ast : IEnumerable[TSGlobal.Module]) : IEnumerable[TSGlobal]
-    {
-      def name = ast.First().Name;
-      def members = ast.SelectMany(a => AnalyzeTSAst(a.Members)).NToList();
-      
-      def ret = TSGlobal.Module(name, members);
-      [ret]
-    }
-    
-    private AnalyzeEnum(ast : IEnumerable[TSGlobal.Enum]) : IEnumerable[TSGlobal]
-    {
-      def name = ast.First().Name;
-      def elements = ast.SelectMany(a => a.Elements).NToList();
-      
-      def ret = TSGlobal.Enum(name, elements);
-      [ret]
-    }
-    
-    /// <summary>
-    /// Generate overloads
-    /// </summary>
-    private AnalyzeFunction(ast : IEnumerable[TSGlobal.Function]) : IEnumerable[TSGlobal]
-    {
-      def name = ast.First().Name;
-      
-      def ret = ast
         .SelectMany(f =>
-          AnalyzeOverloads(f.Params).Select(p => TSGlobal.Function(name, p, f.ReturnType)))
-        .Distinct(TSGlobalFunctionEqualityComparer());
+          GenerateOverloads(f.Signature).Select(s => AmbientFunctionDeclaration(name, s)))
+        .Distinct();
         
       ret
+    }
+    
+    private AnalyzeModule(ast : IEnumerable[AmbientModuleDeclaration]) : IEnumerable[AmbientModuleDeclaration]
+    {
+      def name = ast.First().Name;
+      def members = ast.First().Members;
+      //ast
+        //.SelectMany(a => a.Members)
+        //.NToList();
+      
+      def ret = AmbientModuleDeclaration(name, members);
+      [ret];
+    }
+    
+    #region Function overloads
+    
+    private GenerateOverloads(signature : CallSignature) : IEnumerable[CallSignature]
+    {
+      def res = GenerateLambdaOverloads(signature);
+      def res = res.SelectMany(s => GenerateOverloadsImpl(s));
+      
+      res
+    }
+    
+    private GenerateOverloadsImpl(signature : CallSignature) : IEnumerable[CallSignature]
+    {
+      GenerateOverloadsList(
+        signature.TypeParameters,
+        signature.Parameters,
+        signature.ReturnType)
     }
     
     /// <summary>
     /// Create all possible overloads according to the rules
-    /// Go through all parameters and start generating overloads if needed
-    /// <note>This method removes all elements from the list.</note>
+    /// Go through all parameters and start generating overloads if needed    
     /// </summary>
-    private AnalyzeOverloadsList(parms : List[TSParam]) : IEnumerable[list[TSParam]]
+    private GenerateOverloadsList(
+      typeParams : list[ScriptTypeParameter],
+      parms : list[ScriptParameter],
+      returnType : option[ScriptType]) : IEnumerable[CallSignature]
     {
-      if(parms.Count == 0)
-        yield []
-      else
-        match(parms.Last())
+      when(!(parms is []))
+      {
+        def revParms = parms.Reverse();
+        match(revParms.Head)
         {
-        // Required
-        // Generate parameters and stop
-        | TSParam.Required
-        | TSParam.Option(_, false, _, _) =>
-          yield parms.NToList();
+        | Optional(_, _, _, true) 
+        | Rest =>
+          def returnTypeParametersUsed =
+            if(returnType is Some(r))
+              GetScriptTypeTypes(r)
+            else
+              [];
         
-        // Option or Rest
-        // Generate all parameters, process all without last parameter
-        | TSParam.Option(_, true, _, _)
-        | TSParam.Rest =>
-          yield parms.NToList();
+          // Process all without last parameter
+          def newParams = revParms.Tail;
           
-          // Remove last param
-          parms.RemoveAt(parms.Count - 1);
-          foreach(res in AnalyzeOverloadsList(parms))
-            yield res;
+          // Collect all types that are used
+          def newParamsTypes = CollectParametersTypes(newParams)
+            .Concat(returnTypeParametersUsed)
+            .Distinct();
+          
+          // Only used types from type parameters are needed
+          def newTypeParams = typeParams.Filter(tyParam => newParamsTypes.Contains(tyParam.Name));
+          
+          foreach(res in GenerateOverloadsList(newTypeParams, revParms.Tail, returnType)) yield res;
+          
+        | _ => ()
         }
+      }
+      
+      // Generate current parameters and stop
+      yield CallSignature(typeParams, parms, returnType);
     }
     
     /// <summary>
-    /// Analyze lambda arguments and create Action/Func overload if return type is any.
+    /// Generate lambda arguments and create additional ?->void overload if return type is any.
     /// </summary>
-    private AnalyzeLambdaOverloads(parms : List[TSParam]) : IEnumerable[list[TSParam]]
-    {
-      if(parms.Count == 0)
-        []
-      else
-        AnalyzeLambdaOverloadsImpl(parms, 0)
-    }
-    
-    private AnalyzeLambdaOverloadsImpl(parms : List[TSParam], index : int) : IEnumerable[list[TSParam]]
-    {
-      if(index < parms.Count) 
+    private GenerateLambdaOverloads(signature : CallSignature) : IEnumerable[CallSignature]
+    { 
+      // For any lambda parameter return any type, return list of two possibilities:
+      // one with any return type, second with void return type.
+      def process(x)
       {
-        def parmsOverload = 
-          match(parms[index])
-          {
-          | TSParam.Required(_, Some(TSType.Lambda(_, TSType.Any) as l), _) as p =>
-            AnalyzeLambdaOverloadsImplGenerate(
-              parms,
-              index,
-              () => TSParam.Required(p.Name, Some(TSType.Lambda(l.Params, TSType.Void())), p.Access))
-          | TSParam.Option(_, _, Some(TSType.Lambda(_, TSType.Any) as l ), _) as p =>
-            AnalyzeLambdaOverloadsImplGenerate(
-              parms,
-              index,
-              () => TSParam.Option(p.Name, p.Optional, Some(TSType.Lambda(l.Params, TSType.Void())), p.Access))
-          | TSParam.Rest(_, TSType.Array(TSType.Lambda(_, TSType.Any) as l, rank)) as p =>
-            AnalyzeLambdaOverloadsImplGenerate(
-              parms,
-              index,
-              () => TSParam.Rest(p.Name, TSType.Array(TSType.Lambda(l.Params, TSType.Void()), rank)))
-          | _ =>
-            AnalyzeLambdaOverloadsImpl(parms, index + 1)
-          };
+        | ScriptParameter.Required(
+            RequiredParameter.Regular(
+              _,
+              Some(
+                ScriptType.Function(
+                  ScriptTypeCallSignature(typ, parms, ScriptType.Any()))), _) as p) =>
           
-        foreach(res in parmsOverload) yield res;
-      }
-      else
-        yield parms.NToList();
-    }
-    
-    private AnalyzeLambdaOverloadsImplGenerate(
-      parms : List[TSParam],
-      index : int,
-      f : void -> TSParam) : IEnumerable[list[TSParam]]
-    {
-      // Original parameters
-      foreach(res in AnalyzeLambdaOverloadsImpl(parms, index + 1)) yield res;
-      
-      // New parameters with permutation for lambda parameters
-      def newParms = List(parms);
-      newParms[index] = f();
+          [
+            x,
+            ScriptParameter.Required(
+              RequiredParameter.Regular(
+                p.Name,
+                Some(ScriptType.Function(ScriptTypeCallSignature(typ, parms, ScriptType.Void()))),
+                p.Access))
+          ]
+          
+        | ScriptParameter.Optional(
+              _,
+              Some(ScriptType.Function(ScriptTypeCallSignature(typ, parms, ScriptType.Any()))),
+              _,
+              _) as p =>
+          
+          [
+            x,
+            ScriptParameter.Optional(
+              p.Name,
+              Some(ScriptType.Function(ScriptTypeCallSignature(typ, parms, ScriptType.Void()))),
+              p.Access,
+              p.Optional)
+          ]
         
-      foreach(res in AnalyzeLambdaOverloadsImpl(newParms, index + 1)) yield res;
+        | ScriptParameter.Rest(
+            _,
+            Some(
+              ScriptType.Array(
+                ScriptType.Function(
+                  ScriptTypeCallSignature(typ, parms, ScriptType.Any())), _) as a)) as p =>
+          [
+            x,
+            ScriptParameter.Rest(
+              p.Name,
+              Some(
+                ScriptType.Array(
+                  ScriptType.Function(
+                    ScriptTypeCallSignature(typ, parms, ScriptType.Void())),
+                    a.Rank)))
+          ]
+                
+
+        | ScriptParameter.Rest(
+            _,
+            Some(
+              ScriptType.Ref(
+                "Array",
+                [ScriptType.Function(ScriptTypeCallSignature(typ, parms, ScriptType.Any()))]))) as p =>
+                
+          [
+            x,
+            ScriptParameter.Rest(
+              p.Name,
+              Some(
+                ScriptType.Ref(
+                  "Array",
+                  [ScriptType.Function(
+                    ScriptTypeCallSignature(typ, parms, ScriptType.Void()))])))
+          ]
+              
+        | _ => [x]
+      }
+      
+      def parametersList = GenerateListPermutation(signature.Parameters, process);
+      parametersList.Select(parms => CallSignature(signature.TypeParameters, parms, signature.ReturnType))
     }
     
-    private AnalyzeOverloads(parms : list[TSParam]) : IEnumerable[list[TSParam]]
+    private GenerateListPermutation[T](l : list[T], f : T -> list[T]) : list[list[T]]
+    { 
+      l.Map(f).FoldRight([[]], (m, acc) => m.Map(e => acc.Map(a => e :: a)).Flatten())
+    }
+    
+    #endregion
+    
+    #region Types collection
+    
+    private GetObjectTypes(obj : option[ScriptObject]) : IEnumerable[string]
     {
-      def res = AnalyzeLambdaOverloads(parms.ToList()).ToList();
-      def res = res.SelectMany(parms => AnalyzeOverloadsList(parms.ToList()));
-      res
+      | Some(o) => GetObjectTypes(o)
+      | _ => []
     }
     
-    #endif
+    private GetObjectTypes(obj : ScriptObject) : IEnumerable[string]
+    {
+      | Property(value) => if(value.Type is Some(t)) GetScriptTypeTypes(t) else []
+      | Call(signature) => GetCallSignatureTypes(signature)
+      | Construct(value) => 
+        GetCallSignatureTypes(
+          value.TypeParameters,
+          value.Parameters,
+          GetScriptTypeTypes(value.ReturnType))
+      | Index(value) => GetScriptTypeTypes(value.ReturnType)
+      | Method(value) => GetCallSignatureTypes(value.Signature)
+    }
+    
+    private GetCallSignatureTypes(signature : ScriptTypeCallSignature) : IEnumerable[string]
+    {
+      GetCallSignatureTypes(
+        signature.TypeParameters,
+        signature.Parameters,
+        GetScriptTypeTypes(signature.ReturnType))
+    }
+    
+    private GetCallSignatureTypes(signature : CallSignature) : IEnumerable[string]
+    {
+      GetCallSignatureTypes(
+        signature.TypeParameters,
+        signature.Parameters,
+        GetScriptTypeTypes(signature.ReturnType))
+    }
+    
+    private GetCallSignatureTypes(
+      typeParameters : list[ScriptTypeParameter],
+      parameters : list[ScriptParameter],
+      returnTypes : IEnumerable[string]) : IEnumerable[string]
+    {
+      def paramsTypes = CollectParametersTypes(parameters);          
+      def tyParameters = typeParameters.Select(_.Name);
+        
+      returnTypes.Union(paramsTypes).Except(tyParameters)
+    }
+    
+    private GetScriptTypeTypes(type : option[ScriptType]) : IEnumerable[string]
+    {
+      if(type is Some(t)) GetScriptTypeTypes(t) else []
+    }
+    
+    // Collect types recursively
+    private GetScriptTypeTypes(type : ScriptType) : IEnumerable[string]
+    {
+      | Array(t, _) => GetScriptTypeTypes(t)
+      | Function(signature) => GetCallSignatureTypes(signature)
+      | Object(members) => members.SelectMany(GetObjectTypes)        
+      | Ref(name, tyArgs) => [name].Union(tyArgs.SelectMany(GetScriptTypeTypes))        
+      | _ => []
+    }
+    
+    /// <summary>
+    /// Collects all named types.
+    /// Predefined types are not collected.
+    /// </summary>
+    private CollectParametersTypes(parms : list[ScriptParameter]) : IEnumerable[string]
+    {
+      parms.SelectMany(param =>
+        match(param)
+        {
+        | ScriptParameter.Required(Regular(_, Some(type), _))
+        | ScriptParameter.Optional(_, Some(type), _, _)
+        | ScriptParameter.Rest(_, Some(type)) =>
+          GetScriptTypeTypes(type)
+        | _ => []
+        })
+    }
+    
+    #endregion
   }
 }

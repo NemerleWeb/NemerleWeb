@@ -1129,8 +1129,10 @@ interface Array<T> {
     [n: number]: T;
 }
 declare var Array: {
+    new(arrayLength?: number): any[];
     new <T>(arrayLength: number): T[];
     new <T>(...items: T[]): T[];
+    (arrayLength?: number): any[];
     <T>(arrayLength: number): T[];
     <T>(...items: T[]): T[];
     isArray(arg: any): boolean;
@@ -2491,7 +2493,6 @@ interface Element extends Node, NodeSelector, ElementTraversal {
     setAttributeNS(namespaceURI: string, qualifiedName: string, value: string): void;
     getAttributeNode(name: string): Attr;
     fireEvent(eventName: string, eventObj?: any): boolean;
-    getElementsByTagName(name: string): NodeList;
     getElementsByTagName(name: "a"): NodeListOf<HTMLAnchorElement>;
     getElementsByTagName(name: "abbr"): NodeListOf<HTMLElement>;
     getElementsByTagName(name: "address"): NodeListOf<HTMLElement>;
@@ -2595,6 +2596,7 @@ interface Element extends Node, NodeSelector, ElementTraversal {
     getElementsByTagName(name: "var"): NodeListOf<HTMLElement>;
     getElementsByTagName(name: "video"): NodeListOf<HTMLVideoElement>;
     getElementsByTagName(name: "wbr"): NodeListOf<HTMLElement>;
+    getElementsByTagName(name: string): NodeList;
     getClientRects(): ClientRectList;
     setAttributeNode(newAttr: Attr): Attr;
     removeAttributeNode(oldAttr: Attr): Attr;
@@ -5633,11 +5635,6 @@ interface Document extends Node, NodeSelector, MSEventAttachmentTarget, Document
       * Creates an instance of the element for the specified tag.
       * @param tagName The name of an element.
       */
-    createElement(tagName: string): HTMLElement;
-    /**
-      * Creates an instance of the element for the specified tag.
-      * @param tagName The name of an element.
-      */
     createElement(tagName: "a"): HTMLAnchorElement;
     /**
       * Creates an instance of the element for the specified tag.
@@ -6149,7 +6146,12 @@ interface Document extends Node, NodeSelector, MSEventAttachmentTarget, Document
       * @param tagName The name of an element.
       */
     createElement(tagName: "wbr"): HTMLElement;
-
+    /**
+      * Creates an instance of the element for the specified tag.
+      * @param tagName The name of an element.
+      */
+    createElement(tagName: string): HTMLElement;
+    
     /**
       * Removes mouse capture from the object in the current document.
       */
@@ -6224,11 +6226,6 @@ interface Document extends Node, NodeSelector, MSEventAttachmentTarget, Document
       */
     createComment(data: string): Comment;
 
-    /**
-      * Retrieves a collection of objects based on the specified element name.
-      * @param name Specifies the name of an element.
-      */
-    getElementsByTagName(name: string): NodeList;
     /**
       * Retrieves a collection of objects based on the specified element name.
       * @param name Specifies the name of an element.
@@ -6748,7 +6745,12 @@ interface Document extends Node, NodeSelector, MSEventAttachmentTarget, Document
       * @param name Specifies the name of an element.
       */
     getElementsByTagName(name: "wbr"): NodeListOf<HTMLElement>;
-
+    /**
+      * Retrieves a collection of objects based on the specified element name.
+      * @param name Specifies the name of an element.
+      */
+    getElementsByTagName(name: string): NodeList;
+    
     /**
       * Creates a new document.
       */
@@ -6832,7 +6834,7 @@ interface Document extends Node, NodeSelector, MSEventAttachmentTarget, Document
       *        false (false)
       *           Register the event handler for the bubbling phase. 
       */
-    addEventListener(type: string, listener: EventListener, useCapture?: boolean): void;
+    addEventListener(type: "DOMContentLoaded", listener: (ev: Event) => any, useCapture?: boolean): void;
     /**
       * Registers an event handler for the specified event type. 
       * @param type The type of event type to register. 
@@ -6843,7 +6845,7 @@ interface Document extends Node, NodeSelector, MSEventAttachmentTarget, Document
       *        false (false)
       *           Register the event handler for the bubbling phase. 
       */
-    addEventListener(type: "DOMContentLoaded", listener: (ev: Event) => any, useCapture?: boolean): void;
+    addEventListener(type: string, listener: EventListener, useCapture?: boolean): void;
 }
 
 declare var Document: {
@@ -8542,8 +8544,8 @@ interface HTMLCanvasElement extends HTMLElement {
       * Returns an object that provides methods and properties for drawing and manipulating images and graphics on a canvas element in a document. A context object includes information about colors, line widths, fonts, and other graphic parameters that can be drawn on a canvas.
       * @param contextId The identifier (ID) of the type of canvas to create. Internet Explorer 9 and Internet Explorer 10 support only a 2-D context using canvas.getContext("2d"); IE11 Preview also supports 3-D or WebGL context using canvas.getContext("experimental-webgl");
       */
-    getContext(contextId: string, ...args: any[]): any;
     getContext(contextId: "2d"): CanvasRenderingContext2D;
+    getContext(contextId: string, ...args: any[]): any;
 }
 declare var HTMLCanvasElement: {
     prototype: HTMLCanvasElement;

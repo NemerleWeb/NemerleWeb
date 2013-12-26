@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NemerleWeb;
 
-namespace NemerleWeb.NemerleWeb.Website
+namespace NemerleWeb.Website
 {  
   [Unit]
   public class MainPage

@@ -3,7 +3,7 @@ using NemerleWeb.Tests;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace NemerleWeb.Samples
+namespace NemerleWeb.Website.Samples
 {
   [Unit]
   partial class NameListCSharpPage

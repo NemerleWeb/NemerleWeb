@@ -93,7 +93,7 @@ namespace NemerleWeb
           {
           | (Parm(expr = TExpr.Literal(Literal.String(model))),
               Parm(expr = TExpr.Literal(Literal.String(view)))) =>
-            JSAst.Code($"nweb.utils.getTemplateName(this.$model, '$view')")
+            JSAst.Code($"nweb.utils.getTemplateName($(JSClass.Self).$model, '$view')")
           | _ => Message.FatalError("Invalid GetTemplateName call, use 'name' macro")
           }
         | Call(MethodRef(obj = o, meth = meth), parms, _) =>

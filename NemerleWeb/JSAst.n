@@ -817,7 +817,7 @@ $(indent)}
                 Val = "";
             }
             public override Write(_ = "" : string) : string {
-                $<#"Not implemented: $Val "#>
+                $<#/* Not implemented: $Val */#>
             }
         }
         
@@ -825,7 +825,7 @@ $(indent)}
           {
             public override Write(_ = "" : string) : string
             {
-              <# Error in the code #>
+              <# /*Error in the code*/ #>
             }
           }
         
