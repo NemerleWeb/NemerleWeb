@@ -34,9 +34,8 @@ namespace NemerleWeb
         | "Flatten" => 
           Some(
             JSAst.Call(
-              JSAst.MethodRef(
-                JSAst.FieldRef(JSAst.GlobalRef("Array"), "concat"), "apply", None()),
-            [JSAst.Array([]), obj]))
+              JSAst.StaticMethodRef("[].concat", "apply", None()),
+              [JSAst.Array([]), obj]))
         | "ToList" => Some(obj)
         | _ => None()
         }
