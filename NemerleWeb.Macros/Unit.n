@@ -41,6 +41,8 @@ namespace NemerleWeb
   
   module UnitImpl
   { 
+    _scriptsDirectory = "Scripts";
+    
     public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);
@@ -64,6 +66,8 @@ namespace NemerleWeb
       JSClass.ObjectType = <[ ttype: System.Object ]>;
         
       CreateResourceController(tb, typer);
+      
+      assert2(false);
             
       tb.MethodBeforeStage3 += (_, e) => {
         def typer = e.Typer;
@@ -72,7 +76,7 @@ namespace NemerleWeb
           def methodBuilder = typer.CurrentMethodBuilder;
           def shouldReturn = !(methodBuilder.Header.ReturnType is FixedType.Void()) && !methodBuilder.IsConstructor;
           def ast = JSAstBuilder.BuildJSAst(body, shouldReturn, methodBuilder.Header);
-          JSAstCache.Add(tb, typer.CurrentFunction, ast);          
+          JSAstCache.Add(tb, typer.CurrentFunction, ast);
           AddMainData(tb, JSClass(tb, "  ", typer).Write());
         | _ => ()
         }
@@ -278,12 +282,20 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
     
     public AddMainData(tb : TypeBuilder, data : string) : void
     {
-      def ctor = GetNWebDataConstructor(tb.Manager.Options.OutputFileName, tb.Manager.CoreEnv);
+      when(!Directory.Exists(_scriptsDirectory))
+        _ = Directory.CreateDirectory(_scriptsDirectory);
+              
+      def filename = Path.Combine(_scriptsDirectory, JSClass.GetProperName(tb) + ".js");
+      File.WriteAllText(filename, data);      
+      tb.Manager.Options.EmbeddedResources ::= filename;
+      
+      /*def ctor = GetNWebDataConstructor(tb.Manager.Options.OutputFileName, tb.Manager.CoreEnv);
       
       ctor.Body = <[ 
         $(ctor.Body);
         AddUnitMainDefinition($(JSClass.GetProperName(tb) : string), $(data : string));
       ]>;
+      */
     }
     
     public AddLambdasData(tb : TypeBuilder, data : string) : void

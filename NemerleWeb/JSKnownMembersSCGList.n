@@ -48,14 +48,14 @@ namespace NemerleWeb
         | "Add" => Some(left.JSMethodCall("push", parms))
         | "Remove" => Some(left.JSMethodCall("remove", parms))
         | _ => None()
-        }
-      | [arg1, arg2] =>
-        match (member.Name)
+        }      
+      | items => 
+        match(member.Name, items)
         {
-        | "Insert" => Some(left.JSMethodCall("splice", [arg1, JSAst.Literal(JSLiteral.Integer(0)), arg2]))
+        | ("Insert", [arg1, arg2]) => Some(left.JSMethodCall("splice", [arg1, JSAst.Literal(JSLiteral.Integer(0)), arg2]))
+        | ("Add", _) => Some(left.JSMethodCall("push", [JSAst.Tuple(parms)]))
         | _ => None()
         }
-      | _ => None()
       }
     }
      

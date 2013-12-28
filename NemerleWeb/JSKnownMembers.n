@@ -76,8 +76,10 @@ namespace NemerleWeb
       def callAst =
         match (call)
         {
-        | Call(MethodRef(obj = Call(MethodRef(meth = serverMeth, obj = obj), _, _), meth = meth), parms, _)
-          when serverMeth.Name == "get_server" && (obj is TExpr.This || obj is TExpr.FieldMember) =>
+        | Call(MethodRef(obj = Call(MethodRef(TExpr.This, serverMeth, _, _), _, _), meth = meth), parms, _)
+        | Call(MethodRef(obj = Call(MethodRef(TExpr.FieldMember, serverMeth, _, _), _, _), meth = meth), parms, _)
+        | Call(MethodRef(obj = Call(MethodRef(TExpr.LocalRef(decl), serverMeth, _, _), _, _), meth = meth), parms, _) 
+          when serverMeth.Name == "get_server" && decl.Name == "_N_closurised_this_ptr" =>
             def parameters =
               if (parms.Length > 0) parms.Zip(meth.GetParameters()).Take(parms.Length - 1).Map((cp, mp) => (mp.name, builder'(cp.expr)))
               else [];
@@ -118,8 +120,13 @@ namespace NemerleWeb
           else
             JSAst.Void()
         | Call(Delayed, _, _) => JSAst.Void()
-        | Call(LocalFunRef(decl, _), parms, _isTail) => JSAst.Call(JSAst.LocalRef(decl.Name, None()), parms.Map(paramBuilder))
-        | Call(s, _, _) => Message.Error(s.Location, $"Unsupported call to $s"); JSAst.Void()          
+        | Call(LocalFunRef(decl, _), parms, _isTail)
+        | Call(LocalRef(decl), parms, _isTail) => JSAst.Call(JSAst.LocalRef(decl.Name, None()), parms.Map(paramBuilder))
+        | Call(Call(LocalRef(decl), parms1, _), parms2, _) => 
+          JSAst.Call(JSAst.Call(JSAst.LocalRef(decl.Name, None()), parms1.Map(paramBuilder)), parms2.Map(paramBuilder));
+        | Call(s, _, _) => 
+          assert2(false);
+          Message.Error(s.Location, $"Unsupported call to $s"); JSAst.Void()          
         }
       
       // Unpack ref/out
@@ -297,6 +304,7 @@ namespace NemerleWeb
                                     typeInfo.GetSuperTypes().Any(t => t.TryRequire(JSClass.IPageType)) ||
                                     member.Name == "apply" ||
                                     member.Name == "apply_void")) {
+          assert2(false);
           Message.Error(member.Location, 
                         $"Invalid method $(member.Name) in $(TypeName(typeInfo)), params: ..$parms not implemented in JS");
         }
