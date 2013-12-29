@@ -31,9 +31,7 @@ class Test : ITest
 
 class Program
 {
-    static void Main()
-    {
-    }
+    static void Main() { }
 }#>;
     }
          
@@ -69,7 +67,7 @@ Members count: $(res.Members.Length)
             <span class="output-text">$ParserOutput</span> 
           </div>
           <div class="parser-input">
-            <textarea rows="6" cols="50" value="$ParserInput"/>
+            <textarea rows="20" cols="80" value="$ParserInput"/>
           </div>
         </div>
       #>

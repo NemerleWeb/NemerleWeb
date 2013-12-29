@@ -53,7 +53,7 @@ namespace NemerleWeb.Website.Samples
             <span class="output-text">$ParserOutput</span> 
           </div>
           <div class="parser-input">
-            <textarea rows="6" cols="50" value="$ParserInput"/>
+            <textarea rows="10" cols="50" value="$ParserInput"/>
           </div>
         </div>
       #>
