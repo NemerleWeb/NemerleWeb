@@ -22,26 +22,26 @@ using TExpr = Nemerle.Compiler.Typedtree.TExpr;
 namespace NemerleWeb
 {
   [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
-  macro Unit(tb : TypeBuilder)
+  public macro Unit(tb : TypeBuilder)
   {
     UnitImpl.DoTransformBeforeInheritance(tb, Macros.ImplicitCTX())
   }
   
   [MacroUsage(MacroPhase.BeforeTypedMembers, MacroTargets.Class)]
-  macro Unit(tb : TypeBuilder) 
+  public macro Unit(tb : TypeBuilder) 
   {
     UnitImpl.DoTransformBeforeTypedMembers(tb, Macros.ImplicitCTX())
   }
   
   [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Class)]
-  macro Unit(tb : TypeBuilder) 
+  public macro Unit(tb : TypeBuilder) 
   {
     UnitImpl.DoTransform(tb, Macros.ImplicitCTX())
   }
   
   module UnitImpl
   { 
-    _scriptsDirectory = "Scripts";
+    _scriptsDirectory = Path.Combine("Scripts", "nweb");
     
     public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
     {
@@ -53,7 +53,7 @@ namespace NemerleWeb
       def superTypes = tb.GetDirectSuperTypes();
       
       unless (superTypes != null && superTypes.Exists(t => t.Equals(vmInterface)))
-        tb.AddImplementedInterface(<[ NemerleWeb.IPage ]>);      
+        tb.AddImplementedInterface(<[ NemerleWeb.IPage ]>);                      
     }
      
     public DoTransformBeforeTypedMembers(tb : TypeBuilder, typer : Typer) : void
@@ -67,20 +67,43 @@ namespace NemerleWeb
         
       CreateResourceController(tb, typer);
       
-      assert2(false);
-            
-      tb.MethodBeforeStage3 += (_, e) => {
-        def typer = e.Typer;
-        match(typer.CurrentFunction.body) {
-        | FunBody.Typed(body) =>
+      def translateMethod(typer) 
+      {
+        match(typer.CurrentFunction.body) 
+        {
+        | FunBody.Typed(body) =>       
           def methodBuilder = typer.CurrentMethodBuilder;
+          Message.Hint($"translating $(tb.FullName).$(methodBuilder.Name)");
           def shouldReturn = !(methodBuilder.Header.ReturnType is FixedType.Void()) && !methodBuilder.IsConstructor;
           def ast = JSAstBuilder.BuildJSAst(body, shouldReturn, methodBuilder.Header);
           JSAstCache.Add(tb, typer.CurrentFunction, ast);
-          AddMainData(tb, JSClass(tb, "  ", typer).Write());
         | _ => ()
         }
-      };
+      }
+      
+      def getAllNestedTypes(tb) 
+      {
+        tb.GetNestedTypes()
+          .OfType.[TypeBuilder]()
+          .Where(t => !t.Name.StartsWith("_N_"))
+          .SelectMany(getAllNestedTypes);
+      }
+      
+      tb.MethodBeforeStage3 += (_, e) => translateMethod(e.Typer);
+      
+      foreach(nestedType in getAllNestedTypes(tb))       
+      {
+        when(nestedType != null)
+          nestedType.MethodBeforeStage3 += (_, e) => translateMethod(e.Typer);
+          
+        nestedType.DoBeforeFinalization(() => {
+          AddMainData(tb, JSClass(nestedType, "  ", typer).Write());
+        });
+      }
+      
+      tb.DoBeforeFinalization(() => {
+          AddMainData(tb, JSClass(tb, "  ", typer).Write());
+      });
     }
     
     static mutable collectedJSApiRoots : bool = false;
@@ -219,15 +242,7 @@ namespace NemerleWeb
         def server = tb.DefineNestedType(<[ decl: public class Server {} ]>);
         server.HasBeenUsed = true;
         server.Compile();
-      }
-      
-      tb.Manager.TypeTreeBuildFinish += _ => {
-          def lambdas = tb.DeclaredNestedTypes
-                          .Where(t => t.Name.StartsWith("_N__N_"))
-                          .Select(t => JSClass(t, "  ", typer).Write());
-          def lambdas = $"..$(lambdas; Environment.NewLine)".Replace("{{{SignalR}}}", "");
-          AddLambdasData(tb, lambdas);
-      };
+      }      
     }
 
     private MscorlibGuid = "BED7F4EA-1A96-11d2-8F08-00A0C9A6186D";

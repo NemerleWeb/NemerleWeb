@@ -19,3 +19,11 @@ packages
 /PSTools/ProjectTemplate.zip
 /PSTools/Installer
 /NemerleWeb.Website/Installer
+
+NemerleWeb.Website/Scripts/nweb/*.js
+NemerleWeb.RSDN/Scripts/nweb/*.js
+peg-parser/Calculator/Scripts/nweb/*.js
+peg-parser/CSharpParser/Scripts/nweb/*.js
+peg-parser/Json/Nemerle.Json/Scripts/nweb/*.js
+peg-parser/JSParser/Scripts/nweb/*.js
+peg-parser/Nemerle.Peg/Scripts/nweb/*.js

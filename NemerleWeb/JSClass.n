@@ -134,8 +134,8 @@ namespace NemerleWeb
         get
         {
           def nested = ClassType.DeclaredNestedTypes
-                                .Where(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server
-                                .Where(c => !c.Name.StartsWith("_N__N_")) //Not generated class
+                                .Where(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server                                
+                                .Where(c => !c.Name.StartsWith("_N_")) //Not generated class
                                 .Select(c => JSClass(c, Indent, Typer));
           nested
         }
@@ -169,7 +169,7 @@ namespace NemerleWeb
         def methods = GetMethods(bodyIndent, parentPtr, true);
         def definedMethods = GetDefinedMethods(bodyIndent, parentPtr, true);
         def staticMethods = GetStaticMethods(Indent);
-        def nestedClassesString = GenerateNestedClasses();
+        //def nestedClassesString = GenerateNestedClasses();
         
         // This is needed to make labmda object behave as regular function
         def returning = match(ClassType.BaseType?.Name)
@@ -180,7 +180,6 @@ namespace NemerleWeb
         };
 
  $<#
-$nestedClassesString
 $(Indent)var $properTypeName$$ctor = {};
 $constructorsBody
 $(Indent)function $properTypeName() {
@@ -498,7 +497,14 @@ $(indent)}#>
         match(JSAstCache.Get(ClassType, meth.Header))
         {
         | Some(ast) => ast.Write(indent)
-        | None => "/* No translation found */"
+        | None => 
+          if(meth.IsAbstract) ""
+          else 
+          {
+            Message.Hint($"No JSAst found for $(meth.Name) from $(meth.DeclaringType.Name)");
+            assert2(false);
+            "/* No translation found */"
+          }
         }
       }
       
@@ -563,9 +569,11 @@ $(indent)}#>
         methods.Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
                .Where(m => !m.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
                .Where(m => !m.IsConstructor)
+               .Where(m => !m.IsAbstract)
                .Where(m => !pageMethods.Contains(m.Name))
                .Where(m => m.Name != "View")
                .Where(m => !(m.Name.StartsWith("_N__") && m.Name.EndsWith("____")))
+               .Where(m => !(m.Name.StartsWith("_N_")))
       }
       
       private static DefinedSuffix = "$$";
