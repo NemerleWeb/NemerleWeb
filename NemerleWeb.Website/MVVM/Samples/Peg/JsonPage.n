@@ -15,6 +15,14 @@ namespace NemerleWeb.Website.Samples
     public this()
     {
       _parser = Nemerle.Json.JsonParser();
+      ParserInput = <#{
+  "a" : 1,
+  "b" : [1, 2],
+  "c" : {
+    "x" : 1,
+    "y" : "z"
+  }
+}#>;
     }
          
     ParserOutput : string

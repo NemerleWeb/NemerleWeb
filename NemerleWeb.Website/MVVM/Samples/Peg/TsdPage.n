@@ -15,6 +15,17 @@ namespace NemerleWeb.Website.Samples
     public this()
     {
       _parser = TSParserPeg.TSDeclarationParser();
+      ParserInput = <#interface Window {
+    setTimeout(f : Function) : void;
+}
+
+declare class Testing {
+  f() : void; 
+}
+
+declare module Module {
+   export class Exported {}
+}#>;
     }
          
     ParserOutput : string

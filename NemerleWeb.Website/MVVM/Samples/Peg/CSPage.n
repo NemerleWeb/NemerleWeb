@@ -15,6 +15,26 @@ namespace NemerleWeb.Website.Samples
     public this()
     {
       _parser = CSharpParser.Parser();
+      ParserInput = <#using System;
+using System.Collections.Generic;
+using System.Linq;
+
+interface ITest
+{
+    void F();
+}
+
+class Test : ITest
+{
+    public void F() { }
+}
+
+class Program
+{
+    static void Main()
+    {
+    }
+}#>;
     }
          
     ParserOutput : string

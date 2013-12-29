@@ -45,11 +45,11 @@ namespace NemerleWeb.Website.Samples
     LoadingAndSaving : LoadingAndSavingPage { get; set; }
     SinglePageApps : SPAPage { get; set; }
     
+    PegCS         : CSPage { get; set; }
     PegCalculator : CalculatorPage { get; set; }
     PegJson       : JsonPage { get; set; }
     PegJS         : JSPage { get; set; }
-    PegTsd        : TsdPage { get; set; }
-    PegCS         : CSPage { get; set; }
+    PegTsd        : TsdPage { get; set; }    
     
     Sources : List[string * string] { get; set; }
     ThisPageSource : string { get; set; }
@@ -65,11 +65,11 @@ namespace NemerleWeb.Website.Samples
       ListsAndCollections = ListsAndCollectionsPage();
       LoadingAndSaving = LoadingAndSavingPage();
       SinglePageApps = SPAPage();
+      PegCS         = CSPage(); 
       PegCalculator = CalculatorPage();
       PegJson       = JsonPage();
       PegJS         = JSPage();
       PegTsd        = TsdPage();
-      PegCS         = CSPage();      
             
       Samples = 
       [
@@ -90,6 +90,15 @@ namespace NemerleWeb.Website.Samples
       
       PegSamples =
       [
+        Sample(
+          "C#",
+          [
+            "MVVM/Samples/Peg/CSPage.n",
+            "MVVM/Samples/CSharpParser/Parser.n",
+          ],
+          "",
+          PegCS),
+        
         Sample(
           "Calculator", 
           [
@@ -128,15 +137,6 @@ namespace NemerleWeb.Website.Samples
           ],
           "",
           PegTsd),
-          
-        Sample(
-          "C#",
-          [
-            "MVVM/Samples/Peg/CSPage.n",
-            "MVVM/Samples/CSharpParser/Parser.n",
-          ],
-          "",
-          PegCS),
       ].ToList();
                        
       SelectedSample = Samples[2];
