@@ -44,25 +44,34 @@ namespace NemerleWeb
     public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);
+      unless(typer.Manager.IsIntelliSenseMode)
+      {
+        AddPageBaseMethods(tb, typer);
       
-      AddPageBaseMethods(tb, typer);
-      
-      def vmInterface = <[ ttype: NemerleWeb.IPage ]>;
-      def superTypes = tb.GetDirectSuperTypes();
-      
-      unless (superTypes != null && superTypes.Exists(t => t.Equals(vmInterface)))
-        tb.AddImplementedInterface(<[ NemerleWeb.IPage ]>);
+        def vmInterface = <[ ttype: NemerleWeb.IPage ]>;
+        def superTypes = tb.GetDirectSuperTypes();
+        
+        unless (superTypes != null && superTypes.Exists(t => t.Equals(vmInterface)))
+          tb.AddImplementedInterface(<[ NemerleWeb.IPage ]>);
+      }
     }
     
     public DoTransformBeforeTypedMembers(tb : TypeBuilder, typer : Typer) : void
     {
-      CreateResourceController(tb, typer);
+      unless(typer.Manager.IsIntelliSenseMode)
+        CreateResourceController(tb, typer);
     }
     
     static mutable collectedJSApiRoots : bool = false;
-    
+
     public DoTransform(tb : TypeBuilder, typer : Typer) : void
-    {            
+    {
+      unless(typer.Manager.IsIntelliSenseMode)
+        DoTransformImpl(tb, typer);
+    }
+    
+    public DoTransformImpl(tb : TypeBuilder, typer : Typer) : void
+    {
       Macros.DefineCTX(typer);
       
       // Do not collect JS roots twice

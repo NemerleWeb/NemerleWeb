@@ -29,8 +29,14 @@ namespace NemerleWeb
   {
     internal ToXLinq(typer : Typer, mb : MethodBuilder) : void
     {
+      unless(typer.Manager.IsIntelliSenseMode)
+        ToXLinqImpl(typer, mb);
+    }
+  
+    private ToXLinqImpl(typer : Typer, mb : MethodBuilder) : void
+    {       
       Macros.DefineCTX(typer);
-       
+      
       JSClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
       JSClass.StringType = <[ ttype : System.String ]>;
       JSClass.IPageType = <[ ttype: IPage ]>;
