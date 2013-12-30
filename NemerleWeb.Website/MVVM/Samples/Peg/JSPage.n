@@ -15,6 +15,10 @@ namespace NemerleWeb.Website.Samples
     public this()
     {
       _parser = JSEngine.JSParser();
+      ParserInput = <#var a = 1 + 2 * 3;
+var b = function() { return a; };
+return b;
+#>;
     }
          
     ParserOutput : string

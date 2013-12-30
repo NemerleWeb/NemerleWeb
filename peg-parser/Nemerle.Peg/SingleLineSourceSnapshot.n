@@ -6,7 +6,7 @@ using Nemerle.Collections;
 using Nemerle.Utility;
 using NemerleWeb;
 
-namespace NemerleWeb.Peg
+namespace Nemerle.Peg.Web
 {
   [Unit]
   public class SingleLineSourceSnapshot : SourceSnapshot

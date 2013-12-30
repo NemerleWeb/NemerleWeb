@@ -9,7 +9,7 @@ using Nemerle.Utility;
 using PT = Nemerle.Compiler.Parsetree;
 using TT = Nemerle.Compiler.Typedtree;
 
-namespace NemerleWeb.Peg.AstUtils
+namespace Nemerle.Peg.Web.AstUtils
 {
   // Ensures that AST object contains node that inherits from `nodeTypeName' class
   // and satisfies pattern `nodePattern'.

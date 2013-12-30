@@ -9,7 +9,7 @@ using System;
 using System.Linq;
 using SCG = System.Collections.Generic;
 
-namespace NemerleWeb.Peg
+namespace Nemerle.Peg.Web
 {
   partial internal class RuleCompiler
   {
@@ -21,7 +21,7 @@ namespace NemerleWeb.Peg
     public this(grammarCompiller : GrammarCompiler, ruleToCompile : RuleDefinition, useResult : bool)
     {
       _grammarCompiller = grammarCompiller;
-      _pegLocatedType = FixedType.Class(_grammarCompiller.Typer.Manager.LookupTypeInfo("NemerleWeb.Peg.Located", 0), []);
+      _pegLocatedType = FixedType.Class(_grammarCompiller.Typer.Manager.LookupTypeInfo("Nemerle.Peg.Web.Located", 0), []);
       _useResult = useResult;
       _ruleToCompile = ruleToCompile;
     }

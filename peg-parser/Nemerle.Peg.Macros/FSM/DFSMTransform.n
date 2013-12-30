@@ -6,7 +6,7 @@ using System;
 using System.Console;
 using System.Collections.Generic;
 
-namespace NemerleWeb.Peg
+namespace Nemerle.Peg.Web
 {
   /// <summary>
   /// Description of DFSMTransform.

@@ -32,7 +32,7 @@ namespace NemerleWeb
         {
         | "get_Count" => Some(JSAst.FieldRef(left, "length"))
         | "Clear" =>
-          Some(JSAst.Assign(JSAst.FieldRef(left, "length"), JSAst.Literal(JSLiteral.Integer(0))))
+          Some(JSAst.Assign(JSAst.FieldRef(left, "length"), JSAst.Literal(JSLiteral.Number(0))))
         | "GetEnumerator" => Some(left.JSMethodCall(member.Name, parms))
         | "Peek" => 
           // left[left.length - 1]
@@ -43,7 +43,7 @@ namespace NemerleWeb
                 JSAst.OpCode("-"),
                 [
                   left.Field("length"),
-                  JSAst.Literal(JSLiteral.Integer(1))
+                  JSAst.Literal(JSLiteral.Number(1))
                 ])
               )
           )
@@ -60,7 +60,14 @@ namespace NemerleWeb
         | "Push" => Some(left.JSMethodCall(member.Name, parms))
         | _ => None()
         }
-        
+      | xs => 
+        match (member.Name) 
+        {
+        | "Add" => Some(left.JSMethodCall("push", [JSAst.Tuple(xs)]))
+        | "Remove"
+        | "Push" => Some(left.JSMethodCall(member.Name, [JSAst.Tuple(xs)]))
+        | _ => None()
+        }
       | _ => None()
       }
     }

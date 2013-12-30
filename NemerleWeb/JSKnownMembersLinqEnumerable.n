@@ -13,7 +13,7 @@ namespace NemerleWeb
 {
   internal module JSLinqExtensions
   {
-    public static AsEnumerable(this seq : JSAst) : JSAst
+    public static AsJSEnumerable(this seq : JSAst) : JSAst
     {
       JSAst.Call(JSAst.StaticRef("Enumerable", "from"), [seq])
     }
@@ -38,7 +38,7 @@ namespace NemerleWeb
       | [seq] =>
         match (member.Name)
         {
-        | "AsEnumerable" => Some(seq.AsEnumerable())        
+        | "AsJSEnumerable" => Some(seq.AsJSEnumerable())        
         | "All"
         | "Any"
         | "Average"
@@ -55,10 +55,10 @@ namespace NemerleWeb
         | "Single"
         | "SingleOrDefault"
         | "Sum"        
-        | "ToArray" => Some(seq.AsEnumerable().JSMethodCall(member.Name, []))        
+        | "ToArray" => Some(seq.AsJSEnumerable().JSMethodCall(member.Name, []))        
         | "ToList" => Some(seq)        
         | "FirstOrDefault"
-        | "LastOrDefault" =>  Some(seq.AsEnumerable().JSMethodCall(member.Name, [JSAst.Literal(JSLiteral.Null())]))
+        | "LastOrDefault" =>  Some(seq.AsJSEnumerable().JSMethodCall(member.Name, [JSAst.Literal(JSLiteral.Null())]))
         | _ => None()
         }
        
@@ -100,10 +100,10 @@ namespace NemerleWeb
         | "ToDictionary"          
         | "ToLookup"
         | "Union"
-        | "Where" => Some(seq.AsEnumerable().JSMethodCall(member.Name, [arg1]))
+        | "Where" => Some(seq.AsJSEnumerable().JSMethodCall(member.Name, [arg1]))
         
         | "FirstOrDefault"
-        | "LastOrDefault" =>  Some(seq.AsEnumerable().JSMethodCall(member.Name, [JSAst.Literal(JSLiteral.Null()), arg1]))
+        | "LastOrDefault" =>  Some(seq.AsJSEnumerable().JSMethodCall(member.Name, [JSAst.Literal(JSLiteral.Null()), arg1]))
                               
         // Special method
         | "Range" => Some(JSAst.Call(JSAst.StaticRef("Enumerable", "range"), [seq, arg1]))
@@ -127,7 +127,7 @@ namespace NemerleWeb
         | "ToDictionary"
         | "ToLookup"
         | "Union"
-        | "Zip" => Some(seq.AsEnumerable().JSMethodCall(member.Name, [arg1, arg2]))
+        | "Zip" => Some(seq.AsJSEnumerable().JSMethodCall(member.Name, [arg1, arg2]))
         | _ => None()
         }
         
@@ -137,7 +137,7 @@ namespace NemerleWeb
         | "Aggregate"
         | "GroupBy"
         | "ToDictionary"
-        | "ToLookup" => Some(seq.AsEnumerable().JSMethodCall(member.Name, [arg1, arg2, arg3]))
+        | "ToLookup" => Some(seq.AsJSEnumerable().JSMethodCall(member.Name, [arg1, arg2, arg3]))
         | _ => None()
         }
         
@@ -146,7 +146,7 @@ namespace NemerleWeb
         {
         | "GroupBy"
         | "GroupJoin"
-        | "Join" => Some(seq.AsEnumerable().JSMethodCall(member.Name, [arg1, arg2, arg3, arg4]))
+        | "Join" => Some(seq.AsJSEnumerable().JSMethodCall(member.Name, [arg1, arg2, arg3, arg4]))
         | _ => None()
         }
         
@@ -154,7 +154,7 @@ namespace NemerleWeb
         match (member.Name)
         {
         | "GroupJoin"
-        | "Join" => Some(seq.AsEnumerable().JSMethodCall(member.Name, [arg1, arg2, arg3, arg4, arg5]))
+        | "Join" => Some(seq.AsJSEnumerable().JSMethodCall(member.Name, [arg1, arg2, arg3, arg4, arg5]))
         | _ => None()
         }
       | _ => None()

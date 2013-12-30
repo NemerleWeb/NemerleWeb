@@ -424,13 +424,30 @@ namespace NemerleWeb.Website.Tests
       }
     }
     
+    #pragma warning disable 649
+
+    [Unit]
+    public struct SimpleStruct
+    {
+      public X : int;
+      public Y : string;
+    }
+    
+    [Unit]
+    public struct AggregatedStruct
+    {
+      public S : SimpleStruct;
+    }
+    
+    #pragma warning restore
+    
     public this()
     {
-      def test(description, res)
+      def test(description : string, res : void -> bool) : void
       {
         Results.Add((description, res()));
       }
-      Results = [].ToList();
+      Results = List();
       
       test("simple", () =>
       {
@@ -893,7 +910,7 @@ namespace NemerleWeb.Website.Tests
       
       test("regexp exec 1", () =>
       {
-        def res = jsnew RegExp("pattern", undefined).exec("pattern");
+        def res = jsnew RegExp("pattern").exec("pattern");
         res[0] == "pattern"
       });
       
@@ -905,12 +922,12 @@ namespace NemerleWeb.Website.Tests
       
       test("regexp test", () =>
       {
-        jsnew RegExp("pattern", undefined).test("pattern")
+        jsnew RegExp("pattern").test("pattern")
       });
       
       test("regexp exec 1", () =>
       {
-        def pat = jsnew RegExp(".+", undefined);        
+        def pat = jsnew RegExp(".+");        
         def result = pat.exec("hello world");
         result.length == 1 && result[0] == "hello world"
       });
@@ -1468,12 +1485,11 @@ namespace NemerleWeb.Website.Tests
         i = i + 1;
         mutable d;
         d = 0.0f;
-        mutable s;
-        s += "";
+        mutable s : string;
         mutable b;
-        b = b && false;
+        b = b || false;
         
-        i == 1 && d == 0.0f && s == "" && b == false
+        i == 1 && d == 0.0f && s == null && b == false
       });
       
       test("list append", () =>
@@ -1693,22 +1709,72 @@ namespace NemerleWeb.Website.Tests
         testThis(1)(2)
       });
  
-     test("typed js test", () => {
-       _ = window.console.log : void -> void;
-       true
-     });
-     
-     test("System.Collections.Generic.EqualityComparer[int].Default", () => {
-       EqualityComparer.[int].Default.Equals(1, 1)
-     });
-     
-     test("System.Collections.Generic.EqualityComparer[string].Default", () => {
-       EqualityComparer.[string].Default.Equals("a", "b")
-     });
-     
-     test("System.Collections.Generic.EqualityComparer[list[string]].Default", () => {
-       EqualityComparer.[list[string]].Default.Equals(["a"], ["b"])
-     });
+      test("typed js test", () => {
+        _ = window.console.log : void -> void;
+        true
+      });
+      
+      test("System.Collections.Generic.EqualityComparer[int].Default", () => {
+        EqualityComparer.[int].Default.Equals(1, 1)
+      });
+      
+      test("System.Collections.Generic.EqualityComparer[string].Default", () => {
+        EqualityComparer.[string].Default.Equals("a", "b")
+      });
+      
+      test("System.Collections.Generic.EqualityComparer[list[string]].Default", () => {
+        EqualityComparer.[list[string]].Default.Equals(["a"], ["b"])
+      });
+
+      test("Struct default initialization", () => {
+        mutable s : SimpleStruct;
+        s.X == 0 && s.Y == null
+      });
+      
+      test("Struct explicit default initialization", () => {
+        def s = SimpleStruct();
+        s.X == 0 && s.Y == null
+      });
+      
+      test("Struct aggregated default initialization", () => {
+        mutable s : AggregatedStruct;
+        s.S.X == 0 && s.S.Y == null
+      });
+      
+      test("Struct explicit aggregated default initialization", () => {
+        def s = AggregatedStruct();
+        s.S.X == 0 && s.S.Y == null
+      });
+      
+      test("tuples 2 default initialization", () => {
+        def t = default(int * int);
+        t[0] == 0 && t[1] == 0
+      });
+      
+      test("tuples 2 implicit default initialization", () => {
+        mutable t : int * int;
+        t[0] == 0 && t[1] == 0
+      });
+      
+      test("tuples 3 default initialization", () => {
+        def t = default(int * int * int);
+        t[0] == 0 && t[1] == 0 && t[2] == 0
+      });
+      
+      test("tuples 3 implicit default initialization", () => {
+        mutable t : int * int * int;
+        t[0] == 0 && t[1] == 0 && t[2] == 0
+      });
+      
+      test("tuples 4 default initialization", () => {
+        def t = default(int * int * int * int);
+        t : object == null
+      });
+      
+      test("tuples 4 implicit default initialization", () => {
+        mutable t : int * int * int * int;
+        t : object == null
+      });
     }
     
     public TemplateLambdaTest : list[string] = ["failed", "passed"];

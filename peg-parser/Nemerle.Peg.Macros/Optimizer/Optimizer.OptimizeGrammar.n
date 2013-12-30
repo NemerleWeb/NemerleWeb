@@ -3,7 +3,7 @@ using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
 
-namespace NemerleWeb.Peg
+namespace Nemerle.Peg.Web
 {
   partial internal class Optimizer
   {

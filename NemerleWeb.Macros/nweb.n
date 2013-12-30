@@ -14,8 +14,11 @@ namespace NemerleWeb
   macro NWebMacro(expr) 
   syntax("NWeb", expr)
   {
-    def ctx = Macros.ImplicitCTX();
-    NwebImpl.TransformNweb(expr, ctx);
+    def typer = Macros.ImplicitCTX();
+    if(!typer.Manager.IsIntelliSenseMode)
+      NwebImpl.TransformNweb(expr, typer);
+    else
+      <[ ]>
   }
     
   public module NwebImpl

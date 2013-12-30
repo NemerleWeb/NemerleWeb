@@ -10,7 +10,7 @@ using Nemerle.Compiler.Parsetree.PExpr;
 using Nemerle.Compiler.Token;
 using Nemerle.Imperative;
 
-namespace NemerleWeb.Peg
+namespace Nemerle.Peg.Web
 {
   macro GrammarScope (_rules : Token)
   syntax ("grammar", _rules)

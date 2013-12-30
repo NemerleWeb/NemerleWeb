@@ -16,7 +16,7 @@ namespace NemerleWeb
     public module TyperHelper
     {
         static mutable _index : int = 0;
-                
+        
         public GetTypedBody(method : IMethod, typer : Typer, tb : TypeBuilder, bodyHandler : TExpr -> void, fullTyping : bool = true) : void
         {
           if (method.Header.Name.Contains("_N_GetVariantCodeSafe"))

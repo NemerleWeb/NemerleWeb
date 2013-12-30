@@ -308,14 +308,16 @@ namespace NemerleWeb
         }
     }
     
+    public ReturnValue : string = "_NW$_returnValue";
+
     public MakeReturn(ast : JSAst) : JSAst 
     {
       | Void => ast
       | _ =>
         JSAst.Seq([
-          JSAst.DefValue("__returnValue", JSAst.Void()),
-          DelayAssignment(ast, JSAst.LocalRef("__returnValue", None())),
-          JSAst.Return(JSAst.LocalRef("__returnValue", None()))
+          JSAst.DefValue(ReturnValue, JSAst.Void()),
+          DelayAssignment(ast, JSAst.LocalRef(ReturnValue, None())),
+          JSAst.Return(JSAst.LocalRef(ReturnValue, None()))
         ])
     }
     

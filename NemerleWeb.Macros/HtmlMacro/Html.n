@@ -13,15 +13,17 @@ using System.Collections.Generic;
 namespace NemerleWeb
 {
   [MacroUsage(MacroPhase.BeforeTypedMembers, MacroTargets.Method)]
-  public macro Html(_tb : TypeBuilder, mb : ParsedMethod)
+  public macro Html(tb : TypeBuilder, mb : ParsedMethod)
   {
-    HtmlImpl.ToXLinq(Nemerle.Macros.ImplicitCTX(), mb)
+    unless(tb.Manager.IsIntelliSenseMode)
+      HtmlImpl.ToXLinq(Nemerle.Macros.ImplicitCTX(), mb)
   }
 
   [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Method)]
-  public macro HtmlTyped(_tb : TypeBuilder, mb : MethodBuilder)
+  public macro HtmlTyped(tb : TypeBuilder, mb : MethodBuilder)
   {
-    HtmlImpl.FromTypedToString(Nemerle.Macros.ImplicitCTX(), mb)
+    unless(tb.Manager.IsIntelliSenseMode)
+      HtmlImpl.FromTypedToString(Nemerle.Macros.ImplicitCTX(), mb)
   }
   
   internal module HtmlImpl
@@ -94,7 +96,7 @@ namespace NemerleWeb
       Macros.DefineCTX(typer);
       def escape(code) {
         code.Replace("\"", <#\"#>)
-      }
+      }      
       def htmlFromTExpr(expr, indent) : string {
         match(expr) {
         | TExpr.Block(_, body) => htmlFromTExpr(body, indent)

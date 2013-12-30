@@ -9,7 +9,7 @@ using System;
 using System.Linq;
 using SCG = System.Collections.Generic;
 
-namespace NemerleWeb.Peg
+namespace Nemerle.Peg.Web
 {
   partial internal class RuleCompiler
   {

@@ -15,7 +15,9 @@ namespace NemerleWeb
   {
     public Register() : void
     {
-      JSKnownMembers.RegisterType(typeof(list[_].Cons), Handler);      
+      JSKnownMembers.RegisterType(typeof(list[_]), Handler);
+      JSKnownMembers.RegisterType(typeof(list[_].Cons), Handler);
+      JSKnownMembers.RegisterType(typeof(list[_].Nil), Handler);
     }
     
     private Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
@@ -27,16 +29,24 @@ namespace NemerleWeb
     {
       match (parms)
       {
-      | [arg1] =>
+      | [] =>
         match (member.Name)
         {
+        | "get_Length" => Some(JSAst.FieldRef(left, "length"))
+        | _ => None()
+        }
+      | [arg1] =>
+        match (member.Name)
+        {        
         | "Equals" =>
           Some(
             JSAst.Call(
               JSAst.StaticMethodRef("nweb.collection", "areArrayEqual", None()),
-              [left, arg1]))
+              [left, arg1]))        
+        | "Map" =>
+          Some(left.AsJSEnumerable().JSMethodCall("select", [arg1]))
         | "MapToArray" => 
-          Some(left.AsEnumerable().JSMethodCall("select", [arg1]).JSMethodCall("toArray", []))
+          Some(left.AsJSEnumerable().JSMethodCall("select", [arg1]).JSMethodCall("toArray", []))
         | _ => None()
         }
       | _ => None()
@@ -50,7 +60,15 @@ namespace NemerleWeb
       | [arg1, arg2] =>
         match(member.Name)
         {
-        | ".ctor" => Some(JSAst.Array([arg1]).JSMethodCall("concat", [arg2]))
+        | ".ctor" =>
+          // Optimize lists
+          match((arg1, arg2))
+          {
+          | (JSAst.Array(a1), JSAst.Array(a2)) => Some(JSAst.Array(a1 + a2))
+          | (JSAst.Array(a1), _) => Some(JSAst.Array(a1 + [arg2]))
+          | (_, JSAst.Array(a2)) => Some(JSAst.Array(arg1 :: a2))          
+          | _ => Some(JSAst.Array([arg1]).JSMethodCall("concat", [arg2]))
+          }
         | _ => None()
         }
       | _ => None()

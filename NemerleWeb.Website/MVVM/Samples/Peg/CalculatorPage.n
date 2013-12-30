@@ -15,6 +15,7 @@ namespace NemerleWeb.Website.Samples
     public this()
     {
       _calc = Calculator.CalcParser();
+      CalcInput = "1 + 2 - 3 * 4 / 5";
     }
          
     CalcOutput : string

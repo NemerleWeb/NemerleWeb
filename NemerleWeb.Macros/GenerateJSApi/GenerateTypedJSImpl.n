@@ -29,26 +29,29 @@ namespace NemerleWeb
       
       def args = ParseArgs(options);
       
-      // Add assembly level attribute
-      Manager().Hierarchy.AddAssemblyAttribute(
-        Manager().CoreEnv,
-        <[ NemerleWeb.JSApiRootAttribute($(args.Root : string)) ]>);
+      unless(typer.Manager.IsIntelliSenseMode)
+      {
+        // Add assembly level attribute
+        Manager().Hierarchy.AddAssemblyAttribute(
+          Manager().CoreEnv,
+          <[ NemerleWeb.JSApiRootAttribute($(args.Root : string)) ]>);
         
-      // Add JSApi root
-      _ = JSClassSettings.JSApiRoots.Add(args.Root);
+        // Add JSApi root
+        _ = JSClassSettings.JSApiRoots.Add(args.Root);
       
-      // Step 1: PreParse
-      def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
-      def tsFilesToParse = PreParseTSAll(projectDir, args.Libs, args.Args);
+        // Step 1: PreParse
+        def projectDir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
+        def tsFilesToParse = PreParseTSAll(projectDir, args.Libs, args.Args);
       
-      // Step 2: Parse
-      def tsAsts = tsFilesToParse.SelectMany(ParseTS).ToList();
+        // Step 2: Parse
+        def tsAsts = tsFilesToParse.SelectMany(ParseTS).ToList();
       
-      // Step 3: Analyze
-      def finalAst = TSAnalyzer.AnalyzeTSAst(tsAsts);
+        // Step 3: Analyze
+        def finalAst = TSAnalyzer.AnalyzeTSAst(tsAsts);
       
-      // Step 4: Generate
-      TSGenerator.GenerateCode(typer, args.Root, finalAst);
+        // Step 4: Generate
+        TSGenerator.GenerateCode(typer, args.Root, finalAst);
+      }
     }
     
     private ParseArgs(options : list[PExpr]) : GenerateArgs

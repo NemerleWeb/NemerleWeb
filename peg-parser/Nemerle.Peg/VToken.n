@@ -2,7 +2,7 @@
 using Nemerle.Utility;
 using NemerleWeb;
 
-namespace NemerleWeb.Peg
+namespace Nemerle.Peg.Web
 {
   public type VList[TValue] = VToken[list[TValue]];
 

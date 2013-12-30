@@ -282,7 +282,7 @@ namespace NemerleWeb
         <[ decl: $(JSApiSpecial.New : usesite)[..$typeParameters](..$functionParams) : $realReturnType; ]>);
     }
     
-    CreateIndex(membersScope : TypeBuilder, index : IndexSignature, prefix : string) : void
+    CreateIndex(membersScope : TypeBuilder, index : IndexMemberDeclaration, prefix : string) : void
     {
       def (realParamType, typeName) = GetIndexTypes(index);
         
@@ -300,7 +300,7 @@ namespace NemerleWeb
         ]>);
     }
     
-    GetIndexTypes(index : IndexSignature) : PExpr * string
+    GetIndexTypes(index : IndexMemberDeclaration) : PExpr * string
     {
       match(index.ParameterType)
       {

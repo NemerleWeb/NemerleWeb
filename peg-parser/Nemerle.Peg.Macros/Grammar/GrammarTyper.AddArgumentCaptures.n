@@ -13,7 +13,7 @@ using System.Linq;
 
 using Nemerle.Compiler.Util;
 
-namespace NemerleWeb.Peg
+namespace Nemerle.Peg.Web
 {
   public partial module GrammarTyper
   {

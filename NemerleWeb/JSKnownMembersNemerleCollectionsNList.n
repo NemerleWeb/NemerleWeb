@@ -30,6 +30,12 @@ namespace NemerleWeb
       | [obj] =>
         match (member.Name)
         {
+        | "Concat"
+        | "Flatten" => 
+          Some(
+            JSAst.Call(
+              JSAst.StaticMethodRef("[].concat", "apply", None()),
+              [JSAst.Array([]), obj]))
         | "ToList" => Some(obj)
         | _ => None()
         }

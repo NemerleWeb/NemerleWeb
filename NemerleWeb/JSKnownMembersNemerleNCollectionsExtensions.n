@@ -37,7 +37,7 @@ namespace NemerleWeb
         match (member.Name)
         {
         | "MapToArray" =>
-          Some(arg1.AsEnumerable().JSMethodCall("select", [arg2]).JSMethodCall("toArray", []))
+          Some(arg1.AsJSEnumerable().JSMethodCall("select", [arg2]).JSMethodCall("toArray", []))
         | _ => None()
         }
       | _ => None()

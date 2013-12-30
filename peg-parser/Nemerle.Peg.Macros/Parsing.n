@@ -8,7 +8,7 @@ using Nemerle.Compiler.Parsetree;
 using Nemerle.Compiler.Parsetree.PExpr;
 using Nemerle.Compiler.Token;
 
-namespace NemerleWeb.Peg
+namespace Nemerle.Peg.Web
 {
   public class CriticalUnexpectedException : Exception  { }
 

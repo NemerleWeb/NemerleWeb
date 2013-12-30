@@ -1,6 +1,11 @@
 ﻿using Nemerle.Collections;
 using Nemerle.Xml;
 using Nemerle.Extensions;
+<<<<<<< HEAD
+=======
+using Nemerle.Utility;
+using Nemerle.ComputationExpressions;
+>>>>>>> remotes/origin/master
 
 using System;
 using System.Text;
@@ -34,8 +39,20 @@ module Program
   }
 }
 
+[Unit][Record]
+class A[T]
+{
+  Value : T {get;}
+     
+  public static @:(x : A[T]) : T
+  {
+    x.Value
+  }
+}
+
 [Unit]
 public class Test
+<<<<<<< HEAD
 {  
   public Children : string = "abcdefghijklm";
   public Children2 : string = "nopqrstuvwxyz";
@@ -65,10 +82,20 @@ public class Test
     def a4 = f2(Children2, c : char => c + "2");
   }
   
+=======
+{
+  F():void
+  {
+    def a = A("A");
+    def b : string = a;
+  }
+ 
+>>>>>>> remotes/origin/master
   [Html]
   public View() : string
   {
     <# 
+<<<<<<< HEAD
        <div $foreach(c in Children.Where(c => c != 'f'))>
           <strong data-id="1">$(c + 'a')</strong>
           <span $foreach(c2 in Children2.Where(c => c != 'z'))>
@@ -80,6 +107,9 @@ public class Test
        </div>
        <div>
         2
+=======
+       <div>
+>>>>>>> remotes/origin/master
        </div>
     #>
   }  

@@ -182,63 +182,67 @@
     </Compile>
     <Compile Include="MVVM\Samples\CompListPage.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\Knockout\Tutorial_1_Introduction.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\Knockout\Tutorial_2_ListsAndCollections.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\Knockout\Tutorial_3_SinglePageApps.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\Knockout\Tutorial_5_LoadingAndSaving.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\NameListPage.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\Peg\CalculatorPage.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\Peg\CSPage.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\Peg\JsonPage.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\Peg\JSPage.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Samples\Peg\TsdPage.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\Samples.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\SignalPage.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\TestPage.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\TypedJS.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\VariantsAndMatchingPage.n">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Tests\ServerTestPage.n">
       <SubType>Code</SubType>
@@ -266,7 +270,7 @@
     <Content Include="Content\Site.css" />
     <Compile Include="MVVM\Samples\NameListCSharpPage.cs">
       <SubType>Content</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Content Include="packages.config">
       <SubType>Content</SubType>
@@ -398,6 +402,11 @@
       <Project>{f440f161-d644-4004-b4f0-a9dfa001039e}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\peg-parser\TSParserPeg\TSParserPeg.nproj">
+      <Name>TSParserPeg</Name>
+      <Project>{cfcb42e2-c0cd-4c83-a18e-d97149f21b14}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
@@ -405,7 +414,7 @@
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets. -->
   <PropertyGroup>
-    <YourDestinationDirectory>$(TargetDir)MVVM\Samples</YourDestinationDirectory> 
+    <YourDestinationDirectory>$(TargetDir)MVVM\Samples</YourDestinationDirectory>
   </PropertyGroup>
   <Target Name="BeforeBuild">
   </Target>
@@ -423,9 +432,13 @@
     </ItemGroup>
     <Copy SourceFiles="@(JSParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\JSParser" />
     <ItemGroup>
-      <TypeScriptInterfaceParser Include="$(ProjectDir)..\peg-parser\TypeScriptInterfaceParser\*.n" />
+      <TSParserPeg Include="$(ProjectDir)..\peg-parser\TSParserPeg\*.n" />
     </ItemGroup>
-    <Copy SourceFiles="@(TypeScriptInterfaceParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\TypeScriptInterfaceParser" />
+    <Copy SourceFiles="@(TSParserPeg)" DestinationFolder="$(YourDestinationDirectory)\Peg\TSParserPeg" />
+    <ItemGroup>
+      <CSParserPeg Include="$(ProjectDir)..\peg-parser\CSharpParser\*.n" />
+    </ItemGroup>
+    <Copy SourceFiles="@(CSParserPeg)" DestinationFolder="$(YourDestinationDirectory)\Peg\CSharpParser" />
   </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />

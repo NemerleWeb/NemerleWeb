@@ -5,7 +5,7 @@ using Nemerle.Assertions;
 using Nemerle.Collections;
 using Nemerle.Utility;
 
-using NemerleWeb.Peg;
+using Nemerle.Peg.Web;
 using NemerleWeb;
 
 namespace JSEngine {
