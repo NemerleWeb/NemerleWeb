@@ -20,10 +20,11 @@ packages
 /PSTools/Installer
 /NemerleWeb.Website/Installer
 
-NemerleWeb.Website/Scripts/nweb/*.js
-NemerleWeb.RSDN/Scripts/nweb/*.js
-peg-parser/Calculator/Scripts/nweb/*.js
-peg-parser/CSharpParser/Scripts/nweb/*.js
-peg-parser/Json/Nemerle.Json/Scripts/nweb/*.js
-peg-parser/JSParser/Scripts/nweb/*.js
-peg-parser/Nemerle.Peg/Scripts/nweb/*.js
+NemerleWeb.Website/Scripts/NemerleWeb/*.js
+NemerleWeb.RSDN/Scripts/NemerleWeb/*.js
+peg-parser/Calculator/Scripts/NemerleWeb/*.js
+peg-parser/CSharpParser/Scripts/NemerleWeb/*.js
+peg-parser/Json/Nemerle.Json/Scripts/NemerleWeb/*.js
+peg-parser/JSParser/Scripts/NemerleWeb/*.js
+peg-parser/Nemerle.Peg/Scripts/NemerleWeb/*.js
+peg-parser/TSParserPeg/Scripts/NemerleWeb/*.js

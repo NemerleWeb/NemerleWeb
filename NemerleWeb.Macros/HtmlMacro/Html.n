@@ -153,7 +153,7 @@ namespace NemerleWeb
       
       TyperHelper.GetTypedBody(mb, typer, typer.CurrentTypeBuilder, body => {
         def html = htmlFromTExpr(body, "");          
-        UnitImpl.AddTemplateData(mb.DeclaringType, JSClass.GetProperName(mb.DeclaringType) + "_" + mb.Name, html);
+        UnitImpl.AddTemplateData(mb.DeclaringType, mb.Name, html);
       }, true);      
     }
   }

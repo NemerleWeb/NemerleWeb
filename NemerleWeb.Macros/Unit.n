@@ -75,8 +75,7 @@ namespace NemerleWeb
         match(typer.CurrentFunction.body) 
         {
         | FunBody.Typed(body) =>       
-          def methodBuilder = typer.CurrentMethodBuilder;
-          Message.Hint($"translating $(tb.FullName).$(methodBuilder.Name)");
+          def methodBuilder = typer.CurrentMethodBuilder;          
           def shouldReturn = !(methodBuilder.Header.ReturnType is FixedType.Void()) && !methodBuilder.IsConstructor;
           def ast = JSAstBuilder.BuildJSAst(body, shouldReturn, methodBuilder.Header);
           JSAstCache.Add(tb, typer.CurrentFunction, ast);
@@ -285,9 +284,9 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       }
     }
     
-    public SaveUnitDataToFile(typer : Typer, filename : string, data : string) : string
+    SaveToFile(tb : TypeBuilder, data : string, filename : string) : void
     {
-      def dir = Path.GetDirectoryName(typer.Manager.Options.ProjectPath);
+      def dir = Path.GetDirectoryName(tb.Manager.Options.ProjectPath);
       def bytes = Encoding.Unicode.GetBytes(data);
       using(sha = SHA1CryptoServiceProvider()) 
       {
@@ -299,58 +298,34 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
           _ = Directory.CreateDirectory(scriptsDir);
           
         def filename = Path.Combine(dir, relativeScriptPath);
+        
         File.WriteAllText(filename, data);
+        
+        tb.Manager.Options.EmbeddedResources ::= filename;
+        
         relativeScriptPath
       }
     }
     
     public AddMainData(tb : TypeBuilder, data : string) : void
     {
-      when(!Directory.Exists(_scriptsDirectory))
-        _ = Directory.CreateDirectory(_scriptsDirectory);
-              
-      def filename = Path.Combine(_scriptsDirectory, JSClass.GetProperName(tb) + ".js");
-      File.WriteAllText(filename, data);      
-      tb.Manager.Options.EmbeddedResources ::= filename;
-      
-      /*def ctor = GetNWebDataConstructor(tb.Manager.Options.OutputFileName, tb.Manager.CoreEnv);
-      
-      ctor.Body = <[ 
-        $(ctor.Body);
-        AddUnitMainDefinition($(JSClass.GetProperName(tb) : string), $(data : string));
-      ]>;
-      */
+      SaveToFile(tb, data, JSClass.GetProperName(tb));
     }
-    
-    public AddLambdasData(tb : TypeBuilder, data : string) : void
-    {
-      def ctor = GetNWebDataConstructor(tb.Manager.Options.OutputFileName, tb.Manager.CoreEnv);
-      
-      ctor.Body = <[ 
-        $(ctor.Body);
-        AddUnitLambdas($(JSClass.GetProperName(tb) : string), $(data : string));
-      ]>;
-    }
-    
+        
     public AddSignalrData(tb : TypeBuilder, data : string) : void
     {
-      def ctor = GetNWebDataConstructor(tb.Manager.Options.OutputFileName, tb.Manager.CoreEnv);
-      
-      ctor.Body = <[ 
-        $(ctor.Body);
-        AddUnitSignalRDefinition($(JSClass.GetProperName(tb) : string), $(data : string));
-      ]>;
+      SaveToFile(tb, data, JSClass.GetProperName(tb) + "_signalr");
     }
     
     public AddTemplateData(tb : TypeBuilder, templateName : string, templateContent : string) : void
-    {      
-      def typeName = tb.Name;
-      def ctor = GetNWebDataConstructor(tb.Manager.Options.OutputFileName, tb.Manager.CoreEnv);
-      
-      ctor.Body = <[ 
-        $(ctor.Body);
-        AddUnitTemplate($(JSClass.GetProperName(typeName) : string), $(templateName : string), $(templateContent : string));
-      ]>;
+    {
+      def filename = JSClass.GetProperName(tb) + "_" + templateName;      
+      def content = 
+$<#<script type="text/html" id="$filename">
+$templateContent
+</script>
+#>;
+      SaveToFile(tb, content, filename);
     }
     
     GetStaticConstructor(tb : TypeBuilder) : MethodBuilder
