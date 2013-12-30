@@ -4,6 +4,7 @@ using Nemerle.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CSharpParser;
 
 namespace NemerleWeb.Website.Samples
 {
@@ -41,13 +42,7 @@ class Program
       {
         if (!string.IsNullOrEmpty(ParserInput))
           if (_parser.Parse(ParserInput) is Some(res))
-          {
-            $<#Extern aliases count: $(res.ExternAliases.Length),
-Usings count: $(res.UsingDirectives.Length),
-Global attributes count: $(res.GlobalAttributes.Length),
-Members count: $(res.Members.Length)
-#>
-          }
+            AnalyzeParserOutput(res)
           else
             "Incorrect input"
         else
@@ -57,6 +52,45 @@ Members count: $(res.Members.Length)
      
     public ParserInput : string { get; set; }
     
+    static Indent = "    ";
+    static NL = Environment.NewLine;
+    
+    private static AnalyzeParserOutput(res : CompilationUnit) : string
+    {
+      PrintTopMembers("", res.Members, res.UsingDirectives)
+    }
+    
+    private static PrintTopMembers(indent : string, members : list[NamespaceNode], usings : list[UsingDirective]) : string
+    {
+      $<#Usings count: $(usings.Length)
+Members:$NL
+..$(members; NL; m => PrintNode(indent, m))"#>
+    }
+    
+    private static PrintNode(indent : string, m : NamespaceNode) : string
+    {
+      match(m)
+      {
+      | NamespaceNode.Namespace(name, _, usings, members) =>
+        $"Namespace: $name" + NL + PrintTopMembers(indent + Indent, members, usings)
+      | NamespaceNode.TypeDeclaration(decl) =>
+        PrintType(indent + Indent, decl)
+      }
+    }
+    
+    private static PrintType(indent : string, t : TypeDeclaration) : string
+    {
+      indent +
+        match(t)
+        {
+        | TypeDeclaration.Class    (_baseTypes, _members)           as x => $"Class: $(x.Name.Id)"
+        | TypeDeclaration.Struct   (_baseTypes, _members)           as x => $"Struct: $(x.Name.Id)"
+        | TypeDeclaration.Interface(_baseTypes, _members)           as x => $"Interface: $(x.Name.Id)"
+        | TypeDeclaration.Enum     (_baseTypes, _members)           as x => $"Enum: $(x.Name.Id)"
+        | TypeDeclaration.Delegate (_returnType, _formalParameters) as x => $"Delegate: $(x.Name.Id)"
+        }
+    }
+    
     [Html]
     public View() : string
     {
@@ -64,7 +98,7 @@ Members count: $(res.Members.Length)
         <div>
           <span>This is demonstration of C# parser</span><br />
           <div class="output">
-            <span class="output-text">$ParserOutput</span> 
+            <pre class="output-text">$ParserOutput</pre>
           </div>
           <div class="parser-input">
             <textarea rows="20" cols="80" value="$ParserInput"/>

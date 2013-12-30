@@ -92,9 +92,9 @@ namespace NemerleWeb.Website.Samples
       [
         Sample(
           "C#",
-          [
+          [            
+            "MVVM/Samples/Peg/CSharpParser/Parser.n",
             "MVVM/Samples/Peg/CSPage.n",
-            "MVVM/Samples/CSharpParser/Parser.n",
           ],
           "",
           PegCS),
