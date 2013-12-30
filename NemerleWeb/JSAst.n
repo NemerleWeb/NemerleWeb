@@ -686,7 +686,7 @@ $(indent)break;#>
         | ServerCall     { MethodName : string; TypeName : string; Parameters : list[string * JSAst]; Callback : JSAst;
             public override Write(indent = "" : string) : string {                            
               def jsparms = Parameters.Map((name, val) => $"$name: ' + JSON.stringify(nweb.utils.normalizeObjectForServer($(val.Write()))) + '");
-              def callback = Callback.Write().TrimEnd(';');
+              def callback = Callback.Write(indent).TrimEnd(';');
 $<#$$.ajax({
 $(indent)  url: '/$TypeName/$MethodName',
 $(indent)  type: 'POST',
@@ -694,10 +694,11 @@ $(indent)  dataType: 'json',
 $(indent)  data: { model: '{..$jsparms}' },
 $(indent)  success: function(result) {
 $(indent)    var typed = nweb.utils.toTypedObject(result);
+$(indent)    var callback = $callback;
 $(indent)    if(result != null && nweb.utils.isTuple(result))
-$(indent)      $(callback).apply(undefined, typed);
+$(indent)      callback.apply(undefined, typed);
 $(indent)    else
-$(indent)      $(callback)(typed);
+$(indent)      callback(typed);
 $(indent)
 $(indent)    nweb.invalidate();
 $(indent)  }

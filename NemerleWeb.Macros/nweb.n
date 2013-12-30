@@ -39,31 +39,20 @@ namespace NemerleWeb
         
         def res = <[
           NemerleWebInitializer.Initialize();
-          def allScripts = NemerleWeb.NWebData.GetAllScriptNames().Select(script =>
-          {
-            def mainScript = $<# <script type="text/javascript" src="/NemerleWebResource/Unit/$script.js"></script> #>;
-            def lambdasScript = 
-              if(!string.IsNullOrEmpty(NWebData.GetLambdasScript(script)))
-                $<# <script type="text/javascript" src="/NemerleWebResource/Lambdas/$script.js"></script> #>;
-              else
-                "";  
-
-            $<#$mainScript
-$lambdasScript#>  
-          });
+          
+          def scripts = NemerleWeb.NWebData.GetScripts();
+          def templates = NemerleWeb.NWebData.GetTemplates();
     
-        def templates = NWebData.GetAllScriptNames().Select(script => NWebData.GetTemplatesScripts(script));
-        def allScripts = string.Join("", allScripts);
-        def unitName = $(properName : string);
-        def paramList = List();
-        paramList.Add($signature);
-        {..$(serverParams.NToList())}
-        def callParms = string.Join(",", paramList);
+          def declarations = string.Join("\n", templates.Concat(scripts));
+          def unitName = $(properName : string);
+          def paramList = List();
+          paramList.Add($signature);
+          {..$(serverParams.NToList())}
+          def callParms = string.Join(",", paramList);
 
 $<#
 <div id="nweb-start"></div>
-$allScripts
-..$(templates; "\n")
+$declarations
 <script>
 $$(function() {  
   nweb.go(new $unitName($callParms));

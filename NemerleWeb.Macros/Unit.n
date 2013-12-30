@@ -284,15 +284,15 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       }
     }
     
-    SaveToFile(tb : TypeBuilder, data : string, filename : string) : void
+    SaveToFile(tb : TypeBuilder, data : string, filename : string) : string
     {
       def dir = Path.GetDirectoryName(tb.Manager.Options.ProjectPath);
       def bytes = Encoding.Unicode.GetBytes(data);
       using(sha = SHA1CryptoServiceProvider()) 
       {
         def hash = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "");
-        def relativeScriptPath = Path.Combine("Scripts/NemerleWeb", filename + hash + ".js");
-        def scriptsDir = Path.Combine(dir, "Scripts/NemerleWeb");
+        def scriptsDir = Path.Combine(dir, "Scripts", "NemerleWeb");
+        def relativeScriptPath = Path.Combine("Scripts", "NemerleWeb", filename + hash + ".js");        
         
         when(!Directory.Exists(scriptsDir))
           _ = Directory.CreateDirectory(scriptsDir);
@@ -307,25 +307,32 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       }
     }
     
+    AppendToNWebDataConstructor(tb : TypeBuilder, expr : PExpr) : void    
+    {      
+      def ctor = GetNWebDataConstructor(tb);      
+      ctor.Body = <[ 
+        $(ctor.Body);
+        $expr;
+      ]>;
+    }
+    
     public AddMainData(tb : TypeBuilder, data : string) : void
-    {
-      SaveToFile(tb, data, JSClass.GetProperName(tb));
+    {      
+      def filename = SaveToFile(tb, data, JSClass.GetProperName(tb));
+      AppendToNWebDataConstructor(tb, <[ AddScript($(filename : string)); ]>);
     }
         
     public AddSignalrData(tb : TypeBuilder, data : string) : void
     {
-      SaveToFile(tb, data, JSClass.GetProperName(tb) + "_signalr");
+      def filename = SaveToFile(tb, data, JSClass.GetProperName(tb) + "_signalr");
+      AppendToNWebDataConstructor(tb, <[ AddScript($(filename : string)); ]>);      
     }
     
     public AddTemplateData(tb : TypeBuilder, templateName : string, templateContent : string) : void
     {
-      def filename = JSClass.GetProperName(tb) + "_" + templateName;      
-      def content = 
-$<#<script type="text/html" id="$filename">
-$templateContent
-</script>
-#>;
-      SaveToFile(tb, content, filename);
+      def id = JSClass.GetProperName(tb) + "_" + templateName;
+      def filename = SaveToFile(tb, templateContent, id);
+      AppendToNWebDataConstructor(tb, <[ AddTemplate($(id : string), $(filename : string)); ]>);
     }
     
     GetStaticConstructor(tb : TypeBuilder) : MethodBuilder
@@ -338,10 +345,10 @@ $templateContent
       }
     }
         
-    public GetNWebDataConstructor(outputFileName : string, env : GlobalEnv) : MethodBuilder
+    GetNWebDataConstructor(tb : TypeBuilder) : MethodBuilder
     {
-      def assemblyName = Path.GetFileNameWithoutExtension(outputFileName);
-      def env = env.EnterIntoNamespace([assemblyName]);
+      def assemblyName = Path.GetFileNameWithoutExtension(tb.Manager.Options.OutputFileName);
+      def env = tb.Manager.CoreEnv.EnterIntoNamespace([assemblyName]);
       match(env.LookupType(["NWebDataPerAssembly"])) 
       {
       | Some(type) => 
@@ -350,8 +357,7 @@ $templateContent
         def t = env.Define(<[ decl:
           public class NWebDataPerAssembly : NemerleWeb.NWebDataInstance
           {
-            public this() {
-            }
+            public this() {}
           }
         ]>);
         t.Compile();
@@ -399,43 +405,7 @@ $templateContent
               {
               | e => Content(e.ToString(), "text/javascript");
               }
-            }
-            
-            public Unit(id : string) : System.Web.Mvc.ActionResult
-            {
-              if(id.EndsWith(".js"))
-                Content(NemerleWeb.NWebData.GetScript(id.Substring(0, id.Length - 3)), "text/javascript");
-              else
-                Content("", "text/javascript");
-            }
-            
-            public Lambdas(id : string) : System.Web.Mvc.ActionResult
-            {
-              if(id.EndsWith(".js"))
-                Content(NemerleWeb.NWebData.GetLambdasScript(id.Substring(0, id.Length - 3)), "text/javascript");
-              else
-                Content("", "text/javascript");
-            }
-            
-            public LambdasWithUnit(id : string) : System.Web.Mvc.ActionResult
-            {
-              if(id.EndsWith(".js")) {
-                def typeName = id.Substring(0, id.Length - 3);
-                def lambdasScript = NemerleWeb.NWebData.GetLambdasScript(typeName);                
-                def unitScript = NemerleWeb.NWebData.GetScript(typeName);
-                Content(lambdasScript + System.Environment.NewLine + unitScript, "text/javascript");
-              }
-              else
-                Content("", "text/javascript");
-            }
-            
-            public Templates(id : string) : System.Web.Mvc.ActionResult
-            {
-              if(id.EndsWith(".js"))
-                Content(NemerleWeb.NWebData.GetTemplatesScripts(id.Substring(0, id.Length - 3)), "text/javascript");
-              else
-                Content("", "text/javascript");
-            }
+            }            
           }
         ]>).Compile();  
       }      
