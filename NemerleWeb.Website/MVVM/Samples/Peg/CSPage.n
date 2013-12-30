@@ -63,8 +63,8 @@ class Program
     private static PrintTopMembers(indent : string, members : list[NamespaceNode], usings : list[UsingDirective]) : string
     {
       $<#Usings count: $(usings.Length)
-Members:$NL
-..$(members; NL; m => PrintNode(indent, m))"#>
+Members:
+..$(members; NL; m => PrintNode(indent, m))#>
     }
     
     private static PrintNode(indent : string, m : NamespaceNode) : string
