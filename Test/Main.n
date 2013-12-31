@@ -41,7 +41,7 @@ public class Test
   F():void
   {
     mutable a;
-    int.TryParse("A", out a);
+    int.TryParse("A", System.Globalization.NumberStyles.HexNumber, null, out a);
   }
  
   [Html]

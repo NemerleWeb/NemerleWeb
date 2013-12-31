@@ -824,6 +824,29 @@ nweb.utils.tryParseFloat = function (s, result) {
     return nweb.utils.tryParse(window.parseFloat, s, result);
 };
 
+var NumberStyles = {
+    AllowHexSpecifier: 512
+};
+nweb.utils.tryParseIntStyle = function (s, style, formatter, result) {
+    // Check arguments
+    if (s != null && s.length > 0 && !window.isNaN(s)) {
+        var radix = ((style & NumberStyles.AllowHexSpecifier) != 0) ? 16 : 10;
+        var res = parseInt(s, radix);
+        // Check return value
+        if (!window.isNaN(res) && window.isFinite(res)) {
+            if (result != null) {
+                result.value = res;
+            }
+            return true;
+        }
+    }
+
+    if (result != null) {
+        result.value = 0;
+    }
+    return false;
+};
+
 // End Parsing
 
 nweb.setCookie = function (name, value, days) {
