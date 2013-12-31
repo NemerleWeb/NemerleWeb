@@ -982,13 +982,13 @@ namespace NemerleWeb.Website.Tests
         int.TryParse("1020", out output) && output == 1020
       });
       
-      test("ulong TryParse style", () =>
+      test("ulong TryParse style hex", () =>
       {
         mutable output;
         ulong.TryParse("0x1020", NumberStyles.HexNumber, null, out output) && output == 0x1020
       });
       
-      test("ulong TryParse style", () =>
+      test("ulong TryParse style dec", () =>
       {
         mutable output;
         ulong.TryParse("1020", NumberStyles.None, null, out output) && output == 1020
