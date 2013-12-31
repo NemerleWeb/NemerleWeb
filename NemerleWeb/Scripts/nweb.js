@@ -1174,9 +1174,26 @@ function System_Collections_Generic_Stack(arg) {
         return Enumerable.from(arg).toArray();
 }
 
+function System_Exception(message) {
+    this.message = message;
+
+    this.get_Message = function() { return this.message; };
+}
+
 function System_ArgumentNullException(paramName, message) {
     this.paramName = paramName;
     this.message = message;
+
+    this.get_ParamName = function () { return this.paramName; };
+    this.get_Message = function () { return this.message; };
+}
+
+function System_ArgumentOutOfRangeException(paramName, message) {
+    this.paramName = paramName;
+    this.message = message;
+
+    this.get_ParamName = function () { return this.paramName; };
+    this.get_Message = function () { return this.message; };
 }
 
 var System_Environment = {};
