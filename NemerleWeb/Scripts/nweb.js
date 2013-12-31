@@ -775,13 +775,17 @@ var hasWindowConsole = typeof window.console !== "undefined";
 
 nweb.utils.console = {};
 nweb.utils.console.log =
-    hasWindowConsole && typeof window.console.log !== "undefined" ? window.console.log : noOp;
+    hasWindowConsole && typeof window.console.log !== "undefined"
+    ? function () { window.console.log.apply(window.console, arguments); }
+    : noOp;
 nweb.utils.console.logLine = function(s) {
     nweb.utils.console.log(s);
     nweb.utils.console.log("\n");
 };
 nweb.utils.console.debug =
-    hasWindowConsole && typeof window.console.debug !== "undefined" ? window.console.debug : noOp;
+    hasWindowConsole && typeof window.console.debug !== "undefined"
+    ? function () { window.console.debug.apply(window.console, arguments); }
+    : noOp;
 nweb.utils.console.debugLine = function (s) {
     nweb.utils.console.debug(s);
     nweb.utils.console.debug("\n");
