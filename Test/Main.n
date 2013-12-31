@@ -35,25 +35,13 @@ module Program
     _ = Console.ReadKey();
   }
 }
-
-[Unit][Record]
-class A[T]
-{
-  Value : T {get;}
-     
-  public static @:(x : A[T]) : T
-  {
-    x.Value
-  }
-}
-
 [Unit]
 public class Test
 {
   F():void
   {
-    def a = A("A");
-    def b : string = a;
+    mutable a;
+    int.TryParse("A", out a);
   }
  
   [Html]

@@ -976,6 +976,23 @@ namespace NemerleWeb.Website.Tests
         int.Parse("1020") == 1020
       });
       
+      test("int TryParse", () =>
+      {
+        mutable output;
+        int.TryParse("1020", out output) && output == 1020
+      });
+      
+      test("float Parse", () =>
+      {
+        float.Parse("1020") == 1020
+      });
+            
+      test("float TryParse", () =>
+      {
+        mutable output;
+        float.TryParse("1020", out output) && output == 1020
+      });
+      
       test("option 1", () =>
       {
         def a = Some(1);

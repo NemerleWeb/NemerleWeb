@@ -25,27 +25,25 @@ namespace NemerleWeb
     
     private StaticHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
+      def call(function : string) : option[JSAst]
+      {
+        Some(
+          JSAst.Call(
+            JSAst.MethodRef(
+              JSAst.FieldRef(JSAst.FieldRef(JSAst.GlobalRef("nweb"), "utils"), "console"),
+              function,
+              None()),
+            parms))
+      }
+      
       match (parms)
       {
       | [_] =>
         match (member.Name)
         {
-        | "Write" =>
-          Some(
-            JSAst.Call(
-              JSAst.MethodRef(
-                JSAst.FieldRef(JSAst.FieldRef(JSAst.GlobalRef("nweb"), "utils"), "console"),
-                "debug",
-                None()),
-              parms))
-        | "WriteLine" =>
-          Some(
-            JSAst.Call(
-              JSAst.MethodRef(
-                JSAst.FieldRef(JSAst.FieldRef(JSAst.GlobalRef("nweb"), "utils"), "console"),
-                "debugLine",
-                None()),
-              parms))
+        | "Fail" => call("error")
+        | "Write" => call("debug")
+        | "WriteLine" => call("debugLine")
         | _ => None()
         }
       | _ => None()

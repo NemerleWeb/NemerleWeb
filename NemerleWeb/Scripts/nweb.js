@@ -790,8 +790,41 @@ nweb.utils.console.debugLine = function (s) {
     nweb.utils.console.debug(s);
     nweb.utils.console.debug("\n");
 };
+nweb.utils.console.error =
+    hasWindowConsole && typeof window.console.error !== "undefined"
+    ? function () { window.console.error.apply(window.console, arguments); }
+    : noOp;
 
 // End Console wrappers
+
+// Parsing
+
+nweb.utils.tryParse = function(parseFunction, s, result) {
+    // Check arguments
+    if (s != null && s.length > 0 && !window.isNaN(s)) {
+        var res = parseFunction(s);
+        // Check return value
+        if (!window.isNaN(res) && window.isFinite(res)) {
+            if (result != null) {
+                result.value = res;
+            }
+            return true;
+        }
+    }
+
+    if (result != null) {
+        result.value = 0;
+    }
+    return false;
+};
+nweb.utils.tryParseInt = function (s, result) {
+    return nweb.utils.tryParse(window.parseInt, s, result);
+};
+nweb.utils.tryParseFloat = function (s, result) {
+    return nweb.utils.tryParse(window.parseFloat, s, result);
+};
+
+// End Parsing
 
 nweb.setCookie = function (name, value, days) {
   var expires = "";
@@ -1141,4 +1174,4 @@ nweb.collection = {
     }
 };
 
-nweb.templateCollection = { };
+nweb.templateCollection = {};
