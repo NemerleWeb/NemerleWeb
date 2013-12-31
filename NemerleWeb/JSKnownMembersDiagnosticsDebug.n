@@ -11,14 +11,11 @@ using System.Linq;
 
 namespace NemerleWeb
 {
-  /// <summary>
-  /// Description of JSKnownMembersConsole.
-  /// </summary>
-  module JSKnownMembersConsole
+  module JSKnownMembersDiagnosticsDebug
   {
     public Register() : void
     {
-      JSKnownMembers.RegisterType(typeof(Console), Handler); 
+      JSKnownMembers.RegisterType(typeof(System.Diagnostics.Debug), Handler); 
     }
     
     private Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
@@ -38,7 +35,7 @@ namespace NemerleWeb
             JSAst.Call(
               JSAst.MethodRef(
                 JSAst.FieldRef(JSAst.FieldRef(JSAst.GlobalRef("nweb"), "utils"), "console"),
-                "log",
+                "debug",
                 None()),
               parms))
         | "WriteLine" =>
@@ -46,7 +43,7 @@ namespace NemerleWeb
             JSAst.Call(
               JSAst.MethodRef(
                 JSAst.FieldRef(JSAst.FieldRef(JSAst.GlobalRef("nweb"), "utils"), "console"),
-                "logLine",
+                "debugLine",
                 None()),
               parms))
         | _ => None()
