@@ -76,14 +76,16 @@ namespace NemerleWeb
       def callAst =
         match (call)
         {
-        | Call(MethodRef(obj = Call(MethodRef(TExpr.This, serverMeth, _, _), _, _), meth = meth), parms, _)
-        | Call(MethodRef(obj = Call(MethodRef(TExpr.FieldMember, serverMeth, _, _), _, _), meth = meth), parms, _)
+        | Call(MethodRef(obj = Call(MethodRef(TExpr.This, serverMeth, _, _), _, _), meth = meth), parms, _) 
+          when serverMeth.Name == "get_server"
+        | Call(MethodRef(obj = Call(MethodRef(TExpr.FieldMember, serverMeth, _, _), _, _), meth = meth), parms, _) 
+          when serverMeth.Name == "get_server"
         | Call(MethodRef(obj = Call(MethodRef(TExpr.LocalRef(decl), serverMeth, _, _), _, _), meth = meth), parms, _) 
-          when serverMeth.Name == "get_server" && decl.Name == "_N_closurised_this_ptr" =>
+          when serverMeth.Name == "get_server" && decl.Name == "_N_closurised_this_ptr" =>            
             def parameters =
               if (parms.Length > 0) parms.Zip(meth.GetParameters()).Take(parms.Length - 1).Map((cp, mp) => (mp.name, builder'(cp.expr)))
               else [];
-            def callback = if(parms.Length > 0) builder'(parms.Last().expr) else JSAst.Void();
+            def callback = if(parms.Length > 0) builder'(parms.Last().expr) else JSAst.Void();            
             match(callback)
             {
             | Seq(DefValue as dv :: cb :: []) =>
