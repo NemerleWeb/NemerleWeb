@@ -330,7 +330,7 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
     
     public AddTemplateData(tb : TypeBuilder, templateName : string, templateContent : string) : void
     {
-      def id = JSClass.GetProperName(tb) + "_" + templateName;
+      def id = JSClass.GetProperName(tb) + templateName;
       def filename = SaveToFile(tb, templateContent, id);
       AppendToNWebDataConstructor(tb, <[ AddTemplate($(id : string), $(filename : string)); ]>);
     }

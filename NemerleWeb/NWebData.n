@@ -71,7 +71,7 @@ $content
     {
       Scripts.Add(filename);
     }
-    
+        
     public AddTemplate(id : string, filename : string) : void
     {
       Templates.Add((id, filename));

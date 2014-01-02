@@ -5,7 +5,7 @@ var nweb = {
     if (nweb["debugger"] && !fromDebugger)
       nweb["debugger"](model);
     
-    var template = tpl ? tpl : nweb.utils.getTemplateName(model, "View");
+    var template = tpl ? tpl : nweb.utils.getTemplateName(model, "_N_View");
     var destination = dest ? dest : "#nweb-start";
     var body = $(destination).html($("#" + template).html())[0];
     
@@ -684,7 +684,7 @@ nweb.utils = {
         if (!model)
             throw "Model passed in template() cannot be null or undefined. Make sure, you initialized members that are used in templating.";
 
-        return nweb.utils.getConstructorName(model) + "_" + viewName;
+        return nweb.utils.getConstructorName(model) + viewName;
     },
     getConstructorName: function(model) {
         var funcNameRegex = /function (.{1,})\(/;
