@@ -59,19 +59,19 @@ namespace NemerleWeb
             def tempMethodName = Name("_N_" + mb.Name);
             typer.CurrentTypeBuilder.Define(<[ decl:
               [HtmlTyped]
-              public $(tempMethodName : name)() : list[string] {
-                def tag(name, expr) : string { "" };
-                def attr(name, expr) : string { "" };
-                def attr_splice(name, expr) : string { "" };
-                def text(expr) : string { "" };
-                def text_splice(expr) : string { "" };
+              public $(tempMethodName : name)() : list[object] {
+                def tag(name, expr : object) : object { "" };
+                def attr(name, expr : object) : object { "" };
+                def attr_splice(name, expr : object) : object { "" };
+                def text(expr : object) : object { "" };
+                def text_splice(expr : object) : object { "" };
                 
                 def skip = {
                   tag("", ([], []));
-                  attr("", "");
-                  attr_splice("", "");
-                  text("");
-                  text_splice("");
+                  attr("", null);
+                  attr_splice("", null);
+                  text(null);
+                  text_splice(null);
                 };
                 
                 $pexpr
@@ -94,9 +94,14 @@ namespace NemerleWeb
     internal FromTypedToString(typer : Typer, mb : MethodBuilder) : void
     {
       Macros.DefineCTX(typer);
-      def escape(code) {
-        code.Replace("\"", <#\"#>)
+      
+      def escape(expr) {
+        def expr = if(expr.StartsWith("\"") && expr.EndsWith("\"")) expr.Trim('\"') else expr;
+        def expr = if(expr.StartsWith("(") && expr.EndsWith(")")) expr.Substring(1, expr.Length - 2) else expr;
+        def expr = if(expr.EndsWith(";")) expr.Substring(0, expr.Length - 1) else expr;
+        expr.Replace("\"", "'");
       }      
+      
       def htmlFromTExpr(expr, indent) : string {
         match(expr) {
         | TExpr.Block(_, body) => htmlFromTExpr(body, indent)
@@ -104,46 +109,56 @@ namespace NemerleWeb
         | TExpr.TypeConversion(expr, _, _, _) => htmlFromTExpr(expr, indent)
         | Call(StaticRef(lst, mem, _), parms, _) 
           when lst.TypeInfo.FullName == "Nemerle.Core.Cons[T]" && mem.Name == ".ctor" =>
-          string.Join("", parms.Map(p => htmlFromTExpr(p.expr, indent)));
+          string.Join(" ", parms.Map(p => htmlFromTExpr(p.expr, indent)));
           
         | StaticRef(lst, mem, _) 
           when lst.TypeInfo.FullName == "Nemerle.Core.Nil[T]" && mem.Name == "_N_constant_object" =>         
           ""
           
         | Call(LocalFunRef(decl, _), [Parm(_, Literal(Literal.String(tagName)), _, _), tagExprExpr], _) when decl.Name == "tag" =>           
-          def (attrs, children) = match(tagExprExpr.expr) {          
-          | Sequence(foreachExpr, Tuple([attrs, childTags])) =>            
-            def foreachEnum = match(foreachExpr) 
-            {
-            | DefValIn(name, val, DefValIn(loopValName, _, _)) => 
-              "nw-foreach=\"" + loopValName.Name + " in " + escape(JSAstBuilder.BuildJSAst(val, false, mb.Header).Write()) + "\" "
-            | _ => ""
-            };            
-            def a = htmlFromTExpr(attrs, indent);
-            def t = htmlFromTExpr(childTags, indent + "  ");
-            (foreachEnum + a, t)
-          | _ => assert2(false); ("", "");
-          }
+          def (attrs, children) = 
+            match(tagExprExpr.expr) 
+            {          
+            | DefValIn(_, val, DefValIn(loopValName, _, Tuple([attrs, childTags]))) =>
+              def getLocalValueName(lv) {
+                lv.Name + "_" + lv.Id.ToString()
+              }
+              def foreachEnum = 
+                  "nw-foreach=\"" + getLocalValueName(loopValName) + " in " + escape(JSAstBuilder.BuildJSAst(val, false, mb.Header).Write()) + "\" ";
+              (foreachEnum + htmlFromTExpr(attrs, indent), 
+               htmlFromTExpr(childTags, indent + "  "))
+            | Tuple([attrs, childTags]) =>
+              (htmlFromTExpr(attrs, indent), 
+               htmlFromTExpr(childTags, indent + "  "))
+            | _ => assert2(false); ("", "");
+            }
         
-          indent + $"<$(tagName) $attrs>$children</$(tagName)>"
+          indent + $"<$(tagName) $attrs>" +
+          indent + $"$children" +
+          indent + $"</$(tagName)>";
         
         | Call(LocalFunRef(decl, _), [textExprExpr], _) when decl.Name == "text_splice" => 
           def splice = JSAstBuilder.BuildJSAst(textExprExpr.expr, false, mb.Header).Write();
-          def splice = escape(splice.Trim(array['\"']));          
+          def splice = escape(splice.Trim(array['\"']));
           $"<span nw-text=\"$splice\" />"
         
         | Call(LocalFunRef(decl, _), [Parm(_, Literal(Literal.String(textValue)), _, _)], _) 
           when decl.Name == "text" => 
-          indent + textValue
+          indent + "  " + textValue
         
         | Call(LocalFunRef(decl, _), [Parm(_, Literal(Literal.String(attrName)), _, _), attrExprExpr], _) 
           when decl.Name == "attr_splice" =>
-          def attrSplice = escape(JSAstBuilder.BuildJSAst(attrExprExpr.expr, false, mb.Header).Write());
-          $"nw-$attrName=$attrSplice"
+          def attrExpr = if(attrName == "click")           
+            (attrExprExpr.expr :> TExpr.Sequence).e1;
+          else
+            attrExprExpr.expr;
+         
+          def attrSplice = escape(JSAstBuilder.BuildJSAst(attrExpr, false, mb.Header).Write());
+          $"nw-$attrName=\"$attrSplice\""
           
         | Call(LocalFunRef(decl, _), [Parm(_, Literal(Literal.String(attrName)), _, _), Parm(_, Literal(Literal.String(attrValue)), _, _)], _) 
           when decl.Name == "attr" => 
-          $"$attrName=$attrValue"
+          $"$attrName=\"$attrValue\""
         
         | DefFunctionsIn(_, body) => htmlFromTExpr(body, indent);
         | DefValIn(name, _, body) when name.Name == "skip" => htmlFromTExpr(body, indent);
@@ -151,8 +166,10 @@ namespace NemerleWeb
         }
       }
       
-      TyperHelper.GetTypedBody(mb, typer, typer.CurrentTypeBuilder, body => {
-        def html = htmlFromTExpr(body, "");          
+      Message.Hint(mb.Body.ToString());
+      TyperHelper.GetTypedBody(mb, typer, typer.CurrentTypeBuilder, body => {        
+        Message.Hint(body.ToString());
+        def html = htmlFromTExpr(body, "");
         UnitImpl.AddTemplateData(mb.DeclaringType, mb.Name, html);
       }, true);      
     }

@@ -23,7 +23,6 @@ var nweb = {
       "nw-when": nweb.getWhenBinding,
       "nw-unless": nweb.getUnlessBinding,
       "nw-css": nweb.getCssBinding,
-      "nw-attr": nweb.getAttrBinding,
       "nw-style": nweb.getStyleBinding,
       "nw-visible": nweb.getVisibleBinding,
       "nw-disable": nweb.getDisableBinding,
@@ -56,7 +55,9 @@ var nweb = {
           attrName = "nw-value";
         
       if (attrName.indexOf("nw-") === 0) {
-        var binder = nweb.binds(attrName);
+        var binder = attrName.indexOf("nw-attr-") === 0
+                     ? nweb.getAttrBinding
+                     : nweb.binds(attrName);
         
         if(typeof binder === 'undefined')
           throw "Unrecognized nw-* attribute: " + attrName;
@@ -72,7 +73,7 @@ var nweb = {
                 bindings.push(b);
             }
           } else {
-            var binding = binder(model, el, bindings, loopStack, attrValue);
+            var binding = binder(model, el, bindings, loopStack, attrValue, attrName);
             if (typeof binding !== 'undefined')
               bindings.push(binding);
           }
@@ -130,9 +131,9 @@ var nweb = {
       }
     };
   },
-  getAttrBinding: function (model, el, bindings, loopStack, attrVal) {
-    var attr = /(.+):\s(.+)/.exec(attrVal);
-    var expr = nweb.parseExpression(model, attr[2], loopStack);
+  getAttrBinding: function (model, el, bindings, loopStack, attrVal, attrName) {
+    var attr = attrName.substr(8);
+    var expr = nweb.parseExpression(model, attrVal, loopStack);
     return {
       el: el,
       getValue: function () {
@@ -348,7 +349,7 @@ var nweb = {
     };
     return binding;
   },
-  getWhenBinding: function (model, el, bindings, loopStack, attrVal, isUnless) {
+  getWhenBinding: function (model, el, bindings, loopStack, attrVal, attrName, isUnless) {
     var $el = $(el);
     var expr = nweb.parseExpression(model, attrVal, loopStack);        
     var html = el.outerHTML;
@@ -381,8 +382,8 @@ var nweb = {
     };
     return binding;
   },
-  getUnlessBinding: function (model, el, bindings, loopStack, attrVal) {
-    return nweb.getWhenBinding(model, el, bindings, loopStack, attrVal, true);
+  getUnlessBinding: function (model, el, bindings, loopStack, attrVal, attrName) {
+    return nweb.getWhenBinding(model, el, bindings, loopStack, attrVal, attrName, true);
   },
   getClickBinding: function(model, el, bindings, loopStack, attrVal) {
     var parsed = nweb.parseExpression(model, attrVal, loopStack);

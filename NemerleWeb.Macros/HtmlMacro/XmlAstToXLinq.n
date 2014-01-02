@@ -66,7 +66,7 @@ namespace NemerleWeb
         match (value)
         {
           | Splicable.Value(value)    => <[ $(value : string) ]>
-          | Splicable.Expr(expr)      => Parse(ToLocation(value), expr)          
+          | Splicable.Expr(expr)      => Parse(ToLocation(value), expr)
           | Splicable.ListExpr(_expr) => Message.FatalError(<#The "..$" not supportend in name context.#>);
           | Splicable.ControlExpr     => assert(false)
         })
@@ -87,8 +87,15 @@ namespace NemerleWeb
         }        
         
         match (xmlAst) {
-        | Attr(Splicable.Value(name), Splicable.Expr(expr)) => <[ attr_splice($(name : string), $expr) ]>
-        | Attr(Splicable.Value(name), Splicable.Value(value))  => <[ attr($(name : string), $value) ]>
+        | Attr(Splicable.Value("click"), Splicable.Expr(expr) as splice) => 
+          def e = match(Parse(ToLocation(splice), expr))
+          {
+          | PExpr.Ref as rf => <[ $rf() ]>
+          | PExpr.Call as call => call
+          }
+          <[ attr_splice("click", { $e; null }) ]>
+        | Attr(Splicable.Value(name), Splicable.Expr(expr) as splice) => <[ attr_splice($(name : string), $(Parse(ToLocation(splice), expr))) ]>        
+        | Attr(Splicable.Value(name), Splicable.Value(value))  => <[ attr($(name : string), $(value : string)) ]>
         | Text(Splicable.Value(value))        => <[ text($(value : string)) ]>
         | Tag(Splicable.Value(name), content) =>
           def isInsideTag(c) { c is XmlAst.AttrSplice || c is XmlAst.Attr }
@@ -101,8 +108,10 @@ namespace NemerleWeb
                             .FirstOrDefault() :> XmlAst.AttrSplice;
           
           def eachDefines = 
-            if(each != null) {            
-              match(Parse(ToLocation(each), each.expr)) {
+            if(each != null) 
+            {              
+              match(Parse(ToLocation(each), each.expr)) 
+              {
               | <[ $x in $xs ]> => <[ def from = $xs; def $x = from.FirstOrDefault(); ]>
               | _ => Message.FatalError("Unrecognized foreach syntax");
               }            
@@ -110,16 +119,16 @@ namespace NemerleWeb
           
           <[
             tag($(name : string), {
-              $eachDefines;
+              ..$eachDefines;
               ([..$(attrs)],
                [..$(childTags)])
             })
           ]>
 
-        | TagSplice(expr, _)                     => <[ text_splice($expr) ]>
-        | AttrSplice(s, SpliceType.Foreach)      => <[ attr_splice("foreach", $s) ]>
-        | AttrSplice(s, SpliceType.When)         => <[ attr_splice("when", $s) ]>
-        | AttrSplice(s, SpliceType.Unless)       => <[ attr_splice("unless", $s) ]>
+        | TagSplice(expr, _)                     => <[ text_splice($(Parse(ToLocation(xmlAst), expr))) ]>
+        | AttrSplice(s, SpliceType.Foreach)      => <[ attr_splice("foreach", $(Parse(ToLocation(xmlAst), s))) ]>
+        | AttrSplice(s, SpliceType.When)         => <[ attr_splice("when", $(Parse(ToLocation(xmlAst), s))) ]>
+        | AttrSplice(s, SpliceType.Unless)       => <[ attr_splice("unless", $(Parse(ToLocation(xmlAst), s))) ]>
         | Seq(items)                             => <[ [..$(items.Map(transformImpl))] ]>;
         | _                                      => Message.FatalError(ToLocation(xmlAst), "Unrecognized syntax in Html"); <[]>
         }
