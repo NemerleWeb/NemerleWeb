@@ -5,7 +5,7 @@ var nweb = {
     if (nweb["debugger"] && !fromDebugger)
       nweb["debugger"](model);
     
-    var template = tpl ? tpl : nweb.utils.getTemplateName(model, "_N_View");
+    var template = tpl ? tpl : nweb.utils.getTemplateName(model, "View");
     var destination = dest ? dest : "#nweb-start";
     var body = $(destination).html($("#" + template).html())[0];
     
@@ -14,7 +14,7 @@ var nweb = {
   },
   binds: function(name) {
     var binds = {
-      "nw-repeat": nweb.getRepeatBinding,
+      "nw-foreach": nweb.getRepeatBinding,
       "nw-text": nweb.getTextBinding,
       "nw-html": nweb.getHtmlBinding,
       "nw-value": nweb.getValueBinding,
@@ -22,18 +22,25 @@ var nweb = {
       "nw-template": nweb.getTemplateBinding,
       "nw-when": nweb.getWhenBinding,
       "nw-unless": nweb.getUnlessBinding,
-      "nw-css": nweb.getCssBinding,
-      "nw-style": nweb.getStyleBinding,
       "nw-visible": nweb.getVisibleBinding,
       "nw-disable": nweb.getDisableBinding,
       "nw-enable": nweb.getEnableBinding,
       "nw-click": nweb.getClickBinding,
       "nw-submit": nweb.getSubmitBinding,
-      "nw-apply": nweb.getEventsBinding,
-      "nw-event": nweb.getEventBinding
+      "nw-apply": nweb.getEventsBinding
     };
-    return binds[name];
+
+    var tryFindComplexBinder = function() {
+      if (name.indexOf("nw-css-") == 0) return nweb.getCssBinding;
+      if (name.indexOf("nw-style-") == 0) return nweb.getStyleBinding;
+      if (name.indexOf("nw-event-") == 0) return nweb.getEventBinding;
+      return nweb.getAttrBinding;
+    };
+
+    var binder = binds[name];
+    return !!binder ? binder : tryFindComplexBinder();
   },
+
   doesAllowMultipleBindings: function (attrName) {
     return attrName === "nw-css" ||
       attrName === "nw-style" ||
@@ -55,9 +62,7 @@ var nweb = {
           attrName = "nw-value";
         
       if (attrName.indexOf("nw-") === 0) {
-        var binder = attrName.indexOf("nw-attr-") === 0
-                     ? nweb.getAttrBinding
-                     : nweb.binds(attrName);
+        var binder = nweb.binds(attrName);
         
         if(typeof binder === 'undefined')
           throw "Unrecognized nw-* attribute: " + attrName;
@@ -115,9 +120,9 @@ var nweb = {
       }
     };
   },
-  getCssBinding: function(model, el, bindings, loopStack, attrVal) {
-    var css = /(.+):\s(.+)/.exec(attrVal);
-    var expr = nweb.parseExpression(model, css[2], loopStack);
+  getCssBinding: function(model, el, bindings, loopStack, attrVal, attrName) {
+    var className = attrName.substr(7);
+    var expr = nweb.parseExpression(model, attrVal, loopStack);
     return {
       el: el,
       getValue: function() {
@@ -125,14 +130,14 @@ var nweb = {
       },
       apply: function(value) {
         if(value)
-          $(el).addClass(css[1]);
+          $(el).addClass(className);
         else
-          $(el).removeClass(css[1]);
+          $(el).removeClass(className);
       }
     };
   },
   getAttrBinding: function (model, el, bindings, loopStack, attrVal, attrName) {
-    var attr = attrName.substr(8);
+    var attr = attrName.substr(3);
     var expr = nweb.parseExpression(model, attrVal, loopStack);
     return {
       el: el,
@@ -140,24 +145,25 @@ var nweb = {
         return nweb.getParsedValue(model, expr, loopStack);
       },
       apply: function (value) {
-        if (attr[1] === "class") {
+        if (attr === "class") {
           el.className = value;
         } else {
-          el[attr[1]] = value;
+          el[attr] = value;
         }
       }
     };
-  },
-  getStyleBinding: function(model, el, bindings, loopStack, attrVal) {
-    var style = /(.+):\s(.+)/.exec(attrVal);
-    var expr = nweb.parseExpression(model, style[2], loopStack);
+  },  
+  getStyleBinding: function(model, el, bindings, loopStack, attrVal, attrName) {
+    var styleValue = attrVal;
+    var styleName = attrName.substr(9);
+    var expr = nweb.parseExpression(model, styleValue, loopStack);
     return {
       el: el,
       getValue: function() {
         return nweb.getParsedValue(model, expr, loopStack);
       },
       apply: function(value) {
-        $(el).css(style[1], value);
+        $(el).css(styleName, value);
       }
     };
   },
@@ -295,7 +301,7 @@ var nweb = {
           return;
 
         for (var i = array.length - 1; i >= 0; i--) {
-          var $newEl = $(html).removeAttr("nw-repeat");
+          var $newEl = $(html).removeAttr("nw-foreach");
           
           $newEl.insertAfter($el);
 
@@ -317,25 +323,18 @@ var nweb = {
   },
   getTemplateBinding: function(model, el, bindings, loopStack, attrVal) {
     var $el = $(el);
-    var template = /(.+):\s(.+)/.exec(attrVal);
-    var parsedVal;
+    var parsedExpr = nweb.parseExpression(model, attrVal, loopStack);
+    var templateModel = nweb.getParsedValue(model, parsedExpr, loopStack);
+    var templateName = nweb.utils.getTemplateName(templateModel, "View");
 
-    if(!template) {
-      template = /(.+)/.exec(el.getAttribute("nw-template"));
-      parsedVal = model;
-    } else {
-      parsedVal = nweb.parseExpression(model, template[2], loopStack);
-    }
-
-    var parsedName = nweb.parseExpression(model, template[1], loopStack);    
-    var html = $("#" + nweb.getParsedValue(model, parsedName, loopStack)).html();
+    var html = $("#" + templateName).html();
     el.__nw_is_template = true;
 
     var binding = {
       el: $el,
       subBindings: [],
       getValue: function() {
-        return nweb.getParsedValue(model, parsedVal, loopStack);
+        return nweb.getParsedValue(model, parsedExpr, loopStack);
       },
       apply: function(value) {
         $el = nweb.utils.replaceWith($el, $(html).removeAttr("nw-template"));
@@ -408,11 +407,11 @@ var nweb = {
     var method = nweb.getParsedValue(model, parsed, loopStack, el);
     method.apply(el);
   },
-  getEventBinding: function(model, el, bindings, loopStack, attrVal) {
-    var event = /(.+):\s(.+)/.exec(attrVal);
-    var methodString = nweb.parseExpression(model, event[2], loopStack);
+  getEventBinding: function(model, el, bindings, loopStack, attrVal, attrName) {
+    var eventName = attrName.substr(9);
+    var methodString = nweb.parseExpression(model, attrVal, loopStack);
     var method = nweb.getParsedValue(model, methodString, loopStack, el);
-    $(el).bind(event[1], function (e) { nweb.invalidate(); method(e); nweb.invalidate(); });
+    $(el).bind(eventName, function (e) { nweb.invalidate(); method(e); nweb.invalidate(); });
   },
   isWordCharacter: function(chr) {
     return (chr >= 'a' && chr <= 'z') || (chr >= 'A' && chr <= 'Z') || chr === '_';
@@ -685,7 +684,7 @@ nweb.utils = {
         if (!model)
             throw "Model passed in template() cannot be null or undefined. Make sure, you initialized members that are used in templating.";
 
-        return nweb.utils.getConstructorName(model) + viewName;
+        return nweb.utils.getConstructorName(model) + "_N_" + viewName;
     },
     getConstructorName: function(model) {
         var funcNameRegex = /function (.{1,})\(/;
@@ -704,7 +703,7 @@ nweb.utils = {
             arr.push(attrs[i]);
         }
         arr.sort(function (a, b) {
-          if (a.nodeName === "nw-repeat")
+          if (a.nodeName === "nw-foreach")
             return -2;
           if (a.nodeName === "nw-when" || a.nodeName === "nw-unless")
             return -1;

@@ -92,21 +92,21 @@ namespace NemerleWeb.Rsdn
             <h3 class="search-cat-header">Forums ($(SearchResultsForums.Children.Count))</h3>
           </a>
           <div $when(_showForums)>
-            <div template="$(template(SearchResultsForums))" />
+            <div template="$SearchResultsForums" />
           </div>
           
           <a href="#" click="$ToggleArticles">
             <h3 class="search-cat-header">Articles ($(SearchResultsArticles.Children.Count))</h3>
           </a>
           <div $when(_showArticles)>
-            <div template="$(template(SearchResultsArticles))" />
+            <div template="$SearchResultsArticles" />
           </div>
           
           <a href="#" click="$ToggleOthers">
             <h3 class="search-cat-header">Others ($(SearchResultsOthers.Children.Count))</h3>
           </a>
           <div $when(_showOthers)>
-            <div template="$(template(SearchResultsOthers))" />
+            <div template="$SearchResultsOthers" />
           </div>
         </div>
       #>

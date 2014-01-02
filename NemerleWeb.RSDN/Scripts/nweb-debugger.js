@@ -15,7 +15,7 @@
   });
   
   var template = "<div class='nweb-debug-model' style='margin-left: 10px'>" +
-                 "  <div nw-repeat='member in model.members'>" +
+                 "  <div nw-foreach='member in model.members'>" +
                  "    <span class='nweb-debug-name' nw-click='member.toggle()' nw-text='member.name' style='font-weight: bold; cursor: pointer;'/>: " +
                  "    <span class='nweb-debug-val' nw-text='member.value' style='font-size: 12px'/>" +
                  "    <div nw-when='member.isOpened'>" +

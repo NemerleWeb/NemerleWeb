@@ -119,17 +119,17 @@ namespace NemerleWeb.Rsdn
         <div class="page">
           <div class="left">
             <div $when(Root != null) class="root">
-              <div template="$(template(Search))" />
+              <div template="$Search" />
               <div $when(string.IsNullOrEmpty(Search.SearchTerm))>
                 <div class="pinned-nodes">
-                  <div template="$(template(Pinned))" />
+                  <div template="$Pinned" />
                 </div>
-                <div template="$(template(Root))" />
+                <div template="$Root" />
               </div>
             </div>
           </div>
           <div class="right">
-            <iframe attr-src="$SelectedUrl" frameborder="0" border="0" />
+            <iframe src="$SelectedUrl" frameborder="0" border="0" />
           </div>
         </div>
       #>

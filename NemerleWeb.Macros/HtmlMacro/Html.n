@@ -124,7 +124,7 @@ namespace NemerleWeb
                 lv.Name + "_" + lv.Id.ToString()
               }
               def foreachEnum = 
-                  "nw-foreach=\"" + getLocalValueName(loopValName) + " in " + escape(JSAstBuilder.BuildJSAst(val, false, mb.Header).Write()) + "\" ";
+                  "nw-foreach=\"" + getLocalValueName(loopValName) + " in " + escape(JSAstBuilder.BuildJSAstForSplices(val, mb.Header).Write()) + "\" ";
               (foreachEnum + htmlFromTExpr(attrs, indent), 
                htmlFromTExpr(childTags, indent + "  "))
             | Tuple([attrs, childTags]) =>
@@ -138,7 +138,7 @@ namespace NemerleWeb
           indent + $"</$(tagName)>";
         
         | Call(LocalFunRef(decl, _), [textExprExpr], _) when decl.Name == "text_splice" => 
-          def splice = JSAstBuilder.BuildJSAst(textExprExpr.expr, false, mb.Header).Write();
+          def splice = JSAstBuilder.BuildJSAstForSplices(textExprExpr.expr, mb.Header).Write();
           def splice = escape(splice.Trim(array['\"']));
           $"<span nw-text=\"$splice\" />"
         
@@ -153,7 +153,7 @@ namespace NemerleWeb
           else
             attrExprExpr.expr;
          
-          def attrSplice = escape(JSAstBuilder.BuildJSAst(attrExpr, false, mb.Header).Write());
+          def attrSplice = escape(JSAstBuilder.BuildJSAstForSplices(attrExpr, mb.Header).Write());
           $"nw-$attrName=\"$attrSplice\""
           
         | Call(LocalFunRef(decl, _), [Parm(_, Literal(Literal.String(attrName)), _, _), Parm(_, Literal(Literal.String(attrValue)), _, _)], _) 

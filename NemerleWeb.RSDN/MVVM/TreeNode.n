@@ -82,8 +82,8 @@ namespace NemerleWeb.Rsdn
     {
       <#
         <div $foreach(c in Children) style-margin-left="$(c.Depth * 6)" class="node" css-selected-search-result="$(c.IsSelected)">
-          <a click="$(c.CaptionClick())" attr-href="$("http://www.rsdn.ru" + c.Href)" css-with-children="$(c.HasChildren)">
-            <img class="node-icon" attr-src="$(c.IconUrl)" />
+          <a click="$(c.CaptionClick())" href="$("http://www.rsdn.ru" + c.Href)" css-with-children="$(c.HasChildren)">
+            <img class="node-icon" src="$(c.IconUrl)" />
             <span class="node-caption" css-is-active="$(MainPage.Instance.IsActiveNode(c))">
               $(c.Caption)
             </span>
@@ -93,7 +93,7 @@ namespace NemerleWeb.Rsdn
             Загрузка, пожалуйста подождите...
           </div>
           <div $when(c.IsOpened && Children != null)>
-            <div template="$(template(c))" />
+            <div template="$c" />
           </div>
         </div>
       #>

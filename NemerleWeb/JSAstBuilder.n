@@ -34,7 +34,7 @@ namespace NemerleWeb
       def getLocalValueName(localVal : LocalValue)
       {        
         def isFromMainMethodParams = methodHeader.Parameters.Any(p => p.decl.Id == localVal.Id);
-        if(isFromMainMethodParams) localVal.Name else localVal.Name + "_" + localVal.Id
+        if(isFromMainMethodParams || localVal.ValKind is LocalValue.Kind.FunParm) localVal.Name else localVal.Name + "_" + localVal.Id
       }
             
       match(expr) 
@@ -57,22 +57,8 @@ namespace NemerleWeb
       | DebugInfo(expr = expr)            => build(expr)
       | Def                               => Message.Error(expr.Location, "Def not implemented"); JSAst.NotImpl("Def")
       | DefaultValue as d                 => DefaultValueInitializer.GetJSAst(d.Type)
-      | DefFunctionsIn(header :: _, body) =>               
-        def typedBody = header.body :> FunBody.Typed;
-        
-        def funBody = BuildJSAst(typedBody.expr, header.ReturnType.ToString() != "void", header);
-        def function = JSAst.Function("", header.Parameters.Map(p => p.name), funBody);
-        
-        match(body) 
-        {
-        | TExpr.LocalFunRef => function
-        | _ => 
-          def defFunction = JSAst.DefValue(header.Name, function);          
-          JSAst.Seq([defFunction, build(body)])
-        }
       | DefFunctionsIn(header :: _, body) =>
         def typedBody = header.body :> FunBody.Typed;
-        
         def funBody = BuildJSAst(typedBody.expr, header.ReturnType.ToString() != "void", header);
         def function = JSAst.Function("", header.Parameters.Map(p => p.name), funBody);
         
@@ -290,7 +276,7 @@ namespace NemerleWeb
     /// <summary>
     /// Special method for building ast for slices.
     /// </summary>
-    public BuildJSAstForSplices(expr : TExpr, methodHeader : TFunHeader) : IEnumerable[JSAst.DefValue]
+    public BuildJSAstForSplices(expr : TExpr, methodHeader : TFunHeader) : JSAst
     {
       def ast = JSAstBuilder.Build(expr, [], methodHeader);
       
@@ -302,7 +288,9 @@ namespace NemerleWeb
         | _ => a
         }
       });
-      
+                      
+      ast
+      /*
       JSAstHelper
         .IterateAST(ast)
         .Where(a => a is JSAst.DefValue || a is JSAst.Assign)
@@ -318,7 +306,7 @@ namespace NemerleWeb
           | JSAst.Assign(JSAst.LocalRef(name, _type), r) => JSAst.DefValue(name, r)
           | JSAst.Assign(JSAst.FieldRef(_obj, name), r) => JSAst.DefValue(name, r)
           | _ => Message.Error("Must not get here"); null
-        });
+        });*/
     }
       
     public BuildJSAst(expr : TExpr, shouldReturn : bool, methodHeader : TFunHeader) : JSAst
