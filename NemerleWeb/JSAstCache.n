@@ -25,7 +25,7 @@ namespace NemerleWeb
         _cache[tb.FullName] = funcDictionary;
       }
       
-      funcDictionary[func.Name] = jsAst;
+      funcDictionary[JSAstHelper.Method(func.Name, Some(func.Parameters))] = jsAst;
     }
     
     public Get(tb : TypeBuilder, func : TFunHeader) : option[JSAst]
@@ -33,7 +33,7 @@ namespace NemerleWeb
       mutable funcDictionary;
       mutable ast; 
       
-      if(_cache.TryGetValue(tb.FullName, out funcDictionary) && funcDictionary.TryGetValue(func.Name, out ast))
+      if(_cache.TryGetValue(tb.FullName, out funcDictionary) && funcDictionary.TryGetValue(JSAstHelper.Method(func.Name, Some(func.Parameters)), out ast))
         Some(ast)
       else None()
     }
