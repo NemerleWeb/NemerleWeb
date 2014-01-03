@@ -146,7 +146,7 @@ namespace NemerleWeb
             incrementIncoming("__CHECK_LABEL__" + id);
             newLabel;
           | TryCatch(body, _ex, handler) => 
-            f(body, f(handler, next));
+            f(body, Some(f(handler, next)));
           | TryFinally(body, _handler) => 
             f(body, next);            
           | _ =>
