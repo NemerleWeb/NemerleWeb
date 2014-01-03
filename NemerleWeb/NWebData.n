@@ -8,6 +8,7 @@ using NemerleWeb;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -34,12 +35,22 @@ namespace NemerleWeb
       foreach(dataType in datas)
       {
         def instance = Activator.CreateInstance(dataType, array[], array[]) :> NWebDataInstance;
-                  
-        foreach(f in instance.Scripts)
+        
+        foreach(f in instance.Scripts) 
+        {
           Scripts.Add(f);
+          def filename = Path.GetFileName(f);
+          def scriptContents = readResource(filename, dataType.Assembly);
+          File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "NemerleWeb", filename), scriptContents);
+        }
           
-        foreach((id, filename) in instance.Templates)        
-          Templates.Add((id, readResource(Path.GetFileName(filename), dataType.Assembly)));
+        foreach((id, path) in instance.Templates) 
+        {
+          def filename = Path.GetFileName(path);
+          def templateContents = readResource(filename, dataType.Assembly);
+          Templates.Add((id, templateContents));
+          File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "NemerleWeb", filename), templateContents);
+        }
       }
     }         
     

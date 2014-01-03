@@ -40,19 +40,19 @@ namespace NemerleWeb.Website.Samples
       js <#
           Sammy(function() {
               this.get("#spa/:folder", function() {
-                  _NW$_self.set_ChosenFolderId(this.params.folder);
-                  _NW$_self.set_ChosenMailData(null);
+                  self.set_ChosenFolderId(this.params.folder);
+                  self.set_ChosenMailData(null);
                   $.get("/SPAPage/Folder", { folder: this.params.folder }, function(result) { 
-                      _NW$_self.set_ChosenFolderData(nweb.utils.toTypedObject(JSON.parse(result)));
+                      self.set_ChosenFolderData(nweb.utils.toTypedObject(JSON.parse(result)));
                       nweb.invalidate();
                   });
               });
                     
               this.get("#spa/:folder/:mailId", function() {
-                  _NW$_self.set_ChosenFolderId(this.params.folder);
-                  _NW$_self.set_ChosenMailData(null);
+                  self.set_ChosenFolderId(this.params.folder);
+                  self.set_ChosenMailData(null);
                   $.get("/SPAPage/Mail", { mailId: this.params.mailId }, function(result) { 
-                      _NW$_self.set_ChosenMailData(nweb.utils.toTypedObject(JSON.parse(result)));
+                      self.set_ChosenMailData(nweb.utils.toTypedObject(JSON.parse(result)));
                       nweb.invalidate();
                   });
               });
@@ -105,13 +105,13 @@ namespace NemerleWeb.Website.Samples
       <div xmlns="">
           <h3>Single page apps</h3>
           <ul class="folders">
-              <li $foreach(f in Folders) text="$f" css-selected="$(f == ChosenFolderId)" click="$GoToFolder"> </li>
+              <li $foreach(f in Folders) text="$f" css-selected="$(f == ChosenFolderId)" click="$GoToFolder(f)"> </li>
           </ul>
 
           <table $when(ChosenFolderData != null) class="mails">
               <thead><tr><th>From</th><th>To</th><th>Subject</th><th>Date</th></tr></thead>
               <tbody>
-                  <tr $foreach(m in ChosenFolderData.Mails) click="$GoToMail">
+                  <tr $foreach(m in ChosenFolderData.Mails) click="$GoToMail(m)">
                       <td>$(m.From)</td>
                       <td>$(m.To)</td>
                       <td>$(m.Subject)</td>

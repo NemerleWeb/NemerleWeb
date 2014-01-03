@@ -313,12 +313,12 @@ namespace NemerleWeb
     {
       mutable ast = JSAstBuilder.Build(expr, [], methodHeader);
       
-      ast = JSAstHelper.TransformBottomUp(ast);
-      ast = JSAstHelper.FlattenAndRemoveVoids(ast);
-      ast = JSAstHelper.RemoveEmptyBranches(ast);
-        
       when(shouldReturn)
         ast = JSAstHelper.MakeReturn(ast);
+      
+      ast = JSAstHelper.TransformBottomUp(ast);
+      ast = JSAstHelper.FlattenAndRemoveVoids(ast);
+      ast = JSAstHelper.RemoveEmptyBranches(ast);        
           
       ast = JSAstHelper.FlattenAndRemoveVoids(ast);
       ast = JSAstHelper.GotosToSwitch(ast);

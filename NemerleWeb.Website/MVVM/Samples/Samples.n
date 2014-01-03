@@ -199,7 +199,7 @@ namespace NemerleWeb.Website.Samples
               <h4>NemerleWeb Samples</h4>
               <ul class="nav nav-stacked">
                 <li $foreach(s in Samples) css-selected="$(SelectedSample.Name == s.Name)">
-                  <a href="#" click="$SelectSample">$(s.Name)</a>
+                  <a href="#" click="$(SelectSample(s))">$(s.Name)</a>
                 </li>
               </ul>
             </div>
@@ -207,7 +207,7 @@ namespace NemerleWeb.Website.Samples
               <h4>KnockoutJS Samples</h4>
               <ul class="nav nav-stacked">
                 <li $foreach(s in KnockoutSamples) css-selected="$(SelectedSample.Name == s.Name)">
-                  <a href="#" click="$SelectSample">$(s.Name)</a>
+                  <a href="#" click="$(SelectSample(s))">$(s.Name)</a>
                 </li>            
               </ul>
             </div>
@@ -215,7 +215,7 @@ namespace NemerleWeb.Website.Samples
               <h4>Peg Samples</h4>
               <ul class="nav nav-stacked">
                 <li $foreach(s in PegSamples) css-selected="$(SelectedSample.Name == s.Name)">
-                  <a href="#" click="$SelectSample">$(s.Name)</a>
+                  <a href="#" click="$(SelectSample(s))">$(s.Name)</a>
                 </li>            
               </ul>
             </div>
@@ -223,7 +223,7 @@ namespace NemerleWeb.Website.Samples
           <div $foreach(s in AllSamples)>
             <div $when(SelectedSample.Name == s.Name) class="current-sample">
               <div class="sample">
-                <div template="$(template(s.Instance))"></div>
+                <div template="$(s.Instance)"></div>
               </div>
               <h3>Source</h3>
               <pre class="prettyprint lang-n prettyprinted">$(s.Source)</pre>

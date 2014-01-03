@@ -33,7 +33,7 @@ namespace NemerleWeb.Website.Samples
  
     public More() : void
     {
-      when (LetterCount < Alphabet.Count())        
+      when (LetterCount < Alphabet.Count())
         LetterCount++;
     }
 

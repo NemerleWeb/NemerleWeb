@@ -22,7 +22,7 @@ namespace NemerleWeb.Website
     [Html]
     public View() : string {
       <#
-        <div template="$(template(_buttonDropdown))"></div>
+        <div template="$(_buttonDropdown)"></div>
       #>
     }
   }

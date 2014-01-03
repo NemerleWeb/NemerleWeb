@@ -70,30 +70,36 @@ namespace NemerleWeb
       unless(typer.Manager.IsIntelliSenseMode)
         CreateResourceController(tb, typer);
       
+      //assert2(false);
+      
       def translateMethod(typer) 
       {
         match(typer.CurrentFunction.body) 
         {
-        | FunBody.Typed(body) =>       
+        | FunBody.Typed(body) =>
+          //when(typer.CurrentFunction.name.Contains("catchClause"))
+            //assert2(false);
+            
           def methodBuilder = typer.CurrentMethodBuilder;          
           def shouldReturn = !(methodBuilder.Header.ReturnType is FixedType.Void()) && !methodBuilder.IsConstructor;
           def ast = JSAstBuilder.BuildJSAst(body, shouldReturn, methodBuilder.Header);
-          JSAstCache.Add(tb, typer.CurrentFunction, ast);
+          JSAstCache.Add(typer.CurrentTypeBuilder, typer.CurrentFunction, ast);
         | _ => ()
         }
       }
       
-      def getAllNestedTypes(tb) 
+      def getAllNestedTypes(tb, isTopMost)
       {
-        tb.GetNestedTypes()
-          .OfType.[TypeBuilder]()
-          .Where(t => !t.Name.StartsWith("_N_"))
-          .SelectMany(getAllNestedTypes);
+        def children = JSClass.GetNestedTypes(tb)
+                              .Map(t => getAllNestedTypes(t, false))
+                              .Flatten();
+                              
+        if(isTopMost) children else tb :: children;
       }
       
       tb.MethodBeforeStage3 += (_, e) => translateMethod(e.Typer);
       
-      foreach(nestedType in getAllNestedTypes(tb))       
+      foreach(nestedType in getAllNestedTypes(tb, true))
       {
         when(nestedType != null)
           nestedType.MethodBeforeStage3 += (_, e) => translateMethod(e.Typer);
@@ -292,7 +298,7 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       {
         def hash = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "");
         def scriptsDir = Path.Combine(dir, "Scripts", "NemerleWeb");
-        def relativeScriptPath = Path.Combine("Scripts", "NemerleWeb", filename + hash + ".js");        
+        def relativeScriptPath = Path.Combine("Scripts", "NemerleWeb", filename + "_" + hash + ".js");
         
         when(!Directory.Exists(scriptsDir))
           _ = Directory.CreateDirectory(scriptsDir);

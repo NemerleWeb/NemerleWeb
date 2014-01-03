@@ -97,7 +97,7 @@ namespace NemerleWeb.Website.Samples
                     <li $foreach(t in ActiveTasks)>
                         <input type="checkbox" checked="$(t.IsDone)" />
                         <input value="$(t.Title)" disable="$(t.IsDone)" />
-                        <a href="#" click="$RemoveTask">Delete</a>
+                        <a href="#" click="$(RemoveTask(t))">Delete</a>
                     </li> 
                 </ul>
 

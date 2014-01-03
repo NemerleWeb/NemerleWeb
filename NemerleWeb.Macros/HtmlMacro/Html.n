@@ -60,11 +60,11 @@ namespace NemerleWeb
             typer.CurrentTypeBuilder.Define(<[ decl:
               [HtmlTyped]
               public $(tempMethodName : name)() : list[object] {
-                def tag(name, expr : object) : object { "" };
-                def attr(name, expr : object) : object { "" };
-                def attr_splice(name, expr : object) : object { "" };
-                def text(expr : object) : object { "" };
-                def text_splice(expr : object) : object { "" };
+                def tag(name, expr : object) : object { (name, expr) };
+                def attr(name, expr : object) : object { (name, expr) };
+                def attr_splice(name, expr : object) : object { (name, expr) };
+                def text(expr : object) : object { expr };
+                def text_splice(expr : object) : object { expr };
                 
                 def skip = {
                   tag("", ([], []));
@@ -166,9 +166,10 @@ namespace NemerleWeb
         }
       }
       
-      Message.Hint(mb.Body.ToString());
+      //assert2(false);
+      //Message.Hint(mb.Body.ToString());
       TyperHelper.GetTypedBody(mb, typer, typer.CurrentTypeBuilder, body => {        
-        Message.Hint(body.ToString());
+        //Message.Hint(body.ToString());
         def html = htmlFromTExpr(body, "");
         UnitImpl.AddTemplateData(mb.DeclaringType, mb.Name, html);
       }, true);      

@@ -33,7 +33,7 @@ namespace NemerleWeb
     public static ObjectType : TypeVar { get; set; }
     #endregion
       
-    public static Self : string = "_NW$_self";
+    public static Self : string = "self";
       
     /// <summary>
     /// Initialize self either
@@ -114,17 +114,19 @@ namespace NemerleWeb
         FilterMethods(methods);
       }
     }
-      
+    public static GetNestedTypes(type : TypeBuilder) : IEnumerable[TypeBuilder]
+    {
+      type.DeclaredNestedTypes
+					.Where(c => !c.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
+                        .Where(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server                                
+                        .Where(c => !c.Name.StartsWith("_N_")) //Not generated class;
+    }
+    
     NestedClasses : IEnumerable[JSClass]
     {            
       get
       {
-        def nested = ClassType.DeclaredNestedTypes
-							.Where(c => !c.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
-                              .Where(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server                                
-                              .Where(c => !c.Name.StartsWith("_N_")) //Not generated class
-                              .Select(c => JSClass(c, Indent, Typer));
-        nested
+        GetNestedTypes(ClassType).Select(c => JSClass(c, Indent, Typer));
       }
     }
               
@@ -480,21 +482,21 @@ $(indent)}#>
       $"..$(NestedClasses; Environment.NewLine; _.Write())"
     }
       
-      public TranslateMethodBody([NotNull] meth : IMethod, [NotNull] indent = "" : string) : string
+    public TranslateMethodBody([NotNull] meth : IMethod, [NotNull] indent = "" : string) : string
+    {
+      match(JSAstCache.Get(ClassType, meth.Header))
       {
-        match(JSAstCache.Get(ClassType, meth.Header))
+      | Some(ast) => ast.Write(indent)
+      | None => 
+        if(meth.IsAbstract) ""
+        else 
         {
-        | Some(ast) => ast.Write(indent)
-        | None => 
-          if(meth.IsAbstract) ""
-          else 
-          {
-            Message.Hint($"No JSAst found for $(meth.Name) from $(meth.DeclaringType.Name)");
-            assert2(false);
-            "/* No translation found */"
-          }
+          Message.Hint($"No JSAst found for $(meth.Name) from $(meth.DeclaringType.Name)");
+          assert2(false);
+          "/* No translation found */"
         }
       }
+    }
       
     public static TypeIsArray([NotNull] typeVar : TypeVar) : bool 
     {

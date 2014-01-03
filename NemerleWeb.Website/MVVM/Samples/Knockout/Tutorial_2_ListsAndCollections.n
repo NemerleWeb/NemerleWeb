@@ -78,7 +78,7 @@ namespace NemerleWeb.Website.Samples
                               </select>
                             </td>
                             <td>$(s.FormattedPrice)</td>
-                            <td><a href="#" click="$RemoveSeat">Remove</a></td>
+                            <td><a href="#" click="$(RemoveSeat(s))">Remove</a></td>
                         </tr>    
                     </tbody>
                 </table>

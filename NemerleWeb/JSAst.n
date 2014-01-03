@@ -316,7 +316,7 @@ namespace NemerleWeb
                 JSAst.DefValue(l, JSAst.Void()),
                 JSAstHelper.DelayAssignment(r, JSAst.LocalRef(l, None()))]);
               res;
-            | _ => this                
+            | _ => this
             }
           }            
         }
@@ -644,7 +644,7 @@ $(Body.Write(indent + "  "))
         }
         | Return         { Expr : JSAst;
             public override Write(indent = "" : string) : string {
-                indent + $<#return $(Expr.Write(""))#>
+              indent + $<#return $(Expr.Write(""))#>
             }
         }
         | Seq            { Items : list[JSAst];
@@ -655,9 +655,9 @@ $(Body.Write(indent + "  "))
             }
             public override Transform() : JSAst {
                 match(Items) {
-                | [DefValue("__returnValue", Void), 
-                   Assign(LocalRef("__returnValue", _), toReturn), 
-                   Return(LocalRef("__returnValue", _))] =>
+                | [DefValue(JSAstHelper.ReturnValue, Void), 
+                   Assign(LocalRef(JSAstHelper.ReturnValue, _), toReturn), 
+                   Return(LocalRef(JSAstHelper.ReturnValue, _))] =>
                    
                   JSAst.Return(toReturn)
                 | x :: [] => x
@@ -751,6 +751,16 @@ $(indent)}
         | TupleIndexer          { Obj : JSAst; Pos : int;
           public override Write(_indent = "" : string) : string {            
             $<#$(Obj.Write())[$Pos]#>
+          }
+          public override Transform() : JSAst {
+            if(!IsAllowedForAssignment(Obj)) {
+              def varName = JSAstHelper.GetTemporaryVariableName();
+              JSAst.Seq([
+                JSAst.DefValue(varName, JSAst.Void()),
+                JSAstHelper.DelayAssignment(Obj, JSAst.LocalRef(varName, None())),
+                JSAst.TupleIndexer(LocalRef(varName, None()), Pos)
+              ]);
+            } else this;
           }
         }
         | TypeOf         { Expr : JSAst;
