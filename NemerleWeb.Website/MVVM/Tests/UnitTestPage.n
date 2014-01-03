@@ -111,7 +111,6 @@ namespace NemerleWeb.Website.Tests
       public this(_ : int) { }
     }
     
-    /*
     [Unit]
     class SomeException : Exception
     {
@@ -123,7 +122,6 @@ namespace NemerleWeb.Website.Tests
         }
       }
     }
-    */
     
     enum SampleEnum
     {
@@ -1803,6 +1801,41 @@ namespace NemerleWeb.Website.Tests
       test("tuples 4 implicit default initialization", () => {
         mutable t : int * int * int * int;
         t : object == null
+      });
+      
+      test("some exception any handler", () => {
+        try
+        {
+          throw SomeException();
+        }
+        catch
+        {
+        | _ => true
+        }
+      });
+      
+      test("some exception specific handler", () => {
+        try
+        {
+          throw SomeException();
+        }
+        catch
+        {
+        | _ is SomeException => true
+        }
+      });
+      
+      test("some exception specific handler with filter", () => {
+        def x = 1;
+        
+        try
+        {
+          throw SomeException();
+        }
+        catch
+        {
+        | _ is SomeException when x == 1 => true
+        }
       });
     }
     

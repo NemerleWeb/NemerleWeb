@@ -145,6 +145,8 @@ namespace NemerleWeb
             exprList ::= new (label = newLabel, expr = getGotoToLabel(id), next = next, ifBlocks = None());
             incrementIncoming("__CHECK_LABEL__" + id);
             newLabel;
+          | Try(body, ex, _handler) => 
+            f(body, next);            
           | TryFinally(body, _handler) => 
             f(body, next);            
           | _ =>
@@ -278,6 +280,7 @@ namespace NemerleWeb
               | r => r
               };
             JSAst.Seq(newExprs.Rev())
+        | Try(body, exception, handler) => JSAst.Try(delayAssignment(body), exception, handler)
         | TryFinally(body, handler) => JSAst.TryFinally(delayAssignment(body), handler)
         | Assign(l, r)     => JSAst.Assign(l, delayAssignment(r))
         | If(c, t, e)      => JSAst.If(c, delayAssignment(t), delayAssignment(e))

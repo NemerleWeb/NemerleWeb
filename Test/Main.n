@@ -38,10 +38,16 @@ module Program
 [Unit]
 public class Test
 {
-  F():void
+  F():int
   {
-    mutable a;
-    int.TryParse("A", System.Globalization.NumberStyles.HexNumber, null, out a);
+    try
+    {
+      throw Exception();
+    }
+    finally
+    {
+      1
+    }
   }
  
   [Html]
