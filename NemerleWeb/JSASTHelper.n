@@ -280,7 +280,7 @@ namespace NemerleWeb
               | r => r
               };
             JSAst.Seq(newExprs.Rev())
-        | Try(body, exception, handler) => JSAst.Try(delayAssignment(body), exception, handler)
+        | TryCatch(body, ex, handler) => JSAst.TryCatch(delayAssignment(body), ex, delayAssignment(handler))
         | TryFinally(body, handler) => JSAst.TryFinally(delayAssignment(body), handler)
         | Assign(l, r)     => JSAst.Assign(l, delayAssignment(r))
         | If(c, t, e)      => JSAst.If(c, delayAssignment(t), delayAssignment(e))

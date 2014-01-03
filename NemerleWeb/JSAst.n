@@ -716,7 +716,7 @@ $(indent)})#>
                 indent + $"throw $(Obj.Write())"
             }
         }
-        | Try            { Body : JSAst; Exception : option[string]; Handler : JSAst;
+        | TryCatch            { Body : JSAst; Exception : option[string]; Handler : JSAst;
             public override Write(indent = "" : string) : string {
               def ex = if(Exception.IsSome) $"($(Exception.Value))" else "";
 $<#
@@ -897,7 +897,7 @@ $(indent)}
             | Ternary(cond, then, els)    => JSAst.Ternary(recurse(cond), recurse(then), recurse(els))
             | This                        => ast'
             | Throw(obj)                  => JSAst.Throw(recurse(obj))
-            | Try(body, ex, handler)      => JSAst.Try(recurse(body), ex, recurse(handler))
+            | Try(body, ex, handler)      => JSAst.TryCatch(recurse(body), ex, recurse(handler))
             | TryFinally(body, handler)   => JSAst.TryFinally(recurse(body), recurse(handler))
             | Tuple(args)                 => JSAst.Tuple(args.Map(recurse))
             | TupleIndexer(o, pos)        => JSAst.TupleIndexer(recurse(o), pos)

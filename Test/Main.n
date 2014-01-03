@@ -44,9 +44,9 @@ public class Test
     {
       throw Exception();
     }
-    finally
+    catch
     {
-      1
+      | _ => 1
     }
   }
  
