@@ -38,6 +38,14 @@ namespace NemerleWeb
         match (member.Name)
         {
         | "Parse" => Some(JSAst.Call(JSAst.GlobalRef("parseFloat"), [arg1]))
+        | "TryParse" =>
+          Some(
+            JSAst.Call(
+              JSAst.MethodRef(
+                JSAst.FieldRef(JSAst.GlobalRef("nweb"), "utils"),
+                "tryParseFloat",
+                None()),
+              parms))
         | _ => None()
         }
       | _ => None()

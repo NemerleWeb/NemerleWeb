@@ -18,7 +18,7 @@ namespace NemerleWeb
     if(!typer.Manager.IsIntelliSenseMode)
       NwebImpl.TransformNweb(expr, typer);
     else
-      <[ ]>
+      <[ "" ]>
   }
     
   public module NwebImpl

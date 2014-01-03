@@ -242,6 +242,9 @@
     <Compile Include="JSKnownMembersOperators.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JSKnownMembersDiagnosticsDebug.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JSKnownMembersTextStringBuilder.n">
       <SubType>Code</SubType>
     </Compile>

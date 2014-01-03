@@ -41,6 +41,7 @@ namespace NemerleWeb
       JSKnownMembersArray.Register();
       
       JSKnownMembersMath.Register();
+      JSKnownMembersDiagnosticsDebug.Register();
       JSKnownMembersNemerleOption.Register();
       JSKnownMembersTextStringBuilder.Register();
       JSKnownMembersGlobalizationCutlureInfo.Register();

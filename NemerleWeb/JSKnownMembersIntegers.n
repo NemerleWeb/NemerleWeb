@@ -35,6 +35,17 @@ namespace NemerleWeb
     
     private StaticHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
     {
+      def call(function : string) : option[JSAst]
+      {
+        Some(
+          JSAst.Call(
+            JSAst.MethodRef(
+              JSAst.FieldRef(JSAst.GlobalRef("nweb"), "utils"),
+              function,
+              None()),
+            parms))
+      }
+      
       match (parms)
       {
       | [_] =>
@@ -47,6 +58,13 @@ namespace NemerleWeb
         match (member.Name)
         {
         | "Parse" => Some(JSAst.Call(JSAst.GlobalRef("parseInt"), [arg1]))
+        | "TryParse" => call("tryParseInt")
+        | _ => None()
+        }
+      | [_arg1, _arg2, _arg3, _arg4] =>
+        match (member.Name)
+        {
+        | "TryParse" => call("tryParseIntStyle")
         | _ => None()
         }
       | _ => None()

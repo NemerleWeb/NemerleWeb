@@ -765,8 +765,89 @@ nweb.utils = {
         res.__proto__ = func.prototype;
       }
       return func.apply(res, Array.prototype.slice.call(arguments, 2));
-    }
+    },    
 };
+
+// Console wrappers
+
+function noOp() { }
+var hasWindowConsole = typeof window.console !== "undefined";
+
+nweb.utils.console = {};
+nweb.utils.console.log =
+    hasWindowConsole && typeof window.console.log !== "undefined"
+    ? function () { window.console.log.apply(window.console, arguments); }
+    : noOp;
+nweb.utils.console.logLine = function(s) {
+    nweb.utils.console.log(s);
+    nweb.utils.console.log("\n");
+};
+nweb.utils.console.debug =
+    hasWindowConsole && typeof window.console.debug !== "undefined"
+    ? function () { window.console.debug.apply(window.console, arguments); }
+    : noOp;
+nweb.utils.console.debugLine = function (s) {
+    nweb.utils.console.debug(s);
+    nweb.utils.console.debug("\n");
+};
+nweb.utils.console.error =
+    hasWindowConsole && typeof window.console.error !== "undefined"
+    ? function () { window.console.error.apply(window.console, arguments); }
+    : noOp;
+
+// End Console wrappers
+
+// Parsing
+
+nweb.utils.tryParse = function(parseFunction, s, result) {
+    // Check arguments
+    if (s != null && s.length > 0 && !window.isNaN(s)) {
+        var res = parseFunction(s);
+        // Check return value
+        if (!window.isNaN(res) && window.isFinite(res)) {
+            if (result != null) {
+                result.value = res;
+            }
+            return true;
+        }
+    }
+
+    if (result != null) {
+        result.value = 0;
+    }
+    return false;
+};
+nweb.utils.tryParseInt = function (s, result) {
+    return nweb.utils.tryParse(window.parseInt, s, result);
+};
+nweb.utils.tryParseFloat = function (s, result) {
+    return nweb.utils.tryParse(window.parseFloat, s, result);
+};
+
+var NumberStyles = {
+    AllowHexSpecifier: 512
+};
+nweb.utils.tryParseIntStyle = function (s, style, formatter, result) {
+    // Check arguments
+    if (s != null && s.length > 0 && !window.isNaN(s)) {
+        var radix = ((style & NumberStyles.AllowHexSpecifier) != 0) ? 16 : 10;
+        var res = parseInt(s, radix);
+        // Check return value
+        if (!window.isNaN(res) && window.isFinite(res)) {
+            if (result != null) {
+                result.value = res;
+            }
+            return true;
+        }
+    }
+
+    if (result != null) {
+        result.value = 0;
+    }
+    return false;
+};
+
+// End Parsing
 
 nweb.setCookie = function (name, value, days) {
   var expires = "";
@@ -1093,9 +1174,26 @@ function System_Collections_Generic_Stack(arg) {
         return Enumerable.from(arg).toArray();
 }
 
+function System_Exception(message) {
+    this.message = message;
+
+    this.get_Message = function() { return this.message; };
+}
+
 function System_ArgumentNullException(paramName, message) {
     this.paramName = paramName;
     this.message = message;
+
+    this.get_ParamName = function () { return this.paramName; };
+    this.get_Message = function () { return this.message; };
+}
+
+function System_ArgumentOutOfRangeException(paramName, message) {
+    this.paramName = paramName;
+    this.message = message;
+
+    this.get_ParamName = function () { return this.paramName; };
+    this.get_Message = function () { return this.message; };
 }
 
 var System_Environment = {};
@@ -1116,4 +1214,4 @@ nweb.collection = {
     }
 };
 
-nweb.templateCollection = { };
+nweb.templateCollection = {};
