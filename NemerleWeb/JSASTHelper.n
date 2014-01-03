@@ -145,8 +145,8 @@ namespace NemerleWeb
             exprList ::= new (label = newLabel, expr = getGotoToLabel(id), next = next, ifBlocks = None());
             incrementIncoming("__CHECK_LABEL__" + id);
             newLabel;
-          | Try(body, ex, _handler) => 
-            f(body, next);            
+          | TryCatch(body, _ex, handler) => 
+            f(body, f(handler, next));
           | TryFinally(body, _handler) => 
             f(body, next);            
           | _ =>
