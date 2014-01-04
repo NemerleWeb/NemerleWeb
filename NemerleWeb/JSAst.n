@@ -455,6 +455,12 @@ $(indent)}#>
             }
             public override Transform() : JSAst {
                 match(this) {
+                | JustIf(If(c, t, e), tt)    => 
+                  def varName = JSAstHelper.GetTemporaryVariableName();
+                  JSAst.Seq([
+                    JSAst.DefValue(varName, JSAst.If(c, t, e)).Transform(),
+                    JSAst.JustIf(JSAst.LocalRef(varName, None()), tt)
+                  ]).Transform();
                 | JustIf(Call(func, [something, If(c, t, e)]), then) => 
                   def varName = JSAstHelper.GetTemporaryVariableName();
                   JSAst.Seq([
