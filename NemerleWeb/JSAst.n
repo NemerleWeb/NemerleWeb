@@ -865,7 +865,7 @@ $(indent)}
             typeof(JSAst.Unpack),
             typeof(JSAst.GlobalRef),
             typeof(JSAst.ServerCall),
-            typeof(JSAst.Function)
+            typeof(JSAst.Function),
             typeof(JSAst.HasType),
           ]);
         
