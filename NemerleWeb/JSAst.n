@@ -443,7 +443,7 @@ $indent}#>
             public override Write(_ = "" : string) : string {
                 "/* No Indexer writer implementation */"
             }
-        }      
+        }
         | JustIf         { Cond : JSAst; Body : JSAst;
             public override Write(indent = "" : string) : string {
 $<# 
@@ -453,6 +453,12 @@ $(indent)}#>
             }
             public override Transform() : JSAst {
                 match(this) {
+                | JustIf(If(c, t, e), tt)    => 
+                  def varName = JSAstHelper.GetTemporaryVariableName();
+                  JSAst.Seq([
+                    JSAst.DefValue(varName, JSAst.If(c, t, e)).Transform(),
+                    JSAst.JustIf(JSAst.LocalRef(varName, None()), tt)
+                  ]).Transform();
                 | JustIf(Call(func, [something, If(c, t, e)]), then) => 
                   def varName = JSAstHelper.GetTemporaryVariableName();
                   JSAst.Seq([
@@ -720,12 +726,13 @@ $(indent)})#>
                 indent + $"throw $(Obj.Write())"
             }
         }
-        | Try            { Body : JSAst; Handler : JSAst;
+        | TryCatch            { Body : JSAst; Exception : option[string]; Handler : JSAst;
             public override Write(indent = "" : string) : string {
+              def ex = if(Exception.IsSome) $"($(Exception.Value))" else "";
 $<#
 $(indent)try {
 $(Body.Write(indent + "  "))
-$(indent)} catch {
+$(indent)} catch$ex {
 $(Handler.Write(indent + "  "))
 $(indent)}
 #>
@@ -858,7 +865,8 @@ $(indent)}
             typeof(JSAst.Unpack),
             typeof(JSAst.GlobalRef),
             typeof(JSAst.ServerCall),
-            typeof(JSAst.Function)
+            typeof(JSAst.Function),
+            typeof(JSAst.HasType),
           ]);
         
         public static Recurse(ast : JSAst, selector : (JSAst * int) -> JSAst, currentDepth = 0 : int, topdown : bool = true) : JSAst 
@@ -911,7 +919,7 @@ $(indent)}
             | Ternary(cond, then, els)    => JSAst.Ternary(recurse(cond), recurse(then), recurse(els))
             | This                        => ast'
             | Throw(obj)                  => JSAst.Throw(recurse(obj))
-            | Try(body, handler)          => JSAst.Try(recurse(body), recurse(handler))
+            | TryCatch(body, ex, handler) => JSAst.TryCatch(recurse(body), ex, recurse(handler))
             | TryFinally(body, handler)   => JSAst.TryFinally(recurse(body), recurse(handler))
             | Tuple(args)                 => JSAst.Tuple(args.Map(recurse))
             | TupleIndexer(o, pos)        => JSAst.TupleIndexer(recurse(o), pos)

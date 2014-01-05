@@ -189,7 +189,40 @@ namespace NemerleWeb
           if(defCase.IsSome) build(defCase.Value) else JSAst.Void())
       | This                              => JSAst.This()
       | Throw(expr)                       => JSAst.Throw(build(expr))
-      | Try(_, _)                         => Message.Warning("Try is not implmemented"); JSAst.NotImpl("Try");
+      | Try(body, cases)                  =>
+        def hasType(exception : LocalValue) : JSAst
+        {
+          JSAst.HasType(
+            JSAst.LocalRef(ExceptionName, Some(exception.Type)),
+            JSClass.GetProperName(exception.Type.HintFast.TypeInfo))
+        }
+        def buildCase(case : Try_case) : JSAst * JSAst
+        {          
+        // | _ => handler
+        | Try_case.Fault(handler) =>
+          (JSAst.Literal(JSLiteral.Bool(true)), build(handler))
+        // | exception.Name is exception.Type => handler
+        | Try_case.Catch(exception, handler) =>
+          if(exception.Type.HintFast.TypeInfo.FullName == "System.Exception")
+            (JSAst.Literal(JSLiteral.Bool(true)), build(handler))
+          else
+            (hasType(exception), build(handler))
+        // | exception.Name is exception.Type when filter => handler
+        | Try_case.Filter(exception, filter, handler) =>
+          def cond = JSAst.Call(JSAst.OpCode("&&"), [hasType(exception), build(filter)]);
+          (cond, build(handler))
+        }
+        
+        def catchBody =
+          cases.FoldRight(
+            JSAst.Void(), 
+            (case, acc) => 
+            {
+              def (condition, handler) = buildCase(case);              
+              JSAst.If(condition, handler, acc)
+            });
+        
+        JSAst.TryCatch(build(body), Some(ExceptionName), catchBody)
       | TryFinally(body, handler)         => JSAst.TryFinally(build(body), build(handler))
       | Tuple(args)                       => JSAst.Tuple(args.Map(a => build(a)))
       | TupleIndexer(obj, pos, _len)      => JSAst.TupleIndexer(build(obj), pos)
@@ -200,6 +233,8 @@ namespace NemerleWeb
       | _ => assert2(false); Message.Error($"Unmatched TExpr: $expr"); JSAst.NotImpl("unmatched");
       }
     } 
+    
+    private ExceptionName = "_NW$_exception";
       
     ConvertToJSOpCode(name : string) : JSAst
     {
@@ -309,7 +344,7 @@ namespace NemerleWeb
         });*/
     }
       
-    public BuildJSAst(expr : TExpr, shouldReturn : bool, methodHeader : TFunHeader) : JSAst
+    public BuildJSAst(expr : TExpr, shouldReturn : bool, methodHeader : TFunHeader) : JSAst.Seq
     {
       mutable ast = JSAstBuilder.Build(expr, [], methodHeader);
       
@@ -325,7 +360,7 @@ namespace NemerleWeb
                 
       match(ast)
       {
-      | Seq => ast
+      | Seq as seq => seq
       | _ => JSAst.Seq([ast])
       }
     }

@@ -140,11 +140,24 @@ namespace NemerleWeb
             def newLabel = getNewLabel();
             exprList ::= new (label = newLabel, expr = newExpr, next = next, ifBlocks = Some(bdyLabel, elsLabel));
             newLabel;
+          | JustIf(cond, bdy) =>
+            def bdyLabel = f(bdy, next);
+            def newExpr = JSAst.JustIf(cond, getGotoToLabel(bdyLabel));
+            def newLabel = getNewLabel();
+            exprList ::= new (label = newLabel, expr = newExpr, next = next, ifBlocks = Some(bdyLabel, ""));
+            newLabel;
           | Goto(id) =>
             def newLabel = getNewLabel();            
             exprList ::= new (label = newLabel, expr = getGotoToLabel(id), next = next, ifBlocks = None());
             incrementIncoming("__CHECK_LABEL__" + id);
             newLabel;
+          | TryCatch(body, ex, handler) => 
+            def bodyLabel = f(body, next);
+            def handlerLabel = f(handler, next);
+            def newExpr = JSAst.TryCatch(getGotoToLabel(bodyLabel), ex, getGotoToLabel(handlerLabel));
+            def newLabel = getNewLabel();
+            exprList ::= new (label = newLabel, expr = newExpr, next = next, ifBlocks = None());
+            newLabel
           | TryFinally(body, _handler) => 
             f(body, next);
           | _ =>
@@ -185,7 +198,10 @@ namespace NemerleWeb
           | (If, _, Some((ifLbl, elseLbl))) => 
             //Always render 'if' cases
             incrementIncoming(ifLbl, 2);
-            incrementIncoming(elseLbl, 2);         
+            incrementIncoming(elseLbl, 2);
+          | (JustIf, _, Some((ifLbl, _))) => 
+            //Always render 'if' cases
+            incrementIncoming(ifLbl, 2);
           | (_, Some(nextLabel), _) => incrementIncoming(nextLabel);
           | _ => ()
           }
@@ -278,9 +294,11 @@ namespace NemerleWeb
               | r => r
               };
             JSAst.Seq(newExprs.Rev())
+        | TryCatch(body, ex, handler) => JSAst.TryCatch(delayAssignment(body), ex, delayAssignment(handler))
         | TryFinally(body, handler) => JSAst.TryFinally(delayAssignment(body), handler)
         | Assign(l, r)     => JSAst.Assign(l, delayAssignment(r))
         | If(c, t, e)      => JSAst.If(c, delayAssignment(t), delayAssignment(e))
+        | JustIf(c, t)     => JSAst.JustIf(c, delayAssignment(t))
         | ServerCall => JSAst.Assign(left, expr)
         //| ServerCall(m, t, ps, c) => JSAst.ServerCall(m, t, ps.Map(p => (p[0], delayAssignment(p[1]))), delayAssignment(c)) //Not sure why we delay all the way to server call's closure. Will remove it if everything works as it should
         | Switch(e, cases, deflt) => JSAst.Switch(e, cases.Map(c => JSAst.SwitchCase(c.Id, delayAssignment(c.Body))), delayAssignment(deflt))
