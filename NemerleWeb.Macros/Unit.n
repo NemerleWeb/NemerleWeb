@@ -46,6 +46,9 @@ namespace NemerleWeb
     public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);
+      
+      assert2(false);
+      
       unless(typer.Manager.IsIntelliSenseMode)
       {
         AddPageBaseMethods(tb, typer);
@@ -85,9 +88,15 @@ namespace NemerleWeb
             
       def processType(typeBuilder) 
       { 
+        def getAncesterCount(t : TypeInfo) {
+          if(t.DeclaringType != null) getAncesterCount(t.DeclaringType) + 1 else 0;
+        }
+        
         typeBuilder.MethodBeforeStage3 += (_, e) => translateMethod(e.Typer);        
         typeBuilder.DoBeforeFinalization(() => {
-          AddMainData(tb, JSClass(tb, "  ", typer).Write());
+          def jsClass = JSClass(typeBuilder, "  ", typer);
+          AddMainData(typeBuilder, jsClass.Write(), getAncesterCount(typeBuilder));
+          AddStaticFields(typeBuilder, jsClass.GetStaticFields("") + Environment.NewLine);
         });
       }
       
@@ -120,7 +129,6 @@ namespace NemerleWeb
             
       def cacheFieldInitializers(typeBuilder) 
       {
-        //assert2(false);
         foreach(fld in typeBuilder.GetFields().Cast.[FieldBuilder]())
           JSAstCache.AddFieldInitializer(typeBuilder, fld.Name, fld?.Ast?.Initializer);
       }
@@ -324,16 +332,21 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       ]>;
     }
     
-    public AddMainData(tb : TypeBuilder, data : string) : void
+    public AddMainData(tb : TypeBuilder, data : string, ancestorCount : int) : void
     {      
       def filename = SaveToFile(tb, data, JSClass.GetProperName(tb));
-      AppendToNWebDataConstructor(tb, <[ AddScript($(filename : string)); ]>);
+      AppendToNWebDataConstructor(tb, <[ AddScript($(filename : string), $ancestorCount); ]>);
+    }
+    
+    public AddStaticFields(tb : TypeBuilder, fields : string) : void
+    {
+      AppendToNWebDataConstructor(tb, <[ AddFields($(fields : string)); ]>);
     }
         
     public AddSignalrData(tb : TypeBuilder, data : string) : void
     {
       def filename = SaveToFile(tb, data, JSClass.GetProperName(tb) + "_signalr");
-      AppendToNWebDataConstructor(tb, <[ AddScript($(filename : string)); ]>);      
+      AppendToNWebDataConstructor(tb, <[ AddScript($(filename : string), 0); ]>);
     }
     
     public AddTemplateData(tb : TypeBuilder, templateName : string, templateContent : string) : void

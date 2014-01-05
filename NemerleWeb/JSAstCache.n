@@ -47,7 +47,11 @@ namespace NemerleWeb
     
     public GetFieldInitializer(tb : TypeBuilder, field : string) : PExpr
     {
-      if(field != null) _fieldInitializerCache[tb.FullName + "$" + field];
+      if(field != null) 
+      {
+        mutable initializer;
+        if(_fieldInitializerCache.TryGetValue(tb.FullName + "$" + field, out initializer)) initializer else null;
+      }
       else null;
     }
   }

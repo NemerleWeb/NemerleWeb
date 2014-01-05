@@ -24,7 +24,7 @@ namespace NemerleWeb
     public ClassType : TypeBuilder { get; }
     public Indent : string    { get; }      
     public Typer : Typer { get; }
-      
+    
     // HACK: for using types from JSClass
     #region Types
     public static StringType : TypeVar { get; set; }
@@ -151,7 +151,7 @@ namespace NemerleWeb
       def definedProperties = GetDefinedProperties(bodyIndent, parentPtr, meta);
       def staticProperties = GetStaticProperties(Indent, meta);        
       def fields = GetFields(bodyIndent, parentPtr, meta);        
-      def staticFields = GetStaticFields(Indent);
+      //def staticFields = GetStaticFields(Indent);
       def constructorsBody = GetConstructorsBody(Indent, bodyIndent);
       def callConstrutor = GetCallConstructor(bodyIndent);
       def staticConstructorBody = GetStaticConstructorBody(Indent);
@@ -183,7 +183,7 @@ $definedMethods
 $(meta.WriteToJS(Indent))
 $returning
 $(Indent)}
-$staticFields
+
 $staticMethods
 $staticProperties
 $staticConstructorBody
@@ -306,12 +306,11 @@ $indent};#>
       GenerateFields(indent, parentPtr, Fields, meta)
     }
         
-    GetStaticFields(indent : string) : string 
+    public GetStaticFields(indent : string) : string 
     {
       def parentPtr = GetProperName(ClassType);
       def fieldStrings = StaticFields.Select(f => 
         $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>);
-        
       $<#..$(fieldStrings; ";\n")#>;
     }
 

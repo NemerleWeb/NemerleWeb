@@ -6,12 +6,14 @@ using Nemerle.Extensions;
 using NemerleWeb;
 
 using System;
+using System.Text;
 using System.IO;
 using System.Reflection;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Security.Cryptography;
 
 namespace NemerleWeb
 {
@@ -31,17 +33,23 @@ namespace NemerleWeb
                            .GetAssemblies()
                            .SelectMany(a => a.GetTypes()
                            .Where(t => t.Name.EndsWith("NWebDataPerAssembly")));
+                           
+      def staticFields = StringBuilder();
+      def getFullPath(filename) 
+      {
+        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "NemerleWeb", filename)
+      }
       
       foreach(dataType in datas)
       {
         def instance = Activator.CreateInstance(dataType, array[], array[]) :> NWebDataInstance;
         
-        foreach(f in instance.Scripts) 
+        foreach((f, _) in instance.Scripts) 
         {
           Scripts.Add(f);
           def filename = Path.GetFileName(f);
           def scriptContents = readResource(filename, dataType.Assembly);
-          File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "NemerleWeb", filename), scriptContents);
+          File.WriteAllText(getFullPath(filename), scriptContents);
         }
           
         foreach((id, path) in instance.Templates) 
@@ -49,9 +57,22 @@ namespace NemerleWeb
           def filename = Path.GetFileName(path);
           def templateContents = readResource(filename, dataType.Assembly);
           Templates.Add((id, templateContents));
-          File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "NemerleWeb", filename), templateContents);
+          File.WriteAllText(getFullPath(filename), templateContents);
         }
+        
+        foreach(fields in instance.Fields)
+          _ = staticFields.Append(fields);
       }
+      
+      def staticFieldsContent = staticFields.ToString();
+      def bytes = Encoding.Unicode.GetBytes(staticFieldsContent);
+      using(sha = SHA1CryptoServiceProvider()) 
+      {
+        def hash = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "");
+        def staticFieldsFilename = getFullPath("_N_static_fields_" + hash + " .js");
+        File.WriteAllText(staticFieldsFilename, staticFieldsContent);
+        Scripts.Add(staticFieldsFilename);
+      }      
     }         
     
     public GetScripts() : IEnumerable[string]
@@ -75,14 +96,20 @@ $content
   
   public class NWebDataInstance
   {
-    public Scripts : List[string] = List();
+    public Scripts : List[(string * int)] = List();
     public Templates : List[(string * string)] = List();
+    public Fields : List[string] = List();
     
-    public AddScript(filename : string) : void
+    public AddScript(filename : string, ancestorCount : int) : void
     {
-      Scripts.Add(filename);
+      Scripts.Add((filename, ancestorCount));
     }
-        
+
+    public AddFields(fields : string) : void
+    {
+      Fields.Add(fields);
+    }
+    
     public AddTemplate(id : string, filename : string) : void
     {
       Templates.Add((id, filename));
