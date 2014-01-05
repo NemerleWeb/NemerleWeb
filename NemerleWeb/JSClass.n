@@ -250,7 +250,9 @@ $indent};#>
     FieldValue(field : IField) : string
     {
       def field = field :> FieldBuilder;
-      if(field?.Ast?.Initializer != null)
+      
+      def initializer = JSAstCache.GetFieldInitializer(ClassType, field?.Name);      
+      if(initializer != null)
       {
         def integer(v)
         {
@@ -277,7 +279,7 @@ $indent};#>
         | _ => "null"
         }
           
-        makeInitializer(field.Ast.Initializer)
+        makeInitializer(initializer)
       }
       else
       {
@@ -484,7 +486,7 @@ $(indent)}#>
       
     public TranslateMethodBody([NotNull] meth : IMethod, [NotNull] indent = "" : string) : string
     {
-      match(JSAstCache.Get(ClassType, meth.Header))
+      match(JSAstCache.GetMethodAst(ClassType, meth.Header))
       {
       | Some(ast) => ast.Write(indent)
       | None => 

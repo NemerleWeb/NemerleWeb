@@ -40,15 +40,20 @@ module Program
 [Unit]
 public class Test
 {  
-  public variant V
-  {
-    | A;
-    | B;
-    | C;
-  }
+  public ListInit : list[int] = [1, 2, 3]; 
   
   public this()
   {
+    
+  }
+  
+  Test() : int
+  {
+    try {
+      2
+    } catch {
+      _ => 3
+    }    
   }
   
   [Html]

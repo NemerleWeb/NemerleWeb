@@ -69,23 +69,26 @@ namespace NemerleWeb
         
       unless(typer.Manager.IsIntelliSenseMode)
         CreateResourceController(tb, typer);
-      
-      //assert2(false);
-      
+            
       def translateMethod(typer) 
       {
         match(typer.CurrentFunction.body) 
         {
         | FunBody.Typed(body) =>
-          //when(typer.CurrentFunction.name.Contains("catchClause"))
-            //assert2(false);
-            
           def methodBuilder = typer.CurrentMethodBuilder;          
           def shouldReturn = !(methodBuilder.Header.ReturnType is FixedType.Void()) && !methodBuilder.IsConstructor;
           def ast = JSAstBuilder.BuildJSAst(body, shouldReturn, methodBuilder.Header);
-          JSAstCache.Add(typer.CurrentTypeBuilder, typer.CurrentFunction, ast);
+          JSAstCache.AddMethodAst(typer.CurrentTypeBuilder, typer.CurrentFunction, ast);
         | _ => ()
         }
+      }
+            
+      def processType(typeBuilder) 
+      { 
+        typeBuilder.MethodBeforeStage3 += (_, e) => translateMethod(e.Typer);        
+        typeBuilder.DoBeforeFinalization(() => {
+          AddMainData(tb, JSClass(tb, "  ", typer).Write());
+        });
       }
       
       def getAllNestedTypes(tb, isTopMost)
@@ -97,21 +100,10 @@ namespace NemerleWeb
         if(isTopMost) children else tb :: children;
       }
       
-      tb.MethodBeforeStage3 += (_, e) => translateMethod(e.Typer);
+      processType(tb);      
       
       foreach(nestedType in getAllNestedTypes(tb, true))
-      {
-        when(nestedType != null)
-          nestedType.MethodBeforeStage3 += (_, e) => translateMethod(e.Typer);
-          
-        nestedType.DoBeforeFinalization(() => {
-          AddMainData(tb, JSClass(nestedType, "  ", typer).Write());
-        });
-      }
-      
-      tb.DoBeforeFinalization(() => {
-          AddMainData(tb, JSClass(tb, "  ", typer).Write());
-      });
+          processType(nestedType);
     }
     
     static mutable collectedJSApiRoots : bool = false;
@@ -126,6 +118,16 @@ namespace NemerleWeb
     {
       Macros.DefineCTX(typer);
             
+      def cacheFieldInitializers(typeBuilder) 
+      {
+        //assert2(false);
+        foreach(fld in typeBuilder.GetFields().Cast.[FieldBuilder]())
+          JSAstCache.AddFieldInitializer(typeBuilder, fld.Name, fld?.Ast?.Initializer);
+      }
+      
+      cacheFieldInitializers(tb);
+      JSClass.GetNestedTypes(tb).Iter(cacheFieldInitializers);
+      
       // Do not collect JS roots twice
       when(!collectedJSApiRoots)
       {

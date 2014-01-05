@@ -146,7 +146,7 @@ namespace NemerleWeb
             incrementIncoming("__CHECK_LABEL__" + id);
             newLabel;
           | TryFinally(body, _handler) => 
-            f(body, next);            
+            f(body, next);
           | _ =>
             def newLabel = getNewLabel();
             exprList ::= new (label = newLabel, expr = current, next = next, ifBlocks = None());
