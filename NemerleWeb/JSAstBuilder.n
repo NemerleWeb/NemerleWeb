@@ -193,8 +193,10 @@ namespace NemerleWeb
         }
         def getHandler(handler : TExpr, exception : LocalValue) : JSAst
         {
+          def newName = exception.Name + "_" + exception.Id;
+          
           JSAst.Seq([
-            JSAst.DefValue(exception.Name, JSAst.LocalRef(NWExceptionName, Some(exception.Type))),
+            JSAst.DefValue(newName, JSAst.LocalRef(NWExceptionName, Some(exception.Type))),
             build(handler),
           ])
         }
