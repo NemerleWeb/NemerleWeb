@@ -24,20 +24,6 @@ namespace NemerleWeb
         JSAst.Recurse(ast, (a, _depth) => a.Transform(), 0, false)
     }
     
-    public RemoveEmptyBranches(ast : JSAst) : JSAst
-    {
-        JSAst.Recurse(ast, (a : JSAst, _depth) =>
-        match(a) { 
-        | While(_, Void) 
-        | While(_, Undefined) => JSAst.Void()
-        | If(cond, then, Undefined) 
-        | If(cond, then, Void) => JSAst.JustIf(cond, then)
-        | JustIf(_, Void) 
-        | JustIf(_, Undefined) => JSAst.Void()        
-        | _ => a
-        }, 0, false);
-    }
-    
     public FlattenAndRemoveVoids(ast : JSAst) : JSAst    
     {
         JSAst.Recurse(ast, (a : JSAst, _depth) => {
@@ -91,7 +77,7 @@ namespace NemerleWeb
         def currentLabelVar = GetTemporaryVariableName();
         def loopName = "__gotoSwitchLoop";
         def labelIncomingCount = Dictionary.[string, int]();
-        def incrementIncoming(label, inc = 1) {
+        def incrementIncoming(label : string, inc : int = 1) :  void {
           if(labelIncomingCount.ContainsKey(label))
               labelIncomingCount[label]++;
             else
@@ -104,7 +90,7 @@ namespace NemerleWeb
           ++labelCounter;
           $"__lbl__$labelCounter"
         }
-        def getGotoToLabel(label) {
+        def getGotoToLabel(label : string) : JSAst {
           JSAst.Seq([
             JSAst.Assign(JSAst.LocalRef(currentLabelVar, None()), JSAst.Literal(JSLiteral.String("__CHECK_LABEL__" + label))),
             JSAst.Continue(loopName)
@@ -139,12 +125,6 @@ namespace NemerleWeb
             def newExpr = JSAst.If(cond, getGotoToLabel(bdyLabel), getGotoToLabel(elsLabel));
             def newLabel = getNewLabel();
             exprList ::= new (label = newLabel, expr = newExpr, next = next, ifBlocks = Some(bdyLabel, elsLabel));
-            newLabel;
-          | JustIf(cond, bdy) =>
-            def bdyLabel = f(bdy, next);
-            def newExpr = JSAst.JustIf(cond, getGotoToLabel(bdyLabel));
-            def newLabel = getNewLabel();
-            exprList ::= new (label = newLabel, expr = newExpr, next = next, ifBlocks = Some(bdyLabel, ""));
             newLabel;
           | Goto(id) =>
             def newLabel = getNewLabel();            
@@ -185,7 +165,7 @@ namespace NemerleWeb
         }
         def labelToExprMap = Dictionary();
                 
-        def getIncomingCount(label) {
+        def getIncomingCount(label : string) : int {
           mutable incomingCount = 0;
           if(labelIncomingCount.TryGetValue(label, out incomingCount))
             incomingCount
@@ -199,9 +179,6 @@ namespace NemerleWeb
             //Always render 'if' cases
             incrementIncoming(ifLbl, 2);
             incrementIncoming(elseLbl, 2);
-          | (JustIf, _, Some((ifLbl, _))) => 
-            //Always render 'if' cases
-            incrementIncoming(ifLbl, 2);
           | (_, Some(nextLabel), _) => incrementIncoming(nextLabel);
           | _ => ()
           }
@@ -298,7 +275,6 @@ namespace NemerleWeb
         | TryFinally(body, handler) => JSAst.TryFinally(delayAssignment(body), handler)
         | Assign(l, r)     => JSAst.Assign(l, delayAssignment(r))
         | If(c, t, e)      => JSAst.If(c, delayAssignment(t), delayAssignment(e))
-        | JustIf(c, t)     => JSAst.JustIf(c, delayAssignment(t))
         | ServerCall => JSAst.Assign(left, expr)
         //| ServerCall(m, t, ps, c) => JSAst.ServerCall(m, t, ps.Map(p => (p[0], delayAssignment(p[1]))), delayAssignment(c)) //Not sure why we delay all the way to server call's closure. Will remove it if everything works as it should
         | Switch(e, cases, deflt) => JSAst.Switch(e, cases.Map(c => JSAst.SwitchCase(c.Id, delayAssignment(c.Body))), delayAssignment(deflt))
