@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Website", "NemerleWeb.Website\NemerleWeb.Website-Publish.nproj", "{837F8D8F-B2B7-4BFB-81D3-3C168F86173C}"
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Website", "NemerleWeb.Website\NemerleWeb.Website.nproj", "{837F8D8F-B2B7-4BFB-81D3-3C168F86173C}"
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Tests.Macro", "NemerleWeb.Tests.Macro\NemerleWeb.Tests.Macro.nproj", "{1D616985-5E18-44E1-8F74-D2AC69C3DC6F}"
 EndProject
@@ -28,14 +28,6 @@ EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "JSParser-VS_2010", "peg-parser\JSParser\JSParser-VS_2010.nproj", "{F440F161-D644-4004-B4F0-A9DFA001039E}"
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "TSParserPeg", "peg-parser\TSParserPeg\TSParserPeg.nproj", "{CFCB42E2-C0CD-4C83-A18E-D97149F21B14}"
-EndProject
-Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Rsdn", "NemerleWeb.RSDN\NemerleWeb.Rsdn.nproj", "{528E84E5-86EE-4771-B8F9-EE3373629D93}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NemerleWeb.ItemTemplate", "NemerleWeb.ItemTemplate\NemerleWeb.ItemTemplate.csproj", "{C63B6C30-7D00-4367-9B48-DF06232D3E9B}"
-EndProject
-Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "Test", "Test\Test.nproj", "{F3C3F693-3D23-46B2-9CF7-88A865EFC39F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NemerleWeb.ProjectTemplate", "NemerleWeb.ProjectTemplate\NemerleWeb.ProjectTemplate.csproj", "{290D3D2C-51B2-4286-B3EF-47F3C7607F20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,22 +91,6 @@ Global
 		{CFCB42E2-C0CD-4C83-A18E-D97149F21B14}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFCB42E2-C0CD-4C83-A18E-D97149F21B14}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFCB42E2-C0CD-4C83-A18E-D97149F21B14}.Release|Any CPU.Build.0 = Release|Any CPU
-		{528E84E5-86EE-4771-B8F9-EE3373629D93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{528E84E5-86EE-4771-B8F9-EE3373629D93}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{528E84E5-86EE-4771-B8F9-EE3373629D93}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{528E84E5-86EE-4771-B8F9-EE3373629D93}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C63B6C30-7D00-4367-9B48-DF06232D3E9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C63B6C30-7D00-4367-9B48-DF06232D3E9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C63B6C30-7D00-4367-9B48-DF06232D3E9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C63B6C30-7D00-4367-9B48-DF06232D3E9B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F3C3F693-3D23-46B2-9CF7-88A865EFC39F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F3C3F693-3D23-46B2-9CF7-88A865EFC39F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F3C3F693-3D23-46B2-9CF7-88A865EFC39F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F3C3F693-3D23-46B2-9CF7-88A865EFC39F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{290D3D2C-51B2-4286-B3EF-47F3C7607F20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{290D3D2C-51B2-4286-B3EF-47F3C7607F20}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{290D3D2C-51B2-4286-B3EF-47F3C7607F20}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{290D3D2C-51B2-4286-B3EF-47F3C7607F20}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
