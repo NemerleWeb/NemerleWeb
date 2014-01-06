@@ -21,6 +21,7 @@ namespace NemerleWeb
   {
     public Scripts : List[string] = List();
     public Templates : List[(string * string)] = List();   
+    public CombinedScriptsFilename : string;
     
     this() 
     {
@@ -35,6 +36,7 @@ namespace NemerleWeb
                            .Where(t => t.Name.EndsWith("NWebDataPerAssembly")));
                            
       def staticFields = StringBuilder();
+      def combinedScripts = StringBuilder();
       
       def getRelativePath(filename = "")
       {
@@ -57,9 +59,12 @@ namespace NemerleWeb
         foreach((f, _) in instance.Scripts) 
         {
           Scripts.Add(f);
+          
           def filename = Path.GetFileName(f);
-          def scriptContents = readResource(filename, dataType.Assembly);
+          def scriptContents = readResource(filename, dataType.Assembly);          
+          
           File.WriteAllText(getAbsolutePath(filename), scriptContents);
+          _ = combinedScripts.Append(scriptContents);
         }
           
         foreach((id, path) in instance.Templates) 
@@ -71,26 +76,40 @@ namespace NemerleWeb
         }
         
         foreach(fields in instance.Fields)
+        {
           _ = staticFields.Append(fields);
+          _ = combinedScripts.Append(fields);
+        }        
       }
       
-      def staticFieldsContent = staticFields.ToString();
-      def bytes = Encoding.Unicode.GetBytes(staticFieldsContent);
+      
       using(sha = SHA1CryptoServiceProvider()) 
       {
-        def hash = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "");        
-        def fname = "_N_static_fields_" + hash + " .js";        
+        def staticFieldsContent = staticFields.ToString();
+        def hash = BitConverter.ToString(sha.ComputeHash(Encoding.Unicode.GetBytes(staticFieldsContent))).Replace("-", "");
+        def fname = "_N_static_fields_" + hash + ".js";        
         File.WriteAllText(getAbsolutePath(fname), staticFieldsContent);
         Scripts.Add(getRelativePath(fname));
-      }      
+        
+        def combinedScriptsContent = combinedScripts.ToString();
+        def hash = BitConverter.ToString(sha.ComputeHash(Encoding.Unicode.GetBytes(combinedScriptsContent))).Replace("-", "");
+        def fname = "nweb-combined-" + hash + ".js";
+        File.WriteAllText(getAbsolutePath(fname), combinedScriptsContent);        
+        CombinedScriptsFilename = getRelativePath(fname);
+      }
     }         
     
     public GetScripts() : IEnumerable[string]
     {
+      /*
       Scripts.Select(filename => {
 $<#
 <script type="text/javascript" src="$filename"></script> #>
       });
+      */
+      [$<#
+<script type="text/javascript" src="$CombinedScriptsFilename"></script> #>]
+      
     }
     
     public GetTemplates() : IEnumerable[string]
