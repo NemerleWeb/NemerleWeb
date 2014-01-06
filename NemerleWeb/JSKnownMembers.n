@@ -124,9 +124,10 @@ namespace NemerleWeb
             JSAst.Void()
         | Call(Delayed, _, _) => JSAst.Void()
         | Call(LocalFunRef(decl, _), parms, _isTail)
-        | Call(LocalRef(decl), parms, _isTail) => JSAst.Call(JSAst.LocalRef(decl.Name, None()), parms.Map(paramBuilder))
+        | Call(LocalRef(decl), parms, _isTail) => 
+          JSAst.Call(JSAst.LocalRef(JSAstBuilder.GetLocalValueName(decl), None()), parms.Map(paramBuilder))
         | Call(Call(LocalRef(decl), parms1, _), parms2, _) => 
-          JSAst.Call(JSAst.Call(JSAst.LocalRef(decl.Name, None()), parms1.Map(paramBuilder)), parms2.Map(paramBuilder));
+          JSAst.Call(JSAst.Call(JSAst.LocalRef(JSAstBuilder.GetLocalValueName(decl), None()), parms1.Map(paramBuilder)), parms2.Map(paramBuilder));
         | Call(s, _, _) => 
           assert2(false);
           Message.Error(s.Location, $"Unsupported call to $s"); JSAst.Void()          

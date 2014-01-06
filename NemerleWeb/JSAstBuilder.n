@@ -31,12 +31,7 @@ namespace NemerleWeb
       paramKind : option[ParmKind]) : JSAst
     {
       def build = Build(_, currentScopeDefs, methodHeader);
-      def getLocalValueName(localVal : LocalValue)
-      {        
-        def isFromMainMethodParams = methodHeader.Parameters.Any(p => p.decl.Id == localVal.Id);
-        if(isFromMainMethodParams || localVal.ValKind is LocalValue.Kind.FunParm) localVal.Name else localVal.Name + "_" + localVal.Id
-      }
-            
+                  
       match(expr) 
       {
       | Array(args, _dims)                => JSAst.Array(args.Map(build))
@@ -66,7 +61,7 @@ namespace NemerleWeb
         {
         | TExpr.LocalFunRef => function
         | _ => 
-          def defFunction = JSAst.DefValue(header.Name, function);          
+          def defFunction = JSAst.DefValue(GetLocalValueName(header.decl), function);          
           JSAst.Seq([defFunction, build(body)])
         }
       | DefValIn(name, val, body)         => 
@@ -121,7 +116,7 @@ namespace NemerleWeb
           }
       | LocalFunRef                       => Message.Error(expr.Location, "LocalFunRef not implemented"); JSAst.NotImpl("LocalFunRef")
       | LocalRef(decl)                    => 
-        def name = getLocalValueName(decl);
+        def name = GetLocalValueName(decl);
         
         if(System.Text.RegularExpressions.Regex.IsMatch(name, <#_N_closurised_this_ptr_\d{4}#>))
         {
@@ -163,7 +158,7 @@ namespace NemerleWeb
       | MethodAddress(_, meth, _, _)      => JSAst.MethodRef(JSAst.This(), meth.Name, JSAstHelper.MethodParameters(meth))
       | MethodOf                          => Message.Error(expr.Location, "MethodOf not implemented"); JSAst.NotImpl("MethodOf")
       | MethodRef(obj, meth, _, _)        => JSAst.MethodRef(build(obj), meth.Name, JSAstHelper.MethodParameters(meth))
-      | MultipleAssign(assigns)           => JSAst.Seq(assigns.Map((l, e) => JSAst.Assign(JSAst.LocalRef(getLocalValueName(l), None()), build(e))))
+      | MultipleAssign(assigns)           => JSAst.Seq(assigns.Map((l, e) => JSAst.Assign(JSAst.LocalRef(GetLocalValueName(l), None()), build(e))))
       | OpCode(name)                      => ConvertToJSOpCode(name)
       | PropertyMember(obj, prop)         => JSAst.PropertyGet(build(obj), prop.Name)
       | SelfTailCall(func, parms)         => build(TExpr.Call(func, parms, true))
@@ -233,6 +228,11 @@ namespace NemerleWeb
       | _ => assert2(false); Message.Error($"Unmatched TExpr: $expr"); JSAst.NotImpl("unmatched");
       }
     } 
+    
+    public GetLocalValueName(localVal : LocalValue) : string
+    { 
+      if(localVal.ValKind is LocalValue.Kind.FunParm) localVal.Name else localVal.Name + "_" + localVal.Id
+    }
     
     private ExceptionName = "_NW$_exception";
       

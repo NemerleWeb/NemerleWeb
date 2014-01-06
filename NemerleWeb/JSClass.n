@@ -1,4 +1,5 @@
 ﻿
+
 using Nemerle;
 using Nemerle.Assertions;
 using Nemerle.Collections;
@@ -151,7 +152,7 @@ namespace NemerleWeb
       def definedProperties = GetDefinedProperties(bodyIndent, parentPtr, meta);
       def staticProperties = GetStaticProperties(Indent, meta);        
       def fields = GetFields(bodyIndent, parentPtr, meta);        
-      //def staticFields = GetStaticFields(Indent);
+      def staticFields = GetStaticFields(Indent);
       def constructorsBody = GetConstructorsBody(Indent, bodyIndent);
       def callConstrutor = GetCallConstructor(bodyIndent);
       def staticConstructorBody = GetStaticConstructorBody(Indent);
@@ -184,10 +185,11 @@ $(meta.WriteToJS(Indent))
 $returning
 $(Indent)}
 
+$staticFields
 $staticMethods
 $staticProperties
-$staticConstructorBody
 #>
+//$staticConstructorBody
     }
       
     GenerateProperties(indent : string, parentPtr : string, properties : IEnumerable[IProperty], meta : JSClassMeta, generate : bool) : string 
@@ -309,9 +311,10 @@ $indent};#>
     public GetStaticFields(indent : string) : string 
     {
       def parentPtr = GetProperName(ClassType);
-      def fieldStrings = StaticFields.Select(f => 
-        $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>);
-      $<#..$(fieldStrings; ";\n")#>;
+      def fieldStrings = StaticFields.Select(f => $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>);
+      def res = $<#..$(fieldStrings; ";\n")#>;
+      
+      if(string.IsNullOrWhiteSpace(res)) "" else res + Environment.NewLine;
     }
 
     GetConstructorsBody(indent : string, bodyIndent : string) : string
@@ -385,12 +388,12 @@ $indent#>
       $"$indent$ctorObject[arguments[0]].apply(this, Array.prototype.slice.call(arguments, 1))"
     }
         
-    GetStaticConstructorBody(indent : string) : string 
+    public GetStaticConstructorBody(indent : string) : string 
     {
         def ctors = ClassType.GetConstructors(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
         def ctor = ctors.FirstOrDefault();
         if(ctor != null)
-          TranslateMethodBody(ctor, indent)
+          TranslateMethodBody(ctor, indent) + Environment.NewLine;
         else
           ""
     }

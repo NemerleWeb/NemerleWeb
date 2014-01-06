@@ -47,8 +47,6 @@ namespace NemerleWeb
     {
       Macros.DefineCTX(typer);
       
-      assert2(false);
-      
       unless(typer.Manager.IsIntelliSenseMode)
       {
         AddPageBaseMethods(tb, typer);
@@ -96,7 +94,7 @@ namespace NemerleWeb
         typeBuilder.DoBeforeFinalization(() => {
           def jsClass = JSClass(typeBuilder, "  ", typer);
           AddMainData(typeBuilder, jsClass.Write(), getAncesterCount(typeBuilder));
-          AddStaticFields(typeBuilder, jsClass.GetStaticFields("") + Environment.NewLine);
+          AddStaticFields(typeBuilder, jsClass.GetStaticConstructorBody(""));
         });
       }
       
@@ -126,11 +124,11 @@ namespace NemerleWeb
     public DoTransformImpl(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);
-            
+      
       def cacheFieldInitializers(typeBuilder) 
-      {
-        foreach(fld in typeBuilder.GetFields().Cast.[FieldBuilder]())
-          JSAstCache.AddFieldInitializer(typeBuilder, fld.Name, fld?.Ast?.Initializer);
+      {     
+        foreach(fld in typeBuilder.GetFields().Cast.[FieldBuilder]())        
+          JSAstCache.AddFieldInitializer(typeBuilder, fld.Name, fld?.Ast?.Initializer);        
       }
       
       cacheFieldInitializers(tb);

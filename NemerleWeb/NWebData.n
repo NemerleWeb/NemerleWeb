@@ -35,10 +35,20 @@ namespace NemerleWeb
                            .Where(t => t.Name.EndsWith("NWebDataPerAssembly")));
                            
       def staticFields = StringBuilder();
-      def getFullPath(filename) 
+      
+      def getRelativePath(filename = "")
       {
-        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "NemerleWeb", filename)
+        if(filename != "") Path.Combine("Scripts", "NemerleWeb", filename)
+        else Path.Combine("Scripts", "NemerleWeb")
       }
+      
+      def getAbsolutePath(filename = "") 
+      {
+        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, getRelativePath(filename))
+      }
+
+      Directory.GetFiles(getAbsolutePath())
+               .Iter(File.Delete);
       
       foreach(dataType in datas)
       {
@@ -49,7 +59,7 @@ namespace NemerleWeb
           Scripts.Add(f);
           def filename = Path.GetFileName(f);
           def scriptContents = readResource(filename, dataType.Assembly);
-          File.WriteAllText(getFullPath(filename), scriptContents);
+          File.WriteAllText(getAbsolutePath(filename), scriptContents);
         }
           
         foreach((id, path) in instance.Templates) 
@@ -57,7 +67,7 @@ namespace NemerleWeb
           def filename = Path.GetFileName(path);
           def templateContents = readResource(filename, dataType.Assembly);
           Templates.Add((id, templateContents));
-          File.WriteAllText(getFullPath(filename), templateContents);
+          File.WriteAllText(getAbsolutePath(filename), templateContents);
         }
         
         foreach(fields in instance.Fields)
@@ -68,10 +78,10 @@ namespace NemerleWeb
       def bytes = Encoding.Unicode.GetBytes(staticFieldsContent);
       using(sha = SHA1CryptoServiceProvider()) 
       {
-        def hash = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "");
-        def staticFieldsFilename = getFullPath("_N_static_fields_" + hash + " .js");
-        File.WriteAllText(staticFieldsFilename, staticFieldsContent);
-        Scripts.Add(staticFieldsFilename);
+        def hash = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "");        
+        def fname = "_N_static_fields_" + hash + " .js";        
+        File.WriteAllText(getAbsolutePath(fname), staticFieldsContent);
+        Scripts.Add(getRelativePath(fname));
       }      
     }         
     

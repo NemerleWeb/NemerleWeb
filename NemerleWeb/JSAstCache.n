@@ -42,15 +42,25 @@ namespace NemerleWeb
     
     public AddFieldInitializer(tb : TypeBuilder, field : string, initializer : PExpr) : void
     {
+      when(tb.Name.Contains("JObject"))
+        Message.Hint("add field " + field);
+        
       _fieldInitializerCache[tb.FullName + "$" + field] = initializer;      
     }
     
     public GetFieldInitializer(tb : TypeBuilder, field : string) : PExpr
-    {
+    {        
       if(field != null) 
       {
         mutable initializer;
-        if(_fieldInitializerCache.TryGetValue(tb.FullName + "$" + field, out initializer)) initializer else null;
+        if(_fieldInitializerCache.TryGetValue(tb.FullName + "$" + field, out initializer)) 
+        {          
+          when(tb.Name.Contains("JObject"))
+            Message.Hint("get field " + field + ": " + initializer);
+            
+          initializer 
+        }
+        else null;
       }
       else null;
     }

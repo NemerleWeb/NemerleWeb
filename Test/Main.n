@@ -39,21 +39,16 @@ module Program
 
 [Unit]
 public class Test
-{  
-  public ListInit : list[int] = [1, 2, 3]; 
-  
+{    
   public this()
   {
-    
-  }
-  
-  Test() : int
-  {
-    try {
-      2
-    } catch {
-      _ => 3
-    }    
+    def test(description : string, res : void -> bool) : void
+    {}
+      
+    test("simple", () =>
+    {
+      true
+    });
   }
   
   [Html]
