@@ -324,25 +324,34 @@ var nweb = {
   getTemplateBinding: function(model, el, bindings, loopStack, attrVal) {
     var $el = $(el);
     var parsedExpr = nweb.parseExpression(model, attrVal, loopStack);
-    var templateModel = nweb.getParsedValue(model, parsedExpr, loopStack);
-    var templateName = nweb.utils.getTemplateName(templateModel, "View");
+    var isComplexBinding = attrVal[0] == '{' && attrVal[attrVal.length - 1] == '}';
+    
+    var getTemplateModel = function(value) {
+      if(isComplexBinding) return value[0];
+      return value;
+    }
 
-    var html = $("#" + templateName).html();
+    var getTemplateName = function (value) {
+      if (isComplexBinding) return nweb.utils.getTemplateName(value[0], value[1]);
+      return nweb.utils.getTemplateName(value, "View");
+    }
+    
     el.__nw_is_template = true;
 
-    var binding = {
+    var binding = {      
       el: $el,
       subBindings: [],
       getValue: function() {
-        return nweb.getParsedValue(model, parsedExpr, loopStack);
+        return getTemplateModel(nweb.getParsedValue(model, parsedExpr, loopStack));
       },
-      apply: function(value) {
-        $el = nweb.utils.replaceWith($el, $(html).removeAttr("nw-template"));
-                
-        nweb.eraseGeneratedElements(binding);
+      apply: function (newModel) {
+        var parsedValue = nweb.getParsedValue(model, parsedExpr, loopStack);
+        
+        $el = nweb.utils.replaceWith($el, $($("#" + getTemplateName(parsedValue)).html()).removeAttr("nw-template"));
+        nweb.eraseGeneratedElements(binding);        
 
         jQuery.each($el, function (i, e) {
-          nweb.applyBindings(value, e, binding.subBindings, loopStack, true);
+          nweb.applyBindings(newModel, e, binding.subBindings, loopStack, true);
         });
       }
     };

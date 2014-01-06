@@ -116,6 +116,14 @@ namespace NemerleWeb.Rsdn
     public View() : string
     {
       <#
+        <div template="$(this, "DesktopView")" />
+      #>
+    }
+    
+    [Html]
+    public DesktopView() : string
+    {
+      <#
         <div class="page">
           <div class="left">
             <div $when(Root != null) class="root">
@@ -134,6 +142,17 @@ namespace NemerleWeb.Rsdn
         </div>
       #>
     }
+    
+    [Html]
+    public MobileView() : string
+    {
+      <#
+        <div class="page">
+          MOBILE!!!111
+        </div>
+      #>
+    }
+    
     
     public class Server
     {
