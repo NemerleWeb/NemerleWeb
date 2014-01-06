@@ -1837,6 +1837,22 @@ namespace NemerleWeb.Website.Tests
         | _ is SomeException when x == 1 => true
         }
       });
+      
+      test("some exception specific handler with filter", () => {
+        def f() : int
+        {
+          try
+          {
+            throw Exception();
+          }
+          catch
+          {
+          | _ => 1
+          }
+        }
+        
+        f() == 1
+      });
     }
     
     public TemplateLambdaTest : list[string] = ["failed", "passed"];

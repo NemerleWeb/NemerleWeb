@@ -330,12 +330,20 @@ namespace NemerleWeb
             }
           }
         | For            { ItName : string; Collection : JSAst; Body : JSAst;
-            public override Write(_indent = "" : string) : string {
-$<#
-for(var $ItName in $(Collection.Write())) {
+            public override Write(_indent = "" : string) : string
+            {
+              match(Body)
+              {
+              | Undefined
+              | Void
+              | Literal(JSLiteral.Undefined())
+              | Literal(JSLiteral.String("undefined"))
+              | Literal(JSLiteral.String("")) => ""
+              | _ => $<#for(var $ItName in $(Collection.Write())) {
 var $ItName = $(Collection.Write())[$ItName];
 $(Body.Write("  "))
 }#> 
+              }
             }
         }
         | Function
@@ -378,14 +386,26 @@ $<#function $Name(..$(Parameters; ",")) { $(Body.Write(indent + "  ")) }#>
           }   
         }
         | If             { Cond : JSAst; Body : JSAst; ElseBody : JSAst;
-            public override Write(indent = "" : string) : string {
-$<#
-$(indent)if($(Cond.Write())) { 
-$(Body.Write(indent + "  "))
-$indent} else {
+            public override Write(indent = "" : string) : string
+            {
+              def elseBlock =
+                match(ElseBody)
+                {
+                | Undefined
+                | Void
+                | Literal(JSLiteral.Undefined())
+                | Literal(JSLiteral.String("undefined"))
+                | Literal(JSLiteral.String("")) => ""
+                | _ => $<# else {
 $(ElseBody.Write(indent + "  "))
-$indent}#>
+$indent}#>                
+                };
+                
+              $<#$(indent)if($(Cond.Write())) { 
+$(Body.Write(indent + "  "))
+$indent}$elseBlock#>
             }
+            
             public override Transform() : JSAst {
                 match(this) {
                 | If(If(c, t, e), tt, ee)    => 
@@ -445,66 +465,7 @@ $indent}#>
             public override Write(_ = "" : string) : string {
                 "/* No Indexer writer implementation */"
             }
-        }
-        | JustIf         { Cond : JSAst; Body : JSAst;
-            public override Write(indent = "" : string) : string {
-$<# 
-$(indent)if($(Cond.Write())) { 
-$(Body.Write(indent + "  "))
-$(indent)}#>
-            }
-            public override Transform() : JSAst {
-                match(this) {
-                | JustIf(If(c, t, e), tt)    => 
-                  def varName = JSAstHelper.GetTemporaryVariableName();
-                  JSAst.Seq([
-                    JSAst.DefValue(varName, JSAst.If(c, t, e)).Transform(),
-                    JSAst.JustIf(JSAst.LocalRef(varName, None()), tt)
-                  ]).Transform();
-                | JustIf(Call(func, [something, If(c, t, e)]), then) => 
-                  def varName = JSAstHelper.GetTemporaryVariableName();
-                  JSAst.Seq([
-                    JSAst.DefValue(varName, JSAst.If(c, t, e)).Transform(),
-                    JSAst.JustIf(JSAst.Call(func, [something, JSAst.LocalRef(varName, None())]), then)
-                  ]).Transform();
-                | JustIf(Call(func, [If(c, t, e), something]), then) => 
-                  def varName = JSAstHelper.GetTemporaryVariableName();
-                  JSAst.Seq([
-                    JSAst.DefValue(varName, JSAst.If(c, t, e)).Transform(),
-                    JSAst.JustIf(JSAst.Call(func, [JSAst.LocalRef(varName, None()), something]), then)
-                  ]).Transform();
-                | JustIf(Call(OpCode as op, Seq as seq :: rest), then) =>
-                    def varName = JSAstHelper.GetTemporaryVariableName();
-                    JSAst.Seq([JSAst.DefValue(varName, JSAst.Void()), JSAstHelper.DelayAssignment(seq, JSAst.LocalRef(varName, None())), JSAst.JustIf(JSAst.Call(op, JSAst.LocalRef(varName, None()) :: rest), then)]).Transform();                           
-                | JustIf(Call(OpCode as op, Call(MethodRef(Seq as seq,  m, p), parms) :: rest), then)  =>             
-                    def varName = JSAstHelper.GetTemporaryVariableName();
-                    JSAst.Seq(
-                      [
-                        JSAst.DefValue(varName, JSAst.Void()),
-                        JSAstHelper.DelayAssignment(seq, JSAst.LocalRef(varName, None())),
-                        JSAst.JustIf(
-                          JSAst.Call(
-                            op,
-                            JSAst.Call(
-                              JSAst.MethodRef(JSAst.LocalRef(varName, None()), m, p),
-                              parms) :: rest),
-                          then)
-                      ]
-                    ).Transform();
-                | JustIf(Call(OpCode as op, Call as call :: rest), then) =>             
-                    def varName = JSAstHelper.GetTemporaryVariableName();
-                    JSAst.Seq([JSAst.DefValue(varName, call), JSAst.JustIf(JSAst.Call(op, JSAst.LocalRef(varName, None()) :: rest), then)]).Transform()
-                | JustIf(Seq as seq, then) => 
-                    def varName = JSAstHelper.GetTemporaryVariableName();
-                    JSAst.Seq([JSAst.DefValue(varName, JSAst.Void()), 
-                               JSAstHelper.DelayAssignment(seq, JSAst.LocalRef(varName, None())), 
-                               JSAst.JustIf(JSAst.Call(JSAst.OpCode("==="), 
-                                                   [JSAst.LocalRef(varName, None()), JSAst.Literal(JSLiteral.Bool(true))]), then)])
-                          .Transform();   
-                | _ => this
-                }
-            }
-        }               
+        }          
         | Label          { Id : int; Body : JSAst;
           public override Write(indent = "" : string) : string {
             Body.Write(indent)
@@ -778,21 +739,37 @@ $(indent)}
         }
             
         | While          { Cond : JSAst; Body : JSAst;
-            public override Write(indent = "" : string) : string {
-$<#
-$(indent)while($(Cond.Write())) {
+            public override Write(indent = "" : string) : string
+            {
+              match(Body)
+              {
+              | Undefined
+              | Void
+              | Literal(JSLiteral.Undefined())
+              | Literal(JSLiteral.String("undefined"))
+              | Literal(JSLiteral.String("")) => ""
+              | _ => $<#$(indent)while($(Cond.Write())) {
 $(Body.Write(indent + "  "))
 $(indent)}
 #>
+              } 
             }
         }
         | WhileNamed     { Cond : JSAst; Body : JSAst; Name : string;
-            public override Write(indent = "" : string) : string {
-$<#
-$(indent)$Name: while($(Cond.Write())) {
+            public override Write(indent = "" : string) : string
+            {
+              match(Body)
+              {
+                | Undefined
+                | Void
+                | Literal(JSLiteral.Undefined())
+                | Literal(JSLiteral.String("undefined"))
+                | Literal(JSLiteral.String("")) => ""
+                | _ => $<#$(indent)$Name: while($(Cond.Write())) {
 $(Body.Write(indent + "  "))
 $(indent)}
-#>  
+#> 
+              }
             }
         }
         | Pack     { Expr : JSAst; 
@@ -881,7 +858,6 @@ $(indent)}
             | HasType(obj, type)          => JSAst.HasType(recurse(obj), type)
             | If(cond, then, els)         => JSAst.If(recurse(cond), recurse(then), recurse(els))
             | Indexer(obj)                => JSAst.Indexer(recurse(obj))
-            | JustIf(cond, then)          => JSAst.JustIf(recurse(cond), recurse(then))
             | Label(id, body)             => JSAst.Label(id, recurse(body))
             | Lambda(name, parms, body)   => JSAst.Lambda(name, parms, recurse(body))
             | Literal                     => ast'

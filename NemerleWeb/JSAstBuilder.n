@@ -188,8 +188,15 @@ namespace NemerleWeb
         def hasType(exception : LocalValue) : JSAst
         {
           JSAst.HasType(
-            JSAst.LocalRef(ExceptionName, Some(exception.Type)),
+            JSAst.LocalRef(NWExceptionName, Some(exception.Type)),
             JSClass.GetProperName(exception.Type.HintFast.TypeInfo))
+        }
+        def getHandler(handler : TExpr, exception : LocalValue) : JSAst
+        {
+          JSAst.Seq([
+            JSAst.DefValue(exception.Name, JSAst.LocalRef(NWExceptionName, Some(exception.Type))),
+            build(handler),
+          ])
         }
         def buildCase(case : Try_case) : JSAst * JSAst
         {          
@@ -198,14 +205,15 @@ namespace NemerleWeb
           (JSAst.Literal(JSLiteral.Bool(true)), build(handler))
         // | exception.Name is exception.Type => handler
         | Try_case.Catch(exception, handler) =>
+          def handlerBody = getHandler(handler, exception);
           if(exception.Type.HintFast.TypeInfo.FullName == "System.Exception")
-            (JSAst.Literal(JSLiteral.Bool(true)), build(handler))
+            (JSAst.Literal(JSLiteral.Bool(true)), handlerBody)
           else
-            (hasType(exception), build(handler))
+            (hasType(exception), handlerBody)
         // | exception.Name is exception.Type when filter => handler
         | Try_case.Filter(exception, filter, handler) =>
           def cond = JSAst.Call(JSAst.OpCode("&&"), [hasType(exception), build(filter)]);
-          (cond, build(handler))
+          (cond, getHandler(handler, exception))
         }
         
         def catchBody =
@@ -217,7 +225,7 @@ namespace NemerleWeb
               JSAst.If(condition, handler, acc)
             });
         
-        JSAst.TryCatch(build(body), Some(ExceptionName), catchBody)
+        JSAst.TryCatch(build(body), Some(NWExceptionName), catchBody)
       | TryFinally(body, handler)         => JSAst.TryFinally(build(body), build(handler))
       | Tuple(args)                       => JSAst.Tuple(args.Map(a => build(a)))
       | TupleIndexer(obj, pos, _len)      => JSAst.TupleIndexer(build(obj), pos)
@@ -228,7 +236,7 @@ namespace NemerleWeb
       }
     } 
     
-    private ExceptionName = "_NW$_exception";
+    private NWExceptionName = "_NW$_exception";
       
     ConvertToJSOpCode(name : string) : JSAst
     {
@@ -342,7 +350,6 @@ namespace NemerleWeb
       
       ast = JSAstHelper.TransformBottomUp(ast);
       ast = JSAstHelper.FlattenAndRemoveVoids(ast);
-      ast = JSAstHelper.RemoveEmptyBranches(ast);
         
       when(shouldReturn)
         ast = JSAstHelper.MakeReturn(ast);

@@ -40,13 +40,20 @@ class Program
     {
       get
       {
-        if (!string.IsNullOrEmpty(ParserInput))
-          if (_parser.Parse(ParserInput) is Some(res))
-            AnalyzeParserOutput(res)
+        try
+        {
+          if (!string.IsNullOrEmpty(ParserInput))
+            if (_parser.Parse(ParserInput) is Some(res))
+              AnalyzeParserOutput(res)
+            else
+              "Incorrect input"
           else
-            "Incorrect input"
-        else
-          "";
+            "";
+        }
+        catch
+        {
+        | e => e.Message
+        }
       }
     }
      

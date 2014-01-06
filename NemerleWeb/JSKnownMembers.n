@@ -29,6 +29,7 @@ namespace NemerleWeb
       JSKnownMembersSCGDictionary.Register();
       JSKnownMembersIEnumerable.Register();
       JSKnownMembersEnumerator.Register();
+      JSKnownMembersException.Register();
       
       JSKnownMembersLinqEnumerable.Register();
       
