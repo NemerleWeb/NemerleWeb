@@ -42,7 +42,7 @@ namespace NemerleWeb.Rsdn
       Search = Search();
                        
       UpdatePinned();
-      IsMobile = window.innerWidth < 1000;
+      IsMobile = window.document.body.clientWidth < 1000;
               
       _ = server.GetTopNodes(nodes => {
         Root = TreeNode() <- (
