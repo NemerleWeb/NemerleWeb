@@ -73,16 +73,18 @@ var nweb = {
           if (nweb.doesAllowMultipleBindings(attrName)) {
             var matches = attrValue.match(/<\[\{.+?\}\]>/g);
             for (var k = 0; k < matches.length; k++) {
-              var b = binder(model, el, bindings, loopStack, matches[k].substr(3, matches[k].length - 6));
+              var b = binder(model, el, bindings, loopStack, matches[k].substr(3, matches[k].length - 6));              
               if (typeof b !== 'undefined')
                 bindings.push(b);
             }
           } else {
-            var binding = binder(model, el, bindings, loopStack, attrValue, attrName);
-            if (typeof binding !== 'undefined')
+            var binding = binder(model, el, bindings, loopStack, attrValue, attrName);            
+            if (typeof binding !== 'undefined') {
+              binding.expr = attrValue;
               bindings.push(binding);
+            }
           }
-        }        
+        }
       }
     }
 
@@ -515,22 +517,26 @@ var nweb = {
     nweb.invalidate(nweb.bindings);
   },
   invalidationCount: 0,
+  changeFoundCount: 0,
   invalidate: function (bindings, indent, selfCall) {
+    if (!selfCall)
+      console.log("------------------------ INVALIDATE --------------------------------");
     if(typeof bindings === 'undefined')
       bindings = nweb.bindings;
-    nweb.invalidationCount++;
     
     indent = !!indent ? indent : "";
-    // TODO: Remove
-    if(false)
-      if(typeof console !== "undefined")
-        console.log(indent + nweb.invalidationCount++);
-
+    
     var changeFound;
 
     do {
+      if (!!changeFound) {
+        nweb.changeFoundCount++;
+      }
+      
       changeFound = false;
+
       for (var i = bindings.length - 1; i >= 0; i--) {
+        nweb.invalidationCount++;
         var binding = bindings[i];
         var newValue = binding.getValue();
 
@@ -545,6 +551,7 @@ var nweb = {
           binding.oldValue = newValue.slice();
         } else {
           if (binding.oldValue !== newValue) {
+            console.log(binding.expr + ": " + binding.oldValue + " != " + newValue);
             changeFound = true;
             binding.apply(newValue);
             binding.oldValue = newValue;
@@ -558,6 +565,14 @@ var nweb = {
       //Repeat only on top level, so every binding will be invalidated exactly once per invalidation cycle
     } while (changeFound && !selfCall); 
     
+    if (!selfCall) {
+      console.log("invalidate count: " + nweb.invalidationCount);
+      console.log("change found count: " + nweb.changeFoundCount);
+
+      nweb.invalidationCount = 0;
+      nweb.changeFoundCount = 0;
+    }
+
     return changeFound;
   },
   savePosition: function($el) {

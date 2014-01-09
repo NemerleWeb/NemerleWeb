@@ -148,7 +148,7 @@ namespace NemerleWeb.Rsdn
             </div>
           </div>
           <div class="right">
-            <iframe src="$(SelectedNode.Href)" frameborder="0" border="0" />
+            <iframe src="$(SelectedNodeUrl)" frameborder="0" border="0" />
           </div>
         </div>
       #>
