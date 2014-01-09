@@ -137,6 +137,10 @@ a img {
     text-decoration: underline;
 }
 
+.mobile .node {
+    font-size: 16px;
+}
+
 .left {
     width: 300px;
     height: 100%;
@@ -150,12 +154,16 @@ a img {
     overflow: auto;
 }
 
+.mobile-right {
+    height: 100%;
+}
+
 .vsplitbar {
 	width: 5px;
 	background: #aaa;
 }
 
-.right iframe {
+.right iframe, .mobile-right iframe {
     border: none;
     padding: 0;
     margin: 0;
@@ -169,6 +177,39 @@ a img {
     margin-left: 15px;
 }
 
-.search-cat-header:hover {
+.search-cat-header:hover {  
     color: #1e90ff;
+}
+
+.mobile-toolbar {
+    height: 20px;
+    background: #333333;
+}
+
+.mobile-toolbar span {
+    cursor: pointer;
+    line-height: 18px;
+    margin: 0 5px;
+    padding: 0 10px;
+    text-align: center;
+    color: #eee;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 10px;
+    display: block;
+    float: left
+}
+
+.mobile-toolbar span:hover {
+    color: #999;
+}
+
+.jump-list {
+    position: absolute;
+    left: 0;
+    top: 20px;
+    width: 10000px;
+    height: 10000px;
+    padding: 10px 0 0 5px;
+    background: #333333;
 }

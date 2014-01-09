@@ -92,6 +92,8 @@ namespace NemerleWeb
           {
           | PExpr.Ref as rf => <[ $rf() ]>
           | PExpr.Call as call => call
+          | x => x
+          | _ => assert2(false); <[ () ]>
           }
           <[ attr_splice("click", { $e; null }) ]>
         | Attr(Splicable.Value(name), Splicable.Expr(expr) as splice) => <[ attr_splice($(name : string), $(Parse(ToLocation(splice), expr))) ]>        

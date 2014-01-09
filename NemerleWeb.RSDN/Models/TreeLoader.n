@@ -102,6 +102,13 @@ namespace NemerleWeb.Rsdn
       _leaves.Where(n => ids.Any(i => i == n.Id)).Select(n => CloneNoChildren(n, true))
     }
     
+    public GetPopularNodes() : IEnumerable[TreeNode]
+    {
+      def popularForums = ["Nemerle", ".NET", "О жизни", "Коллеги, улыбнитесь", "Работа", "Веб программирование"];
+      _leaves.Where(l => popularForums.Any(p => p == l.Caption) && l.Icon == "fr")
+             .Select(n => CloneNoChildren(n, true));
+    }
+    
     CloneNoChildren(node : TreeNode, resetDepth = false : bool) : TreeNode
     {
       TreeNode() <- (

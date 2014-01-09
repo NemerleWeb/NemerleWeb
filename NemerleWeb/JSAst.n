@@ -913,7 +913,7 @@ $(indent)}
             if(topdown) result else selector(result, currentDepth)
         }
         
-        private IsAllowedForAssignment(ast : JSAst) : bool
+        public static IsAllowedForAssignment(ast : JSAst) : bool
         {
           AllowedForAssignment.Contains(ast.GetType())
         }

@@ -16,13 +16,21 @@ namespace NemerleWeb.Rsdn
   public class MainPage
   {    
     public mutable static Instance : MainPage;
-
+    public enum State { | Tree | Content | JumpList };
+    
     Root : TreeNode { get; set; }    
     Pinned : TreeNode { get; set; }
+    Popular : TreeNode { get; set; }
     Search : Search { get; set; }
-    
+        
     ActiveNodes : list[TreeNode] { get; set; }
-    SelectedUrl : string { get; set; }
+    SelectedNode : TreeNode { get; set; }
+    SelectedNodeUrl : string { get { if(SelectedNode != null) SelectedNode.Href else "" } }
+    
+    CurrentView : string { get { if(IsMobile) "MobileView" else "DesktopView"; } }
+    IsMobile : bool { get; set; }
+    CurrentState : State { get; set; }
+    PreviousState : State { get; set; }
     
     mutable _splitterAdded : bool;
     
@@ -30,26 +38,22 @@ namespace NemerleWeb.Rsdn
     {
       MainPage.Instance = this;
       
-      SelectedUrl = "";
-
-      LoadTopNodes();
       Pinned = TreeNode();
       Search = Search();
                        
       UpdatePinned();
-      
-      _ = window.setTimeout(_ => 
-        when(window.innerWidth < 800) {
-          _ = jQuery(".page").splitterSetWidth(window.innerWidth);
-        }, 
-        50);
-    }
-        
-    public LoadTopNodes() : void
-    {
+      IsMobile = window.innerWidth < 1000;
+              
       _ = server.GetTopNodes(nodes => {
         Root = TreeNode() <- (
-          Children = nodes
+          Children = nodes.ToList()
+        );
+      });
+      
+      _ = server.GetPopularNodes(nodes => {
+        def pinned = GetPinned();
+        Popular = TreeNode() <- (
+          Children = nodes.Where(n => !pinned.Any(p => p != n.Id)).ToList()
         );
       });
     }
@@ -98,13 +102,10 @@ namespace NemerleWeb.Rsdn
       | _ when node.Parent != null => node.Parent :: getAllParents(node.Parent)
       | _ => [];
       };
-      
-      SelectedUrl = node.Href;
+            
+      SelectedNode = node;
       ActiveNodes = node :: getAllParents(node);
-           
-      when(window.innerWidth < 800) {
-        _ = jscall (@$)(".page").splitterSetWidth(0);
-      }
+      CurrentState = State.Content;
     }
     
     public IsActiveNode(node : TreeNode) : bool 
@@ -112,11 +113,21 @@ namespace NemerleWeb.Rsdn
       ActiveNodes?.Any(n => n.Id == node.Id);
     }
     
+    public ToggleJumpList() : void
+    {
+      if(CurrentState == State.JumpList) {
+        CurrentState = PreviousState;
+      } else {
+        PreviousState = CurrentState;
+        CurrentState = State.JumpList;
+      }
+    }
+    
     [Html]
     public View() : string
     {
       <#
-        <div template="$(this, "DesktopView")" />
+        <div template="$(this, CurrentView)" />
       #>
     }
     
@@ -137,7 +148,7 @@ namespace NemerleWeb.Rsdn
             </div>
           </div>
           <div class="right">
-            <iframe src="$SelectedUrl" frameborder="0" border="0" />
+            <iframe src="$(SelectedNode.Href)" frameborder="0" border="0" />
           </div>
         </div>
       #>
@@ -147,16 +158,41 @@ namespace NemerleWeb.Rsdn
     public MobileView() : string
     {
       <#
-        <div class="page">
-          MOBILE!!!111
+        <div class="mobile">
+          <div class="mobile-toolbar">
+            <span $when(CurrentState == State.Content) class="toggle-tree" click="$(CurrentState = State.Tree)">&lt</span>
+            <span $when(CurrentState == State.Tree && SelectedNode != null) class="toggle-tree" click="$(CurrentState = State.Content)">&gt</span>
+          
+            <span class="toggle-jump-list" click="$(ToggleJumpList())">jump</span>
+            <span $when(CurrentState == State.Content && !IsPinned(SelectedNode)) click="$(AddPinned(SelectedNode.Id))">
+              pin
+            </span>
+            <span $when(CurrentState == State.Content && IsPinned(SelectedNode)) click="$(RemovePinned(SelectedNode.Id))">
+              unpin
+            </span>
+          </div>
+          <div $when(CurrentState == State.Tree)>
+            <div $when(Root != null) class="root">
+              <div template="$Search" />
+              <div $when(string.IsNullOrEmpty(Search.SearchTerm))>
+                <div template="$Root" />
+              </div>
+            </div>
+          </div>
+          <div visible="$(CurrentState == State.Content)" class="mobile-right">
+            <iframe src="$(SelectedNodeUrl)" frameborder="0" border="0" />
+          </div>
+          <div $when(CurrentState == State.JumpList) class="jump-list">
+            <div template="$Pinned" />
+            <div template="$Popular" />
+          </div>
         </div>
       #>
-    }
-    
+    }    
     
     public class Server
     {
-      public GetTopNodes() : List[TreeNode]
+      public GetTopNodes() : IEnumerable[TreeNode]
       {
         TreeLoader.GetTopNodes()
       }
@@ -164,6 +200,11 @@ namespace NemerleWeb.Rsdn
       public LoadByIds(ids : IEnumerable[string]) : IEnumerable[TreeNode]
       {
         TreeLoader.LoadByIds(ids)
+      }
+      
+      public GetPopularNodes() : IEnumerable[TreeNode]
+      {
+        TreeLoader.GetPopularNodes();
       }
     }
   }

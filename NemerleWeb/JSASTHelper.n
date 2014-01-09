@@ -337,7 +337,10 @@ namespace NemerleWeb
       | _ => arg.JSMethodCall("toString", [])
     }
     
-    
+    public FixCommonSpliceProblems(ast : JSAst) : JSAst
+    {
+      ast
+    }
     
     /// Call user ToString if exist
     public CallToString(
