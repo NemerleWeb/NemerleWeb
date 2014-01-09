@@ -8,7 +8,7 @@ namespace System
   [Unit]
   public class ArgumentOutOfRangeException : ArgumentException
   {
-    public this() {}
+    public this() { base("ArgumentOutOfRangeException"); }
     public this(message : string) { base(message); }
     public this(message : string, innerException : Exception) { base(message, innerException) }
     public this(message : string, paramName : string, innerException : Exception)

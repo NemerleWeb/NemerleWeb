@@ -74,6 +74,9 @@
     <Compile Include="System\Exception.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="System\InvalidOperationException.n">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="System" />

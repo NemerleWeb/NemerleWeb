@@ -1838,7 +1838,7 @@ namespace NemerleWeb.Website.Tests
         }
       });
       
-      test("some exception specific handler with filter", () => {
+      test("exception in local function", () => {
         def f() : int
         {
           try
@@ -1852,6 +1852,10 @@ namespace NemerleWeb.Website.Tests
         }
         
         f() == 1
+      });
+      
+      test("exception returning value in catch", () => {
+        try { throw Exception("A"); false } catch { e => e.Message == "A" }
       });
     }
     

@@ -39,7 +39,23 @@ module Program
 
 [Unit]
 public class Test
-{    
+{  
+
+    CalcOutput : string
+    {
+      get
+      {
+        try
+        {
+          ""
+        }
+        catch
+        {
+        | e => e.Message
+        }
+      }
+    }
+
   public this()
   {
   }

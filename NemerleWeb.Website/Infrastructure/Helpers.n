@@ -18,7 +18,11 @@ namespace NemerleWeb.Website
     {
       def dir = Uri(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase)).LocalPath;
       def filename = Path.GetFullPath(Path.Combine(dir, filename));
-      File.ReadAllText(filename)
+      
+      if(filename.StartsWith(dir))      
+        File.ReadAllText(filename)
+      else
+        ""
     }
     
     public GetNames() : list[string]

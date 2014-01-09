@@ -8,7 +8,7 @@ namespace System
   [Unit]
   public class ArgumentException : Exception
   {
-    public this() {}
+    public this() { base("ArgumentException"); }
     public this(message : string) { base(message); }
     public this(message : string, innerException : Exception) { base(message, innerException) }
     public this(message : string, paramName : string, innerException : Exception)

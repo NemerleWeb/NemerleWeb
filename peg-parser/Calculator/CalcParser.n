@@ -60,20 +60,17 @@ namespace Calculator
     
     private parenthesesExprError(_ : NToken, _ : int) : int
     {
-      js <# throw "Need closing parentheses or '+', '-', '*', '/' with following number of expression"; #>;
-      -1
+      throw Exception("Need closing parentheses or '+', '-', '*', '/' with following number of expression");
     }
     
     private inputError(_tok : NToken) : int
     {
-      js <# throw "Need '+', '-', '*', '/' with following number or expression"; #>;
-      -1
+      throw Exception("Need '+', '-', '*', '/' with following number or expression");
     }
     
     private simplExprError(_tok : NToken) : int
     {
-      js <# throw "Need number or expression in parentheses"; #>;
-      -1
+      throw Exception("Need number or expression in parentheses");
     }
     
     private mainRule(se : int, _ : option[int]) : int
