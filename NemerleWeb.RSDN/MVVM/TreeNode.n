@@ -30,7 +30,7 @@ namespace NemerleWeb.Rsdn
     mutable _href : string;
     public Href : string 
     { 
-      get { if(_href == null || _href.StartsWith("http://")) _href else "http://www.rsdn.ru" + _href }; 
+      get { if(_href == null || _href.StartsWith("http://www.rsdn.ru")) _href else "http://www.rsdn.ru" + _href }; 
       set { _href = value }; 
     }
     

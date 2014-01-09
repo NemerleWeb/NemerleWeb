@@ -222,7 +222,7 @@ var nweb = {
       });
     }
 
-    $el.val(eval(expr));
+    $el.val(nweb.getParsedValue(model, expr, loopStack));
     
     return {
       el: el,
@@ -324,7 +324,7 @@ var nweb = {
   getTemplateBinding: function(model, el, bindings, loopStack, attrVal) {
     var $el = $(el);
     var parsedExpr = nweb.parseExpression(model, attrVal, loopStack);
-    var isComplexBinding = attrVal[0] == '{' && attrVal[attrVal.length - 1] == '}';
+    var isComplexBinding = attrVal.indexOf("${") == 0 && attrVal[attrVal.length - 1] == '}';
     
     var getTemplateModel = function(value) {
       if(isComplexBinding) return value[0];
@@ -464,8 +464,10 @@ var nweb = {
     return expr;
   },
   parseExpression: function(model, expr, loopStack) {
-    if(expr === "_nw_self")
+    if (expr === "_nw_self")
       return "model";
+    if (expr.length > 0 && expr[0] == "$")
+      expr = "return " + expr.slice(1);
     var e = nweb.applyLoopStackToExpr(expr, loopStack);
     return e.replace(/_nw_self\./g, "model.");
   },
@@ -480,7 +482,7 @@ var nweb = {
 
         if (!cachedFunc) {
           //var newFunc = eval("(function(model, loopStack) { return " + parsedExpr + "; } )");
-          var newFunc = new Function('model', 'loopStack', "var _nw_self = model; return " + parsedExpr + ";");
+          var newFunc = new Function('model', 'loopStack', "var self = model; return " + parsedExpr + ";");
           nweb.parsedValueCache[parsedExpr] = newFunc;
           val = newFunc(model, loopStack);
         } else {

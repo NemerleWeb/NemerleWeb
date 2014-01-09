@@ -36,7 +36,7 @@ namespace NemerleWeb
       JSClass.StringType = <[ ttype : System.String ]>;
       JSClass.IPageType = <[ ttype: IPage ]>;
       JSClass.ObjectType = <[ ttype: System.Object ]>;
-      
+            
       match (mb.body)
       {
       | FunBody.Parsed(PExpr.Sequence([PExpr.Literal(Literal.String(str)) as lit]))
@@ -102,6 +102,12 @@ namespace NemerleWeb
         expr.Replace("\"", "'");
       }      
       
+      def getAstString(expr) {
+        def (ast, addedReturn) = JSAstBuilder.BuildJSAstForSplices(expr, mb.Header);        
+        def res = if(addedReturn) ast.Write() else "$" + ast.Write();
+        res.Replace("\r\n", "")        
+      }
+      
       def htmlFromTExpr(expr, indent) : string {
         match(expr) {
         | TExpr.Block(_, body) => htmlFromTExpr(body, indent)
@@ -124,7 +130,7 @@ namespace NemerleWeb
                 lv.Name + "_" + lv.Id.ToString()
               }
               def foreachEnum = 
-                  "nw-foreach=\"" + getLocalValueName(loopValName) + " in " + escape(JSAstBuilder.BuildJSAstForSplices(val, mb.Header).Write()) + "\" ";
+                  "nw-foreach=\"" + getLocalValueName(loopValName) + " in " + escape(getAstString(val)) + "\" ";
               (foreachEnum + htmlFromTExpr(attrs, indent), 
                htmlFromTExpr(childTags, indent + "  "))
             | Tuple([attrs, childTags]) =>
@@ -138,7 +144,7 @@ namespace NemerleWeb
           indent + $"</$(tagName)>";
         
         | Call(LocalFunRef(decl, _), [textExprExpr], _) when decl.Name == "text_splice" => 
-          def splice = JSAstBuilder.BuildJSAstForSplices(textExprExpr.expr, mb.Header).Write();
+          def splice = getAstString(textExprExpr.expr);
           def splice = escape(splice.Trim(array['\"']));
           $"<span nw-text=\"$splice\" />"
         
@@ -153,7 +159,7 @@ namespace NemerleWeb
           else
             attrExprExpr.expr;
          
-          def attrSplice = escape(JSAstBuilder.BuildJSAstForSplices(attrExpr, mb.Header).Write());
+          def attrSplice = escape(getAstString(attrExpr));
           $"nw-$attrName=\"$attrSplice\""
           
         | Call(LocalFunRef(decl, _), [Parm(_, Literal(Literal.String(attrName)), _, _), Parm(_, Literal(Literal.String(attrValue)), _, _)], _) 

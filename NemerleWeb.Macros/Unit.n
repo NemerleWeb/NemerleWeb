@@ -69,7 +69,12 @@ namespace NemerleWeb
       JSClass.ObjectType = <[ ttype: System.Object ]>;
         
       unless(typer.Manager.IsIntelliSenseMode)
-        CreateResourceController(tb, typer);
+      {
+        // TODO: Add better check for WebSite project
+        when(tb.Manager.ReferencedAssemblies
+          .Any(a => a.Assembly.FullName.Contains("System.Web.Razor")))
+          CreateResourceController(tb, typer);
+      }
             
       def translateMethod(typer) 
       {
