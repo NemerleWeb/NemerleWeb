@@ -244,7 +244,7 @@ namespace NemerleWeb
       if(localVal.ValKind is LocalValue.Kind.FunParm) localVal.Name else localVal.Name + "_" + localVal.Id
     }
     
-    private NWExceptionName = "_NW$_exception";
+    private NWExceptionName = "_nw_exception";
       
     ConvertToJSOpCode(name : string) : JSAst
     {
@@ -366,6 +366,7 @@ namespace NemerleWeb
           
       ast = JSAstHelper.FlattenAndRemoveVoids(ast);
       ast = JSAstHelper.GotosToSwitch(ast);
+      ast = JSAstHelper.Optimize(ast);
                 
       match(ast)
       {

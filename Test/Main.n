@@ -42,13 +42,15 @@ public class Test
 {    
   public this()
   {
-    def test(description : string, res : void -> bool) : void
-    {}
-      
-    test("simple", () =>
-    {
-      true
-    });
+    def a = Exception("ABC");
+    //try
+    //{
+    //  throw Exception("A");
+    //}
+    //catch
+    //{
+    //  | e =>  _ = e.Message;
+    //}    
   }
   
   [Html]

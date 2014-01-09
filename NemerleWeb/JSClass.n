@@ -34,7 +34,7 @@ namespace NemerleWeb
     public static ObjectType : TypeVar { get; set; }
     #endregion
       
-    public static Self : string = "self";
+    public static Self : string = "_nw_self";
       
     /// <summary>
     /// Initialize self either
@@ -118,7 +118,7 @@ namespace NemerleWeb
     public static GetNestedTypes(type : TypeBuilder) : IEnumerable[TypeBuilder]
     {
       type.DeclaredNestedTypes
-					.Where(c => !c.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
+          .Where(c => !c.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
                         .Where(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server                                
                         .Where(c => !c.Name.StartsWith("_N_")) //Not generated class;
     }
@@ -155,7 +155,6 @@ namespace NemerleWeb
       def staticFields = GetStaticFields(Indent);
       def constructorsBody = GetConstructorsBody(Indent, bodyIndent);
       def callConstrutor = GetCallConstructor(bodyIndent);
-      def staticConstructorBody = GetStaticConstructorBody(Indent);
       def methods = GetMethods(bodyIndent, parentPtr, true);
       def definedMethods = GetDefinedMethods(bodyIndent, parentPtr, true);
       def staticMethods = GetStaticMethods(Indent);
@@ -189,7 +188,6 @@ $staticFields
 $staticMethods
 $staticProperties
 #>
-//$staticConstructorBody
     }
       
     GenerateProperties(indent : string, parentPtr : string, properties : IEnumerable[IProperty], meta : JSClassMeta, generate : bool) : string 
@@ -512,11 +510,16 @@ $(indent)}#>
     /// </summary>
     public static GetProperNameForJS([NotNull] typeInfo : TypeInfo) : string
     {
+      GetProperNameRoots(typeInfo, JSClassSettings.JSApiRoots)
+    }
+    
+    public static GetProperNameRoots([NotNull] typeInfo : TypeInfo, roots : IEnumerable[string]) : string
+    {
       def fullName = typeInfo.FullName;
-        
+      
       // Check default, if doesn't fit, check other roots.
-      def root = JSClassSettings.JSApiRoots.FirstOrDefault(root => fullName.StartsWith(root));
-        
+      def root = roots.FirstOrDefault(root => fullName.StartsWith(root));
+      
       if(root != null)
         if(fullName.Length == root.Length)
           ""
@@ -536,9 +539,11 @@ $(indent)}#>
       }
       else
       {
+        def typeName = GetProperNameRoots(typeInfo, JSClassSettings.JSClrRoots);
+        
         def typeParams = if(typeInfo.Typarms.IsEmpty) "";
-                          else $"[..$(typeInfo.Typarms.Select(_.ToString()))]";
-        GetProperName(typeInfo.FullName + typeParams)
+                         else $"[..$(typeInfo.Typarms.Select(_.ToString()))]";
+        GetProperName(typeName + typeParams)
       }
     }
         
@@ -627,5 +632,7 @@ $(indent)  };#>;
   internal module JSClassSettings
   {
     public JSApiRoots : SortedSet[string] = SortedSet(["NemerleWeb"], InvertedComparer());
+    
+    public JSClrRoots : SortedSet[string] = SortedSet(["NemerleWeb.TypedClr"], InvertedComparer());
   }  
 }

@@ -1,0 +1,24 @@
+﻿using NemerleWeb;
+
+namespace NemerleWeb.TypedClr
+{
+  
+namespace System
+{
+  [Unit]
+  public class ArgumentException : Exception
+  {
+    public this() {}
+    public this(message : string) { base(message); }
+    public this(message : string, innerException : Exception) { base(message, innerException) }
+    public this(message : string, paramName : string, innerException : Exception)
+    {
+      ParamName = paramName;
+      base(message, innerException);
+    }
+    
+    public virtual ParamName : string { get; }
+  }
+}
+
+}

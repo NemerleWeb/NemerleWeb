@@ -464,10 +464,10 @@ var nweb = {
     return expr;
   },
   parseExpression: function(model, expr, loopStack) {
-    if(expr === "self")
+    if(expr === "_nw_self")
       return "model";
     var e = nweb.applyLoopStackToExpr(expr, loopStack);
-    return e.replace(/self\./g, "model.");
+    return e.replace(/_nw_self\./g, "model.");
   },
   parsedValueCache: {},
   getParsedValue: function(model, parsedExpr, loopStack, returnFunction) {
@@ -480,7 +480,7 @@ var nweb = {
 
         if (!cachedFunc) {
           //var newFunc = eval("(function(model, loopStack) { return " + parsedExpr + "; } )");
-          var newFunc = new Function('model', 'loopStack', "var self = model; return " + parsedExpr + ";");
+          var newFunc = new Function('model', 'loopStack', "var _nw_self = model; return " + parsedExpr + ";");
           nweb.parsedValueCache[parsedExpr] = newFunc;
           val = newFunc(model, loopStack);
         } else {
@@ -1181,28 +1181,6 @@ function System_Collections_Generic_Stack(arg) {
         return [];
     else
         return Enumerable.from(arg).toArray();
-}
-
-function System_Exception(message) {
-    this.message = message;
-
-    this.get_Message = function() { return this.message; };
-}
-
-function System_ArgumentNullException(paramName, message) {
-    this.paramName = paramName;
-    this.message = message;
-
-    this.get_ParamName = function () { return this.paramName; };
-    this.get_Message = function () { return this.message; };
-}
-
-function System_ArgumentOutOfRangeException(paramName, message) {
-    this.paramName = paramName;
-    this.message = message;
-
-    this.get_ParamName = function () { return this.paramName; };
-    this.get_Message = function () { return this.message; };
 }
 
 var System_Environment = {};
