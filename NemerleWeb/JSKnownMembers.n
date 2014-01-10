@@ -29,7 +29,6 @@ namespace NemerleWeb
       JSKnownMembersSCGDictionary.Register();
       JSKnownMembersIEnumerable.Register();
       JSKnownMembersEnumerator.Register();
-      JSKnownMembersException.Register();
       
       JSKnownMembersLinqEnumerable.Register();
       
@@ -174,6 +173,34 @@ namespace NemerleWeb
       [NotNull] member : IMember,
       [NotNull] parms : list[JSAst]) : JSAst
     {
+      // Handle CLR typing
+      when(typeInfo != null)
+      {
+        foreach(root in JSClassSettings.JSClrRoots)
+        {
+          def newTypeName = $"$root.$(typeInfo.FullName)";
+            
+          def type = typeInfo.GlobalEnv.LookupType(newTypeName.Split('.').NToList(), null, typeInfo.TyparmsCount);
+          when(type is Some(_))
+          {
+            if(member.IsConstructor)
+            {
+              return
+                JSAst.Call(
+                  JSAst.Constructor(
+                    JSClass.GetProperName(typeInfo),
+                    Some((member :> IMethod).Header.Parameters)),
+                  parms);
+            }
+            else
+            if(member.IsStatic)
+             return typeInfo.FullName.StaticCall(member, parms);
+            else
+              return left.MethodCall(member, parms);
+          }
+        }
+      }
+      
       // First try convert member by name
       def memberName = member.Name;
       mutable memberHandler;
@@ -204,7 +231,7 @@ namespace NemerleWeb
       // Handle JS native calls
       when(typeInfo?.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
         return ConvertJSApiMethod(typeInfo, left, member, parms);
-              
+                    
       // Nothing found, try default dictionary
       mutable defaultMemberHandler;
       when (_convertDefaultMemberHandlers.TryGetValue(memberName, out defaultMemberHandler))

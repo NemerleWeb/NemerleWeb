@@ -257,6 +257,11 @@ namespace NemerleWeb
         ast
     }
     
+    public Optimize(ast : JSAst) : JSAst
+    {
+      ast
+    }
+    
     public DelayAssignment(expr : JSAst, left : JSAst) : JSAst
     {
         def delayAssignment = DelayAssignment(_, left);
@@ -302,7 +307,7 @@ namespace NemerleWeb
         }
     }
     
-    public ReturnValue : string = "_NW$_returnValue";
+    public ReturnValue : string = "_nw_returnValue";
 
     public MakeReturn(ast : JSAst) : JSAst 
     {

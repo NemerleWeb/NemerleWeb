@@ -22,6 +22,7 @@ packages
 
 NemerleWeb.Website/Scripts/NemerleWeb/*.js
 NemerleWeb.RSDN/Scripts/NemerleWeb/*.js
+NemerleWeb.TypedClr/Scripts/NemerleWeb/*.js
 Test/Scripts/NemerleWeb/*.js
 peg-parser/Calculator/Scripts/NemerleWeb/*.js
 peg-parser/CSharpParser/Scripts/NemerleWeb/*.js

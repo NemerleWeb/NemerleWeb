@@ -1,0 +1,17 @@
+﻿using NemerleWeb;
+
+namespace NemerleWeb.TypedClr
+{
+  
+namespace System
+{
+  [Unit]
+  public class InvalidOperationException : Exception
+  {
+    public this() { base("InvalidOperationException"); }
+    public this(message : string) { base(message); }
+    public this(message : string, innerException : Exception) { base(message, innerException) }
+  }
+}
+
+}

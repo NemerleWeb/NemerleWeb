@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Website", "NemerleWeb.Website\NemerleWeb.Website.nproj", "{837F8D8F-B2B7-4BFB-81D3-3C168F86173C}"
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Tests.Macro", "NemerleWeb.Tests.Macro\NemerleWeb.Tests.Macro.nproj", "{1D616985-5E18-44E1-8F74-D2AC69C3DC6F}"
@@ -28,6 +30,8 @@ EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "JSParser-VS_2010", "peg-parser\JSParser\JSParser-VS_2010.nproj", "{F440F161-D644-4004-B4F0-A9DFA001039E}"
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "TSParserPeg", "peg-parser\TSParserPeg\TSParserPeg.nproj", "{CFCB42E2-C0CD-4C83-A18E-D97149F21B14}"
+EndProject
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.TypedClr", "NemerleWeb.TypedClr\NemerleWeb.TypedClr.nproj", "{3AF4BC0F-7B1F-4C66-B221-75D722170EB9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +95,10 @@ Global
 		{CFCB42E2-C0CD-4C83-A18E-D97149F21B14}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFCB42E2-C0CD-4C83-A18E-D97149F21B14}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFCB42E2-C0CD-4C83-A18E-D97149F21B14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AF4BC0F-7B1F-4C66-B221-75D722170EB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AF4BC0F-7B1F-4C66-B221-75D722170EB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AF4BC0F-7B1F-4C66-B221-75D722170EB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AF4BC0F-7B1F-4C66-B221-75D722170EB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

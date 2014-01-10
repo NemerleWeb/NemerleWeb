@@ -39,16 +39,25 @@ module Program
 
 [Unit]
 public class Test
-{    
+{  
+
+    CalcOutput : string
+    {
+      get
+      {
+        try
+        {
+          ""
+        }
+        catch
+        {
+        | e => e.Message
+        }
+      }
+    }
+
   public this()
   {
-    def test(description : string, res : void -> bool) : void
-    {}
-      
-    test("simple", () =>
-    {
-      true
-    });
   }
   
   [Html]

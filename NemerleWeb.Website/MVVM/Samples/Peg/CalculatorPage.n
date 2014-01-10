@@ -22,13 +22,20 @@ namespace NemerleWeb.Website.Samples
     {
       get
       {
-        if (!string.IsNullOrEmpty(CalcInput))
-          if (_calc.Parse(CalcInput) is Some(res))
-            res.ToString()
+        try
+        {
+          if (!string.IsNullOrEmpty(CalcInput))
+            if (_calc.Parse(CalcInput) is Some(res))
+              res.ToString()
+            else
+              "Incorrect input"
           else
-            "Incorrect input"
-        else
-          "";
+            "";
+        }
+        catch
+        {
+        | e => e.Message
+        }
       }
     }
      

@@ -1,0 +1,27 @@
+﻿using NemerleWeb;
+
+// TODOK: [assembly: ClrApiRoot(NemerleWeb.TypedClr)]
+// TODOK: [assembly: UnitAssembly()]
+// TODOK: [assembly: ImplicitClrApRoot(NemerleWeb.TypedClr)]
+namespace NemerleWeb.TypedClr
+{
+  
+namespace System
+{
+  [Unit]
+  public class Exception
+  {
+    public this() {}
+    public this(message : string) { Message = message; }
+    public this(message : string, innerException : Exception)
+    {
+      Message = message;
+      InnerException = innerException;
+    }
+    
+    public virtual Message : string { get; }
+    public virtual InnerException : Exception { get; }
+  }
+}
+
+}

@@ -821,6 +821,7 @@ $(indent)}
           HashSet([
             typeof(JSAst.Call),
             typeof(JSAst.MethodRef),
+            typeof(JSAst.StaticMethodRef),
             typeof(JSAst.LocalRef),            
             typeof(JSAst.ParamRef),
             typeof(JSAst.Literal), 
@@ -845,6 +846,11 @@ $(indent)}
             typeof(JSAst.ServerCall),
             typeof(JSAst.Function),
             typeof(JSAst.HasType),
+            typeof(JSAst.Constructor),
+            typeof(JSAst.ConstructorRef),
+            typeof(JSAst.Assign),
+            typeof(JSAst.BinaryOperator),
+            typeof(JSAst.UnaryOperator),
           ]);
         
         public static Recurse(ast : JSAst, selector : (JSAst * int) -> JSAst, currentDepth = 0 : int, topdown : bool = true) : JSAst 
