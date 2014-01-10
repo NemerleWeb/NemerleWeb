@@ -353,7 +353,6 @@ namespace NemerleWeb
       ast = JSAstHelper.TransformBottomUp(ast);
       ast = JSAstHelper.FlattenAndRemoveVoids(ast);
           
-      ast = JSAstHelper.FlattenAndRemoveVoids(ast);
       ast = JSAstHelper.GotosToSwitch(ast);
       ast = JSAstHelper.Optimize(ast);
                 
