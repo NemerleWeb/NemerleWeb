@@ -85,12 +85,11 @@ $$(function() {
             mutable _isInitialized : bool;
             
             public Initialize() : void
-            {   
+            {
               lock(_locker) 
               {
                 when(!_isInitialized) 
                 {
-                
                   def loadedAssemblies = System.AppDomain
                                                .CurrentDomain
                                                .GetAssemblies()

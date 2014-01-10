@@ -1,0 +1,1 @@
+<div nw-template="${0: _nw_self, 1: _nw_self.get_CurrentView()}" ></div> 
