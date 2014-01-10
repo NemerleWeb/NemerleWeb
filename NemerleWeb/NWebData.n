@@ -22,6 +22,7 @@ namespace NemerleWeb
     public Scripts : List[string] = List();
     public Templates : List[(string * string)] = List();   
     public CombinedScriptsFilename : string;
+    public ResourcesFilename : string;
     
     this() 
     {
@@ -81,22 +82,59 @@ namespace NemerleWeb
           _ = combinedScripts.Append(fields);
         }        
       }
-      
-      
+
       using(sha = SHA1CryptoServiceProvider()) 
       {
         def staticFieldsContent = staticFields.ToString();
         def hash = BitConverter.ToString(sha.ComputeHash(Encoding.Unicode.GetBytes(staticFieldsContent))).Replace("-", "");
-        def fname = "_N_static_fields_" + hash + ".js";        
+        def fname = "_N_static_fields_" + hash + ".js";
         File.WriteAllText(getAbsolutePath(fname), staticFieldsContent);
         Scripts.Add(getRelativePath(fname));
         
         def combinedScriptsContent = combinedScripts.ToString();
         def hash = BitConverter.ToString(sha.ComputeHash(Encoding.Unicode.GetBytes(combinedScriptsContent))).Replace("-", "");
         def fname = "nweb-combined-" + hash + ".js";
-        File.WriteAllText(getAbsolutePath(fname), combinedScriptsContent);        
+        File.WriteAllText(getAbsolutePath(fname), combinedScriptsContent);
         CombinedScriptsFilename = getRelativePath(fname);
       }
+      
+      def scripts =
+      [
+        "NemerleWeb.Scripts.json2.js",
+        "NemerleWeb.Scripts.jquery-1.10.1.js",
+        "NemerleWeb.Scripts.jquery.signalR-1.1.2.js",
+        "NemerleWeb.Scripts.linq.js",
+        "NemerleWeb.Scripts.nweb.js"
+      ];
+              
+      try
+      {
+        def sb = System.Text.StringBuilder();
+        foreach(file in scripts)
+        {
+          using(stream = typeof(NemerleWeb.JSAst).Assembly.GetManifestResourceStream(file))
+          {
+            if(stream != null) 
+            {
+              using(reader = System.IO.StreamReader(stream))
+                _ = sb.Append(reader.ReadToEnd());
+            }
+            else
+            {
+              def errorMessage = $"!!!ERROR!!! Cannot find $file!!!";
+              _ = sb.Append($"\r\n// $errorMessage\r\nconsole.error($errorMessage);\r\n");
+            }
+          }     
+          
+          File.WriteAllText(getAbsolutePath("resource.js"), sb.ToString());          
+        }
+      }
+      catch
+      {
+      | e => File.WriteAllText(getAbsolutePath("resource.js"), e.ToString());
+      }
+      
+      ResourcesFilename = getRelativePath("resource.js");
     }         
     
     public GetScripts() : IEnumerable[string]
@@ -120,6 +158,12 @@ $<#
 $content
 </script>#>
       });
+    }
+    
+    public GetNemerleWebScripts() : string
+    {
+      $<#
+<script type="text/javascript" src="$ResourcesFilename"></script> #>
     }
   }
   
