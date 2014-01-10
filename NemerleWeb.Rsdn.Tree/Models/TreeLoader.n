@@ -27,7 +27,7 @@ namespace NemerleWeb.Rsdn
     {
       def xml = File.ReadAllText(HttpContext.Current.Server.MapPath("~/App_Data/tree.xml"), Encoding.GetEncoding("windows-1251"));
       def readNodes(element, depth) : TreeNode {        
-        def childNodes = element.Elements("node").Select(e => readNodes(e, depth + 1)).ToList();
+        def childNodes = Enumerable.ToList(element.Elements("node").Select(e => readNodes(e, depth + 1)));
         
         if(element.Name.LocalName == "tree") {
           TreeNode() <- ( Id = "", Children = childNodes ) 

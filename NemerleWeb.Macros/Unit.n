@@ -71,8 +71,8 @@ namespace NemerleWeb
       unless(typer.Manager.IsIntelliSenseMode)
       {
         // TODO: Add better check for WebSite project
-        when(tb.Manager.ReferencedAssemblies
-          .Any(a => a.Assembly.FullName.Contains("System.Web.Razor")))
+        //when(tb.Manager.ReferencedAssemblies
+        //  .Any(a => a.Assembly.FullName.Contains("System.Web.Razor")))
           CreateResourceController(tb, typer);
       }
             
@@ -147,6 +147,38 @@ namespace NemerleWeb
         CollectJSApiRoots(typer);
         collectedJSApiRoots = true;
       }
+      
+      def parms = match(tb.GetConstructors().FirstOrDefault()) {
+      | null => []
+      | x => x.GetParameters();
+      };
+      def pparms = parms.Map(p => p.AsParsed());
+      def signature = JSAstHelper.MethodSignature(parms);
+      def properName = JSClass.GetProperName(tb);
+      def serverParams = parms.Select(p => <[ paramList.Add("nweb.utils.toTypedObject(" + NWebUtils.ToJson($(p.Name)) + ")") ]>);
+      
+      GetRenderer(tb).Define(<[ decl: public $(tb.Name : dyn)(..$pparms) : string {
+        
+          def scripts = NemerleWeb.NWebData.GetScripts();
+          def templates = NemerleWeb.NWebData.GetTemplates();
+    
+          def declarations = string.Join("\n", templates.Concat(scripts));
+          def unitName = $(properName : string);
+          def paramList = List();
+          paramList.Add($signature);
+          {..$(serverParams.NToList())}
+          def callParms = string.Join(",", paramList);
+
+$<#
+<div id="nweb-start"></div>
+$declarations
+<script>
+$$(function() {  
+  nweb.go(new $unitName($callParms));
+});
+</script>
+#>
+      }]>);
       
       def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");
       def serverMethods = Dictionary();
@@ -389,6 +421,25 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       }
     }
     
+    GetRenderer(tb : TypeBuilder) : TypeBuilder
+    {
+      def assemblyName = Path.GetFileNameWithoutExtension(tb.Manager.Options.OutputFileName);
+      def env = tb.Manager.CoreEnv.EnterIntoNamespace([assemblyName]);
+      match(env.LookupType(["Render"])) 
+      {
+      | Some(type) => type :> TypeBuilder
+      | None => 
+        def t = env.Define(<[ decl:
+          public module Render
+          {
+            this() {}
+          }
+        ]>);
+        t.Compile();
+        t
+      }
+    }
+    
     CreateResourceController(_tb : TypeBuilder, typer : Typer) : void
     {
       def env = typer.Manager.CoreEnv;
@@ -450,14 +501,6 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       
       def pageBaseMethods =
         [
-          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : Func[$(T), TM]) : string { IgnoreParams(); "" } ]>,
-          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : $(T) -> TM, view : string) : string { IgnoreParams(); "" } ]>,
-          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : $(T) -> TM, view : TM -> void -> string) : string { IgnoreParams(); "" } ]>,
-          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : $(T) -> TM, view : TM -> string) : string { IgnoreParams(); "" } ]>,
-          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : TM) : string { IgnoreParams(); "" } ]>,
-          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : TM, view : string) : string { IgnoreParams(); "" } ]>,
-          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : TM, view : TM -> string) : string { IgnoreParams(); "" } ]>,
-          <[decl: [NemerleWeb.IgnoreAttribute] public new template[TM](model : TM, view : TM -> void -> string) : string { IgnoreParams(); "" }]>,
           <[decl: [NemerleWeb.IgnoreAttribute] public new GetTemplateName([NotNull] modelName : string, [NotNull] viewName : string) : string { IgnoreParams(); "" } ]>,
         ];
         

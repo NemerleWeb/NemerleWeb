@@ -13,7 +13,7 @@ namespace NemerleWeb.Rsdn.Controllers
   {
     public Index() : ActionResult
     {
-      View((NWeb MainPage()) : object);
+      View(NemerleWeb.Rsdn.Tree.Render.MainPage() : object);
     }
   }
 }

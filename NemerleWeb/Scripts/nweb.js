@@ -577,7 +577,6 @@ var nweb = {
         if (nweb.utils.isArray(newValue)) {
           if (!binding.oldValue || !nweb.utils.areArraysEqual(newValue, binding.oldValue)) {
             changeFound = true;
-            console.log("change");
             binding.apply(newValue);
           }
           binding.oldValue = newValue.slice();
@@ -586,7 +585,6 @@ var nweb = {
             changeFound = true;
             binding.apply(newValue);
             binding.oldValue = newValue;
-            console.log("change");
           } else if (binding.isWhen && newValue == true) {
             binding.apply(newValue);
           }

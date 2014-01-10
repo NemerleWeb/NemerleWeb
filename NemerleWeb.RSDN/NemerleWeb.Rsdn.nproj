@@ -197,21 +197,6 @@
     <Compile Include="Global.asax.n">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\TreeLoader.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MVVM\MainPage.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MVVM\Pinned.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MVVM\Search.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MVVM\TreeNode.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
   </ItemGroup>
   <ItemGroup>
@@ -345,8 +330,6 @@
     <Folder Include="Content\Images\" />
     <Folder Include="Content\Images\jquery.splitter\" />
     <Folder Include="Controllers\" />
-    <Folder Include="Models\" />
-    <Folder Include="MVVM" />
     <Folder Include="Properties\" />
     <Folder Include="Scripts\" />
     <Folder Include="Views\" />
@@ -359,6 +342,11 @@
       <Project>{b1454534-cabd-4abe-cc8e-ddff34f51b14}</Project>
       <Private>False</Private>
     </MacroProjectReference>
+    <ProjectReference Include="..\NemerleWeb.Rsdn.Tree\NemerleWeb.Rsdn.Tree.nproj">
+      <Name>NemerleWeb.Rsdn.Tree</Name>
+      <Project>{265b5ceb-d5ad-47b0-a1b1-235e1422aba7}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\NemerleWeb.TypedJS\NemerleWeb.TypedJS.nproj">
       <Name>NemerleWeb.TypedJS</Name>
       <Project>{65c01c91-f57a-4281-b09f-15baa5ac3cc6}</Project>
