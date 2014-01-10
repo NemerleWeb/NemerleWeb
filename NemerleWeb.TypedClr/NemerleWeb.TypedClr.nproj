@@ -61,6 +61,9 @@
     </MacroReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Nemerle\Core\MatchFailureException.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
     <Compile Include="System\ArgumentException.n">
       <SubType>Code</SubType>
@@ -79,6 +82,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Nemerle" />
+    <Folder Include="Nemerle\Core" />
     <Folder Include="System" />
     <Folder Include="Properties\" />
   </ItemGroup>

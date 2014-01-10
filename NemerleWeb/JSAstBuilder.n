@@ -227,7 +227,10 @@ namespace NemerleWeb
               JSAst.If(condition, handler, acc)
             });
         
-        JSAst.TryCatch(build(body), Some(NWExceptionName), catchBody)
+        JSAst.TryCatch(
+          build(body),
+          Some(NWExceptionName),
+          JSAstHelper.FlattenAndRemoveVoids(catchBody))
       | TryFinally(body, handler)         => JSAst.TryFinally(build(body), build(handler))
       | Tuple(args)                       => JSAst.Tuple(args.Map(a => build(a)))
       | TupleIndexer(obj, pos, _len)      => JSAst.TupleIndexer(build(obj), pos)

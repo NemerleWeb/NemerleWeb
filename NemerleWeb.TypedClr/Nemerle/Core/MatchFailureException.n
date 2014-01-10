@@ -1,0 +1,15 @@
+﻿using NemerleWeb;
+
+namespace NemerleWeb.TypedClr
+{
+  
+namespace Nemerle.Core
+{
+  [Unit]
+  public class MatchFailureException : System.Exception 
+  {
+    public this () {}
+  }
+}
+
+}
