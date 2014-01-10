@@ -203,6 +203,9 @@
     <Compile Include="MVVM\MainPage.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MVVM\Pinned.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\Search.n">
       <SubType>Code</SubType>
     </Compile>

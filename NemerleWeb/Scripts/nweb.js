@@ -92,11 +92,10 @@ var nweb = {
       if(attrs[j].nodeName.indexOf("nw-") === 0)
         el.removeAttribute(attrs[j].nodeName);
     
-    if(el.__nw_is_template /*&& !isInsideTemplate*/)
-      return;
-
+    var bindingsForChildren = !!el.__nw_is_conditional ? el.__nw_subBindings : bindings;
+    
     for(var l = 0; l < el.childNodes.length; l++)
-      nweb.applyBindings(model, el.childNodes[l], bindings, loopStack);
+      nweb.applyBindings(model, el.childNodes[l], bindingsForChildren, loopStack);
   },
   getTextBinding: function(model, el, bindings, loopStack, attrVal) {
     var expr = nweb.parseExpression(model, attrVal, loopStack);
@@ -201,6 +200,10 @@ var nweb = {
   },
   getValueBinding: function(model, el, bindings, loopStack, attrVal) {
     var expr = nweb.parseExpression(model, attrVal, loopStack);
+
+    if (expr.indexOf("return ") == 0)
+      expr = expr.slice(7);
+
     var $el = $(el);
     if($el.is(":text")) {
       $el.on("keyup", function() {
@@ -301,7 +304,7 @@ var nweb = {
 
         if (array == null)
           return;
-
+        
         for (var i = array.length - 1; i >= 0; i--) {
           var $newEl = $(html).removeAttr("nw-foreach");
           
@@ -316,7 +319,6 @@ var nweb = {
             nweb.applyBindings(model, $newEl[0], binding.subBindings, loopStack.concat({ name: repeat[1], val: array[i] }), true);
           }
           
-          
           binding.generatedEls.push($newEl);
         }
       }
@@ -327,16 +329,16 @@ var nweb = {
     var $el = $(el);
     var parsedExpr = nweb.parseExpression(model, attrVal, loopStack);
     var isComplexBinding = attrVal.indexOf("${") == 0 && attrVal[attrVal.length - 1] == '}';
-    
-    var getTemplateModel = function(value) {
-      if(isComplexBinding) return value[0];
-      return value;
-    }
 
-    var getTemplateName = function (value) {
+    var getTemplateModel = function(value) {
+      if (isComplexBinding) return value[0];
+      return value;
+    };
+
+    var getTemplateName = function(value) {
       if (isComplexBinding) return nweb.utils.getTemplateName(value[0], value[1]);
       return nweb.utils.getTemplateName(value, "View");
-    }
+    };
     
     el.__nw_is_template = true;
 
@@ -350,8 +352,9 @@ var nweb = {
         var parsedValue = nweb.getParsedValue(model, parsedExpr, loopStack);
         
         $el = nweb.utils.replaceWith($el, $($("#" + getTemplateName(parsedValue)).html()).removeAttr("nw-template"));
-        nweb.eraseGeneratedElements(binding);        
 
+        nweb.eraseGeneratedElements(binding);
+        
         jQuery.each($el, function (i, e) {
           nweb.applyBindings(newModel, e, binding.subBindings, loopStack, true);
         });
@@ -364,32 +367,36 @@ var nweb = {
     var expr = nweb.parseExpression(model, attrVal, loopStack);        
     var html = el.outerHTML;
     
-    $el = nweb.utils.replaceWith($el, $("<!-- " + expr + " -->"));
-    el.__nw_is_template = true;
+    //$el = nweb.utils.replaceWith($el, $("<!-- " + expr + " -->"));
+    el.__nw_is_conditional = true;
 
     var binding = {
       el: el,
+      isWhen: true,
       subBindings: [],
       getValue: function () {
         return nweb.getParsedValue(model, expr, loopStack);
       },
       apply: function (value) {
-        binding.subBindings = [];
-
         if (value && !isUnless) {
-          $el = nweb.utils.replaceWith($el, $(html));
+          //$el = nweb.utils.replaceWith($el, $(html));
 
           if(isUnless)
             $el.removeAttr("nw-unless");
           else
             $el.removeAttr("nw-when");
-
-          nweb.applyBindings(model, $el[0], binding.subBindings, loopStack, true);
+          
+          nweb.invalidate(binding.subBindings, "", true);
+          //nweb.applyBindings(model, $el[0], binding.subBindings, loopStack, true);
+          $el.show();
         } else {
           $el.hide();
         }
       }
     };
+
+    el.__nw_subBindings = binding.subBindings;
+    
     return binding;
   },
   getUnlessBinding: function (model, el, bindings, loopStack, attrVal, attrName) {
@@ -519,8 +526,32 @@ var nweb = {
   invalidationCount: 0,
   changeFoundCount: 0,
   invalidate: function (bindings, indent, selfCall) {
-    if (!selfCall)
-      console.log("------------------------ INVALIDATE --------------------------------");
+    var createBindingsTree = function(b) {
+      var newObj = {};
+      for (var i = 0; i < b.length; i++) {
+        if (!b[i]) continue;
+        newObj[i] = {};
+        newObj[i].expr = b[i].expr;
+        newObj[i].val = b[i].getValue();
+
+        if (!!b[i].subBindings)
+          newObj[i].sub = createBindingsTree(b[i].subBindings);
+      }
+      return newObj;
+    };
+    
+    var getTotalBindingsCount = function (b) {
+      var declCount = 0;
+      for (var i = 0; i < b.length; i++) {
+        if (!b[i]) continue;
+        if (!!b[i].subBindings)
+          declCount += getTotalBindingsCount(b[i].subBindings);
+        
+        declCount++;
+      }
+      return declCount;
+    };
+    
     if(typeof bindings === 'undefined')
       bindings = nweb.bindings;
     
@@ -546,28 +577,33 @@ var nweb = {
         if (nweb.utils.isArray(newValue)) {
           if (!binding.oldValue || !nweb.utils.areArraysEqual(newValue, binding.oldValue)) {
             changeFound = true;
+            console.log("change");
             binding.apply(newValue);
           }
           binding.oldValue = newValue.slice();
         } else {
           if (binding.oldValue !== newValue) {
-            console.log(binding.expr + ": " + binding.oldValue + " != " + newValue);
             changeFound = true;
             binding.apply(newValue);
             binding.oldValue = newValue;
+            console.log("change");
+          } else if (binding.isWhen && newValue == true) {
+            binding.apply(newValue);
           }
         }
-
-        if (binding.subBindings) {
-          changeFound = changeFound || nweb.invalidate(binding.subBindings, indent + "  ", true);
+        
+        if (binding.subBindings && !binding.isWhen) {
+          var c = nweb.invalidate(binding.subBindings, indent + "  ", true);
+          changeFound = changeFound || c;
         }
       }
       //Repeat only on top level, so every binding will be invalidated exactly once per invalidation cycle
     } while (changeFound && !selfCall); 
     
     if (!selfCall) {
+      console.log("total binding count: " + getTotalBindingsCount(bindings));
       console.log("invalidate count: " + nweb.invalidationCount);
-      console.log("change found count: " + nweb.changeFoundCount);
+      console.log("invalidate restart count: " + nweb.changeFoundCount);
 
       nweb.invalidationCount = 0;
       nweb.changeFoundCount = 0;

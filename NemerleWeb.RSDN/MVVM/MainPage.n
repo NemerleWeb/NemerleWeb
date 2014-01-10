@@ -18,11 +18,13 @@ namespace NemerleWeb.Rsdn
     public mutable static Instance : MainPage;
     public enum State { | Tree | Content | JumpList };
     
-    Root : TreeNode { get; set; }    
-    Pinned : TreeNode { get; set; }
+    
+    public Pinned : Pinned { get; set; }
+    
+    Root : TreeNode { get; set; }
     Popular : TreeNode { get; set; }
     Search : Search { get; set; }
-        
+    
     ActiveNodes : list[TreeNode] { get; set; }
     SelectedNode : TreeNode { get; set; }
     SelectedNodeUrl : string { get { if(SelectedNode != null) SelectedNode.Href else "" } }
@@ -38,62 +40,23 @@ namespace NemerleWeb.Rsdn
     {
       MainPage.Instance = this;
       
-      Pinned = TreeNode();
-      Search = Search();
-                       
-      UpdatePinned();
+      Search = Search();                       
+      Pinned = Pinned();      
       IsMobile = window.document.body.clientWidth < 1000;
               
       _ = server.GetTopNodes(nodes => {
+        console.log("loaded top node");
         Root = TreeNode() <- (
           Children = nodes.ToList()
         );
       });
       
       _ = server.GetPopularNodes(nodes => {
-        def pinned = GetPinned();
+        def pinned = Pinned.GetPinned();
         Popular = TreeNode() <- (
           Children = nodes.Where(n => !pinned.Any(p => p != n.Id)).ToList()
         );
       });
-    }
-    
-    UpdatePinned() : void
-    {
-      _ = server.LoadByIds(GetPinned(), nodes => {
-        Pinned.Children = nodes.ToList()
-      });
-    }
-    
-    public AddPinned(id : string) : void
-    {
-      def pinned = nweb.getCookie("pinned");
-      
-      if(pinned == null) nweb.setCookie("pinned", id, 360);
-      else nweb.setCookie("pinned", pinned + "," + id, 360);
-      
-      UpdatePinned();
-    }
-    
-    public RemovePinned(id : string) : void
-    {
-      def pinned = nweb.getCookie.[string]("pinned");
-      when(pinned != null) nweb.setCookie("pinned", pinned.Replace(re (",?" + id) "g", ""), 360);
-      
-      UpdatePinned();
-    }
-    
-    public GetPinned() : IEnumerable[string]
-    {
-      match(nweb.getCookie.[string]("pinned")) {
-      | null => []
-      | str => str.Split(',')
-      }
-    }
-    
-    public IsPinned(node : TreeNode) : bool
-    {
-      GetPinned().Any(id => id == node.Id);
     }
     
     public SelectNode(node : TreeNode) : void
@@ -128,8 +91,20 @@ namespace NemerleWeb.Rsdn
     {
       <#
         <div template="$(this, CurrentView)" />
-      #>
+      #> 
     }
+    /*
+        
+      <#
+        <div>
+          <div $when(isA)>
+            A
+            <div $when(isAA)>AA</div>
+          </div>
+          <div></div>
+        </div>
+      #>
+    */
     
     [Html]
     public DesktopView() : string
@@ -141,7 +116,7 @@ namespace NemerleWeb.Rsdn
               <div template="$Search" />
               <div $when(string.IsNullOrEmpty(Search.SearchTerm))>
                 <div class="pinned-nodes">
-                  <div template="$Pinned" />
+                  <div template="$(Pinned.Node)" />
                 </div>
                 <div template="$Root" />
               </div>
@@ -164,10 +139,10 @@ namespace NemerleWeb.Rsdn
             <span $when(CurrentState == State.Tree && SelectedNode != null) class="toggle-tree" click="$(CurrentState = State.Content)">&gt</span>
           
             <span class="toggle-jump-list" click="$(ToggleJumpList())">jump</span>
-            <span $when(CurrentState == State.Content && !IsPinned(SelectedNode)) click="$(AddPinned(SelectedNode.Id))">
+            <span $when(CurrentState == State.Content && !Pinned.IsPinned(SelectedNode)) click="$(Pinned.AddPinned(SelectedNode.Id))">
               pin
             </span>
-            <span $when(CurrentState == State.Content && IsPinned(SelectedNode)) click="$(RemovePinned(SelectedNode.Id))">
+            <span $when(CurrentState == State.Content && Pinned.IsPinned(SelectedNode)) click="$(Pinned.RemovePinned(SelectedNode.Id))">
               unpin
             </span>
           </div>
@@ -183,7 +158,7 @@ namespace NemerleWeb.Rsdn
             <iframe src="$(SelectedNodeUrl)" frameborder="0" border="0" />
           </div>
           <div $when(CurrentState == State.JumpList) class="jump-list">
-            <div template="$Pinned" />
+            <div template="$(Pinned.Node)" />
             <div template="$Popular" />
           </div>
         </div>

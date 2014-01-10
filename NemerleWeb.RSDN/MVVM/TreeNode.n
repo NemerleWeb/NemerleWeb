@@ -48,8 +48,8 @@ namespace NemerleWeb.Rsdn
         
     public TogglePin() : void
     {            
-      if(!MainPage.Instance.IsPinned(this)) MainPage.Instance.AddPinned(Id)
-      else MainPage.Instance.RemovePinned(Id)
+      if(!MainPage.Instance.Pinned.IsPinned(this)) MainPage.Instance.Pinned.AddPinned(Id)
+      else MainPage.Instance.Pinned.RemovePinned(Id)
     }
     
     public CaptionClick() : void
@@ -77,6 +77,11 @@ namespace NemerleWeb.Rsdn
       }
     }
     
+    public IsPinnedNode(node : TreeNode) : bool
+    {
+      MainPage.Instance.Pinned.IsPinned(node)
+    }
+    
     [Html]
     public View() : string
     {
@@ -87,7 +92,7 @@ namespace NemerleWeb.Rsdn
             <span class="node-caption" css-is-active="$(MainPage.Instance.IsActiveNode(c))">
               $(c.Caption)
             </span>
-            <div $when(!c.HasChildren) click="$(c.TogglePin())" class="node-pin" css-pinned="$(MainPage.Instance.IsPinned(c))" />
+            <div $when(!c.HasChildren) click="$(c.TogglePin())" class="node-pin" css-pinned="$(IsPinnedNode(c))" />
           </a>
           <div $when(c.IsLoading) class="node-loading">
             Загрузка, пожалуйста подождите...

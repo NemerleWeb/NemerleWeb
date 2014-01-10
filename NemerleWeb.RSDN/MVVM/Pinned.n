@@ -1,0 +1,80 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using NemerleWeb;
+using NemerleWeb.TypedJS;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.Rsdn
+{
+  [Unit]
+  public class Pinned
+  {
+    public Node : TreeNode { get; set; }
+    mutable _cookieCache : string;
+    
+    public this()
+    {
+      Node = TreeNode();
+      
+      UpdatePinned();
+    }
+    
+    public UpdatePinned() : void
+    {
+      _ = server.LoadByIds(GetPinned(), nodes => {
+        Node.Children = nodes.ToList()
+      });
+    }
+    
+    public AddPinned(id : string) : void
+    {
+      _cookieCache = null;
+      
+      def pinned = nweb.getCookie("pinned");
+      
+      if(pinned == null) nweb.setCookie("pinned", id, 360);
+      else nweb.setCookie("pinned", pinned + "," + id, 360);
+      
+      UpdatePinned();
+    }
+    
+    public RemovePinned(id : string) : void
+    {
+      _cookieCache = null;
+      
+      def pinned = nweb.getCookie.[string]("pinned");
+      when(pinned != null) nweb.setCookie("pinned", pinned.Replace(re (",?" + id) "g", ""), 360);
+      
+      UpdatePinned();
+    }
+    
+    public GetPinned() : IEnumerable[string]
+    {
+      def pinnedStr = if(_cookieCache != null) _cookieCache;
+                      else nweb.getCookie.[string]("pinned");
+          
+      match(pinnedStr) {
+      | null => []
+      | str => str.Split(',')
+      }
+    }
+    
+    public IsPinned(node : TreeNode) : bool
+    {
+      GetPinned().Any(id => id == node.Id);
+    }
+    
+    public class Server
+    {
+      public LoadByIds(ids : IEnumerable[string]) : IEnumerable[TreeNode]
+      {
+        TreeLoader.LoadByIds(ids)
+      }
+    }
+  }
+}
