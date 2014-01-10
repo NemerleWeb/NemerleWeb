@@ -491,7 +491,7 @@ var nweb = {
 
         if (!cachedFunc) {
           //var newFunc = eval("(function(model, loopStack) { return " + parsedExpr + "; } )");
-          var newFunc = new Function('model', 'loopStack', "var _nw_self = model; return " + parsedExpr + ";");
+          var newFunc = new Function('model', 'loopStack', "var _nw_self = model; " + parsedExpr + ";");
           nweb.parsedValueCache[parsedExpr] = newFunc;
           val = newFunc(model, loopStack);
         } else {
@@ -601,10 +601,10 @@ var nweb = {
     } while (changeFound && !selfCall); 
     
     if (!selfCall) {
-      console.log("total binding count: " + getTotalBindingsCount(bindings));
+      /*console.log("total binding count: " + getTotalBindingsCount(bindings));
       console.log("invalidate count: " + nweb.invalidationCount);
       console.log("invalidate restart count: " + nweb.changeFoundCount);
-
+      */
       nweb.invalidationCount = 0;
       nweb.changeFoundCount = 0;
     }
