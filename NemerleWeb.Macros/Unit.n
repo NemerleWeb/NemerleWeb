@@ -155,7 +155,7 @@ namespace NemerleWeb
       def pparms = parms.Map(p => p.AsParsed());
       def signature = JSAstHelper.MethodSignature(parms);
       def properName = JSClass.GetProperName(tb);
-      def serverParams = parms.Select(p => <[ paramList.Add("nweb.utils.toTypedObject(" + NWebUtils.ToJson($(p.Name)) + ")") ]>);
+      def serverParams = parms.Select(p => <[ paramList.Add("nweb.utils.toTypedObject(" + NWebUtils.ToJson($(p.Name : usesite)) + ")") ]>);
       
       GetRenderer(tb).Define(<[ decl: public $(tb.Name : dyn)(..$pparms) : string {
         
