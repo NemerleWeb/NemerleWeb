@@ -10,7 +10,7 @@ using NemerleWeb;
 namespace CSharpParser
 {
   [Unit]
-  internal sealed class PreprocessorWriter
+  public class PreprocessorWriter
   {
     public this(originalText : string)
     {
