@@ -42,6 +42,7 @@ namespace NemerleWeb
           
           def scripts = NemerleWeb.NWebData.GetScripts();
           def templates = NemerleWeb.NWebData.GetTemplates();
+          def resources = NemerleWeb.NWebData.GetNemerleWebScripts();
     
           def declarations = string.Join("\n", templates.Concat(scripts));
           def unitName = $(properName : string);
@@ -52,6 +53,7 @@ namespace NemerleWeb
 
 $<#
 <div id="nweb-start"></div>
+$resources
 $declarations
 <script>
 $$(function() {  

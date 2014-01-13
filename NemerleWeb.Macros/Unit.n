@@ -161,7 +161,8 @@ namespace NemerleWeb
         
           def scripts = NemerleWeb.NWebData.GetScripts();
           def templates = NemerleWeb.NWebData.GetTemplates();
-    
+          def resources = NemerleWeb.NWebData.GetNemerleWebScripts();
+          
           def declarations = string.Join("\n", templates.Concat(scripts));
           def unitName = $(properName : string);
           def paramList = List();
@@ -171,6 +172,7 @@ namespace NemerleWeb
 
 $<#
 <div id="nweb-start"></div>
+$resources
 $declarations
 <script>
 $$(function() {  
@@ -480,7 +482,7 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
               {
               | e => Content(e.ToString(), "text/javascript");
               }
-            }            
+            }
           }
         ]>).Compile();  
       }      
