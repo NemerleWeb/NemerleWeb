@@ -40,25 +40,25 @@
     <DocumentationFile>$(OutputPath)\$(MSBuildProjectName).xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.AspNet.SignalR.Client, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+    <Reference Include="Microsoft.AspNet.SignalR.Client, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>Microsoft.AspNet.SignalR.Client</Name>
       <AssemblyName>Microsoft.AspNet.SignalR.Client.dll</AssemblyName>
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.Client.1.1.2\lib\net40\Microsoft.AspNet.SignalR.Client.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Client.1.2.0\lib\net40\Microsoft.AspNet.SignalR.Client.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>Microsoft.AspNet.SignalR.Core</Name>
       <AssemblyName>Microsoft.AspNet.SignalR.Core.dll</AssemblyName>
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.1.1.2\lib\net40\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.1.2.0\lib\net40\Microsoft.AspNet.SignalR.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.Owin, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+    <Reference Include="Microsoft.AspNet.SignalR.Owin, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>Microsoft.AspNet.SignalR.Owin</Name>
       <AssemblyName>Microsoft.AspNet.SignalR.Owin.dll</AssemblyName>
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.Owin.1.1.2\lib\net40\Microsoft.AspNet.SignalR.Owin.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Owin.1.2.0\lib\net40\Microsoft.AspNet.SignalR.Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>Microsoft.AspNet.SignalR.SystemWeb</Name>
       <AssemblyName>Microsoft.AspNet.SignalR.SystemWeb.dll</AssemblyName>
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.1.1.2\lib\net40\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.1.2.0\lib\net40\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Name>Microsoft.Owin.Host.SystemWeb</Name>
@@ -74,7 +74,7 @@
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
       <Name>Newtonsoft.Json</Name>
       <AssemblyName>Newtonsoft.Json.dll</AssemblyName>
-      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5">
       <Name>Owin</Name>
@@ -299,28 +299,40 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.10.1.intellisense.js">
+    <Content Include="Scripts\json2.min.js">
       <SubType>Content</SubType>
     </Content>
-    <EmbeddedResource Include="Scripts\jquery-1.10.1.js">
-      <SubType>Content</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\jquery-1.10.1.min.js">
-      <SubType>Content</SubType>
-    </EmbeddedResource>
-    <Content Include="Scripts\jquery-1.10.1.min.map">
+    <Content Include="Scripts\linq-vsdoc.js">
       <SubType>Content</SubType>
     </Content>
-    <EmbeddedResource Include="Scripts\jquery.signalR-1.1.2.js">
+    <Content Include="Scripts\linq.d.ts">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\linq.min.js">
+      <SubType>Content</SubType>
+    </Content>
+    <EmbeddedResource Include="Scripts\jquery.signalR-1.2.0.js">
       <SubType>Content</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\jquery.signalR-1.1.2.min.js">
+    <Content Include="Scripts\jquery-1.10.2.intellisense.js">
+      <SubType>Content</SubType>
+    </Content>
+    <EmbeddedResource Include="Scripts\jquery-1.10.2.js">
+      <SubType>Content</SubType>
+    </EmbeddedResource>
+    <Content Include="Scripts\jquery-1.10.2.min.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery-1.10.2.min.map">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery.signalR-1.2.0.min.js">
+      <SubType>Content</SubType>
+    </Content>
+    <EmbeddedResource Include="Scripts\linq.js">
       <SubType>Content</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Scripts\json2.js">
-      <SubType>Content</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\linq.js">
       <SubType>Content</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Scripts\nweb.js">

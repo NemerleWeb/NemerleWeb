@@ -1,4 +1,4 @@
-// Type definitions for Angular JS 1.0
+// Type definitions for Angular JS 1.2+
 // Project: http://angularjs.org
 // Definitions by: Diego Vilar <http://github.com/diegovilar>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
@@ -105,6 +105,7 @@ declare module ng {
         filter(object: Object): IModule;
         provider(name: string, serviceProviderConstructor: Function): IModule;
         provider(name: string, inlineAnnotadedConstructor: any[]): IModule;
+        provider(name: string, providerObject: auto.IProvider): IModule;
         provider(object: Object): IModule;
         run(initializationFunction: Function): IModule;
         run(inlineAnnotadedFunction: any[]): IModule;
@@ -127,15 +128,15 @@ declare module ng {
     	// this is necessary to be able to access the scoped attributes. it's not very elegant
     	// because you have to use attrs['foo'] instead of attrs.foo but I don't know of a better way
     	// this should really be limited to return string but it creates this problem: http://stackoverflow.com/q/17201854/165656
-    	[name: string]: any; 
-    	
-        // Adds the CSS class value specified by the classVal parameter to the 
-        // element. If animations are enabled then an animation will be triggered 
+    	[name: string]: any;
+
+        // Adds the CSS class value specified by the classVal parameter to the
+        // element. If animations are enabled then an animation will be triggered
         // for the class addition.
         $addClass(classVal: string): void;
 
-        // Removes the CSS class value specified by the classVal parameter from the 
-        // element. If animations are enabled then an animation will be triggered for 
+        // Removes the CSS class value specified by the classVal parameter from the
+        // element. If animations are enabled then an animation will be triggered for
         // the class removal.
         $removeClass(classVal: string): void;
 
@@ -143,12 +144,12 @@ declare module ng {
         $set(key: string, value: any): void;
 
         // Observes an interpolated attribute.
-        // The observer function will be invoked once during the next $digest 
-        // following compilation. The observer is then invoked whenever the 
+        // The observer function will be invoked once during the next $digest
+        // following compilation. The observer is then invoked whenever the
         // interpolated value changes.
         $observe(name: string, fn:(value?:any)=>any): Function;
 
-        // A map of DOM element attribute names to the normalized name. This is needed 
+        // A map of DOM element attribute names to the normalized name. This is needed
         // to do reverse lookup from normalized name back to actual name.
         $attr: Object;
     }
@@ -368,9 +369,18 @@ declare module ng {
     ///////////////////////////////////////////////////////////////////////////
     // ParseService
     // see http://docs.angularjs.org/api/ng.$parse
+    // see http://docs.angularjs.org/api/ng.$parseProvider
     ///////////////////////////////////////////////////////////////////////////
     interface IParseService {
         (expression: string): ICompiledExpression;
+    }
+
+    interface IParseProvider {
+    	logPromiseWarnings(): boolean;
+    	logPromiseWarnings(value: boolean): IParseProvider;
+
+    	unwrapPromises(): boolean;
+    	unwrapPromises(value: boolean): IParseProvider;
     }
 
     interface ICompiledExpression {
@@ -451,12 +461,12 @@ declare module ng {
         then<TResult>(successCallback: (promiseValue: T) => IHttpPromise<TResult>, errorCallback?: (reason: any) => any, notifyCallback?: (state: any) => any): IPromise<TResult>;
         then<TResult>(successCallback: (promiseValue: T) => IPromise<TResult>, errorCallback?: (reason: any) => any, notifyCallback?: (state: any) => any): IPromise<TResult>;
         then<TResult>(successCallback: (promiseValue: T) => TResult, errorCallback?: (reason: any) => TResult, notifyCallback?: (state: any) => any): IPromise<TResult>;
-        
-        
+
+
         catch<TResult>(onRejected: (reason: any) => IHttpPromise<TResult>): IPromise<TResult>;
         catch<TResult>(onRejected: (reason: any) => IPromise<TResult>): IPromise<TResult>;
         catch<TResult>(onRejected: (reason: any) => TResult): IPromise<TResult>;
-        
+
         finally<TResult>(finallyCallback: ()=>any):IPromise<TResult>;
     }
 
@@ -516,9 +526,9 @@ declare module ng {
     // see http://docs.angularjs.org/api/ng.$compileProvider
     ///////////////////////////////////////////////////////////////////////////
     interface ICompileService {
-        (element: string, transclude?: ITemplateLinkingFunction, maxPriority?: number): ITemplateLinkingFunction;
-        (element: Element, transclude?: ITemplateLinkingFunction, maxPriority?: number): ITemplateLinkingFunction;
-        (element: JQuery, transclude?: ITemplateLinkingFunction, maxPriority?: number): ITemplateLinkingFunction;
+        (element: string, transclude?: ITranscludeFunction, maxPriority?: number): ITemplateLinkingFunction;
+        (element: Element, transclude?: ITranscludeFunction, maxPriority?: number): ITemplateLinkingFunction;
+        (element: JQuery, transclude?: ITranscludeFunction, maxPriority?: number): ITemplateLinkingFunction;
     }
 
     interface ICompileProvider extends IServiceProvider {
@@ -528,9 +538,22 @@ declare module ng {
         directive(directivesMap: any): ICompileProvider;
     }
 
-    interface ITemplateLinkingFunction {
+    interface ICloneAttachFunction {
         // Let's hint but not force cloneAttachFn's signature
-        (scope: IScope, cloneAttachFn?: (clonedElement?: JQuery, scope?: IScope) => any): JQuery;
+        (clonedElement?: JQuery, scope?: IScope): any;
+    }
+
+    // This corresponds to the "publicLinkFn" returned by $compile.
+    interface ITemplateLinkingFunction {
+        (scope: IScope, cloneAttachFn?: ICloneAttachFunction): IAugmentedJQuery;
+    }
+
+    // This corresponds to $transclude (and also the transclude function passed to link).
+    interface ITranscludeFunction {
+        // If the scope is provided, then the cloneAttachFn must be as well.
+        (scope: IScope, cloneAttachFn: ICloneAttachFunction): IAugmentedJQuery;
+        // If one argument is provided, then it's assumed to be the cloneAttachFn.
+        (cloneAttachFn?: ICloneAttachFunction): IAugmentedJQuery;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -700,7 +723,7 @@ declare module ng {
         valueOf(value: any): any;
     }
 
-	
+
     ///////////////////////////////////////////////////////////////////////////
     // SCEDelegateProvider
     // see http://docs.angularjs.org/api/ng.$sceDelegateProvider
@@ -709,7 +732,7 @@ declare module ng {
         resourceUrlBlacklist(blacklist: any[]): void;
         resourceUrlWhitelist(whitelist: any[]): void;
     }
-	
+
     ///////////////////////////////////////////////////////////////////////////
     // Directive
     // see http://docs.angularjs.org/api/ng.$compileProvider#directive
@@ -718,17 +741,18 @@ declare module ng {
 
     interface IDirective{
         compile?:
-            (templateElement: any,
+            (templateElement: IAugmentedJQuery,
             templateAttributes: IAttributes,
-            transclude: (scope: IScope, cloneLinkingFn: Function) => void
+            transclude: ITranscludeFunction
             ) => any;
         controller?: any;
         controllerAs?: string;
         link?:
             (scope: IScope,
-            instanceElement: any,
+            instanceElement: IAugmentedJQuery,
             instanceAttributes: IAttributes,
-            controller: any
+            controller: any,
+            transclude: ITranscludeFunction
             ) => void;
         name?: string;
         priority?: number;
@@ -783,6 +807,9 @@ declare module ng {
     // AUTO module (angular.js)
     ///////////////////////////////////////////////////////////////////////////
     export module auto {
+        interface IProvider {
+            $get: any;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // InjectorService
@@ -793,6 +820,7 @@ declare module ng {
             annotate(inlineAnnotadedFunction: any[]): string[];
             get (name: string): any;
             instantiate(typeConstructor: Function, locals?: any): any;
+            invoke(inlineAnnotadedFunction: any[]): any;
             invoke(func: Function, context?: any, locals?: any): any;
         }
 
