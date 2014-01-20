@@ -101,7 +101,7 @@ namespace NemerleWeb
       def scripts =
       [
         "NemerleWeb.Scripts.json2.js",        
-        "NemerleWeb.Scripts.jquery.signalR-1.1.2.js",
+        "NemerleWeb.Scripts.jquery.signalR-1.2.0.js",
         "NemerleWeb.Scripts.linq.js",
         "NemerleWeb.Scripts.nweb.js"
       ];
