@@ -39,26 +39,11 @@ module Program
 
 [Unit]
 public class Test
-{  
-
-    CalcOutput : string
+{
+    F(): void
     {
-      get
-      {
-        try
-        {
-          ""
-        }
-        catch
-        {
-        | e => e.Message
-        }
-      }
+      throw ArgumentException("A");
     }
-
-  public this()
-  {
-  }
   
   [Html]
   public View() : string

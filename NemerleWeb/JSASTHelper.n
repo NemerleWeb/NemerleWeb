@@ -423,8 +423,8 @@ namespace NemerleWeb
     }
     
     public MethodParameters(m : IMethod) : option[list[TParameter]]
-    {
-      if (AssemblyHelpers.IsFrameworkAssembly(m.DeclaringType) ||
+    {      
+      if (AssemblyHelpers.IsFrameworkAssembly(m.DeclaringType) || // TODO: This check is not required anymore
           m.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute") ||
           m.DeclaringType.IsCustomAttributeDefined("NemerleWeb.JSApiAttribute"))
         None()

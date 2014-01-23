@@ -6,10 +6,46 @@ namespace NemerleWeb.TypedClr
 namespace Nemerle.Core
 {
   [Unit]
+  [System.Serializable]
+  public class AssertionException : System.Exception
+  {
+    public this () {}
+
+    public this (file : string, line : int, cond : string, msg : string) 
+    { 
+      def cond = if (cond != "") " ``" + cond + "''" else "";
+      def m = "assertion" + cond + " failed in file " + file + ", line " 
+              + line.ToString ();
+      def m = if (msg != "") m + ": " + msg else m;
+      base (m);
+    }
+  } 
+  
+  [Unit]
+  [System.Serializable]
   public class MatchFailureException : System.Exception 
   {
     public this () {}
   }
+  
+  [Unit]
+  [System.Serializable]
+  public class NullMatchException : MatchFailureException
+  {
+    public this () {}
+
+    public static raise_self () : bool 
+    { 
+      throw NullMatchException ()
+    }
+  }
+
+  [Unit]
+  [System.Serializable]
+  public class AssemblyFindException : System.Exception 
+  {
+    public this () {}
+  } 
 }
 
 }

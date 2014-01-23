@@ -80,6 +80,9 @@
     <Compile Include="System\InvalidOperationException.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="System\NotSupportedException.n">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Nemerle" />
