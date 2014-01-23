@@ -19,8 +19,14 @@ namespace System
       InnerException = innerException;
     }
     
+    internal SetErrorCode(hr : int) : void
+    {
+      this.HResult = hr;
+    }
+    
     public virtual Message : string { get; }
     public virtual InnerException : Exception { get; }
+    protected HResult : int { get; set; }
   }
 }
 

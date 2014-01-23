@@ -1,0 +1,22 @@
+﻿using NemerleWeb;
+
+namespace NemerleWeb.TypedClr
+{
+  
+namespace System
+{
+  [Unit]
+  public class InvalidCastException : SystemException
+  {
+    public this() { base("InvalidCastException"); }
+    public this(message : string) { base(message); }
+    public this(message : string, innerException : Exception) { base(message, innerException) }
+    public this(message : string, errorCode : int)
+    {
+      base(message);
+      base.SetErrorCode(errorCode);
+    }
+  }
+}
+
+}
