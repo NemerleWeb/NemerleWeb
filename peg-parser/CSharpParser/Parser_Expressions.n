@@ -447,7 +447,8 @@ namespace CSharpParser
         chain = match(op) {
           | op is Identifier  => Expr.UnaryOperator(loc, chain, op, true)
           | toType is Expr => Expr.CastOperator(loc, chain, toType)
-          | _ => throw ArgumentOutOfRangeException("ops")
+          | _ => Expr.CastOperator(loc, chain, op :> Expr)
+		  // TODO: Restore throw ArgumentOutOfRangeException("ops")
         }
       }
       chain
