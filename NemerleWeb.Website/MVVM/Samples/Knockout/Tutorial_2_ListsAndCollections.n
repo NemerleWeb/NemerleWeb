@@ -53,9 +53,9 @@ namespace NemerleWeb.Website.Samples
         Seats.Add(SeatReservation("", AvailableMeals[0]))
     }
     
-    public RemoveSeat(seat : SeatReservation) : bool 
+    public RemoveSeat(seat : SeatReservation) : void 
     {        
-        Seats.Remove(seat)
+        _ = Seats.Remove(seat)
     }
     
     [Html]
