@@ -321,6 +321,9 @@
     <Content Include="Scripts\prettify.js">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\sammy-0.7.4.js">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\sammy-0.7.4.min.js">
       <SubType>Content</SubType>
     </Content>
