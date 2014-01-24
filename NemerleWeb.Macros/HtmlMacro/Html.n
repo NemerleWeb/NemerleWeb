@@ -57,7 +57,7 @@ namespace NemerleWeb
           | Some(result) => 
             def pexpr = XmlAstToXLinq(typer, parser).Transform(result);
             def tempMethodName = Name("_N_" + mb.Name);
-            typer.CurrentTypeBuilder.Define(<[ decl:
+            typer.CurrentTypeBuilder.DefineWithSource(<[ decl:
               [HtmlTyped]
               public $(tempMethodName : name)() : list[object] {
                 def tag(name, expr : object) : object { (name, expr) };
@@ -67,11 +67,11 @@ namespace NemerleWeb
                 def text_splice(expr : object) : object { expr };
                 
                 def skip = {
-                  tag("", ([], []));
-                  attr("", null);
-                  attr_splice("", null);
-                  text(null);
-                  text_splice(null);
+                  _ = tag("", ([], []));
+                  _ = attr("", null);
+                  _ = attr_splice("", null);
+                  _ = text(null);
+                  _ = text_splice(null);
                 };
                 _ = skip;
                 

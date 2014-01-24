@@ -249,6 +249,7 @@
     </Compile>
     <Compile Include="MVVM\Samples\SignalPage.n">
       <SubType>Code</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\Samples\TestPage.n">
       <SubType>Code</SubType>

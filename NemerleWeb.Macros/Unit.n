@@ -149,7 +149,7 @@ namespace NemerleWeb
       def properName = JSClass.GetProperName(tb);
       def serverParams = parms.Select(p => <[ paramList.Add("nweb.utils.toTypedObject(" + NWebUtils.ToJson($(p.Name : usesite)) + ")") ]>);
       
-      GetRenderer(tb).Define(<[ decl: public $(tb.Name : dyn)(..$pparms) : string {
+      _ = GetRenderer(tb).DefineWithSource(<[ decl: public $(tb.Name : dyn)(..$pparms) : string {
         
           def scripts = NemerleWeb.NWebData.GetScripts();
           def templates = NemerleWeb.NWebData.GetTemplates();
@@ -453,7 +453,7 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       // Define and suppress warnings about unused parameters
       foreach(pageMethod in pageBaseMethods)
       {
-        tb.Define(pageMethod);
+        _ = tb.DefineWithSource(pageMethod);
       }
     }
   }

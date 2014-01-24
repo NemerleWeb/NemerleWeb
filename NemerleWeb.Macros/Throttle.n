@@ -28,7 +28,7 @@ namespace NemerleWeb
       {
         | <[ ($(timeout : int), $code) ]> =>                     
           def timeoutVarName = "_timeoutVar" + typer.Manager.GetNewId();
-          typer.CurrentTypeBuilder.Define(<[ decl: mutable $(timeoutVarName : usesite) : float; ]>);
+          _ = typer.CurrentTypeBuilder.DefineWithSource(<[ decl: mutable $(timeoutVarName : usesite) : float; ]>);
           
           def lambda = <[ () => { $code; NemerleWeb.TypedJS.nweb.invalidate(); } ]>;
           
