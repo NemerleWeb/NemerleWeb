@@ -56,7 +56,7 @@ $$.connection.hub.start({}, function() {
       def client = tb.DefineAndReturn(<[ decl: client : $(declaringType.ParsedTypeName) = default($(declaringType.ParsedTypeName)); ]>);
       client.HasBeenUsed = true;
       
-      tb.DefineNestedType(<[ decl: public class $(hubName : dyn) : HubBase {} ]>).Compile();
+      tb.DefineNestedType(<[ decl: public class $(hubName : dyn) : Microsoft.AspNet.SignalR.Hub {} ]>).Compile();
     }
   }
 }

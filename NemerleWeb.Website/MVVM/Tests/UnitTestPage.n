@@ -1855,7 +1855,7 @@ namespace NemerleWeb.Website.Tests
       });
       
       test("exception returning value in catch", () => {
-        try { throw Exception("A"); false } catch { e => e.Message == "A" }
+        try { throw Exception("A"); } catch { e => e.Message == "A" }
       });
     }
     

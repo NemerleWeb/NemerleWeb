@@ -68,7 +68,6 @@ namespace NemerleWeb
         | "Push" => Some(left.JSMethodCall(member.Name, [JSAst.Tuple(xs)]))
         | _ => None()
         }
-      | _ => None()
       }
     }
      

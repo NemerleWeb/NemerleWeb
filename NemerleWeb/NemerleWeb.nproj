@@ -267,9 +267,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
-    <Compile Include="SignalR\HubBase.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="TyperHelper.n">
       <SubType>Code</SubType>
     </Compile>
@@ -299,42 +296,42 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\json2.min.js">
+    <EmbeddedResource Include="Scripts\json2.min.js">
       <SubType>Content</SubType>
-    </Content>
+    </EmbeddedResource>
     <Content Include="Scripts\linq-vsdoc.js">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\linq.d.ts">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\linq.min.js">
-      <SubType>Content</SubType>
-    </Content>
-    <EmbeddedResource Include="Scripts\jquery.signalR-1.2.0.js">
+    <EmbeddedResource Include="Scripts\linq.min.js">
       <SubType>Content</SubType>
     </EmbeddedResource>
+    <Content Include="Scripts\jquery.signalR-1.2.0.js">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\jquery-1.10.2.intellisense.js">
       <SubType>Content</SubType>
     </Content>
-    <EmbeddedResource Include="Scripts\jquery-1.10.2.js">
-      <SubType>Content</SubType>
-    </EmbeddedResource>
-    <Content Include="Scripts\jquery-1.10.2.min.js">
+    <Content Include="Scripts\jquery-1.10.2.js">
       <SubType>Content</SubType>
     </Content>
+    <EmbeddedResource Include="Scripts\jquery-1.10.2.min.js">
+      <SubType>Content</SubType>
+    </EmbeddedResource>
     <Content Include="Scripts\jquery-1.10.2.min.map">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery.signalR-1.2.0.min.js">
+    <EmbeddedResource Include="Scripts\jquery.signalR-1.2.0.min.js">
+      <SubType>Content</SubType>
+    </EmbeddedResource>
+    <Content Include="Scripts\linq.js">
       <SubType>Content</SubType>
     </Content>
-    <EmbeddedResource Include="Scripts\linq.js">
+    <Content Include="Scripts\json2.js">
       <SubType>Content</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\json2.js">
-      <SubType>Content</SubType>
-    </EmbeddedResource>
+    </Content>
     <EmbeddedResource Include="Scripts\nweb.js">
       <SubType>Content</SubType>
     </EmbeddedResource>

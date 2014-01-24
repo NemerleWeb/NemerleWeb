@@ -27,6 +27,7 @@ namespace NemerleWeb.Website
         | Info => "btn-info"
         | Warning => "btn-warning"
         | Danger => "btn-danger"
+        | _ => "Invalid style"
         }
       }
     }

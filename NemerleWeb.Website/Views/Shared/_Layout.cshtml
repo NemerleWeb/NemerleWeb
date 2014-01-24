@@ -13,56 +13,59 @@
         }
     </style>
     <script src="@Url.Content("~/Scripts/jquery-1.10.2.min.js")" type="text/javascript"></script>
+    <!-- This should be done in NWebData-->
+    <script src="@Url.Content("~/Scripts/jquery.signalR-1.2.0.min.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/sammy-0.7.4.min.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/prettify.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/lang-n.js")" type="text/javascript"></script>    
 </head>
-<body onload="prettyPrint()">
-    <div class="container-narrow">
-        <div class="header">
-            <ul class="nav nav-pills pull-right">
-                <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                <li>@Html.ActionLink("Tutorial", "Tutorial", "Home")</li>
-                <li>@Html.ActionLink("Samples", "Samples", "Home")</li>
-                <li><a href="https://github.com/NemerleWeb/NemerleWeb">Github</a></li>
+    <body onload="prettyPrint()">
+        <!-- This should be done in NWebData-->
+        <script src="@Url.Content("~/signalr/hubs")" type="text/javascript"></script>
+        <div class="container-narrow">
+            <div class="header">
+                <ul class="nav nav-pills pull-right">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("Tutorial", "Tutorial", "Home")</li>
+                    <li>@Html.ActionLink("Samples", "Samples", "Home")</li>
+                    <li><a href="https://github.com/NemerleWeb/NemerleWeb">Github</a></li>
                 
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        Contacts <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="https://www.rsdn.ru/forum/nemerle">Russian Forum</a></li>
-                        <li><a href="https://groups.google.com/forum/?fromgroups=#!forum/nemerleweb">English Forum</a></li>
-                        @*<li>@Html.ActionLink("About us", "Index", "About us")</li>*@
-                    </ul>
-                </li>                
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            Contacts <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.rsdn.ru/forum/nemerle">Russian Forum</a></li>
+                            <li><a href="https://groups.google.com/forum/?fromgroups=#!forum/nemerleweb">English Forum</a></li>
+                            @*<li>@Html.ActionLink("About us", "Index", "About us")</li>*@
+                        </ul>
+                    </li>                
 
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        Tests <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>@Html.ActionLink("Unit tests", "Index", "UnitTests")</li>
-                        <li>@Html.ActionLink("Template tests", "Index", "TemplateTests")</li>
-                        <li>@Html.ActionLink("Server tests", "Index", "ServerTests")</li>
-                    </ul>
-                </li>                
-            </ul>
-            <a href="/"><h2 class="text-muted">NemerleWeb</h2></a>
-        </div>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            Tests <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("Unit tests", "Index", "UnitTests")</li>
+                            <li>@Html.ActionLink("Template tests", "Index", "TemplateTests")</li>
+                            <li>@Html.ActionLink("Server tests", "Index", "ServerTests")</li>
+                        </ul>
+                    </li>                
+                </ul>
+                <a href="/"><h2 class="text-muted">NemerleWeb</h2></a>
+            </div>
         
-        @RenderBody()
-    </div>
-    <script src="@Url.Content("~/signalr/hubs")"></script>
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            if (window.location == null) {
-                $('.header a[href="' + '"]').parent().addClass('active');
-            } else {
-                $('.header a[href="' + window.location.pathname + '"]').parent().addClass('active');
-            }
-        });
-    </script>
-</body>
+            @RenderBody()
+        </div>    
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                if (window.location == null) {
+                    $('.header a[href="' + '"]').parent().addClass('active');
+                } else {
+                    $('.header a[href="' + window.location.pathname + '"]').parent().addClass('active');
+                }
+            });
+        </script>
+    </body>
 </html>

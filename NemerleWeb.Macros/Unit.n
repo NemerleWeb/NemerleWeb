@@ -68,14 +68,6 @@ namespace NemerleWeb
       JSClass.IPageType = <[ ttype: IPage ]>;
       JSClass.ObjectType = <[ ttype: System.Object ]>;
         
-      unless(typer.Manager.IsIntelliSenseMode)
-      {
-        // TODO: Add better check for WebSite project
-        //when(tb.Manager.ReferencedAssemblies
-        //  .Any(a => a.Assembly.FullName.Contains("System.Web.Razor")))
-          CreateResourceController(tb, typer);
-      }
-            
       def translateMethod(typer) 
       {
         match(typer.CurrentFunction.body) 
@@ -442,68 +434,20 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       }
     }
     
-    CreateResourceController(_tb : TypeBuilder, typer : Typer) : void
-    {
-      def env = typer.Manager.CoreEnv;
-      def controllerName = "NemerleWebResourceController";
-      when (env.LookupType([controllerName]) is None())
-      {
-        env.Define(<[ decl: 
-          public class $(controllerName : usesite) : System.Web.Mvc.Controller
-          {
-            public NemerleWebJs() : System.Web.Mvc.ActionResult
-            {
-              def scripts =
-              [
-                "NemerleWeb.Scripts.json2.js",
-                //"NemerleWeb.Scripts.jquery-1.10.2.js",
-                "NemerleWeb.Scripts.jquery.signalR-1.2.0.js",
-                "NemerleWeb.Scripts.linq.js",
-                "NemerleWeb.Scripts.nweb.js"
-              ];
-              
-              try
-              {
-                def sb = System.Text.StringBuilder();
-                foreach(file in scripts)
-                  using(stream = typeof(NemerleWeb.JSAst).Assembly.GetManifestResourceStream(file))
-                    if(stream != null)
-                      using(reader = System.IO.StreamReader(stream))
-                        _ = sb.Append(reader.ReadToEnd());
-                    else
-                    {
-                      def errorMessage = $"!!!ERROR!!! Cannot find $file!!!";
-                      _ = sb.Append($"\r\n// $errorMessage\r\nconsole.error($errorMessage);\r\n");
-                    }
-                
-                Content(sb.ToString(), "text/javascript");
-              }
-              catch
-              {
-              | e => Content(e.ToString(), "text/javascript");
-              }
-            }
-          }
-        ]>).Compile();  
-      }      
-    }
-    
     public AddPageBaseMethods(tb : TypeBuilder, typer : Typer) : void
     {                
       Macros.DefineCTX(typer);
-      def T = 
-        if(tb.ParsedDeclaration.DeclaredTypeParametersCount == 0)
-          <[ $(tb.ParsedName : name) ]>
-        else 
-        {
-          def tparms = tb.ParsedDeclaration.DeclaredTypeParameters;
-          def tparms = tparms.tyvars.Map(t => <[ $(tb.ParsedName.NewName(t.ToString()) : name) ]>);
-          <[ $(tb.ParsedName : name).[..$tparms] ]>;
-        }
       
       def pageBaseMethods =
         [
-          <[decl: [NemerleWeb.IgnoreAttribute] public new GetTemplateName([NotNull] modelName : string, [NotNull] viewName : string) : string { IgnoreParams(); "" } ]>,
+          <[decl:
+              [NemerleWeb.IgnoreAttribute]
+              public new GetTemplateName([NotNull] modelName : string, [NotNull] viewName : string) : string
+              {
+                IgnoreParams();
+                ""
+              }
+          ]>,
         ];
         
       // Define and suppress warnings about unused parameters

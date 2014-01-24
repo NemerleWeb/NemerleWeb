@@ -33,7 +33,7 @@ namespace NemerleWeb.Website.Samples
     {
       <#
         <div>
-          <a $foreach(i in items) href="#" click="$Click">
+          <a $foreach(_i in items) href="#" click="$Click">
             Click me
           </a>
           <span>$selected</span>

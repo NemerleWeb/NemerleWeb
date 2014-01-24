@@ -38,7 +38,7 @@ namespace NemerleWeb.Website.Samples
     NameList : NameListPage { get; set; }
     NameListCSharp : NameListCSharpPage { get; set; }
     CompList : CompListPage { get; set; }
-    //Signal : SignalPage { get; set; }
+    Signal : SignalPage { get; set; }
     Variants : VariantsAndMatchingPage { get; set; }    
     Introduction : IntroductionPage { get; set; }
     ListsAndCollections : ListsAndCollectionsPage { get; set; }
@@ -59,7 +59,7 @@ namespace NemerleWeb.Website.Samples
       NameList = NameListPage();
       NameListCSharp = NameListCSharpPage();
       CompList = CompListPage();
-      //Signal = SignalPage();
+      Signal = SignalPage();
       Variants = VariantsAndMatchingPage();
       Introduction = IntroductionPage("John", "Silver");
       ListsAndCollections = ListsAndCollectionsPage();
@@ -76,7 +76,7 @@ namespace NemerleWeb.Website.Samples
         Sample("Filtering", ["MVVM/Samples/NameListPage.n"], "", NameList),  // in tname template(_.NameList) second parameter is View by default
         Sample("Filtering C#", ["MVVM/Samples/NameListCSharpPage.cs"], "", NameListCSharp), 
         Sample("Alphabet (Computation Expressions)", ["MVVM/Samples/CompListPage.n"], "", CompList), 
-        //Sample("Chat using SignalR", ["MVVM/Samples/SignalPage.n"], "", Signal),
+        Sample("Chat using SignalR", ["MVVM/Samples/SignalPage.n"], "", Signal),
         Sample("Variants and Pattern Matching", ["MVVM/Samples/VariantsAndMatchingPage.n"], "", Variants)
       ].ToList();
       

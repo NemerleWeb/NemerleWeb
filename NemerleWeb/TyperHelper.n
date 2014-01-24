@@ -19,21 +19,17 @@ namespace NemerleWeb
         
         public GetTypedBody(method : IMethod, typer : Typer, tb : TypeBuilder, bodyHandler : TExpr -> void, fullTyping : bool = true) : void
         {
-          if (method.Header.Name.Contains("_N_GetVariantCodeSafe"))
-          {
-            TExpr.Literal(Literal.Void())
-          }
-          else
+          when (!method.Header.Name.Contains("_N_GetVariantCodeSafe"))
           {
             // NOTE: Must not use 'Body' property because it checks for FunBody.Parsed
             match(method.Header.body)
             {
-            | FunBody.Typed(typedBody) => typedBody
+            | FunBody.Typed(_typedBody) => ()
             | FunBody.Parsed(parsed) =>
               match(parsed)
               {
               | <[ {} ]>
-              | <[ { base () } ]> => TExpr.Literal(Literal.Void())
+              | <[ { base () } ]> => ()
               | _ => 
                 def oldEmitDebug = typer.Manager.Options.EmitDebug;
                 typer.Manager.Options.EmitDebug = false;
@@ -43,7 +39,7 @@ namespace NemerleWeb
                 if (env == null)
                 {
                   Message.Error($"Env is null in $mb");
-                  TExpr.Error()
+                  ()
                 }
                 else
                 {
@@ -80,16 +76,14 @@ namespace NemerleWeb
                   typer.Manager.Options.EmitDebug = oldEmitDebug;
                 }
               }
-            | FunBody.Abstract => TExpr.Literal(Literal.Void())
+            | FunBody.Abstract => ()
             | null =>
               // External method don't have body
               def mi = method :> LibraryReference.ExternalMethodInfo;
               
               Message.Error($"External methods are not implemented: $(mi.GetName())");
-              TExpr.Error();          
             | _ =>
               Message.Error("Couldn't type body"); 
-              TExpr.Error();
             }
           }
         }

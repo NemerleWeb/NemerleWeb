@@ -13,17 +13,17 @@ using System.Collections.Generic;
 namespace NemerleWeb
 {
   [MacroUsage(MacroPhase.BeforeTypedMembers, MacroTargets.Method)]
-  public macro Html(tb : TypeBuilder, mb : ParsedMethod)
+  public macro Html(tb : TypeBuilder, mb : ParsedMethod) : void
   {
     unless(tb.Manager.IsIntelliSenseMode)
-      HtmlImpl.ToXLinq(Nemerle.Macros.ImplicitCTX(), mb)
+      HtmlImpl.ToXLinq(Nemerle.Macros.ImplicitCTX(), mb);
   }
 
   [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Method)]
-  public macro HtmlTyped(tb : TypeBuilder, mb : MethodBuilder)
+  public macro HtmlTyped(tb : TypeBuilder, mb : MethodBuilder) : void
   {
     unless(tb.Manager.IsIntelliSenseMode)
-      HtmlImpl.FromTypedToString(Nemerle.Macros.ImplicitCTX(), mb)
+      HtmlImpl.FromTypedToString(Nemerle.Macros.ImplicitCTX(), mb);
   }
   
   internal module HtmlImpl
@@ -73,6 +73,7 @@ namespace NemerleWeb
                   text(null);
                   text_splice(null);
                 };
+                _ = skip;
                 
                 $pexpr
               }
@@ -95,20 +96,20 @@ namespace NemerleWeb
     {
       Macros.DefineCTX(typer);
       
-      def escape(expr) {
+      def escape(expr : string) : string{
         def expr = if(expr.StartsWith("\"") && expr.EndsWith("\"")) expr.Trim('\"') else expr;
         def expr = if(expr.StartsWith("(") && expr.EndsWith(")")) expr.Substring(1, expr.Length - 2) else expr;
         def expr = if(expr.EndsWith(";")) expr.Substring(0, expr.Length - 1) else expr;
         expr.Replace("\"", "'");
       }      
       
-      def getAstString(expr) {
+      def getAstString(expr : TExpr) : string {
         def (ast, addedReturn) = JSAstBuilder.BuildJSAstForSplices(expr, mb.Header);        
         def res = if(addedReturn) ast.Write() else "$" + ast.Write();
-        res.Replace("\r\n", "")        
+        res.Replace("\r\n", "")
       }
       
-      def htmlFromTExpr(expr, indent) : string {
+      def htmlFromTExpr(expr : TExpr, indent : string) : string {
         match(expr) {
         | TExpr.Block(_, body) => htmlFromTExpr(body, indent)
         | TExpr.Label(_, body) => htmlFromTExpr(body, indent)

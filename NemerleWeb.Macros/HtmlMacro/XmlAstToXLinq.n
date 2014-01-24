@@ -93,7 +93,6 @@ namespace NemerleWeb
           | PExpr.Ref as rf => <[ $rf() ]>
           | PExpr.Call as call => call
           | x => x
-          | _ => assert2(false); <[ () ]>
           }
           <[ attr_splice("click", { $e; null }) ]>
         | Attr(Splicable.Value(name), Splicable.Expr(expr) as splice) => <[ attr_splice($(name : string), $(Parse(ToLocation(splice), expr))) ]>        
@@ -132,7 +131,7 @@ namespace NemerleWeb
         | AttrSplice(s, SpliceType.When)         => <[ attr_splice("when", $(Parse(ToLocation(xmlAst), s))) ]>
         | AttrSplice(s, SpliceType.Unless)       => <[ attr_splice("unless", $(Parse(ToLocation(xmlAst), s))) ]>
         | Seq(items)                             => <[ [..$(items.Map(transformImpl))] ]>;
-        | _                                      => Message.FatalError(ToLocation(xmlAst), "Unrecognized syntax in Html"); <[]>
+        | _                                      => Message.FatalError(ToLocation(xmlAst), "Unrecognized syntax in Html");
         }
     }
     
