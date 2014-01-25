@@ -168,7 +168,8 @@ namespace NemerleWeb
           $"$attrName=\"$attrValue\""
         
         | DefFunctionsIn(_, body) => htmlFromTExpr(body, indent);
-        | DefValIn(name, _, body) when name.Name == "skip" => htmlFromTExpr(body, indent);
+        | DefValIn(name, _, body) when name.Name == "skip"
+        | DefValIn(_, LocalRef as val, body) when val.decl.Name == "skip" => htmlFromTExpr(body, indent);
         | _ => assert2(false); ""
         }
       }
