@@ -200,6 +200,7 @@ var nweb = {
   },
   getValueBinding: function(model, el, bindings, loopStack, attrVal) {
     var expr = nweb.parseExpression(model, attrVal, loopStack);
+    var exprWithReturn = expr;
 
     if (expr.indexOf("return ") == 0)
       expr = expr.slice(7);
@@ -227,12 +228,12 @@ var nweb = {
       });
     }
 
-    $el.val(nweb.getParsedValue(model, expr, loopStack));
+    $el.val(nweb.getParsedValue(model, exprWithReturn, loopStack));
     
     return {
       el: el,
       getValue: function() {
-        return nweb.getParsedValue(model, expr, loopStack);
+        return nweb.getParsedValue(model, exprWithReturn, loopStack);
       },
       apply: function (value) {
         nweb.setValue($el[0], value);        
