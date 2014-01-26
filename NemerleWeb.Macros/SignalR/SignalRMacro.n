@@ -44,7 +44,7 @@ nweb.invalidate();
       def methods = $<#..$(methods; "")#>;
       def script = $<#
 function $(properName)_signalr(this_ptr) {
-  $(JSClass.Self) = this_ptr;
+  var $(JSClass.Self) = this_ptr;
   var $jsHubName = $$.connection.$jsHubName;
   
   $methods
