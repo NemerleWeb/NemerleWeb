@@ -179,7 +179,10 @@ $fields
 $callConstrutor
 $definedProperties
 $definedMethods
-///SignalR///
+
+if(window["$(properTypeName)_signalr"])
+  $(properTypeName)_signalr($Self);
+
 $(meta.WriteToJS(Indent))
 $returning
 $(Indent)}
