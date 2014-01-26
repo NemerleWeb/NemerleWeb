@@ -48,13 +48,14 @@ function $(properName)_signalr(this_ptr) {
   var $jsHubName = $$.connection.$jsHubName;
   
   $methods
+  
+  setTimeout(function() {
+  $$.connection.hub.start({}, function() {
+    $$.get('/$(declaringType.Name)/__SetSignalRConnectionId', {id: this.id});
+  });
+  }, 1000);
 }
-
-setTimeout(function() {
-$$.connection.hub.start({}, function() {
-  $$.get('/$(declaringType.Name)/__SetSignalRConnectionId', {id: this.id});
-});
-}, 1000);#>;
+#>;
 
       UnitImpl.AddSignalrData(declaringType, script);
 

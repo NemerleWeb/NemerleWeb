@@ -180,8 +180,9 @@ $callConstrutor
 $definedProperties
 $definedMethods
 
-if(window["$(properTypeName)_signalr"])
-  $(properTypeName)_signalr($Self);
+$(Indent)  if(window["$(properTypeName)_signalr"]) {
+$(Indent)    $(properTypeName)_signalr($Self);
+$(Indent)  }
 
 $(meta.WriteToJS(Indent))
 $returning
@@ -253,7 +254,7 @@ $indent};#>
     FieldValue(field : IField) : string
     {
       def field = field :> FieldBuilder;
-      
+            
       def initializer = JSAstCache.GetFieldInitializer(ClassType, field?.Name);      
       if(initializer != null)
       {
@@ -277,11 +278,12 @@ $indent};#>
         | PExpr.Literal(Literal.String(val)) => JSAstHelper.EscapeString(val)
         | PExpr.ListLiteral(elements) => $<#[..$(elements; ", "; makeInitializer)]#>
         | PExpr.Tuple(elements) => $<#[..$(elements; ", "; makeInitializer)]#>
+        | PExpr.Call => JSAstBuilder.BuildJSAst(Typer.TypeExpr(expr), false, null).Write() + ";"    
         | PExpr.Literal(Literal.Void)
-        | PExpr.Literal(Literal.Null)          
+        | PExpr.Literal(Literal.Null)    
         | _ => "null"
         }
-          
+        
         makeInitializer(initializer)
       }
       else
@@ -312,7 +314,8 @@ $indent};#>
     public GetStaticFields(indent : string) : string 
     {
       def parentPtr = GetProperName(ClassType);
-      def fieldStrings = StaticFields.Select(f => $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>);
+      //$(FieldValue(f))
+      def fieldStrings = StaticFields.Select(f => $<#$indent$parentPtr.$(f.Name) = null#>);
       def res = $<#..$(fieldStrings; ";\n")#>;
       
       if(string.IsNullOrWhiteSpace(res)) "" else res + Environment.NewLine;
