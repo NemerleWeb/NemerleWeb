@@ -344,6 +344,11 @@
       <Project>{265b5ceb-d5ad-47b0-a1b1-235e1422aba7}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\NemerleWeb.TypedClr\NemerleWeb.TypedClr.nproj">
+      <Name>NemerleWeb.TypedClr</Name>
+      <Project>{3af4bc0f-7b1f-4c66-b221-75d722170eb9}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\NemerleWeb.TypedJS\NemerleWeb.TypedJS.nproj">
       <Name>NemerleWeb.TypedJS</Name>
       <Project>{65c01c91-f57a-4281-b09f-15baa5ac3cc6}</Project>
