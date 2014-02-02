@@ -27,7 +27,17 @@
                 <ul class="nav nav-pills pull-right">
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     <li>@Html.ActionLink("Tutorial", "Tutorial", "Home")</li>
-                    <li>@Html.ActionLink("Samples", "Samples", "Home")</li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle disabled" data-toggle="dropdown" href="@Url.Action("Samples", "Home")">
+                            Samples <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("Samples", "Samples", "Home")</li>
+                            <li><a href="http://parsers.nemerleweb.com">RSDN tree sample</a></li>
+                            <li><a href="http://rsdn.nemerleweb.com">RSDN tree sample</a></li>
+                        </ul>
+                    </li>
+
                     <li><a href="https://github.com/NemerleWeb/NemerleWeb">Github</a></li>
                 
                     <li class="dropdown">
