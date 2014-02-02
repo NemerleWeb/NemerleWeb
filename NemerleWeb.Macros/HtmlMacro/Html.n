@@ -140,9 +140,7 @@ namespace NemerleWeb
             | _ => assert2(false); ("", "");
             }
         
-          indent + $"<$(tagName) $attrs>" +
-          indent + $"$children" +
-          indent + $"</$(tagName)>";
+          indent + $"<$(tagName) $attrs>" + $"$children" + $"</$(tagName)>";
         
         | Call(LocalFunRef(decl, _), [textExprExpr], _) when decl.Name == "text_splice" => 
           def splice = getAstString(textExprExpr.expr);
@@ -151,7 +149,7 @@ namespace NemerleWeb
         
         | Call(LocalFunRef(decl, _), [Parm(_, Literal(Literal.String(textValue)), _, _)], _) 
           when decl.Name == "text" => 
-          indent + "  " + textValue
+          indent + textValue
         
         | Call(LocalFunRef(decl, _), [Parm(_, Literal(Literal.String(attrName)), _, _), attrExprExpr], _) 
           when decl.Name == "attr_splice" =>
