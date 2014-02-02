@@ -419,6 +419,7 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
     {
       def assemblyName = Path.GetFileNameWithoutExtension(tb.Manager.Options.OutputFileName);
       def env = tb.Manager.CoreEnv.EnterIntoNamespace([assemblyName]);
+      
       match(env.LookupType(["Render"])) 
       {
       | Some(type) => type :> TypeBuilder

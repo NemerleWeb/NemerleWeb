@@ -13,7 +13,7 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Web;
 
-namespace NemerleWeb.Rsdn
+namespace Rsdn
 {
   module TreeLoader
   {

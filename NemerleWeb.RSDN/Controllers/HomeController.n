@@ -12,8 +12,8 @@ namespace NemerleWeb.Rsdn.Controllers
   public class HomeController : Controller
   {
     public Index() : ActionResult
-    {
-      View(NemerleWeb.Rsdn.Tree.Render.MainPage("http://www.google.com") : object);
+    {      
+      View();
     }
   }
 }

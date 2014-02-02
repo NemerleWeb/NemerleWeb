@@ -49,10 +49,15 @@ namespace NemerleWeb
       {
         Path.Combine(AppDomain.CurrentDomain.BaseDirectory, getRelativePath(filename))
       }
+      
+      def scriptsDir = getAbsolutePath();
+      
+      when(!Directory.Exists(scriptsDir))
+        _ = Directory.CreateDirectory(scriptsDir);
 
       Directory.GetFiles(getAbsolutePath())
                .Iter(File.Delete);
-      
+               
       foreach(dataType in datas)
       {
         def instance = Activator.CreateInstance(dataType, array[], array[]) :> NWebDataInstance;
