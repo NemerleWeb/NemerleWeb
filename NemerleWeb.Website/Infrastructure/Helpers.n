@@ -16,13 +16,10 @@ namespace NemerleWeb.Website
   {
     public LoadSourceFor([NotNull] filename : string) : string 
     {
-      def dir = Uri(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase)).LocalPath;
+      def dir = System.Web.HttpContext.Current.Server.MapPath("/bin");
       def filename = Path.GetFullPath(Path.Combine(dir, filename));
       
-      if(filename.StartsWith(dir))      
-        File.ReadAllText(filename)
-      else
-        ""
+      if(filename.StartsWith(dir)) File.ReadAllText(filename) else ""
     }
     
     public GetNames() : list[string]
