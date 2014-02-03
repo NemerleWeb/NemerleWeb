@@ -1867,7 +1867,7 @@ namespace NemerleWeb.Website.Tests
       <#
         <table class="jsast-tests">
           <tbody>
-            <tr $foreach(r in Results) css-succeeded='$(r[1].ToString() == "true")'>
+            <tr $foreach(r in Results) css-passed="$(r[1].ToString() != "false")">
               <td>$(r[0])</td>
               <td>$(r[1])</td>
             </tr>

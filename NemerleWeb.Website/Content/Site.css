@@ -109,9 +109,9 @@ body {
 }
 
 .folders { background-color: #bbb; list-style-type: none; padding: 0; margin: 0; border-radius: 7px; 
-	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #d6d6d6), color-stop(0.4, #c0c0c0), color-stop(1,#a4a4a4)); 
-	margin: 10px 0 16px 0;
-	font-size: 0px;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #d6d6d6), color-stop(0.4, #c0c0c0), color-stop(1,#a4a4a4)); 
+    margin: 10px 0 16px 0;
+    font-size: 0px;
 }
 .folders li:hover { background-color: #ddd; }    
 .folders li:first-child { border-left: none; border-radius: 7px 0 0 7px; }
@@ -140,15 +140,16 @@ body {
     font-size: 12px;
 }
 
-.jsast-tests tr td {
-    background-color: greenyellow;
+.jsast-tests tr td {    
     padding: 2px 5px;
     text-align: center;
-}
-
-.jsast-tests tr.failed td {
     background-color: red;
     color: #fff;
+}
+
+.jsast-tests tr.passed td {
+    background-color: greenyellow;
+    color: #000;
 }
 
 .chat td:nth-child(2) {
