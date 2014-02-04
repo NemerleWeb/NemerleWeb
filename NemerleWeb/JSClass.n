@@ -6,6 +6,7 @@ using Nemerle.Utility;
 using Nemerle.Compiler;
 using Nemerle.Compiler.Parsetree;
 using Nemerle.Compiler.Typedtree;
+using Nemerle.Extensions;
 
 using System;
 using System.Collections.Generic;
@@ -142,7 +143,7 @@ namespace NemerleWeb
       }
     }
         
-    public Write() : string 
+    public Write(debug : bool) : string 
     {        
       def meta = JSClassMeta();
       def properTypeName = GetProperName(ClassType);
@@ -160,7 +161,7 @@ namespace NemerleWeb
       def definedMethods = GetDefinedMethods(bodyIndent, parentPtr, true);
       def staticMethods = GetStaticMethods(Indent);
       //def nestedClassesString = GenerateNestedClasses();
-      def className = ClassType.ToString();
+      def className = ClassType.FullName;
         
       // This is needed to make labmda object behave as regular function
       def returning = match(ClassType.BaseType?.Name)
@@ -170,41 +171,45 @@ namespace NemerleWeb
       | _ => ""
       };
 
+      def debugWrite(s : string) : string { if(debug) s else "" }
+      
 $<#
-// $className - Define ctor
+$(debugWrite($"// $className === Begin ==="))
+$(debugWrite($"// $className - Define ctor"))
 $(Indent)var $properTypeName$$ctor = {};
-// $className - Constructors body
+$(debugWrite($"// $className - Constructors body"))
 $constructorsBody
-// $className - Init
+$(debugWrite($"// $className - Init"))
 $(Indent)function $properTypeName() {
 $(bodyIndent)$SelfInit
-// $className - Properties
+$(debugWrite($"// $className - Properties"))
 $properties
-// $className - Methods
+$(debugWrite($"// $className - Methods"))
 $methods
-// $className - Fields
+$(debugWrite($"// $className - Fields"))
 $fields
-// $className - Call constructor
+$(debugWrite($"// $className - Call constructor"))
 $callConstrutor
-// $className - Defined properties
+$(debugWrite($"// $className - Defined properties"))
 $definedProperties
-// $className - Defined methods
+$(debugWrite($"// $className - Defined methods"))
 $definedMethods
-// $className - SignalR
+$(debugWrite($"// $className - SignalR"))
 $(Indent)  if(window["$(properTypeName)_signalr"]) {
 $(Indent)    $(properTypeName)_signalr($Self);
 $(Indent)  }
-// $className - Meta
+$(debugWrite($"// $className - Meta"))
 $(meta.WriteToJS(Indent))
-// $className - Return
+$(debugWrite($"// $className - Return"))
 $returning
 $(Indent)}
-// $className - Static methods
+$(debugWrite($"// $className - Static methods"))
 $staticMethods
-// $className - Static properties
+$(debugWrite($"// $className - Static properties"))
 $staticProperties
-// $className - Static fields
+$(debugWrite($"// $className - Static fields"))
 $staticFields
+$(debugWrite($"// $className === End ==="))
 #>
     }
       
@@ -348,11 +353,11 @@ $indent};#>
     GenerateFields(indent : string, parentPtr : string, fields : IEnumerable[IField]) : string
     {
       def declarations = fields.Select(f => $<#$indent$parentPtr.$(f.Name) = $(DefaultFieldValue(f))#>);      
-              
+      
       def initializations = fields
-        .Select(f => FieldInitValue(f))
-        .Where(init => init.HasValue)
-        .Select(init => init.Value);
+        .Select(f => new (f = f, init = FieldInitValue(f)))
+        .Where(i => i.init.HasValue)
+        .Select(i => $"$indent$parentPtr.$(i.f.Name) = $(i.init.Value)");
       
       string.Join(InitSeparator, declarations.Concat(initializations));
     }
@@ -533,10 +538,10 @@ $(indent)}#>
       GenerateMethods(indent, GetProperName(ClassType), false, StaticMethods, true)
     }
       
-    GenerateNestedClasses() : string
-    {
-      $"..$(NestedClasses; Environment.NewLine; _.Write())"
-    }
+    //GenerateNestedClasses() : string
+    //{
+    //  $"..$(NestedClasses; Environment.NewLine; _.Write())"
+    //}
       
     public TranslateMethodBody([NotNull] meth : IMethod, [NotNull] indent = "" : string) : string
     {
