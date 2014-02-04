@@ -37,17 +37,31 @@ module Program
   }
 }
 
-  [Unit]
-    class Dummy
+ [Unit]
+    class InitializerTest
     {
-      public static mutable StaticField : string = StaticFieldWithInit;
-      public static mutable StaticFieldWithInit : string = "Passed";
+      public ListInit : list[int] = [1, 2, 3];
+      public TupleInit : int * string * double = (1, "a", 2.0);
+      
+      public IntInit : int = 10;
+      public DoubleInit : double = 20.0;
+      public StringInit : string = "x";
+      
+      F() : void {}
+      static G() : void {}
+      X : int { get { 0} }
+      static Y : int { get { 1 } }
     }
-    
     
 [Unit]
 public class Test
 {
+F() : void
+{
+  
+        document.body.onkeydown = e => null;
+}
+
   [Html]
   public View() : string
   {

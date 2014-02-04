@@ -189,6 +189,17 @@ namespace NemerleWeb.Website.Tests
     }
     
     [Unit]
+    static class StaticInitializerTest
+    {
+      public static ListInit : list[int] = [1, 2, 3];
+      public static TupleInit : int * string * double = (1, "a", 2.0);
+      
+      public static IntInit : int = 10;
+      public static DoubleInit : double = 20.0;
+      public static StringInit : string = "x";
+    }
+    
+    [Unit]
     variant DummyVariant
     {
       | Case1 { A : string }
@@ -1556,6 +1567,15 @@ namespace NemerleWeb.Website.Tests
         InitializerTest().StringInit == "x"
       });
       
+      test("Static Initializers", () =>
+      {
+        StaticInitializerTest.ListInit is [1, 2, 3] && 
+        StaticInitializerTest.TupleInit is (1, "a", 2.0) &&
+        StaticInitializerTest.IntInit == 10 &&
+        StaticInitializerTest.DoubleInit == 20.0 &&
+        StaticInitializerTest.StringInit == "x"
+      });
+      
       test("Call base constructor", () =>
       {
         def d = DerivedClass("x");
@@ -1724,6 +1744,16 @@ namespace NemerleWeb.Website.Tests
         def xhr = server.A(_ => ());
         _ = xhr.status;
         true
+      });
+      
+      test("js typing set property lambda", () => {
+        def orig = document.body.onkeydown;
+        
+        document.body.onkeydown = _e => null;
+        def ret = document.body.onkeydown != null;
+        document.body.onkeydown = orig;
+        
+        ret
       });
       
       test("original this in lambda", () => {

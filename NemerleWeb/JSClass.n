@@ -152,7 +152,8 @@ namespace NemerleWeb
       def properties = GetProperties(bodyIndent, parentPtr, meta);
       def definedProperties = GetDefinedProperties(bodyIndent, parentPtr, meta);
       def staticProperties = GetStaticProperties(Indent, meta);
-      def fields = GetFields(bodyIndent, parentPtr);        
+      def fieldsDecl = GetFieldsDefaultInit(bodyIndent, parentPtr);
+      def fieldsInit = GetFieldsInit(bodyIndent, parentPtr);
       AddFieldsMeta(Fields, meta);
       //def staticFields = GetStaticFields(Indent);
       def constructorsBody = GetConstructorsBody(Indent, bodyIndent);
@@ -186,7 +187,8 @@ $(bodyIndent)$SelfInit#>)
         .AppendWhen(debug, _.AppendLine($"// $className - Methods"))
         .AppendLineValue(methods)
         .AppendWhen(debug, _.AppendLine($"// $className - Fields"))
-        .AppendLineValue(fields)
+        .AppendLineValue(fieldsDecl)
+        .AppendLineValue(fieldsInit)
         .AppendWhen(debug, _.AppendLine($"// $className - Call constructor"))
         .AppendLineValue(callConstrutor)
         .AppendWhen(debug, _.AppendLine($"// $className - Defined properties"))
@@ -313,7 +315,7 @@ $indent};#>
             .Select(init => init.Value);
             
           def ret = string.Join(", ", elementsWithValue);          
-          Some(ret)
+          Some($"[$ret]")
         | PExpr.Call => Some(JSAstBuilder.BuildJSAst(Typer.TypeExpr(expr), false, null).Write() + ";")
         | PExpr.Literal(Literal.Void)
         | PExpr.Literal(Literal.Null)    
@@ -349,36 +351,36 @@ $indent};#>
             f.GetMemType().IsValueType))
     }
       
-    GenerateFields(indent : string, parentPtr : string, fields : IEnumerable[IField]) : string
+    GenerateFieldsInit(indent : string, parentPtr : string, fields : IEnumerable[IField]) : string
     {
-      def declarations = fields.Select(f => $<#$indent$parentPtr.$(f.Name) = $(DefaultFieldValue(f))#>);      
-      
       def initializations = fields
         .Select(f => new (f = f, init = FieldInitValue(f)))
         .Where(i => i.init.HasValue)
         .Select(i => $"$indent$parentPtr.$(i.f.Name) = $(i.init.Value)");
       
-      string.Join(InitSeparator, declarations.Concat(initializations));
-    }
-        
-    GetFields(indent : string, parentPtr : string) : string 
-    {
-      GenerateFields(indent, parentPtr, Fields)
+      string.Join(InitSeparator, initializations);
     }
     
-    GetStaticFields(indent : string) : string
+    GenerateFieldsDefaultInit(indent : string, parentPtr : string, fields : IEnumerable[IField]) : string
     {
-      def parentPtr = GetProperName(ClassType);
-      GenerateFields(indent, parentPtr, StaticFields)
+      def declarations = fields.Select(f => $<#$indent$parentPtr.$(f.Name) = $(DefaultFieldValue(f))#>);
+      string.Join(InitSeparator, declarations);
+    }
+        
+    GetFieldsDefaultInit(indent : string, parentPtr : string) : string 
+    {
+      GenerateFieldsDefaultInit(indent, parentPtr, Fields)
+    }
+    
+    GetFieldsInit(indent : string, parentPtr : string) : string 
+    {
+      GenerateFieldsInit(indent, parentPtr, Fields)
     }
     
     public GetStaticFieldsDefaultInit(indent : string) : string
     {
       def parentPtr = GetProperName(ClassType);
-      def declarations = StaticFields.Select(
-        f => $<#$indent$parentPtr.$(f.Name) = $(DefaultFieldValue(f))#>);      
-      
-      string.Join(InitSeparator, declarations)
+      GenerateFieldsDefaultInit(indent, parentPtr, StaticFields)
     }
 
     GetConstructorsBody(indent : string, bodyIndent : string) : string
