@@ -154,7 +154,7 @@ namespace NemerleWeb
       def staticProperties = GetStaticProperties(Indent, meta);
       def fields = GetFields(bodyIndent, parentPtr);        
       AddFieldsMeta(Fields, meta);
-      def staticFields = GetStaticFields(Indent);
+      //def staticFields = GetStaticFields(Indent);
       def constructorsBody = GetConstructorsBody(Indent, bodyIndent);
       def callConstrutor = GetCallConstructor(bodyIndent);
       def methods = GetMethods(bodyIndent, parentPtr, true);
@@ -171,46 +171,45 @@ namespace NemerleWeb
       | _ => ""
       };
 
-      def debugWrite(s : string) : string { if(debug) s else "" }
-      
-$<#
-$(debugWrite($"// $className === Begin ==="))
-$(debugWrite($"// $className - Define ctor"))
-$(Indent)var $properTypeName$$ctor = {};
-$(debugWrite($"// $className - Constructors body"))
-$constructorsBody
-$(debugWrite($"// $className - Init"))
-$(Indent)function $properTypeName() {
-$(bodyIndent)$SelfInit
-$(debugWrite($"// $className - Properties"))
-$properties
-$(debugWrite($"// $className - Methods"))
-$methods
-$(debugWrite($"// $className - Fields"))
-$fields
-$(debugWrite($"// $className - Call constructor"))
-$callConstrutor
-$(debugWrite($"// $className - Defined properties"))
-$definedProperties
-$(debugWrite($"// $className - Defined methods"))
-$definedMethods
-$(debugWrite($"// $className - SignalR"))
-$(Indent)  if(window["$(properTypeName)_signalr"]) {
+      def ret = StringBuilder();
+      _ = ret
+        .AppendWhen(debug, _.AppendLine($"// $className === Begin ==="))
+        .AppendWhen(debug, _.AppendLine($"// $className - Define ctor"))
+        .AppendLineValue($"$(Indent)var $properTypeName$$ctor = {};")
+        .AppendWhen(debug, _.AppendLine($"// $className - Constructors body"))
+        .AppendLineValue(constructorsBody)
+        .AppendWhen(debug, _.AppendLine($"// $className - Init"))
+        .AppendLineValue($<#$(Indent)function $properTypeName() {
+$(bodyIndent)$SelfInit#>)
+        .AppendWhen(debug, _.AppendLine($"// $className - Properties"))
+        .AppendLineValue(properties)
+        .AppendWhen(debug, _.AppendLine($"// $className - Methods"))
+        .AppendLineValue(methods)
+        .AppendWhen(debug, _.AppendLine($"// $className - Fields"))
+        .AppendLineValue(fields)
+        .AppendWhen(debug, _.AppendLine($"// $className - Call constructor"))
+        .AppendLineValue(callConstrutor)
+        .AppendWhen(debug, _.AppendLine($"// $className - Defined properties"))
+        .AppendLineValue(definedProperties)
+        .AppendWhen(debug, _.AppendLine($"// $className - Defined methods"))
+        .AppendLineValue(definedMethods)
+        .AppendWhen(debug, _.AppendLine($"// $className - SignalR"))
+        .AppendLineValue($<#$(Indent)  if(window["$(properTypeName)_signalr"]) {
 $(Indent)    $(properTypeName)_signalr($Self);
-$(Indent)  }
-$(debugWrite($"// $className - Meta"))
-$(meta.WriteToJS(Indent))
-$(debugWrite($"// $className - Return"))
-$returning
-$(Indent)}
-$(debugWrite($"// $className - Static methods"))
-$staticMethods
-$(debugWrite($"// $className - Static properties"))
-$staticProperties
-$(debugWrite($"// $className - Static fields"))
-$staticFields
-$(debugWrite($"// $className === End ==="))
-#>
+$(Indent)  }#>)
+        .AppendWhen(debug, _.AppendLine($"// $className - Meta"))
+        .AppendLineValue(meta.WriteToJS(bodyIndent))
+        .AppendWhen(debug, _.AppendLine($"// $className - Return"))
+        .AppendLineValue(returning)
+        .AppendLineValue($"$(Indent)}")
+        .AppendWhen(debug, _.AppendLine($"// $className - Static methods"))
+        .AppendLineValue(staticMethods)
+        .AppendWhen(debug, _.AppendLine($"// $className - Static properties"))
+        .AppendLineValue(staticProperties)
+        .AppendWhen(debug, _.AppendLine($"// $className === End ==="))
+        ;
+
+      ret.ToString()
     }
       
     GenerateProperties(indent : string, parentPtr : string, properties : IEnumerable[IProperty], meta : JSClassMeta, generate : bool) : string 
@@ -366,12 +365,21 @@ $indent};#>
     {
       GenerateFields(indent, parentPtr, Fields)
     }
-        
-    GetStaticFields(indent : string) : string 
+    
+    GetStaticFields(indent : string) : string
     {
       def parentPtr = GetProperName(ClassType);
       GenerateFields(indent, parentPtr, StaticFields)
-    }    
+    }
+    
+    public GetStaticFieldsDefaultInit(indent : string) : string
+    {
+      def parentPtr = GetProperName(ClassType);
+      def declarations = StaticFields.Select(
+        f => $<#$indent$parentPtr.$(f.Name) = $(DefaultFieldValue(f))#>);      
+      
+      string.Join(InitSeparator, declarations)
+    }
 
     GetConstructorsBody(indent : string, bodyIndent : string) : string
     {
@@ -694,4 +702,17 @@ $(indent)  };#>;
     
     public JSClrRoots : SortedSet[string] = SortedSet(["NemerleWeb.TypedClr"], InvertedComparer());
   }  
+  
+  internal module StringBuilderExtensions
+  {
+    public AppendValue(this sb : StringBuilder, val : string) : StringBuilder
+    {
+      if(!string.IsNullOrWhiteSpace(val)) sb.Append(val) else sb
+    }
+    
+    public AppendLineValue(this sb : StringBuilder, val : string) : StringBuilder
+    {
+      if(!string.IsNullOrWhiteSpace(val)) sb.AppendLine(val) else sb
+    }
+  }
 }
