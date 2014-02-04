@@ -1,6 +1,4 @@
-﻿
-
-using Nemerle;
+﻿using Nemerle;
 using Nemerle.Assertions;
 using Nemerle.Collections;
 using Nemerle.Text;
@@ -35,6 +33,7 @@ namespace NemerleWeb
     #endregion
       
     public static Self : string = "_nw_self";
+    private static InitSeparator = ";\n";
       
     /// <summary>
     /// Initialize self either
@@ -103,7 +102,7 @@ namespace NemerleWeb
       get
       {            
         def methods = ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-        FilterMethods(methods);
+        FilterMethods(methods)
       }
     }
       
@@ -112,7 +111,7 @@ namespace NemerleWeb
       get
       {            
         def methods = ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Static| BindingFlags.Public | BindingFlags.NonPublic);            
-        FilterMethods(methods);
+        FilterMethods(methods)
       }
     }
     public static GetNestedTypes(type : TypeBuilder) : IEnumerable[TypeBuilder]
@@ -137,7 +136,8 @@ namespace NemerleWeb
     {
       get
       {
-        def constructors = ClassType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);              
+        def constructors =
+          ClassType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         constructors
       }
     }
@@ -150,8 +150,9 @@ namespace NemerleWeb
       def bodyIndent = Indent + "  ";
       def properties = GetProperties(bodyIndent, parentPtr, meta);
       def definedProperties = GetDefinedProperties(bodyIndent, parentPtr, meta);
-      def staticProperties = GetStaticProperties(Indent, meta);        
-      def fields = GetFields(bodyIndent, parentPtr, meta);        
+      def staticProperties = GetStaticProperties(Indent, meta);
+      def fields = GetFields(bodyIndent, parentPtr);        
+      AddFieldsMeta(Fields, meta);
       def staticFields = GetStaticFields(Indent);
       def constructorsBody = GetConstructorsBody(Indent, bodyIndent);
       def callConstrutor = GetCallConstructor(bodyIndent);
@@ -159,6 +160,7 @@ namespace NemerleWeb
       def definedMethods = GetDefinedMethods(bodyIndent, parentPtr, true);
       def staticMethods = GetStaticMethods(Indent);
       //def nestedClassesString = GenerateNestedClasses();
+      def className = ClassType.ToString();
         
       // This is needed to make labmda object behave as regular function
       def returning = match(ClassType.BaseType?.Name)
@@ -169,28 +171,40 @@ namespace NemerleWeb
       };
 
 $<#
+// $className - Define ctor
 $(Indent)var $properTypeName$$ctor = {};
+// $className - Constructors body
 $constructorsBody
+// $className - Init
 $(Indent)function $properTypeName() {
 $(bodyIndent)$SelfInit
+// $className - Properties
 $properties
+// $className - Methods
 $methods
+// $className - Fields
 $fields
+// $className - Call constructor
 $callConstrutor
+// $className - Defined properties
 $definedProperties
+// $className - Defined methods
 $definedMethods
-
+// $className - SignalR
 $(Indent)  if(window["$(properTypeName)_signalr"]) {
 $(Indent)    $(properTypeName)_signalr($Self);
 $(Indent)  }
-
+// $className - Meta
 $(meta.WriteToJS(Indent))
+// $className - Return
 $returning
 $(Indent)}
-
-$staticFields
+// $className - Static methods
 $staticMethods
+// $className - Static properties
 $staticProperties
+// $className - Static fields
+$staticFields
 #>
     }
       
@@ -251,14 +265,17 @@ $indent};#>
       GenerateProperties(indent, GetProperName(ClassType), StaticProperties, meta, true)
     }
       
-    FieldValue(field : IField) : string
+    /// <summary>
+    /// Return value only if it is not the default one
+    /// </summary>
+    FieldInitValue(field : IField) : option[string]
     {
       def field = field :> FieldBuilder;
             
       def initializer = JSAstCache.GetFieldInitializer(ClassType, field?.Name);      
       if(initializer != null)
       {
-        def integer(v)
+        def integer(v : Literal.Integer) : string
         {
           if (v.is_negative)
             (unchecked(v.val :> long) * -1).ToString(CultureInfo.InvariantCulture)
@@ -266,60 +283,90 @@ $indent};#>
             v.val.ToString(CultureInfo.InvariantCulture)
         }
           
-        def makeInitializer(expr)
+        def makeInitializer(expr) : option[string]
         {
-        | PExpr.Literal(Literal.Bool(val)) => val.ToString(CultureInfo.InvariantCulture).ToLower()
-        | PExpr.Literal(Literal.Char(val)) => val.ToString(CultureInfo.InvariantCulture)
-        | PExpr.Literal(Literal.Decimal(val)) => val.ToString(CultureInfo.InvariantCulture)
-        | PExpr.Literal(Literal.Double(val)) => val.ToString(CultureInfo.InvariantCulture)
-        | PExpr.Literal(Literal.Enum(Integer as i, _, _)) => integer(i)
-        | PExpr.Literal(Literal.Float(val)) => val.ToString(CultureInfo.InvariantCulture)
-        | PExpr.Literal(Literal.Integer as i) => integer(i)
-        | PExpr.Literal(Literal.String(val)) => JSAstHelper.EscapeString(val)
-        | PExpr.ListLiteral(elements) => $<#[..$(elements; ", "; makeInitializer)]#>
-        | PExpr.Tuple(elements) => $<#[..$(elements; ", "; makeInitializer)]#>
-        | PExpr.Call => JSAstBuilder.BuildJSAst(Typer.TypeExpr(expr), false, null).Write() + ";"    
+        | PExpr.Literal(Literal.Bool(false)) => None()
+        | PExpr.Literal(Literal.Bool(val)) => Some(val.ToString(CultureInfo.InvariantCulture).ToLower())
+        | PExpr.Literal(Literal.Char('\0')) => None()
+        | PExpr.Literal(Literal.Char(val)) => Some(val.ToString(CultureInfo.InvariantCulture))
+        | PExpr.Literal(Literal.Decimal(0m)) => None()
+        | PExpr.Literal(Literal.Decimal(val)) => Some(val.ToString(CultureInfo.InvariantCulture))
+        | PExpr.Literal(Literal.Double(0.0)) => None()
+        | PExpr.Literal(Literal.Double(val)) => Some(val.ToString(CultureInfo.InvariantCulture))
+        | PExpr.Literal(Literal.Enum(Integer(0, _, _), _, _)) => None()
+        | PExpr.Literal(Literal.Enum(Integer as i, _, _)) => Some(integer(i))
+        | PExpr.Literal(Literal.Float(0f)) => None()
+        | PExpr.Literal(Literal.Float(val)) => Some(val.ToString(CultureInfo.InvariantCulture))
+        | PExpr.Literal(Literal.Integer(0, _, _)) => None()
+        | PExpr.Literal(Literal.Integer as i) => Some(integer(i))
+        | PExpr.Literal(Literal.String(null)) => None()
+        | PExpr.Literal(Literal.String(val)) => Some(JSAstHelper.EscapeString(val))
+        | PExpr.ListLiteral(elements)
+        | PExpr.Tuple(elements) =>
+          def elementsWithValue = elements
+            .Select(e => makeInitializer(e))
+            .Where(init => init.HasValue)
+            .Select(init => init.Value);
+            
+          def ret = string.Join(", ", elementsWithValue);          
+          Some(ret)
+        | PExpr.Call => Some(JSAstBuilder.BuildJSAst(Typer.TypeExpr(expr), false, null).Write() + ";")
         | PExpr.Literal(Literal.Void)
         | PExpr.Literal(Literal.Null)    
-        | _ => "null"
+        | _ => None()
         }
         
-        makeInitializer(initializer)
+        def ret = makeInitializer(initializer);
+        
+        // Filter out empty strings
+        if(ret is Some(v))
+          if(v.Length != 0) Some(v) else None()
+        else
+          None()
       }
       else
       {
-        DefaultValueInitializer.GetJSAst(field.GetMemType()).Write()
+        None()
       }
     }
-      
-    GenerateFields(indent : string, parentPtr : string, fields: IEnumerable[IField], meta : JSClassMeta) : string
+    
+    DefaultFieldValue(field : IField) : string
     {
-      def fieldStrings = fields.Select(f => {
+      DefaultValueInitializer.GetJSAst(field.GetMemType()).Write()
+    }
+            
+    AddFieldsMeta(fields : IEnumerable[IField], meta : JSClassMeta) : void
+    {
+      foreach(f in fields)
         meta.Fields.Add(
-        JSClassMemberMeta(
-          f.Name,
-          f.GetModifiers().GetCustomAttributes().Select(a => a.ToString()).ToList(),
-          f.GetMemType().IsValueType));
-        $<#$indent$parentPtr.$(f.Name) = $(FieldValue(f))#>;
-      });
-                
-      $<#..$(fieldStrings; ";\n")#>;
+          JSClassMemberMeta(
+            f.Name,
+            f.GetModifiers().GetCustomAttributes().Select(a => a.ToString()).ToList(),
+            f.GetMemType().IsValueType))
     }
-        
-    GetFields(indent : string, parentPtr : string, meta : JSClassMeta) : string 
+      
+    GenerateFields(indent : string, parentPtr : string, fields : IEnumerable[IField]) : string
     {
-      GenerateFields(indent, parentPtr, Fields, meta)
+      def declarations = fields.Select(f => $<#$indent$parentPtr.$(f.Name) = $(DefaultFieldValue(f))#>);      
+              
+      def initializations = fields
+        .Select(f => FieldInitValue(f))
+        .Where(init => init.HasValue)
+        .Select(init => init.Value);
+      
+      string.Join(InitSeparator, declarations.Concat(initializations));
     }
         
-    public GetStaticFields(indent : string) : string 
+    GetFields(indent : string, parentPtr : string) : string 
+    {
+      GenerateFields(indent, parentPtr, Fields)
+    }
+        
+    GetStaticFields(indent : string) : string 
     {
       def parentPtr = GetProperName(ClassType);
-      //$(FieldValue(f))
-      def fieldStrings = StaticFields.Select(f => $<#$indent$parentPtr.$(f.Name) = null#>);
-      def res = $<#..$(fieldStrings; ";\n")#>;
-      
-      if(string.IsNullOrWhiteSpace(res)) "" else res + Environment.NewLine;
-    }
+      GenerateFields(indent, parentPtr, StaticFields)
+    }    
 
     GetConstructorsBody(indent : string, bodyIndent : string) : string
     {
@@ -335,7 +382,8 @@ $indent};#>
         });        
         
       def allCtorsCode = valueTypeCtorCode.Concat(ctorsCode);        
-      $<#..$(allCtorsCode; ";\n")#>
+      
+      string.Join(InitSeparator, allCtorsCode)
     }
       
     private MakeCtor(indent : string, bodyIndent : string, ctorBody : string, parameters : list[TParameter]) : string

@@ -37,14 +37,17 @@ module Program
   }
 }
 
+  [Unit]
+    class Dummy
+    {
+      public static mutable StaticField : string = StaticFieldWithInit;
+      public static mutable StaticFieldWithInit : string = "Passed";
+    }
+    
+    
 [Unit]
 public class Test
 {
-    F(): void
-    {
-      throw ArgumentException("A");
-    }
-  
   [Html]
   public View() : string
   {
