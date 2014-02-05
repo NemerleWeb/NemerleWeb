@@ -1776,11 +1776,13 @@ namespace NemerleWeb.Website.Tests
       });
       
       test("System.Collections.Generic.EqualityComparer[string].Default", () => {
-        EqualityComparer.[string].Default.Equals("a", "b")
+        EqualityComparer.[string].Default.Equals("a", "a") &&
+        !EqualityComparer.[string].Default.Equals("a", "b") 
       });
       
       test("System.Collections.Generic.EqualityComparer[list[string]].Default", () => {
-        EqualityComparer.[list[string]].Default.Equals(["a"], ["b"])
+        EqualityComparer.[list[string]].Default.Equals(["a"], ["a"]) &&
+        !EqualityComparer.[list[string]].Default.Equals(["a"], ["b"])
       });
 
       test("Struct default initialization", () => {
