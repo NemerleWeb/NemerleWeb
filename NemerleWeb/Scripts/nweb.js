@@ -990,30 +990,32 @@
     nweb.templateCollection = {};
 
 //#region CLR Typing
-//#endregion
+    //#endregion
 
-// Adding prototype methods
-    Array.prototype.getEnumerator = function() {
-        this.__enumeratorIndex = -1;
-        this.Current = null;
-        this.get_Current = function() {
-            return this.Current;
-        };
-        return this;
+    function arrayEnumerator() {
+        var obj = this;
+        return (function() {
+            return {
+                __enumeratorIndex: -1,
+                Current: null,
+                get_Current: function () { return this.Current; },
+                current: function() { return this.Current; },
+                dispose: function() { },
+                moveNext: function() {
+                    if (this.__enumeratorIndex >= obj.length) {
+                        return false;
+                    }
+
+                    this.__enumeratorIndex++;
+                    this.Current = obj[this.__enumeratorIndex];
+                    return this.__enumeratorIndex < obj.length;
+                },
+            };
+        })({});
     };
 
-    Array.prototype.dispose = Array.prototype.getEnumerator;
-
-    Array.prototype.moveNext = function() {
-        if (typeof this.__enumeratorIndex === 'undefined')
-            this.__enumeratorIndex = -1;
-        this.Current = this[this.__enumeratorIndex++];
-        return this.__enumeratorIndex < this.length;
-    };
-
-    Array.prototype.current = function() {
-        return this[this.__enumeratorIndex];
-    };
+    // Adding prototype methods
+    Array.prototype.getEnumerator = arrayEnumerator;
 
     Array.prototype.hd = function() {
         return this[0];
@@ -1079,28 +1081,7 @@
         };
     })();
 
-    String.prototype.getEnumerator = function() {
-        this.__enumeratorIndex = -1;
-        this.Current = null;
-        this.get_Current = function() {
-            return this.Current;
-        };
-        return this;
-    };
-
-    String.prototype.dispose = String.prototype.getEnumerator;
-
-    String.prototype.moveNext = function() {
-        if (typeof this.__enumeratorIndex === 'undefined')
-            this.__enumeratorIndex = -1;
-        this.__enumeratorIndex++;
-        this.Current = this[this.__enumeratorIndex];
-        return this.__enumeratorIndex < this.length;
-    };
-
-    String.prototype.current = function() {
-        return this[this.__enumeratorIndex];
-    };
+    String.prototype.getEnumerator = arrayEnumerator;
 
     window.System_String_GetHashCode = function(s) {
         var len = s.length;

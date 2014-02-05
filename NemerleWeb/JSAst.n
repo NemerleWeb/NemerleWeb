@@ -332,20 +332,12 @@ namespace NemerleWeb
         | For            { ItName : string; Collection : JSAst; Body : JSAst;
             public override Write(_indent = "" : string) : string
             {
-              match(Body)
-              {
-              | Undefined
-              | Void
-              | Literal(JSLiteral.Undefined())
-              | Literal(JSLiteral.String("undefined"))
-              | Literal(JSLiteral.String("")) => ""
-              | _ => $<#for(var $ItName in $(Collection.Write())) {
+              $<#for(var $ItName in $(Collection.Write())) {
 var $ItName = $(Collection.Write())[$ItName];
 $(Body.Write("  "))
-}#> 
-              }
+}#>
             }
-        }
+          }
         | Function
           {
             Name : string;
@@ -389,18 +381,11 @@ $<#function $Name(..$(Parameters; ",")) { $(Body.Write(indent + "  ")) }#>
             public override Write(indent = "" : string) : string
             {
               def elseBlock =
-                match(ElseBody)
-                {
-                | Undefined
-                | Void
-                | Literal(JSLiteral.Undefined())
-                | Literal(JSLiteral.String("undefined"))
-                | Literal(JSLiteral.String("")) => ""
-                | _ => $<# else {
+                if(IsEmptySequence(ElseBody)) ""
+                else $<# else {
 $(ElseBody.Write(indent + "  "))
-$indent}#>                
-                };
-                
+$indent}#>;
+              
               $<#$(indent)if($(Cond.Write())) { 
 $(Body.Write(indent + "  "))
 $indent}$elseBlock#>
@@ -756,35 +741,19 @@ $(indent)}
         | While          { Cond : JSAst; Body : JSAst;
             public override Write(indent = "" : string) : string
             {
-              match(Body)
-              {
-              | Undefined
-              | Void
-              | Literal(JSLiteral.Undefined())
-              | Literal(JSLiteral.String("undefined"))
-              | Literal(JSLiteral.String("")) => ""
-              | _ => $<#$(indent)while($(Cond.Write())) {
+              $<#$(indent)while($(Cond.Write())) {
 $(Body.Write(indent + "  "))
 $(indent)}
 #>
-              } 
             }
         }
         | WhileNamed     { Cond : JSAst; Body : JSAst; Name : string;
             public override Write(indent = "" : string) : string
             {
-              match(Body)
-              {
-                | Undefined
-                | Void
-                | Literal(JSLiteral.Undefined())
-                | Literal(JSLiteral.String("undefined"))
-                | Literal(JSLiteral.String("")) => ""
-                | _ => $<#$(indent)$Name: while($(Cond.Write())) {
+              $<#$(indent)$Name: while($(Cond.Write())) {
 $(Body.Write(indent + "  "))
 $(indent)}
-#> 
-              }
+#>
             }
         }
         | Pack     { Expr : JSAst; 
@@ -932,6 +901,17 @@ $(indent)}
         private GetDefinedJSName(name : string) : string
         {
           if(name == JSApiSpecial.JSThis) "this" else GetJSName(name)
+        }
+        
+        private static IsEmptySequence(ast : JSAst) : bool
+        {
+          | Undefined
+          | Void
+          | Literal(JSLiteral.Undefined())
+          | Literal(JSLiteral.String("undefined"))
+          | Literal(JSLiteral.String("")) => true
+          | Label(_, body) => IsEmptySequence(body)
+          | _ => false
         }
     }
 }
