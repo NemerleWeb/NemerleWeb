@@ -707,7 +707,7 @@ $(indent)}
         }
         | TupleIndexer          { Obj : JSAst; Pos : int;
           public override Write(_indent = "" : string) : string {            
-            $<#$(Obj.Write())[Field$Pos]#>
+            $<#$(Obj.Write())[$Pos]#>
           }
           public override Transform() : JSAst {
             if(!IsAllowedForAssignment(Obj)) {

@@ -58,8 +58,7 @@ namespace NemerleWeb
         else
         if(type is FixedType.Tuple(args))
         {
-          def asts = args.Map(arg => GetJSAst(arg));          
-          JSAst.Object(asts.MapI((i, ast) => ($"Field$i", ast)))
+          JSAst.Tuple(args.Map(arg => GetJSAst(arg)))
         }
         else
           // Check predefined types
