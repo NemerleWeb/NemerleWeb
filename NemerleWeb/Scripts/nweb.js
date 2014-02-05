@@ -1151,6 +1151,10 @@
             return x.toString() === y.toString();
         }
 
+        if (nweb.utils.isArray(x) && nweb.utils.isArray(y)) {
+            return nweb.utils.areArrayEqual(x, y);
+        }
+
         // At last checking prototypes as good a we can
         if (!(x instanceof Object && y instanceof Object)) {
             return false;

@@ -41,12 +41,12 @@ module Program
 [Unit]
 public class Test
 {
-  static StaticOut(a : out int) : int { a=1;2}
-  
- StaticOutTest() : int
+  OutTest() : void
   {
-    mutable a;
-    StaticOut(out a);
+    _=EqualityComparer.[string].Default.Equals("a", "b");
+        
+        
+
   }
   
   [Html]
