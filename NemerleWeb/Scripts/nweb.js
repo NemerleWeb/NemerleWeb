@@ -1152,7 +1152,7 @@
         }
 
         if (nweb.utils.isArray(x) && nweb.utils.isArray(y)) {
-            return nweb.utils.areArrayEqual(x, y);
+            return nweb.collection.areArrayEqual(x, y);
         }
 
         // At last checking prototypes as good a we can
