@@ -37,31 +37,18 @@ module Program
   }
 }
 
- [Unit]
-    class InitializerTest
-    {
-      public ListInit : list[int] = [1, 2, 3];
-      public TupleInit : int * string * double = (1, "a", 2.0);
-      
-      public IntInit : int = 10;
-      public DoubleInit : double = 20.0;
-      public StringInit : string = "x";
-      
-      F() : void {}
-      static G() : void {}
-      X : int { get { 0} }
-      static Y : int { get { 1 } }
-    }
     
 [Unit]
 public class Test
 {
-F() : void
-{
+  static StaticOut(a : out int) : int { a=1;2}
   
-        document.body.onkeydown = e => null;
-}
-
+ StaticOutTest() : int
+  {
+    mutable a;
+    StaticOut(out a);
+  }
+  
   [Html]
   public View() : string
   {

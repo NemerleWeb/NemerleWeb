@@ -23,15 +23,15 @@ namespace NemerleWeb
     {
       Build(expr, currentScopeDefs, methodHeader, None())
     }
-        
+    
     Build(
       expr : TExpr,
       currentScopeDefs : list[string * string],
       methodHeader : TFunHeader,
       paramKind : option[ParmKind]) : JSAst
-    {
-      def build = Build(_, currentScopeDefs, methodHeader);
-                  
+    {      
+      def build(expr) { Build(expr, currentScopeDefs, methodHeader); }
+      
       match(expr) 
       {
       | Array(args, _dims)                => JSAst.Array(args.Map(build))

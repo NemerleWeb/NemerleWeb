@@ -504,7 +504,7 @@ $(Body.Write(indent + "  "))
           }
         | ParamRef       { Name : string; Type : option[TypeVar];
             public override Write(_ = "" : string) : string {
-                $<#$(GetDefinedJSName(Name)).value#>
+                $<#$(GetDefinedJSName(Name))._nw_value#>
             }
         }
         | MethodRef
@@ -607,13 +607,14 @@ $(Body.Write(indent + "  "))
                 $<#..$(ss; ";" + Environment.NewLine)#>
             }
             public override Transform() : JSAst {
-                match(Items) {
+                match(Items)
+                {
                 | [DefValue(JSAstHelper.ReturnValue, Void), 
                    Assign(LocalRef(JSAstHelper.ReturnValue, _), toReturn), 
                    Return(LocalRef(JSAstHelper.ReturnValue, _))] =>
                    
                   JSAst.Return(toReturn)
-                | x :: [] => x
+                | [x] => x
                 //| xs => JSAst.Seq(xs.Map(x => x.Transform()))
                 | _ => this
                 }
@@ -758,12 +759,12 @@ $(indent)}
         }
         | Pack     { Expr : JSAst; 
           public override Write(indent = "" : string) : string {
-            JSAst.Assign(Expr, JSAst.Object([("value", Expr)])).Write(indent)
+            JSAst.Assign(Expr, JSAst.Object([("_nw_value", Expr)])).Write(indent)
           }
         }
         | Unpack     { Expr : JSAst; 
           public override Write(indent = "" : string) : string {
-            JSAst.Assign(Expr, JSAst.FieldRef(Expr, "value")).Write(indent)
+            JSAst.Assign(Expr, JSAst.FieldRef(Expr, "_nw_value")).Write(indent)
           }
         }
         | NotImpl { 
@@ -810,7 +811,6 @@ $(indent)}
             typeof(JSAst.ArrayIndexer),
             typeof(JSAst.Label),
             typeof(JSAst.Object),
-            typeof(JSAst.Unpack),
             typeof(JSAst.GlobalRef),
             typeof(JSAst.ServerCall),
             typeof(JSAst.Function),
