@@ -883,14 +883,14 @@
             // Check return value
             if (!window.isNaN(res) && window.isFinite(res)) {
                 if (result != null) {
-                    result.value = res;
+                    result._nw_value = res;
                 }
                 return true;
             }
         }
 
         if (result != null) {
-            result.value = 0;
+            result._nw_value = 0;
         }
         return false;
     };
@@ -912,14 +912,14 @@
             // Check return value
             if (!window.isNaN(res) && window.isFinite(res)) {
                 if (result != null) {
-                    result.value = res;
+                    result._nw_value = res;
                 }
                 return true;
             }
         }
 
         if (result != null) {
-            result.value = 0;
+            result._nw_value = 0;
         }
         return false;
     };

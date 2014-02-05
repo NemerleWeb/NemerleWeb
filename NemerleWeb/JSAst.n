@@ -346,7 +346,9 @@ $(Body.Write("  "))
           
             public override Write(indent = "" : string) : string
             {
-$<#function $Name(..$(Parameters; ",")) { $(Body.Write(indent + "  ")) }#>
+              def (seqIndent, bodyIndent) = if(Body is JSAst.Seq) ("\n", "  ") else (" ", "");
+              
+$<#function $Name(..$(Parameters; ",")) {$seqIndent$(Body.Write(indent + bodyIndent)) }#>
             }
           }
         | GlobalRef
