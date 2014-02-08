@@ -37,13 +37,17 @@ module Program
   }
 }
 
+    
 [Unit]
 public class Test
 {
-    F(): void
-    {
-      throw ArgumentException("A");
-    }
+  OutTest() : void
+  {
+    _=EqualityComparer.[string].Default.Equals("a", "b");
+        
+        
+
+  }
   
   [Html]
   public View() : string

@@ -271,7 +271,10 @@ namespace NemerleWeb
             def newExprs =
               match(exprs.Rev())
               {
-              | (JSAst.Unpack as u) :: (JSAst.Call as c) :: rest => u :: delayAssignment(c) :: rest
+              | (JSAst.Unpack as u) :: (JSAst.Call as c) :: rest =>
+                u :: delayAssignment(c) :: rest
+              | Seq([JSAst.Unpack]) as u :: (JSAst.Call as c) :: rest =>
+                u :: delayAssignment(c) :: rest
               | last :: allButLast => delayAssignment(last) :: allButLast
               | r => r
               };

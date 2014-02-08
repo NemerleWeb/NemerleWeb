@@ -67,7 +67,9 @@ namespace NemerleWeb
       JSClass.StringType = <[ ttype : System.String ]>;
       JSClass.IPageType = <[ ttype: IPage ]>;
       JSClass.ObjectType = <[ ttype: System.Object ]>;
-        
+      
+      def debug = typer.Env.Defines.Contains("DEBUG");
+      
       def translateMethod(typer) 
       {
         match(typer.CurrentFunction.body) 
@@ -90,8 +92,15 @@ namespace NemerleWeb
         typeBuilder.MethodBeforeStage3 += (_, e) => translateMethod(e.Typer);        
         typeBuilder.DoBeforeFinalization(() => {
           def jsClass = JSClass(typeBuilder, "  ", typer);
-          AddMainData(typeBuilder, jsClass.Write(), getAncesterCount(typeBuilder));
-          AddStaticFields(typeBuilder, jsClass.GetStaticConstructorBody(""));
+          AddMainData(typeBuilder, jsClass.Write(debug), getAncesterCount(typeBuilder));
+          
+          def staticBody = StringBuilder();
+          _ = staticBody
+            .AppendWhen(debug, _.AppendLine($"// $(typeBuilder.FullName) - Static constructor body"))
+            .AppendLineValue(jsClass.GetStaticFieldsDefaultInit(""))
+            .AppendLineValue(jsClass.GetStaticConstructorBody(""));
+            
+          AddStaticFields(typeBuilder, staticBody.ToString());
         });
       }
       

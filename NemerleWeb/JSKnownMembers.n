@@ -72,7 +72,8 @@ namespace NemerleWeb
         .Where(isRefOut)
         .Select(p => builder'(p.expr))
         .Where(expr => !(expr is JSAst.ParamRef()))
-        .Select(expr => JSAst.Pack(expr));
+        .Select(expr => JSAst.Pack(expr))
+        .NToList();
       
       def callAst =
         match (call)
@@ -131,7 +132,7 @@ namespace NemerleWeb
         | Call(s, _, _) => 
           assert2(false);
           Message.Error(s.Location, $"Unsupported call to $s"); JSAst.Void()          
-        }
+        };
       
       // Unpack ref/out
       // x = x.value
@@ -139,10 +140,11 @@ namespace NemerleWeb
         .Where(isRefOut)
         .Select(p => builder'(p.expr))
         .Where(expr => !(expr is JSAst.ParamRef()))
-        .Select(expr => JSAst.Unpack(expr));
+        .Select(expr => JSAst.Unpack(expr))
+        .NToList();
       
       if(packRefOut.Any())
-        JSAst.Seq([JSAst.Seq(packRefOut.NToList()), callAst, JSAst.Seq(unpackRefOut.NToList())])
+        JSAst.Seq([JSAst.Seq(packRefOut), callAst, JSAst.Seq(unpackRefOut)])
       else
         callAst
     }
