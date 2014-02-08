@@ -5,10 +5,13 @@ using Nemerle.Utility;
 using Nemerle.Extensions;
 
 using System;
+using System.Web;
 using System.Collections.Generic;
 using System.Linq;
 using NemerleWeb;
 using NemerleWeb.TypedJS;
+
+using Rsdn.NavTree;
 
 namespace Rsdn
 {    
@@ -17,12 +20,10 @@ namespace Rsdn
   {    
     public mutable static Instance : MainPage;
     public enum State { | Tree | Content | JumpList };
-    
-    
+        
     public Pinned : Pinned { get; set; }
     
     Root : TreeNode { get; set; }
-    Popular : TreeNode { get; set; }
     Search : Search { get; set; }
     
     ActiveNodes : list[TreeNode] { get; set; }
@@ -48,13 +49,6 @@ namespace Rsdn
         console.log("loaded top node");
         Root = TreeNode() <- (
           Children = nodes.ToList()
-        );
-      });
-      
-      _ = server.GetPopularNodes(nodes => {
-        def pinned = Pinned.GetPinned();
-        Popular = TreeNode() <- (
-          Children = nodes.Where(n => !pinned.Any(p => p != n.Id)).ToList()
         );
       });
     }
@@ -157,10 +151,6 @@ namespace Rsdn
           <div visible="$(CurrentState == State.Content)" class="mobile-right">
             <iframe src="$(SelectedNodeUrl)" frameborder="0" border="0" />
           </div>
-          <div $when(CurrentState == State.JumpList) class="jump-list">
-            <div template="$(Pinned.Node)" />
-            <div template="$Popular" />
-          </div>
         </div>
       #>
     }    
@@ -169,17 +159,15 @@ namespace Rsdn
     {
       public GetTopNodes() : IEnumerable[TreeNode]
       {
-        TreeLoader.GetTopNodes()
+        TreeLoader.Service.GetChildren(".", HttpContext.Current.Request)
+                  .Select(TreeLoader.MapToTreeNode)
       }
       
       public LoadByIds(ids : IEnumerable[string]) : IEnumerable[TreeNode]
       {
-        TreeLoader.LoadByIds(ids)
-      }
-      
-      public GetPopularNodes() : IEnumerable[TreeNode]
-      {
-        TreeLoader.GetPopularNodes();
+        TreeLoader.Service
+                  .LoadByIds(ids, HttpContext.Current.Request)
+                  .Select(TreeLoader.MapToTreeNode)
       }
     }
   }

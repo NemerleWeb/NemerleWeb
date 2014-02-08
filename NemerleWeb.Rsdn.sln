@@ -12,7 +12,7 @@ Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb", "NemerleWeb\Ne
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Macros", "NemerleWeb.Macros\NemerleWeb.Macros.nproj", "{B1454534-CABD-4ABE-CC8E-DDFF34F51B14}"
 EndProject
-Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.Rsdn", "NemerleWeb.Rsdn\NemerleWeb.Rsdn.nproj", "{528E84E5-86EE-4771-B8F9-EE3373629D93}"
+Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "Rsdn", "NemerleWeb.Rsdn\Rsdn.nproj", "{528E84E5-86EE-4771-B8F9-EE3373629D93}"
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "TSParser", "TSParser\TSParser.nproj", "{ABCBBBEA-C0CD-4C8E-A18E-D97D59F21B14}"
 EndProject
@@ -21,6 +21,8 @@ EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "Rsdn.Tree", "NemerleWeb.Rsdn.Tree\Rsdn.Tree.nproj", "{265B5CEB-D5AD-47B0-A1B1-235E1422ABA7}"
 EndProject
 Project("{EDCC3B85-0BAD-11DB-BC1A-00112FDE8B61}") = "NemerleWeb.TypedClr", "NemerleWeb.TypedClr\NemerleWeb.TypedClr.nproj", "{3AF4BC0F-7B1F-4C66-B221-75D722170EB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rsdn.NavTree", "Rsdn.NavTree\Rsdn.NavTree.csproj", "{53903A2B-FEB7-4F1F-AE9D-E01F014E6AC3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -86,6 +88,14 @@ Global
 		{3AF4BC0F-7B1F-4C66-B221-75D722170EB9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3AF4BC0F-7B1F-4C66-B221-75D722170EB9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{3AF4BC0F-7B1F-4C66-B221-75D722170EB9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{53903A2B-FEB7-4F1F-AE9D-E01F014E6AC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53903A2B-FEB7-4F1F-AE9D-E01F014E6AC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53903A2B-FEB7-4F1F-AE9D-E01F014E6AC3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{53903A2B-FEB7-4F1F-AE9D-E01F014E6AC3}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{53903A2B-FEB7-4F1F-AE9D-E01F014E6AC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53903A2B-FEB7-4F1F-AE9D-E01F014E6AC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53903A2B-FEB7-4F1F-AE9D-E01F014E6AC3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{53903A2B-FEB7-4F1F-AE9D-E01F014E6AC3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

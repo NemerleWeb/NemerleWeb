@@ -1,0 +1,58 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Web;
+using System.Web.Routing;
+using System.Collections.Generic;
+using System.Linq;
+
+using Rsdn.NavTree;
+
+namespace Rsdn
+{  
+  public class NWebTreeService : INavTreeService
+  {    
+    public GetChildren(parentID : string, _requestContext : HttpRequest) : IEnumerable[NodeData]
+    {
+      if(parentID == ".")
+        TreeLoader.GetTopNodes().Select(MapToNodeData)
+      else 
+        TreeLoader.LoadNodeChildren(parentID).Select(MapToNodeData)
+    }
+    
+    public LoadByIds(ids : IEnumerable[string], _requestContext : HttpRequest) : IEnumerable[NodeData]
+    {
+      TreeLoader.LoadByIds(ids)
+                .Select(MapToNodeData)
+    }
+    
+    public Search(term : string, _requestContext : HttpRequest) : IEnumerable[NodeData]
+    {
+      TreeLoader.Search(term)
+                .Select(MapToNodeData)
+    }
+    
+    MapToNodeData(node : TreeNode) : NodeData
+    {
+      NodeData("", NodeInfo(node.Id, node.Caption, GetIconUrl(node), GetHref(node.Href), SortOrder.Normal, node.LoadOnDemand))
+    }
+    
+    GetHref(href : string) : string
+    {
+      if(href == null || href.StartsWith("http://")) href else "http://www.rsdn.ru/" + href;
+    }
+    
+    GetIconUrl(node : TreeNode) : string
+    {
+      def suffix = match(node.IsOpened, node.LoadOnDemand || node.Children != null) {
+                      | (false, true) => "c.gif" 
+                      | (true, _) => "o.gif";
+                      | _ => "s.gif";
+                     };
+      "http://rsdn.ru/images/tree/" + node.Icon + suffix;
+    }
+  }
+}

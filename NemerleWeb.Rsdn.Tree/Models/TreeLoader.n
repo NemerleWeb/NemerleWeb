@@ -12,17 +12,22 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Xml.Linq;
 using System.Web;
+using System.Web.Routing;
+
+using Rsdn.NavTree;
 
 namespace Rsdn
 {
-  module TreeLoader
+  public module TreeLoader
   {
+    public Service : INavTreeService { get; set; }
+    
     _tree : TreeNode;
     _childrenById : ConcurrentDictionary[string, List[TreeNode]] = ConcurrentDictionary();
     _searchTerms : SortedDictionary[string, int] = SortedDictionary();
     _searchTermResults : ConcurrentDictionary[string, array[TreeNode]] = ConcurrentDictionary();
     _leaves : IEnumerable[TreeNode];
-    
+        
     this()
     {
       def xml = File.ReadAllText(HttpContext.Current.Server.MapPath("~/App_Data/tree.xml"), Encoding.GetEncoding("windows-1251"));
@@ -42,8 +47,7 @@ namespace Rsdn
             Href = element.Attribute("href")?.Value,
             Icon = element.Attribute("icon")?.Value,
             Hide = element.Attribute("hide")?.Value == "1",
-            HasChildren = childNodes.Count > 0,
-            Depth = depth,
+            LoadOnDemand = childNodes.Count > 0,
             Children = childNodes,
           );
         }
@@ -94,22 +98,26 @@ namespace Rsdn
     SearchLeavesForTerm(term : string) : IEnumerable[TreeNode]
     {
       _leaves.Where((node : TreeNode, _) => node.Caption?.ToLower().Contains(term.ToLower()))
-             .Select(n => CloneNoChildren(n, true))      
+             .Select(n => CloneNoChildren(n))      
     }
     
     public LoadByIds(ids : IEnumerable[string]) : IEnumerable[TreeNode]
     {
-      _leaves.Where(n => ids.Any(i => i == n.Id)).Select(n => CloneNoChildren(n, true))
+      _leaves.Where(n => ids.Any(i => i == n.Id)).Select(n => CloneNoChildren(n))
     }
     
-    public GetPopularNodes() : IEnumerable[TreeNode]
-    {
-      def popularForums = ["Nemerle", ".NET", "О жизни", "Коллеги, улыбнитесь", "Работа", "Веб программирование"];
-      _leaves.Where(l => popularForums.Any(p => p == l.Caption) && l.Icon == "fr")
-             .Select(n => CloneNoChildren(n, true));
+    public MapToTreeNode(node : NodeData) : TreeNode
+    {        
+      TreeNode() <- ( 
+        Id = node.Info.ID,
+        Caption = node.Info.DisplayName,
+        IconUrl = node.Info.ImageUrl,
+        Href = node.Info.Url,        
+        LoadOnDemand = node.Info.LoadOnDemand
+      )
     }
     
-    CloneNoChildren(node : TreeNode, resetDepth = false : bool) : TreeNode
+    CloneNoChildren(node : TreeNode) : TreeNode
     {
       TreeNode() <- (
         Id = node.Id,
@@ -117,9 +125,8 @@ namespace Rsdn
         Href = node.Href,
         Icon = node.Icon,
         Hide = node.Hide,
-        Depth = if(resetDepth) 0 else node.Depth,
-        HasChildren = node.HasChildren        
-      )      
+        LoadOnDemand = node.LoadOnDemand
+      )
     }
   }
 }

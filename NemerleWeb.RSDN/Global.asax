@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.n" Inherits="NemerleWeb.Rsdn.MvcApplication" Language="Nemerle" %>
+﻿<%@ Application Codebehind="Global.asax.n" Inherits="Rsdn.MvcApplication" Language="Nemerle" %>
