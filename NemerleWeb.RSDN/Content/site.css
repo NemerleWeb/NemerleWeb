@@ -29,7 +29,7 @@ a img {
     font-size: 12px;
     position: relative;
     clear: both;
-    margin: 2px 0;
+    margin: 2px 0 0 10px;
 }
 
 .node-loading {
@@ -56,12 +56,13 @@ a img {
 .node .node-icon {
     display: block;
     float: left;
-    width: 32px;
+    width: 18px;
+    height: 18px;
 }
 
 .node .node-caption {
     display: block;
-    margin-left: 35px;
+    margin-left: 25px;
     padding-right: 26px;
 }
 

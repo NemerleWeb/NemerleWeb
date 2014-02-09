@@ -67,7 +67,7 @@ namespace Rsdn
     public View() : string
     {
       <#        
-        <div $foreach(c in Children) style="margin-left: 10px" class="node">
+        <div $foreach(c in Children) style="" class="node">
           <a click="$(c.CaptionClick())" href="$("http://www.rsdn.ru" + c.Href)">
             <img class="node-icon" src="$(c.IconUrl)" />
             <span class="node-caption" css-is-active="$(c.IsActive)">

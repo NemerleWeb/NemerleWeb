@@ -36,6 +36,11 @@ namespace NemerleWeb.Website.Controllers
       View("Content", GetContent("Tutorial") : object);
     }
     
+    public TutorialSample(sample : string) : ActionResult
+    {        
+      View("TutorialSample", sample);
+    }
+    
     public Samples() : ActionResult
     {
       View("Index", (NWeb SamplesPage()) : object);

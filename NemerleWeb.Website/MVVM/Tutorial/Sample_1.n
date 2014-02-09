@@ -9,9 +9,9 @@ using System.Linq;
 using NemerleWeb;
 
 namespace NemerleWeb.Website
-{
+{  
   [Unit]
-  public class SamplePage
+  public class Sample_1
   {
     public Name : string = "Stranger";
     

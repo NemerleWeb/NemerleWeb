@@ -47,12 +47,19 @@ namespace Rsdn
     
     GetIconUrl(node : TreeNode) : string
     {
-      def suffix = match(node.IsOpened, node.LoadOnDemand || node.Children != null) {
-                      | (false, true) => "c.gif" 
-                      | (true, _) => "o.gif";
-                      | _ => "s.gif";
-                     };
-      "http://rsdn.ru/images/tree/" + node.Icon + suffix;
+      def isLeaf = (!node.LoadOnDemand && node.Children == null);
+      def filename = match(isLeaf, node.Icon) {
+      | (true, "mag")  => "/Images/article18.png"
+      | (false, "mag") => "/Images/mag18.png"
+      | (true, "at")   => "/Images/article18.png"
+      | (false, "at")  => "/Images/folder18.png"
+      | (true, "fl")   => "/Images/files18.png"
+      | (false, "fl")  => "/Images/filefolder18.png"
+      | (true, "fr")   => "/Images/forum18.png"
+      | (false, "fr")  => "/Images/forumfolder18.png"
+      | _ => "/Images/forum18.png"
+      }
+      "http://www.rsdn.ru" + filename
     }
   }
 }

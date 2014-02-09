@@ -307,6 +307,12 @@
     <Content Include="Scripts\splitter.js">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Views\Home\Tree.cshtml">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Views\Shared\TreeLayout.cshtml">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

@@ -15,5 +15,10 @@ namespace Rsdn.Controllers
     {      
       View();
     }
+    
+    public Tree() : ActionResult
+    {
+      View();
+    }    
   }
 }

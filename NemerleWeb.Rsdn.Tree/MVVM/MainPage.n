@@ -19,7 +19,6 @@ namespace Rsdn
   public class MainPage
   {    
     public mutable static Instance : MainPage;
-    public enum State { | Tree | Content | JumpList };
         
     public Pinned : Pinned { get; set; }
     
@@ -32,10 +31,6 @@ namespace Rsdn
     
     CurrentView : string { get { if(IsMobile) "MobileView" else "DesktopView"; } }
     IsMobile : bool { get; set; }
-    CurrentState : State { get; set; }
-    PreviousState : State { get; set; }
-    
-    mutable _splitterAdded : bool;
     
     public this(urlToOpen : string) 
     {
@@ -43,16 +38,13 @@ namespace Rsdn
       
       Search = Search();                       
       Pinned = Pinned();      
-      IsMobile = window.document.body.clientWidth < 1000;
+      IsMobile = window.top.document.body.clientWidth < 1000;
               
       _ = server.GetTopNodes(nodes => {
-        console.log("loaded top node");
         Root = TreeNode() <- (
           Children = nodes.ToList()
         );
       });
-      
-      (document.getElementById("asd") :> HTMLFrameElement).src = "";
     }
     
     public SelectNode(node : TreeNode) : void
@@ -61,10 +53,11 @@ namespace Rsdn
       | _ when node.Parent != null => node.Parent :: getAllParents(node.Parent)
       | _ => [];
       };
-            
+      
+      (window.top.document.getElementById("frmMain") :> HTMLFrameElement).src = node.Href;
+      
       SelectedNode = node;
       ActiveNodes = node :: getAllParents(node);
-      CurrentState = State.Content;
     }
     
     public IsActiveNode(node : TreeNode) : bool 
@@ -72,91 +65,24 @@ namespace Rsdn
       ActiveNodes?.Any(n => n.Id == node.Id);
     }
     
-    public ToggleJumpList() : void
-    {
-      if(CurrentState == State.JumpList) {
-        CurrentState = PreviousState;
-      } else {
-        PreviousState = CurrentState;
-        CurrentState = State.JumpList;
-      }
-    }
-    
     [Html]
     public View() : string
     {
       <#
-        <div template="$(this, CurrentView)" />
-      #> 
-    }
-    /*
-        
-      <#
-        <div>
-          <div $when(isA)>
-            A
-            <div $when(isAA)>AA</div>
-          </div>
-          <div></div>
-        </div>
-      #>
-    */
-    
-    [Html]
-    public DesktopView() : string
-    {
-      <#
         <div class="page">
-          <div class="left">
-            <div $when(Root != null) class="root">
-              <div template="$Search" />
-              <div $when(string.IsNullOrEmpty(Search.SearchTerm))>
-                <div class="pinned-nodes">
-                  <div template="$(Pinned.Node)" />
-                </div>
-                <div template="$Root" />
+          <div $when(Root != null) class="root">
+            <div template="$Search" />
+            <div $when(string.IsNullOrEmpty(Search.SearchTerm))>
+              <div class="pinned-nodes">
+                <div template="$(Pinned.Node)" />
               </div>
+              <div template="$Root" />
             </div>
-          </div>
-          <div class="right">
-            <iframe src="$(SelectedNodeUrl)" frameborder="0" border="0" />
           </div>
         </div>
       #>
     }
-    
-    [Html]
-    public MobileView() : string
-    {
-      <#
-        <div class="mobile">
-          <div class="mobile-toolbar">
-            <span $when(CurrentState == State.Content) class="toggle-tree" click="$(CurrentState = State.Tree)">&lt</span>
-            <span $when(CurrentState == State.Tree && SelectedNode != null) class="toggle-tree" click="$(CurrentState = State.Content)">&gt</span>
-          
-            <span class="toggle-jump-list" click="$(ToggleJumpList())">jump</span>
-            <span $when(CurrentState == State.Content && !Pinned.IsPinned(SelectedNode)) click="$(Pinned.AddPinned(SelectedNode.Id))">
-              pin
-            </span>
-            <span $when(CurrentState == State.Content && Pinned.IsPinned(SelectedNode)) click="$(Pinned.RemovePinned(SelectedNode.Id))">
-              unpin
-            </span>
-          </div>
-          <div $when(CurrentState == State.Tree)>
-            <div $when(Root != null) class="root">
-              <div template="$Search" />
-              <div $when(string.IsNullOrEmpty(Search.SearchTerm))>
-                <div template="$Root" />
-              </div>
-            </div>
-          </div>
-          <div visible="$(CurrentState == State.Content)" class="mobile-right">
-            <iframe src="$(SelectedNodeUrl)" frameborder="0" border="0" />
-          </div>
-        </div>
-      #>
-    }    
-    
+        
     public class Server
     {
       public GetTopNodes() : IEnumerable[TreeNode]

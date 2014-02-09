@@ -153,7 +153,7 @@ $<#
       });
       */
       [$<#
-<script type="text/javascript" src="$CombinedScriptsFilename"></script> #>]
+<script type="text/javascript" src="\$CombinedScriptsFilename"></script> #>]
       
     }
     
@@ -170,7 +170,7 @@ $content
     public GetNemerleWebScripts() : string
     {
       $<#
-<script type="text/javascript" src="$ResourcesFilename"></script> #>
+<script type="text/javascript" src="\$ResourcesFilename"></script> #>
     }
   }
   

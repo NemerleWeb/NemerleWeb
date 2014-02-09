@@ -279,6 +279,9 @@
       <SubType>Code</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="MVVM\Tutorial\TutorialSamples.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\WorkbenchPage.n">
       <SubType>Code</SubType>
     </Compile>
@@ -338,6 +341,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Views\Home\Index.cshtml">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Views\Home\TutorialSample.cshtml">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Web.config" />
