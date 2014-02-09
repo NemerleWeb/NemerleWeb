@@ -263,6 +263,9 @@
       <SubType>Code</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="MVVM\SourceLoader.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\Tests\ServerTestPage.n">
       <SubType>Code</SubType>
     </Compile>
@@ -271,6 +274,10 @@
     </Compile>
     <Compile Include="MVVM\Tests\UnitTestPage.n">
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MVVM\Tutorial\Sample_1.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="MVVM\WorkbenchPage.n">
       <SubType>Code</SubType>
@@ -351,6 +358,7 @@
     <Folder Include="Infrastructure\" />
     <Folder Include="installer\" />
     <Folder Include="MVVM" />
+    <Folder Include="MVVM\Tutorial" />
     <Folder Include="MVVM\Samples\" />
     <Folder Include="MVVM\Samples\Knockout\" />
     <Folder Include="MVVM\Samples\Peg" />

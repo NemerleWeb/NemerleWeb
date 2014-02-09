@@ -27,8 +27,10 @@ namespace Rsdn
     public LoadOnDemand : bool { get; set; }
     
     public Parent : TreeNode { get; set; }
-    public IsLoading : bool { get; set; }    
-    public IsSelected : bool { get; set; }
+    
+    public IsLoading : bool { get; set; }
+    public IsPinned : bool { get { MainPage.Instance?.Pinned?.IsPinned(this) } }    
+    public IsActive : bool { get { MainPage.Instance?.IsActiveNode(this) } }
     
     public TogglePin() : void
     {            
@@ -61,22 +63,17 @@ namespace Rsdn
       }
     }
     
-    public IsPinnedNode(node : TreeNode) : bool
-    {
-      MainPage.Instance.Pinned.IsPinned(node)
-    }
-    
     [Html]
     public View() : string
     {
       <#        
-        <div $foreach(c in Children) style="margin-left: 10px" class="node" css-selected-search-result="$(c.IsSelected)">
+        <div $foreach(c in Children) style="margin-left: 10px" class="node">
           <a click="$(c.CaptionClick())" href="$("http://www.rsdn.ru" + c.Href)">
             <img class="node-icon" src="$(c.IconUrl)" />
-            <span class="node-caption" css-is-active="$(MainPage.Instance.IsActiveNode(c))">
+            <span class="node-caption" css-is-active="$(c.IsActive)">
               $(c.Caption)
             </span>
-            <div click="$(c.TogglePin())" class="node-pin" css-pinned="$(IsPinnedNode(c))" />
+            <div $when(c.Children == null && (c.IsActive || c.IsPinned)) click="$(c.TogglePin())" class="node-pin" css-pinned="$(c.IsPinned)" />
           </a>
           <div $when(c.IsLoading) class="node-loading">
             Загрузка, пожалуйста подождите...

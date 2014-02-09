@@ -6,6 +6,7 @@ using NemerleWeb;
 using NemerleWeb.TypedJS;
 
 using System;
+using System.Web;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -73,7 +74,8 @@ namespace Rsdn
     {
       public LoadByIds(ids : IEnumerable[string]) : IEnumerable[TreeNode]
       {
-        TreeLoader.LoadByIds(ids)
+        TreeLoader.Service.LoadByIds(ids, HttpContext.Current.Request)
+                  .Select(TreeLoader.MapToTreeNode)
       }
     }
   }

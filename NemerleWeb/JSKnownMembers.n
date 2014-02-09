@@ -82,6 +82,8 @@ namespace NemerleWeb
           when serverMeth.Name == "get_server"
         | Call(MethodRef(obj = Call(MethodRef(TExpr.FieldMember, serverMeth, _, _), _, _), meth = meth), parms, _) 
           when serverMeth.Name == "get_server"
+        | Call(MethodRef(obj = Call(StaticRef(_, serverMeth, _), _, _), meth = meth), parms, _) 
+          when serverMeth.Name == "get_server"
         | Call(MethodRef(obj = Call(MethodRef(TExpr.LocalRef(decl), serverMeth, _, _), _, _), meth = meth), parms, _) 
           when serverMeth.Name == "get_server" && decl.Name == "_N_closurised_this_ptr" =>            
             def parameters =

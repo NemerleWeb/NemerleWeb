@@ -77,7 +77,6 @@ a img {
     background-image: url('/content/images/pin.png');
     width: 16px;
     height: 16px;
-    visibility: hidden;
 }
 
 .node .node-pin:hover {

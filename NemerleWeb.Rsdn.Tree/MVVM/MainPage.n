@@ -51,6 +51,8 @@ namespace Rsdn
           Children = nodes.ToList()
         );
       });
+      
+      (document.getElementById("asd") :> HTMLFrameElement).src = "";
     }
     
     public SelectNode(node : TreeNode) : void
