@@ -13,7 +13,7 @@ using Rsdn.NavTree;
 
 namespace Rsdn
 {  
-  public class NWebTreeService : INavTreeService
+  public class NWebTreeProvider : INavTreeProvider
   {    
     public GetChildren(parentID : string, _requestContext : HttpRequest) : IEnumerable[NodeData]
     {
@@ -33,6 +33,11 @@ namespace Rsdn
     {
       TreeLoader.Search(term)
                 .Select(MapToNodeData)
+    }
+    
+    public FindNodesByUrl(url : string, context : RequestContext) : IEnumerable[NodeInfo]
+    {
+      null
     }
     
     MapToNodeData(node : TreeNode) : NodeData

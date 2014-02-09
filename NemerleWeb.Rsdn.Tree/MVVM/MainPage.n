@@ -87,13 +87,13 @@ namespace Rsdn
     {
       public GetTopNodes() : IEnumerable[TreeNode]
       {
-        TreeLoader.Service.GetChildren(".", HttpContext.Current.Request)
+        TreeLoader.Provider.GetChildren(".", HttpContext.Current.Request)
                   .Select(TreeLoader.MapToTreeNode)
       }
       
       public LoadByIds(ids : IEnumerable[string]) : IEnumerable[TreeNode]
       {
-        TreeLoader.Service
+        TreeLoader.Provider
                   .LoadByIds(ids, HttpContext.Current.Request)
                   .Select(TreeLoader.MapToTreeNode)
       }

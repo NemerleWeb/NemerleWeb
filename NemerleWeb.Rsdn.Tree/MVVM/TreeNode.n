@@ -29,7 +29,7 @@ namespace Rsdn
     public Parent : TreeNode { get; set; }
     
     public IsLoading : bool { get; set; }
-    public IsPinned : bool { get { MainPage.Instance?.Pinned?.IsPinned(this) } }    
+    public IsPinned : bool { get { MainPage.Instance?.Pinned?.IsPinned(this) } }
     public IsActive : bool { get { MainPage.Instance?.IsActiveNode(this) } }
     
     public TogglePin() : void
@@ -89,7 +89,7 @@ namespace Rsdn
     {
       public LoadNodeChildren(id : string) : IEnumerable[TreeNode]
       {
-        TreeLoader.Service.GetChildren(id, HttpContext.Current.Request)
+        TreeLoader.Provider.GetChildren(id, HttpContext.Current.Request)
                   .Select(TreeLoader.MapToTreeNode).ToList();
       }
     }

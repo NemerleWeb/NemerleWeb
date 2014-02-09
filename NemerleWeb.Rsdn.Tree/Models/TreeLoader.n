@@ -20,7 +20,7 @@ namespace Rsdn
 {
   public module TreeLoader
   {
-    public Service : INavTreeService { get; set; }
+    public Provider : INavTreeProvider { get; set; }
     
     _tree : TreeNode;
     _childrenById : ConcurrentDictionary[string, List[TreeNode]] = ConcurrentDictionary();
@@ -41,7 +41,7 @@ namespace Rsdn
           
           _ = _childrenById.TryAdd(id, childNodes.Select(n => CloneNoChildren(n)).ToList());
           
-          TreeNode() <- (           
+          TreeNode() <- (
             Id = id,
             Caption = element.Attribute("caption")?.Value,
             Href = element.Attribute("href")?.Value,

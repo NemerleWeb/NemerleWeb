@@ -74,7 +74,7 @@ namespace Rsdn
     {
       public LoadByIds(ids : IEnumerable[string]) : IEnumerable[TreeNode]
       {
-        TreeLoader.Service.LoadByIds(ids, HttpContext.Current.Request)
+        TreeLoader.Provider.LoadByIds(ids, HttpContext.Current.Request)
                   .Select(TreeLoader.MapToTreeNode)
       }
     }

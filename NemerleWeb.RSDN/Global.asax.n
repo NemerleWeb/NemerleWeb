@@ -39,7 +39,7 @@ namespace Rsdn
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
             
-            TreeLoader.Service = NWebTreeService();
+            TreeLoader.Provider = NWebTreeProvider();
         }
     }
 }
