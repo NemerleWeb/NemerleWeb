@@ -40,7 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="INavTreeService.cs" />
+    <Compile Include="INavTreeProvider.cs" />
     <Compile Include="NodeData.cs" />
     <Compile Include="NodeInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
