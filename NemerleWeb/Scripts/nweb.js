@@ -245,6 +245,7 @@
         getCheckedBinding: function(model, el, bindings, loopStack, attrVal) {
             var expr = nweb.parseExpression(model, attrVal, loopStack);
             var $el = $(el);
+            var exprWithReturn = expr;
 
             if (expr.indexOf("return ") == 0)
                 expr = expr.slice(7);
@@ -258,7 +259,7 @@
             return {
                 el: el,
                 getValue: function() {
-                    return nweb.getParsedValue(model, expr, loopStack);
+                    return nweb.getParsedValue(model, exprWithReturn, loopStack);
                 },
                 apply: function(value) {
                     $el.prop("checked", value);
