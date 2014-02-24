@@ -246,6 +246,9 @@
             var expr = nweb.parseExpression(model, attrVal, loopStack);
             var $el = $(el);
 
+            if (expr.indexOf("return ") == 0)
+                expr = expr.slice(7);
+
             $(el).change(function() {
                 nweb.execute(function() {
                     eval(nweb.utils.makeAssignExpression(expr, "$el.prop('checked')"));
