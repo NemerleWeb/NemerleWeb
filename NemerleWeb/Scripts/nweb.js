@@ -210,34 +210,32 @@
                 expr = expr.slice(7);
 
             var $el = $(el);
-            if ($el.is(":text")) {
-                $el.on("keyup", function() {
-                    nweb.execute(function() {
-                        eval(nweb.utils.makeAssignExpression(expr, "$el.val()"));
-                    });
-                });
-            } else if (el.tagName.toUpperCase() === "TEXTAREA") {
-                $(el).keyup(function() {
-                    nweb.execute(function() {
-                        eval(nweb.utils.makeAssignExpression(expr, "val"));
-                    });
-                });
-            } else {
-                $(el).change(function() {
-                    nweb.execute(function() {
-                        eval(nweb.utils.makeAssignExpression(expr, "newVal"));
+            var parsedValue = nweb.getParsedValue(model, exprWithReturn, loopStack);
+            var isTextElement = $el.is(":text") || el.tagName.toUpperCase() === "TEXTAREA";
+            var invalidationEvent = isTextElement ? "keyup" : "change";
+
+            if (typeof parsedValue === "number") {
+                $el.on(invalidationEvent, function () {
+                    nweb.execute(function () {
+                        eval(nweb.utils.makeAssignExpression(expr, "+$el.val() ? +$el.val() : $el.val()"));
                     });
                 });
             }
-
-            $el.val(nweb.getParsedValue(model, exprWithReturn, loopStack));
+            else {
+                $el.on(invalidationEvent, function () {
+                    nweb.execute(function () {
+                        eval(nweb.utils.makeAssignExpression(expr, "$el.val()"));
+                    });
+                });
+            }
+            $el.val(parsedValue);
 
             return {
                 el: el,
-                getValue: function() {
+                getValue: function () {
                     return nweb.getParsedValue(model, exprWithReturn, loopStack);
                 },
-                apply: function(value) {
+                apply: function (value) {
                     nweb.setValue($el[0], value);
                 }
             };
