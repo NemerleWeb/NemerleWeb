@@ -41,15 +41,17 @@ namespace Rsdn
           
           _ = _childrenById.TryAdd(id, childNodes.Select(n => CloneNoChildren(n)).ToList());
           
-          TreeNode() <- (
+          def node = TreeNode() <- (
             Id = id,
             Caption = element.Attribute("caption")?.Value,
             Href = element.Attribute("href")?.Value,
-            Icon = element.Attribute("icon")?.Value,
+            ImageClassName = element.Attribute("icon")?.Value,
             Hide = element.Attribute("hide")?.Value == "1",
             LoadOnDemand = childNodes.Count > 0,
             Children = childNodes,
           );
+          node.ImageClassName = if(node.LoadOnDemand) node.ImageClassName + "s" else node.ImageClassName;
+          node;
         }
       }
             
@@ -111,7 +113,7 @@ namespace Rsdn
       TreeNode() <- ( 
         Id = node.Info.ID,
         Caption = node.Info.DisplayName,
-        IconUrl = node.Info.ImageUrl,
+        ImageClassName = node.Info.ImageClassName,
         Href = node.Info.Url,        
         LoadOnDemand = node.Info.LoadOnDemand
       )
@@ -122,8 +124,8 @@ namespace Rsdn
       TreeNode() <- (
         Id = node.Id,
         Caption = node.Caption,
+        ImageClassName = node.ImageClassName,
         Href = node.Href,
-        Icon = node.Icon,
         Hide = node.Hide,
         LoadOnDemand = node.LoadOnDemand
       )

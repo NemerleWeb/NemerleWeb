@@ -37,35 +37,21 @@ namespace Rsdn
     
     public FindNodesByUrl(url : string, context : RequestContext) : IEnumerable[NodeInfo]
     {
-      
       null
     }
     
     MapToNodeData(node : TreeNode) : NodeData
     {
-      NodeData("", NodeInfo(node.Id, node.Caption, GetIconUrl(node), GetHref(node.Href), SortOrder.Normal, node.LoadOnDemand))
+      NodeData("", NodeInfo(node.Id, node.Caption, node.ImageClassName, GetHref(node.Href), SortOrder.Normal, node.LoadOnDemand))
     }
     
     GetHref(href : string) : string
     {
-      if(href == null || href.StartsWith("http://")) href else "http://www.rsdn.ru/" + href;
-    }
-    
-    GetIconUrl(node : TreeNode) : string
-    {
-      def isLeaf = (!node.LoadOnDemand && node.Children == null);
-      def filename = match(isLeaf, node.Icon) {
-      | (true, "mag")  => "/Images/article18.png"
-      | (false, "mag") => "/Images/mag18.png"
-      | (true, "at")   => "/Images/article18.png"
-      | (false, "at")  => "/Images/folder18.png"
-      | (true, "fl")   => "/Images/files18.png"
-      | (false, "fl")  => "/Images/filefolder18.png"
-      | (true, "fr")   => "/Images/forum18.png"
-      | (false, "fr")  => "/Images/forumfolder18.png"
-      | _ => "/Images/forum18.png"
+      match(href) {
+      | null => "http://www.rsdn.ru"
+      | s when s.StartsWith("http://") => s
+      | s => "http://www.rsdn.ru" + s
       }
-      "http://www.rsdn.ru" + filename
-    }
+    }    
   }
 }

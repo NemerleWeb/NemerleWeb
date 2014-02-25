@@ -18,11 +18,10 @@ namespace Rsdn
   {
     public Id : string { get; set; }
     public Caption : string { get; set; }
-    public Icon : string { get; set; }
     public Hide : bool { get; set; }
     public IsOpened : bool { get; set; }
     public Children : List[TreeNode] { get; set; }
-    public IconUrl : string { get; set; }
+    public ImageClassName : string { get; set; }
     public Href : string {  get; set; }
     public LoadOnDemand : bool { get; set; }
     
@@ -67,10 +66,9 @@ namespace Rsdn
     public View() : string
     {
       <#        
-        <div $foreach(c in Children) style="" class="node">
-          <a click="$(c.CaptionClick())" href="$("http://www.rsdn.ru" + c.Href)">
-            <img class="node-icon" src="$(c.IconUrl)" />
-            <span class="node-caption" css-is-active="$(c.IsActive)">
+        <div $foreach(c in Children) class="node">
+          <a click="$(c.CaptionClick())" href="$(c.Href)">
+            <span class="$(c.ImageClassName + " node-caption")" css-is-active="$(c.IsActive)">
               $(c.Caption)
             </span>
             <div $when(c.Children == null && (c.IsActive || c.IsPinned)) click="$(c.TogglePin())" class="node-pin" css-pinned="$(c.IsPinned)" />

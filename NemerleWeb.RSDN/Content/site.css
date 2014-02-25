@@ -62,12 +62,46 @@ a img {
 
 .node .node-caption {
     display: block;
-    margin-left: 25px;
+    padding-left: 25px;
     padding-right: 26px;
+    background-repeat: no-repeat;
+    background-image: url(http://www.rsdn.ru/Images/forum18.png);
 }
 
 .node .node-caption.is-active {
     font-weight: bold;
+}
+
+.node-caption.mag {
+    background-image: url(http://www.rsdn.ru/Images/article18.png);
+}
+
+.node-caption.mags {
+    background-image: url(http://www.rsdn.ru/Images/mag18.png);
+}
+
+.node-caption.at {
+    background-image: url(http://www.rsdn.ru/Images/article18.png);
+}
+
+.node-caption.ats {
+    background-image: url(http://www.rsdn.ru/Images/folder18.png);
+}
+
+.node-caption.fl {
+    background-image: url(http://www.rsdn.ru/Images/files18.png);
+}
+
+.node-caption.fls {
+    background-image: url(http://www.rsdn.ru/Images/filefolder18.png);
+}
+
+.node-caption.fr {
+    background-image: url(http://www.rsdn.ru/Images/forum18.png);
+}
+
+.node-caption.frs {
+    background-image: url(http://www.rsdn.ru/Images/forumfolder18.png);
 }
 
 .node .node-pin {

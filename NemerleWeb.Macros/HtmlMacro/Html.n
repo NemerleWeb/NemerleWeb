@@ -57,7 +57,7 @@ namespace NemerleWeb
           | Some(result) => 
             def pexpr = XmlAstToXLinq(typer, parser).Transform(result);
             def tempMethodName = Name("_N_" + mb.Name);
-            typer.CurrentTypeBuilder.DefineWithSource(<[ decl:
+            typer.CurrentTypeBuilder.Define(<[ decl:
               [HtmlTyped]
               public $(tempMethodName : name)() : list[object] {
                 def tag(name, expr : object) : object { (name, expr) };

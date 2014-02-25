@@ -1,58 +1,28 @@
 ﻿namespace Rsdn.NavTree
 {
 	public class NodeInfo
-	{
-		private readonly string _id;
-		private readonly string _displayName;
-		private readonly string _imageUrl;
-		private readonly string _url;
-		private readonly SortOrder _sortOrder;
-		private readonly bool _loadOnDemand;
+    {
+        public string ID { get; private set; }
+        public string DisplayName { get; private set; }
+        public string ImageClassName { get; private set; }
+        public string Url { get; private set; }
+        public SortOrder SortOrder { get; private set; }
+        public bool LoadOnDemand { get; private set; }
 
 		public NodeInfo(
 			string id,
 			string displayName,
-			string imageUrl,
+			string imageClassName,
 			string url,
 			SortOrder sortOrder = SortOrder.Normal,
 			bool loadOnDemand = false)
 		{
-			_id = id;
-			_displayName = displayName;
-			_imageUrl = imageUrl;
-			_url = url;
-			_sortOrder = sortOrder;
-			_loadOnDemand = loadOnDemand;
-		}
-
-		public string ID
-		{
-			get { return _id; }
-		}
-
-		public string DisplayName
-		{
-			get { return _displayName; }
-		}
-
-		public string ImageUrl
-		{
-			get { return _imageUrl; }
-		}
-
-		public string Url
-		{
-			get { return _url; }
-		}
-
-		public SortOrder SortOrder
-		{
-			get { return _sortOrder; }
-		}
-
-		public bool LoadOnDemand
-		{
-			get { return _loadOnDemand; }
+            ID = id;
+            DisplayName = displayName;
+            ImageClassName = imageClassName;
+            Url = url;
+            SortOrder = sortOrder;
+            LoadOnDemand = loadOnDemand;
 		}
 	}
 }
