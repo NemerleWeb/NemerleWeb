@@ -217,7 +217,7 @@
             if (typeof parsedValue === "number") {
                 $el.on(invalidationEvent, function () {
                     nweb.execute(function () {
-                        eval(nweb.utils.makeAssignExpression(expr, "+$el.val() ? +$el.val() : $el.val()"));
+                        eval(nweb.utils.makeAssignExpression(expr, "nweb.utils.tryGetNumber($el.val())"));
                     });
                 });
             }
@@ -832,6 +832,9 @@
         },
         loadTemplate: function(modelName) {
 
+        },
+        tryGetNumber: function(val) {
+            return +val ? +val : val;
         },
 
         // Creates lambda and returns what the function returns.
