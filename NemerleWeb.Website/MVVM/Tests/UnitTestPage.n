@@ -10,6 +10,7 @@ using Nemerle.Utility;
 using Nemerle.Peg;
 using NemerleWeb.Tests.Macro;
 using NemerleWeb.TypedJS;
+using NemerleWeb.Predefined;
 
 namespace NemerleWeb.Website.Tests
 {

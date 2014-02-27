@@ -13,14 +13,14 @@ namespace NemerleWeb.Website
   [Unit]
   public class Sample_1
   {
-    public Name : string = "Stranger";
+    public Name : string = "world";
     
     [Html]
     public View() : string
     {
        <#
          <input value="$Name" />
-         <div>Hello, Name</div>
+         <div>Hello, $Name!</div>
        #>
     }
   }

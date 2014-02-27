@@ -38,7 +38,7 @@ namespace NemerleWeb.Website.Controllers
     
     public TutorialSample(sample : string) : ActionResult
     {        
-      View("TutorialSample", sample);
+      View("TutorialSample", sample :> object);
     }
     
     public Samples() : ActionResult

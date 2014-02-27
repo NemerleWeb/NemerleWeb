@@ -13,13 +13,27 @@ using System.Linq;
 namespace NemerleWeb.Website
 {
   public module Helpers
-  {
-    public LoadSourceFor([NotNull] filename : string) : string 
+  {    
+    public LoadSourceFor([NotNull] filename : string, cutUsingsAndNamespace : bool = false) : string 
     {
       def dir = System.Web.HttpContext.Current.Server.MapPath("/bin");
       def filename = Path.GetFullPath(Path.Combine(dir, filename));
       
-      if(filename.StartsWith(dir)) File.ReadAllText(filename) else ""
+      def cutUsings(lines) {
+        if(cutUsingsAndNamespace) {
+          def start = lines.FindIndex(line => line.Length > 0 && line[0] == '{');
+          def end = lines.FindLastIndex(line => line.Length > 0 && line[0] == '}');
+          
+          string.Join(Environment.NewLine, lines.Skip(start).Take(end - start));
+        }
+        else string.Join(Environment.NewLine, lines)
+      }
+      
+      if(filename.StartsWith(dir))
+        if(cutUsingsAndNamespace)          
+          cutUsings(File.ReadAllLines(filename).ToList())
+        else File.ReadAllText(filename)
+      else ""
     }
     
     public GetNames() : list[string]

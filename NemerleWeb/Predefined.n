@@ -43,12 +43,12 @@ namespace NemerleWeb
   public sealed class __Unit__
   {
   }
-}
-
-[NemerleWeb.JSApi]
-public module NemerleWeb
-{
-  public static undefined : __Undefined__;
   
-  public static jsthis : __JSThis__;
+  [NemerleWeb.JSApi]
+  public module Predefined
+  {
+    public static undefined : __Undefined__;
+  
+    public static jsthis : __JSThis__;
+  }
 }

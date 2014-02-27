@@ -185,7 +185,7 @@ namespace NemerleWeb.Website.Samples
       
       public LoadSourceForList(samples : IEnumerable[string]) : string
       {
-        $<#..$(samples; "\n--------------------------------------------------\n"; Helpers.LoadSourceFor)#>
+        $<#..$(samples; "\n--------------------------------------------------\n"; s => Helpers.LoadSourceFor(s))#>
       }
     }
     

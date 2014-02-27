@@ -346,6 +346,9 @@
     <Content Include="Views\Home\TutorialSample.cshtml">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Views\Shared\_Empty.cshtml">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
