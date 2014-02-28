@@ -66,6 +66,11 @@ namespace NemerleWeb.Website.Controllers
       View("Index", (NWeb WorkbenchPage()) : object);
     }
     
+    public DependencyGraph() : ActionResult
+    {
+      View("Index", (NWeb DependencyGraphTest()) : object);
+    }
+    
     private static GetContent(name : string) : string
     {
       mutable res;

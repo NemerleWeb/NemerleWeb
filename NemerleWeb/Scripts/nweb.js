@@ -272,12 +272,11 @@
             var isExprTuple = false;
             var tupleDecls = [];
 
-            if (repeat[1].indexOf("{") === 0) {
+            if (repeat[1].indexOf("[") === 0) {
                 isExprTuple = true;
-                var tupleObj = JSON.parse(repeat[1]);
-                for (var k in tupleObj)
-                    if (tupleObj.hasOwnProperty(k))
-                        tupleDecls.push(tupleObj[k]);
+                var tupleObjList = JSON.parse(repeat[1]);
+                for (var i = 0; i < tupleObjList.length; i++)
+                  tupleDecls.push(tupleObjList[i]);
             }
 
             //$el = nweb.utils.replaceWith($el, $("<!-- repeat " + expr + " -->"));

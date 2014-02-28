@@ -316,7 +316,7 @@ $indent};#>
             
           def ret = string.Join(", ", elementsWithValue);          
           Some($"[$ret]")
-        | PExpr.Call => Some(JSAstBuilder.BuildJSAst(Typer.TypeExpr(expr), false, null).Write() + ";")
+        | PExpr.Call => Some(JSAstBuilder.BuildJSAst(ClassType.FullName, Typer.TypeExpr(expr), false, null).Write() + ";")
         | PExpr.Literal(Literal.Void)
         | PExpr.Literal(Literal.Null)    
         | _ => None()

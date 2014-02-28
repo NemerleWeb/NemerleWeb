@@ -1,0 +1,59 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.Website.Tests
+{
+  [Unit]
+  public class DependencyGraphTest
+  {
+    _tests = List.[(string * bool)]();
+    mutable _a : A;
+    
+    public this()
+    {
+      def test(name, code) {
+        try {
+          code();
+          _tests.Add(name, true) 
+        } catch {
+        | _ => _tests.Add(name, false)
+        }
+      }
+      
+      test("field access", () => _a = A());
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+          <div $foreach((name, result) in _tests)>
+            <span class="test-result-tick" css-passed="$result" />
+            $name
+          </div>
+      #>
+    }
+  }
+  
+  [Unit]
+  class A
+  {}
+  
+  [Unit]
+  class B
+  {}
+  
+  [Unit]
+  class C
+  {}
+  
+  [Unit]
+  class D
+  {}
+}

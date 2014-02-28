@@ -104,11 +104,15 @@ namespace NemerleWeb
       }      
       
       def getAstString(expr : TExpr) : string {
-        def (ast, addedReturn) = JSAstBuilder.BuildJSAstForSplices(expr, mb.Header);        
+        def (ast, addedReturn) = JSAstBuilder.BuildJSAstForSplices(typer.CurrentType.FullName, expr, mb.Header);        
         def res = if(addedReturn) ast.Write() else "$" + ast.Write();
         res.Replace("\r\n", "")
       }
       
+      def getLocalValueName(lv) {
+        lv.Name + "_" + lv.Id.ToString()
+      }
+          
       def htmlFromTExpr(expr : TExpr, indent : string) : string {
         match(expr) {
         | TExpr.Block(_, body) => htmlFromTExpr(body, indent)
@@ -123,17 +127,30 @@ namespace NemerleWeb
           ""
           
         | Call(LocalFunRef(decl, _), [Parm(_, Literal(Literal.String(tagName)), _, _), tagExprExpr], _) when decl.Name == "tag" =>           
+          
           def (attrs, children) = 
             match(tagExprExpr.expr) 
-            {          
-            | DefValIn(_, val, DefValIn(loopValName, _, Tuple([attrs, childTags]))) =>
-              def getLocalValueName(lv) {
-                lv.Name + "_" + lv.Id.ToString()
-              }
+            {
+            //foreach(x in xs)
+            | DefValIn(_, val, DefValIn(loopValName, _, Tuple([attrs, childTags]))) =>              
               def foreachEnum = 
                   "nw-foreach=\"" + getLocalValueName(loopValName) + " in " + escape(getAstString(val)) + "\" ";
               (foreachEnum + htmlFromTExpr(attrs, indent), 
                htmlFromTExpr(childTags, indent + "  "))
+            //foreach((x0, x1) in xs)
+            | DefValIn(_, val, Match(_, [case])) => 
+              match(case.patterns) {
+              | [(Pattern.Tuple(args), _, _)] => 
+                match(case.body)
+                {
+                | TypeConversion(Tuple([attrs, childTags]), _, _, _) => 
+                  def values = args.OfType.[Pattern.As]().Select((a, i) => $<#&quot;$(getLocalValueName(a.decl))&quot;#>);
+                  def foreachEnum = $<#nw-foreach="[..$values] in $(escape(getAstString(val)))" #>;
+                  (foreachEnum + htmlFromTExpr(attrs, indent), htmlFromTExpr(childTags, indent + "  "))
+                | _ => assert2(false); ("", "")
+                }
+              | _ => assert2(false); ("", "")
+              }              
             | Tuple([attrs, childTags]) =>
               (htmlFromTExpr(attrs, indent), 
                htmlFromTExpr(childTags, indent + "  "))

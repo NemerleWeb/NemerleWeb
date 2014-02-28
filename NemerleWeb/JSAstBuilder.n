@@ -14,24 +14,38 @@ using System.Runtime.Serialization;
 
 namespace NemerleWeb
 {
+  public class TypeDependencyGraph
+  {
+    _dependencyList = List.[(string * string)]();
+    
+    public Add(typeName : string, tp : FixedType) : void
+    {      
+      when(tp.TypeInfo != null && tp.TypeInfo.GetDirectSuperTypes().Any(c => c.TypeInfo.FullName == typeof(IPage).FullName))
+        _dependencyList.Add(typeName, tp.TypeInfo.FullName);
+    }
+  }
+  
   public module JSAstBuilder
   {
+    public DependencyGraph : TypeDependencyGraph = TypeDependencyGraph();
+    
     Build(
+      typeName : string,
       expr : TExpr,
       currentScopeDefs : list[string * string],
       methodHeader : TFunHeader) : JSAst
     {
-      Build(expr, currentScopeDefs, methodHeader, None())
+      Build(typeName, expr, currentScopeDefs, methodHeader, None())
     }
     
     Build(
+      typeName : string,
       expr : TExpr,
       currentScopeDefs : list[string * string],
       methodHeader : TFunHeader,
       paramKind : option[ParmKind]) : JSAst
     {      
-      def build(expr) { Build(expr, currentScopeDefs, methodHeader); }
-      
+      def build(expr) { Build(typeName, expr, currentScopeDefs, methodHeader); }
       match(expr) 
       {
       | Array(args, _dims)                => JSAst.Array(args.Map(build))
@@ -43,8 +57,9 @@ namespace NemerleWeb
       | Cache                             => Message.Error(expr.Location, "Cache not implemented"); JSAst.NotImpl("Cache")
       | CacheRef                          => Message.Error(expr.Location, "CacheRef not implemented"); JSAst.NotImpl("CacheRef")
       | Call(Delayed(susp), parms, istail) when susp.IsResolved 
-                                          => JSKnownMembers.Convert(TExpr.Call(susp.ResolutionResult, parms, istail), Build(_, currentScopeDefs, methodHeader, _))
-      | Call as call                      => JSKnownMembers.Convert(call, Build(_, currentScopeDefs, methodHeader, _))
+                                          => JSKnownMembers.Convert(TExpr.Call(susp.ResolutionResult, parms, istail), Build(typeName, _, currentScopeDefs, methodHeader, _))
+      | Call as call                      =>       
+        JSKnownMembers.Convert(call, Build(typeName, _, currentScopeDefs, methodHeader, _))
       | ClosureFieldOf                    => Message.Error(expr.Location, "ClosureFieldOf not implemented"); JSAst.NotImpl("ClosureFieldOf")
       | ClosureObjectOf                   => Message.Error(expr.Location, "ClosureObjectOf not implemented"); JSAst.NotImpl("ClosureObjectOf")
       | ConstantObjectRef                 => Message.Error(expr.Location, "ConstantObjectRef not implemented"); JSAst.NotImpl("ConstantObjectRef") 
@@ -54,7 +69,7 @@ namespace NemerleWeb
       | DefaultValue as d                 => DefaultValueInitializer.GetJSAst(d.Type)
       | DefFunctionsIn(header :: _, body) =>
         def typedBody = header.body :> FunBody.Typed;
-        def funBody = BuildJSAst(typedBody.expr, header.ReturnType.ToString() != "void", header);
+        def funBody = BuildJSAst(typeName, typedBody.expr, header.ReturnType.ToString() != "void", header);
         def function = JSAst.Function("", header.Parameters.Map(p => p.name), funBody);
         
         match(body) 
@@ -67,21 +82,23 @@ namespace NemerleWeb
       | DefValIn(name, val, body)         => 
         def newName = name.Name + "_" + name.Id;
         
-        match(Build(val, currentScopeDefs, methodHeader)) 
+        match(Build(typeName, val, currentScopeDefs, methodHeader)) 
         {
         | Seq([Seq(Pack :: _) as pack, smth, Seq(Unpack :: _) as unpack]) => 
           JSAst.Seq(pack.Items.Append([JSAst.DefValue(newName, smth)])
                               .Append(unpack.Items)
-                              .Append([Build(body, (name.Name, newName) :: currentScopeDefs, methodHeader)]));
+                              .Append([Build(typeName, body, (name.Name, newName) :: currentScopeDefs, methodHeader)]));
         | value => 
           JSAst.Seq([JSAst.DefValue(newName, value), 
-                     Build(body, (name.Name, newName) :: currentScopeDefs, methodHeader)
+                     Build(typeName, body, (name.Name, newName) :: currentScopeDefs, methodHeader)
                     ])
         }
       | Delayed                           => JSAst.NotImpl("Delayed")
       | Error                             => Message.Error(expr.Location, "Error in the code"); JSAst.NotImpl("Error")
       | EventMember                       => Message.Error(expr.Location, "EventMember not implemented"); JSAst.NotImpl("EventMember")
-      | FieldMember(obj, fld)             => JSKnownMembers.ConvertField(obj, fld, build)
+      | FieldMember(obj, fld)             =>         
+        //DependencyGraph.Add(typeName, fld.GetMemType());
+        JSKnownMembers.ConvertField(obj, fld, build)
       | FieldOf                           => Message.Error(expr.Location, "FieldOf not implemented"); JSAst.NotImpl("FieldOf")
       | Goto(target, _)                   => JSAst.Goto(target.ToString())
       | HasType(expr, type)               => JSAst.HasType(build(expr), JSClass.GetProperName(type.TypeInfo))
@@ -324,9 +341,9 @@ namespace NemerleWeb
     /// <summary>
     /// Special method for building ast for slices.
     /// </summary>
-    public BuildJSAstForSplices(expr : TExpr, methodHeader : TFunHeader) : (JSAst * bool)
+    public BuildJSAstForSplices(typeName : string, expr : TExpr, methodHeader : TFunHeader) : (JSAst * bool)
     {
-      def ast = JSAstBuilder.Build(expr, [], methodHeader);
+      def ast = JSAstBuilder.Build(typeName, expr, [], methodHeader);
       
       def (ast, addedReturn) = match(ast) 
       {
@@ -346,9 +363,9 @@ namespace NemerleWeb
       (ast, addedReturn)
     }
       
-    public BuildJSAst(expr : TExpr, shouldReturn : bool, methodHeader : TFunHeader) : JSAst.Seq
+    public BuildJSAst(typeName : string, expr : TExpr, shouldReturn : bool, methodHeader : TFunHeader) : JSAst.Seq
     {
-      mutable ast = JSAstBuilder.Build(expr, [], methodHeader);
+      mutable ast = JSAstBuilder.Build(typeName, expr, [], methodHeader);
       
       when(shouldReturn)
         ast = JSAstHelper.MakeReturn(ast);

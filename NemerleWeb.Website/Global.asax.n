@@ -61,6 +61,12 @@ namespace NemerleWeb.Website
                 new (controller = "Home", action = "ServerTests", id = UrlParameter.Optional) // Parameter defaults
             );
             
+            _ = routes.MapRoute(
+                "DependencyGraph", // Route name
+                "dependencygraph", // URL with parameters
+                new (controller = "Home", action = "DependencyGraph", id = UrlParameter.Optional) // Parameter defaults
+            );
+            
             // Default
             _ = routes.MapRoute(
                 "Default", // Route name

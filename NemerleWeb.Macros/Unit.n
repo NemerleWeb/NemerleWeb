@@ -77,7 +77,7 @@ namespace NemerleWeb
         | FunBody.Typed(body) =>
           def methodBuilder = typer.CurrentMethodBuilder;          
           def shouldReturn = !(methodBuilder.Header.ReturnType is FixedType.Void()) && !methodBuilder.IsConstructor;
-          def ast = JSAstBuilder.BuildJSAst(body, shouldReturn, methodBuilder.Header);
+          def ast = JSAstBuilder.BuildJSAst(typer.CurrentType.FullName, body, shouldReturn, methodBuilder.Header);
           JSAstCache.AddMethodAst(typer.CurrentTypeBuilder, typer.CurrentFunction, ast);
         | _ => ()
         }
