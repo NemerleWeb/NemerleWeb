@@ -212,23 +212,25 @@
             var $el = $(el);
             var parsedValue = nweb.getParsedValue(model, exprWithReturn, loopStack);
             var isTextElement = $el.is(":text") || el.tagName.toUpperCase() === "TEXTAREA";
+            var isSelectElement = $el[0].tagName.toUpperCase() === "SELECT";
             var invalidationEvent = isTextElement ? "keyup" : "change";
-
+            var getValueExpr = isSelectElement ? "nweb.getValue($el[0])" : "$el.val()";
+            var tryGetNumberExpr = "nweb.utils.tryGetNumber("+getValueExpr+")";
             if (typeof parsedValue === "number") {
                 $el.on(invalidationEvent, function () {
                     nweb.execute(function () {
-                        eval(nweb.utils.makeAssignExpression(expr, "nweb.utils.tryGetNumber($el.val())"));
+                        eval(nweb.utils.makeAssignExpression(expr, tryGetNumberExpr));
                     });
                 });
             }
             else {
                 $el.on(invalidationEvent, function () {
                     nweb.execute(function () {
-                        eval(nweb.utils.makeAssignExpression(expr, "$el.val()"));
+                        eval(nweb.utils.makeAssignExpression(expr, getValueExpr));
                     });
                 });
             }
-            $el.val(parsedValue);
+            nweb.setValue($el[0], parsedValue);
 
             return {
                 el: el,

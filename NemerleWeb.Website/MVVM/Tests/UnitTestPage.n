@@ -12,6 +12,8 @@ using NemerleWeb.Tests.Macro;
 using NemerleWeb.TypedJS;
 using NemerleWeb.Predefined;
 
+[assembly: JSApiRoot("NemerleWeb.Predefined")]
+
 namespace NemerleWeb.Website.Tests
 {
   [Unit]
