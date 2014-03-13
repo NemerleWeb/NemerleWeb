@@ -1,0 +1,60 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Typedtree;
+using Nemerle.Compiler.Parsetree;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  public class TypeDependencyGraph
+  {
+    public _dependencyMap = Dictionary.[string, HashSet[string]]();
+    
+    public Add(typeName : string, tp : FixedType) : void
+    { 
+      when(tp.TypeInfo != null)
+        Add(typeName, tp.TypeInfo);
+    }
+        
+    public Add(typeName : string, ti : TypeInfo) : void
+    {
+      assert2(ti != null);
+            
+      //If 'ti' is variant option, then use variant itself
+      // ti = if(ti.VariantOptionCode > -1) ti.BaseType else ti;
+      
+      def hasUnitInHierarchy(ti) {        
+        def typeWithRootExists(root) {          
+          ti.GlobalEnv.LookupType($"$root.$(ti.FullName)".Split('.').NToList(), 
+                                  null, ti.TyparmsCount) is Some(_)
+        }
+       
+        if(ti.IsCustomAttributeDefined("NemerleWeb.UnitAttribute")) true
+        else if(ti.DeclaringType != null) hasUnitInHierarchy(ti.DeclaringType)
+        else JSClassSettings.JSClrRoots.Any(typeWithRootExists)
+      }
+      
+      when(!ti.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute") && hasUnitInHierarchy(ti) && typeName != ti.FullName)
+      {
+        def dependentTypeName = ti.FullName;
+        mutable hashSet;
+        if(_dependencyMap.TryGetValue(typeName, out hashSet))
+          _ = hashSet.Add(dependentTypeName);
+        else _dependencyMap[typeName] = HashSet([dependentTypeName]);
+      }
+    }
+    
+    public GetTypeDependencies(typeName : string) : IEnumerable[string]
+    {
+      mutable lst;
+      if(_dependencyMap.TryGetValue(typeName, out lst)) lst
+      else []
+    }
+  }
+}

@@ -24,9 +24,7 @@ namespace NemerleWeb
   public module NwebImpl
   {
     public TransformNweb(expr : PExpr, typer : Typer) : PExpr 
-    {    
-      CreateNemerleWebInitializer(typer);
-      
+    {          
       match(expr)
       {
       | <[ $_unitName() ]> with parms = []
@@ -65,46 +63,6 @@ $$(function() {
       res
       | _ => Message.Error("Correct usage: NWeb ClassName(arguments)"); <[ ]>
       }      
-    }
-    
-    CreateNemerleWebInitializer(typer : Typer) : void
-    {
-      def env = typer.Manager.CoreEnv;
-      def typeName = "NemerleWebInitializer";
-      def assemblies = typer.Manager
-                            .ReferencedAssemblies
-                            .Map(a =>                             
-                              <[ 
-                                when(!loadedAssemblies.Contains($(a.Assembly.FullName : string))) 
-                                  _ = System.Reflection.Assembly.Load($(a.Assembly.FullName : string)) 
-                               ]>);
-      when (env.LookupType([typeName]) is None())
-      {  
-        env.Define(<[ decl: 
-          public module $(typeName : usesite)
-          {
-            _locker : object = object();
-            mutable _isInitialized : bool;
-            
-            public Initialize() : void
-            {
-              lock(_locker) 
-              {
-                when(!_isInitialized) 
-                {
-                  def loadedAssemblies = System.AppDomain
-                                               .CurrentDomain
-                                               .GetAssemblies()
-                                               .Select(a => a.FullName)
-                                               .ToList();
-                  {..$assemblies;}
-                  _isInitialized = true;
-                }
-              }
-            }
-          }
-        ]>).Compile();
-      }
     }
   } 
 }

@@ -14,6 +14,7 @@ using System.Xml.Linq;
 
 using NemerleWeb;
 using NemerleWeb.TypedJS;
+using NemerleWeb.Predefined;
 
 //[assembly: GenerateTypedJS(
 // Root = "A",
@@ -26,9 +27,10 @@ module Program
   {
     //def result = NWeb Test();
     
-    foreach (f in NWebData.Scripts)
+    foreach (f in NWebData.DependencyMap["Test"])
     {
-      WriteLine(File.ReadAllText(f));
+      WriteLine(f);
+      //WriteLine(File.ReadAllText(f));
       //WriteLine(NWebData.GetLambdasScript(s));
     }    
     
@@ -40,21 +42,9 @@ module Program
     
 [Unit]
 public class Test
-{
-  OutTest() : void
+{ 
+  public this()
   {
-    _=EqualityComparer.[string].Default.Equals("a", "b");
-        
-        
-
+    throw Exception();
   }
-  
-  [Html]
-  public View() : string
-  {
-    <# 
-       <div>
-       </div>
-    #>
-  }  
 }

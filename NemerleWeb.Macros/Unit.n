@@ -42,6 +42,7 @@ namespace NemerleWeb
   module UnitImpl
   { 
     _scriptsDirectory = Path.Combine("Scripts", "nweb");
+    _dependenciesFilename = Path.Combine(Path.GetTempPath(), "dependencies.dat");
     
     public DoTransformBeforeInheritance(tb : TypeBuilder, typer : Typer) : void
     {
@@ -50,12 +51,22 @@ namespace NemerleWeb
       unless(typer.Manager.IsIntelliSenseMode)
       {
         AddPageBaseMethods(tb, typer);
-      
+        
+        tb.Ast.AddCustomAttribute(<[ UnitAttribute ]>);        
+        
         def vmInterface = <[ ttype: NemerleWeb.IPage ]>;
         def superTypes = tb.GetDirectSuperTypes();
         
         unless (superTypes != null && superTypes.Exists(t => t.Equals(vmInterface)))
           tb.AddImplementedInterface(<[ NemerleWeb.IPage ]>);
+          
+        when(!tb.Manager.Options.EmbeddedResources.Contains(_dependenciesFilename)) 
+        { 
+          File.Delete(_dependenciesFilename);
+          tb.Manager.Options.EmbeddedResources ::= _dependenciesFilename;
+        }
+        
+        CreateNemerleWebInitializer(typer);
       }
     }
      
@@ -89,11 +100,17 @@ namespace NemerleWeb
           if(t.DeclaringType != null) getAncesterCount(t.DeclaringType) + 1 else 0;
         }
         
+        def saveDependencyList() {
+          def deps = JSAstBuilder.DependencyGraph.GetTypeDependencies(typeBuilder.FullName);
+          def serialized = string.Join(",", [typeBuilder.FullName].Concat(deps)) + Environment.NewLine;
+          File.AppendAllText(_dependenciesFilename, serialized);
+        }
+        
         typeBuilder.MethodBeforeStage3 += (_, e) => translateMethod(e.Typer);        
         typeBuilder.DoBeforeFinalization(() => {
           def jsClass = JSClass(typeBuilder, "  ", typer);
-          AddMainData(typeBuilder, jsClass.Write(debug), getAncesterCount(typeBuilder));
-          
+          _ = AddMainData(typeBuilder, jsClass.Write(debug), getAncesterCount(typeBuilder));
+                      
           def staticBody = StringBuilder();
           _ = staticBody
             .AppendWhen(debug, _.AppendLine($"// $(typeBuilder.FullName) - Static constructor body"))
@@ -101,6 +118,8 @@ namespace NemerleWeb
             .AppendLineValue(jsClass.GetStaticConstructorBody(""));
             
           AddStaticFields(typeBuilder, staticBody.ToString());
+          
+          saveDependencyList();
         });
       }
       
@@ -113,10 +132,12 @@ namespace NemerleWeb
         if(isTopMost) children else tb :: children;
       }
       
-      processType(tb);      
+      processType(tb);
       
       foreach(nestedType in getAllNestedTypes(tb, true))
           processType(nestedType);
+                            
+      CreateRenderer(tb);
     }
     
     static mutable collectedJSApiRoots : bool = false;
@@ -149,40 +170,6 @@ namespace NemerleWeb
         collectedJSApiRoots = true;
       }
       
-      def parms = match(tb.GetConstructors().FirstOrDefault()) {
-      | null => []
-      | x => x.GetParameters();
-      };
-      def pparms = parms.Map(p => p.AsParsed());
-      def signature = JSAstHelper.MethodSignature(parms);
-      def properName = JSClass.GetProperName(tb);
-      def serverParams = parms.Select(p => <[ paramList.Add("nweb.utils.toTypedObject(" + NWebUtils.ToJson($(p.Name : usesite)) + ")") ]>);
-      
-      _ = GetRenderer(tb).DefineWithSource(<[ decl: public $(tb.Name : dyn)(..$pparms) : string {
-        
-          def scripts = NemerleWeb.NWebData.GetScripts();
-          def templates = NemerleWeb.NWebData.GetTemplates();
-          def resources = NemerleWeb.NWebData.GetNemerleWebScripts();
-          
-          def declarations = string.Join("\n", templates.Concat(scripts));
-          def unitName = $(properName : string);
-          def paramList = List();
-          paramList.Add($signature);
-          {..$(serverParams.NToList())}
-          def callParms = string.Join(",", paramList);
-
-$<#
-<div id="nweb-start"></div>
-$resources
-$declarations
-<script>
-$$(function() {  
-  nweb.go(new $unitName($callParms));
-});
-</script>
-#>
-      }]>);
-      
       def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");
       def serverMethods = Dictionary();
       if(serverClass != null)
@@ -198,6 +185,7 @@ $$(function() {
           controller.Define(field);
                  
           def proxy = tb.DefineNestedType(<[ decl:
+              [Ignore]
               class ServerProxy
               {}
           ]>);
@@ -304,10 +292,49 @@ $$(function() {
         def server = tb.DefineNestedType(<[ decl: public class Server {} ]>);
         server.HasBeenUsed = true;
         server.Compile();
-      }      
+      }
     }
 
     private MscorlibGuid = "BED7F4EA-1A96-11d2-8F08-00A0C9A6186D";
+    
+    private CreateRenderer(tb : TypeBuilder) : void
+    {
+      def parms = match(tb.GetConstructors().FirstOrDefault()) {
+      | null => []
+      | x => x.GetParameters();
+      };
+      
+      def pparms = parms.Map(p => p.AsParsed());
+      def signature = JSAstHelper.MethodSignature(parms);
+      def properName = JSClass.GetProperName(tb);
+      def serverParams = parms.Select(p => <[ paramList.Add("nweb.utils.toTypedObject(" + NWebUtils.ToJson($(p.Name : usesite)) + ")") ]>);
+      
+      _ = tb.DefineWithSource(<[ decl: public static new Render(..$pparms) : string {
+          NemerleWebInitializer.Initialize();
+          
+          def scripts = NemerleWeb.NWebData.GetScriptsForType($(tb.FullName : string));
+          def templates = NemerleWeb.NWebData.GetTemplatesForType($(tb.FullName : string));
+          def resources = NemerleWeb.NWebData.GetNemerleWebScripts();
+          
+          def declarations = string.Join("\n", templates.Concat(scripts));
+          def unitName = $(properName : string);
+          def paramList = List();
+          paramList.Add($signature);
+          {..$(serverParams.NToList())}
+          def callParms = string.Join(",", paramList);
+
+$<#
+<div id="nweb-start"></div>
+$resources
+$declarations
+<script>
+$$(function() {  
+  nweb.go(new $unitName($callParms));
+});
+</script>
+#>
+      } ]>);
+    }
     
     private ValidateReferences(manager : ManagerClass) : void
     {
@@ -342,6 +369,7 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
     {
       def dir = Path.GetDirectoryName(tb.Manager.Options.ProjectPath);
       def bytes = Encoding.Unicode.GetBytes(data);
+      
       using(sha = SHA1CryptoServiceProvider()) 
       {
         def hash = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "");
@@ -370,28 +398,36 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       ]>;
     }
     
-    public AddMainData(tb : TypeBuilder, data : string, ancestorCount : int) : void
+    public AddMainData(tb : TypeBuilder, data : string, ancestorCount : int) : string
     {      
       def filename = SaveToFile(tb, data, JSClass.GetProperName(tb));
-      AppendToNWebDataConstructor(tb, <[ AddScript($(filename : string), $ancestorCount); ]>);
+      def typeName = JSClass.GetProperNameRoots(tb, JSClassSettings.JSClrRoots);
+      
+      AppendToNWebDataConstructor(tb, <[ AddScript($(typeName : string), $(filename : string), $ancestorCount); ]>);
+      filename
     }
     
     public AddStaticFields(tb : TypeBuilder, fields : string) : void
     {
-      AppendToNWebDataConstructor(tb, <[ AddFields($(fields : string)); ]>);
+      def filename = SaveToFile(tb, fields, JSClass.GetProperName(tb) + "_fields");
+      def typeName = JSClass.GetProperNameRoots(tb, JSClassSettings.JSClrRoots);
+      
+      AppendToNWebDataConstructor(tb, <[ AddFields($(typeName : string), $(filename : string)); ]>);
     }
         
-    public AddSignalrData(tb : TypeBuilder, data : string) : void
+    public AddSignalrData(tb : TypeBuilder, data : string) : string
     {
       def filename = SaveToFile(tb, data, JSClass.GetProperName(tb) + "_signalr");
-      AppendToNWebDataConstructor(tb, <[ AddScript($(filename : string), 0); ]>);
+      def typeName = tb.FullName + "_signalr";
+      AppendToNWebDataConstructor(tb, <[ AddScript($(typeName : string), $(filename : string), 0); ]>);
+      filename
     }
     
     public AddTemplateData(tb : TypeBuilder, templateName : string, templateContent : string) : void
     {
       def id = JSClass.GetProperName(tb) + templateName;
       def filename = SaveToFile(tb, templateContent, id);
-      AppendToNWebDataConstructor(tb, <[ AddTemplate($(id : string), $(filename : string)); ]>);
+      AppendToNWebDataConstructor(tb, <[ AddTemplate($(tb.FullName : string), $(id : string), $(filename : string)); ]>);
     }
     
     GetStaticConstructor(tb : TypeBuilder) : MethodBuilder
@@ -424,26 +460,6 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       }
     }
     
-    GetRenderer(tb : TypeBuilder) : TypeBuilder
-    {
-      def assemblyName = Path.GetFileNameWithoutExtension(tb.Manager.Options.OutputFileName);
-      def env = tb.Manager.CoreEnv.EnterIntoNamespace([assemblyName]);
-      
-      match(env.LookupType(["Render"])) 
-      {
-      | Some(type) => type :> TypeBuilder
-      | None => 
-        def t = env.Define(<[ decl:
-          public module Render
-          {
-            this() {}
-          }
-        ]>);
-        t.Compile();
-        t
-      }
-    }
-    
     public AddPageBaseMethods(tb : TypeBuilder, typer : Typer) : void
     {                
       Macros.DefineCTX(typer);
@@ -464,6 +480,47 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
       foreach(pageMethod in pageBaseMethods)
       {
         _ = tb.DefineWithSource(pageMethod);
+      }
+    }
+    
+    CreateNemerleWebInitializer(typer : Typer) : void
+    {
+      def env = typer.Manager.CoreEnv;
+      def typeName = "NemerleWebInitializer";
+      when (env.LookupType([typeName]) is None())
+      {  
+        def assemblies = typer.Manager
+                            .ReferencedAssemblies
+                            .Map(a =>                             
+                              <[ 
+                                when(!loadedAssemblies.Contains($(a.Assembly.FullName : string))) 
+                                  _ = System.Reflection.Assembly.Load($(a.Assembly.FullName : string)) 
+                               ]>);
+                               
+        env.Define(<[ decl: 
+          public module $(typeName : usesite)
+          {
+            _locker : object = object();
+            mutable _isInitialized : bool;
+            
+            public Initialize() : void
+            {
+              lock(_locker) 
+              {
+                when(!_isInitialized) 
+                {
+                  def loadedAssemblies = System.AppDomain
+                                               .CurrentDomain
+                                               .GetAssemblies()
+                                               .Select(a => a.FullName)
+                                               .ToList();
+                  {..$assemblies;}
+                  _isInitialized = true;
+                }
+              }
+            }
+          }
+        ]>).Compile();
       }
     }
   }

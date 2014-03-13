@@ -13,7 +13,9 @@ namespace NemerleWeb.Website.Tests
   public class DependencyGraphTest
   {
     _tests = List.[(string * bool)]();
-    mutable _a : A;
+    _a : A = A();
+    _b : B = B();
+    B : B { get { _b; } }
     
     public this()
     {
@@ -26,34 +28,41 @@ namespace NemerleWeb.Website.Tests
         }
       }
       
-      test("field access", () => _a = A());
+      test("constructor", () => { def c = C(); });
+      test("field access", () => _ = _a.S);
+      test("property access", () => _ = B.S);
+      //need test for base class constructor call
     }
     
     [Html]
     public View() : string
     {
       <#
-          <div $foreach((name, result) in _tests)>
-            <span class="test-result-tick" css-passed="$result" />
-            $name
-          </div>
+        <table class="jsast-tests">
+          <tbody>
+            <tr $foreach((name, result) in _tests) css-passed="$result">
+              <td>$name</td>
+              <td>$(if(result) "pass" else "fail")</td>
+            </tr>
+          </tbody>
+        </table>
       #>
     }
   }
   
   [Unit]
   class A
-  {}
+  { public S = "1"; }
   
   [Unit]
   class B
-  {}
+  { public S = "1"; }
   
   [Unit]
   class C
-  {}
+  { public S = "1"; }
   
   [Unit]
   class D
-  {}
+  { public S = "1"; }
 }

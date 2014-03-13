@@ -137,14 +137,12 @@ namespace NemerleWeb
     {
       get
       {
-        def constructors =
-          ClassType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        constructors
+        ClassType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
       }
     }
         
     public Write(debug : bool) : string 
-    {        
+    {                
       def meta = JSClassMeta();
       def properTypeName = GetProperName(ClassType);
       def parentPtr = Self;
@@ -420,7 +418,8 @@ $indent#>
           // Call empty base constructor if exists
           if (parameters is [] && JSClassHelper.HasBase(ClassType))
           {
-            def baseName = GetProperName(ClassType.BaseType.FullName);
+            JSAstBuilder.DependencyGraph.Add(ClassType.FullName, ClassType.BaseType);
+            def baseName = GetProperName(ClassType.BaseType.FullName);            
             makeBody($<#$bodyIndent$baseName.call($Self, "");#>)
           }
           else
@@ -700,8 +699,7 @@ $(indent)  };#>;
   /// Defines settings for JSclass 
   internal module JSClassSettings
   {
-    public JSApiRoots : SortedSet[string] = SortedSet(["NemerleWeb"], InvertedComparer());
-    
+    public JSApiRoots : SortedSet[string] = SortedSet(["NemerleWeb", "NemerleWeb.Predefined"], InvertedComparer());
     public JSClrRoots : SortedSet[string] = SortedSet(["NemerleWeb.TypedClr"], InvertedComparer());
   }  
   

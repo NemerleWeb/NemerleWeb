@@ -20,9 +20,13 @@ namespace NemerleWeb
   public module NWebData
   {
     public Scripts : List[string] = List();
-    public Templates : List[(string * string)] = List();   
+    public Templates = Dictionary.[string, (string * string)]();   
     public CombinedScriptsFilename : string;
     public ResourcesFilename : string;
+    
+    public TypesToScriptFilenames = Dictionary.[string, string]();
+    public StaticFieldsInitializers = Dictionary.[string, string]();
+    public DependencyMap = Dictionary.[string, HashSet[string]]();
     
     this() 
     {
@@ -50,6 +54,24 @@ namespace NemerleWeb
         Path.Combine(AppDomain.CurrentDomain.BaseDirectory, getRelativePath(filename))
       }
       
+      def parseAndAddTypeDependencies(assembly) 
+      {
+        def typeDependencies = readResource("dependencies.dat", assembly).Split(array[Environment.NewLine], StringSplitOptions.None);
+        def dependencyGroups = typeDependencies.Select(line => line.Split(','))
+                                               .Where(split => split.Any())
+                                               .Select(split => new ( key = split[0], values = split.Skip(1)));
+        foreach(depGroup in dependencyGroups) 
+        {
+          mutable hashSet;
+          def values = depGroup.values;
+                    
+          if(DependencyMap.TryGetValue(depGroup.key, out hashSet))
+            foreach(dep in values) 
+              _ = hashSet.Add(dep);
+          else DependencyMap[depGroup.key] = HashSet(values);
+        }
+      }
+      
       def scriptsDir = getAbsolutePath();
       
       when(!Directory.Exists(scriptsDir))
@@ -62,7 +84,9 @@ namespace NemerleWeb
       {
         def instance = Activator.CreateInstance(dataType, array[], array[]) :> NWebDataInstance;
         
-        foreach((f, _) in instance.Scripts) 
+        parseAndAddTypeDependencies(dataType.Assembly);
+                                               
+        foreach((typeName, f, _) in instance.Scripts) 
         {
           Scripts.Add(f);
           
@@ -71,36 +95,28 @@ namespace NemerleWeb
           
           File.WriteAllText(getAbsolutePath(filename), scriptContents);
           _ = combinedScripts.Append(scriptContents);
+          
+          TypesToScriptFilenames[typeName] = getRelativePath(filename);
         }
           
-        foreach((id, path) in instance.Templates) 
+        foreach((typeName, id, path) in instance.Templates) 
         {
           def filename = Path.GetFileName(path);
           def templateContents = readResource(filename, dataType.Assembly);
-          Templates.Add((id, templateContents));
+          
+          Templates[typeName] = (id, templateContents);
+          
           File.WriteAllText(getAbsolutePath(filename), templateContents);
         }
         
-        foreach(fields in instance.Fields)
-        {
-          _ = staticFields.Append(fields);
-          _ = combinedScripts.Append(fields);
-        }        
-      }
-
-      using(sha = SHA1CryptoServiceProvider()) 
-      {
-        def staticFieldsContent = staticFields.ToString();
-        def hash = BitConverter.ToString(sha.ComputeHash(Encoding.Unicode.GetBytes(staticFieldsContent))).Replace("-", "");
-        def fname = "_N_static_fields_" + hash + ".js";
-        File.WriteAllText(getAbsolutePath(fname), staticFieldsContent);
-        Scripts.Add(getRelativePath(fname));
-        
-        def combinedScriptsContent = combinedScripts.ToString();
-        def hash = BitConverter.ToString(sha.ComputeHash(Encoding.Unicode.GetBytes(combinedScriptsContent))).Replace("-", "");
-        def fname = "nweb-combined-" + hash + ".js";
-        File.WriteAllText(getAbsolutePath(fname), combinedScriptsContent);
-        CombinedScriptsFilename = getRelativePath(fname);
+        foreach((type, path) in instance.Fields) {
+          def filename = Path.GetFileName(path);
+          def templateContents = readResource(filename, dataType.Assembly);
+          
+          StaticFieldsInitializers[type] = path;
+          
+          File.WriteAllText(getAbsolutePath(filename), templateContents);
+        }
       }
       
       def scripts =
@@ -142,31 +158,71 @@ namespace NemerleWeb
       }
       
       ResourcesFilename = getRelativePath("resource.js");
-    }         
+    }
+    
+    private GetTypeDependencies(typePath : list[string]) : IEnumerable[string]
+    {
+      //This is to avoid recursive dependencies 
+      match(typePath)
+      {
+      | typeName :: _ => 
+        mutable lst;
+        if(DependencyMap.TryGetValue(typeName, out lst))
+          lst.Concat(lst.Where(d => typePath.All(p => d != p))
+                        .SelectMany(d => GetTypeDependencies(d :: typePath)))
+             .Distinct()
+        else [];
+      }
+    }
+    
+    public GetScriptsForType(typeName : string) : IEnumerable[string]
+    {
+      def getTypeScriptFilenames(t) {
+        mutable signalRScript;
+        mutable fieldInitializers;
+        
+        def signal = TypesToScriptFilenames.TryGetValue(t + "_signalr", out signalRScript);
+        def stat = StaticFieldsInitializers.TryGetValue(t, out fieldInitializers);
+        
+        match(signal, stat)
+        {
+        | (true, true) => [TypesToScriptFilenames[t], fieldInitializers, signalRScript]
+        | (true, false) => [TypesToScriptFilenames[t], signalRScript]
+        | (false, true) => [TypesToScriptFilenames[t], fieldInitializers]
+        | _ => [TypesToScriptFilenames[t]]
+        }
+      }
+      
+      def typeScripts = getTypeScriptFilenames(typeName);
+      def dependentTypes = GetTypeDependencies([typeName]);
+      def dependentFileNames = dependentTypes.SelectMany(t => getTypeScriptFilenames(t));
+      typeScripts.Concat(dependentFileNames).Select(fname => 
+      $<# <script type="text/javascript" src="\$fname"></script>$(Environment.NewLine)#>);
+    }
     
     public GetScripts() : IEnumerable[string]
     {
-      /*
-      Scripts.Select(filename => {
-$<#
-<script type="text/javascript" src="$filename"></script> #>
-      });
-      */
       [$<#
-<script type="text/javascript" src="\$CombinedScriptsFilename"></script> #>]
-      
+<script type="text/javascript" src="\$CombinedScriptsFilename"></script> #>]      
     }
     
-    public GetTemplates() : IEnumerable[string]
+    public GetTemplatesForType(typeName : string) : IEnumerable[string]
     {
-      Templates.Select(((id, content), _) => {
-$<#
+      def typeTemplate = Templates[typeName];
+      def dependentTypes = GetTypeDependencies([typeName]);
+      def dependentFileNames = dependentTypes.SelectMany(t => {
+        mutable template;
+        if(Templates.TryGetValue(t, out template)) [template]
+        else []
+      });
+        
+      [typeTemplate].Concat(dependentFileNames).Select(((id, content), _) => 
+      $<#
 <script type="text/html" id="$(id)">
 $content
-</script>#>
-      });
+</script>#>);
     }
-    
+        
     public GetNemerleWebScripts() : string
     {
       $<#
@@ -176,23 +232,23 @@ $content
   
   public class NWebDataInstance
   {
-    public Scripts : List[(string * int)] = List();
-    public Templates : List[(string * string)] = List();
-    public Fields : List[string] = List();
+    public Scripts = List.[(string * string * int)]();
+    public Templates = List.[(string * string * string)]();
+    public Fields = List.[(string * string)]();    
     
-    public AddScript(filename : string, ancestorCount : int) : void
+    public AddScript(typeName : string, filename : string, ancestorCount : int) : void
     {
-      Scripts.Add((filename, ancestorCount));
-    }
-
-    public AddFields(fields : string) : void
-    {
-      Fields.Add(fields);
+      Scripts.Add((typeName, filename, ancestorCount));
     }
     
-    public AddTemplate(id : string, filename : string) : void
+    public AddFields(typeName : string, fields : string) : void
     {
-      Templates.Add((id, filename));
+      Fields.Add((typeName, fields));
+    }
+    
+    public AddTemplate(typeName : string, id : string, filename : string) : void
+    {
+      Templates.Add((typeName, id, filename));
     }
   }
 }

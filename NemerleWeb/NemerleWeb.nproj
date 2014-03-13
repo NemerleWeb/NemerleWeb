@@ -267,6 +267,9 @@
     <Compile Include="StringExtensions.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="TypeDependencyGraph.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="UnitAttribute.n">
       <SubType>Code</SubType>
     </Compile>

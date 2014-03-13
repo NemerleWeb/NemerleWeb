@@ -8,7 +8,6 @@ using System.Web.Mvc;
 
 using Nemerle;
 using NemerleWeb;
-using NemerleWeb.Website;
 using NemerleWeb.Website.Samples;
 using NemerleWeb.Website.Tests;
 
@@ -38,37 +37,37 @@ namespace NemerleWeb.Website.Controllers
     
     public TutorialSample(sample : string) : ActionResult
     {        
-      View("TutorialSample", sample :> object);
+      View("TutorialSample", sample : object);
     }
     
     public Samples() : ActionResult
-    {
-      View("Index", (NWeb SamplesPage()) : object);
+    {      
+      View("Index", SamplesPage.Render() : object);
     }
     
     public UnitTests() : ActionResult
     {      
-      View("Index", (NWeb UnitTestPage()) : object);
+      View("Index", UnitTestPage.Render() : object);
     }
     
     public TemplateTests() : ActionResult
     {
-      View("Index", (NWeb TemplateTestsPage()) : object);
+      View("Index", TemplateTestsPage.Render() : object);
     }
     
     public ServerTests() : ActionResult
     {
-      View("Index", (NWeb ServerTestPage()) : object);
+      View("Index", ServerTestPage.Render() : object);
     }
     
     public Workbench() : ActionResult
     {
-      View("Index", (NWeb WorkbenchPage()) : object);
+      View("Index", WorkbenchPage.Render() : object);
     }
     
     public DependencyGraph() : ActionResult
     {
-      View("Index", (NWeb DependencyGraphTest()) : object);
+      View("Index", DependencyGraphTest.Render() : object);
     }
     
     private static GetContent(name : string) : string

@@ -25,6 +25,7 @@ namespace NemerleWeb
     
     public CreateSignalIfNeeded(tb : TypeBuilder, _typer : Typer) : void 
     {
+      //assert2(false);
       def declaringType = tb.DeclaringType :> TypeBuilder;
       def hubName = declaringType.Name + "Hub";
       def jsHubName = char.ToLowerInvariant(hubName[0]) + hubName.Substring(1);
@@ -57,12 +58,12 @@ function $(properName)_signalr(this_ptr) {
 }
 #>;
 
-      UnitImpl.AddSignalrData(declaringType, script);
+      _ = UnitImpl.AddSignalrData(declaringType, script);
 
       def client = tb.DefineAndReturn(<[ decl: client : $(declaringType.ParsedTypeName) = default($(declaringType.ParsedTypeName)); ]>);
       client.HasBeenUsed = true;
       
-      tb.DefineNestedType(<[ decl: public class $(hubName : dyn) : Microsoft.AspNet.SignalR.Hub {} ]>).Compile();
+      tb.DefineNestedTypeWithSource(<[ decl: public class $(hubName : dyn) : Microsoft.AspNet.SignalR.Hub {} ]>).Compile();
     }
   }
 }

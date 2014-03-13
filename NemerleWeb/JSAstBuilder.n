@@ -14,17 +14,6 @@ using System.Runtime.Serialization;
 
 namespace NemerleWeb
 {
-  public class TypeDependencyGraph
-  {
-    _dependencyList = List.[(string * string)]();
-    
-    public Add(typeName : string, tp : FixedType) : void
-    {      
-      when(tp.TypeInfo != null && tp.TypeInfo.GetDirectSuperTypes().Any(c => c.TypeInfo.FullName == typeof(IPage).FullName))
-        _dependencyList.Add(typeName, tp.TypeInfo.FullName);
-    }
-  }
-  
   public module JSAstBuilder
   {
     public DependencyGraph : TypeDependencyGraph = TypeDependencyGraph();
@@ -46,6 +35,7 @@ namespace NemerleWeb
       paramKind : option[ParmKind]) : JSAst
     {      
       def build(expr) { Build(typeName, expr, currentScopeDefs, methodHeader); }
+      
       match(expr) 
       {
       | Array(args, _dims)                => JSAst.Array(args.Map(build))
@@ -57,9 +47,9 @@ namespace NemerleWeb
       | Cache                             => Message.Error(expr.Location, "Cache not implemented"); JSAst.NotImpl("Cache")
       | CacheRef                          => Message.Error(expr.Location, "CacheRef not implemented"); JSAst.NotImpl("CacheRef")
       | Call(Delayed(susp), parms, istail) when susp.IsResolved 
-                                          => JSKnownMembers.Convert(TExpr.Call(susp.ResolutionResult, parms, istail), Build(typeName, _, currentScopeDefs, methodHeader, _))
+                                          => JSKnownMembers.Convert(TExpr.Call(susp.ResolutionResult, parms, istail), Build(typeName, _, currentScopeDefs, methodHeader, _), typeName)
       | Call as call                      =>       
-        JSKnownMembers.Convert(call, Build(typeName, _, currentScopeDefs, methodHeader, _))
+        JSKnownMembers.Convert(call, Build(typeName, _, currentScopeDefs, methodHeader, _), typeName)
       | ClosureFieldOf                    => Message.Error(expr.Location, "ClosureFieldOf not implemented"); JSAst.NotImpl("ClosureFieldOf")
       | ClosureObjectOf                   => Message.Error(expr.Location, "ClosureObjectOf not implemented"); JSAst.NotImpl("ClosureObjectOf")
       | ConstantObjectRef                 => Message.Error(expr.Location, "ConstantObjectRef not implemented"); JSAst.NotImpl("ConstantObjectRef") 
@@ -96,14 +86,18 @@ namespace NemerleWeb
       | Delayed                           => JSAst.NotImpl("Delayed")
       | Error                             => Message.Error(expr.Location, "Error in the code"); JSAst.NotImpl("Error")
       | EventMember                       => Message.Error(expr.Location, "EventMember not implemented"); JSAst.NotImpl("EventMember")
-      | FieldMember(obj, fld)             =>         
-        //DependencyGraph.Add(typeName, fld.GetMemType());
+      | FieldMember(obj, fld)             =>
+        DependencyGraph.Add(typeName, fld.GetMemType());
         JSKnownMembers.ConvertField(obj, fld, build)
       | FieldOf                           => Message.Error(expr.Location, "FieldOf not implemented"); JSAst.NotImpl("FieldOf")
       | Goto(target, _)                   => JSAst.Goto(target.ToString())
-      | HasType(expr, type)               => JSAst.HasType(build(expr), JSClass.GetProperName(type.TypeInfo))
+      | HasType(expr, type)               => 
+        DependencyGraph.Add(typeName, type);
+        JSAst.HasType(build(expr), JSClass.GetProperName(type.TypeInfo))
       | If(cond, then, els, _, _)         => JSAst.If(build(cond), build(then), build(els))
-      | ImplicitValueTypeCtor as i        => DefaultValueInitializer.GetJSAst(i.Type)
+      | ImplicitValueTypeCtor as i        => 
+        DependencyGraph.Add(typeName, i.ty.FixedValue);
+        DefaultValueInitializer.GetJSAst(i.Type)
       | Label(id, body)                   => JSAst.Label(id, build(body))
       | Literal(val)                      => 
           match(val)
@@ -182,7 +176,9 @@ namespace NemerleWeb
       | Sequence(e1, e2)                  => JSAst.Seq([build(e1), build(e2)])
       | StaticEventRef                    => Message.Error(expr.Location, "StaticEventRef not implemented"); JSAst.NotImpl("StaticEventRef")
       | StaticPropertyRef(from, prop)     => JSAst.PropertyGet(JSAst.LocalRef(from.tycon.Name, None()), prop.Name)
-      | StaticRef(from, mem, _)           =>        
+      | StaticRef(from, mem, _)           =>
+        DependencyGraph.Add(typeName, from);
+        
         def typeName =
           if(from.tycon.SystemType != null) from.tycon.SystemType.FullName
           else                              from.tycon.FrameworkTypeName;              
@@ -251,7 +247,9 @@ namespace NemerleWeb
       | TryFinally(body, handler)         => JSAst.TryFinally(build(body), build(handler))
       | Tuple(args)                       => JSAst.Tuple(args.Map(a => build(a)))
       | TupleIndexer(obj, pos, _len)      => JSAst.TupleIndexer(build(obj), pos)
-      | TypeConversion(e, _, _, _)        => build(e)
+      | TypeConversion(e, targetType, _, _)        => 
+        DependencyGraph.Add(typeName, targetType.FixedValue);
+        build(e)
       | TypeOf                            => Message.Error("TypeOf is not implemented"); JSAst.NotImpl("TypeOf")
       | Use                               => Message.Error("Use is not implemented"); JSAst.NotImpl("Use")
       | null => JSAst.Void()
@@ -366,7 +364,7 @@ namespace NemerleWeb
     public BuildJSAst(typeName : string, expr : TExpr, shouldReturn : bool, methodHeader : TFunHeader) : JSAst.Seq
     {
       mutable ast = JSAstBuilder.Build(typeName, expr, [], methodHeader);
-      
+
       when(shouldReturn)
         ast = JSAstHelper.MakeReturn(ast);
       

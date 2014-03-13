@@ -50,9 +50,10 @@ namespace NemerleWeb
       JSKnownMembersNemerleCollectionsHashtable.Register();
     }
     
-    public Convert(
+    public Convert(     
       [NotNull] call : TExpr.Call,
-      [NotNull] builder : TExpr * option[ParmKind] -> JSAst) : JSAst
+      [NotNull] builder : TExpr * option[ParmKind] -> JSAst,
+      [NotNull] currentTypeName : string) : JSAst
     {
       def builder'(expr) { builder(expr, None()) }
       def paramBuilder(p) { builder(p.expr, Some(p.kind)) }
@@ -117,6 +118,7 @@ namespace NemerleWeb
           def declaringType = baseCtor.DeclaringType;
           if (declaringType.GetSuperTypes().Any(_.TryRequire(JSClass.IPageType)))
           {
+            JSAstBuilder.DependencyGraph.Add(currentTypeName, declaringType);
             JSAst.Call(
               JSAst.ConstructorRef(
                 JSClass.GetProperName(declaringType),
