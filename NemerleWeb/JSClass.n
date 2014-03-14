@@ -40,13 +40,23 @@ namespace NemerleWeb
     /// Initialize self either
     /// </summary>
     public static SelfInit : string = $<#var $Self = this;#>;
+    static InstanceBindingFlags =
+      BindingFlags.Instance |
+      BindingFlags.Public |
+      BindingFlags.NonPublic |
+      BindingFlags.DeclaredOnly;
       
+    static StaticBindingFlags =
+      BindingFlags.Static |
+      BindingFlags.Public |
+      BindingFlags.NonPublic |
+      BindingFlags.DeclaredOnly;
     public Fields : IEnumerable[IField]
     {
       [Memoize]
       get
       {
-        ClassType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+        ClassType.GetFields(InstanceBindingFlags)
                   .Where(f => f.Name != "server" && f.Name != "__constructorParams")
                   .Where(f => !f.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
       }
@@ -56,7 +66,7 @@ namespace NemerleWeb
     {
       get
       {
-        ClassType.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+        ClassType.GetFields(StaticBindingFlags)
                   .Where(f => !f.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
                   .Where(f => f.Name != "server" && f.Name != "__constructorParams")
       }
@@ -67,7 +77,7 @@ namespace NemerleWeb
       [Memoize]
       get
       {
-        ClassType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+        ClassType.GetProperties(InstanceBindingFlags)
                   .Where(p => !p.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
                   .Where(_ is PropertyBuilder)
                   .Where(prop =>
@@ -90,7 +100,7 @@ namespace NemerleWeb
     {
       get
       {
-        ClassType.GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+        ClassType.GetProperties(StaticBindingFlags)
                   .Where(p => !p.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
                   .Where(_ is PropertyBuilder)
                   .Where(p => p.Name != "server")
@@ -102,7 +112,7 @@ namespace NemerleWeb
       [Memoize]
       get
       {            
-        def methods = ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        def methods = ClassType.GetMethods(InstanceBindingFlags);
         FilterMethods(methods)
       }
     }
@@ -111,7 +121,7 @@ namespace NemerleWeb
     {
       get
       {            
-        def methods = ClassType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Static| BindingFlags.Public | BindingFlags.NonPublic);            
+        def methods = ClassType.GetMethods(StaticBindingFlags);
         FilterMethods(methods)
       }
     }
@@ -137,7 +147,7 @@ namespace NemerleWeb
     {
       get
       {
-        ClassType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        ClassType.GetConstructors(InstanceBindingFlags)
       }
     }
         
