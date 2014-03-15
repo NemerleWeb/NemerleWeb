@@ -28,7 +28,7 @@ namespace NemerleWeb.Website.Tests
         }
       }
       
-      test("constructor", () => { def c = C(); });
+      test("constructor", () => { def _c = C(); });
       test("field access", () => _ = _a.S);
       test("property access", () => _ = B.S);
       //need test for base class constructor call

@@ -15,7 +15,7 @@ namespace NemerleWeb.Website
   {
     public LoadSourceFor(sample : string, handler : string -> void) : void
     {
-      server.LoadSourceFor(sample, handler);
+      _ = server.LoadSourceFor(sample, handler);
     }
     
     public class Server

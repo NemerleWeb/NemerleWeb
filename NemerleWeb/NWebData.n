@@ -40,7 +40,7 @@ namespace NemerleWeb
                            .SelectMany(a => a.GetTypes()
                            .Where(t => t.Name.EndsWith("NWebDataPerAssembly")));
                            
-      def staticFields = StringBuilder();
+      //def staticFields = StringBuilder();
       def combinedScripts = StringBuilder();
       
       def getRelativePath(filename = "")
@@ -163,16 +163,14 @@ namespace NemerleWeb
     private GetTypeDependencies(typePath : list[string]) : IEnumerable[string]
     {
       //This is to avoid recursive dependencies 
-      match(typePath)
-      {
-      | typeName :: _ => 
-        mutable lst;
-        if(DependencyMap.TryGetValue(typeName, out lst))
-          lst.Concat(lst.Where(d => typePath.All(p => d != p))
-                        .SelectMany(d => GetTypeDependencies(d :: typePath)))
-             .Distinct()
-        else [];
-      }
+      def typeName = typePath.Head;
+      
+      mutable lst;
+      if(DependencyMap.TryGetValue(typeName, out lst))
+        lst.Concat(lst.Where(d => typePath.All(p => d != p))
+                      .SelectMany(d => GetTypeDependencies(d :: typePath)))
+            .Distinct()
+      else [];
     }
     
     public GetScriptsForType(typeName : string) : IEnumerable[string]
