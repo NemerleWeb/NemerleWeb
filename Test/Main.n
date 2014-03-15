@@ -60,6 +60,7 @@ module Program
         Y = Q() + W() + U + V;
       }
       
+      Y : int;
       Q() : int { 2 }      
       static W() : int { 4 }
       
