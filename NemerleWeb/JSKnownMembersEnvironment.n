@@ -1,0 +1,44 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Compiler;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  module JSKnownMembersEnvironment
+  {    
+    public Register() : void
+    {
+      JSKnownMembers.RegisterType(typeof(Environment), Handler);
+    }
+  
+    public Handler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
+    {
+      (if (left is JSAst.StaticMethodRef) StaticHandler else InstanceHandler)(left, member, parms)
+    }
+    
+    private InstanceHandler(left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
+    { 
+      | _ => None()
+    }
+     
+    private StaticHandler(_left : JSAst, member : IMember, parms : list[JSAst]) : option[JSAst]
+    {
+      match (parms)
+      {
+      | [] =>
+        match (member.Name)
+        {
+        | "get_NewLine" => Some(JSAst.Literal(JSLiteral.String("\r\n")))
+        | _ => None()
+        }
+      | _ => None()
+      }
+    }
+  }
+}

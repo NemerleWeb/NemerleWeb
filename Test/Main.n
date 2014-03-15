@@ -16,10 +16,6 @@ using NemerleWeb;
 using NemerleWeb.TypedJS;
 using NemerleWeb.Predefined;
 
-//[assembly: GenerateTypedJS(
-// Root = "A",
-// Files = [ (@"d:\MyProjects\NemerleWeb\NemerleWeb.TypedJS\Scripts\typings") ]
-//)]
 
 module Program
 {
@@ -27,24 +23,56 @@ module Program
   {
     //def result = NWeb Test();
     
-    foreach (f in NWebData.DependencyMap["Test"])
+    foreach (f in NWebData.Scripts)
     {
-      WriteLine(f);
-      //WriteLine(File.ReadAllText(f));
+      WriteLine(File.ReadAllText(f));
       //WriteLine(NWebData.GetLambdasScript(s));
-    }    
+    }
     
     //WriteLine(result);
     _ = Console.ReadKey();
   }
 }
 
+
+    [Unit]
+    abstract class AbstractBase
+    {
+      public this()
+      {
+        X = F() + G() + I + J;
+      }
+            
+      F() : int { 1 }      
+      static G() : int { 2 }
+      
+      I : int = 10;
+      J : int = 20;
+      
+      public X : int;
+    }
     
+    [Unit]
+    class NonAbstractDerived : AbstractBase
+    {
+      public this()
+      {
+        Y = Q() + W() + U + V;
+      }
+      
+      Q() : int { 2 }      
+      static W() : int { 4 }
+      
+      U : int = 20;
+      V : int = 40;
+    }
+    
+
 [Unit]
 public class Test
 { 
-  public this()
+  F() : void
   {
-    throw Exception();
   }
 }
+

@@ -144,7 +144,7 @@ namespace NemerleWeb
                 match(case.body)
                 {
                 | TypeConversion(Tuple([attrs, childTags]), _, _, _) => 
-                  def values = args.OfType.[Pattern.As]().Select((a, i) => $<#&quot;$(getLocalValueName(a.decl))&quot;#>);
+                  def values = args.OfType.[Pattern.As]().Select(a => $<#&quot;$(getLocalValueName(a.decl))&quot;#>);
                   def foreachEnum = $<#nw-foreach="[..$values] in $(escape(getAstString(val)))" #>;
                   (foreachEnum + htmlFromTExpr(attrs, indent), htmlFromTExpr(childTags, indent + "  "))
                 | _ => assert2(false); ("", "")
@@ -157,7 +157,7 @@ namespace NemerleWeb
             | _ => assert2(false); ("", "");
             }
         
-          indent + $"<$(tagName) $attrs>" + $"$children" + $"</$(tagName)>";
+          indent + $"<$(tagName) $attrs>$children</$(tagName)>";
         
         | Call(LocalFunRef(decl, _), [textExprExpr], _) when decl.Name == "text_splice" => 
           def splice = getAstString(textExprExpr.expr);

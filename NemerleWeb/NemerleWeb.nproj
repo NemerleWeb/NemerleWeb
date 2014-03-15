@@ -186,6 +186,9 @@
     <Compile Include="JSKnownMembersConvert.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JSKnownMembersEnvironment.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JSKnownMembersFloats.n">
       <SubType>Code</SubType>
     </Compile>
