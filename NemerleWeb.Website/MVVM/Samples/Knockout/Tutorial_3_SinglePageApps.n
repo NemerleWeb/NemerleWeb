@@ -6,7 +6,7 @@ using NemerleWeb;
 using NemerleWeb.TypedJS;
 
 namespace NemerleWeb.Website.Samples
-{
+{  
   [Unit]
   public class SPAPage
   {
