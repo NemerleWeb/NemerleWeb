@@ -179,3 +179,7 @@ ul.nav li.dropdown:hover > ul.dropdown-menu {
 .tutorial-sample {
     margin: 0;
 }
+
+.tutorial-sample > div {
+    padding: 40px;
+}

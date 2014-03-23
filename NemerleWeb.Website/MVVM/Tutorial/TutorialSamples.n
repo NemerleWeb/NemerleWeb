@@ -20,7 +20,8 @@ namespace NemerleWeb.Website
     {
       Sample_1 = Sample_1();
       server.LoadSourceFor("MVVM/Tutorial/Sample_1.n", src => {
-        Sample_1_Source = src
+        Sample_1_Source = src;        
+        js <# nweb.invalidate(); prettyPrint(); #>;
       });
     }
     
@@ -29,7 +30,7 @@ namespace NemerleWeb.Website
     {
        <#
          <div class="tutorial-sample-1 tutorial-sample row">
-           <pre class="col-md-6">$Sample_1_Source</pre>
+           <pre class="col-md-6 prettyprint lang-n">$Sample_1_Source</pre>
            <div class="col-md-6">
             <div template="$Sample_1"></div>
            </div>
