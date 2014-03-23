@@ -161,6 +161,7 @@ namespace NemerleWeb
         | _ => build(ex)
         }          
       | Match(_, _) as m                  =>       
+        // HACK: Open 'match' using our own Typer3 instance
         def typerType = typeof(Typer3);
         def typer = FormatterServices.GetUninitializedObject(typerType);
         def localFunField = typerType.GetField("current_local_fun", BindingFlags.NonPublic | BindingFlags.Instance);

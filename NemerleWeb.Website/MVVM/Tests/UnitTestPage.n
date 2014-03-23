@@ -355,6 +355,19 @@ namespace NemerleWeb.Website.Tests
     }
     
     [Unit]
+    class ClosureThis
+    {
+      public this()
+      {
+        def f(o) { o(); }
+        
+        f(() => this.Y = 1);
+      }
+      
+      public mutable Y : int;
+    }
+    
+    [Unit]
     class ConstructorsOverload
     {
       public A : string;
@@ -449,6 +462,22 @@ namespace NemerleWeb.Website.Tests
     public struct AggregatedStruct
     {
       public S : SimpleStruct;
+    }
+    
+    [Unit]
+    public class UsingServerInConstructor
+    {
+      public this()
+      {
+        _ = server.F(s => S = s);
+      }
+      
+      public S : string { get; set; }
+      
+      public class Server
+      {
+        public F() : string { "" }
+      }
     }
     
     #pragma warning restore
@@ -1891,6 +1920,11 @@ namespace NemerleWeb.Website.Tests
       
       test("exception returning value in catch", () => {
         try { throw Exception("A"); } catch { e => e.Message == "A" }
+      });
+      
+      test("closure this", () => {
+        def c = ClosureThis();
+        c.Y == 1
       });
     }
     

@@ -333,8 +333,8 @@ $indent};#>
         def ret = makeInitializer(initializer);
         
         // Filter out empty strings
-        if(ret is Some(v))
-          if(v.Length != 0) Some(v) else None()
+        if(ret is Some(v) when !string.IsNullOrEmpty(v))
+          ret
         else
           None()
       }
@@ -404,7 +404,7 @@ $indent};#>
           MakeCtor(indent, bodyIndent, ctorBody, ctor.Header.Parameters)
         });        
         
-      def allCtorsCode = valueTypeCtorCode.Concat(ctorsCode);        
+      def allCtorsCode = valueTypeCtorCode.Concat(ctorsCode);
       
       string.Join(InitSeparator, allCtorsCode)
     }

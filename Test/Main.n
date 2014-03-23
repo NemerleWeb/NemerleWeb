@@ -35,37 +35,27 @@ module Program
 }
 
 
-    [Unit]
-    abstract class AbstractBase
-    {
-      public this()
-      {
-        X = F() + G() + I + J;
-      }
-            
-      F() : int { 1 }      
-      static G() : int { 2 }
-      
-      I : int = 10;
-      J : int = 20;
-      
-      public X : int;
-    }
     
     [Unit]
-    class NonAbstractDerived : AbstractBase
+    class UsingServerInConstructor
     {
       public this()
       {
-        Y = Q() + W() + U + V;
+        _ = server.F(s => S = s.First());
       }
       
-      Y : int;
-      Q() : int { 2 }      
-      static W() : int { 4 }
+      public S : string { get; set; }
       
-      U : int = 20;
-      V : int = 40;
+      public class Server
+      {
+        public F() : IEnumerable[string] { yield "" }
+      }
+      
+      [Html]
+      public View() : string
+      {
+        <# <div></div> #>
+      }
     }
     
 
@@ -74,6 +64,7 @@ public class Test
 { 
   F() : void
   {
+    def f= UsingServerInConstructor();
   }
 }
 

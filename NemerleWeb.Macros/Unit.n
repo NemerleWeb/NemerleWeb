@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using BF = System.Reflection.BindingFlags;
 using TExpr = Nemerle.Compiler.Typedtree.TExpr;
 
@@ -83,14 +84,28 @@ namespace NemerleWeb
       
       def translateMethod(typer) 
       {
-        match(typer.CurrentFunction.body) 
+        when(typer.CurrentFunction.body is FunBody.Typed(body))
         {
-        | FunBody.Typed(body) =>
-          def methodBuilder = typer.CurrentMethodBuilder;          
+          def methodBuilder = typer.CurrentMethodBuilder; 
+          def funBody =
+            if(methodBuilder.IsConstructor)
+            {
+              // HACK: Add base call using our own Typer3 instance
+              def t2 = Typer2 (typer.CurrentType, typer.CurrentMethodBuilder, typer);            
+              def typer3 = Typer3(typer.CurrentMethodBuilder, typer, t2);
+            
+              def fixBaseCall = typer3.GetType().GetMethod(
+                "FixBaseCall", BindingFlags.NonPublic | BindingFlags.Instance);
+              _ = fixBaseCall.Invoke(typer3, array[null : TExpr]);
+               
+              (typer.CurrentFunction.body :> FunBody.Typed).expr
+            }
+            else
+              body;
+                    
           def shouldReturn = !(methodBuilder.Header.ReturnType is FixedType.Void()) && !methodBuilder.IsConstructor;
-          def ast = JSAstBuilder.BuildJSAst(typer.CurrentType.FullName, body, shouldReturn, methodBuilder.Header);
+          def ast = JSAstBuilder.BuildJSAst(typer.CurrentType.FullName, funBody, shouldReturn, methodBuilder.Header);
           JSAstCache.AddMethodAst(typer.CurrentTypeBuilder, typer.CurrentFunction, ast);
-        | _ => ()
         }
       }
             
