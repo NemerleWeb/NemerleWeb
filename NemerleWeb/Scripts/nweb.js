@@ -12,7 +12,8 @@
 
             nweb.applyBindings(model, body, nweb.bindings, []);
             nweb.invalidate(nweb.bindings);
-            window.dispatchEvent(new CustomEvent("nweb-initialized"));
+          
+            $(window).trigger("nweb-initialized");
         },
         binds: function(name) {
             var binds = {
