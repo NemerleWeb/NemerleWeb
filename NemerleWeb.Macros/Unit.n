@@ -151,8 +151,6 @@ namespace NemerleWeb
       
       foreach(nestedType in getAllNestedTypes(tb, true))
           processType(nestedType);
-                            
-      CreateRenderer(tb);
     }
     
     static mutable collectedJSApiRoots : bool = false;
@@ -166,6 +164,8 @@ namespace NemerleWeb
     public DoTransformImpl(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);
+                            
+      CreateRenderer(tb);
       
       def cacheFieldInitializers(typeBuilder) 
       {     

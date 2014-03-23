@@ -175,3 +175,11 @@ body {
 ul.nav li.dropdown:hover > ul.dropdown-menu {
     display: block;    
 }
+
+.tutorial-sample {
+    margin: 0;
+}
+
+.tutorial-sample > div {
+    padding: 40px;
+}

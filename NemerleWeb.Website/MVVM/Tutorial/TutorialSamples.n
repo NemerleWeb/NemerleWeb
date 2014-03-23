@@ -11,27 +11,39 @@ using NemerleWeb;
 namespace NemerleWeb.Website
 {
   [Unit]
-  class TutorialSamples
+  public class TutorialSamples
   {
-    public Source : string;
-    public Sample : object;
+    public Sample_1_Source : string { get; set; }
+    public Sample_1 : Sample_1 { get; set; }
     
-    public this(sample : string)
+    public this()
     {
-      Sample = match(sample) {
-      | _ => Sample_1()
-      }
+      Sample_1 = Sample_1();
+      server.LoadSourceFor("MVVM/Tutorial/Sample_1.n", src => {
+        Sample_1_Source = src;        
+        js <# nweb.invalidate(); prettyPrint(); #>;
+      });
     }
     
     [Html]
     public View() : string
     {
        <#
-         <div class="tutorial-sample">
-           <pre>$Source</pre>
-           <div template="$Sample"></div>
+         <div class="tutorial-sample-1 tutorial-sample row">
+           <pre class="col-md-6 prettyprint lang-n">$Sample_1_Source</pre>
+           <div class="col-md-6">
+            <div template="$Sample_1"></div>
+           </div>
          </div>
        #>
+    }
+    
+    public class Server
+    {      
+      public LoadSourceFor(sample : string) : string
+      {
+        Helpers.LoadSourceFor(sample, true);
+      }
     }
   }
 }

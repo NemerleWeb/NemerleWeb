@@ -24,7 +24,10 @@ namespace NemerleWeb.Website
           def start = lines.FindIndex(line => line.Length > 0 && line[0] == '{');
           def end = lines.FindLastIndex(line => line.Length > 0 && line[0] == '}');
           
-          string.Join(Environment.NewLine, lines.Skip(start).Take(end - start));
+          string.Join(Environment.NewLine, lines.Skip(start + 1)
+                                                .Take(end - start - 1)
+                                                .Select(line => if(line.Length > 2) line.Substring(2) 
+                                                                else line));
         }
         else string.Join(Environment.NewLine, lines)
       }

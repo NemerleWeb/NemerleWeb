@@ -32,14 +32,9 @@ namespace NemerleWeb.Website.Controllers
     
     public Tutorial() : ActionResult
     {        
-      View("Content", GetContent("Tutorial") : object);
+      View("Content", (GetContent("Tutorial") + NemerleWeb.Website.TutorialSamples.Render()) : object);
     }
-    
-    public TutorialSample(sample : string) : ActionResult
-    {        
-      View("TutorialSample", sample : object);
-    }
-    
+        
     public Samples() : ActionResult
     {      
       View("Index", SamplesPage.Render() : object);
