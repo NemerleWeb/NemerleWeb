@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NemerleWeb;
+using NemerleWeb.TypedJS;
+using NemerleWeb.Website.Samples.TypedJS;
 
 namespace NemerleWeb.Website
 {
@@ -19,9 +21,11 @@ namespace NemerleWeb.Website
     public this()
     {
       Sample_1 = Sample_1();
-      server.LoadSourceFor("MVVM/Tutorial/Sample_1.n", src => {
+      _ = server.LoadSourceFor("MVVM/Tutorial/Sample_1.n", src => {
         Sample_1_Source = src;        
-        js <# nweb.invalidate(); prettyPrint(); #>;
+        
+        nweb.invalidate();
+        prettyPrint();
       });
     }
     

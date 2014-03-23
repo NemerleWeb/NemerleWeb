@@ -88,7 +88,7 @@ namespace NemerleWeb
         {
           def methodBuilder = typer.CurrentMethodBuilder; 
           def funBody =
-            if(methodBuilder.IsConstructor)
+            /*if(methodBuilder.IsConstructor)
             {
               // HACK: Add base call using our own Typer3 instance
               def t2 = Typer2 (typer.CurrentType, typer.CurrentMethodBuilder, typer);            
@@ -100,7 +100,7 @@ namespace NemerleWeb
                
               (typer.CurrentFunction.body :> FunBody.Typed).expr
             }
-            else
+            else*/
               body;
                     
           def shouldReturn = !(methodBuilder.Header.ReturnType is FixedType.Void()) && !methodBuilder.IsConstructor;
