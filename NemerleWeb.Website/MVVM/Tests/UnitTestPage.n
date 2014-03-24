@@ -1906,8 +1906,8 @@ namespace NemerleWeb.Website.Tests
               <td>$(r[0])</td>
               <td>$(r[1])</td>
             </tr>
-            <tr $foreach(l in TemplateLambdaTest.Where(l => l == "passed"))>
-              $l
+            <tr $foreach(l in TemplateLambdaTest.Where(l => l == "passed")) css-passed="$(l[1])">
+              <td>$l</td>
             </tr>
           </tbody>
         </table>
