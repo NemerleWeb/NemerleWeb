@@ -480,6 +480,32 @@ namespace NemerleWeb.Website.Tests
       }
     }
     
+    [Unit]
+    public class ClosureInConstructorBase
+    {
+      public this()
+      {
+        Z = 10;
+      }
+      
+      public Z : int;
+    }
+    
+    [Unit]
+    public class ClosureInConstructor : ClosureInConstructorBase
+    {
+      public this()
+      {
+        def f(o) { o(); }
+        
+        mutable a = 1;
+        f(() => a = 2);
+        A = a;
+      }
+      
+      public A : int;
+    }
+    
     #pragma warning restore
     
     public this()
@@ -1925,6 +1951,11 @@ namespace NemerleWeb.Website.Tests
       test("closure this", () => {
         def c = ClosureThis();
         c.Y == 1
+      });
+      
+      test("closure in constructor with inheritance", () => {
+        def c = ClosureInConstructor();
+        c.A == 2 && c.Z == 10
       });
     }
     
