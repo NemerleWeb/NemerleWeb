@@ -1640,11 +1640,16 @@ namespace NemerleWeb.Website.Tests
         d.S == "x"
       });
       
-      test("Use fields and methods from constructor", () =>
+      test("Use base fields from constructor", () =>
       {
         def obj = NonAbstractDerived();
-        
-        obj.X == 33 && obj.Y == 66 && obj.M() == "N" && obj.MProp == "NProp"
+        obj.X == 33 && obj.Y == 66
+      });
+      
+      test("Use virtual methods and properties from constructor", () =>
+      {
+        def obj = NonAbstractDerived();        
+        obj.M() == "N" && obj.MProp == "NProp"
       });
       
       test("Constructors overload", () =>
