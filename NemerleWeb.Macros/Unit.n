@@ -86,27 +86,14 @@ namespace NemerleWeb
       {
         when(typer.CurrentFunction.body is FunBody.Typed(body))
         {
-          def methodBuilder = typer.CurrentMethodBuilder;
-          //when(typer.CurrentType.Name.Contains("UsingServerInConstructor"))assert2(false);
-          def funBody =
-            /*if(methodBuilder.IsConstructor && methodBuilder.Header.ClosureVars is [])
-            {
-              // HACK: Add base call using our own Typer3 instance
-              // We do it only when 'this' not closurized.
-              def t2 = Typer2 (typer.CurrentType, typer.CurrentMethodBuilder, typer);            
-              def typer3 = Typer3(typer.CurrentMethodBuilder, typer, t2);
-            
-              def fixBaseCall = typer3.GetType().GetMethod(
-                "FixBaseCall", BindingFlags.NonPublic | BindingFlags.Instance);
-              _ = fixBaseCall.Invoke(typer3, array[null : TExpr]);
-              
-              (typer.CurrentFunction.body :> FunBody.Typed).expr
-            }
-            else*/
-              body;
-                    
+          def methodBuilder = typer.CurrentMethodBuilder;          
           def shouldReturn = !(methodBuilder.Header.ReturnType is FixedType.Void()) && !methodBuilder.IsConstructor;
-          def ast = JSAstBuilder.BuildJSAst(typer.CurrentType.FullName, funBody, shouldReturn, methodBuilder.Header);
+          def ast = JSAstBuilder.BuildJSAst(
+            typer.CurrentType.FullName,
+            body,
+            shouldReturn,
+            methodBuilder.Header,
+            Some(tb));
           JSAstCache.AddMethodAst(typer.CurrentTypeBuilder, typer.CurrentFunction, ast);
         }
       }

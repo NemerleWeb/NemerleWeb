@@ -1,4 +1,5 @@
 ﻿using Nemerle;
+using Nemerle.Assertions;
 using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
@@ -22,9 +23,10 @@ namespace NemerleWeb
       typeName : string,
       expr : TExpr,
       currentScopeDefs : list[string * string],
-      methodHeader : TFunHeader) : JSAst
+      methodHeader : TFunHeader,
+      typeInfo : option[TypeInfo]) : JSAst
     {
-      Build(typeName, expr, currentScopeDefs, methodHeader, None())
+      Build(typeName, expr, currentScopeDefs, methodHeader, None(), typeInfo)
     }
     
     Build(
@@ -32,9 +34,17 @@ namespace NemerleWeb
       expr : TExpr,
       currentScopeDefs : list[string * string],
       methodHeader : TFunHeader,
-      paramKind : option[ParmKind]) : JSAst
+      paramKind : option[ParmKind],
+      typeInfo : option[TypeInfo]) : JSAst
     {      
-      def build(expr) { Build(typeName, expr, currentScopeDefs, methodHeader); }
+      def build(expr : TExpr) : JSAst
+      { 
+        Build(typeName, expr, currentScopeDefs, methodHeader, typeInfo)
+      }
+      def buildCallback(expr : TExpr, paramKind : option[ParmKind]) : JSAst
+      {
+        Build(typeName, expr, currentScopeDefs, methodHeader, paramKind, typeInfo)
+      }
       
       match(expr) 
       {
@@ -47,9 +57,8 @@ namespace NemerleWeb
       | Cache                             => Message.Error(expr.Location, "Cache not implemented"); JSAst.NotImpl("Cache")
       | CacheRef                          => Message.Error(expr.Location, "CacheRef not implemented"); JSAst.NotImpl("CacheRef")
       | Call(Delayed(susp), parms, istail) when susp.IsResolved 
-                                          => JSKnownMembers.Convert(TExpr.Call(susp.ResolutionResult, parms, istail), Build(typeName, _, currentScopeDefs, methodHeader, _), typeName)
-      | Call as call                      =>       
-        JSKnownMembers.Convert(call, Build(typeName, _, currentScopeDefs, methodHeader, _), typeName)
+                                          => JSKnownMembers.Convert(TExpr.Call(susp.ResolutionResult, parms, istail), buildCallback, typeName)
+      | Call as call                      => JSKnownMembers.Convert(call, buildCallback, typeName)
       | ClosureFieldOf                    => Message.Error(expr.Location, "ClosureFieldOf not implemented"); JSAst.NotImpl("ClosureFieldOf")
       | ClosureObjectOf                   => Message.Error(expr.Location, "ClosureObjectOf not implemented"); JSAst.NotImpl("ClosureObjectOf")
       | ConstantObjectRef                 => Message.Error(expr.Location, "ConstantObjectRef not implemented"); JSAst.NotImpl("ConstantObjectRef") 
@@ -59,7 +68,12 @@ namespace NemerleWeb
       | DefaultValue as d                 => DefaultValueInitializer.GetJSAst(d.Type)
       | DefFunctionsIn(header :: _, body) =>
         def typedBody = header.body :> FunBody.Typed;
-        def funBody = BuildJSAst(typeName, typedBody.expr, header.ReturnType.ToString() != "void", header);
+        def funBody = BuildJSAst(
+          typeName,
+          typedBody.expr,
+          header.ReturnType.ToString().ToLowerInvariant() != "void",
+          header,
+          typeInfo);
         def function = JSAst.Function("", header.Parameters.Map(p => p.name), funBody);
         
         match(body) 
@@ -72,15 +86,15 @@ namespace NemerleWeb
       | DefValIn(name, val, body)         => 
         def newName = name.Name + "_" + name.Id;
         
-        match(Build(typeName, val, currentScopeDefs, methodHeader)) 
+        match(Build(typeName, val, currentScopeDefs, methodHeader, typeInfo)) 
         {
         | Seq([Seq(Pack :: _) as pack, smth, Seq(Unpack :: _) as unpack]) => 
           JSAst.Seq(pack.Items.Append([JSAst.DefValue(newName, smth)])
                               .Append(unpack.Items)
-                              .Append([Build(typeName, body, (name.Name, newName) :: currentScopeDefs, methodHeader)]));
+                              .Append([Build(typeName, body, (name.Name, newName) :: currentScopeDefs, methodHeader, typeInfo)]));
         | value => 
           JSAst.Seq([JSAst.DefValue(newName, value), 
-                     Build(typeName, body, (name.Name, newName) :: currentScopeDefs, methodHeader)
+                     Build(typeName, body, (name.Name, newName) :: currentScopeDefs, methodHeader, typeInfo)
                     ])
         }
       | Delayed                           => JSAst.NotImpl("Delayed")
@@ -333,7 +347,7 @@ namespace NemerleWeb
       | ">=.f"                      
       | ">=.u"                      => JSAst.OpCode(">=")
       | _                           => 
-          Message.Error("unmatched TExpr.Opcode (" + name + ")"); 
+          Message.Error($"unmatched TExpr.Opcode ($name)"); 
           JSAst.NotImpl();
     }
 
@@ -342,7 +356,7 @@ namespace NemerleWeb
     /// </summary>
     public BuildJSAstForSplices(typeName : string, expr : TExpr, methodHeader : TFunHeader) : (JSAst * bool)
     {
-      def ast = JSAstBuilder.Build(typeName, expr, [], methodHeader);
+      def ast = JSAstBuilder.Build(typeName, expr, [], methodHeader, None());
       
       def (ast, addedReturn) = match(ast) 
       {
@@ -362,24 +376,33 @@ namespace NemerleWeb
       (ast, addedReturn)
     }
       
-    public BuildJSAst(typeName : string, expr : TExpr, shouldReturn : bool, methodHeader : TFunHeader) : JSAst.Seq
+    public BuildJSAst(
+      typeName : string,
+      expr : TExpr,
+      shouldReturn : bool,
+      methodHeader : TFunHeader,
+      typeInfo : option[TypeInfo]) : JSAst.Seq
     {
-      mutable ast = JSAstBuilder.Build(typeName, expr, [], methodHeader);
+      def ast = JSAstBuilder.Build(typeName, expr, [], methodHeader, typeInfo);
 
-      when(shouldReturn)
-        ast = JSAstHelper.MakeReturn(ast);
+      def ast = if(shouldReturn) JSAstHelper.MakeReturn(ast) else ast;
       
-      ast = JSAstHelper.TransformBottomUp(ast);
-      ast = JSAstHelper.FlattenAndRemoveVoids(ast);
+      def ast = JSAstHelper.TransformBottomUp(ast);
+      def ast =
+        if(methodHeader?.Name == ".ctor")
+          match(typeInfo)
+          {
+          | Some(ti) when JSClassHelper.HasBase(ti) =>
+            JSAstHelper.FixBaseCall(ast, ti)
+          | _ => ast
+          }
+        else ast;
+      def ast = JSAstHelper.FlattenAndRemoveVoids(ast);
           
-      ast = JSAstHelper.GotosToSwitch(ast);
-      ast = JSAstHelper.Optimize(ast);
+      def ast = JSAstHelper.GotosToSwitch(ast);
+      def ast = JSAstHelper.Optimize(ast);
                 
-      match(ast)
-      {
-      | Seq as seq => seq
-      | _ => JSAst.Seq([ast])
-      }
+      if(ast is Seq as seq) seq else JSAst.Seq([ast])
     }
   }
 }

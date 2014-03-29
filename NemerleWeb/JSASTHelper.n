@@ -328,6 +328,43 @@ namespace NemerleWeb
       JSAst.Function("", [], MakeReturn(ast))
     }
     
+    /// <summary>
+    /// Call base constructor if it wasn't called explicitely.
+    /// </summary>
+    /// <remark>
+    /// It currently doesn't support calling base after non instance metnhods.
+    /// </remark>
+    public FixBaseCall(ast : JSAst, [NotNull] typeInfo : TypeInfo) : JSAst
+    {
+      def hasConstructorCall(ast : JSAst) : bool
+      {
+        | Call as c =>
+          match(c.Fun)
+          {
+          | ConstructorRef => true
+          | _ => false
+          }
+        | Seq as s => s.Items.Any(i => hasConstructorCall(i))
+        | _ => false
+      }
+      
+      if (!hasConstructorCall(ast))
+      {
+        JSAstBuilder.DependencyGraph.Add(typeInfo.FullName, typeInfo.BaseType);
+        
+        def call = 
+          JSAst.Call(
+            JSAst.ConstructorRef(
+              JSClass.GetProperName(typeInfo.BaseType),
+              Some([])),
+            []);
+        
+        JSAst.Seq([call, ast])
+      }      
+      else
+        ast
+    }
+    
     public Append(ast : JSAst, toAppend : JSAst) : JSAst
     {
       match(ast) 

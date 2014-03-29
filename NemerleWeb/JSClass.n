@@ -80,18 +80,6 @@ namespace NemerleWeb
         ClassType.GetProperties(InstanceBindingFlags)
                   .Where(p => !p.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
                   .Where(_ is PropertyBuilder)
-                  .Where(prop =>
-                    {
-                      // Filter out properties not belonging to this class
-                      if (!JSClassHelper.HasBase(ClassType)) true
-                      else
-                      {                          
-                        def declaringType =
-                          prop.GetGetter()?.DeclaringType ?? prop.GetSetter()?.DeclaringType;
-                         
-                        ClassType.FullName == declaringType.FullName
-                      }
-                    })
                   .Where(p => p.Name != "server")
       }
     }
@@ -324,7 +312,14 @@ $indent};#>
             
           def ret = string.Join(", ", elementsWithValue);          
           Some($"[$ret]")
-        | PExpr.Call => Some(JSAstBuilder.BuildJSAst(ClassType.FullName, Typer.TypeExpr(expr), false, null).Write() + ";")
+        | PExpr.Call => 
+          def ast = JSAstBuilder.BuildJSAst(
+            ClassType.FullName,
+            Typer.TypeExpr(expr),
+            false,
+            null,
+            Some(ClassType));
+          Some(ast.Write() + ";")
         | PExpr.Literal(Literal.Void)
         | PExpr.Literal(Literal.Null)    
         | _ => None()
@@ -421,22 +416,8 @@ $(bodyIndent)$SelfInit
 $body
 $indent#>
         }
-            
-      def writeBody =
-        if(ctorBody.Trim().Length == 0)
-        {
-          // Call empty base constructor if exists
-          if (parameters is [] && JSClassHelper.HasBase(ClassType))
-          {
-            JSAstBuilder.DependencyGraph.Add(ClassType.FullName, ClassType.BaseType);
-            def baseName = GetProperName(ClassType.BaseType.FullName);            
-            makeBody($<#$bodyIndent$baseName.call($Self, "");#>)
-          }
-          else
-            ""
-        }
-        else
-          makeBody(ctorBody);
+      
+      def writeBody = makeBody(ctorBody);
             
       def properTypeName = GetProperName(ClassType);
       def ctorObject = properTypeName + "$ctor";
