@@ -286,6 +286,10 @@
       <SubType>Code</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="MVVM\Tutorial\Sample_3.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="MVVM\Tutorial\TutorialSamples.n">
       <SubType>Code</SubType>
     </Compile>

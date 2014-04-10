@@ -84,6 +84,7 @@ namespace NemerleWeb
         | "Max"
         | "Min"
         | "OrderBy"
+        | "OrderByDescending"
         | "Repeat"
         | "Select"
         | "SelectMany"

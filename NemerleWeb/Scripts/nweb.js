@@ -613,7 +613,6 @@
             } while (changeFound && !selfCall);
 
             if (!selfCall) {
-              $(window).trigger("nweb-invalidated");
               nweb.invalidationCount = 0;
               nweb.changeFoundCount = 0;
             }

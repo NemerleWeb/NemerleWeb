@@ -15,25 +15,22 @@ namespace NemerleWeb.Website
   [Unit]
   public class TutorialSamples
   {    
-    public Samples : List[(object * string * int)] = List();
+    public Samples : List[TutorialSample] = List();
     
     public this()
     {
       def samplesRoot = "MVVM/Tutorial/";
-      def samples = [(Sample_1(), "Sample_1.n"),
-                     (Sample_2(), "Sample_2.n")];
       
-      foreach((s, f) in samples with i) {
-        def index = i;
+      Samples.Add(TutorialSample(Sample_1(), 0, "Sample_1.n", ""));
+      Samples.Add(TutorialSample(Sample_2(), 1, "Sample_2.n", ""));
+      Samples.Add(TutorialSample(Sample_3(), 2, "Sample_3.n", ""));
+                     
+      foreach(s in Samples) {
         def sample = s;
-        def fname = f;
-        
-        Samples.Add((sample, "", i + 1));
-        
-        _ = server.LoadSourceFor(samplesRoot + fname, src => {
-          Samples[i] = (sample, src, i + 1);
-          when(i == Samples.Count - 1)
-            prettyPrint();
+        _ = server.LoadSourceFor(samplesRoot + sample.Filename, src => {
+          sample.Source = src;
+          when(sample.Index == Samples.Count - 1)       
+            jQuery(window).trigger("samples-initialized");
         });
       }
     }
@@ -42,14 +39,9 @@ namespace NemerleWeb.Website
     public View() : string
     {
        <#
-         <div $foreach((sample, src, index) in Samples) class="$("tutorial-sample-" + index)">
-           <div class="tutorial-sample row">
-             <pre class="col-md-6 prettyprint lang-n">$src</pre>
-             <div class="col-md-6">
-              <div template="$sample"></div>
-             </div>
-           </div>
-         </div>         
+         <div template="$(Samples[0])"></div>
+         <div template="$(Samples[1])"></div>
+         <div template="$(Samples[2])"></div>
        #>
     }
     
@@ -58,6 +50,30 @@ namespace NemerleWeb.Website
       public LoadSourceFor(sample : string) : string
       {
         Helpers.LoadSourceFor(sample, true);
+      }
+    }
+    
+    [Unit, Record]
+    public class TutorialSample
+    {
+      public Sample : object { get; set; }
+      public Index : int { get; set; }
+      public Filename : string { get; set; }
+      public Source : string { get; set; }
+      
+      [Html]
+      public View() : string
+      {
+         <#
+           <div class="$("tutorial-sample-" + Index)">
+             <div class="tutorial-sample row">
+               <pre class="col-md-8 prettyprint lang-n">$Source</pre>
+               <div class="col-md-4">
+                <div template="$Sample"></div>
+               </div>
+             </div>
+           </div>         
+         #>
       }
     }
   }
