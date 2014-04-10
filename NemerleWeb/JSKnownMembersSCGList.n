@@ -53,6 +53,7 @@ namespace NemerleWeb
         match(member.Name, items)
         {
         | ("Insert", [arg1, arg2]) => Some(left.JSMethodCall("splice", [arg1, JSAst.Literal(JSLiteral.Number(0)), arg2]))
+        | ("set_Item", [arg1, arg2]) => Some(JSAst.Assign(JSAst.ArrayIndexer(left, arg1), arg2))
         | ("Add", _) => Some(left.JSMethodCall("push", [JSAst.Tuple(parms)]))
         | _ => None()
         }

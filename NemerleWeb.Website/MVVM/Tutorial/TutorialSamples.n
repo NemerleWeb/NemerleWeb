@@ -14,31 +14,42 @@ namespace NemerleWeb.Website
 {
   [Unit]
   public class TutorialSamples
-  {
-    public Sample_1_Source : string { get; set; }
-    public Sample_1 : Sample_1 { get; set; }
+  {    
+    public Samples : List[(object * string * int)] = List();
     
     public this()
     {
-      Sample_1 = Sample_1();
-      _ = server.LoadSourceFor("MVVM/Tutorial/Sample_1.n", src => {
-        Sample_1_Source = src;        
+      def samplesRoot = "MVVM/Tutorial/";
+      def samples = [(Sample_1(), "Sample_1.n"),
+                     (Sample_2(), "Sample_2.n")];
+      
+      foreach((s, f) in samples with i) {
+        def index = i;
+        def sample = s;
+        def fname = f;
         
-        nweb.invalidate();
-        prettyPrint();
-      });
+        Samples.Add((sample, "", i + 1));
+        
+        _ = server.LoadSourceFor(samplesRoot + fname, src => {
+          Samples[i] = (sample, src, i + 1);
+          when(i == Samples.Count - 1)
+            prettyPrint();
+        });
+      }
     }
     
     [Html]
     public View() : string
     {
        <#
-         <div class="tutorial-sample-1 tutorial-sample row">
-           <pre class="col-md-6 prettyprint lang-n">$Sample_1_Source</pre>
-           <div class="col-md-6">
-            <div template="$Sample_1"></div>
+         <div $foreach((sample, src, index) in Samples) class="$("tutorial-sample-" + index)">
+           <div class="tutorial-sample row">
+             <pre class="col-md-6 prettyprint lang-n">$src</pre>
+             <div class="col-md-6">
+              <div template="$sample"></div>
+             </div>
            </div>
-         </div>
+         </div>         
        #>
     }
     

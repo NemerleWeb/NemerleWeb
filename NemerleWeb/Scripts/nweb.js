@@ -613,12 +613,9 @@
             } while (changeFound && !selfCall);
 
             if (!selfCall) {
-                /*console.log("total binding count: " + getTotalBindingsCount(bindings));
-      console.log("invalidate count: " + nweb.invalidationCount);
-      console.log("invalidate restart count: " + nweb.changeFoundCount);
-      */
-                nweb.invalidationCount = 0;
-                nweb.changeFoundCount = 0;
+              $(window).trigger("nweb-invalidated");
+              nweb.invalidationCount = 0;
+              nweb.changeFoundCount = 0;
             }
 
             return changeFound;

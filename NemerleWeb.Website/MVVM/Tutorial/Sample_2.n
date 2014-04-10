@@ -1,0 +1,37 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NemerleWeb;
+
+namespace NemerleWeb.Website
+{  
+  [Unit]
+  public class Sample_2
+  {
+    Tasks = List.[string]();
+    TaskToAdd : string { get; set; }
+
+    AddTask() : void
+    {
+      Tasks.Add(TaskToAdd);
+      TaskToAdd = "";
+    }
+
+    [Html]
+    View() : string
+    {
+      <#
+        <input value="$TaskToAdd" />
+        <button click="$AddTask">Add task</button>
+        <ul>
+          <li $foreach(t in Tasks)>$t</li>
+        </ul>
+      #>
+    }
+  }
+}
