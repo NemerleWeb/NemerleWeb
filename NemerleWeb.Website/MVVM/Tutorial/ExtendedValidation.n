@@ -1,0 +1,73 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NemerleWeb;
+
+namespace NemerleWeb.Website
+{  
+  [Unit]
+  public class ExtendedValidation
+  {
+    Tasks = List.[Task]();
+    TaskToAdd : Task { get; set; }
+
+    public this()
+    {
+      TaskToAdd = Task("", 0, false);
+    }
+    
+    AddTask() : void
+    {      
+      Tasks.Add(TaskToAdd);
+      TaskToAdd = Task("", 0, false);
+    }
+    
+    TitleIsLongEnough(task : Task) : bool 
+    {
+      task.Title.Length > 2
+    }
+
+    PriorityIsPositive(task : Task) : bool
+    {
+      task.Priority > 0
+    }
+
+    ValidateTask(task : Task) : bool
+    {
+      TitleIsLongEnough(task) && PriorityIsPositive(task)
+    }
+    
+    [Html]
+    View() : string
+    {
+      <#
+        <div>
+          Title: <input value="$(TaskToAdd.Title)" />
+          <span visible="$(!TitleIsLongEnough(TaskToAdd))" class="validation-error">Title is not long enough</span>
+          Priority: <input value="$(TaskToAdd.Priority)" />
+          <span visible="$(!PriorityIsPositive(TaskToAdd))" class="validation-error">Priority should be positive</span>
+          <button click="$AddTask" disabled="$(!ValidateTask(TaskToAdd))">Add task</button>
+          <ul>
+            <li $foreach(t in Tasks.OrderByDescending(t => t.Priority))>
+              $(t.Title) ($(t.Priority))
+              <input type="checkbox" checked="$(t.Status)" />
+            </li>
+          </ul>
+        </div>
+      #>
+    }
+    
+    [Record]
+    class Task
+    {
+        public Title : string;
+        public Priority : int;
+        public Status : bool;
+    }
+  }  
+}

@@ -1,0 +1,62 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NemerleWeb;
+
+namespace NemerleWeb.Website
+{  
+  [Unit]
+  public class SimpleValidation
+  {
+    Tasks = List.[Task]();
+    TaskToAdd : Task { get; set; }
+
+    public this()
+    {
+      TaskToAdd = Task("", 0, false);
+    }
+    
+    AddTask() : void
+    {      
+      Tasks.Add(TaskToAdd);
+      TaskToAdd = Task("", 0, false);
+    }
+
+    ValidateTask(task : Task) : bool
+    {
+      task.Title.Length > 2 &&
+      task.Priority >= 0
+    }
+    
+    [Html]
+    View() : string
+    {
+      <#
+        <div>
+          Title: <input value="$(TaskToAdd.Title)" />
+          Priority: <input value="$(TaskToAdd.Priority)" />
+          <button click="$AddTask" disabled="$(!ValidateTask(TaskToAdd))">Add task</button>
+          <ul>
+            <li $foreach(t in Tasks.OrderByDescending(t => t.Priority))>
+              $(t.Title) ($(t.Priority))
+              <input type="checkbox" checked="$(t.Status)" />
+            </li>
+          </ul>
+        </div>
+      #>
+    }
+    
+    [Record]
+    class Task
+    {
+        public Title : string;
+        public Priority : int;
+        public Status : bool;
+    }
+  }  
+}

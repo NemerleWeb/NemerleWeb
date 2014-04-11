@@ -183,3 +183,12 @@ ul.nav li.dropdown:hover > ul.dropdown-menu {
 .tutorial-sample > div {
     padding: 40px;
 }
+
+.tutorial-sample .validation-error {
+    color: red;
+}
+
+.tutorial-sample input, .tutorial-sample button {
+    display: block;
+    margin: 5px 0;
+}
