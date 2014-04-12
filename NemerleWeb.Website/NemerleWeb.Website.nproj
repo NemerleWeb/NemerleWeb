@@ -278,6 +278,10 @@
     <Compile Include="MVVM\Tests\UnitTestPage.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MVVM\Tutorial\CSharpPage.cs">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="MVVM\Tutorial\ExtendedValidation.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -301,6 +305,9 @@
     <Compile Include="MVVM\Tutorial\SimpleValidation.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\Tutorial\TestPage.n">
+      <SubType>Code</SubType>
     </Compile>
     <Compile Include="MVVM\Tutorial\TutorialSamples.n">
       <SubType>Code</SubType>

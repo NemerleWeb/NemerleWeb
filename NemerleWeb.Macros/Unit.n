@@ -75,71 +75,74 @@ namespace NemerleWeb
     {      
       Macros.DefineCTX(typer);
       
-      JSClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
-      JSClass.StringType = <[ ttype : System.String ]>;
-      JSClass.IPageType = <[ ttype: IPage ]>;
-      JSClass.ObjectType = <[ ttype: System.Object ]>;
-      
-      def debug = typer.Env.Defines.Contains("DEBUG");
-      
-      def translateMethod(typer) 
+      unless(typer.Manager.IsIntelliSenseMode)
       {
-        when(typer.CurrentFunction.body is FunBody.Typed(body))
+        JSClass.IEnumerableType = <[ ttype : System.Collections.IEnumerable ]>;
+        JSClass.StringType = <[ ttype : System.String ]>;
+        JSClass.IPageType = <[ ttype: IPage ]>;
+        JSClass.ObjectType = <[ ttype: System.Object ]>;
+      
+        def debug = typer.Env.Defines.Contains("DEBUG");
+      
+        def translateMethod(typer) 
         {
-          def methodBuilder = typer.CurrentMethodBuilder;          
-          def shouldReturn = !(methodBuilder.Header.ReturnType is FixedType.Void()) && !methodBuilder.IsConstructor;
-          def ast = JSAstBuilder.BuildJSAst(
-            typer.CurrentType.FullName,
-            body,
-            shouldReturn,
-            methodBuilder.Header,
-            Some(tb));
-          JSAstCache.AddMethodAst(typer.CurrentTypeBuilder, typer.CurrentFunction, ast);
+          when(typer.CurrentFunction.body is FunBody.Typed(body))
+          {
+            def methodBuilder = typer.CurrentMethodBuilder;          
+            def shouldReturn = !(methodBuilder.Header.ReturnType is FixedType.Void()) && !methodBuilder.IsConstructor;
+            def ast = JSAstBuilder.BuildJSAst(
+              typer.CurrentType.FullName,
+              body,
+              shouldReturn,
+              methodBuilder.Header,
+              Some(tb));
+            JSAstCache.AddMethodAst(typer.CurrentTypeBuilder, typer.CurrentFunction, ast);
+          }
         }
-      }
             
-      def processType(typeBuilder) 
-      { 
-        def getAncesterCount(t : TypeInfo) {
-          if(t.DeclaringType != null) getAncesterCount(t.DeclaringType) + 1 else 0;
-        }
+        def processType(typeBuilder) 
+        { 
+          def getAncesterCount(t : TypeInfo) {
+            if(t.DeclaringType != null) getAncesterCount(t.DeclaringType) + 1 else 0;
+          }
         
-        def saveDependencyList() {
-          def deps = JSAstBuilder.DependencyGraph.GetTypeDependencies(typeBuilder.FullName);
-          def serialized = string.Join(",", [typeBuilder.FullName].Concat(deps)) + Environment.NewLine;
-          File.AppendAllText(_dependenciesFilename, serialized);
-        }
+          def saveDependencyList() {
+            def deps = JSAstBuilder.DependencyGraph.GetTypeDependencies(typeBuilder.FullName);
+            def serialized = string.Join(",", [typeBuilder.FullName].Concat(deps)) + Environment.NewLine;
+            File.AppendAllText(_dependenciesFilename, serialized);
+          }
         
-        typeBuilder.MethodBeforeStage3 += (_, e) => translateMethod(e.Typer);        
-        typeBuilder.DoBeforeFinalization(() => {
-          def jsClass = JSClass(typeBuilder, "  ", typer);
-          _ = AddMainData(typeBuilder, jsClass.Write(debug), getAncesterCount(typeBuilder));
+          typeBuilder.MethodBeforeStage3 += (_, e) => translateMethod(e.Typer);        
+          typeBuilder.DoBeforeFinalization(() => {
+            def jsClass = JSClass(typeBuilder, "  ", typer);
+            _ = AddMainData(typeBuilder, jsClass.Write(debug), getAncesterCount(typeBuilder));
                       
-          def staticBody = StringBuilder();
-          _ = staticBody
-            .AppendWhen(debug, _.AppendLine($"// $(typeBuilder.FullName) - Static constructor body"))
-            .AppendLineValue(jsClass.GetStaticFieldsDefaultInit(""))
-            .AppendLineValue(jsClass.GetStaticConstructorBody(""));
+            def staticBody = StringBuilder();
+            _ = staticBody
+              .AppendWhen(debug, _.AppendLine($"// $(typeBuilder.FullName) - Static constructor body"))
+              .AppendLineValue(jsClass.GetStaticFieldsDefaultInit(""))
+              .AppendLineValue(jsClass.GetStaticConstructorBody(""));
             
-          AddStaticFields(typeBuilder, staticBody.ToString());
+            AddStaticFields(typeBuilder, staticBody.ToString());
           
-          saveDependencyList();
-        });
-      }
+            saveDependencyList();
+          });
+        }
       
-      def getAllNestedTypes(tb, isTopMost)
-      {
-        def children = JSClass.GetNestedTypes(tb)
-                              .Map(t => getAllNestedTypes(t, false))
-                              .Flatten();
+        def getAllNestedTypes(tb, isTopMost)
+        {
+          def children = JSClass.GetNestedTypes(tb)
+                                .Map(t => getAllNestedTypes(t, false))
+                                .Flatten();
                               
-        if(isTopMost) children else tb :: children;
+          if(isTopMost) children else tb :: children;
+        }
+      
+        processType(tb);
+      
+        foreach(nestedType in getAllNestedTypes(tb, true))
+            processType(nestedType);
       }
-      
-      processType(tb);
-      
-      foreach(nestedType in getAllNestedTypes(tb, true))
-          processType(nestedType);
     }
     
     static mutable collectedJSApiRoots : bool = false;
@@ -157,7 +160,7 @@ namespace NemerleWeb
       CreateRenderer(tb);
       
       def cacheFieldInitializers(typeBuilder) 
-      {     
+      {             
         foreach(fld in typeBuilder.GetFields().Cast.[FieldBuilder]())        
           JSAstCache.AddFieldInitializer(typeBuilder, fld.Name, fld?.Ast?.Initializer);        
       }
