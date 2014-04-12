@@ -120,7 +120,7 @@ namespace NemerleWeb
         | TExpr.TypeConversion(expr, _, _, _) => htmlFromTExpr(expr, indent)
         | Call(StaticRef(lst, mem, _), parms, _) 
           when lst.TypeInfo.FullName == "Nemerle.Core.Cons[T]" && mem.Name == ".ctor" =>
-          string.Join(" ", parms.Map(p => htmlFromTExpr(p.expr, indent)));
+          string.Join("", parms.Map(p => htmlFromTExpr(p.expr, indent)));
           
         | StaticRef(lst, mem, _) 
           when lst.TypeInfo.FullName == "Nemerle.Core.Nil[T]" && mem.Name == "_N_constant_object" =>         
@@ -136,7 +136,7 @@ namespace NemerleWeb
               def foreachEnum = 
                   "nw-foreach=\"" + getLocalValueName(loopValName) + " in " + escape(getAstString(val)) + "\" ";
               (foreachEnum + htmlFromTExpr(attrs, indent), 
-               htmlFromTExpr(childTags, indent + "  "))
+               htmlFromTExpr(childTags, ""))
             //foreach((x0, x1) in xs)
             | DefValIn(_, val, Match(_, [case])) => 
               match(case.patterns) {
@@ -153,7 +153,7 @@ namespace NemerleWeb
               }              
             | Tuple([attrs, childTags]) =>
               (htmlFromTExpr(attrs, indent), 
-               htmlFromTExpr(childTags, indent + "  "))
+               htmlFromTExpr(childTags, ""))
             | _ => assert2(false); ("", "");
             }
         

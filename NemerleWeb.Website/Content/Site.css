@@ -180,6 +180,11 @@ ul.nav li.dropdown:hover > ul.dropdown-menu {
     margin: 0;
 }
 
+.tutorial-sample .lang-n {
+    font-family: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,serif;
+    font-size: 11px;
+}
+
 .tutorial-sample > div {
     padding: 40px;
 }
@@ -188,7 +193,13 @@ ul.nav li.dropdown:hover > ul.dropdown-menu {
     color: red;
 }
 
-.tutorial-sample input, .tutorial-sample button {
+.tutorial-sample input[text], .tutorial-sample button {
     display: block;
     margin: 5px 0;
+}
+
+.tutorial-sample ul {
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
 }

@@ -613,6 +613,7 @@
             } while (changeFound && !selfCall);
 
             if (!selfCall) {
+              $(window).trigger("nweb-invalidated");
               nweb.invalidationCount = 0;
               nweb.changeFoundCount = 0;
             }
@@ -633,7 +634,7 @@
             if (el.tagName === "SELECT") {
                 var selected = $("option:selected", el)[0];
                 if (selected)
-                    return selected[nweb.dataKey];
+                  return selected[nweb.dataKey];
                 return $("option", el)[0][nweb.dataKey];
             } else {
                 return $(el).val();
@@ -653,7 +654,7 @@
                     $el.val(val);
             }
         },
-        dataKey: "__nw_value_data",
+        dataKey: "value",
         bindings: []
     };
     window.nweb = nweb;

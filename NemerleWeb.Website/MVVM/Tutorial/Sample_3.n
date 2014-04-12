@@ -18,13 +18,13 @@ namespace NemerleWeb.Website
 
     public this()
     {
-      TaskToAdd = Task("", 0, false);
+      TaskToAdd = Task("Eat a pretzel", 0, false);
     }
     
     AddTask() : void
     {      
       Tasks.Add(TaskToAdd);
-      TaskToAdd = Task("", 0, false);
+      TaskToAdd = Task("Eat pretzel #" + (Tasks.Count + 1), 0, false);
     }
 
     [Html]
@@ -32,8 +32,14 @@ namespace NemerleWeb.Website
     {
       <#
         <div>
-          Title: <input value="$(TaskToAdd.Title)" />
-          Priority: <input value="$(TaskToAdd.Priority)" />
+          Title
+          <input value="$(TaskToAdd.Title)" />
+          Priority
+          <select value="$(TaskToAdd.Priority)">
+            <option value="0">low</option>
+            <option value="1">kinda important</option>
+            <option value="2">really hungry!</option>
+          </select>
           <button click="$AddTask">Add task</button>
           <ul>
             <li $foreach(t in Tasks.OrderByDescending(t => t.Priority))>

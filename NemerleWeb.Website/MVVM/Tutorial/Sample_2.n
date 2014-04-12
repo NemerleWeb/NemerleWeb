@@ -16,10 +16,15 @@ namespace NemerleWeb.Website
     Tasks = List.[string]();
     TaskToAdd : string { get; set; }
 
+    public this() 
+    {
+      TaskToAdd = "Eat a pretzel";
+    }
+    
     AddTask() : void
     {
       Tasks.Add(TaskToAdd);
-      TaskToAdd = "";
+      TaskToAdd = "Eat a pretzel #" + (Tasks.Count + 1);
     }
 
     [Html]
