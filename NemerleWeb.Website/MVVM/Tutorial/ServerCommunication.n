@@ -1,0 +1,61 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NemerleWeb;
+
+namespace NemerleWeb.Website
+{  
+  [Unit]
+  public class ServerCommunication
+  {   
+    //Server class will be running on server side,
+    //inside MVC controller generated for this Unit
+    public class Server
+    {
+      //We use 'static' field to store our value
+      public static mutable _name : string;
+      
+      public SetName(name : string) : object 
+      { 
+        _name = $"Hello, $name!"; 
+        //Return 'null' since we still need a return value,
+        //even if client side doesn't need it
+        null
+      }
+      
+      public GetName() : string { _name; }
+    }
+    
+    mutable Name : string;
+    mutable ServerName : string;
+      
+    SendName() : void
+    {
+      server.SetName(Name, _ => ReceiveName());
+    }
+      
+    ReceiveName() : void
+    {
+      server.GetName(name => ServerName = name);
+    }
+   
+    [Html]
+    public View() : string
+    {
+      <#
+        <span class="instructions">
+          Enter a name and save it. Then refresh a page and press "Load"
+        </span>
+        <input value="$Name" />
+        <div visible=$(ServerName != null)>$ServerName</div>
+        <input type="button" value="Save" click="$(SendName())" />
+        <input type="button" value="Load" click="$(ReceiveName())" />
+      #>
+    }
+  }
+}

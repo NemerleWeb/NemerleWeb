@@ -26,6 +26,7 @@ namespace NemerleWeb.Website
       Samples.Add(TutorialSample(Sample_3(), 2, "Sample_3.n", ""));
       Samples.Add(TutorialSample(SimpleValidation(), 3, "SimpleValidation.n", ""));
       Samples.Add(TutorialSample(ExtendedValidation(), 4, "ExtendedValidation.n", ""));
+      Samples.Add(TutorialSample(ServerCommunication(), 5, "ServerCommunication.n", ""));
                      
       foreach(s in Samples) {
         def sample = s;
@@ -46,6 +47,7 @@ namespace NemerleWeb.Website
          <div template="$(Samples[2])"></div>
          <div template="$(Samples[3])"></div>
          <div template="$(Samples[4])"></div>
+         <div template="$(Samples[5])"></div>
        #>
     }
     

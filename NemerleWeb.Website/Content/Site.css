@@ -185,6 +185,10 @@ ul.nav li.dropdown:hover > ul.dropdown-menu {
     font-size: 11px;
 }
 
+.tutorial-sample .instructions {
+    font-size: 11px;
+}
+
 .tutorial-sample > div {
     padding: 40px;
 }
