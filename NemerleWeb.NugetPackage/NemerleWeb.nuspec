@@ -2,15 +2,15 @@
 <package >
   <metadata>
     <id>NemerleWeb</id>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <authors>NemerleWeb team</authors>
     <owners>NemerleWeb team</owners>
     <licenseUrl>http://opensource.org/licenses/mit-license.php</licenseUrl>
     <projectUrl>http://www.github.com/NemerleWeb/NemerleWeb</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>NemerleWeb web framework</description>
+    <description>NemerleWeb framework</description>
     
-    <copyright>Copyright 2013</copyright>
+    <copyright>Copyright 2014</copyright>
     <tags>Nemerle Web MVVM</tags>
   </metadata>
 </package>
