@@ -77,7 +77,7 @@ switch -wildcard ($command)
     & $installPath\IISExpress\iisexpress.exe /path:"$currentDirectory" /port:63749
   }
 
-  "help" {
+  default {
     Write-Host "`r`nCreate project in current directory`r`n---------------------------" -ForegroundColor Yellow
 
     Write-Host "nweb create ProjectName`r`nnweb c ProjectName"
