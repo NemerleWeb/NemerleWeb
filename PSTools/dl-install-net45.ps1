@@ -5,6 +5,7 @@ function Is-45-Installed()
     if(!(Test-Path $path)) { return $false }
     if ((Get-ItemProperty $path).$key -eq "378389") { return $true } # .NET Framework 4.5
     if ((Get-ItemProperty $path).$key -eq "378575") { return $true } # .NET Framework 4.5.1 Preview
+    if ((Get-ItemProperty $path).$key -eq "378675") { return $true } # .NET Framework 4.5.1
 
     return $false
 }

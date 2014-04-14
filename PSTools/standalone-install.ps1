@@ -34,6 +34,10 @@ if(test-path 'HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\11.0') {
 	$vsInstallDir = (get-itemproperty 'HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\11.0').InstallDir
 }
 
+if(!$vsInstallDir -and (test-path 'HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\12.0')) {
+	$vsInstallDir = (get-itemproperty 'HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\12.0').InstallDir 
+}
+
 if($vsInstallDir) {
 	write-host "You have Visual Studio 2012 installed, downloading extension..."
 	

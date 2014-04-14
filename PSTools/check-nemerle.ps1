@@ -1,12 +1,10 @@
-$nemerlePath = Join-Path $env:NemerleBinPathRoot "net-4.0"
-
-if($env:NemerleBinPathRoot -eq "" -or ![System.IO.Directory]::Exists($nemerlePath)) {
+if($env:NemerleBinPathRoot -eq "" -or ![System.IO.Directory]::Exists(Join-Path $env:NemerleBinPathRoot "net-4.0")) {
 	Write-Host "You don't have Nemerle installed or it isn't installed properly" -ForegroundColor Yellow
 	./dl-install-nemerle.ps1
 } else {
-	$nccPath = Join-Path $nemerlePath "ncc.exe"
+	$nccPath = Join-Path (Join-Path $env:NemerleBinPathRoot "net-4.0") "ncc.exe"
 	$version = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($nccPath).FileVersion
-	$requiredVersion = '1.2.0.26'
+	$requiredVersion = '1.2.208.0'
 
 	if($version -lt $requiredVersion) {
 		do {

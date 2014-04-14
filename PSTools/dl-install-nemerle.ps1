@@ -2,7 +2,7 @@ $installPath = Join-Path $env:APPDATA "NemerleWeb"
 if (![System.IO.Directory]::Exists($installPath)) {[System.IO.Directory]::CreateDirectory($installPath)}
 
 Write-Host "Downloading latest Nemerle installer" -ForegroundColor Yellow;
-$url = "http://nemerle.org/Download/Nightly%20master-NET45-VS2012/608/NemerleSetup-net-4.5-v1.2.56.0.msi"
+$url = "http://nemerle.org/Download/Nightly%20master-NET45-VS2012/build-177/NemerleSetup-net-4.5-v1.2.208.0.msi"
 $file = Join-Path $installPath "latest.msi"
 $downloader = new-object System.Net.WebClient
 $downloader.DownloadFile($url, $file)
