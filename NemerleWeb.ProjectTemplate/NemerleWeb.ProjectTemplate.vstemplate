@@ -20,7 +20,13 @@
       <ProjectItem ReplaceParameters="true" OpenInEditor="true">Content\Site.css</ProjectItem>
       <ProjectItem ReplaceParameters="true" OpenInEditor="true">Global.asax</ProjectItem>
       <ProjectItem ReplaceParameters="true" OpenInEditor="true">Global.asax.n</ProjectItem>
-      <ProjectItem ReplaceParameters="true" OpenInEditor="true">MVVM\MainPage.n</ProjectItem>
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">MVVM\MainPage.n</ProjectItem>      
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">Scripts\jquery.signalR-1.2.0.js</ProjectItem>
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">Scripts\jquery.signalR-1.2.0.min.js</ProjectItem>
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">Scripts\jquery-1.10.2.js</ProjectItem>
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">Scripts\jquery-1.10.2.intellisense.js</ProjectItem>
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">Scripts\jquery-1.10.2.min.js</ProjectItem>
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">Scripts\jquery-1.10.2.min.map</ProjectItem>
       <ProjectItem ReplaceParameters="true" OpenInEditor="true">Views\Home\Index.cshtml</ProjectItem>
       <ProjectItem ReplaceParameters="true" OpenInEditor="true">Views\Shared\Error.cshtml</ProjectItem>
       <ProjectItem ReplaceParameters="true" OpenInEditor="true">Views\Shared\_Layout.cshtml</ProjectItem>
