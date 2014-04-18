@@ -29,7 +29,13 @@ namespace NemerleWeb.Website
                 "samples", // URL with parameters
                 new (controller = "Home", action = "Samples", id = UrlParameter.Optional) // Parameter defaults
             );
-
+			
+            _ = routes.MapRoute(
+                "ParsersSamples", // Route name
+                "parserssamples", // URL with parameters
+                new (controller = "Home", action = "ParsersSamples", id = UrlParameter.Optional) // Parameter defaults
+            );
+			
             _ = routes.MapRoute(
                 "Tutorial", // Route name
                 "tutorial", // URL with parameters

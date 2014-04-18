@@ -36,12 +36,12 @@ namespace NemerleWeb.Website
       
     SendName() : void
     {
-      server.SetName(Name, _ => ReceiveName());
+      _ = server.SetName(Name, _ => ReceiveName());
     }
       
     ReceiveName() : void
     {
-      server.GetName(name => ServerName = name);
+      _ = server.GetName(name => ServerName = name);
     }
    
     [Html]

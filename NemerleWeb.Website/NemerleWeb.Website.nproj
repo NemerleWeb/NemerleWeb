@@ -7,8 +7,7 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{837f8d8f-b2b7-4bfb-81d3-3c168f86173c}</ProjectGuid>
-    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{edcc3b85-0bad-11db-bc1a-00112fde8b61}</ProjectTypeGuids>
+    <ProjectGuid>{837f8d8f-b2b7-4bfb-81d3-3c168f86173c}</ProjectGuid>    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{edcc3b85-0bad-11db-bc1a-00112fde8b61}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NemerleWeb.Website</RootNamespace>
@@ -223,23 +222,27 @@
       <SubType>Code</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\Samples\Peg\CalculatorPage.n">
+    <Compile Include="MVVM\ParsersSamples\Peg\CalculatorPage.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\Samples\Peg\CSPage.n">
+    <Compile Include="MVVM\ParsersSamples\Peg\CSPage.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\Samples\Peg\JsonPage.n">
+    <Compile Include="MVVM\ParsersSamples\Peg\JsonPage.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\Samples\Peg\JSPage.n">
+    <Compile Include="MVVM\ParsersSamples\Peg\JSPage.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="MVVM\Samples\Peg\TsdPage.n">
+    <Compile Include="MVVM\ParsersSamples\Peg\TsdPage.n">
+      <SubType>Code</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="MVVM\ParsersSamples\ParsersSamples.n">
       <SubType>Code</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
@@ -400,7 +403,8 @@
     <Folder Include="MVVM\Tutorial" />
     <Folder Include="MVVM\Samples\" />
     <Folder Include="MVVM\Samples\Knockout\" />
-    <Folder Include="MVVM\Samples\Peg" />
+	<Folder Include="MVVM\ParsersSamples\" />
+    <Folder Include="MVVM\ParsersSamples\Peg" />
     <Folder Include="MVVM\Tests\" />
     <Folder Include="Properties\" />
     <Folder Include="PSTools\" />
@@ -488,7 +492,10 @@
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets. -->
   <PropertyGroup>
-    <YourDestinationDirectory>$(TargetDir)MVVM\Samples</YourDestinationDirectory>
+    <SamplesDestinationDirectory>$(TargetDir)MVVM\Samples</SamplesDestinationDirectory>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ParsersDestinationDirectory>$(TargetDir)MVVM\ParsersSamples</ParsersDestinationDirectory>
   </PropertyGroup>
   <Target Name="BeforeBuild">
   </Target>
@@ -496,23 +503,23 @@
     <ItemGroup>
       <CalculatorParser Include="$(ProjectDir)..\peg-parser\Calculator\*.n" />
     </ItemGroup>
-    <Copy SourceFiles="@(CalculatorParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\CalculatorParser" />
+    <Copy SourceFiles="@(CalculatorParser)" DestinationFolder="$(ParsersDestinationDirectory)\Peg\CalculatorParser" />
     <ItemGroup>
       <JsonParser Include="$(ProjectDir)..\peg-parser\Json\Nemerle.Json\*.n" />
     </ItemGroup>
-    <Copy SourceFiles="@(JsonParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\JsonParser" />
+    <Copy SourceFiles="@(JsonParser)" DestinationFolder="$(ParsersDestinationDirectory)\Peg\JsonParser" />
     <ItemGroup>
       <JSParser Include="$(ProjectDir)..\peg-parser\JSParser\*.n" />
     </ItemGroup>
-    <Copy SourceFiles="@(JSParser)" DestinationFolder="$(YourDestinationDirectory)\Peg\JSParser" />
+    <Copy SourceFiles="@(JSParser)" DestinationFolder="$(ParsersDestinationDirectory)\Peg\JSParser" />
     <ItemGroup>
       <TSParserPeg Include="$(ProjectDir)..\peg-parser\TSParserPeg\*.n" />
     </ItemGroup>
-    <Copy SourceFiles="@(TSParserPeg)" DestinationFolder="$(YourDestinationDirectory)\Peg\TSParserPeg" />
+    <Copy SourceFiles="@(TSParserPeg)" DestinationFolder="$(ParsersDestinationDirectory)\Peg\TSParserPeg" />
     <ItemGroup>
       <CSParserPeg Include="$(ProjectDir)..\peg-parser\CSharpParser\*.n" />
     </ItemGroup>
-    <Copy SourceFiles="@(CSParserPeg)" DestinationFolder="$(YourDestinationDirectory)\Peg\CSharpParser" />
+    <Copy SourceFiles="@(CSParserPeg)" DestinationFolder="$(ParsersDestinationDirectory)\Peg\CSharpParser" />
   </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />

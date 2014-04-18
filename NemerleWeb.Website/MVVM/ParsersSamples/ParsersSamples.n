@@ -1,0 +1,185 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Collections.Concurrent;
+using Nemerle;
+using NemerleWeb;
+using NemerleWeb.TypedJS;
+using NemerleWeb.Website.Tests;
+using NemerleWeb.Website.Samples.TypedJS;
+
+namespace NemerleWeb.Website.Samples
+{
+  [Unit, Record]
+  class ParsersSample
+  {
+    public Name : string { get; set; }
+    public SourceFiles : list[string] { get; set; }
+    public Source : string { get; set; }
+    public Instance : object { get; set; }
+  }
+  
+  [Unit]
+  class ParsersSamplesPage
+  {      
+    SelectedSample : ParsersSample { get; set; }
+    
+    Samples = List.[ParsersSample]();
+    PegSamples = List.[ParsersSample]();
+    AllSamples : array[ParsersSample] 
+    {
+      get
+      {
+        Samples.Concat(PegSamples).ToArray()
+      }
+    }
+    
+    PegCS         : CSPage { get; set; }
+    PegCalculator : CalculatorPage { get; set; }
+    PegJson       : JsonPage { get; set; }
+    PegJS         : JSPage { get; set; }
+    PegTsd        : TsdPage { get; set; }    
+    
+    Sources : List[string * string] { get; set; }
+    ThisPageSource : string { get; set; }
+        
+    public this()
+    {
+      PegCS         = CSPage(); 
+      PegCalculator = CalculatorPage();
+      PegJson       = JsonPage();
+      PegJS         = JSPage();
+      PegTsd        = TsdPage();
+            
+      Samples = [].ToList();
+      
+      PegSamples =
+      [
+        ParsersSample(
+          "C#",
+          [            
+            "MVVM/ParsersSamples/Peg/CSharpParser/Parser.n",
+            "MVVM/ParsersSamples/Peg/CSPage.n",
+          ],
+          "",
+          PegCS),
+        
+        ParsersSample(
+          "Calculator", 
+          [
+            "MVVM/ParsersSamples/Peg/CalculatorParser/CalcParser.n",
+            "MVVM/ParsersSamples/Peg/CalculatorPage.n"
+          ],
+          "",
+          PegCalculator),
+          
+        ParsersSample(
+          "Json",
+          [
+            "MVVM/ParsersSamples/Peg/JsonParser/JsonParser.n",
+            "MVVM/ParsersSamples/Peg/JsonPage.n",
+            "MVVM/ParsersSamples/Peg/JsonParser/Ast.n",
+            "MVVM/ParsersSamples/Peg/JsonParser/JsonUtils.n"
+          ],
+          "",
+          PegJson),
+        
+        ParsersSample(
+          "JavaScript",
+          [
+            "MVVM/ParsersSamples/Peg/JSParser/JSParser.n",
+            "MVVM/ParsersSamples/Peg/JSPage.n",
+          ],
+          "",
+          PegJS),
+          
+        ParsersSample(
+          "TypeScript Declarations",
+          [
+            "MVVM/ParsersSamples/Peg/TSParserPeg/TSDeclarationParser.n",
+            "MVVM/ParsersSamples/Peg/TsdPage.n",
+            "MVVM/ParsersSamples/Peg/TSParserPeg/TSDeclarationParser_Ast.n",
+          ],
+          "",
+          PegTsd),
+      ].ToList();
+                       
+      SelectedSample = Samples[1];
+            
+      LoadSamples(PegSamples);
+            
+      _ = server.LoadSourceFor("MVVM/ParsersSamples/ParsersSamples.n", source =>
+      {
+        ThisPageSource = source;
+        prettyPrint();
+      });
+    }
+    
+    LoadSamples(samples : List[ParsersSample]) : void
+    {
+      for(mutable i = 0; i < samples.Count; i++)      
+        LoadSample(samples, i)
+    }
+      
+    LoadSample(samples : List[ParsersSample], index : int) : void
+    {
+      _ = server.LoadSourceForList(samples[index].SourceFiles, source =>
+      {          
+        samples[index].Source = source;
+        prettyPrint();
+      });
+    }
+    
+    SelectSample(sample : ParsersSample) : void 
+    {
+      SelectedSample = sample;
+      nweb.invalidate();
+      prettyPrint();
+    }
+    
+    public class Server
+    {
+      public static _lastMessages : ConcurrentQueue[ParsersSample] = ConcurrentQueue.[ParsersSample]();
+      
+      public LoadSourceFor(sample : string) : string
+      {
+        Helpers.LoadSourceFor(sample);
+      }
+      
+      public LoadSourceForList(samples : IEnumerable[string]) : string
+      {
+        $<#..$(samples; "\n--------------------------------------------------\n"; s => Helpers.LoadSourceFor(s))#>
+      }
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <# 
+        <div>
+          <div class="row samples-nav">
+            <div class="col-xs-6">
+              <h4>Peg Samples</h4>
+              <ul class="nav nav-stacked">
+                <li $foreach(s in PegSamples) css-selected="$(SelectedSample.Name == s.Name)">
+                  <a href="#" click="$(SelectSample(s))">$(s.Name)</a>
+                </li>            
+              </ul>
+            </div>
+          </div>
+          <div $foreach(s in AllSamples)>
+            <div $when(SelectedSample.Name == s.Name) class="current-sample">
+              <div class="sample">
+                <div template="$(s.Instance)"></div>
+              </div>
+              <h3>Source</h3>
+              <pre class="prettyprint lang-n prettyprinted">$(s.Source)</pre>
+            </div>
+          </div>
+          <h3>Main page source</h3>
+          <pre class="prettyprint lang-n prettyprinted">$ThisPageSource</pre>
+        </div>
+      #>
+    }
+  }
+}

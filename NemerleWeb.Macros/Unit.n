@@ -149,15 +149,17 @@ namespace NemerleWeb
 
     public DoTransform(tb : TypeBuilder, typer : Typer) : void
     {
-      unless(typer.Manager.IsIntelliSenseMode)
+      if(!typer.Manager.IsIntelliSenseMode)
         DoTransformImpl(tb, typer);
+      else
+        DoTransformIntellisense(tb, typer);
     }
     
     public DoTransformImpl(tb : TypeBuilder, typer : Typer) : void
     {
       Macros.DefineCTX(typer);
                             
-      CreateRenderer(tb);
+      CreateRenderer(tb, true);
       
       def cacheFieldInitializers(typeBuilder) 
       {             
@@ -177,8 +179,7 @@ namespace NemerleWeb
         collectedJSApiRoots = true;
       }
       
-      def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");
-      def serverMethods = Dictionary();
+      def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");      
       if(serverClass != null)
       {          
           def env = typer.Manager.CoreEnv;
@@ -199,6 +200,7 @@ namespace NemerleWeb
           proxy.HasBeenUsed = true;
           tb.Define(<[ decl: new server : ServerProxy { get { ServerProxy() } } ]>);
           
+          def serverMethods = Dictionary();
           foreach(method is IMethod
             when !method.IsConstructor && method.DeclaringType.FullName == serverClass.FullName
             in serverClass.GetMembers())
@@ -302,9 +304,78 @@ namespace NemerleWeb
       }
     }
 
+    private DoTransformIntellisense(tb : TypeBuilder, typer : Typer) : void
+    {
+      Macros.DefineCTX(typer);
+        
+      CreateRenderer(tb, false);
+        
+      // Define server to make VS happy
+      def serverClass = tb.DeclaredNestedTypes.FirstOrDefault(t => t.Name == "Server");        
+      if(serverClass != null)
+      {
+        def env = typer.Manager.CoreEnv;
+        def env = env.EnterIntoNamespace(tb.NamespaceNode);
+        def controllerName = tb.Name + "Controller";
+        def field = <[ decl: _server : $(serverClass.Name : usesite) = $(serverClass.Name : usesite)() ]>;          
+        def controller = env.Define(<[ decl: 
+          public class $(controllerName : usesite) : System.Web.Mvc.Controller
+          {}
+        ]>);
+        controller.Define(field);
+                 
+        def proxy = tb.DefineNestedType(<[ decl:
+            [Ignore]
+            class ServerProxy
+            {}
+        ]>);
+        proxy.HasBeenUsed = true;
+        tb.Define(<[ decl: new server : ServerProxy { get { ServerProxy() } } ]>);
+          
+        def serverMethods = Dictionary();
+        foreach(method is IMethod
+          when !method.IsConstructor && method.DeclaringType.FullName == serverClass.FullName
+          in serverClass.GetMembers())
+        {
+          def parameters = method.GetParameters().Map(p => <[ $(p.Name : usesite) : $(p.ty : typed) ]>);
+          def fparms = parameters.Map(PParameter);
+          def methodName = controller.ParsedName.NewName(method.Name);
+                  
+          when(method.ReturnType.TryRequire(<[ ttype: void ]>))
+            Message.FatalError("Server methods cannot return void, please return something");
+              
+          if (serverMethods.ContainsKey(method.Name))
+          {
+            serverMethods[method.Name] += fparms;
+          }
+          else
+            serverMethods.Add(method.Name, fparms);
+                  
+          def allParms = fparms.Append([<[ parameter: _callback : Action[$(method.ReturnType : typed)] ]>]);
+                  
+          proxy.Define(<[ decl:                   
+            public new $(methodName : name) (..$(allParms)) : NemerleWeb.TypedJS.XMLHttpRequest
+            {
+              IgnoreParams();
+              throw ClientCodeCalledInServerException();
+            }
+          ]>);
+        }
+          
+        proxy.Compile();
+        controller.Compile();
+      }
+      else
+      {
+        def server = tb.DefineNestedType(<[ decl: public class Server {} ]>);
+        server.HasBeenUsed = true;
+        server.Compile();
+      }
+    }
+    
     private MscorlibGuid = "BED7F4EA-1A96-11d2-8F08-00A0C9A6186D";
     
-    private CreateRenderer(tb : TypeBuilder) : void
+    private CreateRenderer(tb : TypeBuilder, hasBody : bool) : void
     {
       def parms = match(tb.GetConstructors().FirstOrDefault()) {
       | null => []
@@ -316,19 +387,21 @@ namespace NemerleWeb
       def properName = JSClass.GetProperName(tb);
       def serverParams = parms.Select(p => <[ paramList.Add("nweb.utils.toTypedObject(" + NWebUtils.ToJson($(p.Name : usesite)) + ")") ]>);
       
-      _ = tb.DefineWithSource(<[ decl: public static new Render(..$pparms) : string {
-          NemerleWebInitializer.Initialize();
+      if(hasBody)      
+        _ = tb.DefineWithSource(<[ decl: public static new Render(..$pparms) : string
+          {
+            NemerleWebInitializer.Initialize();
           
-          def scripts = NemerleWeb.NWebData.GetScriptsForType($(tb.FullName : string));
-          def templates = NemerleWeb.NWebData.GetTemplatesForType($(tb.FullName : string));
-          def resources = NemerleWeb.NWebData.GetNemerleWebScripts();
+            def scripts = NemerleWeb.NWebData.GetScriptsForType($(tb.FullName : string));
+            def templates = NemerleWeb.NWebData.GetTemplatesForType($(tb.FullName : string));
+            def resources = NemerleWeb.NWebData.GetNemerleWebScripts();
           
-          def declarations = string.Join("\n", templates.Concat(scripts));
-          def unitName = $(properName : string);
-          def paramList = List();
-          paramList.Add($signature);
-          {..$(serverParams.NToList())}
-          def callParms = string.Join(",", paramList);
+            def declarations = string.Join("\n", templates.Concat(scripts));
+            def unitName = $(properName : string);
+            def paramList = List();
+            paramList.Add($signature);
+            {..$(serverParams.NToList())}
+            def callParms = string.Join(",", paramList);
 
 $<#
 <div id="nweb-start"></div>
@@ -340,7 +413,9 @@ $$(function() {
 });
 </script>
 #>
-      } ]>);
+        } ]>);
+      else
+      _ = tb.Define(<[ decl: public static new Render(..$pparms) : string { "" } ]>);
     }
     
     private ValidateReferences(manager : ManagerClass) : void

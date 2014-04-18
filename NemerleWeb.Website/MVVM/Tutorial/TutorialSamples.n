@@ -34,7 +34,7 @@ namespace NemerleWeb.Website
         _ = server.LoadSourceFor(samplesRoot + sample.Filename, src => {
           sample.Source = src;
           when(sample.Index == Samples.Count - 1)       
-            jQuery(window).trigger("samples-initialized");
+            _ = jQuery(window).trigger("samples-initialized");
         });
       }
     }
