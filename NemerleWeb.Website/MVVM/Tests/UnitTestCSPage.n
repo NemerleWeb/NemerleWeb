@@ -1,0 +1,56 @@
+﻿using NemerleWeb;
+using Nemerle.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Globalization;
+using Nemerle;
+using Nemerle.Utility;
+using Nemerle.Peg;
+using NemerleWeb.Tests.Macro;
+using NemerleWeb.TypedJS;
+using NemerleWeb.Predefined;
+
+namespace NemerleWeb.Website.Tests
+{
+  [Unit]
+  public class UnitTestCSPage
+  {
+    Results : List[(string * bool)] { get; set; }
+        
+    public this()
+    {
+      def test(description : string, res : void -> bool) : void
+      {
+        Results.Add((description, res()));
+      }
+      Results = List();
+      
+      test("simple", () =>
+      {
+        true
+      });
+    }
+    
+    public TemplateLambdaTest : list[string] = ["failed", "passed"];
+    
+    [Html]
+    public View() : string
+    {
+      <#
+        <table class="jsast-tests">
+          <tbody>
+            <tr $foreach(r in Results) css-passed="$(r[1])">
+              <td>$(r[0])</td>
+              <td>$(r[1])</td>
+            </tr>
+            <tr $foreach(l in TemplateLambdaTest.Where(l => l == "passed")) css-passed="$(l[1])">
+              <td>$l</td>
+            </tr>
+          </tbody>
+        </table>
+      #>
+    }
+  }
+}

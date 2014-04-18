@@ -29,13 +29,13 @@ namespace NemerleWeb.Website
                 "samples", // URL with parameters
                 new (controller = "Home", action = "Samples", id = UrlParameter.Optional) // Parameter defaults
             );
-			
+      
             _ = routes.MapRoute(
                 "ParsersSamples", // Route name
                 "parserssamples", // URL with parameters
                 new (controller = "Home", action = "ParsersSamples", id = UrlParameter.Optional) // Parameter defaults
             );
-			
+      
             _ = routes.MapRoute(
                 "Tutorial", // Route name
                 "tutorial", // URL with parameters
@@ -53,6 +53,12 @@ namespace NemerleWeb.Website
                 "UnitTests", // Route name
                 "unittests", // URL with parameters
                 new (controller = "Home", action = "UnitTests", id = UrlParameter.Optional) // Parameter defaults
+            );
+            
+            _ = routes.MapRoute(
+                "UnitTestsCS", // Route name
+                "unittestscs", // URL with parameters
+                new (controller = "Home", action = "UnitTestsCS", id = UrlParameter.Optional) // Parameter defaults
             );
             
             _ = routes.MapRoute(

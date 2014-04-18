@@ -50,6 +50,11 @@ namespace NemerleWeb.Website.Controllers
       View("Index", UnitTestPage.Render() : object);
     }
     
+    public UnitTestsCS() : ActionResult
+    {      
+      View("Index", UnitTestCSPage.Render() : object);
+    }
+    
     public TemplateTests() : ActionResult
     {
       View("Index", TemplateTestsPage.Render() : object);
