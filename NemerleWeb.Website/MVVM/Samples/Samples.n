@@ -25,14 +25,8 @@ namespace NemerleWeb.Website.Samples
     SelectedSample : Sample { get; set; }
     
     Samples = List.[Sample]();
-    KnockoutSamples = List.[Sample]();    
-    AllSamples : array[Sample] 
-    {
-      get
-      {
-        Samples.Concat(KnockoutSamples).ToArray()
-      }
-    }
+    KnockoutSamples = List.[Sample]();
+    AllSamples : array[Sample] { get; }
     
     NameList : NameListPage { get; set; }
     NameListCSharp : NameListCSharpPage { get; set; }
@@ -77,9 +71,11 @@ namespace NemerleWeb.Website.Samples
       ].ToList();
       
       SelectedSample = Samples[2];
-            
+      
       LoadSamples(Samples);
       LoadSamples(KnockoutSamples);
+      
+      AllSamples = Samples.Concat(KnockoutSamples).ToArray();
             
       _ = server.LoadSourceFor("MVVM/Samples/Samples.n", source =>
       {

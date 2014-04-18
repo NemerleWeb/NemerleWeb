@@ -26,13 +26,7 @@ namespace NemerleWeb.Website.Samples
     
     Samples = List.[ParsersSample]();
     PegSamples = List.[ParsersSample]();
-    AllSamples : array[ParsersSample] 
-    {
-      get
-      {
-        Samples.Concat(PegSamples).ToArray()
-      }
-    }
+    AllSamples : array[ParsersSample] { get; }
     
     PegCS         : CSPage { get; set; }
     PegCalculator : CalculatorPage { get; set; }
@@ -106,7 +100,10 @@ namespace NemerleWeb.Website.Samples
                        
       SelectedSample = Samples[1];
             
+      LoadSamples(Samples);
       LoadSamples(PegSamples);
+      
+      AllSamples = Samples.Concat(PegSamples).ToArray();
             
       _ = server.LoadSourceFor("MVVM/ParsersSamples/ParsersSamples.n", source =>
       {
