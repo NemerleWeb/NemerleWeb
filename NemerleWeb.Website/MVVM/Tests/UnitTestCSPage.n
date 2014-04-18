@@ -31,9 +31,35 @@ namespace NemerleWeb.Website.Tests
       {
         true
       });
+      
+      test("Field initialization", () =>
+      {
+        def f = FieldsInitializationCS();
+        
+        f.Field == 1
+      });
+      
+      test("Readonly field initialization", () =>
+      {
+        def f = FieldsInitializationCS();
+        
+        f.ReadonlyField == 2
+      });
+      
+      test("Field constructor initialization", () =>
+      {
+        def f = ConstructorFieldsInitializationCS();
+        
+        f.Field == 1
+      });
+      
+      test("Readonly field constructor initialization", () =>
+      {
+        def f = ConstructorFieldsInitializationCS();
+        
+        f.ReadonlyField == 2
+      });
     }
-    
-    public TemplateLambdaTest : list[string] = ["failed", "passed"];
     
     [Html]
     public View() : string
@@ -44,9 +70,6 @@ namespace NemerleWeb.Website.Tests
             <tr $foreach(r in Results) css-passed="$(r[1])">
               <td>$(r[0])</td>
               <td>$(r[1])</td>
-            </tr>
-            <tr $foreach(l in TemplateLambdaTest.Where(l => l == "passed")) css-passed="$(l[1])">
-              <td>$l</td>
             </tr>
           </tbody>
         </table>
