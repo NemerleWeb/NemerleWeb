@@ -32,18 +32,48 @@ namespace NemerleWeb.Website.Tests
         true
       });
       
-      test("Field initialization", () =>
+      test("Field initialization no constructor", () =>
       {
-        def f = FieldsInitializationCS();
-        
+        def f = FieldsInitializationCS();        
         f.Field == 1
       });
       
-      test("Readonly field initialization", () =>
+      test("Readonly field initialization no constructor", () =>
       {
-        def f = FieldsInitializationCS();
-        
+        def f = FieldsInitializationCS();        
         f.ReadonlyField == 2
+      });
+      
+      test("Field initialization empty constructor", () =>
+      {
+        def f = FieldsInitializationEmptyConstructorCS();        
+        f.Field == 1
+      });
+      
+      test("Readonly field initialization empty constructor", () =>
+      {
+        def f = FieldsInitializationEmptyConstructorCS();        
+        f.ReadonlyField == 2
+      });
+
+      test("Static Field initialization no constructor", () =>
+      {
+        StaticFieldsInitializationCS.Field == 1
+      });
+      
+      test("Static Readonly field initialization no constructor", () =>
+      {
+        StaticFieldsInitializationCS.ReadonlyField == 2
+      });
+      
+      test("Static Field initialization empty constructor", () =>
+      {
+        StaticFieldsInitializationEmptyConstructorCS.Field == 1
+      });
+      
+      test("Static Readonly field initialization empty constructor", () =>
+      {
+        StaticFieldsInitializationEmptyConstructorCS.ReadonlyField == 2
       });
       
       test("Field constructor initialization", () =>

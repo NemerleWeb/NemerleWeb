@@ -15,6 +15,35 @@ namespace NemerleWeb.Website.Tests
 	}
 
 	[Unit]
+	public class FieldsInitializationEmptyConstructorCS
+	{
+		public int Field = 1;
+		public readonly int ReadonlyField = 2;
+
+		public FieldsInitializationEmptyConstructorCS()
+		{
+		}
+	}
+
+	[Unit]
+	public class StaticFieldsInitializationCS
+	{
+		public static int Field = 1;
+		public static readonly int ReadonlyField = 2;
+	}
+
+	[Unit]
+	public class StaticFieldsInitializationEmptyConstructorCS
+	{
+		public static int Field = 1;
+		public static readonly int ReadonlyField = 2;
+
+		static StaticFieldsInitializationEmptyConstructorCS()
+		{
+		}
+	}
+
+	[Unit]
 	public class ConstructorFieldsInitializationCS
 	{
 		public int Field;
