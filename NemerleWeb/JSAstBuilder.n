@@ -140,7 +140,7 @@ namespace NemerleWeb
             JSAst.NotImpl();
           }
       | LocalFunRef                       => Message.Error(expr.Location, "LocalFunRef not implemented"); JSAst.NotImpl("LocalFunRef")
-      | LocalRef(decl)                    => 
+      | LocalRef(decl)                    =>
         def name = GetLocalValueName(decl);
         
         if(System.Text.RegularExpressions.Regex.IsMatch(name, <#_N_closurised_this_ptr_\d{4}#>))
@@ -194,15 +194,18 @@ namespace NemerleWeb
       | StaticRef(from, mem, _)           =>
         DependencyGraph.Add(typeName, from);
         
-        def typeName =
+        def fromTypeName =
           if(from.tycon.SystemType != null) from.tycon.SystemType.FullName
           else                              from.tycon.FrameworkTypeName;              
         
-        if (typeName == typeof(Nemerle.Core.list[_].Nil).FullName)
+        if (fromTypeName == typeof(Nemerle.Core.list[_].Nil).FullName)
           JSAst.Array([])
         else
           if(mem is IMethod as m)
-            JSAst.StaticMethodRef(JSClass.GetProperName(from.TypeInfo), mem.Name, JSAstHelper.MethodParameters(m))
+            JSAst.StaticMethodRef(
+              JSClass.GetProperName(from.TypeInfo),
+              mem.Name,
+              JSAstHelper.MethodParameters(m))
           else
             JSAst.StaticRef(JSClass.GetProperName(from.TypeInfo), mem.Name);
       | Switch(expr, defCase, cases)      =>

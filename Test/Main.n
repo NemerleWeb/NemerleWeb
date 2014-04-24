@@ -34,4 +34,27 @@ namespace Test
       _ = Console.ReadKey();
     }
   }
+  
+  
+  [Unit]
+  public class SomeVariantValue
+  {
+    public class Empty : SomeVariantValue {}
+  }
+  
+  [Unit]
+  public class SomeVariantObject
+  {
+    public class Value : SomeVariantObject
+    {
+      value : SomeVariantValue;
+      
+      public this()
+      {
+        value = SomeVariantValue.Empty();
+      }
+    }
+    
+    public static TestValue : SomeVariantObject = SomeVariantObject.Value();
+  }
 }
