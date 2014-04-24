@@ -16,96 +16,22 @@ using NemerleWeb;
 using NemerleWeb.TypedJS;
 using NemerleWeb.Predefined;
 
-
-module Program
-{
-  Main() : void
+namespace Test
+{  
+  module Program
   {
-    //def result = NWeb Test();
-    
-    foreach (f in NWebData.Scripts)
+    Main() : void
     {
-      WriteLine(File.ReadAllText(f));
-      //WriteLine(NWebData.GetLambdasScript(s));
-    }
+      //def result = NWeb Test();
     
-    //WriteLine(result);
-    _ = Console.ReadKey();
+      foreach (f in NWebData.Scripts)
+      {
+        WriteLine(File.ReadAllText(f));
+        //WriteLine(NWebData.GetLambdasScript(s));
+      }
+    
+      //WriteLine(result);
+      _ = Console.ReadKey();
+    }
   }
 }
-
-[Unit]
-    abstract class AbstractBase
-    {
-      public this()
-      {
-        X = F() + G() + I + J;
-      }
-            
-      F() : int { 1 }      
-      static G() : int { 2 }
-      
-      I : int = 10;
-      J : int = 20;
-      
-      public X : int;
-      
-      public virtual M() : string { N() }
-      public abstract N() : string;
-      
-      public virtual MProp : string { get { NProp } }
-      public abstract NProp : string { get; }
-    }
-    
-    [Unit]
-    class NonAbstractDerived : AbstractBase
-    {
-      public this()
-      {
-        Y = Q() + W() + U + V;
-      }
-      
-      Q() : int { 2 }      
-      static W() : int { 4 }
-      
-      U : int = 20;
-      V : int = 40;
-      
-      public Y : int;
-      
-      public override N() : string { "N" }      
-      public override NProp : string { get { "NProp" } }
-    }
-    
-    [Unit]
-    class UsingServerInConstructor
-    {
-      public this()
-      {
-        _ = server.F(s => S = s.First());
-      }
-      
-      public S : string { get; set; }
-      
-      public class Server
-      {
-        public F() : IEnumerable[string] { yield "" }
-      }
-      
-      [Html]
-      public View() : string
-      {
-        <# <div></div> #>
-      }
-    }
-    
-
-[Unit]
-public class Test
-{ 
-  F() : void
-  {
-    def f= UsingServerInConstructor();
-  }
-}
-

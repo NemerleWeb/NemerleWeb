@@ -79,6 +79,9 @@
   <ItemGroup>
     <Compile Include="Main.n" />
     <Compile Include="Properties\AssemblyInfo.n" />
+    <Compile Include="Test.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
