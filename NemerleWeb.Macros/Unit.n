@@ -160,11 +160,22 @@ namespace NemerleWeb
       Macros.DefineCTX(typer);
                             
       CreateRenderer(tb, true);
-      
+
       def cacheFieldInitializers(typeBuilder) 
-      {             
-        foreach(fld in typeBuilder.GetFields().Cast.[FieldBuilder]())        
-          JSAstCache.AddFieldInitializer(typeBuilder, fld.Name, fld?.Ast?.Initializer);        
+      {
+        def flags =
+          BindingFlags.Instance |
+          BindingFlags.Static |
+          BindingFlags.Public |
+          BindingFlags.NonPublic |
+          BindingFlags.DeclaredOnly;
+        
+        foreach(fld in typeBuilder.GetFields(flags).Cast.[FieldBuilder]())
+        {
+          def init = fld?.Ast?.Initializer ?? null;
+            
+          JSAstCache.AddFieldInitializer(typeBuilder, fld.Name, init);
+        }
       }
       
       cacheFieldInitializers(tb);
