@@ -35,7 +35,7 @@ namespace NemerleWeb.Website.Tests
       test("constructor", () => { def _c = C(); });
       test("field access", () => _ = _a.S);
       test("property access", () => _ = B.S);
-      test("static field", () => SomeVariantObject.TestValue.Test());
+      test("static field", () => DependecyTester().Test());
       //need test for base class constructor call
     }
     
@@ -72,25 +72,12 @@ namespace NemerleWeb.Website.Tests
   { public S = "1"; }
   
   [Unit]
-  public class SomeVariantValue
-  {
-    public class Empty : SomeVariantValue {}
-  }
-  
-  [Unit]
-  public class SomeVariantObject
-  {
-    public class Value : SomeVariantObject
-    {
-      value : SomeVariantValue;
-      
-      public this()
-      {
-        value = SomeVariantValue.Empty();
-      }
-    }
+  class XEmptyClass {}
     
-    public static TestValue : SomeVariantObject = SomeVariantObject.Value();
+  [Unit]
+  class DependecyTester
+  { 
+    public static TestValue : XEmptyClass = XEmptyClass();
     
     public Test() : void {}
   }
