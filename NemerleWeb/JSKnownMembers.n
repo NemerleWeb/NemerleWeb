@@ -111,7 +111,8 @@ namespace NemerleWeb
             ConvertMethod(o.Type.TypeInfo, builder'(o), meth, parms.Map(paramBuilder));
           else
             ConvertFixedTypeMethod(o.Type.FixedValue, builder'(o), meth, parms.Map(paramBuilder))
-        | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) =>          
+        | Call(StaticRef(from = fromType, mem = meth) as left, parms, _) =>
+          JSAstBuilder.DependencyGraph.Add(currentTypeName, fromType);
           ConvertMethod(fromType.TypeInfo, builder'(left), meth, parms.Map(paramBuilder))
         | Call(OpCode as op, parms, _) => JSAst.Call(builder'(op), parms.Map(paramBuilder))
         | Call(Base(baseCtor), parms, _) =>

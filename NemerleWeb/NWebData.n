@@ -1,5 +1,4 @@
 ﻿using Nemerle;
-using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
 using Nemerle.Extensions;
@@ -77,8 +76,8 @@ namespace NemerleWeb
       when(!Directory.Exists(scriptsDir))
         _ = Directory.CreateDirectory(scriptsDir);
 
-      Directory.GetFiles(getAbsolutePath())
-               .Iter(File.Delete);
+      foreach(f in Directory.GetFiles(getAbsolutePath()))
+        File.Delete(f);
                
       foreach(dataType in datas)
       {
@@ -167,9 +166,21 @@ namespace NemerleWeb
       
       mutable lst;
       if(DependencyMap.TryGetValue(typeName, out lst))
-        lst.Concat(lst.Where(d => typePath.All(p => d != p))
-                      .SelectMany(d => GetTypeDependencies(d :: typePath)))
-            .Distinct()
+      {
+        // Get all dependent types and reverse the result
+        def types = lst
+          .Concat(lst.Where(d => typePath.All(p => d != p))
+          .SelectMany(d => GetTypeDependencies(d :: typePath)))
+          .Reverse();
+          
+       // Create a list without duplicates preserving order
+       def ret = List();
+       foreach(t in types)
+         when(!ret.Contains(t))
+          ret.Add(t);
+          
+        ret
+      }
       else [];
     }
     

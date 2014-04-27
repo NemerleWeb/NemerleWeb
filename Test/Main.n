@@ -37,24 +37,16 @@ namespace Test
   
   
   [Unit]
-  public class SomeVariantValue
-  {
-    public class Empty : SomeVariantValue {}
-  }
+  class XEmptyClass {}
   
   [Unit]
-  public class SomeVariantObject
-  {
-    public class Value : SomeVariantObject
-    {
-      value : SomeVariantValue;
-      
-      public this()
-      {
-        value = SomeVariantValue.Empty();
-      }
-    }
+  class XEmptyClass2 : XEmptyClass {}
     
-    public static TestValue : SomeVariantObject = SomeVariantObject.Value();
+  [Unit]
+  class StaticDependecyTester
+  { 
+    public static TestValue : XEmptyClass = XEmptyClass2();
+    public Test() : void {}
   }
+  
 }

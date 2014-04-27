@@ -35,6 +35,8 @@ namespace NemerleWeb.Website.Tests
       test("constructor", () => { def _c = C(); });
       test("field access", () => _ = _a.S);
       test("property access", () => _ = B.S);
+      test("static field", () => StaticDependecyTester().Test());
+      test("recursive static field", () => { RecursiveTest1().Test(); RecursiveTest2().Test() });
       //need test for base class constructor call
     }
     
@@ -72,22 +74,28 @@ namespace NemerleWeb.Website.Tests
   
   [Unit]
   class XEmptyClass {}
+  
+  [Unit]
+  class XEmptyClass2 : XEmptyClass {}
     
   [Unit]
-  class StatucDependecyTester
+  class StaticDependecyTester
   { 
-    public static TestValue : XEmptyClass = XEmptyClass();
+    public static TestValue : XEmptyClass = XEmptyClass2();
+    public Test() : void {}
   }
   
   [Unit]
   class RecursiveTest1
   {
     static sf : RecursiveTest2 = RecursiveTest2();
+    public Test() : void {}
   }
   
   [Unit]
   class RecursiveTest2
   {
     static sf : RecursiveTest1 = RecursiveTest1();
+    public Test() : void {}
   }
 }
