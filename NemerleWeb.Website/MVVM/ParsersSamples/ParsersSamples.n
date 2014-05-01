@@ -24,7 +24,6 @@ namespace NemerleWeb.Website.Samples
   {      
     SelectedSample : ParsersSample { get; set; }
     
-    Samples = List.[ParsersSample]();
     PegSamples = List.[ParsersSample]();
     AllSamples : array[ParsersSample] { get; }
     
@@ -44,8 +43,6 @@ namespace NemerleWeb.Website.Samples
       PegJson       = JsonPage();
       PegJS         = JSPage();
       PegTsd        = TsdPage();
-            
-      Samples = [].ToList();
       
       PegSamples =
       [
@@ -98,12 +95,11 @@ namespace NemerleWeb.Website.Samples
           PegTsd),
       ].ToList();
                        
-      SelectedSample = Samples[1];
-            
-      LoadSamples(Samples);
+      SelectedSample = PegSamples[1];
+      
       LoadSamples(PegSamples);
       
-      AllSamples = Samples.Concat(PegSamples).ToArray();
+      AllSamples = PegSamples.ToArray();
             
       _ = server.LoadSourceFor("MVVM/ParsersSamples/ParsersSamples.n", source =>
       {
