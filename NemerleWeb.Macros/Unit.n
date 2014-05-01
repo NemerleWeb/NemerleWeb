@@ -83,6 +83,17 @@ namespace NemerleWeb
         JSClass.ObjectType = <[ ttype: System.Object ]>;
       
         def debug = typer.Env.Defines.Contains("DEBUG");
+        
+        def addStaticFields(typeBuilder : TypeBuilder, jsClass : JSClass) : void
+        {
+          def staticBody = StringBuilder();
+            _ = staticBody
+              .AppendWhen(debug, _.AppendLine($"// $(typeBuilder.FullName) - Static constructor body"))
+              .AppendLineValue(jsClass.GetStaticFieldsDefaultInit(""))
+              .AppendLineValue(jsClass.GetStaticConstructorBody(""));
+            
+            AddStaticFields(typeBuilder, staticBody.ToString());
+        }
       
         def translateMethod(typer : Typer)  : void
         {
@@ -119,6 +130,7 @@ namespace NemerleWeb
             def jsClass = JSClass(typeBuilder, "  ", typer);
             _ = AddMainData(typeBuilder, jsClass.Write(debug), getAncesterCount(typeBuilder));
             
+            addStaticFields(typeBuilder, jsClass);
             types.Add((typeBuilder, jsClass));
           
             saveDependencyList();
@@ -141,17 +153,9 @@ namespace NemerleWeb
         foreach(nestedType in getAllNestedTypes(tb, true))
             processType(nestedType, types);
             
-        // Add static fields in the end
+        // Add static fields
         foreach ((typeBuilder, jsClass) in types)
-        {
-            def staticBody = StringBuilder();
-            _ = staticBody
-              .AppendWhen(debug, _.AppendLine($"// $(typeBuilder.FullName) - Static constructor body"))
-              .AppendLineValue(jsClass.GetStaticFieldsDefaultInit(""))
-              .AppendLineValue(jsClass.GetStaticConstructorBody(""));
-            
-            AddStaticFields(typeBuilder, staticBody.ToString());
-        }
+          addStaticFields(typeBuilder, jsClass);
       }
     }
     
