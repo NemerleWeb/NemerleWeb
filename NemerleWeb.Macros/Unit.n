@@ -95,7 +95,7 @@ namespace NemerleWeb
             AddStaticFields(typeBuilder, staticBody.ToString());
         }
       
-        def translateMethod(typer : Typer)  : void
+        def translateMethod(typeBuilder : TypeBuilder, typer : Typer)  : void
         {
           when(typer.CurrentFunction.body is FunBody.Typed(body))
           {
@@ -106,13 +106,13 @@ namespace NemerleWeb
               body,
               shouldReturn,
               methodBuilder.Header,
-              Some(tb));
+              Some(typeBuilder));
             JSAstCache.AddMethodAst(typer.CurrentTypeBuilder, typer.CurrentFunction, ast);
           }
         }
-            
-        def processType(typeBuilder : TypeBuilder, types : List.[TypeBuilder * JSClass]) : void
-        { 
+     
+        def processType(typeBuilder : TypeBuilder) : void
+        {
           def getAncesterCount(t : TypeInfo) : int
           {
             if(t.DeclaringType != null) getAncesterCount(t.DeclaringType) + 1 else 0;
@@ -124,38 +124,47 @@ namespace NemerleWeb
             def serialized = string.Join(",", [typeBuilder.FullName].Concat(deps)) + Environment.NewLine;
             File.AppendAllText(_dependenciesFilename, serialized);
           }
-        
-          typeBuilder.MethodBeforeStage3 += (_, e) => translateMethod(e.Typer);        
+          
+          // Add base types
+          processBaseTypes(typeBuilder);
+          
+          typeBuilder.MethodBeforeStage3 += (_, e) => translateMethod(typeBuilder, e.Typer);
           typeBuilder.DoBeforeFinalization(() => {
             def jsClass = JSClass(typeBuilder, "  ", typer);
             _ = AddMainData(typeBuilder, jsClass.Write(debug), getAncesterCount(typeBuilder));
             
             addStaticFields(typeBuilder, jsClass);
-            types.Add((typeBuilder, jsClass));
-          
+            
             saveDependencyList();
           });
         }
-      
-        def getAllNestedTypes(tb, isTopMost)
+                
+        and processBaseTypes(typeBuilder : TypeBuilder) : void
         {
-          def children = JSClass.GetNestedTypes(tb)
+          // Process base types, the type and the nested types
+          for(mutable baseType = typeBuilder.BaseType;
+              JSClassHelper.CanBeBase(baseType) && baseType is TypeBuilder;
+              baseType = baseType.BaseType)
+          {
+            JSAstBuilder.DependencyGraph.Add(tb.FullName, baseType);
+            JSAstBuilder.DependencyGraph.Add(typeBuilder.FullName, baseType);
+            
+            processType(baseType :> TypeBuilder);
+          }
+        }
+      
+        def getAllNestedTypes(typeBuilder : TypeBuilder, isTopMost : bool) : list[TypeBuilder]
+        {
+          def children = JSClass.GetNestedTypes(typeBuilder)
                                 .Map(t => getAllNestedTypes(t, false))
                                 .Flatten();
                               
-          if(isTopMost) children else tb :: children;
+          if(isTopMost) children else typeBuilder :: children;
         }
-              
-        def types = List();
         
-        // Process type and the nested types
-        processType(tb, types);      
+        processType(tb);
         foreach(nestedType in getAllNestedTypes(tb, true))
-            processType(nestedType, types);
-            
-        // Add static fields
-        foreach ((typeBuilder, jsClass) in types)
-          addStaticFields(typeBuilder, jsClass);
+          processType(nestedType);
       }
     }
     

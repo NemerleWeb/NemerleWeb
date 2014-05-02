@@ -98,4 +98,16 @@ namespace NemerleWeb.Website.Tests
     static sf : RecursiveTest1 = RecursiveTest1();
     public Test() : void {}
   }
+  
+  [Unit]
+  class VariantEmulation
+  {    
+    [Unit]
+    class VariantOption : VariantEmulation
+    {
+      public this() { }
+    }
+  
+    static Option : VariantEmulation = VariantEmulation.VariantOption();
+  }
 }

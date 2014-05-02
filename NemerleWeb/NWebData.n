@@ -171,7 +171,8 @@ namespace NemerleWeb
         def types = lst
           .Concat(lst.Where(d => typePath.All(p => d != p))
           .SelectMany(d => GetTypeDependencies(d :: typePath)))
-          .Reverse();
+          .Reverse()
+          .ToArray();
           
        // Create a list without duplicates preserving order
        def ret = List();

@@ -676,14 +676,18 @@ $(indent)  };#>;
   
   module JSClassHelper
   {
-    public HasBase(ti : TypeInfo) : bool 
+    public HasBaseClass([NotNull] ti : TypeInfo) : bool 
     {
-      ti.BaseType != null &&      
-      ti.BaseType.FullName != "System.Object" &&
-      ti.BaseType.FullName != "System.ValueType" &&
-      ti.BaseType.FullName != "Nemerle.Builtins.Function" &&
-      ti.BaseType.FullName != "Nemerle.Builtins.FunctionVoid" &&
-      !ti.BaseType.IsInterface
+      CanBeBase(ti.BaseType) && !ti.BaseType.IsInterface
+    }
+    
+    public CanBeBase(tiBaseType : TypeInfo) : bool 
+    {
+      tiBaseType != null &&      
+      tiBaseType.FullName != "System.Object" &&
+      tiBaseType.FullName != "System.ValueType" &&
+      tiBaseType.FullName != "Nemerle.Builtins.Function" &&
+      tiBaseType.FullName != "Nemerle.Builtins.FunctionVoid"
     }
   }
     

@@ -395,7 +395,7 @@ namespace NemerleWeb
         if(methodHeader?.Name == ".ctor")
           match(typeInfo)
           {
-          | Some(ti) when JSClassHelper.HasBase(ti) =>
+          | Some(ti) when JSClassHelper.HasBaseClass(ti) =>
             JSAstHelper.FixBaseCall(ast, ti)
           | _ => ast
           }
