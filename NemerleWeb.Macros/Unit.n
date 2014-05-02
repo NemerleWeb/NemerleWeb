@@ -125,9 +125,6 @@ namespace NemerleWeb
             File.AppendAllText(_dependenciesFilename, serialized);
           }
           
-          // Add base types
-          processBaseTypes(typeBuilder);
-          
           typeBuilder.MethodBeforeStage3 += (_, e) => translateMethod(typeBuilder, e.Typer);
           typeBuilder.DoBeforeFinalization(() => {
             def jsClass = JSClass(typeBuilder, "  ", typer);
@@ -137,20 +134,6 @@ namespace NemerleWeb
             
             saveDependencyList();
           });
-        }
-                
-        and processBaseTypes(typeBuilder : TypeBuilder) : void
-        {
-          // Process base types, the type and the nested types
-          for(mutable baseType = typeBuilder.BaseType;
-              JSClassHelper.CanBeBase(baseType) && baseType is TypeBuilder;
-              baseType = baseType.BaseType)
-          {
-            JSAstBuilder.DependencyGraph.Add(tb.FullName, baseType);
-            JSAstBuilder.DependencyGraph.Add(typeBuilder.FullName, baseType);
-            
-            processType(baseType :> TypeBuilder);
-          }
         }
       
         def getAllNestedTypes(typeBuilder : TypeBuilder, isTopMost : bool) : list[TypeBuilder]
