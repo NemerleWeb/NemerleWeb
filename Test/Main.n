@@ -34,6 +34,11 @@ namespace Test
       _ = Console.ReadKey();
     }
   }
+  [Unit]
+  variant QQ {
+    | W
+    | T 
+  }
   
   
   [Unit]

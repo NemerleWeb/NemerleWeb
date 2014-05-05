@@ -113,9 +113,22 @@ namespace NemerleWeb
         FilterMethods(methods)
       }
     }
+    
     public static GetNestedTypes(type : TypeBuilder) : IEnumerable[TypeBuilder]
     {
       type.DeclaredNestedTypes
+          .Where(c => !c.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
+                        .Where(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server                                
+                        .Where(c => !c.Name.StartsWith("_N_")) //Not generated class;
+    }
+    
+    public static GetNestedTypes(type : TypeInfo) : IEnumerable[TypeInfo]
+    {
+      type.GetNestedTypes(BindingFlags.Static |
+                          BindingFlags.Instance |
+                          BindingFlags.Public |
+                          BindingFlags.NonPublic |
+                          BindingFlags.DeclaredOnly)
           .Where(c => !c.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute"))
                         .Where(c => c.Name != "Server" && c.Name != "ServerProxy") //Not server                                
                         .Where(c => !c.Name.StartsWith("_N_")) //Not generated class;

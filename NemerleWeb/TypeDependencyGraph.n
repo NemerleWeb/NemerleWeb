@@ -39,10 +39,11 @@ namespace NemerleWeb
         else JSClassSettings.JSClrRoots.Any(typeWithRootExists)
       }
       
-      when(!ti.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute") && hasUnitInHierarchy(ti) && typeName != ti.FullName)
+      def addDependency(ti : TypeInfo) : void
       {
         def dependentTypeName = ti.FullName;
         mutable types;
+        
         if(_dependencyMap.TryGetValue(typeName, out types))
         {
           when(!types.Contains(dependentTypeName))
@@ -50,8 +51,27 @@ namespace NemerleWeb
         }
         else
         {
-          _dependencyMap.Add(typeName, List([dependentTypeName]));
+          types = List();
+          types.Add(dependentTypeName);
+          _dependencyMap.Add(typeName, types);
         }
+      }
+      
+      // Add only Unit classes, and do not add myself.
+      when(!ti.IsCustomAttributeDefined("NemerleWeb.IgnoreAttribute") && hasUnitInHierarchy(ti) && typeName != ti.FullName)
+      {
+        def isVariant = ti.GetTydecl() is TypeDeclaration.Variant;
+        when(isVariant)
+        {when(ti.FullName.Contains("Color"))assert2(false);
+          // Add nested before the variant class itself
+          foreach(type in JSClass.GetNestedTypes(ti))
+          {
+            addDependency(type);
+          }
+        }
+      
+        // Add the type
+        addDependency(ti);
       }
     }
     
