@@ -62,12 +62,11 @@ namespace NemerleWeb
       {
         def isVariant = ti.GetTydecl() is TypeDeclaration.Variant;
         when(isVariant)
-        {when(ti.FullName.Contains("Color"))assert2(false);
+        {
           // Add nested before the variant class itself
           foreach(type in JSClass.GetNestedTypes(ti))
-          {
-            addDependency(type);
-          }
+            when(hasUnitInHierarchy(ti) && typeName != ti.FullName)
+              addDependency(type);
         }
       
         // Add the type
