@@ -10,11 +10,16 @@ namespace NemerleWeb.Website.Tests
   [Unit]
   public class BindingTestsPage
   {
-    public Dummy : TemplateDummy;    
+    _templateDummy : TemplateDummy = TemplateDummy();
+    _selectedOption : string = "a";
+    _dummy1 : Dummy = Dummy("failed");
+    _dummy2 : Dummy  = Dummy("passed");
+    _dummies : list[Dummy];
+    _selectedDummy : Dummy;
     
     public this() 
     {
-      Dummy = TemplateDummy();
+      _dummies = [_dummy2, _dummy1];
     }
     
     public GetCustomViewName(name : string) : string
@@ -27,9 +32,24 @@ namespace NemerleWeb.Website.Tests
     {
       <#
         <ul>
-          <li>1. template(Dummy): <span template="$Dummy"></span></li>
-          <li>2. template(Dummy, "CustomName"): <span template="$(Dummy, "CustomName")"></span></li>
-          <li>3. template(Dummy, GetCustomViewName("CustomName")): <span template="$(Dummy, GetCustomViewName("CustomName"))"></span></li>
+          <li>template(Dummy): <span template="$_templateDummy"></span></li>
+          <li>template(Dummy, "CustomName"): <span template="$(_templateDummy, "CustomName")"></span></li>
+          <li>template(Dummy, GetCustomViewName("CustomName")): <span template="$(_templateDummy, GetCustomViewName("CustomName"))"></span></li>
+          <li>
+            &lt;option value="pass"/&gt;
+            <select value="$_selectedOption">
+              <option>failed</option>
+              <option value="a">passed</option>
+            </select>
+          </li>
+          <li>
+            &lt;select value=&quot;&#36;complexObj&quot;/&gt;
+            <select value="$_selectedDummy">
+              <option $foreach(d in _dummies) value="$d" text="$(d.Value)"/>
+            </select>
+            <span>$(if(_selectedDummy != null) _selectedDummy.Value else "failed")</span>
+          </li>
+          <li></li>
         </ul>
       #>
     }
@@ -56,6 +76,13 @@ namespace NemerleWeb.Website.Tests
           </span>
         #>
       }
-    }   
+    }
+    
+    [Unit]
+    [Record]
+    public class Dummy
+    {
+        public Value : string { get; set; }
+    }
   }
 }

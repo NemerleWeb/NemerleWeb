@@ -232,7 +232,9 @@
                     });
                 });
             }
-            nweb.setValue($el[0], parsedValue);
+
+            if (!(isSelectElement && parsedValue == null))
+              nweb.setValue($el[0], parsedValue);
 
             return {
                 el: el,
@@ -630,6 +632,12 @@
             else
                 $el[0].__nw_parent.prepend($el);
         },
+        getOptionValue: function(option) {
+          if (typeof option[nweb.dataKey] !== "undefined")
+            return option[nweb.dataKey];
+          else
+            return $(option).val();
+        },
         getValue: function(el) {
             if (el.tagName === "SELECT") {
                 var selected = $("option:selected", el)[0];
@@ -640,10 +648,7 @@
                 if (selected === "undefined" || selected === null)
                   return; //return undefined if no options were found
 
-                if (typeof selected[nweb.dataKey] !== "undefined")
-                  return selected[nweb.dataKey];
-                else
-                  return $(selected).val();
+                return nweb.getOptionValue(selected);
             } else {
                 return $(el).val();
             }
@@ -651,7 +656,7 @@
         setValue: function(el, val) {
             if (el.tagName === "SELECT") {
                 var toSelect = $("option", el).filter(function() {
-                    return this[nweb.dataKey] == val;
+                    return nweb.getOptionValue(this) == val;
                 }).prop("selected", false);
                 toSelect.prop("selected", true);
             } else if (el.tagName === "OPTION") {
