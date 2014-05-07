@@ -279,7 +279,7 @@
     <Compile Include="MVVM\Tests\CSClasses.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MVVM\Tests\TemplateTestPage.n">
+    <Compile Include="MVVM\Tests\BindingTestsPage.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MVVM\Tests\UnitTestPage.n">

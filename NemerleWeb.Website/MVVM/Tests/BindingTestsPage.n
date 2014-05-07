@@ -1,0 +1,61 @@
+﻿using NemerleWeb;
+
+using Nemerle.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb.Website.Tests
+{
+  [Unit]
+  public class BindingTestsPage
+  {
+    public Dummy : TemplateDummy;    
+    
+    public this() 
+    {
+      Dummy = TemplateDummy();
+    }
+    
+    public GetCustomViewName(name : string) : string
+    {
+      name
+    }
+    
+    [Html]
+    public View() : string
+    {
+      <#
+        <ul>
+          <li>1. template(Dummy): <span template="$Dummy"></span></li>
+          <li>2. template(Dummy, "CustomName"): <span template="$(Dummy, "CustomName")"></span></li>
+          <li>3. template(Dummy, GetCustomViewName("CustomName")): <span template="$(Dummy, GetCustomViewName("CustomName"))"></span></li>
+        </ul>
+      #>
+    }
+    
+    [Unit]
+    public class TemplateDummy 
+    {
+      [Html]
+      public View() : string
+      {
+        <#
+          <span class="binding-test-passed">
+            Passed (View)
+          </span>
+        #>
+      }
+      
+      [Html]
+      public CustomName() : string
+      {
+        <#
+          <span class="binding-test-passed">
+            Passed (CustomName)
+          </span>
+        #>
+      }
+    }   
+  }
+}

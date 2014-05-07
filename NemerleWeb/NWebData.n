@@ -19,7 +19,7 @@ namespace NemerleWeb
   public module NWebData
   {
     public Scripts : List[string] = List();
-    public Templates = Dictionary.[string, (string * string)]();   
+    public Templates = Dictionary.[string, List[(string * string)]]();   
     public CombinedScriptsFilename : string;
     public ResourcesFilename : string;
     
@@ -100,10 +100,13 @@ namespace NemerleWeb
           
         foreach((typeName, id, path) in instance.Templates) 
         {
+          when (!Templates.ContainsKey(typeName))
+            Templates[typeName] = List();
+            
           def filename = Path.GetFileName(path);
           def templateContents = readResource(filename, dataType.Assembly);
           
-          Templates[typeName] = (id, templateContents);
+          Templates[typeName].Add(id, templateContents);
           
           File.WriteAllText(getAbsolutePath(filename), templateContents);
         }
@@ -218,15 +221,15 @@ namespace NemerleWeb
     
     public GetTemplatesForType(typeName : string) : IEnumerable[string]
     {
-      def typeTemplate = Templates[typeName];
+      def typeTemplates = Templates[typeName];
       def dependentTypes = GetTypeDependencies([typeName]);
       def dependentFileNames = dependentTypes.SelectMany(t => {
-        mutable template;
-        if(Templates.TryGetValue(t, out template)) [template]
+        mutable templates;
+        if(Templates.TryGetValue(t, out templates)) templates
         else []
       });
         
-      [typeTemplate].Concat(dependentFileNames).Select(((id, content), _) => 
+      typeTemplates.Concat(dependentFileNames).Select(((id, content), _) => 
       $<#
 <script type="text/html" id="$(id)">
 $content

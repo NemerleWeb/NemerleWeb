@@ -57,7 +57,7 @@ namespace NemerleWeb.Website.Controllers
     
     public TemplateTests() : ActionResult
     {
-      View("Index", TemplateTestsPage.Render() : object);
+      View("Index", BindingTestsPage.Render() : object);
     }
     
     public ServerTests() : ActionResult
