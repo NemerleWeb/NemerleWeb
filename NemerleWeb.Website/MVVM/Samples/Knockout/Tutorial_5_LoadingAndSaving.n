@@ -111,7 +111,7 @@ namespace NemerleWeb.Website.Samples
                 </ul>
 
                 You have <b>$(IncompleteTasks.Count())</b> incomplete task(s)
-                You have <b>$(Deleted.Count())</b> deleted task(s)
+                You have <b>$(DeletedTasks.Count())</b> deleted task(s)
                 <span visible="$(IncompleteTasks.Count() == 0)"> - it's beer time!</span>
 
                 <button click="$Save">Save</button>
