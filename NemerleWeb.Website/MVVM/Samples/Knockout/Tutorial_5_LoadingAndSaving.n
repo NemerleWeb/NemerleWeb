@@ -19,11 +19,12 @@ namespace NemerleWeb.Website.Samples
 
     public Tasks : List[Task] { get; set; default List.[Task]() }
     public NewTaskText : string { get; set; }
+    
     public IncompleteTasks : IEnumerable[Task]
     {
       get
       {
-        Tasks.Where(t => !t.IsDone)
+        Tasks.Where(t => !t.IsDone && !t.IsDestroyed)
       }
     }
     
@@ -32,6 +33,14 @@ namespace NemerleWeb.Website.Samples
       get
       {
         Tasks.Where(t => !t.IsDestroyed)
+      }
+    }
+    
+    public DeletedTasks : IEnumerable[Task] 
+    {
+      get
+      {
+        Tasks.Where(t => t.IsDestroyed)
       }
     }
 
@@ -102,6 +111,7 @@ namespace NemerleWeb.Website.Samples
                 </ul>
 
                 You have <b>$(IncompleteTasks.Count())</b> incomplete task(s)
+                You have <b>$(Deleted.Count())</b> deleted task(s)
                 <span visible="$(IncompleteTasks.Count() == 0)"> - it's beer time!</span>
 
                 <button click="$Save">Save</button>
