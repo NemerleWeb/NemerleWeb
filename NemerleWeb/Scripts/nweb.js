@@ -633,8 +633,13 @@
         getValue: function(el) {
             if (el.tagName === "SELECT") {
                 var selected = $("option:selected", el)[0];
-                if (selected)
-                  return selected[nweb.dataKey];
+                if (selected) {
+                  if (typeof selected[nweb.dataKey] !== "undefined")
+                    return selected[nweb.dataKey];
+                  else
+                    return $(selected).val();
+                }
+                
                 return $("option", el)[0][nweb.dataKey];
             } else {
                 return $(el).val();
