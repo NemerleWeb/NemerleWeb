@@ -654,7 +654,7 @@
                     $el.val(val);
             }
         },
-        dataKey: "value",
+        dataKey: "__nw_value_data",
         bindings: []
     };
     window.nweb = nweb;
