@@ -212,3 +212,12 @@ ul.nav li.dropdown:hover > ul.dropdown-menu {
     background-color: greenyellow;
     color: #000;
 }
+
+.reactive-todo-table {
+    margin-bottom: 20px;
+}
+
+.reactive-todo-table td, .reactive-todo-table th {
+    padding: 3px 25px 3px 5px;
+    border-bottom: 1px solid #999;
+}

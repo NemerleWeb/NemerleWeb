@@ -438,6 +438,7 @@
             var eventName = attrName.substr(9);
             var methodString = nweb.parseExpression(model, attrVal, loopStack);
             var method = nweb.getParsedValue(model, methodString, loopStack, el);
+
             $(el).bind(eventName, function(e) {
                 nweb.invalidate();
                 method(e);

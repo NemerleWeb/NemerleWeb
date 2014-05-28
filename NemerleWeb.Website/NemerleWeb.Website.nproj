@@ -193,6 +193,9 @@
     <Compile Include="Infrastructure\HtmlHelperExtensions.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MVVM\ArticleSamples\ArticleSample1.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\ButtonDropdown.n">
       <SubType>Code</SubType>
     </Compile>
@@ -407,6 +410,7 @@
     <Folder Include="Infrastructure\" />
     <Folder Include="installer\" />
     <Folder Include="MVVM" />
+    <Folder Include="MVVM\ArticleSamples" />
     <Folder Include="MVVM\Tutorial" />
     <Folder Include="MVVM\Samples\" />
     <Folder Include="MVVM\Samples\Knockout\" />

@@ -1,0 +1,106 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Extensions;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using NemerleWeb.TypedJS;
+
+namespace NemerleWeb.Website.MVVM.ArticleSamples
+{
+  [Unit]
+  public class ReactiveToDo
+  {
+    [Unit]
+	  public class Task { public mutable Name : string; public mutable IsDone : bool; public mutable Priority : string; }
+
+	  mutable _tasks : List[Task] = List();
+	  mutable _newTask : Task;
+  
+	  public this() 
+	  {	    
+	    _newTask = Task() <- ( Name = "First task", Priority = "high" );
+	    LoadTasks();
+	  }	  
+	  
+	  public LoadTasks() : void 
+	  {
+	    server.Load(tasks => _tasks = tasks);
+	  }
+	  
+	  public Add() : void
+	  {
+		  _tasks.Add(_newTask);
+		  server.Add(_newTask, status => window.console.log(status));
+		  _newTask = Task() <- ( Name = "Task #" + _tasks.Count, Priority = "low" );
+	  }
+  
+	  public Update() : void
+	  {
+	    server.UpdateTasks(_tasks, status => window.console.log(status))
+	  }
+	  
+	  [Html]
+	  public View() : string
+	  {
+		  <#
+		    <table class="reactive-todo-table">
+		      <tr>
+		        <th>Priority</th><th>Task</th><th>Status</th>
+		      </tr>
+			    <tr $foreach(task in _tasks.OrderBy(t => t.Priority))>
+				    <td>$(task.Priority)</td>
+				    <td>$(task.Name)</td>
+				    <td><input type="checkbox" event-change="$Update" checked="$(task.IsDone)" /></td>
+			    </tr>
+			  </table>
+			  
+			  <div>
+				  <input value="$(_newTask.Name)" />
+				  <select value="$(_newTask.Priority)">
+					  <option>high</option>
+					  <option>low</option>
+				  </select>
+				  <button click="$Add">Add</button>
+			  </div>
+		  #>
+	  }
+    
+	  
+	  public class Server
+	  {
+		  static mutable _db : List[Task] = List();
+
+		  static this()
+		  {
+		    _db.Add(Task() <- ( Name = "Write article", Priority = "high" ));
+		    _db.Add(Task() <- ( Name = "Fix website bugs", Priority = "high" ));
+		    _db.Add(Task() <- ( Name = "Add new functionality", Priority = "low" ));
+		  }
+		  
+		  [SignalR]
+		  public Add(task : Task) : string
+		  {
+			  _db.Add(task);
+			  broadcast client.LoadTasks();
+			  "ok";
+		  }
+		  
+		  public Load() : List[Task]
+		  {		    
+		    _db
+		  }
+		  
+		  public UpdateTasks(tasks : List[Task]) : string
+		  {
+		    _db = tasks;
+		    broadcast client.LoadTasks();
+		    "ok"
+		  }
+	  }
+  }
+}

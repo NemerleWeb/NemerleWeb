@@ -10,6 +10,7 @@ using Nemerle;
 using NemerleWeb;
 using NemerleWeb.Website.Samples;
 using NemerleWeb.Website.Tests;
+using NemerleWeb.Website.MVVM.ArticleSamples;
 
 namespace NemerleWeb.Website.Controllers
 {
@@ -73,6 +74,11 @@ namespace NemerleWeb.Website.Controllers
     public DependencyGraph() : ActionResult
     {
       View("Index", DependencyGraphTest.Render() : object);
+    }
+    
+    public ArticleSample1() : ActionResult
+    {
+      View("Index", ReactiveToDo.Render() : object);
     }
     
     private static GetContent(name : string) : string
