@@ -41,6 +41,10 @@ namespace NemerleWeb.Website.MVVM.ArticleSamples
   
 	  public Update() : void
 	  {
+	    foreach(t in _tasks) {
+	      window.console.log(t.Name + ": " + t.IsDone);
+	    }
+	    
 	    server.UpdateTasks(_tasks, status => window.console.log(status))
 	  }
 	  

@@ -295,15 +295,33 @@
                 el: el,
                 generatedEls: [],
                 subBindings: [],
+                hasChanged: function () {
+                    if (binding.array !== binding.appliedArray)
+                        return true;
+
+                    return !nweb.utils.areArraysEqual(binding.array, binding.appliedArray);
+                },
                 getValue: function() {
                     var ret = nweb.getParsedValue(model, expr, loopStack);
 
-                    if (ret !== undefined && ret !== null && ret.toArray)
-                        return ret.toArray();
-                    else
+                    if (ret !== undefined && ret !== null && ret.toArray) {
+                        if (ret.source && ret.source.getSource) {
+                            binding.isEnumerable = true;
+                            binding.array = ret.source.getSource();
+                            return ret.toArray();
+                        } else {
+                            binding.array = ret.toArray();
+                            return binding.array;
+                        }
+                    }
+                    else {
+                        binding.array = ret;
                         return ret;
+                    }
                 },
                 apply: function(value) {
+                    binding.appliedArray = binding.array;
+
                     var array = value;
 
                     for (var j = 0; j < binding.generatedEls.length; j++)
@@ -592,7 +610,9 @@
                         continue;
 
                     if (nweb.utils.isArray(newValue)) {
-                        if (!binding.oldValue || !nweb.utils.areArraysEqual(newValue, binding.oldValue)) {
+                        if (!binding.oldValue ||
+                            ((binding.hasChanged && binding.hasChanged(newValue) || !nweb.utils.areArraysEqual(newValue, binding.oldValue))))
+                        {
                             changeFound = true;
                             binding.apply(newValue);
                         }
@@ -970,15 +990,17 @@
     };
 
     if (nweb["debugger"]) {
-        nweb.utils.areArraysEqual = function (l, r) {
+      nweb.utils.areArraysEqual = function (l, r) {
             if (l.length !== r.length)
-                return false;
+              return false;
+          
             return JSON.stringify(l) === JSON.stringify(r);
         };
     } else {
-        nweb.utils.areArraysEqual = function (l, r) {
+      nweb.utils.areArraysEqual = function (l, r) {
             if (r.length !== l.length)
-                return false;
+              return false;
+          
             for (var i = 0, len = l.length; i < len; i++)
                 if (l[i] !== r[i]) {
                     if (typeof l[i] === 'undefined' && typeof r[i] !== 'undefined')
