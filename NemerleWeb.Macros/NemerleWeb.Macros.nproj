@@ -110,6 +110,15 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\DataMacroHelper.n">
+      <SubType>Code</SubType>
+    </Compile>
+   <Compile Include="Data\Dto.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Rec.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="EventsDSL\EventsMacros.n">
       <SubType>Code</SubType>
     </Compile>
@@ -181,6 +190,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Data" />
     <Folder Include="HtmlMacro\" />
     <Folder Include="EventsDSL" />
     <Folder Include="GenerateJSApi" />
