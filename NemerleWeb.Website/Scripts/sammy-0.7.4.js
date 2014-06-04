@@ -1,19 +1,18 @@
 // name: sammy
-// version: 0.7.4
+// version: 0.7.5
 
 // Sammy.js / http://sammyjs.org
 
-(function($, window) {
-  (function(factory){
-    // Support module loading scenarios
-    if (typeof define === 'function' && define.amd){
-      // AMD Anonymous Module
-      define(['jquery'], factory);
-    } else {
-      // No module loader (plain <script> tag) - put directly in global namespace
-      $.sammy = window.Sammy = factory($);
-    }
-  })(function($){
+(function(factory){
+  // Support module loading scenarios
+  if (typeof define === 'function' && define.amd){
+    // AMD Anonymous Module
+    define(['jquery'], factory);
+  } else {
+    // No module loader (plain <script> tag) - put directly in global namespace
+    jQuery.sammy = window.Sammy = factory(jQuery);
+  }
+})(function($){
 
   var Sammy,
       PATH_REPLACER = "([^\/]+)",
@@ -87,7 +86,7 @@
     }
   };
 
-  Sammy.VERSION = '0.7.4';
+  Sammy.VERSION = '0.7.5';
 
   // Add to the global logger pool. Takes a function that accepts an
   // unknown number of arguments and should print them or send them somewhere
@@ -108,7 +107,7 @@
   };
 
   if (typeof window.console != 'undefined') {
-    if (_isFunction(window.console.log.apply)) {
+    if (typeof window.console.log === 'function' && _isFunction(window.console.log.apply)) {
       Sammy.addLogger(function() {
         window.console.log.apply(window.console, arguments);
       });
@@ -217,11 +216,14 @@
 
 
   // Return whether the event targets this window.
-  Sammy.targetIsThisWindow = function targetIsThisWindow(event) {
-    var targetWindow = $(event.target).attr('target');
-    if ( !targetWindow || targetWindow === window.name || targetWindow === '_self' ) { return true; }
-    if ( targetWindow === '_blank' ) { return false; }
-    if ( targetWindow === 'top' && window === window.top ) { return true; }
+  Sammy.targetIsThisWindow = function targetIsThisWindow(event, tagName) {
+    var targetElement = $(event.target).closest(tagName);
+    if (targetElement.length === 0) { return true; }
+
+    var targetWindow = targetElement.attr('target');
+    if (!targetWindow || targetWindow === window.name || targetWindow === '_self') { return true; }
+    if (targetWindow === '_blank') { return false; }
+    if (targetWindow === 'top' && window === window.top) { return true; }
     return false;
   };
 
@@ -287,13 +289,24 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
         });
         // bind to link clicks that have routes
         $(document).delegate('a', 'click.history-' + this.app.eventNamespace(), function (e) {
-            if (e.isDefaultPrevented() || e.metaKey || e.ctrlKey) {
+          if (e.isDefaultPrevented() || e.metaKey || e.ctrlKey) {
             return;
           }
-          var full_path = lp.fullPath(this);
-          if (this.hostname == window.location.hostname &&
+          var full_path = lp.fullPath(this),
+            // Get anchor's host name in a cross browser compatible way.
+            // IE looses hostname property when setting href in JS
+            // with a relative URL, e.g. a.setAttribute('href',"/whatever").
+            // Circumvent this problem by creating a new link with given URL and
+            // querying that for a hostname.
+            hostname = this.hostname ? this.hostname : function (a) {
+              var l = document.createElement("a");
+              l.href = a.href;
+              return l.hostname;
+            }(this);
+
+          if (hostname == window.location.hostname &&
               app.lookupRoute('get', full_path) &&
-              Sammy.targetIsThisWindow(e)) {
+              Sammy.targetIsThisWindow(e, 'a')) {
             e.preventDefault();
             proxy.setLocation(full_path);
             return false;
@@ -568,8 +581,8 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
       // if the method signature is just (path, callback)
       // assume the verb is 'any'
       if (callback.length === 0 && _isFunction(path)) {
-        path = verb;
         callback = [path];
+        path = verb;
         verb = 'any';
       }
 
@@ -824,45 +837,51 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
     //
     // ### Example
     //
-    // app.get('/chain',function(context,next){
-    //     console.log('chain1');
-    //    next();
-    // },function(context,next){
-    //     console.log('chain2');
-    //    next();
-    // });
-    // app.get('/link',function(context,next){
-    //     console.log('link1');
-    //    next();
-    // },function(context,next){
-    //     console.log('link2');
-    //    next();
-    // });
-    // app.onComplete(function(){
-    //     console.log("Running finally")
-    // });
+    //      app.get('/chain',function(context,next) {
+    //          console.log('chain1');
+    //          next();
+    //      },function(context,next) {
+    //          console.log('chain2');
+    //          next();
+    //      });
+    //
+    //      app.get('/link',function(context,next) {
+    //          console.log('link1');
+    //          next();
+    //      },function(context,next) {
+    //          console.log('link2');
+    //          next();
+    //      });
+    //
+    //      app.onComplete(function() {
+    //          console.log("Running finally");
+    //      });
     //
     // If you go to '/chain', you will get the following messages:
-    //   chain1
-    //   chain2
-    //   Running onComplete
+    //
+    //      chain1
+    //      chain2
+    //      Running onComplete
     //
     //
     // If you go to /link, you will get the following messages:
-    //   link1
-    //   link2
-    //   Running onComplete
+    //
+    //      link1
+    //      link2
+    //      Running onComplete
+    //
     //
     // It really comes to play when doing asynchronous:
-    // app.get('/chain',function(context,next){
-    //    $.get('/my/url',function(){
-    //       console.log('chain1');
-    //      next();
-    //    })
-    // },function(context,next){
-    //     console.log('chain2');
-    //    next();
-    // });
+    //
+    //      app.get('/chain',function(context,next) {
+    //        $.get('/my/url',function() {
+    //          console.log('chain1');
+    //          next();
+    //        });
+    //      },function(context,next) {
+    //        console.log('chain2');
+    //        next();
+    //      });
     //
     onComplete: function(callback) {
       this._onComplete = callback;
@@ -976,7 +995,7 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
 
       // bind to submit to capture post/put/delete routes
       this.bind('submit', function(e) {
-        if ( !Sammy.targetIsThisWindow(e) ) { return true; }
+        if ( !Sammy.targetIsThisWindow(e, 'form') ) { return true; }
         var returned = app._checkFormSubmission($(e.target).closest('form'));
         return (returned === false) ? e.preventDefault() : false;
       });
@@ -1209,6 +1228,10 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
     //     // match all except a path
     //     app.contextMatchesOptions(context, {except: {path:'#/otherpath'}}); //=> true
     //     app.contextMatchesOptions(context, {except: {path:'#/mypath'}}); //=> false
+    //     // match all except a verb and a path
+    //     app.contextMatchesOptions(context, {except: {path:'#/otherpath', verb:'post'}}); //=> true
+    //     app.contextMatchesOptions(context, {except: {path:'#/mypath', verb:'post'}}); //=> true
+    //     app.contextMatchesOptions(context, {except: {path:'#/mypath', verb:'get'}}); //=> false
     //     // match multiple paths
     //     app.contextMatchesOptions(context, {path: ['#/mypath', '#/otherpath']}); //=> true
     //     app.contextMatchesOptions(context, {path: ['#/otherpath', '#/thirdpath']}); //=> false
@@ -1218,6 +1241,9 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
     //     // match all except multiple paths
     //     app.contextMatchesOptions(context, {except: {path: ['#/mypath', '#/otherpath']}}); //=> false
     //     app.contextMatchesOptions(context, {except: {path: ['#/otherpath', '#/thirdpath']}}); //=> true
+    //     // match all except multiple paths and verbs
+    //     app.contextMatchesOptions(context, {except: {path: ['#/mypath', '#/otherpath'], verb: ['get', 'post']}}); //=> false
+    //     app.contextMatchesOptions(context, {except: {path: ['#/otherpath', '#/thirdpath'], verb: ['get', 'post']}}); //=> true
     //
     contextMatchesOptions: function(context, match_options, positive) {
       var options = match_options;
@@ -1621,7 +1647,7 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
         if (callback) { this.then(callback); }
         if (typeof location === 'string') {
           // it's a path
-          is_json      = (location.match(/\.json$/) || options.json);
+          is_json      = (location.match(/\.json(\?|$)/) || options.json);
           should_cache = is_json ? options.cache === true : options.cache !== false;
           context.next_engine = context.event_context.engineFor(location);
           delete options.cache;
@@ -1960,7 +1986,7 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
       if (_isFunction(engine)) { return engine; }
       // lookup engine name by path extension
       engine = (engine || context.app.template_engine).toString();
-      if ((engine_match = engine.match(/\.([^\.\?\#]+)$/))) {
+      if ((engine_match = engine.match(/\.([^\.\?\#]+)(\?|$)/))) {
         engine = engine_match[1];
       }
       // set the engine to the default template engine if no match is found
@@ -2117,4 +2143,3 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
 
   return Sammy;
 });
-})(jQuery, window);
