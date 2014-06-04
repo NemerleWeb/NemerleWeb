@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MacroLibrary1
+namespace NemerleWeb
 {
   /// <summary>
   /// Helper class for implementing data macros

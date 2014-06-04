@@ -10,9 +10,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-
-namespace MacroLibrary1
+namespace NemerleWeb
 {
+  /// <summary>
+  /// Converts all fields to be 'public mutable'.
+  /// </summary>
+  [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
+  macro Dto(typeBuilder : TypeBuilder)
+  {
+    DtoImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder)
+  }
+  
+  /// <summary>
+  /// Converts all fields to be 'public mutable'.
+  /// </summary>
+  [MacroUsage(MacroPhase.BeforeTypedMembers, MacroTargets.Class)]
+  macro Dto(typeBuilder : TypeBuilder)
+  {
+    DtoImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder)
+  }
+  
   /// <summary>
   /// Converts all fields to be 'public mutable'.
   /// </summary>
@@ -33,7 +50,7 @@ namespace MacroLibrary1
         NemerleModifiers.Private |
         NemerleModifiers.Protected |
         NemerleModifiers.Internal;
-        
+      
       DataMacroHelper.ChangeFieldsAccess(typeBuilder, toAdd, toRemove);
     }
   }

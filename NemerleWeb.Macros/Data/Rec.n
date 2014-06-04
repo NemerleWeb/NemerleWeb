@@ -10,8 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-
-namespace MacroLibrary1
+namespace NemerleWeb
 {
   /// <summary>
   /// Converts all fields to be 'public immutable'.
