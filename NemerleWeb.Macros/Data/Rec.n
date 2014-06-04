@@ -16,6 +16,15 @@ namespace MacroLibrary1
   /// <summary>
   /// Converts all fields to be 'public immutable'.
   /// </summary>
+  [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
+  macro Rec(typeBuilder : TypeBuilder)
+  {
+    RecImpl.DoTransformBeforeInheritance(Macros.ImplicitCTX(), typeBuilder)
+  }
+  
+  /// <summary>
+  /// Converts all fields to be 'public immutable'.
+  /// </summary>
   [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Class)]
   macro Rec(typeBuilder : TypeBuilder)
   {
@@ -24,17 +33,25 @@ namespace MacroLibrary1
   
   module RecImpl
   {
+    public DoTransformBeforeInheritance(typer : Typer, typeBuilder : TypeBuilder) : void
+    {
+      Macros.DefineCTX(typer);
+    
+      typeBuilder.AddMacroAttribute(<[ Nemerle.Core.Record ]>);
+    }
+    
     public DoTransform(typer : Typer, typeBuilder : TypeBuilder) : void
     {
       Macros.DefineCTX(typer);
       
-      DataMacroHelper.ChangeFieldsAccess(
-        typeBuilder,
-        NemerleModifiers.Public,
+      def toAdd = NemerleModifiers.Public;
+      def toRemove =
         NemerleModifiers.Private |
-          NemerleModifiers.Protected |
-          NemerleModifiers.Internal |
-          NemerleModifiers.Mutable);
+        NemerleModifiers.Protected |
+        NemerleModifiers.Internal |
+        NemerleModifiers.Mutable;
+        
+      DataMacroHelper.ChangeFieldsAccess(typeBuilder, toAdd, toRemove);
     }
   }
 }

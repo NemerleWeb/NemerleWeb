@@ -28,12 +28,13 @@ namespace MacroLibrary1
     {
       Macros.DefineCTX(typer);         
       
-      DataMacroHelper.ChangeFieldsAccess(
-        typeBuilder,
-        NemerleModifiers.Public | NemerleModifiers.Mutable,
+      def toAdd = NemerleModifiers.Public | NemerleModifiers.Mutable;
+      def toRemove =
         NemerleModifiers.Private |
-          NemerleModifiers.Protected |
-          NemerleModifiers.Internal);
+        NemerleModifiers.Protected |
+        NemerleModifiers.Internal;
+        
+      DataMacroHelper.ChangeFieldsAccess(typeBuilder, toAdd, toRemove);
     }
   }
 }
