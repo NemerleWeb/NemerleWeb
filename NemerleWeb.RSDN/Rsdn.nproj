@@ -241,6 +241,18 @@
     <Content Include="Scripts\jquery-1.10.1.min.map">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Scripts\jquery-1.11.1.intellisense.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery-1.11.1.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery-1.11.1.min.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery-1.11.1.min.map">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Scripts\jquery.cookie.js">
       <SubType>Content</SubType>
     </Content>

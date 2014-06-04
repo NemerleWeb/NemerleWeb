@@ -113,7 +113,7 @@
     <Compile Include="Data\DataMacroHelper.n">
       <SubType>Code</SubType>
     </Compile>
-   <Compile Include="Data\Dto.n">
+    <Compile Include="Data\Dto.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Data\Rec.n">
@@ -200,6 +200,18 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery-1.11.1.intellisense.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery-1.11.1.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery-1.11.1.min.js">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Scripts\jquery-1.11.1.min.map">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\jquery.signalR-1.2.0.js">
