@@ -45,7 +45,8 @@ namespace NemerleWeb.Website.Samples
     {
       Messages.Add(message);
     }
-  
+      
+    [SignalR]
     public class Server 
     {      
       public static _lastMessages : ConcurrentQueue[Message] = ConcurrentQueue.[Message]();
@@ -54,8 +55,7 @@ namespace NemerleWeb.Website.Samples
       {
         _lastMessages.ToList()
       }
-      
-      [SignalR]
+            
       public SendMessage(name : string, message : string) : string
       {
         def msg = Message(if(string.IsNullOrWhiteSpace(name)) "anon" else name, message, DateTime.Now.ToString());
