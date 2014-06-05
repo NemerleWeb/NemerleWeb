@@ -1,0 +1,56 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Compiler;
+using Nemerle.Compiler.Parsetree;
+using Nemerle.Compiler.Typedtree;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NemerleWeb
+{
+  /// <summary>
+  /// Converts all fields to be 'public immutable'.
+  /// </summary>
+  [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
+  macro Rec(typeBuilder : TypeBuilder)
+  {
+    RecImpl.DoTransformBeforeInheritance(Macros.ImplicitCTX(), typeBuilder)
+  }
+  
+  /// <summary>
+  /// Converts all fields to be 'public immutable'.
+  /// </summary>
+  [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Class)]
+  macro Rec(typeBuilder : TypeBuilder)
+  {
+    RecImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder)
+  }
+  
+  module RecImpl
+  {
+    public DoTransformBeforeInheritance(typer : Typer, typeBuilder : TypeBuilder) : void
+    {
+      Macros.DefineCTX(typer);
+    
+      typeBuilder.AddMacroAttribute(<[ Nemerle.Core.Record ]>);
+    }
+    
+    public DoTransform(typer : Typer, typeBuilder : TypeBuilder) : void
+    {
+      Macros.DefineCTX(typer);
+      
+      def toAdd = NemerleModifiers.Public;
+      def toRemove =
+        NemerleModifiers.Private |
+        NemerleModifiers.Protected |
+        NemerleModifiers.Internal |
+        NemerleModifiers.Mutable;
+        
+      DataMacroHelper.ChangeFieldsAccess(typeBuilder, toAdd, toRemove);
+    }
+  }
+}
