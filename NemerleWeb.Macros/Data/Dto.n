@@ -20,31 +20,13 @@ namespace NemerleWeb
   {
     DtoImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder)
   }
-  
-  /// <summary>
-  /// Converts all fields to be 'public mutable'.
-  /// </summary>
-  [MacroUsage(MacroPhase.BeforeTypedMembers, MacroTargets.Class)]
-  macro Dto(typeBuilder : TypeBuilder)
-  {
-    DtoImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder)
-  }
-  
-  /// <summary>
-  /// Converts all fields to be 'public mutable'.
-  /// </summary>
-  [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Class)]
-  macro Dto(typeBuilder : TypeBuilder)
-  {
-    DtoImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder)
-  }
-  
+    
   module DtoImpl
   {
     public DoTransform(typer : Typer, typeBuilder : TypeBuilder) : void
     {
       Macros.DefineCTX(typer);         
-      
+            
       def toAdd = NemerleModifiers.Public | NemerleModifiers.Mutable;
       def toRemove =
         NemerleModifiers.Private |
@@ -52,6 +34,8 @@ namespace NemerleWeb
         NemerleModifiers.Internal;
       
       DataMacroHelper.ChangeFieldsAccess(typeBuilder, toAdd, toRemove);
+      
+      typeBuilder.AddMacroAttribute(<[ Nemerle.Core.Record ]>);     
     }
   }
 }

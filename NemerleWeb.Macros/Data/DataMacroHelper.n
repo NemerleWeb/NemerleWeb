@@ -21,16 +21,14 @@ namespace NemerleWeb
       toAdd : NemerleModifiers,
       toRemove : NemerleModifiers) : void
     {
-      def fields = typeBuilder.GetFields(
-        BindingFlags.Instance |
-        BindingFlags.NonPublic |
-        BindingFlags.Public);
-       
-      // Get all non generated fields
-      foreach(field is FieldBuilder when !field.IsGenerated in fields)
+      match(typeBuilder.Ast) 
       {
-        field.Attributes |= toAdd;
-        field.Attributes &= ~toRemove;
+      | TopDeclaration.Class(_, decls) => 
+        foreach(field in decls.OfType.[ClassMember.Field]()) {
+          field.Attributes |= toAdd;
+          field.Attributes &= ~toRemove;
+        }
+      | _ => {}
       }
     }
   }

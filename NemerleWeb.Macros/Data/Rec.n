@@ -21,22 +21,15 @@ namespace NemerleWeb
     RecImpl.DoTransformBeforeInheritance(Macros.ImplicitCTX(), typeBuilder)
   }
   
-  /// <summary>
-  /// Converts all fields to be 'public immutable'.
-  /// </summary>
-  [MacroUsage(MacroPhase.WithTypedMembers, MacroTargets.Class)]
-  macro Rec(typeBuilder : TypeBuilder)
-  {
-    RecImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder)
-  }
-  
   module RecImpl
   {
     public DoTransformBeforeInheritance(typer : Typer, typeBuilder : TypeBuilder) : void
     {
       Macros.DefineCTX(typer);
     
-      typeBuilder.AddMacroAttribute(<[ Nemerle.Core.Record ]>);
+      DoTransform(typer, typeBuilder);
+      
+      typeBuilder.AddMacroAttribute(<[ Nemerle.Core.Record ]>);      
     }
     
     public DoTransform(typer : Typer, typeBuilder : TypeBuilder) : void

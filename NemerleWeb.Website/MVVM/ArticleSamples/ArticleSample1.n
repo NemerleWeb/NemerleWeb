@@ -17,8 +17,7 @@ namespace NemerleWeb.Website.MVVM.ArticleSamples
   {
     //Вся логика в классе с атрибутом [Unit] будет транслирована в javascript, 
     //кроме внутреннего класса Server, из которого будет сгенерирован ASP.NET MVC Controller
-    [Unit, Record]
-	  public class Task { public mutable Name : string; public mutable IsDone : bool; public mutable Priority : string; }
+    [Dto] class Task { Name : string; IsDone : bool; Priority : string; }
 
 	  //В Немерле все поля по умолчанию immutable, 
 	  //поэтому нам приходится помечать их модификатором mutable
