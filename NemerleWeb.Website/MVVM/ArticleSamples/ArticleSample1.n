@@ -19,54 +19,54 @@ namespace NemerleWeb.Website.MVVM.ArticleSamples
     //кроме внутреннего класса Server, из которого будет сгенерирован ASP.NET MVC Controller
     [Dto] class Task { Name : string; IsDone : bool; Priority : string; }
 
-	  //В Немерле все поля по умолчанию immutable, 
-	  //поэтому нам приходится помечать их модификатором mutable
-	  mutable _tasks = List.[Task]();
-	  mutable _todoName = "New task";
-	  mutable _todoPriority = "high";
+    //В Немерле все поля по умолчанию immutable, 
+    //поэтому нам приходится помечать их модификатором mutable
+    mutable _tasks = List.[Task]();
+    mutable _todoName = "New task";
+    mutable _todoPriority = "high";
   
-	  public this() 
-	  {
+    public this() 
+    {
 	    _ = server.Load(tasks => SetTasks(tasks));
 	    //Поле server генерируется автоматически, если у в Unit
 	    //присутствует класс Server (см. ниже)
 	    //К параметрам метода Load() добавляется callback, 
 	    //который принимает результат. Так как параметров у Load
 	    //нет, то callback - это единственный параметр
-	  }
+    }
 	  
-	  SetTasks(tasks : List[Task]) : void 
-	  {
+    SetTasks(tasks : List[Task]) : void 
+    {
 	    _tasks = tasks;
 	    //Мы будем вызывать этот код с сервера с помощью SignalR,
 	    //поэтому выделяем такую простую логику в отдельный метод
-	  }
+    }
 	  
-	  Add() : void
-	  {
-		  _tasks.Add(Task(_todoName, false, _todoPriority));
+    Add() : void
+    {
+	    _tasks.Add(Task(_todoName, false, _todoPriority));
 		  
-		  SaveToServer();
+	    SaveToServer();
 		  
-		  _todoName = "Task #" + _tasks.Count;
-		  _todoPriority = "high";
-	  }
+	    _todoName = "Task #" + _tasks.Count;
+	    _todoPriority = "high";
+    }
   
-	  SaveToServer() : void
-	  {
+    SaveToServer() : void
+    {
 	    _ = server.Save(_tasks, status => window.console.log(status))
 	    //Метод Save принимает параметр List[Task], к которому автоматически генерируется 
 	    //колбек с результатом. На данный момент нам с этим результатом делать нечего, 
 	    //поэтому просто выведем его в консоль, для наглядности
-	  }
+    }
 	  
-	  [Html]
-	  //О примитивах биндинга мы расскажем впоследствие более подробно.
-	  //Можете обратить внимание, что внутри шаблонов работает LINQ, 
-	  //который реализован с помощью linq.js
-	  public View() : string
-	  {
-		  <#
+    [Html]
+    //О примитивах биндинга мы расскажем впоследствие более подробно.
+    //Можете обратить внимание, что внутри шаблонов работает LINQ, 
+    //который реализован с помощью linq.js
+    public View() : string
+    {
+	    <#
 		    <table class="reactive-todo-table">
 		      <tr>
 		        <th>Priority</th><th>Task</th><th>Status</th>
@@ -76,45 +76,45 @@ namespace NemerleWeb.Website.MVVM.ArticleSamples
 				    <td>$(task.Name)</td>
 				    <td><input type="checkbox" event-change="$SaveToServer" checked="$(task.IsDone)" /></td>
 			    </tr>
-			  </table>
+		    </table>
 			  
-			  <div>
-				  <input value="$_todoName" />
-				  <select value="$_todoPriority">
-					  <option>high</option>
-					  <option>low</option>
-				  </select>
-				  <button click="$Add">Add</button>
-			  </div>
-		  #>
-	  }
+		    <div>
+			    <input value="$_todoName" />
+			    <select value="$_todoPriority">
+				    <option>high</option>
+				    <option>low</option>
+			    </select>
+			    <button click="$Add">Add</button>
+		    </div>
+	    #>
+    }
     	 
-	  [SignalR]
-	  public class Server
-	  {
+    [SignalR]
+    public class Server
+    {
       //Из этого класса будет сгенерирован контроллер ASP.NET MVC
       //Весь маппинг между клиентом и сервером делается автоматически,
       //поэтому параметры и возвращаемое значение это те же типы, которые
       //мы используем на стороне клиента. Атрибутом [SignalR] помечаются те типы Server,
       //в которых мы будем пользоваться макросами broadcast или signal (см. ниже)
-		  static mutable _db : List[Task] = List();
+	    static mutable _db : List[Task] = List();
 
-		  static this()
-		  {
+	    static this()
+	    {
 		    _db.Add(Task("Write article", false, "high"));
 		    _db.Add(Task("Fix website bugs", false, "high"));
 		    _db.Add(Task("Add new functionality", false, "low"));
-		  }	  
+	    }	  
 		  
-		  public Load() : List[Task]
-		  {
+	    public Load() : List[Task]
+	    {
 		    _db
 		    //Немерле позволяет не писать return для возвращения значения
 		    //Такой синтаксис позволяет реализовать идею Everything is expression
-		  }
+	    }
 		  
-		  public Save(tasks : List[Task]) : string
-		  {
+	    public Save(tasks : List[Task]) : string
+	    {
 		    _db = tasks;
 		    broadcast client.SetTasks(_db);
 		    //Вот он весь SignalR. Как обычно, все неудобные подробности 
@@ -127,7 +127,7 @@ namespace NemerleWeb.Website.MVVM.ArticleSamples
 		    
 		    //Возвращать нам нечего, поэтому просто отвечаем:
 		    "ok"
-		  }
-	  }
+	    }
+    }
   }
 }
