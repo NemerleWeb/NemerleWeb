@@ -213,8 +213,11 @@ namespace NemerleWeb
       def typeScripts = getTypeScriptFilenames(typeName);
       def dependentTypes = GetTypeDependencies([typeName]);
       def dependentFileNames = dependentTypes.SelectMany(t => getTypeScriptFilenames(t));
-      typeScripts.Concat(dependentFileNames).Select(fname => 
-      $<# <script type="text/javascript" src="\$fname"></script>$(Environment.NewLine)#>);
+      typeScripts.Concat(dependentFileNames)
+                 .Select(fname => (fname, if(fname.Contains("_fields_")) 1 else 0))
+                 .OrderBy((_, priority) => priority)
+                 .Select(((fname, _), _) => 
+      $<# <script type="text/javascript" src="\$(fname)"></script>$(Environment.NewLine)#>);
     }
     
     public GetScripts() : IEnumerable[string]
