@@ -13,11 +13,13 @@ using NemerleWeb.TypedJS;
 namespace NemerleWeb.Website.MVVM.ArticleSamples
 {
   [Unit]
+  //Вся логика в классе с атрибутом [Unit] будет транслирована в javascript, 
+  //кроме внутреннего класса Server, из которого будет сгенерирован ASP.NET MVC Controller
   public class ReactiveToDo
   {
-    //Вся логика в классе с атрибутом [Unit] будет транслирована в javascript, 
-    //кроме внутреннего класса Server, из которого будет сгенерирован ASP.NET MVC Controller
-    [Dto] class Task { Name : string; IsDone : bool; Priority : string; }
+    //Макрос [Dto] помечает все поля как public mutable и добавляет макроатрибут [Record],
+    //который в свою очередь создаёт конструктор, принимающий значения всех полей
+    [Dto] public class Task { Name : string; IsDone : bool; Priority : string; }
 
     //В Немерле все поля по умолчанию immutable, 
     //поэтому нам приходится помечать их модификатором mutable

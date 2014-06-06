@@ -9,18 +9,12 @@ namespace NemerleWeb.Website.Samples
   [Unit]
   public class LoadingAndSavingPage
   {
-    [Unit]
-    public class Task
-    {
-      public Title : string { get; set; }
-      public IsDone : bool { get; set; }
-      public IsDestroyed : bool { get; set; }
-    }
+    [Dto] public class Task { Title : string; IsDone : bool; IsDestroyed : bool; }
 
-    public Tasks : List[Task] { get; set; default List.[Task]() }
-    public NewTaskText : string { get; set; }
+    Tasks : List[Task] { get; set; default List.[Task]() }
+    NewTaskText : string { get; set; }
     
-    public IncompleteTasks : IEnumerable[Task]
+    IncompleteTasks : IEnumerable[Task]
     {
       get
       {
@@ -28,7 +22,7 @@ namespace NemerleWeb.Website.Samples
       }
     }
     
-    public ActiveTasks : IEnumerable[Task] 
+    ActiveTasks : IEnumerable[Task] 
     {
       get
       {
@@ -36,7 +30,7 @@ namespace NemerleWeb.Website.Samples
       }
     }
     
-    public DeletedTasks : IEnumerable[Task] 
+    DeletedTasks : IEnumerable[Task] 
     {
       get
       {
@@ -51,7 +45,7 @@ namespace NemerleWeb.Website.Samples
 
     AddTask() : void
     {
-      Tasks.Add(Task() <- (Title = NewTaskText, IsDone = false, IsDestroyed = false));
+      Tasks.Add(Task(NewTaskText, false, false));
       NewTaskText = "";
     }
 
@@ -83,10 +77,10 @@ namespace NemerleWeb.Website.Samples
 
       public Load() : IEnumerable[Task]
       {
-        yield Task() <- (Title = "Wire the money to Panama", IsDone = true, IsDestroyed = false);
-        yield Task() <- (Title = "Get hair dye, beard trimmer, dark glasses and \"passport\"", IsDone = false, IsDestroyed = false);
-        yield Task() <- (Title = "Book taxi to airport", IsDone = false, IsDestroyed = false);
-        yield Task() <- (Title = "Arrange for someone to look after the cat", IsDone = false, IsDestroyed = false);
+        yield Task("Wire the money to Panama", true, false);
+        yield Task("Get hair dye, beard trimmer, dark glasses and \"passport\"", false, false);
+        yield Task("Book taxi to airport", false, false);
+        yield Task("Arrange for someone to look after the cat", false, false);
       }
     }
 

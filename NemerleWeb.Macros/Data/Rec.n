@@ -42,6 +42,9 @@ namespace NemerleWeb
         NemerleModifiers.Protected |
         NemerleModifiers.Internal |
         NemerleModifiers.Mutable;
+      
+      typeBuilder.Ast.Attributes |= NemerleModifiers.Public;
+      typeBuilder.Ast.Attributes &= ~toRemove;
         
       DataMacroHelper.ChangeFieldsAccess(typeBuilder, toAdd, toRemove);
     }
