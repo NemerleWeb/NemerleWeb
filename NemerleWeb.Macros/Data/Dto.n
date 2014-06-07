@@ -31,11 +31,18 @@ namespace NemerleWeb
       def toRemove =
         NemerleModifiers.Private |
         NemerleModifiers.Protected |
-        NemerleModifiers.Internal;
+        NemerleModifiers.Internal;      
       
       DataMacroHelper.ChangeFieldsAccess(typeBuilder, toAdd, toRemove);
       
       typeBuilder.AddMacroAttribute(<[ Nemerle.Core.Record ]>);     
+      
+      // Add default constructor if doesn't exist
+      def ctors = typeBuilder.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic);
+      when(!ctors.Any(c => c.Header.Parameters is []))
+      {
+        _ = typeBuilder.DefineWithSource(<[decl: public this() {} ]>);
+      }
     }
   }
 }

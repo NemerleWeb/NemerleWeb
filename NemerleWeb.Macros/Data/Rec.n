@@ -18,20 +18,11 @@ namespace NemerleWeb
   [MacroUsage(MacroPhase.BeforeInheritance, MacroTargets.Class)]
   macro Rec(typeBuilder : TypeBuilder)
   {
-    RecImpl.DoTransformBeforeInheritance(Macros.ImplicitCTX(), typeBuilder)
+    RecImpl.DoTransform(Macros.ImplicitCTX(), typeBuilder)
   }
   
   module RecImpl
   {
-    public DoTransformBeforeInheritance(typer : Typer, typeBuilder : TypeBuilder) : void
-    {
-      Macros.DefineCTX(typer);
-    
-      DoTransform(typer, typeBuilder);
-      
-      typeBuilder.AddMacroAttribute(<[ Nemerle.Core.Record ]>);      
-    }
-    
     public DoTransform(typer : Typer, typeBuilder : TypeBuilder) : void
     {
       Macros.DefineCTX(typer);
@@ -42,11 +33,10 @@ namespace NemerleWeb
         NemerleModifiers.Protected |
         NemerleModifiers.Internal |
         NemerleModifiers.Mutable;
-      
-      typeBuilder.Ast.Attributes |= NemerleModifiers.Public;
-      typeBuilder.Ast.Attributes &= ~toRemove;
-        
+            
       DataMacroHelper.ChangeFieldsAccess(typeBuilder, toAdd, toRemove);
+      
+      typeBuilder.AddMacroAttribute(<[ Nemerle.Core.Record ]>);
     }
   }
 }

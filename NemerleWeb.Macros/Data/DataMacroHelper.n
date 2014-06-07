@@ -21,14 +21,13 @@ namespace NemerleWeb
       toAdd : NemerleModifiers,
       toRemove : NemerleModifiers) : void
     {
-      match(typeBuilder.Ast) 
+      when(typeBuilder.Ast is TopDeclaration.Class(_, decls))
       {
-      | TopDeclaration.Class(_, decls) => 
-        foreach(field in decls.OfType.[ClassMember.Field]()) {
+        foreach(field is ClassMember.Field in decls)
+        {
           field.Attributes |= toAdd;
           field.Attributes &= ~toRemove;
         }
-      | _ => {}
       }
     }
   }
