@@ -1,12 +1,33 @@
 ﻿<!DOCTYPE html>
 <html>
-    <head>
-        <meta name="viewport" content="width=device-width" />
-        <title>RSDN.ru</title>
-    </head>
-    @RenderBody()
-    <frameset cols="*,75%" id="treeshower" border="2" bordercolor="#65a7cb" framespacing="2" frameborder="1">
-	    <frame name="frmTree" src="/Home/Tree" marginwidth="0" marginheight="0" bordercolor="#65a7cb" frameborder="1"></frame>
-	    <frame id="frmMain" name="frmMain" src="http://www.rsdn.ru/frames/main" bordercolor="#65a7cb" marginwidth="0" marginheight="0" frameborder="1" scrolling="auto"></frame>
-    </frameset>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/jquery.splitter.css")" rel="stylesheet" type="text/css" />
+    <script src="~/Scripts/jquery-1.10.2.min.js" type="text/javascript"></script>
+	<script src="~/Scripts/deprecated.js" type="text/javascript"></script>
+    <script src="~/Scripts/jquery.cookie.js" type="text/javascript"></script>
+    <script src="~/Scripts/splitter.js" type="text/javascript"></script>
+    <script src="/signalr/hubs" type="text/javascript"></script>
+</head>
+    <body>
+        <div class="body-container">
+            @RenderBody()
+        </div>
+        <script>
+            $(function() {
+                $(".page").splitter({
+                    type: "v",
+                    sizeLeft: 300,
+                    dock: true,
+                    dockKey: 'Z',
+                    cookie: "rsdn-docksplitter",
+                    //accessKey: 'I',
+                    splitbarKey: 'I',
+                    resizeToWidth: true
+                });
+            });
+        </script>
+    </body>
 </html>

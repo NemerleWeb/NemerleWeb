@@ -42,7 +42,7 @@ namespace Rsdn
       
       Search = Search();                       
       Pinned = Pinned();      
-      IsMobile = window.document.body.clientWidth < 1000;
+      //IsMobile = window.document.body.clientWidth < 1000;
               
       _ = server.GetTopNodes(nodes => {
         console.log("loaded top node");
@@ -65,9 +65,7 @@ namespace Rsdn
       | _ when node.Parent != null => node.Parent :: getAllParents(node.Parent)
       | _ => [];
       };
-            
-      (window.top.document.getElementById("frmMain") :> HTMLFrameElement).src = node.Href;
-      
+                  
       SelectedNode = node;
       ActiveNodes = node :: getAllParents(node);
       CurrentState = State.Content;
