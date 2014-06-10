@@ -42,7 +42,7 @@ namespace Rsdn
       
       Search = Search();                       
       Pinned = Pinned();      
-      //IsMobile = window.document.body.clientWidth < 1000;
+      IsMobile = window.document.body.clientWidth < 1000;
               
       _ = server.GetTopNodes(nodes => {
         console.log("loaded top node");
