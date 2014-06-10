@@ -58,7 +58,7 @@ namespace Rsdn
           _ = console.log(nodes.Length);
           
           foreach(node in nodes) {
-            match(node.ImageClassName) {
+            match(node.Icon) {
             | "fr" => SearchResultsForums.Children.Add(node)
             | "qna"
             | "at" => SearchResultsArticles.Children.Add(node)

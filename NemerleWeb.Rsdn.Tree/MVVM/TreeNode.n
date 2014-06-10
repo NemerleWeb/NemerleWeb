@@ -6,8 +6,6 @@ using Nemerle.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-
 using NemerleWeb;
 using NemerleWeb.TypedJS;
 
@@ -18,19 +16,36 @@ namespace Rsdn
   {
     public Id : string { get; set; }
     public Caption : string { get; set; }
+    public Icon : string { get; set; }
     public Hide : bool { get; set; }
+    public Depth : int { get; set; }
     public IsOpened : bool { get; set; }
-    public Children : List[TreeNode] { get; set; }
-    public ImageClassName : string { get; set; }
-    public Href : string {  get; set; }
-    public LoadOnDemand : bool { get; set; }
+    public Children : List[TreeNode] { get; set; }    
+    public HasChildren : bool { get; set; }
     
     public Parent : TreeNode { get; set; }
+    public IsLoading : bool { get; set; }    
+    public IsSelected : bool { get; set; }
     
-    public IsLoading : bool { get; set; }
-    public IsPinned : bool { get { MainPage.Instance?.Pinned?.IsPinned(this) } }
-    public IsActive : bool { get { MainPage.Instance?.IsActiveNode(this) } }
+    mutable _href : string;
+    public Href : string 
+    { 
+      get { if(_href == null || _href.StartsWith("http://www.rsdn.ru")) _href else "http://www.rsdn.ru" + _href }; 
+      set { _href = value }; 
+    }
     
+    public IconUrl : string 
+    {      
+      get {        
+        def suffix = match(IsOpened, HasChildren) {
+                      | (false, true) => "c.gif" 
+                      | (true, _) => "o.gif";
+                      | _ => "s.gif";
+                     };
+        "http://rsdn.ru/images/tree/" + Icon + suffix;
+      }
+    }
+        
     public TogglePin() : void
     {            
       if(!MainPage.Instance.Pinned.IsPinned(this)) MainPage.Instance.Pinned.AddPinned(Id)
@@ -39,12 +54,12 @@ namespace Rsdn
     
     public CaptionClick() : void
     {
-      if(LoadOnDemand || Children != null) {
+      if(HasChildren) {
         if(Children == null) {
           IsLoading = true;
           IsOpened = !IsOpened;
           _ = server.LoadNodeChildren(Id, children => {
-            Children = children.ToList();
+            Children = children;
             
             foreach(child in Children)
               child.Parent = this;
@@ -62,16 +77,22 @@ namespace Rsdn
       }
     }
     
+    public IsPinnedNode(node : TreeNode) : bool
+    {
+      MainPage.Instance.Pinned.IsPinned(node)
+    }
+    
     [Html]
     public View() : string
     {
       <#        
-        <div $foreach(c in Children) class="node">
-          <a click="$(c.CaptionClick())" href="$(c.Href)">
-            <span class="$(c.ImageClassName + " node-caption")" css-is-active="$(c.IsActive)">
+        <div $foreach(c in Children) style-margin-left="$(c.Depth * 6)" class="node" css-selected-search-result="$(c.IsSelected)">
+          <a click="$(c.CaptionClick())" href="$("http://www.rsdn.ru" + c.Href)" css-with-children="$(c.HasChildren)">
+            <img class="node-icon" src="$(c.IconUrl)" />
+            <span class="node-caption" css-is-active="$(MainPage.Instance.IsActiveNode(c))">
               $(c.Caption)
             </span>
-            <div $when(c.Children == null && (c.IsActive || c.IsPinned)) click="$(c.TogglePin())" class="node-pin" css-pinned="$(c.IsPinned)" />
+            <div $when(!c.HasChildren) click="$(c.TogglePin())" class="node-pin" css-pinned="$(IsPinnedNode(c))" />
           </a>
           <div $when(c.IsLoading) class="node-loading">
             Загрузка, пожалуйста подождите...
@@ -85,10 +106,9 @@ namespace Rsdn
     
     public class Server
     {
-      public LoadNodeChildren(id : string) : IEnumerable[TreeNode]
+      public LoadNodeChildren(id : string) : List[TreeNode]
       {
-        TreeLoader.Provider.GetChildren(id, HttpContext.Current.Request)
-                  .Select(TreeLoader.MapToTreeNode).ToList();
+        TreeLoader.LoadNodeChildren(id)
       }
     }
   }
