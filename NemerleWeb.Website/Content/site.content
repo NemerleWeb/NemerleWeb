@@ -1,0 +1,699 @@
+%%Index%%
+<div class="jumbotron">
+    <h1>NemerleWeb</h1>
+    <p class="lead">
+        NemerleWeb is a Reactive Web Application Framework. <br/>
+        It differs from other frameworks by:
+    </p>
+    <ul class="feature-list">
+        <li>It's meant to be used with <a href="http://www.nemerle.org">Nemerle</a>, most powerful .NET language</li>
+        <li>Simplicity</li>
+        <li>Static typing</li>
+        <li>Auto-completion</li>
+        <li>Declarative templates</li>        
+        <li>Models are the same on server and client</li>
+        <li>Communication with server is seamless. No serialization, no mapping.</li>
+        <li>Seamless integrated SignalR support for duplex communication</li>
+        <li>Macros for abstracting commonly used code patterns</li>
+        <li>It's much nicer to look at :)</li>
+    </ul>
+    <!--<p><a class="btn btn-large btn-success" href="#">Try it!</a></p>-->
+</div>
+
+<h2 id="install">How to install?</h2>
+
+<p>
+    It's real easy! If you've ever installed <a href="http://chocolatey.org/">Chocolatey</a>, then it should be familiar.
+    Open a command prompt, and paste following command:
+
+    <pre class="cmd">
+<span>C:\&gt;</span> powershell -NoProfile -ExecutionPolicy unrestricted -Command "iex ((new-object net.webclient).DownloadString('http://www.nemerleweb.com/Installer/standalone-install.ps1'))"</pre>
+</p>
+<p>
+	This script will check for following components and install them if necessary:
+	<ul>
+		<li>.NET Framework 4.5</li>
+		<li>Nemerle</li>
+		<li>NemerleWeb</li>
+	</ul>
+</p>
+
+<h2>Creating project</h2>
+<p>
+	There are two ways to create and run NemerleWeb projects
+	<h3>Visual studio 2012</h3>
+	<p>
+		Start your Visual Studio 2012 and go "File -> New Project -> Nemerle -> NemerleWeb project"
+		When project is created, hit F5. You should see NemerleWeb default page in the browser.
+		Now you can go to MVVM/MainPage.n and begin coding.
+	</p>
+
+	<h3>Command prompt</h3>
+	<p>
+		In console, go to directory you want to create project in. Type:
+		<pre>nweb create MyProjectName</pre>
+		Obviously, you are free to substitute MyProjectName with something more meaningful for you.
+		Now go to created project directory
+    <pre>cd MyProjectName</pre> 
+    and build your newly created project
+    <pre>nweb build</pre>
+    Now you can run it
+		<pre>nweb run</pre>
+		This will fire up IISExpress and open your project in the browser. You should see NemerleWeb default page in the opened tab.
+		Page logic is located in MVVM/MainPage.n file. Use your text editor of choice to modify it.
+    You will have to open second console window, because first one will be occupied by IISExpress.
+    Once you opened it and changed current directory to your project path, you can rebuild project
+		<pre>nweb build</pre>
+    And refresh browser tab.
+		Your modifications should take effect after you refresh page in browser.
+	</p>
+</p>
+
+
+%%Tutorial%%
+
+<ul>
+	<li>
+		<a href="#Preface">Preface</a>
+	</li>
+	<li>
+		<a href="#AboutNemerleWeb">About NemerleWeb</a>
+	</li>
+	<li>
+		<a href="#Binding">Binding</a>
+	</li>
+	<li>
+		<a href="#Clientsidelogic">Client-side logic</a>
+	</li>
+	<li>
+		<a href="#Communicationwithserver">Communication with server</a>
+	</li>
+	<li>
+		<a href="#C">C#</a>
+	</li>
+	<li>
+		<a href="#Templates">Templates</a>
+	</li>
+	<li>
+		<a href="#Bindingattributes">Binding attributes</a>
+	</li>
+	<li>
+		<a href="#JavaScriptTyping">JavaScript Typing</a>
+	</li>
+	<li>
+		<a href="#IntegrationwithTypeScript">Integration with TypeScript</a>
+	</li>
+</ul>
+
+<h2 id="Preface">Preface</h2>
+<p>
+	NemerleWeb is based on Nemerle language.
+	If you are not familiar with this language, it is similar to C# but easier to learn and more powerful.
+</p>
+<p>
+	You can write code in any language providing front-end for Nemerle.
+	For example, there is a C# front-end implemented, we will show it further in this tutorial.
+</p>
+
+<h2 id="AboutNemerleWeb">About NemerleWeb</h2>
+<p>
+	NemerleWeb is Model-View-ViewModel framework that simplifies creating dynamic web pages.
+	You write your code in Nemerle or other front-end language like C#, then it gets translated into mixture of javascript, HTML and server side classes. 
+	Basic page looks something like this:
+</p>
+
+<div class="tutorial-placeholder" data-tutorialid="tutorial-sample-0"></div>
+
+<p>
+This sample displays input box that when changed, automatically updates div contents. 
+</p>
+<p>
+Since we can't bind values to part of text node, framework creates empty <span> element and binds value to that.
+</p>
+
+<h2 id="Binding">Binding</h2>
+Usually, when you develop your web pages, there is some data you want to display and update. Most popular example of that functionality is probably ToDo List. You start with empty collection of tasks. Now you want to add something, that means you will have to modify your collection. You can do it in jQuery fashion:
+
+<pre>
+$("button").click(function() {
+   $("ul").append($("&lt;li&gt;" + $("input").text() + "&lt;/li&gt;"));
+   $("input").text("");
+});
+</pre>
+
+<p>
+	And while this code looks simple enough, it has it's flaws. First of all it's highly jQuery specific. 
+	You are not operating inside your problem domain, which is ToDo List, but rather dealing with DOM structure and events. 
+</p>
+
+<p>
+	If this is the only thing your application does, then it's probably fine. 
+	But as your project grows you will find, that maintaining this kind of code is not that easy. 
+</p>
+
+<p>
+	Secondly, this code contains 3 references to DOM: "button", "ul", "input". Again, as soon as you face the need of refactoring you will have to 
+	deal with these string based references, which means lots of Ctrl+F'ing. 
+</p>
+
+<p>
+	Third, and probably most important issue is lack of data structure. 
+	As of this moment, all your data lives inside DOM, so you can't make queries against it, or modify in anyway. 
+	To do that, you will again need to traverse document, and build your model piece by piece.
+</p>
+
+<p>
+	So, how can we deal with these problems? This is where MVVM and specifically Binding will help us. 
+	MVVM by it's nature advertises decoupling model from presentation level. 
+	What that means, is that you can have your domain model with entities like Task, 
+	User or Milestone, that know nothing about HTML, WPF or any other presentation engine. 
+</p>
+
+<p>
+Now let's try and implement this sample with NemerleWeb:
+</p>
+
+<div class="tutorial-placeholder" data-tutorialid="tutorial-sample-1"></div>
+
+<p>
+Note: That upper part doesn't know anything about HTML. It is like any other code that you write. There is a collection of tasks, and code can modify it in some way.
+For example if we need to search for tasks, all we need to change is:
+<pre>&lt;ul $foreach(t in Tasks.Where(t =&gt; t.Contains(SearchTerm)))&gt;</pre>
+where SearchTerm is new field binded to text input. If this field is modified, task list will modify itself, without any need to re-render it manually.</p>
+
+<p>
+	Not only this is easier to write, but it is also much easier to maintain.
+	What will happen if you decide that Task is not just a string, but also contains Date, Priority, Status or other fields. 
+	I assure you, that jQuery version will eventually grow into something huge and almost unreadable.
+</p>
+
+<p>
+	To do it properly we need to introduce Task type.
+</p>
+
+<pre>
+[Record]
+class Task
+{
+   Title : string;
+   Priority : int;
+   Status : bool;
+}
+</pre>
+
+<p>
+	How will our code change? Actually not that much:
+</p>
+
+<div class="tutorial-placeholder" data-tutorialid="tutorial-sample-2"></div>
+
+<p>
+	It still looks like normal code, nothing framework'y here. 
+	Actually, one of the goals of this project was to introduce as few new concepts as possible, 
+	and yet give developers ability to express themselves without restrictions.
+</p>
+
+<p>
+	Look, for example at HTML. Can you notice any "binding" primitives, that tell you that data is binded and not statically rendered? 
+	There is none - you write your markup just as you write any other template, be that Razor, Haml or anything else. 
+	It's framework's job to parse it and create appropriate bindings, so it all happens behind the scenes. 
+</p>
+
+<h2 id="Clientsidelogic">Client-side logic</h2>
+
+<p>
+	Alright. You know the basics of NemerleWeb and how it works. Let's dive into more complicated examples. Did you notice 
+	<pre>&lt;ul $foreach(t in Tasks.OrderBy(t =&gt; t.Priority))&gt;</pre> 
+	line in previous example? It shows how easy it is to add new features, like ordering, when you keep your model separately from view. 
+</p>
+
+<p>
+	Now, let's do something fun, like client-side validation. There are numerous validation frameworks out there. 
+	Some of those are based on specific attributes, other on specific classes. 
+	Web frameworks like ASP.NET MVC or Ruby on Rails try their best to generate all that meta information inside your template. 
+	What if validation was much simpler than that?
+</p>
+
+<p>
+	Let's see how will very simple validation look:
+</p>
+
+<div class="tutorial-placeholder" data-tutorialid="tutorial-sample-3"></div>
+
+<p>
+	Easy. 
+	But attentive web developer will notice, that there is no specific messages for different validation problems. Let's fix that:
+</p>
+
+<div class="tutorial-placeholder" data-tutorialid="tutorial-sample-4"></div>
+
+<p>
+	I hope, this sample illustrates my previous comment about one of the goals being not to introduce new concepts without actual need. 
+	Also, keep in mind, that while we created methods that accept Task, we could also move validation logic into model itself, or even different type. 
+	It means that we would have the same validation methods on server and client side. 
+	No need to duplicate your validation logic or rely on some engine to generate HTML that might not suit your requirements. 
+	Everything is under your control.
+</p>
+
+<h2 id="Communicationwithserver">Communication with server</h2>
+
+<p>
+	There is no serious web application without contacting the server. So, how do we do this?
+</p>
+
+<p>
+	Lets define Server class inside our Unit:
+</p>
+
+<div class="tutorial-placeholder" data-tutorialid="tutorial-sample-5"></div>
+
+<p>
+	HTTP servers are stateless by their nature, so each request will create new Server object. That means, that if you want to share data between requests you should store it somewhere. The easiest way is to store it in "static" variable (all multithreading issues apply here). Of course usually you will be using database to save or retrieve data.
+</p>
+
+<p>
+	As soon as you define Server class, you are able to use it as an instance via "server" field. This field is created automatically by macro, so you don't need to declare it yourself.
+	"server" methods have the same signature as Server class, but with additional callback, which is called after server response.
+	Example: <pre>server.GetName(name => DisplayName(name));</pre>
+</p>
+
+<p>
+	This simple code demonstrates sending and receiving data from server.
+	Of course this sample rather trivial, but look how easy it was to implement communication.
+	You don't need any special proxy classes, anything unrelated to the work itself.
+</p>
+
+<h2 id="C">C#</h2>
+
+<p>
+	What about writing in C# if you don't want people to learn new language?
+	No problems. Nemerle supports different front-ends, you can implement your own, e.g. F# front-end.
+	Just write code in C#, put .cs extension of course, and add file to the project.
+</p>
+
+<p>
+	Note: It is not fully compatible C# language. It is being translated to Nemerle to support some features like macro-attributes. Also there are some unsupported C# features like dynamic (By the time writing this tutorial).
+</p>
+
+<p>
+Let's rock:
+</p>
+
+<div class="tutorial-placeholder" data-tutorialid="tutorial-sample-6"></div>
+
+<p>
+	Nemerle syntax macros cannot be used in C# program.
+	If you need them you can create a partial class, one part in C# and the other in Nemerle (yes it works).
+	In the future there will be alternative syntax using macro attributes, and you won't need partial classes.
+</p>
+
+<h2 id="Templates">Templates</h2>
+
+<p>
+	One important feature, that was left unnoticed is Templating. Imagine, that you are developing some kind of Contact List application. 
+	Each contact has first name, last name, photo, telephone number etc. Let's put it into code:
+</p>
+
+<pre>
+[Record]
+class Contact
+{
+  FirstName : string;
+  LastName : string;
+  PhotoUrl : string;
+  PhoneNumber : string;
+  Email : string;
+}
+</pre>
+
+<p>
+	Now, to render all that we need quite a bit of HTML:
+</p>
+
+<pre>
+<#
+  &lt;div class=&quot;contact&quot;&gt;  
+    &lt;div class=&quot;left&quot;&gt;
+      &lt;div class=&quot;photo&quot;&gt;
+        &lt;img src=&quot;$PhotoUrl&quot; /&gt;
+      &lt;div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;right&quot;&gt;
+      &lt;div class=&quot;firstname&quot;&gt;$FirstName&lt;/div&gt;
+      &lt;div class=&quot;lastname&quot;&gt;$LastName&lt;/div&gt;
+      &lt;div class=&quot;phone&quot;&gt;$PhoneNumber&lt;/div&gt;
+      &lt;div class=&quot;email&quot;&gt;$Email&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#>
+</pre>
+
+<p>
+	This kind of HTML is highly specific for contacts and not that usable for anything else. So why should we include it in Contact List unit? 
+	By doing that, we are creating God object, that has too many responsibilities, and is hard to maintain.
+	Much better choice would be to move this HTML where it belongs, to Contact class:
+</p>
+
+<pre>
+[Record, Unit]
+class Contact
+{
+  FirstName : string;
+  LastName : string;
+  PhotoUrl : string;
+  PhoneNumber : string;
+  Email : string;
+
+  public View() : string
+  {
+    <#
+      &lt;div class=&quot;contact&quot;&gt;  
+        &lt;div class=&quot;left&quot;&gt;
+          &lt;div class=&quot;photo&quot;&gt;
+            &lt;img src=&quot;$PhotoUrl&quot; /&gt;
+          &lt;div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;right&quot;&gt;
+          &lt;div class=&quot;firstname&quot;&gt;$FirstName&lt;/div&gt;
+          &lt;div class=&quot;lastname&quot;&gt;$LastName&lt;/div&gt;
+          &lt;div class=&quot;phone&quot;&gt;$PhoneNumber&lt;/div&gt;
+          &lt;div class=&quot;email&quot;&gt;$Email&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    #>
+  }
+}
+</pre>
+
+<p>
+Now, we can define Contact list class:
+</p>
+
+<pre>
+[Unit]
+class ContactList
+{
+  Contacts : List[Contact];
+
+  public View() : string
+  {
+    <#
+      &lt;div $foreach(contact in Contacts)&gt;
+        &lt;div template=&quot;$(template(contact))&quot; /&gt;
+      &lt;/div&gt;
+    #>
+  }
+}
+</pre>
+
+<p>
+	Template attribute will automatically look for View method inside the object it receives as an argument and renders it. If you have defined multiple methods or use another naming convention, you can pass method name as a second parameter. Full list of different ways to render a template looks like that:
+</p>
+
+<pre>
+<#
+  &lt;ul&gt;
+    &lt;li&gt;&lt;span template=&quot;$(template(_.Dummy))&quot;&gt;&lt;/span&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;span template=&quot;$(template(_.Dummy, GetCustomViewName(&quot;1&quot;)))&quot;&gt;&lt;/span&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;span template=&quot;$(template(_.Dummy, _.CustomName))&quot;&gt;&lt;/span&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;span template=&quot;$(template(_.Dummy, _.CustomName()))&quot;&gt;&lt;/span&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;span template=&quot;$(template(Dummy))&quot;&gt;&lt;/span&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;span template=&quot;$(template(Dummy, &quot;CustomName&quot;))&quot;&gt;&lt;/span&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;span template=&quot;$(template(Dummy, GetCustomViewName(&quot;2&quot;)))&quot;&gt;&lt;/span&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;span template=&quot;$(template(Dummy, _.CustomName))&quot;&gt;&lt;/span&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;span template=&quot;$(template(Dummy, _.CustomName()))&quot;&gt;&lt;/span&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+#>
+</pre>
+
+<p>
+where Dummy is a member of containing class and defined as follows:
+</p>
+
+<pre>
+[Unit]
+public class TemplateDummy 
+{
+  public GetCustomViewName(suffix : string) : string
+  {
+    //That won't work, because we don't have "View1" or "View2" defined
+    //But this feature is very usable, when you need your template to depend on variable
+    "View" + suffix; 
+  }
+
+  [Html]
+  public View() : string
+  {
+    <#
+      &lt;span&gt;
+        Passed (View)
+      &lt;/span&gt;
+    #>
+  }
+  
+  [Html]
+  public CustomName() : string
+  {
+    <#
+      &lt;span&gt;
+        Passed (CustomName)
+      &lt;/span&gt;
+    #>
+  }
+}   
+</pre>
+
+<h2 id="JavaScriptTyping">JavaScript Typing</h2>
+
+<p>
+	NemerleWeb allows to type arbitrary JavaScript code.
+	You write regular Nemerle code, but it doesn't translate as usual code in NemerleWeb.
+</p>
+
+<p>
+	Assume we want to call <strong>window.alert</strong>.
+	The simplest method is using js macro to write JavaScript as-is;
+</p>
+
+<pre>
+js <# window.alert("hello"); #>
+</pre>
+
+<p>
+	While this approach is simple it doesn't validate your code. You can easily write a typo and the page will be incorrect .
+	After all the purpose of NemerleWeb is to write type safe code.
+</p>
+
+<p>
+This can be done by writing simple class:
+</p>
+
+<pre>
+class window
+{
+  public assert(str : string) : void {}
+}
+</pre>
+
+<p>
+	While this is obvious , it doesn't work.
+</p>
+<p>
+	NemerleWeb doesn't generate simpe JS code in order to have method overloads and ober type safety.
+	You'll have the following JS ( more or less ): window.alert["System.String"]("abc")
+	But we wanted simple window.alert("abc")  :-(
+</p>
+
+<p>
+	Don't worry, you don't need to rewrite anything, just use special attribute JSApi.
+</p>
+
+<h3>JSApi</h3>
+<p>
+	Add attribute "JSApi" to your class and you get 'normal' names in JS.
+</p>
+
+<pre>
+[JSApi]
+class window
+{
+  public static alert(s : string) : void {}
+}
+</pre>
+
+<p>
+	That's all.
+	JSApi improvement
+	The better code is to disallow calling this class in the server side:
+</p>
+
+<pre>
+[JSApi]
+class window
+{
+  public static alert(s : string) : void { throw NotImplementedException(); }
+}
+</pre>
+
+<h3>JSApiImpl</h3>
+
+<p>
+	To simplify our life there is a macro JSApiImpl.
+	This macro adds JSApi attribute automatically.
+</p>
+
+<pre>
+[JSApiImpl]
+class window
+{
+  public static alert(s : string) : void;
+}
+</pre>
+
+<strong>
+	Attention: you don't need to write the body at all!
+</strong>
+
+<h3>JSApiRoot</h3>
+<p>
+	In order to specify which parts of the fully qualified name are not relevant in JS generation, there is a special macro JSApiRoot.
+	Usage:
+</p>
+
+<pre>
+[assembly: JSApiRoot("MyNamespace")]
+</pre>
+
+<p>
+	Then later in code you can write anything inside MyNamespace and 'MyNamespace' won't appear in JS:
+</p>
+
+<pre>
+namespace MyNamespace
+{
+  [JSApi] class A { }
+}
+
+def a = MyNamespace.A(); // Resulting JS: var a = new A();
+</pre>
+
+<h3>JSCall and JSNew</h3>
+
+<p>
+	JavaScript allows many things that are not placed good in Nemerle type system.
+	For instance one can define function that returns different types for different arguments and even works with 'new' !
+	Code sample:
+</p>
+
+<pre>
+function F(a) {
+  if(this == window)
+    if(typeof a === "number" ) return 1;
+    else return "a";
+  else {
+   this.X = 1;
+  }
+}
+</pre>
+
+<p>
+	How you type that?
+	You must have a type with both constructor and call a.k.a '()' operator.
+	To workaround this problem NemerleWeb introduces special syntax for defining typing and for calling:
+</p>
+
+<pre>
+[JSApiImpl]
+public interface F_X
+{
+  public X : int { get; set; }
+}
+
+[JSApiImpl]
+public interface F_Type
+{
+  [JSCall]
+  public static @_(a : int) : int;
+
+  [JSCall]
+  public static @_(a : object) : String;
+
+  [JSNew]
+  public static @_() : F_X;
+
+  [JSNew]
+  public static @_(a : object) : F_X;
+}
+
+[assembly: JSApiRoot("M")]
+
+module M
+{
+  public F : F_Type;
+}
+
+// ---
+using M;
+
+[Unit]
+class MyUnit
+{
+  public X() : void
+  {
+    def a = jscall F(1);   // var a = F(1);
+    def b = jscall F("x"); // var b = F(x);
+    def c = jsnew F();     // var c = new F();
+    def d = jsnew F(1);    // var d = new F(1);
+  }
+}
+</pre>
+
+<p>
+	This way you can handle RegExp class which defined both as callable (RegExp("a")) and as constructible (new RegExp("a")).
+	Also solves problem with jQuery which can used as $(document) and as $.method() .
+</p>
+
+<p>
+	Note: In most cases the code is simpler and one can define simple class with constructor and @() operator, also automatic code generation from TypeScrip can do it.
+	Maybe it will be done in the future.
+</p>
+
+<h2 id="IntegrationwithTypeScript">Integration with TypeScript</h2>
+
+<p>
+	NemerleWeb supports automatic typing through TypeScript Declaration files (.d.ts).
+</p>
+
+<p>
+	The usage is following:
+</p>
+
+<pre>
+[assembly: GenerateTypedJS(
+  Root = "Your root namespace/module",
+  Lib = "Optional path for library infrastructure (lib.d.ts) file",
+  // List of tuples
+  // First argument is directory.
+  // Second optional argument is excluding pattern (RegExp).
+  Files = [ ("TS", @"TS\\(_infrastructure|i18next\\lib)\\") ]
+)]
+</pre>
+
+<strong>
+	Important: This macro implies JSApiRoot macro, you don't need to repeat yourself.
+</strong>
+
+<p>
+	There is an special assembly <strong>NemerleWeb.TypedJS</strong> ready with most of typing you'll need.
+</p>
+<script type="text/javascript">
+  $(window).on("samples-initialized", function() {
+    $(".tutorial-placeholder").each(function(i, holder) {
+      var tutorialId = $(holder).data("tutorialid");
+      $("." + tutorialId).appendTo($(holder));
+    });    
+  });
+  $(window).on("nweb-invalidated", function() {
+    prettyPrint();
+  });
+</script>
