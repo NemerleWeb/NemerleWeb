@@ -77,9 +77,6 @@
     </MacroReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\NWebTreeService.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Models\TreeLoader.n">
       <SubType>Code</SubType>
     </Compile>
@@ -123,11 +120,6 @@
     <ProjectReference Include="..\NemerleWeb\NemerleWeb.nproj">
       <Name>NemerleWeb</Name>
       <Project>{b1635fea-c0cd-4c8e-a18e-d97d59f21b14}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Rsdn.NavTree\Rsdn.NavTree.csproj">
-      <Name>Rsdn.NavTree</Name>
-      <Project>{53903a2b-feb7-4f1f-ae9d-e01f014e6ac3}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>

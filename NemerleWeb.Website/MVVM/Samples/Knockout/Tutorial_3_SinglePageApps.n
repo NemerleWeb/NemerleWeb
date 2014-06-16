@@ -72,6 +72,41 @@ namespace NemerleWeb.Website.Samples
       window.location.hash = "spa/" + mail.Folder + '/' + mail.Id;
     }   
         
+    [Html]
+    public View() : string
+    {
+      <# 
+      <div xmlns="">
+          <h3>Single page apps</h3>
+          <ul class="folders">
+              <li $foreach(f in Folders) text="$f" css-selected="$(f == ChosenFolderId)" click="$(GoToFolder(f))"> </li>
+          </ul>
+
+          <table $when(ChosenFolderData != null) class="mails">
+              <thead><tr><th>From</th><th>To</th><th>Subject</th><th>Date</th></tr></thead>
+              <tbody>
+                  <tr $foreach(m in ChosenFolderData.Mails) click="$(GoToMail(m))">
+                      <td>$(m.From)</td>
+                      <td>$(m.To)</td>
+                      <td>$(m.Subject)</td>
+                      <td>$(m.Date)</td>
+                  </tr>
+              </tbody>
+          </table>
+
+          <div $when(ChosenMailData != null) class="viewMail">
+              <div class="mailInfo">
+                  <h1>$(ChosenMailData.Subject)</h1>
+                  <p><label>From</label>: <span>$(ChosenMailData.From)</span></p>
+                  <p><label>To</label>: <span>$(ChosenMailData.To)</span></p>
+                  <p><label>Date</label>: <span>$(ChosenMailData.Date)</span></p>
+              </div>
+              <p class="message" html="$(ChosenMailData.MessageContent)"> </p>
+          </div>
+      </div>
+      #>
+    }
+        
     public class Server
     {
       allMail : list[Mail] = 
@@ -96,41 +131,6 @@ namespace NemerleWeb.Website.Samples
       {
         allMail.FirstOrDefault(m => m.Id == mailId);
       }
-    }
-        
-    [Html]
-    public View() : string
-    {
-      <# 
-      <div xmlns="">
-          <h3>Single page apps</h3>
-          <ul class="folders">
-              <li $foreach(f in Folders) text="$f" css-selected="$(f == ChosenFolderId)" click="$GoToFolder(f)"> </li>
-          </ul>
-
-          <table $when(ChosenFolderData != null) class="mails">
-              <thead><tr><th>From</th><th>To</th><th>Subject</th><th>Date</th></tr></thead>
-              <tbody>
-                  <tr $foreach(m in ChosenFolderData.Mails) click="$GoToMail(m)">
-                      <td>$(m.From)</td>
-                      <td>$(m.To)</td>
-                      <td>$(m.Subject)</td>
-                      <td>$(m.Date)</td>
-                  </tr>
-              </tbody>
-          </table>
-
-          <div $when(ChosenMailData != null) class="viewMail">
-              <div class="mailInfo">
-                  <h1>$(ChosenMailData.Subject)</h1>
-                  <p><label>From</label>: <span>$(ChosenMailData.From)</span></p>
-                  <p><label>To</label>: <span>$(ChosenMailData.To)</span></p>
-                  <p><label>Date</label>: <span>$(ChosenMailData.Date)</span></p>
-              </div>
-              <p class="message" html="$(ChosenMailData.MessageContent)"> </p>
-          </div>
-      </div>
-      #>
     }
   }
 }

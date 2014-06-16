@@ -13,12 +13,12 @@ namespace Rsdn.Controllers
   {
     public Index() : ActionResult
     {      
-      View();
+      View(Rsdn.MainPage.Render("http://www.google.com") : object);
     }
     
     public Tree() : ActionResult
     {
-      View();
-    }    
+      View(Rsdn.MainPage.Render("http://www.google.com") : object);
+    }
   }
 }

@@ -64,9 +64,10 @@ namespace NemerleWeb
         when(isVariant)
         {
           // Add nested before the variant class itself
-          foreach(type in JSClass.GetNestedTypes(ti))
-            when(hasUnitInHierarchy(ti) && typeName != ti.FullName)
-              addDependency(type);
+          // TODO: Restore !!!
+          //foreach(type in JSClass.GetNestedTypes(ti))
+            //when(hasUnitInHierarchy(ti) && typeName != ti.FullName)
+              //addDependency(type);
         }
       
         // Add the type

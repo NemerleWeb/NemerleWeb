@@ -50,9 +50,7 @@ namespace NemerleWeb
       Macros.DefineCTX(typer);
       
       unless(typer.Manager.IsIntelliSenseMode)
-      {
-        AddPageBaseMethods(tb, typer);
-        
+      {        
         tb.Ast.AddCustomAttribute(<[ UnitAttribute ]>);        
         
         def vmInterface = <[ ttype: NemerleWeb.IPage ]>;
@@ -274,7 +272,7 @@ namespace NemerleWeb
                 
                     def parsedModel = Newtonsoft.Json.Linq.JObject.Parse(model);
                     _ = parsedModel;
-                
+
                     def result = _server.$(method.Name : dyn)(..$deserializedParams);
                   
                     def settings = Newtonsoft.Json.JsonSerializerSettings();
@@ -310,6 +308,7 @@ namespace NemerleWeb
                 HttpContext.Current.Session["SignalRConnectionId"] = id;
                 Content("");
               }]>);
+          
           proxy.Compile();
           controller.Compile();
       }
@@ -558,30 +557,7 @@ Please add the following: ..$(manager.ReferencedAssemblies; "\n"; a => a.Assembl
         t.GetConstructors().First() :> MethodBuilder;
       }
     }
-    
-    public AddPageBaseMethods(tb : TypeBuilder, typer : Typer) : void
-    {                
-      Macros.DefineCTX(typer);
-      
-      def pageBaseMethods =
-        [
-          <[decl:
-              [NemerleWeb.IgnoreAttribute]
-              public new GetTemplateName([NotNull] modelName : string, [NotNull] viewName : string) : string
-              {
-                IgnoreParams();
-                ""
-              }
-          ]>,
-        ];
         
-      // Define and suppress warnings about unused parameters
-      foreach(pageMethod in pageBaseMethods)
-      {
-        _ = tb.DefineWithSource(pageMethod);
-      }
-    }
-    
     CreateNemerleWebInitializer(typer : Typer) : void
     {
       def env = typer.Manager.CoreEnv;

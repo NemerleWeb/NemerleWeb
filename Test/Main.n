@@ -29,7 +29,7 @@ namespace Test
         WriteLine(File.ReadAllText(f));
         //WriteLine(NWebData.GetLambdasScript(s));
       }
-    
+      
       //WriteLine(result);
       _ = Console.ReadKey();
     }
@@ -40,6 +40,7 @@ namespace Test
     | T 
   }
   
+  [Dto] class Task { Name : string; IsDone : bool }  
   
   [Unit]
   class XEmptyClass {}

@@ -12,22 +12,17 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Xml.Linq;
 using System.Web;
-using System.Web.Routing;
-
-using Rsdn.NavTree;
 
 namespace Rsdn
 {
-  public module TreeLoader
+  module TreeLoader
   {
-    public Provider : INavTreeProvider { get; set; }
-    
     _tree : TreeNode;
     _childrenById : ConcurrentDictionary[string, List[TreeNode]] = ConcurrentDictionary();
     _searchTerms : SortedDictionary[string, int] = SortedDictionary();
     _searchTermResults : ConcurrentDictionary[string, array[TreeNode]] = ConcurrentDictionary();
     _leaves : IEnumerable[TreeNode];
-        
+    
     this()
     {
       def xml = File.ReadAllText(HttpContext.Current.Server.MapPath("~/App_Data/tree.xml"), Encoding.GetEncoding("windows-1251"));
@@ -41,17 +36,16 @@ namespace Rsdn
           
           _ = _childrenById.TryAdd(id, childNodes.Select(n => CloneNoChildren(n)).ToList());
           
-          def node = TreeNode() <- (
+          TreeNode() <- (           
             Id = id,
             Caption = element.Attribute("caption")?.Value,
             Href = element.Attribute("href")?.Value,
-            ImageClassName = element.Attribute("icon")?.Value,
+            Icon = element.Attribute("icon")?.Value,
             Hide = element.Attribute("hide")?.Value == "1",
-            LoadOnDemand = childNodes.Count > 0,
+            HasChildren = childNodes.Count > 0,
+            Depth = depth,
             Children = childNodes,
           );
-          node.ImageClassName = if(node.LoadOnDemand) node.ImageClassName + "s" else node.ImageClassName;
-          node;
         }
       }
             
@@ -100,35 +94,32 @@ namespace Rsdn
     SearchLeavesForTerm(term : string) : IEnumerable[TreeNode]
     {
       _leaves.Where((node : TreeNode, _) => node.Caption?.ToLower().Contains(term.ToLower()))
-             .Select(n => CloneNoChildren(n))      
+             .Select(n => CloneNoChildren(n, true))      
     }
     
     public LoadByIds(ids : IEnumerable[string]) : IEnumerable[TreeNode]
     {
-      _leaves.Where(n => ids.Any(i => i == n.Id)).Select(n => CloneNoChildren(n))
+      _leaves.Where(n => ids.Any(i => i == n.Id)).Select(n => CloneNoChildren(n, true))
     }
     
-    public MapToTreeNode(node : NodeData) : TreeNode
-    {        
-      TreeNode() <- ( 
-        Id = node.Info.ID,
-        Caption = node.Info.DisplayName,
-        ImageClassName = node.Info.ImageClassName,
-        Href = node.Info.Url,        
-        LoadOnDemand = node.Info.LoadOnDemand
-      )
+    public GetPopularNodes() : IEnumerable[TreeNode]
+    {
+      def popularForums = ["Nemerle", ".NET", "О жизни", "Коллеги, улыбнитесь", "Работа", "Веб программирование"];
+      _leaves.Where(l => popularForums.Any(p => p == l.Caption) && l.Icon == "fr")
+             .Select(n => CloneNoChildren(n, true));
     }
     
-    CloneNoChildren(node : TreeNode) : TreeNode
+    CloneNoChildren(node : TreeNode, resetDepth = false : bool) : TreeNode
     {
       TreeNode() <- (
         Id = node.Id,
         Caption = node.Caption,
-        ImageClassName = node.ImageClassName,
         Href = node.Href,
+        Icon = node.Icon,
         Hide = node.Hide,
-        LoadOnDemand = node.LoadOnDemand
-      )
+        Depth = if(resetDepth) 0 else node.Depth,
+        HasChildren = node.HasChildren        
+      )      
     }
   }
 }

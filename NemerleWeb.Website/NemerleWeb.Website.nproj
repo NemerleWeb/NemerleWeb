@@ -193,6 +193,9 @@
     <Compile Include="Infrastructure\HtmlHelperExtensions.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MVVM\ArticleSamples\ArticleSample1.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\ButtonDropdown.n">
       <SubType>Code</SubType>
     </Compile>
@@ -344,16 +347,16 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.10.2.intellisense.js">
+    <Content Include="Scripts\jquery-1.11.1.intellisense.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.10.2.js">
+    <Content Include="Scripts\jquery-1.11.1.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.10.2.min.js">
+    <Content Include="Scripts\jquery-1.11.1.min.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.10.2.min.map">
+    <Content Include="Scripts\jquery-1.11.1.min.map">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\jquery.signalR-1.2.0.js">
@@ -407,6 +410,7 @@
     <Folder Include="Infrastructure\" />
     <Folder Include="installer\" />
     <Folder Include="MVVM" />
+    <Folder Include="MVVM\ArticleSamples" />
     <Folder Include="MVVM\Tutorial" />
     <Folder Include="MVVM\Samples\" />
     <Folder Include="MVVM\Samples\Knockout\" />
