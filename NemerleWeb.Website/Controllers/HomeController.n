@@ -76,6 +76,11 @@ namespace NemerleWeb.Website.Controllers
       View("Index", DependencyGraphTest.Render() : object);
     }
     
+    public ArticleSample0() : ActionResult
+    {
+      View("Index", HelloWorld.Render() : object);
+    }
+
     public ArticleSample1() : ActionResult
     {
       View("Index", ReactiveToDo.Render() : object);

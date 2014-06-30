@@ -1,0 +1,30 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Extensions;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+// Для вызова стандартных JavaScript функций
+using NemerleWeb.TypedJS;
+
+namespace NemerleWeb.Website.MVVM.ArticleSamples
+{
+  [Unit]
+  public class HelloWorld
+  {
+    Name : string = "world";
+
+    [Html]
+    public View() : string
+    {
+      <#
+        <input value="$Name" />
+        <div>Hello, $Name</div>
+      #>
+    }
+  }
+}

@@ -25,6 +25,12 @@ namespace NemerleWeb.Website
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             
             _ = routes.MapRoute(
+                "HelloWorld", // Route name
+                "helloworld", // URL with parameters
+                new (controller = "Home", action = "ArticleSample0", id = UrlParameter.Optional) // Parameter defaults
+            );
+
+            _ = routes.MapRoute(
                 "ReactiveToDo", // Route name
                 "reactivetodo", // URL with parameters
                 new (controller = "Home", action = "ArticleSample1", id = UrlParameter.Optional) // Parameter defaults
