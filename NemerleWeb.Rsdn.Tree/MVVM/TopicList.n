@@ -1,0 +1,55 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Extensions;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NemerleWeb;
+using NemerleWeb.TypedJS;
+
+using Rsdn.Tree.Models;
+
+namespace Rsdn
+{    
+  [Unit]
+  public class TopicList
+  {
+    [Dto] public class Topic { Name : string; Author : string; Rating : string; Comments : string }
+
+    private mutable _url : string;
+    private mutable _topics : List[Topic];
+
+    public Url : string 
+    { 
+      get { _url; } 
+      set { 
+        _url = value; 
+        _ = server.GetTopicList(value, topics => _topics = topics.ToList());
+      }
+    }
+
+    [Html]
+    public View() : string
+    {
+      <#
+        <div $foreach(topic in _topics)>
+          <span>$(topic.Name)</span>
+          <span>$(topic.Author)</span>
+          <span>$(topic.Rating)</span>
+          <span>$(topic.Comments)</span>
+        </div>
+      #>
+    }
+    
+    public class Server
+    {
+      public GetTopicList(url : string) : IEnumerable[Topic]
+      {
+        TopicLoader.GetTopicList(url);
+      }
+    }
+  }
+}

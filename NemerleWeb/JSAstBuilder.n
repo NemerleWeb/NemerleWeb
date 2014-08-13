@@ -400,8 +400,8 @@ namespace NemerleWeb
           | _ => ast
           }
         else ast;
-      def ast = JSAstHelper.FlattenAndRemoveVoids(ast);
-          
+
+      def ast = JSAstHelper.FlattenAndRemoveVoids(ast);          
       def ast = JSAstHelper.GotosToSwitch(ast);
       def ast = JSAstHelper.Optimize(ast);
                 

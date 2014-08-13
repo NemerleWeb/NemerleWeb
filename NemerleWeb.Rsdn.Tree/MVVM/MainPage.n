@@ -24,6 +24,7 @@ namespace Rsdn
     Root : TreeNode { get; set; }
     Popular : TreeNode { get; set; }
     Search : Search { get; set; }
+    TopicList : TopicList { get; set; }
     
     ActiveNodes : list[TreeNode] { get; set; }
     SelectedNode : TreeNode { get; set; }
@@ -41,7 +42,9 @@ namespace Rsdn
       MainPage.Instance = this;
       
       Search = Search();                       
-      Pinned = Pinned();      
+      Pinned = Pinned();
+      TopicList = TopicList();
+
       IsMobile = window.document.body.clientWidth < 1000;
               
       _ = server.GetTopNodes(nodes => {
@@ -65,10 +68,12 @@ namespace Rsdn
       | _ when node.Parent != null => node.Parent :: getAllParents(node.Parent)
       | _ => [];
       };
-                  
+            
       SelectedNode = node;
       ActiveNodes = node :: getAllParents(node);
       CurrentState = State.Content;
+
+      TopicList.Url = node.Href;
     }
     
     public IsActiveNode(node : TreeNode) : bool 
@@ -124,6 +129,7 @@ namespace Rsdn
           </div>
           <div class="right">
             <iframe src="$(SelectedNodeUrl)" frameborder="0" border="0" />
+            <div template="" />
           </div>
         </div>
       #>

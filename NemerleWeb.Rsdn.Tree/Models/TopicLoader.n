@@ -1,0 +1,34 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using HtmlAgilityPack;
+
+namespace Rsdn.Tree.Models
+{
+  module TopicLoader
+  {
+    public GetTopicList(url : string) : IEnumerable[TopicList.Topic]
+    {
+      def url = "http://www.rsdn.ru/Forum/MsgList.aspx?group=" + url.Substring(url.Trim('/').LastIndexOf('/')).Trim('/');
+      def doc = HtmlWeb().Load(url);
+      
+      def rows = doc.DocumentNode.SelectNodes("//table[@id='tbl']/tr");
+
+      rows.Skip(1).Take(rows.Count - 2).Select(row => {
+        
+        def name = row.SelectSingleNode(".//table//td[@nowrap]").InnerText;
+        def author = row.SelectSingleNode(".//td[2]").InnerText;
+        def rating = row.SelectSingleNode(".//td[3]").InnerText;
+        def comments = row.SelectSingleNode(".//td[4]").InnerText;
+
+        TopicList.Topic(name, author, rating, comments);
+      });
+    }
+  }
+}

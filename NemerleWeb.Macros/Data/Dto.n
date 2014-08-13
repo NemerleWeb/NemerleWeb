@@ -35,7 +35,8 @@ namespace NemerleWeb
       
       DataMacroHelper.ChangeFieldsAccess(typeBuilder, toAdd, toRemove);
       
-      typeBuilder.AddMacroAttribute(<[ Nemerle.Core.Record ]>);     
+      typeBuilder.AddMacroAttribute(<[ Nemerle.Core.Record ]>);
+      typeBuilder.AddMacroAttribute(<[ NemerleWeb.Unit ]>);
       
       // Add default constructor if doesn't exist
       def ctors = typeBuilder.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic);

@@ -21,6 +21,18 @@ namespace NemerleWeb
     { 
       when(tp.TypeInfo != null)
         Add(typeName, tp.TypeInfo);
+      
+      def addTypeArgs(fixedType) {
+        match(fixedType) {
+        | x is FixedType.Class => 
+          x.args.Iter(a => addTypeArgs(a));
+          when(x.TypeInfo != null)
+            Add(typeName, x.TypeInfo);
+        | _ => ()
+        }        
+      }
+
+      addTypeArgs(tp);
     }
         
     public Add([NotNull] typeName : string, [NotNull] ti : TypeInfo) : void
@@ -72,6 +84,9 @@ namespace NemerleWeb
       
         // Add the type
         addDependency(ti);
+
+        when (ti.FullName.Contains("System.Collections.Generic.List"))
+          assert2(false);
       }
     }
     
