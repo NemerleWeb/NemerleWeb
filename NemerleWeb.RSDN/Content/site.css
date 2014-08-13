@@ -247,3 +247,24 @@ a img {
     padding: 10px 0 0 5px;
     background: #333333;
 }
+
+.topic {
+    background-color: #eee;
+    margin: 2px;
+    padding: 10px 20px;
+}
+
+.topic:hover {
+    background-color: #ccc;
+    cursor: pointer;
+}
+
+.topic-name {
+    display: block;
+}
+
+.topic-comment-count, .topic-author, .topic-rating {
+    display: inline-block;
+    width: 110px;
+    font-size: 12px;
+}

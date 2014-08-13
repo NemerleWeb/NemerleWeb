@@ -17,7 +17,7 @@ namespace Rsdn
   [Unit]
   public class TopicList
   {
-    [Dto] public class Topic { Name : string; Author : string; Rating : string; Comments : string }
+    [Dto] public class Topic { Name : string; Author : string; Rating : string; Comments : string; Url : string }
 
     private mutable _url : string;
     private mutable _topics : List[Topic];
@@ -31,15 +31,20 @@ namespace Rsdn
       }
     }
 
+    OpenTopic(url : string) : void
+    {
+      window.alert(url);
+    }
+
     [Html]
     public View() : string
     {
       <#
-        <div $foreach(topic in _topics)>
-          <span>$(topic.Name)</span>
-          <span>$(topic.Author)</span>
-          <span>$(topic.Rating)</span>
-          <span>$(topic.Comments)</span>
+        <div $foreach(topic in _topics) class="topic" click="$(OpenTopic(topic.Url))">
+          <span class="topic-name">$(topic.Name)</span>
+          <span class="topic-comment-count">Ответов: $(topic.Comments)</span>
+          <span class="topic-author">Автор: $(topic.Author)</span>
+          <span class="topic-rating">Рейтинг: $(topic.Rating)</span>
         </div>
       #>
     }

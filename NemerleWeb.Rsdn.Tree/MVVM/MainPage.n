@@ -128,11 +128,11 @@ namespace Rsdn
             </div>
           </div>
           <div class="right">
-            <iframe src="$(SelectedNodeUrl)" frameborder="0" border="0" />
-            <div template="" />
+            <div template="$(TopicList)" />
           </div>
         </div>
       #>
+//<iframe src="$(SelectedNodeUrl)" frameborder="0" border="0" />
     }
     
     [Html]

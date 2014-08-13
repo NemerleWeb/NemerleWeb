@@ -23,11 +23,12 @@ namespace Rsdn.Tree.Models
       rows.Skip(1).Take(rows.Count - 2).Select(row => {
         
         def name = row.SelectSingleNode(".//table//td[@nowrap]").InnerText;
-        def author = row.SelectSingleNode(".//td[2]").InnerText;
-        def rating = row.SelectSingleNode(".//td[3]").InnerText;
-        def comments = row.SelectSingleNode(".//td[4]").InnerText;
+        def url = row.SelectSingleNode(".//table//td[@nowrap]//a").Attributes["href"]?.Value;
+        def author = row.SelectSingleNode("./td[2]").InnerText;
+        def rating = row.SelectSingleNode("./td[3]").InnerText;
+        def comments = row.SelectSingleNode("./td[4]").InnerText;
 
-        TopicList.Topic(name, author, rating, comments);
+        TopicList.Topic(name, author, rating, comments, url);
       });
     }
   }
