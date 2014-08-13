@@ -18,9 +18,11 @@ namespace Rsdn
   public class TopicList
   {
     [Dto] public class Topic { Name : string; Author : string; Rating : string; Comments : string; Url : string }
+    [Dto] public class CommentNode { Text : string; Children : List[CommentNode] }
 
     private mutable _url : string;
     private mutable _topics : List[Topic];
+    private mutable _selectedTopic : CommentNode;
 
     public Url : string 
     { 
@@ -33,14 +35,14 @@ namespace Rsdn
 
     OpenTopic(url : string) : void
     {
-      window.alert(url);
+      _ = server.LoadReplies(url, node => _selectedTopic = node);
     }
 
     [Html]
     public View() : string
     {
       <#
-        <div $foreach(topic in _topics) class="topic" click="$(OpenTopic(topic.Url))">
+        <div $foreach(topic in _topics) class="topic" click="$(OpenTopic(topic.Url))" visible="$(_selectedTopic == null)">
           <span class="topic-name">$(topic.Name)</span>
           <span class="topic-comment-count">Ответов: $(topic.Comments)</span>
           <span class="topic-author">Автор: $(topic.Author)</span>
@@ -54,6 +56,11 @@ namespace Rsdn
       public GetTopicList(url : string) : IEnumerable[Topic]
       {
         TopicLoader.GetTopicList(url);
+      }
+
+      public LoadReplies(url : string) : CommentNode
+      {
+        TopicLoader.LoadReplies(url)
       }
     }
   }
