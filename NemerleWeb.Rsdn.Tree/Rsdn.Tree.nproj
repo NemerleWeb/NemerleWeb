@@ -100,6 +100,9 @@
     <Compile Include="MVVM\TopicList.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MVVM\TopicReply.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MVVM\TreeNode.n">
       <SubType>Code</SubType>
     </Compile>

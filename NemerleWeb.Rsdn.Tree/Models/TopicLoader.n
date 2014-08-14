@@ -2,6 +2,7 @@
 using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
+using Nemerle.Extensions;
 using Nemerle.Imperative;
 
 using System;
@@ -11,6 +12,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 
 using HtmlAgilityPack;
+using Newtonsoft.Json;
 
 namespace Rsdn.Tree.Models
 {
@@ -35,34 +37,59 @@ namespace Rsdn.Tree.Models
       });
     }
 
-    public LoadReplies(url : string) : TopicList.CommentNode
+    public LoadReplies(url : string) : CommentNode
     {
       def start = url.LastIndexOf('/');
       def end = url.LastIndexOf('.');
 
       when (start == -1 || end == -1)
-        return TopicList.CommentNode();
+        return CommentNode("", [], 0);
 
       def id = url.Substring(start + 1, (end - start) - 1);
-      def replies = WebClient().DownloadString("http://rsdn.ru/Forum/LoadRe.aspx?tid=" + id);
-
-      def start' = replies.IndexOf("window.parent.LE");
-      def start'' = replies.IndexOf("\"", start');
-      def end' = replies.IndexOf('\n', start'') - 3;
-      def repliesHtml = replies.Substring(start'', end' - start'');
+      def replies = WebClient().DownloadString($"http://www.rsdn.ru/rs/topic/$(id)/replies");
+      def replyObjects = JsonConvert.DeserializeAnonymousType(replies, array[new (
+        id = 0,
+        parentId = 0,
+        subject = "",
+        authorNick = ""
+      )]);
       
-      def doc = HtmlDocument();
-      doc.LoadHtml(repliesHtml);
-      def docNode = doc.DocumentNode;
-
-      def buildCommentNode(node, isRoot) {        
-        def url = if(!isRoot) node.SelectSingleNode(".//a[@href]").Attributes["href"].Value else "";
-        TopicList.CommentNode(url, node.ChildNodes
-                                       .Where(c => c.Name == "table")
-                                       .Select(c => buildCommentNode(c, false)).ToList())
+      def loadReplyText(replyId) {
+        System.Threading.Tasks.Task.Run(() => {
+          try {
+            def client = WebClient();
+            client.Encoding = System.Text.Encoding.UTF8;
+            def json = client.DownloadString($"http://www.rsdn.ru/rs/message/$(replyId)?formatted=true");
+            JsonConvert.DeserializeAnonymousType(json, new ( text = "" )).text;
+          } catch {
+            | _ => "Couldn't load reply, sorry"
+          }
+        });
       }
 
-      def res = buildCommentNode(docNode, true);
+      def repliesWithText = replyObjects.Select(o => {
+        new (
+          text = loadReplyText(o.id),
+          id = o.id,
+          parentId = o.parentId,
+          subjet = o.subject,
+          authorNick = o.authorNick
+        )
+      }).ToList();
+
+      def map = repliesWithText.GroupBy(r => r.parentId).ToDictionary(g => g.Key, g => g);
+
+      def getChildNodes(parentNodeId, depth) {
+        mutable childNodes;
+        if(map.TryGetValue(parentNodeId, out childNodes)) {
+          childNodes.Map(c => CommentNode(c.text.Result, getChildNodes(c.id, depth + 1), depth))
+        } else []
+      }
+
+      _ = replyObjects;
+
+      def topicId = int.Parse(id);
+      def res = CommentNode(loadReplyText(topicId).Result, getChildNodes(topicId, 1), 0);
       res
     }
   }

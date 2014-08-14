@@ -1,0 +1,38 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Extensions;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NemerleWeb;
+using NemerleWeb.TypedJS;
+
+using Rsdn.Tree.Models;
+
+namespace Rsdn
+{    
+  [Unit]
+  [Record]
+  public class CommentNode
+  {
+    public Html : string;
+    public Children : list[CommentNode];
+    public Depth : int;
+
+    [Html]
+    public View() : string
+    {
+      <#
+         <div>
+           <div class="comment-node" style-margin-left="$(Depth * 25)">
+              <div html="$Html" />
+           </div>
+           <div $foreach(child in Children) template="$child" />
+        </div>
+      #>
+    }
+  }
+}

@@ -18,7 +18,6 @@ namespace Rsdn
   public class TopicList
   {
     [Dto] public class Topic { Name : string; Author : string; Rating : string; Comments : string; Url : string }
-    [Dto] public class CommentNode { Text : string; Children : List[CommentNode] }
 
     private mutable _url : string;
     private mutable _topics : List[Topic];
@@ -47,6 +46,9 @@ namespace Rsdn
           <span class="topic-comment-count">Ответов: $(topic.Comments)</span>
           <span class="topic-author">Автор: $(topic.Author)</span>
           <span class="topic-rating">Рейтинг: $(topic.Rating)</span>
+        </div>
+        <div $when(_selectedTopic != null)>
+          <div template="$_selectedTopic" />
         </div>
       #>
     }

@@ -268,3 +268,9 @@ a img {
     width: 110px;
     font-size: 12px;
 }
+
+.comment-node {
+    margin: 2px 0 2px 0;
+    padding: 5px;
+    background-color: #eeeeee;
+}
