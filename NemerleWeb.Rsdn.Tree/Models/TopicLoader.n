@@ -63,30 +63,28 @@ namespace Rsdn.Tree.Models
     public LoadReplies(id : int) : CommentNode
     {
       def replies = WebClient().DownloadString($"http://www.rsdn.ru/rs/topic/$(id)/replies");
-      def replyObjects = JsonConvert.DeserializeAnonymousType(replies, array[new (
+      def meta = JsonConvert.DeserializeAnonymousType(replies, array[new (id = 0)]);
+            
+      def client = WebClient();
+      client.Encoding = System.Text.Encoding.UTF8;
+      def json = client.DownloadString($"http://www.rsdn.ru/rs/topic/$(id)/messages?formatted=true&len=$(meta.Length + 1)");
+      def replies = JsonConvert.DeserializeAnonymousType(json, array[new ( 
+        text = "", 
         id = 0,
         parentId = 0,
+        authorNick = "",
+        rate = 0,
+        rateCount = 0,
+        agrees = 0,
+        disagrees = 0,
+        smiles = 0,
         subject = "",
-        authorNick = ""
-      )]);
-      
-      def loadReply(replyId) {
-        def client = WebClient();
-        client.Encoding = System.Text.Encoding.UTF8;
-        def json = client.DownloadString($"http://www.rsdn.ru/rs/message/$(replyId)?formatted=true");
-        JsonConvert.DeserializeAnonymousType(json, new ( 
-          text = "", 
-          id = 0,
-          authorNick = "",
-          rate = 0,
-          rateCount = 0,
-          agrees = 0,
-          disagrees = 0,
-          smiles = 0,
-          subject = "",
-          createdOn = ""
-        ));        
-      }
+        createdOn = ""
+      )]);        
+
+      def mapById = replies.ToDictionary(r => r.id);
+      def mapByParentId = replies.GroupBy(r => r.parentId)
+                                 .ToDictionary(g => g.Key, g => g);
 
       def mapJsonToCommentNode(a, children, depth) {
         CommentNode(a.text.Replace(" src=\'/", " src=\'http://www.rsdn.ru/"), 
@@ -102,17 +100,15 @@ namespace Rsdn.Tree.Models
                     depth)
       }
 
-      def map = replyObjects.GroupBy(r => r.parentId)
-                            .ToDictionary(g => g.Key, g => g);
-
       def getChildNodes(parentNodeId, depth) {
         mutable childNodes;
-        if(map.TryGetValue(parentNodeId, out childNodes)) {
-          childNodes.Map(c => mapJsonToCommentNode(loadReply(c.id), getChildNodes(c.id, depth + 1), depth))
+  
+        if(mapByParentId.TryGetValue(parentNodeId, out childNodes)) {
+          childNodes.Map(c => mapJsonToCommentNode(c, getChildNodes(c.id, depth + 1), depth))
         } else []
       }
 
-      def mainComment = mapJsonToCommentNode(loadReply(id), getChildNodes(id, 1), 0);
+      def mainComment = mapJsonToCommentNode(mapById[id], getChildNodes(id, 1), 0);      
       mainComment
     }
 

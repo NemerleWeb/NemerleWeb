@@ -35,6 +35,8 @@ namespace Rsdn
     private mutable _url : string;
     private mutable _topics : List[Topic];
     private mutable _selectedTopic : CommentNode;
+    private mutable _maxDepth : int;
+    private mutable _isLoading : bool;
 
     public mutable Name : string;
     public Url : string 
@@ -46,11 +48,13 @@ namespace Rsdn
         _ = server.GetTopicList(value, topics => _topics = topics.ToList());
       }
     }
-
+    
     OpenTopic(topic : Topic) : void
     {
-      _ = server.LoadReplies(topic.Id, node => {
+      _isLoading = true;
+      _ = server.LoadReplies(topic.Id, (node) => {
         _selectedTopic = node;
+        _isLoading = false;
       });
     }
 
@@ -91,6 +95,7 @@ namespace Rsdn
         <div $when(_selectedTopic != null)>
           <div template="$_selectedTopic" />
         </div>
+        <div class="loading" visible="$_isLoading">Loading...</div>
       #>
     }
     
