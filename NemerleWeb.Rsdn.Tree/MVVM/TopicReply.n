@@ -19,6 +19,14 @@ namespace Rsdn
   public class CommentNode
   {
     public Html : string;
+    public Author : string;
+    public Rate : int;
+    public RateCount : int;
+    public Agrees : int;
+    public Disagrees : int;
+    public Smiles : int;
+    public Subject : string;
+    public CreatedOn : string;
     public Children : list[CommentNode];
     public Depth : int;
 
@@ -26,11 +34,23 @@ namespace Rsdn
     public View() : string
     {
       <#
-         <div>
-           <div class="comment-node" style-margin-left="$(Depth * 25)">
-              <div html="$Html" />
-           </div>
-           <div $foreach(child in Children) template="$child" />
+        <div class="comment-meta" css-even="$(Depth % 2 == 0)">
+          <span class="comment-subject">$Subject</span>
+          <span class="comment-author">$Author</span>
+          <span class="comment-createdon">$CreatedOn</span>
+          <span class="comment-rating">$(RateCount + "(" + Rate + ")")</span>
+          <span class="comment-agrees">+$Agrees</span>
+          /
+          <span class="comment-disagrees">-$Agrees</span>
+          <span $when(Smiles > 0) class="comment-smiles">
+            <span $foreach(_ in Enumerable.Range(0, Smiles))>
+              :)
+            </span>
+          </span>
+        </div>
+        <div class="comment-node" css-even="$(Depth % 2 == 0)">              
+          <div html="$Html" />
+          <div $foreach(child in Children) template="$child" />
         </div>
       #>
     }

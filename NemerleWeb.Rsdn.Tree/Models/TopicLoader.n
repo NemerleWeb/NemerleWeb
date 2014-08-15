@@ -44,13 +44,6 @@ namespace Rsdn.Tree.Models
 
         def topics = reply.topics;
         
-        def formatDateTime(str : string) {
-          str.Substring(5)
-             .Substring(0, 11)
-             .Replace('-', '.')
-             .Replace('T', ' ');
-        }      
-
         topics.Skip(1).Take(reply.total - 2).Select(topic =>
           TopicList.Topic(topic.subject, 
                           if(string.IsNullOrWhiteSpace(topic.authorNick)) "Аноним" else topic.authorNick, 
@@ -58,8 +51,8 @@ namespace Rsdn.Tree.Models
                           topic.answersCount, 
                           topic.id,
                           topic.lastAnswerBy,
-                          formatDateTime(topic.lastUpdatedOn),
-                          formatDateTime(topic.createdOn),
+                          FormatDateTime(topic.lastUpdatedOn),
+                          FormatDateTime(topic.createdOn),
                           topic.topicAgrees,
                           topic.topicDisagrees,
                           topic.topicSmiles)
@@ -77,40 +70,58 @@ namespace Rsdn.Tree.Models
         authorNick = ""
       )]);
       
-      def loadReplyText(replyId) {
-        System.Threading.Tasks.Task.Run(() => {
-          try {
-            def client = WebClient();
-            client.Encoding = System.Text.Encoding.UTF8;
-            def json = client.DownloadString($"http://www.rsdn.ru/rs/message/$(replyId)?formatted=true");
-            JsonConvert.DeserializeAnonymousType(json, new ( text = "" )).text;
-          } catch {
-            | _ => "Couldn't load reply, sorry"
-          }
-        });
+      def loadReply(replyId) {
+        def client = WebClient();
+        client.Encoding = System.Text.Encoding.UTF8;
+        def json = client.DownloadString($"http://www.rsdn.ru/rs/message/$(replyId)?formatted=true");
+        JsonConvert.DeserializeAnonymousType(json, new ( 
+          text = "", 
+          id = 0,
+          authorNick = "",
+          rate = 0,
+          rateCount = 0,
+          agrees = 0,
+          disagrees = 0,
+          smiles = 0,
+          subject = "",
+          createdOn = ""
+        ));        
       }
 
-      def repliesWithText = replyObjects.Select(o => {
-        new (
-          text = loadReplyText(o.id),
-          id = o.id,
-          parentId = o.parentId,
-          subjet = o.subject,
-          authorNick = o.authorNick
-        )
-      }).ToList();
+      def mapJsonToCommentNode(a, children, depth) {
+        CommentNode(a.text.Replace(" src=\'/", " src=\'http://www.rsdn.ru/"), 
+                    if(string.IsNullOrWhiteSpace(a.authorNick)) "Аноним" else a.authorNick,
+                    a.rate,
+                    a.rateCount,
+                    a.agrees,
+                    a.disagrees,
+                    a.smiles,
+                    a.subject,
+                    FormatDateTime(a.createdOn),
+                    children, 
+                    depth)
+      }
 
-      def map = repliesWithText.GroupBy(r => r.parentId).ToDictionary(g => g.Key, g => g);
+      def map = replyObjects.GroupBy(r => r.parentId)
+                            .ToDictionary(g => g.Key, g => g);
 
       def getChildNodes(parentNodeId, depth) {
         mutable childNodes;
         if(map.TryGetValue(parentNodeId, out childNodes)) {
-          childNodes.Map(c => CommentNode(c.text.Result, getChildNodes(c.id, depth + 1), depth))
+          childNodes.Map(c => mapJsonToCommentNode(loadReply(c.id), getChildNodes(c.id, depth + 1), depth))
         } else []
       }
 
-      def res = CommentNode(loadReplyText(id).Result, getChildNodes(id, 1), 0);
-      res
+      def mainComment = mapJsonToCommentNode(loadReply(id), getChildNodes(id, 1), 0);
+      mainComment
+    }
+
+    private FormatDateTime(str : string) : string
+    {
+      str.Substring(5)
+         .Substring(0, 11)
+         .Replace('-', '.')
+         .Replace('T', ' ');
     }
   }
 }

@@ -48,7 +48,9 @@ namespace Rsdn
 
     OpenTopic(topic : Topic) : void
     {
-      _ = server.LoadReplies(topic.Id, node => _selectedTopic = node);
+      _ = server.LoadReplies(topic.Id, node => {
+        _selectedTopic = node;
+      });
     }
 
     [Html]
