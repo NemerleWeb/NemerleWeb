@@ -244,6 +244,15 @@ a img {
     background: #333333;
 }
 
+.topic-list-name {
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.topic-list-name:hover {
+    text-decoration: underline;
+}
+
 .topic {
     margin: 2px 2px 2px 5px;
     padding: 10px 20px;
@@ -256,6 +265,10 @@ a img {
     background-color: #efefef;
     cursor: pointer;
 }
+
+.topic:hover .topic-name {
+    text-decoration: underline;
+} 
 
 .topic-rating-box {
     float: left;

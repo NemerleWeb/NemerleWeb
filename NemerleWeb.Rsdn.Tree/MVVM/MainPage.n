@@ -72,6 +72,7 @@ namespace Rsdn
       ActiveNodes = node :: getAllParents(node);
       CurrentState = State.Content;
 
+      TopicList.Name = node.Caption;
       TopicList.Url = node.Href;
     }
     

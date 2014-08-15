@@ -36,6 +36,7 @@ namespace Rsdn
     private mutable _topics : List[Topic];
     private mutable _selectedTopic : CommentNode;
 
+    public mutable Name : string;
     public Url : string 
     { 
       get { _url; } 
@@ -53,10 +54,16 @@ namespace Rsdn
       });
     }
 
+    ReturnToList() : void
+    {
+      _selectedTopic = null;
+    }
+    
     [Html]
     public View() : string
     {
       <#
+        <h2 class="topic-list-name" click="$ReturnToList">$Name</h2>
         <div $foreach(topic in _topics) class="topic" click="$(OpenTopic(topic))" visible="$(_selectedTopic == null)">
           <div class="topic-rating-box">
             <div>$(topic.Rating)</div>
