@@ -305,6 +305,7 @@ a img {
     margin: 0 0 2px 10px;
     padding: 10px 20px;
     background-color: #efefef;
+    border: 1px solid #c0c0c0;
 }
 
 .comment-node.even, .comment-meta.even {
