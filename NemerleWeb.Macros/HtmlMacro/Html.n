@@ -149,6 +149,15 @@ namespace NemerleWeb
                   (foreachEnum + htmlFromTExpr(attrs, indent), htmlFromTExpr(childTags, indent + "  "))
                 | _ => assert2(false); ("", "")
                 }
+              | [(Pattern.Wildcard, _, _)] =>
+                match(case.body)
+                {
+                | TypeConversion(Tuple([attrs, childTags]), _, _, _) => 
+                  def value = $<#&quot;$(JSAstHelper.GetTemporaryVariableName())&quot;#>;
+                  def foreachEnum = $<#nw-foreach="$(value) in $(escape(getAstString(val)))" #>;
+                  (foreachEnum + htmlFromTExpr(attrs, indent), htmlFromTExpr(childTags, indent + "  "))
+                | _ => assert2(false); ("", "")
+                }
               | _ => assert2(false); ("", "")
               }              
             | Tuple([attrs, childTags]) =>

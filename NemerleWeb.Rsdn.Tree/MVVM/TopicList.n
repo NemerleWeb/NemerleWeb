@@ -17,7 +17,20 @@ namespace Rsdn
   [Unit]
   public class TopicList
   {
-    [Dto] public class Topic { Name : string; Author : string; Rating : string; Comments : string; Url : string }
+    [Dto] public class Topic 
+    { 
+      Name : string; 
+      Author : string; 
+      Rating : int; 
+      Comments : int; 
+      Id : int;
+      LastAnswerBy : string;
+      LastUpdatedOn : string;
+      CreatedOn : string;
+      Agrees : int;
+      Disagrees : int;
+      Smiles : int
+    }
 
     private mutable _url : string;
     private mutable _topics : List[Topic];
@@ -27,25 +40,44 @@ namespace Rsdn
     { 
       get { _url; } 
       set { 
-        _url = value; 
+        _url = value;
+        _selectedTopic = null;
         _ = server.GetTopicList(value, topics => _topics = topics.ToList());
       }
     }
 
-    OpenTopic(url : string) : void
+    OpenTopic(topic : Topic) : void
     {
-      _ = server.LoadReplies(url, node => _selectedTopic = node);
+      _ = server.LoadReplies(topic.Id, node => _selectedTopic = node);
     }
 
     [Html]
     public View() : string
     {
       <#
-        <div $foreach(topic in _topics) class="topic" click="$(OpenTopic(topic.Url))" visible="$(_selectedTopic == null)">
-          <span class="topic-name">$(topic.Name)</span>
-          <span class="topic-comment-count">Ответов: $(topic.Comments)</span>
-          <span class="topic-author">Автор: $(topic.Author)</span>
-          <span class="topic-rating">Рейтинг: $(topic.Rating)</span>
+        <div $foreach(topic in _topics) class="topic" click="$(OpenTopic(topic))" visible="$(_selectedTopic == null)">
+          <div class="topic-rating-box">
+            <div>$(topic.Rating)</div>
+            <span class="agrees">$(topic.Agrees)</span>
+            <span class="disagrees">$(topic.Disagrees)</span>
+          </div>
+          <div class="topic-description">
+            <span class="topic-name">$(topic.Name)</span>          
+            <span class="topic-comment-count">
+              Ответов: 
+              <strong>$(topic.Comments)</strong>, последний $(topic.LastUpdatedOn) от
+              <strong>$(topic.LastAnswerBy)</strong>
+            </span>
+            <span class="topic-author">Автор: $(topic.Author)</span>
+            <span class="topic-rating">Рейтинг: $(topic.Rating)</span>
+            <span class="topic-createdon">Создан: $(topic.CreatedOn)</span>
+            <span $when(topic.Smiles > 0) class="topic-smiles" >
+              Улыбок:             
+              <span $foreach(_ in Enumerable.Range(0, topic.Smiles))>
+                :)
+              </span>
+            </span>
+          </div>
         </div>
         <div $when(_selectedTopic != null)>
           <div template="$_selectedTopic" />
@@ -60,9 +92,9 @@ namespace Rsdn
         TopicLoader.GetTopicList(url);
       }
 
-      public LoadReplies(url : string) : CommentNode
+      public LoadReplies(id : int) : CommentNode
       {
-        TopicLoader.LoadReplies(url)
+        TopicLoader.LoadReplies(id)
       }
     }
   }

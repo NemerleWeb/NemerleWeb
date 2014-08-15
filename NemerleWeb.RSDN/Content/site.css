@@ -2,6 +2,7 @@ body, html {
     height:100%;
     margin: 0;
     padding: 0;
+    background-color: #f3f3f3;
 }
 
 body {
@@ -56,16 +57,12 @@ a img {
 .node .node-icon {
     display: block;
     float: left;
-    width: 18px;
-    height: 18px;
 }
 
 .node .node-caption {
     display: block;
-    padding-left: 25px;
+    padding-left: 35px;
     padding-right: 26px;
-    background-repeat: no-repeat;
-    background-image: url(http://www.rsdn.ru/Images/forum18.png);
 }
 
 .node .node-caption.is-active {
@@ -179,7 +176,6 @@ a img {
     width: 300px;
     height: 100%;
     overflow: auto;
-    background-color: white;
 }
 
 .right {
@@ -249,24 +245,60 @@ a img {
 }
 
 .topic {
-    background-color: #eee;
-    margin: 2px;
+    margin: 2px 2px 2px 5px;
     padding: 10px 20px;
+    border-left: 1px solid #ccc;
+    height: 50px;
+    background-color: #fff;
 }
 
 .topic:hover {
-    background-color: #ccc;
+    background-color: #efefef;
     cursor: pointer;
+}
+
+.topic-rating-box {
+    float: left;
+    width: 45px;
+    padding: 10px 2px 2px 2px;
+    font-family: monospace;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.topic-rating-box .agrees {
+    color: #228b22;
+}
+
+.topic-rating-box .disagrees {
+    color: red;
+}
+
+.topic-description {
+    display: inline-block;
 }
 
 .topic-name {
     display: block;
+    font-size: 16px
 }
 
-.topic-comment-count, .topic-author, .topic-rating {
-    display: inline-block;
-    width: 110px;
+.topic-comment-count {
+    display: block;
     font-size: 12px;
+    color: #555;
+}
+
+.topic-author, .topic-rating, .topic-createdon {
+    width: 120px;
+}
+
+.topic-author, .topic-rating, .topic-createdon, .topic-smiles {
+    display: inline-block;
+    font-size: 12px;
+    color: #555;
 }
 
 .comment-node {

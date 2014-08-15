@@ -17,8 +17,7 @@ namespace Rsdn
   {    
     public mutable static Instance : MainPage;
     public enum State { | Tree | Content | JumpList };
-    
-    
+        
     public Pinned : Pinned { get; set; }
     
     Root : TreeNode { get; set; }

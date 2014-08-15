@@ -20,32 +20,55 @@ namespace Rsdn.Tree.Models
   {
     public GetTopicList(url : string) : IEnumerable[TopicList.Topic]
     {
-      def url = "http://www.rsdn.ru/Forum/MsgList.aspx?group=" + url.Substring(url.Trim('/').LastIndexOf('/')).Trim('/');
-      def doc = HtmlWeb().Load(url);
-      
-      def rows = doc.DocumentNode.SelectNodes("//table[@id='tbl']/tr");
+      def forum = url.Substring(url.Trim('/').LastIndexOf('/')).Trim('/');
 
-      rows.Skip(1).Take(rows.Count - 2).Select(row => {
+      using(client = WebClient()) {
+        client.Encoding = System.Text.Encoding.UTF8;
+        def topicsJson = client.DownloadString($"http://www.rsdn.ru/rs/forum/$(forum)/topics");
+        def reply = JsonConvert.DeserializeAnonymousType(topicsJson, new ( 
+          total = 0,
+          topics = array[new (
+            answersCount = 0,
+            createdOn = "",        
+            id = 0,
+            authorNick = "",
+            lastAnswerBy = "",
+            lastUpdatedOn = "",
+            topicRate = 0,
+            topicRateCount = 0,
+            topicAgrees = 0,
+            topicDisagrees = 0,
+            topicSmiles = 0,
+            subject = ""        
+        )]));
+
+        def topics = reply.topics;
         
-        def name = row.SelectSingleNode(".//table//td[@nowrap]").InnerText;
-        def url = row.SelectSingleNode(".//table//td[@nowrap]//a").Attributes["href"]?.Value;
-        def author = row.SelectSingleNode("./td[2]").InnerText;
-        def rating = row.SelectSingleNode("./td[3]").InnerText;
-        def comments = row.SelectSingleNode("./td[4]").InnerText;
+        def formatDateTime(str : string) {
+          str.Substring(5)
+             .Substring(0, 11)
+             .Replace('-', '.')
+             .Replace('T', ' ');
+        }      
 
-        TopicList.Topic(name, author, rating, comments, url);
-      });
+        topics.Skip(1).Take(reply.total - 2).Select(topic =>
+          TopicList.Topic(topic.subject, 
+                          if(string.IsNullOrWhiteSpace(topic.authorNick)) "Аноним" else topic.authorNick, 
+                          topic.topicRate, 
+                          topic.answersCount, 
+                          topic.id,
+                          topic.lastAnswerBy,
+                          formatDateTime(topic.lastUpdatedOn),
+                          formatDateTime(topic.createdOn),
+                          topic.topicAgrees,
+                          topic.topicDisagrees,
+                          topic.topicSmiles)
+        );
+      }
     }
 
-    public LoadReplies(url : string) : CommentNode
+    public LoadReplies(id : int) : CommentNode
     {
-      def start = url.LastIndexOf('/');
-      def end = url.LastIndexOf('.');
-
-      when (start == -1 || end == -1)
-        return CommentNode("", [], 0);
-
-      def id = url.Substring(start + 1, (end - start) - 1);
       def replies = WebClient().DownloadString($"http://www.rsdn.ru/rs/topic/$(id)/replies");
       def replyObjects = JsonConvert.DeserializeAnonymousType(replies, array[new (
         id = 0,
@@ -86,10 +109,7 @@ namespace Rsdn.Tree.Models
         } else []
       }
 
-      _ = replyObjects;
-
-      def topicId = int.Parse(id);
-      def res = CommentNode(loadReplyText(topicId).Result, getChildNodes(topicId, 1), 0);
+      def res = CommentNode(loadReplyText(id).Result, getChildNodes(id, 1), 0);
       res
     }
   }
