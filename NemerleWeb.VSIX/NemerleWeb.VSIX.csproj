@@ -1,10 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VsSDKInstall>$(MSBuildProjectDirectory)\..\ExternalDependences\vssdk2012\</VsSDKInstall>
     <VsixSchemaPath>$(VsSDKInstall)\Schemas\VSIXManifestSchema.xsd</VsixSchemaPath>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -45,36 +50,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\NemerleWeb.NugetPackage\NemerleWeb.1.0.0.nupkg">
+    <Content Include="..\NemerleWeb.NugetPackage\NemerleWeb.1.0.2.nupkg">
       <Link>packages\NemerleWeb.1.0.0.nupkg</Link>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\NemerleWeb.NugetPackage\jQuery.1.6.4.nupkg">
-      <Link>packages\jQuery.1.6.4.nupkg</Link>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.1.1.2.nupkg">
-      <Link>packages\Microsoft.AspNet.SignalR.1.1.2.nupkg</Link>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.Client.1.1.2.nupkg">
-      <Link>packages\Microsoft.AspNet.SignalR.Client.1.1.2.nupkg</Link>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.Core.1.1.2.nupkg">
-      <Link>packages\Microsoft.AspNet.SignalR.Core.1.1.2.nupkg</Link>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.JS.1.1.2.nupkg">
-      <Link>packages\Microsoft.AspNet.SignalR.JS.1.1.2.nupkg</Link>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.Owin.1.1.2.nupkg">
-      <Link>packages\Microsoft.AspNet.SignalR.Owin.1.1.2.nupkg</Link>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.SystemWeb.1.1.2.nupkg">
-      <Link>packages\Microsoft.AspNet.SignalR.SystemWeb.1.1.2.nupkg</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="..\NemerleWeb.NugetPackage\Microsoft.Owin.Host.SystemWeb.1.0.1.nupkg">
@@ -83,6 +60,34 @@
     </Content>
     <Content Include="..\NemerleWeb.NugetPackage\Owin.1.0.nupkg">
       <Link>packages\Owin.1.0.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.1.2.0.nupkg">
+      <Link>packages\Microsoft.AspNet.SignalR.1.2.0.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.Client.1.2.0.nupkg">
+      <Link>packages\Microsoft.AspNet.SignalR.Client.1.2.0.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.Core.1.2.0.nupkg">
+      <Link>packages\Microsoft.AspNet.SignalR.Core.1.2.0.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.JS.1.2.0.nupkg">
+      <Link>packages\Microsoft.AspNet.SignalR.JS.1.2.0.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.Owin.1.2.0.nupkg">
+      <Link>packages\Microsoft.AspNet.SignalR.Owin.1.2.0.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\Microsoft.AspNet.SignalR.SystemWeb.1.2.0.nupkg">
+      <Link>packages\Microsoft.AspNet.SignalR.SystemWeb.1.2.0.nupkg</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\NemerleWeb.NugetPackage\jQuery.1.10.2.nupkg">
+      <Link>packages\jQuery.1.10.2.nupkg</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="source.extension.vsixmanifest">

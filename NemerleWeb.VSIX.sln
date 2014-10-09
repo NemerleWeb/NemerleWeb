@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NemerleWeb.VSIX", "NemerleWeb.VSIX\NemerleWeb.VSIX.csproj", "{47789AB8-5ACC-47DA-BDF7-78A47286A1E3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B1454534-CABD-4ABE-CC8E-DDFF34F51B14} = {B1454534-CABD-4ABE-CC8E-DDFF34F51B14}

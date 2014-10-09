@@ -31,4 +31,3 @@ peg-parser/Json/Nemerle.Json/Scripts/NemerleWeb/*.js
 peg-parser/JSParser/Scripts/NemerleWeb/*.js
 peg-parser/Nemerle.Peg/Scripts/NemerleWeb/*.js
 peg-parser/TSParserPeg/Scripts/NemerleWeb/*.js
-/NemerleWeb.NugetPackage/*.nupkg

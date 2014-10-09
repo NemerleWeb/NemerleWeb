@@ -87,15 +87,15 @@
             <SpecificVersion>False</SpecificVersion>
             <HintPath>$(Nemerle)\Nemerle.Peg.dll</HintPath>
         </Reference>
-        <Reference Include="NemerleWeb, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="NemerleWeb, Version=1.0.2.0, Culture=neutral, PublicKeyToken=null">
           <Name>NemerleWeb</Name>
           <AssemblyName>NemerleWeb.dll</AssemblyName>
-          <HintPath>$nugetpackagesfolder$NemerleWeb.1.0.1\lib\net45\NemerleWeb.dll</HintPath>
+          <HintPath>$nugetpackagesfolder$NemerleWeb.1.0.2\lib\net45\NemerleWeb.dll</HintPath>
         </Reference>
-        <Reference Include="NemerleWeb.TypedJS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="NemerleWeb.TypedJS, Version=1.0.2.0, Culture=neutral, PublicKeyToken=null">
           <Name>NemerleWeb.TypedJS</Name>
           <AssemblyName>NemerleWeb.TypedJS.dll</AssemblyName>
-          <HintPath>$nugetpackagesfolder$NemerleWeb.1.0.1\lib\net45\NemerleWeb.TypedJS.dll</HintPath>
+          <HintPath>$nugetpackagesfolder$NemerleWeb.1.0.2\lib\net45\NemerleWeb.TypedJS.dll</HintPath>
         </Reference>
         <Reference Include="mscorlib" />
         <Reference Include="Microsoft.CSharp" />
@@ -212,7 +212,7 @@
     <ItemGroup>
         <MacroReference Include="NemerleWeb.Macros">
             <Private>True</Private>
-            <HintPath>$nugetpackagesfolder$NemerleWeb.1.0.1\lib\net45\NemerleWeb.Macros.dll</HintPath>
+            <HintPath>$nugetpackagesfolder$NemerleWeb.1.0.2\lib\net45\NemerleWeb.Macros.dll</HintPath>
         </MacroReference>
         <MacroReference Include="NemerleWeb.Peg.Macros">
             <Name>Nemerle.Peg.Macros</Name>
