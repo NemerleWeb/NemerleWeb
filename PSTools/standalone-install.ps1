@@ -38,7 +38,7 @@ if(!$vsInstallDir -and (test-path 'HKLM:\Software\Microsoft\VisualStudio\11.0'))
 	$vsInstallDir = (get-itemproperty 'HKLM:\Software\Microsoft\VisualStudio\11.0').InstallDir
 }
 
-if(test-path 'HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\11.0') {
+if(!$vsInstallDir -and (test-path 'HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\11.0')) {
 	$vsInstallDir = (get-itemproperty 'HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\11.0').InstallDir
 }
 
@@ -49,7 +49,7 @@ if($vsInstallDir) {
 	$webClient.DownloadFile('http://www.nemerleweb.com/installer/NemerleWeb.VSIX.vsix', $vsixPath)
 	
 	$vsixInstaller = join-path $vsInstallDir VSIXInstaller.exe
-
+	
 	& "$vsixInstaller" /quiet $vsixPath
 
 	write-host "Visual Studio extension installed" -ForegroundColor Green
