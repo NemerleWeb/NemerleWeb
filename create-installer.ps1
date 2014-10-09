@@ -1,7 +1,7 @@
 $msbuild = "$env:SystemRoot\Microsoft.NET\Framework\v4.0.30319\msbuild.exe"
-iex "$msbuild NemerleWeb.VSIX.sln /p:Configuration=Release"
+iex "$msbuild NemerleWeb.VSIX.sln /p:Configuration=Debug"
 
-copy .\NemerleWeb.VSIX\bin\Release\NemerleWeb.VSIX.vsix NemerleWeb.Website\Installer\
+copy .\NemerleWeb.VSIX\bin\Debug\NemerleWeb.VSIX.vsix NemerleWeb.Website\Installer\
 
 if(test-path .\NemerleWeb.ProjectTemplate\bin) {
     Remove-Item .\NemerleWeb.ProjectTemplate\bin -Force -Recurse
