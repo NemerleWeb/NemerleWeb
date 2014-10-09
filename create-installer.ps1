@@ -1,7 +1,5 @@
-if(-not (test-path .\NemerleWeb.VSIX\bin\Release\NemerleWeb.VSIX.vsix)) {
-    $msbuild = "$env:SystemRoot\Microsoft.NET\Framework\v4.0.30319\msbuild.exe"
-    iex "$msbuild NemerleWeb.VSIX.sln /p:Configuration=Release"
-}
+$msbuild = "$env:SystemRoot\Microsoft.NET\Framework\v4.0.30319\msbuild.exe"
+iex "$msbuild NemerleWeb.VSIX.sln /p:Configuration=Release"
 
 copy .\NemerleWeb.VSIX\bin\Release\NemerleWeb.VSIX.vsix NemerleWeb.Website\Installer\
 
