@@ -161,7 +161,7 @@ namespace Rsdn
             </div>
           </div>
           <div visible="$(CurrentState == State.Content)" class="mobile-right">
-            <iframe src="$(SelectedNodeUrl)" frameborder="0" border="0" />
+            <div template="$(TopicList)" />
           </div>
           <div $when(CurrentState == State.JumpList) class="jump-list">
             <div template="$(Pinned.Node)" />

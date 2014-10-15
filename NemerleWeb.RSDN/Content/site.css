@@ -379,3 +379,36 @@ a img {
 .lineQuote.level3 {
     color: #9fd095;
 }
+
+.m .c:before {
+font-family: FontAwesome;
+font-style: normal;
+font-weight: normal;
+font-variant: normal;
+line-height: 1;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+content: '?';
+color: #d0d0d0;
+font-size: 23px;
+margin-left: -48px;
+height: 12px;
+display: block;
+}
+
+.m .c {
+font-family: Consolas,"Courier New",Courier,monospace;
+background-color: #f4f4f4;
+border: 1px solid #d0d0d0;
+border-left-width: 4px;
+color: #000;
+display: block;
+margin: 4px 30px 4px 30px;
+padding: 2px 10px;
+white-space: pre;
+overflow: auto;
+}
+
+.m .kw {
+color: blue;
+}
