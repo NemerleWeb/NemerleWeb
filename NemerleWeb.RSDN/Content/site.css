@@ -318,18 +318,24 @@ a img {
     margin: 0 -20px 2px 0;
     padding: 10px 10px;
     background-color: #efefef;
-    border-left: 1px solid #c0c0c0;
-    border-top: 1px solid #c0c0c0;
-    border-bottom: 1px solid #c0c0c0;
 }
 
 .comment-node.even, .comment-meta.even {
-    background-color: #dfdfdf;
+    background-color: #dddddd;
+}
+
+.comment-meta.even:hover {
+    background-color: #d9d9d9;
 }
 
 .comment-meta {
     font-size: 12px;
     margin: 10px -20px 2px 0;
+    cursor: pointer;
+}
+
+.comment-meta:hover {
+    background-color: #e9e9e9;
 }
 
 .comment-author {
@@ -360,4 +366,16 @@ a img {
     color: #333;
     opacity: 0.5;
     padding-top: 80px;
+}
+
+.lineQuote.level1 {
+    color: #137900;
+}
+
+.lineQuote.level2 {
+    color: #74b967;
+}
+
+.lineQuote.level3 {
+    color: #9fd095;
 }

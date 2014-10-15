@@ -86,7 +86,7 @@ namespace Rsdn.Tree.Models
       def mapByParentId = replies.GroupBy(r => r.parentId)
                                  .ToDictionary(g => g.Key, g => g);
 
-      def mapJsonToCommentNode(a, children, depth) {
+      def mapJsonToCommentNode(a, children : List[CommentNode], depth, isVisible) {
         CommentNode(a.text.Replace(" src=\'/", " src=\'http://www.rsdn.ru/"), 
                     if(string.IsNullOrWhiteSpace(a.authorNick)) "Аноним" else a.authorNick,
                     a.rate,
@@ -97,18 +97,24 @@ namespace Rsdn.Tree.Models
                     a.subject,
                     FormatDateTime(a.createdOn),
                     children, 
-                    depth)
+                    depth, isVisible)
       }
 
+      def getChildNodeCount(parentNodeId) {
+        mutable childNodes;
+        if(mapByParentId.TryGetValue(parentNodeId, out childNodes)) childNodes.Count()
+        else 0
+      }
+      
       def getChildNodes(parentNodeId, depth) {
         mutable childNodes;
   
         if(mapByParentId.TryGetValue(parentNodeId, out childNodes)) {
-          childNodes.Map(c => mapJsonToCommentNode(c, getChildNodes(c.id, depth + 1), depth))
+          childNodes.Map(c => mapJsonToCommentNode(c, getChildNodes(c.id, depth + 1).ToList(), depth, getChildNodeCount(parentNodeId) <= 1))
         } else []
       }
 
-      def mainComment = mapJsonToCommentNode(mapById[id], getChildNodes(id, 1), 0);      
+      def mainComment = mapJsonToCommentNode(mapById[id], getChildNodes(id, 1).ToList(), 0, true);
       mainComment
     }
 

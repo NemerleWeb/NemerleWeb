@@ -27,15 +27,26 @@ namespace Rsdn
     public Smiles : int;
     public Subject : string;
     public CreatedOn : string;
-    public Children : list[CommentNode];
+    public Children : List[CommentNode];
     public Depth : int;
-
+    public mutable IsVisible : bool;
+    
+    public TotalReplies : int
+    {
+        get { Children.Select(c => c.TotalReplies + 1).Sum() }
+    }
+    
+    public ToggleVisibility() : void
+    {
+        IsVisible = !IsVisible;
+    }
+    
     [Html]
     public View() : string
     {
       <#
-        <div class="comment-meta" css-even="$(Depth % 2 == 0)">
-          <span class="comment-subject">$Subject</span>
+        <div class="comment-meta" css-even="$(Depth % 2 == 0)" click="$ToggleVisibility">
+          <span class="comment-subject">$(Subject + " (ответов: " + TotalReplies + ")")</span>
           <span class="comment-author">$Author</span>
           <span class="comment-createdon">$CreatedOn</span>
           <span class="comment-rating">$(RateCount + "(" + Rate + ")")</span>
@@ -48,7 +59,7 @@ namespace Rsdn
             </span>
           </span>
         </div>
-        <div class="comment-node" css-even="$(Depth % 2 == 0)">              
+        <div class="comment-node" css-even="$(Depth % 2 == 0)" visible="$IsVisible">              
           <div html="$Html" />
           <div $foreach(child in Children) template="$child" />
         </div>
