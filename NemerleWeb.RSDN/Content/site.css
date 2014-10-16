@@ -40,6 +40,7 @@ a img {
 
 .node a {
     color: #1e90ff;
+    cursor: pointer;
 }
 
 .node a:hover {
@@ -257,7 +258,6 @@ a img {
     margin: 2px 2px 2px 5px;
     padding: 10px 20px;
     border-left: 1px solid #ccc;
-    height: 50px;
     background-color: #fff;
 }
 
@@ -290,7 +290,9 @@ a img {
 }
 
 .topic-description {
-    display: inline-block;
+    display: block;
+    float-left: 45px;
+    overflow: hidden;
 }
 
 .topic-name {
