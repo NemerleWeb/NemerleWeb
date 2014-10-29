@@ -46,7 +46,6 @@ namespace Rsdn
     {
       <#
         <div class="comment-meta" css-even="$(Depth % 2 == 0)" click="$ToggleVisibility">
-          <span class="comment-subject">$(Subject + " (ответов: " + TotalReplies + ")")</span>
           <span class="comment-author">$Author</span>
           <span class="comment-createdon">$CreatedOn</span>
           <span class="comment-rating">$(RateCount + "(" + Rate + ")")</span>
@@ -59,7 +58,7 @@ namespace Rsdn
             </span>
           </span>
         </div>
-        <div class="comment-node" css-even="$(Depth % 2 == 0)" visible="$IsVisible">              
+        <div class="comment-node" css-even="$(Depth % 2 == 0)">              
           <div html="$Html" />
           <div $foreach(child in Children) template="$child" />
         </div>
