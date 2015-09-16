@@ -29,7 +29,9 @@ namespace Rsdn
       CreatedOn : string;
       Agrees : int;
       Disagrees : int;
-      Smiles : int
+      Smiles : int;
+      public LolIconCount : int { get { Smiles / 3; } }
+      public SmileIconCount : int { get { Smiles % 3; } }
     }
 
     private mutable _url : string;
@@ -85,10 +87,8 @@ namespace Rsdn
             <span class="topic-rating">Рейтинг: $(topic.Rating)</span>
             <span class="topic-createdon">Создан: $(topic.CreatedOn)</span>
             <span $when(topic.Smiles > 0) class="topic-smiles" >
-              Улыбок:             
-              <span $foreach(_ in Enumerable.Range(0, topic.Smiles))>
-                :)
-              </span>
+              <img $foreach(_ in Enumerable.Range(0, topic.LolIconCount)) class="rate-ref-img" src="http://www.rsdn.ru/Forum/Images/lol.gif" alt=":)))" />
+              <img $foreach(_ in Enumerable.Range(0, topic.SmileIconCount)) class="rate-ref-img" src="http://www.rsdn.ru/Forum/Images/smile.gif" alt=":)))" />
             </span>
           </div>
         </div>

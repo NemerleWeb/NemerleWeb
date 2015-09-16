@@ -423,6 +423,7 @@ $<#
 <div id="nweb-start"></div>
 $resources
 $declarations
+<script src="/Scripts/nweb.js" type="text/javascript"></script>
 <script>
 $$(function() {  
   nweb.go(new $unitName($callParms));

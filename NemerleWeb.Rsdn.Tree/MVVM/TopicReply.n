@@ -29,7 +29,9 @@ namespace Rsdn
     public CreatedOn : string;
     public Children : List[CommentNode];
     public Depth : int;
-    public mutable IsVisible : bool;
+    public mutable IsVisible : bool;    
+    public LolIconCount : int { get { Smiles / 3; } }
+    public SmileIconCount : int { get { Smiles % 3; } }
     
     public TotalReplies : int
     {
@@ -46,17 +48,46 @@ namespace Rsdn
     {
       <#
         <div class="comment-meta" css-even="$(Depth % 2 == 0)" click="$ToggleVisibility">
-          <span class="comment-author">$Author</span>
-          <span class="comment-createdon">$CreatedOn</span>
-          <span class="comment-rating">$(RateCount + "(" + Rate + ")")</span>
-          <span class="comment-agrees">+$Agrees</span>
-          /
-          <span class="comment-disagrees">-$Agrees</span>
-          <span $when(Smiles > 0) class="comment-smiles">
-            <span $foreach(_ in Enumerable.Range(0, Smiles))>
-              :)
-            </span>
-          </span>
+          <div class="comment-header">
+            $Subject
+          </div>
+          
+          <div class="comment-info">
+            <table>
+              <tr>
+                <td class="comment-from">
+                  От:
+                </td>
+                <td class="comment-author">
+                  $Author
+                </td>
+              </tr>
+              
+              <tr>
+                <td class="comment-date">
+                  Дата:
+                </td>
+                <td>
+                  $CreatedOn
+                </td>
+              </tr>
+              
+              <tr $when(RateCount > 0 || Agrees > 0 || Smiles > 0)>
+                <td class="comment-rate">
+                  Оценка:
+                </td>
+                <td>
+                  <span $when(RateCount > 0) class="comment-rating">$(Rate + " (" + RateCount + ")")</span>
+                  <span $when(Agrees > 0) class="comment-agrees">+$Agrees</span>                  
+                  <span $when(Disagrees > 0) class="comment-disagrees">-$Disagrees</span>
+                  <span $when(Smiles > 0) class="comment-smiles">
+                    <img $foreach(_ in Enumerable.Range(0, LolIconCount)) class="rate-ref-img" src="http://www.rsdn.ru/Forum/Images/lol.gif" alt=":)))" />
+                    <img $foreach(_ in Enumerable.Range(0, SmileIconCount)) class="rate-ref-img" src="http://www.rsdn.ru/Forum/Images/smile.gif" alt=":)))" />
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </div>
         </div>
         <div class="comment-node" css-even="$(Depth % 2 == 0)">              
           <div html="$Html" />

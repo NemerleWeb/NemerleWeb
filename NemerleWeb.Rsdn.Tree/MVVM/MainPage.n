@@ -165,7 +165,6 @@ namespace Rsdn
           </div>
           <div $when(CurrentState == State.JumpList) class="jump-list">
             <div template="$(Pinned.Node)" />
-            <div template="$Popular" />
           </div>
         </div>
       #>
