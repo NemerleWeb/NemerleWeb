@@ -350,16 +350,16 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.11.1.intellisense.js">
+    <Content Include="Scripts\jquery-1.11.3.intellisense.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.11.1.js">
+    <Content Include="Scripts\jquery-1.11.3.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.11.1.min.js">
+    <Content Include="Scripts\jquery-1.11.3.min.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.11.1.min.map">
+    <Content Include="Scripts\jquery-1.11.3.min.map">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\jquery.signalR-1.2.0.js">
@@ -502,7 +502,7 @@
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v14.0\WebApplications\Microsoft.WebApplication.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets. -->
   <PropertyGroup>

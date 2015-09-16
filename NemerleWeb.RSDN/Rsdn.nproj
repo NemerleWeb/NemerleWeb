@@ -189,6 +189,9 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="favicon.ico">
+      <SubType>Content</SubType>
+    </Content>
     <Compile Include="Controllers\HomeController.n" />
     <Compile Include="Global.asax.n">
       <DependentUpon>Global.asax</DependentUpon>
@@ -225,28 +228,16 @@
     <Content Include="Scripts\bootstrap.min.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.10.1.intellisense.js">
+    <Content Include="Scripts\jquery-1.11.3.intellisense.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.10.1.js">
+    <Content Include="Scripts\jquery-1.11.3.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.10.1.min.js">
+    <Content Include="Scripts\jquery-1.11.3.min.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.10.1.min.map">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\jquery-1.11.1.intellisense.js">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\jquery-1.11.1.js">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\jquery-1.11.1.min.js">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Scripts\jquery-1.11.1.min.map">
+    <Content Include="Scripts\jquery-1.11.3.min.map">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\jquery.cookie.js">

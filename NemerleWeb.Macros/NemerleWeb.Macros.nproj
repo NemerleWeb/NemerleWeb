@@ -202,16 +202,16 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.11.1.intellisense.js">
+    <Content Include="Scripts\jquery-1.11.3.intellisense.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.11.1.js">
+    <Content Include="Scripts\jquery-1.11.3.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.11.1.min.js">
+    <Content Include="Scripts\jquery-1.11.3.min.js">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.11.1.min.map">
+    <Content Include="Scripts\jquery-1.11.3.min.map">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Scripts\jquery.signalR-1.2.0.js">
