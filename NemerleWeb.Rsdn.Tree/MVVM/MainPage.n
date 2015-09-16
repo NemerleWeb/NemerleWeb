@@ -47,7 +47,7 @@ namespace Rsdn
       IsMobile = window.document.body.clientWidth < 1000;
               
       _ = server.GetTopNodes(nodes => {
-        console.log("loaded top node");
+        // console.log("loaded top node");
         Root = TreeNode() <- (
           Children = nodes.ToList()
         );

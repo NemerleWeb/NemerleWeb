@@ -217,13 +217,13 @@ namespace NemerleWeb
                  .Select(fname => (fname, if(fname.Contains("_fields_")) 1 else 0))
                  .OrderBy((_, priority) => priority)
                  .Select(((fname, _), _) => 
-      $<# <script type="text/javascript" src="\$(fname)"></script>$(Environment.NewLine)#>);
+      $<# <script type="text/javascript" src="/$(NormalizeUri(fname))"></script>$(Environment.NewLine)#>);
     }
     
     public GetScripts() : IEnumerable[string]
     {
       [$<#
-<script type="text/javascript" src="\$CombinedScriptsFilename"></script> #>]      
+<script type="text/javascript" src="/$(NormalizeUri(CombinedScriptsFilename))"></script> #>]      
     }
     
     public GetTemplatesForType(typeName : string) : IEnumerable[string]
@@ -246,7 +246,12 @@ $content
     public GetNemerleWebScripts() : string
     {
       $<#
-<script type="text/javascript" src="\$ResourcesFilename"></script> #>
+<script type="text/javascript" src="/$(NormalizeUri(ResourcesFilename))"></script> #>
+    }
+    
+    private NormalizeUri(s : string) : string
+    {
+      s.Replace("\\", "/")
     }
   }
   

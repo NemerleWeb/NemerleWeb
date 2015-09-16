@@ -55,7 +55,7 @@ namespace Rsdn
       when(!string.IsNullOrWhiteSpace(term)) {        
         _ = server.Search(term, nodes => {
           
-          _ = console.log(nodes.Length);
+          // _ = console.log(nodes.Length);
           
           foreach(node in nodes) {
             match(node.Icon) {
