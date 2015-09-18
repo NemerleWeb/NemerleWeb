@@ -15,6 +15,7 @@ packages
 /NemerleWeb.NugetPackage/lib/net45/*.dll
 /NemerleWeb.NugetPackage/lib/net45/*.pdb
 
+.vs/
 /PSTools/ItemTemplate.zip
 /PSTools/ProjectTemplate.zip
 /PSTools/Installer
