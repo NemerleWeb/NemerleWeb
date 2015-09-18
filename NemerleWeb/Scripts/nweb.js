@@ -1,8 +1,8 @@
-(function() {
+(function () {
     "use strict";
 
     var nweb = {
-        go: function(model, tpl, dest, fromDebugger) {
+        go: function (model, tpl, dest, fromDebugger) {
             if (nweb["debugger"] && !fromDebugger)
                 nweb["debugger"](model);
 
@@ -12,10 +12,10 @@
 
             nweb.applyBindings(model, body, nweb.bindings, []);
             nweb.invalidate(nweb.bindings);
-          
+
             $(window).trigger("nweb-initialized");
         },
-        binds: function(name) {
+        binds: function (name) {
             var binds = {
                 "nw-foreach": nweb.getRepeatBinding,
                 "nw-text": nweb.getTextBinding,
@@ -33,7 +33,7 @@
                 "nw-apply": nweb.getEventsBinding
             };
 
-            var tryFindComplexBinder = function() {
+            var tryFindComplexBinder = function () {
                 if (name.indexOf("nw-css-") == 0) return nweb.getCssBinding;
                 if (name.indexOf("nw-style-") == 0) return nweb.getStyleBinding;
                 if (name.indexOf("nw-event-") == 0) return nweb.getEventBinding;
@@ -44,13 +44,13 @@
             return !!binder ? binder : tryFindComplexBinder();
         },
 
-        doesAllowMultipleBindings: function(attrName) {
+        doesAllowMultipleBindings: function (attrName) {
             return attrName === "nw-css" ||
                 attrName === "nw-style" ||
                 attrName === "nw-event" ||
                 attrName === "nw-attr";
         },
-        applyBindings: function(model, el, bindings, loopStack) {
+        applyBindings: function (model, el, bindings, loopStack) {
             if (!el)
                 throw "Argument null or undefined exception: el in applyBindings";
             if (el.nodeType !== 1)
@@ -103,39 +103,39 @@
             for (var l = 0; l < el.childNodes.length; l++)
                 nweb.applyBindings(model, el.childNodes[l], bindingsForChildren, loopStack);
         },
-        getTextBinding: function(model, el, bindings, loopStack, attrVal) {
+        getTextBinding: function (model, el, bindings, loopStack, attrVal) {
             var expr = nweb.parseExpression(model, attrVal, loopStack);
             return {
                 el: el,
-                getValue: function() {
+                getValue: function () {
                     return nweb.getParsedValue(model, expr, loopStack);
                 },
-                apply: function(value) {
+                apply: function (value) {
                     el.innerHTML = nweb.utils.htmlEncode(value);
                 }
             };
         },
-        getHtmlBinding: function(model, el, bindings, loopStack, attrVal) {
+        getHtmlBinding: function (model, el, bindings, loopStack, attrVal) {
             var expr = nweb.parseExpression(model, attrVal, loopStack);
             return {
                 el: el,
-                getValue: function() {
+                getValue: function () {
                     return nweb.getParsedValue(model, expr, loopStack);
                 },
-                apply: function(value) {
+                apply: function (value) {
                     el.innerHTML = value;
                 }
             };
         },
-        getCssBinding: function(model, el, bindings, loopStack, attrVal, attrName) {
+        getCssBinding: function (model, el, bindings, loopStack, attrVal, attrName) {
             var className = attrName.substr(7);
             var expr = nweb.parseExpression(model, attrVal, loopStack);
             return {
                 el: el,
-                getValue: function() {
+                getValue: function () {
                     return nweb.getParsedValue(model, expr, loopStack);
                 },
-                apply: function(value) {
+                apply: function (value) {
                     if (value)
                         $(el).addClass(className);
                     else
@@ -143,15 +143,15 @@
                 }
             };
         },
-        getAttrBinding: function(model, el, bindings, loopStack, attrVal, attrName) {
+        getAttrBinding: function (model, el, bindings, loopStack, attrVal, attrName) {
             var attr = attrName.substr(3);
             var expr = nweb.parseExpression(model, attrVal, loopStack);
             return {
                 el: el,
-                getValue: function() {
+                getValue: function () {
                     return nweb.getParsedValue(model, expr, loopStack);
                 },
-                apply: function(value) {
+                apply: function (value) {
                     if (attr === "class") {
                         el.className = value;
                     } else {
@@ -160,28 +160,28 @@
                 }
             };
         },
-        getStyleBinding: function(model, el, bindings, loopStack, attrVal, attrName) {
+        getStyleBinding: function (model, el, bindings, loopStack, attrVal, attrName) {
             var styleValue = attrVal;
             var styleName = attrName.substr(9);
             var expr = nweb.parseExpression(model, styleValue, loopStack);
             return {
                 el: el,
-                getValue: function() {
+                getValue: function () {
                     return nweb.getParsedValue(model, expr, loopStack);
                 },
-                apply: function(value) {
+                apply: function (value) {
                     $(el).css(styleName, value);
                 }
             };
         },
-        getVisibleBinding: function(model, el, bindings, loopStack, attrVal) {
+        getVisibleBinding: function (model, el, bindings, loopStack, attrVal) {
             var expr = nweb.parseExpression(model, attrVal, loopStack);
             return {
                 el: el,
-                getValue: function() {
+                getValue: function () {
                     return nweb.getParsedValue(model, expr, loopStack);
                 },
-                apply: function(value) {
+                apply: function (value) {
                     if (value)
                         $(el).show();
                     else
@@ -189,22 +189,22 @@
                 }
             };
         },
-        getDisableBinding: function(model, el, bindings, loopStack, attrVal, isEnable) {
+        getDisableBinding: function (model, el, bindings, loopStack, attrVal, isEnable) {
             var expr = nweb.parseExpression(model, attrVal, loopStack);
             return {
                 el: el,
-                getValue: function() {
+                getValue: function () {
                     return nweb.getParsedValue(model, expr, loopStack);
                 },
-                apply: function(value) {
+                apply: function (value) {
                     $(el).prop("disabled", value && !isEnable);
                 }
             };
         },
-        getEnableBinding: function(model, el, bindings, loopStack, attrVal) {
+        getEnableBinding: function (model, el, bindings, loopStack, attrVal) {
             return nweb.getDisableBinding(model, el, bindings, loopStack, attrVal, true);
         },
-        getValueBinding: function(model, el, bindings, loopStack, attrVal) {
+        getValueBinding: function (model, el, bindings, loopStack, attrVal) {
             var expr = nweb.parseExpression(model, attrVal, loopStack);
             var exprWithReturn = expr;
 
@@ -217,7 +217,7 @@
             var isSelectElement = $el[0].tagName.toUpperCase() === "SELECT";
             var invalidationEvent = isTextElement ? "keyup" : "change";
             var getValueExpr = isSelectElement ? "nweb.getValue($el[0])" : "$el.val()";
-            var tryGetNumberExpr = "nweb.utils.tryGetNumber("+getValueExpr+")";
+            var tryGetNumberExpr = "nweb.utils.tryGetNumber(" + getValueExpr + ")";
             if (typeof parsedValue === "number") {
                 $el.on(invalidationEvent, function () {
                     nweb.execute(function () {
@@ -234,7 +234,7 @@
             }
 
             if (!(isSelectElement && parsedValue == null))
-              nweb.setValue($el[0], parsedValue);
+                nweb.setValue($el[0], parsedValue);
 
             return {
                 el: el,
@@ -246,7 +246,7 @@
                 }
             };
         },
-        getCheckedBinding: function(model, el, bindings, loopStack, attrVal) {
+        getCheckedBinding: function (model, el, bindings, loopStack, attrVal) {
             var expr = nweb.parseExpression(model, attrVal, loopStack);
             var $el = $(el);
             var exprWithReturn = expr;
@@ -254,23 +254,23 @@
             if (expr.indexOf("return ") == 0)
                 expr = expr.slice(7);
 
-            $(el).change(function() {
-                nweb.execute(function() {
+            $(el).change(function () {
+                nweb.execute(function () {
                     eval(nweb.utils.makeAssignExpression(expr, "$el.prop('checked')"));
                 });
             });
 
             return {
                 el: el,
-                getValue: function() {
+                getValue: function () {
                     return nweb.getParsedValue(model, exprWithReturn, loopStack);
                 },
-                apply: function(value) {
+                apply: function (value) {
                     $el.prop("checked", value);
                 }
             };
         },
-        getRepeatBinding: function(model, el, bindings, loopStack, attrVal) {
+        getRepeatBinding: function (model, el, bindings, loopStack, attrVal) {
             var $el = $(el);
             var repeat = /(.+)\sin\s(.+)/.exec(attrVal);
             var html = el.outerHTML;
@@ -282,7 +282,7 @@
                 isExprTuple = true;
                 var tupleObjList = JSON.parse(repeat[1]);
                 for (var i = 0; i < tupleObjList.length; i++)
-                  tupleDecls.push(tupleObjList[i]);
+                    tupleDecls.push(tupleObjList[i]);
             }
 
             //$el = nweb.utils.replaceWith($el, $("<!-- repeat " + expr + " -->"));
@@ -301,7 +301,7 @@
 
                     return !nweb.utils.areArraysEqual(binding.array, binding.appliedArray);
                 },
-                getValue: function() {
+                getValue: function () {
                     var ret = nweb.getParsedValue(model, expr, loopStack);
 
                     if (ret !== undefined && ret !== null && ret.toArray) {
@@ -319,7 +319,7 @@
                         return ret;
                     }
                 },
-                apply: function(value) {
+                apply: function (value) {
                     binding.appliedArray = binding.array;
 
                     var array = value;
@@ -353,17 +353,17 @@
             };
             return binding;
         },
-        getTemplateBinding: function(model, el, bindings, loopStack, attrVal) {
+        getTemplateBinding: function (model, el, bindings, loopStack, attrVal) {
             var $el = $(el);
             var parsedExpr = nweb.parseExpression(model, attrVal, loopStack);
             var isComplexBinding = attrVal.indexOf("${") == 0 && attrVal[attrVal.length - 1] == '}';
 
-            var getTemplateModel = function(value) {
+            var getTemplateModel = function (value) {
                 if (isComplexBinding) return value[0];
                 return value;
             };
 
-            var getTemplateName = function(value) {
+            var getTemplateName = function (value) {
                 if (isComplexBinding) return nweb.utils.getTemplateName(value[0], value[1]);
                 return nweb.utils.getTemplateName(value, "View");
             };
@@ -373,27 +373,29 @@
             var binding = {
                 el: $el,
                 subBindings: [],
-                getValue: function() {
+                generatedEls: [],
+                getValue: function () {
                     return getTemplateModel(nweb.getParsedValue(model, parsedExpr, loopStack));
                 },
-                apply: function(newModel) {
+                apply: function (newModel) {
                     var parsedValue = nweb.getParsedValue(model, parsedExpr, loopStack);
 
                     $el = nweb.utils.replaceWith($el, $($("#" + getTemplateName(parsedValue)).html()).removeAttr("nw-template"));
 
                     nweb.eraseGeneratedElements(binding);
 
-                    jQuery.each($el, function(i, e) {
+                    jQuery.each($el, function (i, e) {
                         nweb.applyBindings(newModel, e, binding.subBindings, loopStack, true);
+                        binding.generatedEls.push(e);
                     });
                 }
             };
             return binding;
         },
-        getWhenBinding: function(model, el, bindings, loopStack, attrVal, attrName, isUnless) {
+        getWhenBinding: function (model, el, bindings, loopStack, attrVal, attrName, isUnless) {
             var $el = $(el);
             var expr = nweb.parseExpression(model, attrVal, loopStack);
-            
+
             //$el = nweb.utils.replaceWith($el, $("<!-- " + expr + " -->"));
             el.__nw_is_conditional = true;
 
@@ -401,10 +403,10 @@
                 el: el,
                 isWhen: true,
                 subBindings: [],
-                getValue: function() {
+                getValue: function () {
                     return nweb.getParsedValue(model, expr, loopStack);
                 },
-                apply: function(value) {
+                apply: function (value) {
                     if (value && !isUnless) {
                         //$el = nweb.utils.replaceWith($el, $(html));
 
@@ -426,47 +428,49 @@
 
             return binding;
         },
-        getUnlessBinding: function(model, el, bindings, loopStack, attrVal, attrName) {
+        getUnlessBinding: function (model, el, bindings, loopStack, attrVal, attrName) {
             return nweb.getWhenBinding(model, el, bindings, loopStack, attrVal, attrName, true);
         },
-        getClickBinding: function(model, el, bindings, loopStack, attrVal) {
+        getClickBinding: function (model, el, bindings, loopStack, attrVal) {
             var parsed = nweb.parseExpression(model, attrVal, loopStack);
-            $(el).on("click", function(e) {
-                nweb.execute(function() {
+            $(el).on("click", function (e) {
+                window.event = e;
+
+                nweb.execute(function () {
                     nweb.getParsedValue(model, parsed, loopStack);
                 });
                 return false;
             });
         },
-        getSubmitBinding: function(model, el, bindings, loopStack, attrVal) {
+        getSubmitBinding: function (model, el, bindings, loopStack, attrVal) {
             var parsed = nweb.parseExpression(model, attrVal, loopStack);
-            $(el).on("submit", function() {
-                nweb.execute(function() {
+            $(el).on("submit", function () {
+                nweb.execute(function () {
                     nweb.getParsedValue(model, parsed, loopStack);
                 });
             });
         },
-        getEventsBinding: function(model, el, bindings, loopStack, attrVal) {
+        getEventsBinding: function (model, el, bindings, loopStack, attrVal) {
             var parsed = nweb.parseExpression(model, attrVal, loopStack);
             var method = nweb.getParsedValue(model, parsed, loopStack, el);
             method.apply(el);
         },
-        getEventBinding: function(model, el, bindings, loopStack, attrVal, attrName) {
+        getEventBinding: function (model, el, bindings, loopStack, attrVal, attrName) {
             var eventName = attrName.substr(9);
             var methodString = nweb.parseExpression(model, attrVal, loopStack);
             var method = nweb.getParsedValue(model, methodString, loopStack, el);
 
-            $(el).bind(eventName, function(e) {
+            $(el).bind(eventName, function (e) {
                 nweb.invalidate();
                 method(e);
                 nweb.invalidate();
             });
         },
-        isWordCharacter: function(chr) {
+        isWordCharacter: function (chr) {
             return (chr >= 'a' && chr <= 'z') || (chr >= 'A' && chr <= 'Z') || chr === '_';
         },
         /// Replace all loopStack[i].name identifiers to loopStack[<index>]
-        applyLoopStackToExpr: function(expr, loopStack) {
+        applyLoopStackToExpr: function (expr, loopStack) {
             for (var i = loopStack.length - 1; i >= 0; i--) {
                 var loop = loopStack[i];
 
@@ -503,7 +507,7 @@
             }
             return expr;
         },
-        parseExpression: function(model, expr, loopStack) {
+        parseExpression: function (model, expr, loopStack) {
             if (expr === "_nw_self")
                 return "model";
             if (expr.length > 0 && expr[0] == "$")
@@ -512,7 +516,7 @@
             return e.replace(/_nw_self\./g, "model.");
         },
         parsedValueCache: {},
-        getParsedValue: function(model, parsedExpr, loopStack, returnFunction) {
+        getParsedValue: function (model, parsedExpr, loopStack, returnFunction) {
             if (parsedExpr.length === 0)
                 return null;
             else {
@@ -541,7 +545,7 @@
                 }
             }
         },
-        eraseGeneratedElements: function(binding) {
+        eraseGeneratedElements: function (binding) {
             if (!!binding.generatedEls)
                 for (var i = 0; i < binding.generatedEls.length; i++)
                     binding.generatedEls[i].remove();
@@ -549,14 +553,14 @@
                 for (var j = 0; j < binding.subBindings.length; j++)
                     nweb.eraseGeneratedElements(binding.subBindings[j]);
         },
-        execute: function(code) {
+        execute: function (code) {
             code();
             nweb.invalidate(nweb.bindings);
         },
         invalidationCount: 0,
         changeFoundCount: 0,
-        invalidate: function(bindings, indent, selfCall) {
-            var createBindingsTree = function(b) {
+        invalidate: function (bindings, indent, selfCall) {
+            var createBindingsTree = function (b) {
                 var newObj = {};
                 for (var ii = 0; ii < b.length; ii++) {
                     if (!b[ii]) continue;
@@ -570,7 +574,7 @@
                 return newObj;
             };
 
-            var getTotalBindingsCount = function(b) {
+            var getTotalBindingsCount = function (b) {
                 var declCount = 0;
                 for (var ii = 0; ii < b.length; ii++) {
                     if (!b[ii]) continue;
@@ -610,8 +614,7 @@
 
                     if (nweb.utils.isArray(newValue)) {
                         if (!binding.oldValue ||
-                            ((binding.hasChanged && binding.hasChanged(newValue) || !nweb.utils.areArraysEqual(newValue, binding.oldValue))))
-                        {
+                            ((binding.hasChanged && binding.hasChanged(newValue) || !nweb.utils.areArraysEqual(newValue, binding.oldValue)))) {
                             changeFound = true;
                             binding.apply(newValue);
                         }
@@ -635,47 +638,47 @@
             } while (changeFound && !selfCall);
 
             if (!selfCall) {
-              $(window).trigger("nweb-invalidated");
-              nweb.invalidationCount = 0;
-              nweb.changeFoundCount = 0;
+                $(window).trigger("nweb-invalidated");
+                nweb.invalidationCount = 0;
+                nweb.changeFoundCount = 0;
             }
 
             return changeFound;
         },
-        savePosition: function($el) {
+        savePosition: function ($el) {
             $el[0].__nw_prev = $el.prev();
             $el[0].__nw_parent = $el.parent();
         },
-        restoreInSavedPosition: function($el) {
+        restoreInSavedPosition: function ($el) {
             if ($el[0].__nw_prev.length > 0)
                 $el[0].__nw_prev.after($el);
             else
                 $el[0].__nw_parent.prepend($el);
         },
-        getOptionValue: function(option) {
-          if (typeof option[nweb.dataKey] !== "undefined")
-            return option[nweb.dataKey];
-          else
-            return $(option).val();
+        getOptionValue: function (option) {
+            if (typeof option[nweb.dataKey] !== "undefined")
+                return option[nweb.dataKey];
+            else
+                return $(option).val();
         },
-        getValue: function(el) {
+        getValue: function (el) {
             if (el.tagName === "SELECT") {
                 var selected = $("option:selected", el)[0];
 
                 if (selected === "undefined" || selected === null)
-                  selected = $("option", el)[0];
+                    selected = $("option", el)[0];
 
                 if (selected === "undefined" || selected === null)
-                  return; //return undefined if no options were found
+                    return; //return undefined if no options were found
 
                 return nweb.getOptionValue(selected);
             } else {
                 return $(el).val();
             }
         },
-        setValue: function(el, val) {
+        setValue: function (el, val) {
             if (el.tagName === "SELECT") {
-                var toSelect = $("option", el).filter(function() {
+                var toSelect = $("option", el).filter(function () {
                     return nweb.getOptionValue(this) == val;
                 }).prop("selected", false);
                 toSelect.prop("selected", true);
@@ -693,17 +696,17 @@
     window.nweb = nweb;
 
     nweb.utils = {
-        isArray: function(obj) {
+        isArray: function (obj) {
             return Object.prototype.toString.call(obj) === '[object Array]';
         },
-        isFunction: function(obj) {
+        isFunction: function (obj) {
             return obj && {}.toString.call(obj) === '[object Function]';
         },
-        firstPropertyOrUndefined: function(obj) {
+        firstPropertyOrUndefined: function (obj) {
             for (var v in obj) return v;
             return undefined;
         },
-        toTypedObject: function(obj) {
+        toTypedObject: function (obj) {
             if (obj != null && !!obj.$type) {
                 var typename = obj.$type.replace(/\./g, "_").replace(/\+/g, "_").replace(/(.+),.+/g, "$1");
 
@@ -742,10 +745,10 @@
             }
             return obj;
         },
-        getObjectType: function(obj) {
+        getObjectType: function (obj) {
             return Object.prototype.toString.call(obj).match(/^\[object (.*)\]$/)[1];
         },
-        isTuple: function(obj) {
+        isTuple: function (obj) {
             return !!obj.$type && obj.$type.indexOf('Nemerle.Builtins.Tuple`') === 0;
         },
         normalizeObjectForServer: function (obj) {
@@ -775,7 +778,7 @@
             }
 
             var result = {};
-            var isFunction = function(m) {
+            var isFunction = function (m) {
                 var isGeneratedMethod = nweb.utils.getObjectType(m) === 'Object' && nweb.utils.getObjectType(m[""]) === 'Function';
                 var isNormalFunction = nweb.utils.getObjectType(m) === 'Function';
                 return isGeneratedMethod || isNormalFunction;
@@ -791,29 +794,29 @@
             }
             return result;
         },
-        getTemplateName: function(model, viewName) {
+        getTemplateName: function (model, viewName) {
             if (!model)
                 throw "Model passed in template() cannot be null or undefined. Make sure, you initialized members that are used in templating.";
 
             return nweb.utils.getConstructorName(model) + "_N_" + viewName;
         },
-        getConstructorName: function(model) {
+        getConstructorName: function (model) {
             var funcNameRegex = /function (.{1,})\(/;
             var results = (funcNameRegex).exec(model.constructor.toString());
             return (results && results.length > 1) ? results[1] : "";
         },
-        htmlEncode: function(value) {
+        htmlEncode: function (value) {
             return $('<div/>').text(value).html();
         },
-        htmlDecode: function(value) {
+        htmlDecode: function (value) {
             return $('<div/>').html(value).text();
         },
-        getElementAttributes: function(el) {
+        getElementAttributes: function (el) {
             var arr = [];
             for (var i = 0, attrs = el.attributes, l = attrs.length; i < l; i++) {
                 arr.push(attrs[i]);
             }
-            arr.sort(function(a, b) {
+            arr.sort(function (a, b) {
                 if (a.nodeName === "nw-foreach")
                     return -2;
                 if (a.nodeName === "nw-when" || a.nodeName === "nw-unless")
@@ -822,11 +825,14 @@
             });
             return arr;
         },
-        replaceWith: function($el, $newEl) {
+        replaceWith: function ($el, $newEl) {
+            for (var i = 0; i < $el.length - 1; i++)
+                $($el[i]).remove();
+
             $el.replaceWith($newEl);
             return $newEl;
         },
-        makeAssignExpression: function(expr, value) {
+        makeAssignExpression: function (expr, value) {
             var m = /(get_([^\.]+))\(\)$/;;
             var setExpr = expr.replace(m, "set_$2");
 
@@ -835,7 +841,7 @@
             else
                 return setExpr + "(" + value + ");";
         },
-        getFieldsAndProperties: function(model) {
+        getFieldsAndProperties: function (model) {
             var result = [];
             var meta = model.__nweb_meta;
 
@@ -863,35 +869,35 @@
 
             return result;
         },
-        loadTemplate: function(modelName) {
+        loadTemplate: function (modelName) {
 
         },
-        tryGetNumber: function(val) {
+        tryGetNumber: function (val) {
             return +val ? +val : val;
         },
 
         // Creates lambda and returns what the function returns.
         // You can pass arguments to the constructor in the rest.
         // Pay attention, second argument is starting object.
-        createLambda: function(func, res) {
+        createLambda: function (func, res) {
             res = (typeof res !== "undefined") ? res : {};
             if (func.prototype !== null) {
                 res.__proto__ = func.prototype;
             }
             return func.apply(res, Array.prototype.slice.call(arguments, 2));
         },
-    };    
+    };
 
-// Console wrappers
+    // Console wrappers
 
-    function noOp() {}
+    function noOp() { }
 
     var hasWindowConsole = typeof window.console !== "undefined";
 
     nweb.utils.console = {};
     nweb.utils.console.log =
         hasWindowConsole && typeof window.console.log !== "undefined"
-        ? function() { window.console.log.apply(window.console, arguments); }
+        ? function () { window.console.log.apply(window.console, arguments); }
         : noOp;
     nweb.utils.console.logLine = function (s) {
         nweb.utils.console.log(s);
@@ -899,7 +905,7 @@
     };
     nweb.utils.console.debug =
         hasWindowConsole && typeof window.console.debug !== "undefined"
-        ? function() { window.console.debug.apply(window.console, arguments); }
+        ? function () { window.console.debug.apply(window.console, arguments); }
         : noOp;
     nweb.utils.console.debugLine = function (s) {
         nweb.utils.console.debug(s);
@@ -907,12 +913,12 @@
     };
     nweb.utils.console.error =
         hasWindowConsole && typeof window.console.error !== "undefined"
-        ? function() { window.console.error.apply(window.console, arguments); }
+        ? function () { window.console.error.apply(window.console, arguments); }
         : noOp;
 
-// End Console wrappers
+    // End Console wrappers
 
-// Parsing
+    // Parsing
 
     nweb.utils.tryParse = function (parseFunction, s, result) {
         // Check arguments
@@ -962,7 +968,7 @@
         return false;
     };
 
-// End Parsing
+    // End Parsing
 
     nweb.setCookie = function (name, value, days) {
         var expires = "";
@@ -989,17 +995,17 @@
     };
 
     if (nweb["debugger"]) {
-      nweb.utils.areArraysEqual = function (l, r) {
+        nweb.utils.areArraysEqual = function (l, r) {
             if (l.length !== r.length)
-              return false;
-          
+                return false;
+
             return JSON.stringify(l) === JSON.stringify(r);
         };
     } else {
-      nweb.utils.areArraysEqual = function (l, r) {
+        nweb.utils.areArraysEqual = function (l, r) {
             if (r.length !== l.length)
-              return false;
-          
+                return false;
+
             for (var i = 0, len = l.length; i < len; i++)
                 if (l[i] !== r[i]) {
                     if (typeof l[i] === 'undefined' && typeof r[i] !== 'undefined')
@@ -1015,7 +1021,7 @@
     }
 
     nweb.collection = {
-        areArrayEqual: function(arr1, arr2) {
+        areArrayEqual: function (arr1, arr2) {
             if (arr1.length !== arr2.length)
                 return false;
 
@@ -1029,19 +1035,19 @@
 
     nweb.templateCollection = {};
 
-//#region CLR Typing
+    //#region CLR Typing
     //#endregion
 
     function arrayEnumerator() {
         var obj = this;
-        return (function() {
+        return (function () {
             return {
                 __enumeratorIndex: -1,
                 Current: null,
                 get_Current: function () { return this.Current; },
-                current: function() { return this.Current; },
-                dispose: function() { },
-                moveNext: function() {
+                current: function () { return this.Current; },
+                dispose: function () { },
+                moveNext: function () {
                     if (this.__enumeratorIndex >= obj.length) {
                         return false;
                     }
@@ -1057,18 +1063,18 @@
     // Adding prototype methods
     Array.prototype.getEnumerator = arrayEnumerator;
 
-    Array.prototype.hd = function() {
+    Array.prototype.hd = function () {
         return this[0];
     };
 
-    Array.prototype.tl = function() {
+    Array.prototype.tl = function () {
         return this.slice(1);
     };
 
     Array.prototype.Head = Array.prototype.hd;
     Array.prototype.Tail = Array.prototype.tl;
 
-    Array.prototype.remove = function() {
+    Array.prototype.remove = function () {
         var what, ax;
         while (arguments.length && this.length) {
             what = arguments[--arguments.length];
@@ -1080,7 +1086,7 @@
     };
 
     if (!Array.prototype.indexOf) {
-        Array.prototype.indexOf = function(what, i) {
+        Array.prototype.indexOf = function (what, i) {
             i = i || 0;
             while (i < this.length) {
                 if (this[i] === what) return i;
@@ -1091,7 +1097,7 @@
     }
 
     // Implement Object.keys for browser which doesn't support
-    Object.keys = Object.keys || (function() {
+    Object.keys = Object.keys || (function () {
         var hasOwnProperty = Object.prototype.hasOwnProperty,
             hasDontEnumBug = !{ toString: null }.propertyIsEnumerable("toString"),
             dontEnums = [
@@ -1100,7 +1106,7 @@
             ],
             dontEnumsLength = dontEnums.length;
 
-        return function(o) {
+        return function (o) {
             if (typeof o !== "object" && typeof o !== "function" || o === null)
                 throw new TypeError("Object.keys called on a non-object");
 
@@ -1123,7 +1129,7 @@
 
     String.prototype.getEnumerator = arrayEnumerator;
 
-    window.System_String_GetHashCode = function(s) {
+    window.System_String_GetHashCode = function (s) {
         var len = s.length;
 
         if (len === 0) {
@@ -1142,27 +1148,27 @@
     };
 
     window.Nemerle_Utility_Identity_$A$$B$_ = {
-        Instance: function(x) {
+        Instance: function (x) {
             return x;
         }
     };
 
-    window.Nemerle_Core_Some_$T$__$T$_ = function(sig, val) {
+    window.Nemerle_Core_Some_$T$__$T$_ = function (sig, val) {
         this.val = val;
-        this._N_GetVariantCode = function() {
+        this._N_GetVariantCode = function () {
             return 1;
         };
     };
 
-    window.Nemerle_Core_None_$T$__$T$_ = function() {
-        this._N_GetVariantCode = function() {
+    window.Nemerle_Core_None_$T$__$T$_ = function () {
+        this._N_GetVariantCode = function () {
             return 0;
         };
     };
 
     window.Nemerle_Core_None_$T$__$T$_._N_constant_object = new window.Nemerle_Core_None_$T$__$T$_();
 
-    window.Nemerle_Core_option_$T$__$T$_ = function(sig, val) {
+    window.Nemerle_Core_option_$T$__$T$_ = function (sig, val) {
         this.val = val;
     };
 
@@ -1224,28 +1230,28 @@
     }
 
     window.System_Collections_Generic_EqualityComparer_$T$_ = {
-        get_Default: function() {
+        get_Default: function () {
             return {
                 Equals: compareObjects
             };
         }
     };
 
-    window.System_Text_StringBuilder = function() {
+    window.System_Text_StringBuilder = function () {
         this.string = "";
 
-        this.get_Length = function() {
+        this.get_Length = function () {
             return this.string.length;
         };
 
-        this.set_Length = function(newLength) {
+        this.set_Length = function (newLength) {
             if (newLength < 0) throw "Length must be positive";
 
             if (this.string.length > newLength)
                 this.string = this.string.substring(0, newLength);
         };
 
-        this.Append = function(s) {
+        this.Append = function (s) {
             if (typeof s === "object" && ("ToString" in s) &&
                 typeof s.ToString === "object" && nweb.utils.isFunction(s.ToString[""]))
                 this.string += s.ToString[""].call(s);
@@ -1254,40 +1260,40 @@
             return this;
         };
 
-        this.AppendLine = function(s) {
+        this.AppendLine = function (s) {
             switch (arguments.length) {
-            case 0:
-                return this.Append("\n");
-            case 1:
-                return this.Append(s).Append("\n");
-            default:
-                throw "Invalid number of parameters";
+                case 0:
+                    return this.Append("\n");
+                case 1:
+                    return this.Append(s).Append("\n");
+                default:
+                    throw "Invalid number of parameters";
             }
         };
 
-        this.ToString = function() {
+        this.ToString = function () {
             return this.string;
         };
     };
 
-// This is not constructor, call directly without 'new'.
-    window.System_String = function() {
+    // This is not constructor, call directly without 'new'.
+    window.System_String = function () {
         if (nweb.utils.isArray(arguments[0]))
             return arguments[0].join("");
         else
             return arguments[0];
     };
 
-// This is not constructor, call directly without 'new'.
-    window.System_Collections_Generic_List = function(arg) {
+    // This is not constructor, call directly without 'new'.
+    window.System_Collections_Generic_List = function (arg) {
         if (typeof arg === typeof 0)
             return [];
         else
             return Enumerable.from(arg).toArray();
     };
 
-// This is not constructor, call directly without 'new'.
-    window.System_Collections_Generic_Stack = function(arg) {
+    // This is not constructor, call directly without 'new'.
+    window.System_Collections_Generic_Stack = function (arg) {
         if (typeof arg === typeof 0)
             return [];
         else

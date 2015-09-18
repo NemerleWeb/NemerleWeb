@@ -2,7 +2,7 @@ body, html {
     height:100%;
     margin: 0;
     padding: 0;
-    background-color: #f3f3f3;
+    background-color: rgb(246, 246, 246);
 }
 
 body {
@@ -64,6 +64,7 @@ a img {
     display: block;
     padding-left: 35px;
     padding-right: 26px;
+    color: rgb(33, 97, 132);
 }
 
 .node .node-caption.is-active {
@@ -185,6 +186,8 @@ a img {
     float: right;
     height: 100%;
     overflow: auto;
+    color: rgb(33, 97, 132);
+    background-color: #fff;
 }
 
 .mobile-right {
@@ -247,9 +250,36 @@ a img {
     background: #333333;
 }
 
+.topic-list {
+    color: #333;
+}
+
+.topic-list th {
+    font-size: 12px;
+    background-color: rgb(224, 240, 224);
+}
+
+.topic-list td {
+    font-size: 13px;
+}
+
+.topic-list tr:nth-child(even) td {
+    background-color:rgb(244, 255, 244);
+}
+
+.topic-list tr:nth-child(odd) td {
+    background-color:rgb(232, 249, 232);
+}
+
+.topic-list td, .topic-list th {
+    padding: 1px 5px;
+}
+
 .topic-list-name {
-    margin-left: 5px;
+    margin-left: 20px;
     cursor: pointer;
+    font-size: 14px;
+    color: #333;
 }
 
 .topic-list-name:hover {
@@ -299,8 +329,8 @@ a img {
 }
 
 .topic-name {
-    display: block;
-    font-size: 16px
+    font-size: 16px;
+    font-weight: bold;
 }
 
 .topic-comment-count {
@@ -329,6 +359,7 @@ a img {
     padding: 10px 10px 0 10px;
     background-color: #ffffff;
     border-left: 1px solid #eeeeee;
+    color: #333;
 }
 
 .comment-meta.even:hover {
@@ -358,6 +389,7 @@ a img {
 
 .comment-info {
     padding-left: 5px;
+    color: #333;
 }
 
 .comment-createdon {

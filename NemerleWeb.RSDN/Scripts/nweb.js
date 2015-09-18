@@ -433,7 +433,9 @@
         },
         getClickBinding: function(model, el, bindings, loopStack, attrVal) {
             var parsed = nweb.parseExpression(model, attrVal, loopStack);
-            $(el).on("click", function(e) {
+            $(el).on("click", function (e) {
+                window.event = e;
+
                 nweb.execute(function() {
                     nweb.getParsedValue(model, parsed, loopStack);
                 });

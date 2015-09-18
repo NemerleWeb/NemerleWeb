@@ -70,28 +70,40 @@ namespace Rsdn
     {
       <#
         <h2 class="topic-list-name" click="$ReturnToList">$Name</h2>
-        <div $foreach(topic in _topics) class="topic" click="$(OpenTopic(topic))" visible="$(_selectedTopic == null)">
-          <div class="topic-rating-box">
-            <div>$(topic.Rating)</div>
-            <span class="agrees">$(topic.Agrees)</span>
-            <span class="disagrees">$(topic.Disagrees)</span>
-          </div>
-          <div class="topic-description">
-            <span class="topic-name">$(topic.Name)</span>          
-            <span class="topic-comment-count">
-              Ответов: 
-              <strong>$(topic.Comments)</strong>, последний $(topic.LastUpdatedOn) от
-              <strong>$(topic.LastAnswerBy)</strong>
-            </span>
-            <span class="topic-author">Автор: $(topic.Author)</span>
-            <span class="topic-rating">Рейтинг: $(topic.Rating)</span>
-            <span class="topic-createdon">Создан: $(topic.CreatedOn)</span>
-            <span $when(topic.Smiles > 0) class="topic-smiles" >
-              <img $foreach(_ in Enumerable.Range(0, topic.LolIconCount)) class="rate-ref-img" src="http://www.rsdn.ru/Forum/Images/lol.gif" alt=":)))" />
-              <img $foreach(_ in Enumerable.Range(0, topic.SmileIconCount)) class="rate-ref-img" src="http://www.rsdn.ru/Forum/Images/smile.gif" alt=":)))" />
-            </span>
-          </div>
-        </div>
+        <table $when(_selectedTopic == null && (_topics != null && _topics.Count > 0)) class="topic-list">
+          <tr>
+            <th colspan="2">Сообщения</th>
+            <th>Автор</th>
+            <th>#</th>
+            <th colspan="2">Ответы</th>
+          </tr>
+          <tr $foreach(topic in _topics) class="topic" click="$(OpenTopic(topic))">
+            <td>
+              <img $when(topic.Comments > 0) src="http://rsdn.ru/Forum/images/fr1.gif" />
+              <img $when(topic.Comments == 0) src="http://rsdn.ru/Forum/images/fr0.gif" />
+            </td>
+            <td class="topic-name">
+              $(topic.Name)
+            </td>
+            <td>
+              $(topic.Author)
+            </td>
+            <td>
+              <span $when(topic.Rating > 0)>
+                $(topic.Rating)                
+              </span>
+              <span $when(topic.Rating == 0 && (topic.Agrees > 0 || topic.Disagrees > 0))>
+                +/-
+              </span>
+            </td>
+            <td>
+              $(topic.Comments)
+            </td>
+            <td>              
+              $(topic.LastUpdatedOn)
+            </td>
+          </tr>
+        </table>
         <div $when(_selectedTopic != null)>
           <div template="$_selectedTopic" />
         </div>

@@ -47,12 +47,12 @@ namespace Rsdn
     public View() : string
     {
       <#
-        <div class="comment-meta" css-even="$(Depth % 2 == 0)" click="$ToggleVisibility">
+        <div class="comment-meta" css-even="$(Depth % 2 == 0)">
           <div class="comment-header">
             $Subject
           </div>
           
-          <div class="comment-info">
+          <div class="comment-info" click="$ToggleVisibility">
             <table>
               <tr>
                 <td class="comment-from">
@@ -89,7 +89,7 @@ namespace Rsdn
             </table>
           </div>
         </div>
-        <div class="comment-node" css-even="$(Depth % 2 == 0)">              
+        <div $when(IsVisible) class="comment-node" css-even="$(Depth % 2 == 0)">              
           <div html="$Html" />
           <div $foreach(child in Children) template="$child" />
         </div>

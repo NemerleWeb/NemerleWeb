@@ -44,7 +44,7 @@ namespace Rsdn.Tree.Models
 
         def topics = reply.topics;
         
-        topics.Skip(1).Take(reply.total - 2).Select(topic =>
+        topics.Select(topic =>
           TopicList.Topic(topic.subject, 
                           if(string.IsNullOrWhiteSpace(topic.authorNick)) "Аноним" else topic.authorNick, 
                           topic.topicRate, 
@@ -86,7 +86,7 @@ namespace Rsdn.Tree.Models
       def mapByParentId = replies.GroupBy(r => r.parentId)
                                  .ToDictionary(g => g.Key, g => g);
 
-      def mapJsonToCommentNode(a, children : List[CommentNode], depth, isVisible) {
+      def mapJsonToCommentNode(a, children : List[CommentNode], depth, _isVisible) {
         CommentNode(a.text.Replace(" src=\'/", " src=\'http://www.rsdn.ru/"), 
                     if(string.IsNullOrWhiteSpace(a.authorNick)) "Аноним" else a.authorNick,
                     a.rate,
@@ -97,7 +97,7 @@ namespace Rsdn.Tree.Models
                     a.subject,
                     FormatDateTime(a.createdOn),
                     children, 
-                    depth, isVisible)
+                    depth, true)
       }
 
       def getChildNodeCount(parentNodeId) {
