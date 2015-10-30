@@ -693,7 +693,11 @@ class MyUnit
       $("." + tutorialId).appendTo($(holder));
     });    
   });
+  var needsPrettify = true;
   $(window).on("nweb-invalidated", function() {
-    prettyPrint();
+    if (needsPrettify) {
+      prettyPrint();
+      needsPrettify = false;
+    }
   });
 </script>
